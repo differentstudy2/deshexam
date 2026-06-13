@@ -20,7 +20,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { 
@@ -30,14 +29,11 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { 
-  getGuideBoards, getGuideClassesByBoard, getGuideClasses, getGuideSubjectsByClass, getGuideTextbooksBySubject, getGuideChaptersByTextbook, getGuideTopicsByChapter, getTopicSections, 
-  createGuideBoard, createGuideClass, createGuideSubject, createGuideTextbook, createGuideChapter, createGuideTopic,
-  deleteGuideBoard, deleteGuideClass, deleteGuideSubject, deleteGuideTextbook, deleteGuideChapter, deleteGuideTopic,
-  updateGuideNodeTitle, migrateOldTextbooksToGuide, updateGuideNodeOrders, updateGuideNodeSEO, getGuideNodeById,
-  moveGuideNode, getGuideAllChapters, getGuideTextbooks, getGuideStats
-} from '@/lib/firebase/guide';
-import { db } from '@/lib/firebase/client';
-import { collection, query, getDocs, doc, setDoc } from 'firebase/firestore';
+  getTaxonomyNodesByTrack, getTaxonomyNodesByType, getTaxonomyNodesByParent,
+  createTaxonomyNode, updateTaxonomyNode, deleteTaxonomyNode, getTaxonomyNodeById,
+  updateTaxonomyNodeOrders, generateSlug, NodeType
+} from '@/lib/firebase/taxonomy';
+import { getTopicSections } from '@/lib/firebase/guide'; // Keeps old content fetching for topic internals
 
 const getLevelConfig = (type: string) => {
   switch (type) {
@@ -55,12 +51,12 @@ const getLevelConfig = (type: string) => {
 type TreeNodeProps = {
   node: any;
   level?: number;
-  onAddClick: (parentId: string, parentType: string, typeName: string, onSuccess: () => void) => void;
-  onBulkAddClick: (parentId: string, parentType: string, typeName: string, onSuccess: () => void) => void;
-  onEditClick: (nodeId: string, nodeType: string, nodeName: string, nodeAuthor: string | undefined, onSuccess: () => void) => void;
-  onDeleteClick: (nodeId: string, nodeType: string, nodeName: string, onSuccess: () => void) => void;
-  onSeoClick: (nodeId: string, nodeType: string, nodeData: any, onSuccess: () => void) => void;
-  onMoveClick: (nodeId: string, nodeType: string, nodeName: string, onSuccess: () => void) => void;
+  onAddClick: (parentId: string, typeName: NodeType, onSuccess: () => void) => void;
+  onBulkAddClick: (parentId: string, typeName: NodeType, onSuccess: () => void) => void;
+  onEditClick: (nodeId: string, nodeName: string, nodeAuthor: string | undefined, onSuccess: () => void) => void;
+  onDeleteClick: (nodeId: string, nodeName: string, onSuccess: () => void) => void;
+  onSeoClick: (nodeId: string, nodeData: any, onSuccess: () => void) => void;
+  onMoveClick: (nodeId: string, nodeName: string, onSuccess: () => void) => void;
   onMoveUp?: () => void;
   onMoveDown?: () => void;
   refreshParent?: () => void;
@@ -79,24 +75,13 @@ const TreeNode = ({ node, level = 0, onAddClick, onBulkAddClick, onEditClick, on
       setLoading(true);
       try {
         let fetchedChildren: any[] = [];
-        if (node.type === 'board') {
-          const res = (await getGuideClassesByBoard(node.id)) as any[];
-          fetchedChildren = res.map((r, i) => ({ id: r.id, name: r.title, type: 'class', status: r.status || 'published', author: r.author, orderIndex: r.orderIndex ?? i }));
-        } else if (node.type === 'class') {
-          const res = (await getGuideSubjectsByClass(node.id)) as any[];
-          fetchedChildren = res.map((r, i) => ({ id: r.id, name: r.title, type: 'subject', status: r.status || 'published', author: r.author, orderIndex: r.orderIndex ?? i }));
-        } else if (node.type === 'subject') {
-          const res = (await getGuideTextbooksBySubject(node.id)) as any[];
-          fetchedChildren = res.map((r, i) => ({ id: r.id, name: r.title, type: 'textbook', status: r.status || 'published', author: r.author, orderIndex: r.orderIndex ?? i }));
-        } else if (node.type === 'textbook') {
-          const res = (await getGuideChaptersByTextbook(node.id)) as any[];
-          fetchedChildren = res.map((r, i) => ({ id: r.id, name: r.title, type: 'chapter', status: r.status || 'published', author: r.author, orderIndex: r.orderIndex ?? i }));
-        } else if (node.type === 'chapter') {
-          const res = (await getGuideTopicsByChapter(node.id)) as any[];
-          fetchedChildren = res.map((r, i) => ({ id: r.id, name: r.title, type: 'topic', status: r.status || 'published', author: r.author, orderIndex: r.orderIndex ?? i }));
-        } else if (node.type === 'topic') {
+        if (node.type === 'topic') {
+          // Sections are stored inside topics, keep using old method
           const res = (await getTopicSections(node.id)) as Record<string, any>;
-          fetchedChildren = Object.keys(res).map((key, i) => ({ id: key, name: key, type: 'section', status: 'published', orderIndex: i }));
+          fetchedChildren = Object.keys(res).map((key, i) => ({ id: key, title: key, type: 'section', status: 'published', orderIndex: i }));
+        } else {
+          // Fetch children dynamically using universal taxonomy parentId mapping
+          fetchedChildren = await getTaxonomyNodesByParent(node.id);
         }
         
         fetchedChildren.sort((a, b) => a.orderIndex - b.orderIndex);
@@ -123,18 +108,18 @@ const TreeNode = ({ node, level = 0, onAddClick, onBulkAddClick, onEditClick, on
     setChildren(newChildren);
 
     try {
-      await updateGuideNodeOrders(newChildren[0].type, newChildren.map(c => ({ id: c.id, orderIndex: c.orderIndex })));
+      await updateTaxonomyNodeOrders(newChildren.map(c => ({ id: c.id, orderIndex: c.orderIndex })));
     } catch (e) {
       console.error("Failed to reorder", e);
     }
   };
 
-  const getChildTypeName = () => {
-    if (node.type === 'board') return 'Class';
-    if (node.type === 'class') return 'Subject';
-    if (node.type === 'subject') return 'Textbook';
-    if (node.type === 'textbook') return 'Chapter';
-    if (node.type === 'chapter') return 'Topic';
+  const getChildTypeName = (): NodeType | '' => {
+    if (node.type === 'board') return 'class';
+    if (node.type === 'class') return 'subject';
+    if (node.type === 'subject') return 'textbook';
+    if (node.type === 'textbook') return 'chapter';
+    if (node.type === 'chapter') return 'topic';
     return '';
   };
 
@@ -142,14 +127,14 @@ const TreeNode = ({ node, level = 0, onAddClick, onBulkAddClick, onEditClick, on
     e.stopPropagation();
     const typeName = getChildTypeName();
     if (!typeName) return;
-    onAddClick(node.id, node.type, typeName, () => handleToggle(true));
+    onAddClick(node.id, typeName, () => handleToggle(true));
   };
 
   const handleBulkAddChild = (e: React.MouseEvent) => {
     e.stopPropagation();
     const typeName = getChildTypeName();
     if (!typeName) return;
-    onBulkAddClick(node.id, node.type, typeName, () => handleToggle(true));
+    onBulkAddClick(node.id, typeName, () => handleToggle(true));
   };
 
   const hasChildren = node.type !== 'section';
@@ -169,7 +154,7 @@ const TreeNode = ({ node, level = 0, onAddClick, onBulkAddClick, onEditClick, on
           <Icon className={`w-5 h-5 ${conf.color}`} />
           <div className="flex flex-col">
             <span className={`font-semibold text-gray-800 ${level === 0 ? 'text-lg' : ''}`}>
-              {node.name}
+              {node.title || node.name}
             </span>
             {node.author && (
               <span className="text-xs text-slate-500 italic mt-0.5">Author: {node.author}</span>
@@ -203,11 +188,11 @@ const TreeNode = ({ node, level = 0, onAddClick, onBulkAddClick, onEditClick, on
                 </>
               )}
               
-              <Button variant="ghost" size="icon" className="h-8 w-8 text-amber-600 hover:bg-amber-50" onClick={(e) => { e.stopPropagation(); onEditClick(node.id, node.type, node.name, node.author, () => { if (refreshParent) refreshParent(); }); }} title="Rename">
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-amber-600 hover:bg-amber-50" onClick={(e) => { e.stopPropagation(); onEditClick(node.id, node.title || node.name, node.author, () => { if (refreshParent) refreshParent(); }); }} title="Rename">
                 <Edit2 className="w-4 h-4" />
               </Button>
               
-              <Button variant="ghost" size="icon" className="h-8 w-8 text-red-600 hover:bg-red-50" onClick={(e) => { e.stopPropagation(); onDeleteClick(node.id, node.type, node.name, () => { if (refreshParent) refreshParent(); }); }} title="Delete">
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-red-600 hover:bg-red-50" onClick={(e) => { e.stopPropagation(); onDeleteClick(node.id, node.title || node.name, () => { if (refreshParent) refreshParent(); }); }} title="Delete">
                 <Trash2 className="w-4 h-4" />
               </Button>
 
@@ -226,11 +211,11 @@ const TreeNode = ({ node, level = 0, onAddClick, onBulkAddClick, onEditClick, on
                       <Eye className="w-4 h-4 mr-2 text-emerald-500" /> View in Guide
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onSeoClick(node.id, node.type, node, () => { if (refreshParent) refreshParent(); }); }}>
+                  <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onSeoClick(node.id, node, () => { if (refreshParent) refreshParent(); }); }}>
                     <Settings className="w-4 h-4 mr-2 text-amber-500" /> SEO Settings
                   </DropdownMenuItem>
                   {(node.type === 'chapter' || node.type === 'topic') && (
-                    <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onMoveClick(node.id, node.type, node.name, () => { if (refreshParent) refreshParent(); }); }}>
+                    <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onMoveClick(node.id, node.title || node.name, () => { if (refreshParent) refreshParent(); }); }}>
                       <ArrowRightLeft className="w-4 h-4 mr-2 text-indigo-500" /> Move / Convert
                     </DropdownMenuItem>
                   )}
@@ -277,40 +262,49 @@ export function DesktopExplorer({ className }: { className?: string }) {
   const [stats, setStats] = useState({ boards: 0, classes: 0, subjects: 0, textbooks: 0, chapters: 0, topics: 0 });
 
   // Dialog States
-  const [dialogState, setDialogState] = useState({ isOpen: false, parentId: '', parentType: '', typeName: '', onSuccess: () => {} });
+  const [dialogState, setDialogState] = useState({ isOpen: false, parentId: '', typeName: '' as NodeType, onSuccess: () => {} });
   const [titleInput, setTitleInput] = useState('');
   const [authorInput, setAuthorInput] = useState('');
   const [saving, setSaving] = useState(false);
 
-  const [bulkAddDialog, setBulkAddDialog] = useState({ isOpen: false, parentId: '', parentType: '', typeName: '', onSuccess: () => {} });
+  const [bulkAddDialog, setBulkAddDialog] = useState({ isOpen: false, parentId: '', typeName: '' as NodeType, onSuccess: () => {} });
   const [bulkTextInput, setBulkTextInput] = useState('');
 
-  const [editDialog, setEditDialog] = useState({ isOpen: false, nodeId: '', nodeType: '', nodeName: '', authorName: '', onSuccess: () => {} });
+  const [editDialog, setEditDialog] = useState({ isOpen: false, nodeId: '', nodeName: '', authorName: '', onSuccess: () => {} });
   const [editTitleInput, setEditTitleInput] = useState('');
   const [editAuthorInput, setEditAuthorInput] = useState('');
   const [editing, setEditing] = useState(false);
 
-  const [seoDialog, setSeoDialog] = useState({ isOpen: false, nodeId: '', nodeType: '', onSuccess: () => {} });
+  const [seoDialog, setSeoDialog] = useState({ isOpen: false, nodeId: '', onSuccess: () => {} });
   const [seoInput, setSeoInput] = useState({ title: '', slug: '', seoTitle: '', description: '', featureImage: '', tags: '', keywords: '' });
   const [savingSeo, setSavingSeo] = useState(false);
 
-  const [deleteDialog, setDeleteDialog] = useState({ isOpen: false, nodeId: '', nodeType: '', nodeName: '', onSuccess: () => {} });
+  const [deleteDialog, setDeleteDialog] = useState({ isOpen: false, nodeId: '', nodeName: '', onSuccess: () => {} });
   const [deleting, setDeleting] = useState(false);
   const [deleteConfirmInput, setDeleteConfirmInput] = useState('');
 
-  const [moveNodeDialog, setMoveNodeDialog] = useState({ isOpen: false, nodeId: '', nodeType: '', nodeName: '', onSuccess: () => {} });
+  const [moveNodeDialog, setMoveNodeDialog] = useState({ isOpen: false, nodeId: '', nodeName: '', onSuccess: () => {} });
   const [movingNode, setMovingNode] = useState(false);
   const [moveDestinations, setMoveDestinations] = useState<any[]>([]);
   const [selectedDestination, setSelectedDestination] = useState<string>('');
 
-  const [migrationDialog, setMigrationDialog] = useState(false);
-
-  const fetchRoot = async () => {
+  const fetchRootAndStats = async () => {
     setLoading(true);
     try {
-      const cls = (await getGuideBoards()) as any[];
-      setClasses(cls.map((c, i) => ({ id: c.id, name: c.title || c.name || c.id, type: 'board', status: c.status || 'published', author: c.author, orderIndex: c.orderIndex ?? i })));
-      getGuideStats().then(setStats);
+      const allNodes = await getTaxonomyNodesByTrack('academic');
+      
+      const boards = allNodes.filter(n => n.type === 'board');
+      setClasses(boards);
+
+      setStats({
+        boards: boards.length,
+        classes: allNodes.filter(n => n.type === 'class').length,
+        subjects: allNodes.filter(n => n.type === 'subject').length,
+        textbooks: allNodes.filter(n => n.type === 'textbook').length,
+        chapters: allNodes.filter(n => n.type === 'chapter').length,
+        topics: allNodes.filter(n => n.type === 'topic').length,
+      });
+
     } catch (e) {
       console.error(e);
     } finally {
@@ -319,7 +313,7 @@ export function DesktopExplorer({ className }: { className?: string }) {
   };
 
   useEffect(() => {
-    fetchRoot();
+    fetchRootAndStats();
   }, []);
 
   const handleMoveBoard = async (index: number, direction: number) => {
@@ -331,36 +325,34 @@ export function DesktopExplorer({ className }: { className?: string }) {
     newClasses[targetIndex] = temp;
     newClasses.forEach((child, i) => { child.orderIndex = i; });
     setClasses(newClasses);
-    try { await updateGuideNodeOrders('board', newClasses.map(c => ({ id: c.id, orderIndex: c.orderIndex }))); } catch (e) { console.error(e); }
+    try { await updateTaxonomyNodeOrders(newClasses.map(c => ({ id: c.id, orderIndex: c.orderIndex }))); } catch (e) { console.error(e); }
   };
 
-  const handleOpenDialog = (parentId: string, parentType: string, typeName: string, onSuccess: () => void) => {
-    setTitleInput(''); setAuthorInput(''); setDialogState({ isOpen: true, parentId, parentType, typeName, onSuccess });
+  const handleOpenDialog = (parentId: string, typeName: NodeType, onSuccess: () => void) => {
+    setTitleInput(''); setAuthorInput(''); setDialogState({ isOpen: true, parentId, typeName, onSuccess });
   };
 
-  const handleOpenBulkAdd = (parentId: string, parentType: string, typeName: string, onSuccess: () => void) => {
-    setBulkTextInput(''); setBulkAddDialog({ isOpen: true, parentId, parentType, typeName, onSuccess });
-  };
-
-  const executeAdd = async (items: string[], parentType: string, parentId: string, author?: string) => {
-    if (parentType === 'root') for (const item of items) await createGuideBoard(item);
-    else if (parentType === 'board') for (const item of items) await createGuideClass(parentId, item);
-    else if (parentType === 'class') for (const item of items) await createGuideSubject(parentId, item);
-    else if (parentType === 'subject') for (const item of items) await createGuideTextbook(parentId, item, author);
-    else if (parentType === 'textbook') for (const item of items) await createGuideChapter(parentId, item, author);
-    else if (parentType === 'chapter') for (const item of items) await createGuideTopic(parentId, item, author);
+  const handleOpenBulkAdd = (parentId: string, typeName: NodeType, onSuccess: () => void) => {
+    setBulkTextInput(''); setBulkAddDialog({ isOpen: true, parentId, typeName, onSuccess });
   };
 
   const handleSaveDialog = async () => {
     if (!titleInput.trim()) return;
     setSaving(true);
     try {
-      const items = [titleInput.trim()]; // Single add
-      await executeAdd(items, dialogState.parentType, dialogState.parentId, authorInput);
+      await createTaxonomyNode({
+        title: titleInput.trim(),
+        slug: generateSlug(titleInput.trim()),
+        type: dialogState.typeName,
+        track: 'academic',
+        parentId: dialogState.parentId || null,
+        author: authorInput,
+        status: 'published'
+      });
       dialogState.onSuccess();
       setDialogState(prev => ({ ...prev, isOpen: false }));
       toast({ title: "Success", description: "Created successfully!" });
-      getGuideStats().then(setStats);
+      fetchRootAndStats();
     } catch (e) { toast({ title: "Error", description: "Failed to save", variant: "destructive" }); } finally { setSaving(false); }
   };
 
@@ -369,74 +361,78 @@ export function DesktopExplorer({ className }: { className?: string }) {
     setSaving(true);
     try {
       const items = bulkTextInput.split(/[\n,]/).map(s => s.trim()).filter(Boolean);
-      await executeAdd(items, bulkAddDialog.parentType, bulkAddDialog.parentId);
+      for (const item of items) {
+        await createTaxonomyNode({
+          title: item,
+          slug: generateSlug(item),
+          type: bulkAddDialog.typeName,
+          track: 'academic',
+          parentId: bulkAddDialog.parentId || null,
+          status: 'published'
+        });
+      }
       bulkAddDialog.onSuccess();
       setBulkAddDialog(prev => ({ ...prev, isOpen: false }));
       toast({ title: "Success", description: `Created ${items.length} items successfully!` });
-      getGuideStats().then(setStats);
+      fetchRootAndStats();
     } catch (e) { toast({ title: "Error", description: "Failed to save", variant: "destructive" }); } finally { setSaving(false); }
   };
 
-  const handleOpenSeo = async (nodeId: string, nodeType: string, nodeData: any, onSuccess: () => void) => {
-    const freshNode = await getGuideNodeById(nodeId) || nodeData;
+  const handleOpenSeo = async (nodeId: string, nodeData: any, onSuccess: () => void) => {
+    const freshNode = await getTaxonomyNodeById(nodeId) || nodeData;
     setSeoInput({
       title: freshNode.title || '', slug: freshNode.slug || '', seoTitle: freshNode.seoTitle || '', description: freshNode.description || '',
       featureImage: freshNode.featureImage || '', tags: Array.isArray(freshNode.tags) ? freshNode.tags.join(', ') : (freshNode.tags || ''),
       keywords: Array.isArray(freshNode.keywords) ? freshNode.keywords.join(', ') : (freshNode.keywords || '')
     });
-    setSeoDialog({ isOpen: true, nodeId, nodeType, onSuccess });
+    setSeoDialog({ isOpen: true, nodeId, onSuccess });
   };
 
   const handleSaveSeo = async () => {
     setSavingSeo(true);
     try {
-      const success = await updateGuideNodeSEO(seoDialog.nodeType, seoDialog.nodeId, {
+      await updateTaxonomyNode(seoDialog.nodeId, {
         ...seoInput, tags: seoInput.tags.split(',').map(t => t.trim()).filter(Boolean), keywords: seoInput.keywords.split(',').map(k => k.trim()).filter(Boolean)
       });
-      if (success) { toast({ title: "Success", description: "SEO metadata saved." }); setSeoDialog(prev => ({ ...prev, isOpen: false })); seoDialog.onSuccess(); }
+      toast({ title: "Success", description: "SEO metadata saved." }); setSeoDialog(prev => ({ ...prev, isOpen: false })); seoDialog.onSuccess(); 
     } catch (e) { toast({ title: "Error", description: "An error occurred.", variant: "destructive" }); } finally { setSavingSeo(false); }
   };
 
-  const handleOpenEdit = (nodeId: string, nodeType: string, nodeName: string, nodeAuthor: string | undefined, onSuccess: () => void) => {
+  const handleOpenEdit = (nodeId: string, nodeName: string, nodeAuthor: string | undefined, onSuccess: () => void) => {
     setEditTitleInput(nodeName); setEditAuthorInput(nodeAuthor || '');
-    setEditDialog({ isOpen: true, nodeId, nodeType, nodeName, authorName: nodeAuthor || '', onSuccess });
+    setEditDialog({ isOpen: true, nodeId, nodeName, authorName: nodeAuthor || '', onSuccess });
   };
 
   const handleSaveEdit = async () => {
     if (!editTitleInput.trim()) return;
     setEditing(true);
     try {
-      await updateGuideNodeTitle(editDialog.nodeId, editDialog.nodeType, editTitleInput, editAuthorInput);
-      if (editDialog.nodeType === 'board') fetchRoot();
+      await updateTaxonomyNode(editDialog.nodeId, {
+        title: editTitleInput,
+        author: editAuthorInput
+      });
       editDialog.onSuccess(); setEditDialog(prev => ({ ...prev, isOpen: false })); toast({ title: "Success", description: "Changes saved!" });
     } catch (e) { toast({ title: "Error", description: "Failed to edit item", variant: "destructive" }); } finally { setEditing(false); }
   };
 
-  const handleDeleteClick = (nodeId: string, nodeType: string, nodeName: string, onSuccess: () => void) => {
-    setDeleteDialog({ isOpen: true, nodeId, nodeType, nodeName, onSuccess }); setDeleteConfirmInput('');
+  const handleDeleteClick = (nodeId: string, nodeName: string, onSuccess: () => void) => {
+    setDeleteDialog({ isOpen: true, nodeId, nodeName, onSuccess }); setDeleteConfirmInput('');
   };
 
   const handleConfirmDelete = async () => {
     setDeleting(true);
     try {
-      const { nodeId, nodeType } = deleteDialog;
-      if (nodeType === 'board') await deleteGuideBoard(nodeId);
-      else if (nodeType === 'class') await deleteGuideClass(nodeId);
-      else if (nodeType === 'subject') await deleteGuideSubject(nodeId);
-      else if (nodeType === 'textbook') await deleteGuideTextbook(nodeId);
-      else if (nodeType === 'chapter') await deleteGuideChapter(nodeId);
-      else if (nodeType === 'topic') await deleteGuideTopic(nodeId);
-
-      if (nodeType === 'board') fetchRoot();
+      await deleteTaxonomyNode(deleteDialog.nodeId);
       deleteDialog.onSuccess(); setDeleteDialog(prev => ({ ...prev, isOpen: false })); toast({ title: "Success", description: "Deleted!" });
-      getGuideStats().then(setStats);
+      fetchRootAndStats();
     } catch (e) { toast({ title: "Error", description: "Failed to delete item.", variant: "destructive" }); } finally { setDeleting(false); }
   };
 
-  const handleMoveNodeClick = async (nodeId: string, nodeType: string, nodeName: string, onSuccess: () => void) => {
-    setMoveNodeDialog({ isOpen: true, nodeId, nodeType, nodeName, onSuccess }); setSelectedDestination('');
+  const handleMoveNodeClick = async (nodeId: string, nodeName: string, onSuccess: () => void) => {
+    setMoveNodeDialog({ isOpen: true, nodeId, nodeName, onSuccess }); setSelectedDestination('');
     try {
-      const textbooks = await getGuideTextbooks(); const chapters = await getGuideAllChapters();
+      const textbooks = await getTaxonomyNodesByType('academic', 'textbook'); 
+      const chapters = await getTaxonomyNodesByType('academic', 'chapter');
       setMoveDestinations([
         ...textbooks.map((t: any) => ({ id: t.id, name: t.title, type: 'textbook', label: `Textbook: ${t.title}` })),
         ...chapters.map((c: any) => ({ id: c.id, name: c.title, type: 'chapter', label: `Chapter: ${c.title}` }))
@@ -448,14 +444,13 @@ export function DesktopExplorer({ className }: { className?: string }) {
     if (!selectedDestination) return;
     setMovingNode(true);
     try {
-      const dest = moveDestinations.find(d => d.id === selectedDestination);
-      const res = await moveGuideNode(moveNodeDialog.nodeId, moveNodeDialog.nodeType as any, dest.id, dest.type as any);
-      if (res.success) { toast({ title: "Success", description: res.message }); moveNodeDialog.onSuccess(); fetchRoot(); setMoveNodeDialog({ ...moveNodeDialog, isOpen: false }); }
-      else { toast({ title: "Move failed", description: res.message, variant: "destructive" }); }
+      await updateTaxonomyNode(moveNodeDialog.nodeId, { parentId: selectedDestination });
+      toast({ title: "Success", description: "Successfully moved!" }); 
+      moveNodeDialog.onSuccess(); fetchRootAndStats(); setMoveNodeDialog(prev => ({ ...prev, isOpen: false })); 
     } catch (e: any) { toast({ title: "Error", description: e.message, variant: "destructive" }); } finally { setMovingNode(false); }
   };
 
-  const filteredClasses = classes.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase()));
+  const filteredClasses = classes.filter(c => (c.title || c.name || '').toLowerCase().includes(searchQuery.toLowerCase()));
 
   return (
     <div className={`space-y-6 max-w-7xl mx-auto p-4 md:p-6 ${className || ''}`}>
@@ -465,15 +460,15 @@ export function DesktopExplorer({ className }: { className?: string }) {
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
             <FolderTree className="w-7 h-7 text-[#107c41]" />
-            Guide Content Explorer
+            Guide Content (Universal API)
           </h1>
-          <p className="text-sm text-slate-500 mt-1">Navigate and manage the entire 7-level curriculum tree.</p>
+          <p className="text-sm text-slate-500 mt-1">Navigate and manage the entire 7-level academic tree.</p>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="outline" className="border-gray-200" onClick={() => handleOpenDialog('root', 'root', 'Board', fetchRoot)}>
+          <Button variant="outline" className="border-gray-200" onClick={() => handleOpenDialog('', 'board', fetchRootAndStats)}>
             <Plus className="w-4 h-4 mr-2" /> Add Board
           </Button>
-          <Button variant="outline" className="border-gray-200" onClick={() => handleOpenBulkAdd('root', 'root', 'Board', fetchRoot)}>
+          <Button variant="outline" className="border-gray-200" onClick={() => handleOpenBulkAdd('', 'board', fetchRootAndStats)}>
             <AlignLeft className="w-4 h-4 mr-2" /> Bulk Add Boards
           </Button>
         </div>
@@ -504,7 +499,7 @@ export function DesktopExplorer({ className }: { className?: string }) {
                 <TreeNode 
                   key={c.id} 
                   node={c} 
-                  refreshParent={fetchRoot} 
+                  refreshParent={fetchRootAndStats} 
                   onMoveUp={index > 0 ? () => handleMoveBoard(index, -1) : undefined} 
                   onMoveDown={index < filteredClasses.length - 1 ? () => handleMoveBoard(index, 1) : undefined} 
                   onAddClick={handleOpenDialog} 
@@ -589,7 +584,7 @@ export function DesktopExplorer({ className }: { className?: string }) {
           <DialogHeader><DialogTitle>Add New {dialogState.typeName}</DialogTitle></DialogHeader>
           <div className="py-4 space-y-4">
             <Input value={titleInput} onChange={(e) => setTitleInput(e.target.value)} placeholder={`Enter ${dialogState.typeName} title`} autoFocus />
-            {['Textbook', 'Chapter', 'Topic'].includes(dialogState.typeName) && <Input value={authorInput} onChange={(e) => setAuthorInput(e.target.value)} placeholder="Author (Optional)" />}
+            {['textbook', 'chapter', 'topic'].includes(dialogState.typeName) && <Input value={authorInput} onChange={(e) => setAuthorInput(e.target.value)} placeholder="Author (Optional)" />}
           </div>
           <DialogFooter><Button onClick={handleSaveDialog} disabled={saving || !titleInput.trim()}>Create</Button></DialogFooter>
         </DialogContent>
@@ -615,7 +610,7 @@ export function DesktopExplorer({ className }: { className?: string }) {
           <DialogHeader><DialogTitle>Rename</DialogTitle></DialogHeader>
           <div className="py-4 space-y-4">
             <Input value={editTitleInput} onChange={(e) => setEditTitleInput(e.target.value)} placeholder="New title" autoFocus />
-            {['textbook', 'chapter', 'topic'].includes(editDialog.nodeType) && <Input value={editAuthorInput} onChange={(e) => setEditAuthorInput(e.target.value)} placeholder="Author" />}
+            <Input value={editAuthorInput} onChange={(e) => setEditAuthorInput(e.target.value)} placeholder="Author" />
           </div>
           <DialogFooter><Button onClick={handleSaveEdit} disabled={editing || !editTitleInput.trim()}>Save Changes</Button></DialogFooter>
         </DialogContent>

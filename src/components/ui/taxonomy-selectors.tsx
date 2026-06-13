@@ -4,13 +4,10 @@ import React, { useState, useEffect } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { 
-  getCategories, 
-  getSubcategories, 
-  getExams, 
-  getSubjects, 
-  getChapters,
-  getTopics 
-} from '@/lib/firebase/exam-taxonomy';
+  getTaxonomyNodesByType,
+  getTaxonomyNodesByParent,
+  TaxonomyNode
+} from '@/lib/firebase/taxonomy';
 
 interface TaxonomySelectorProps {
   onSelectionChange: (selection: {
@@ -41,12 +38,12 @@ export function ExamTaxonomySelector({
 }: TaxonomySelectorProps) {
   
   // Data States
-  const [categories, setCategories] = useState<any[]>([]);
-  const [subcategories, setSubcategories] = useState<any[]>([]);
-  const [exams, setExams] = useState<any[]>([]);
-  const [subjects, setSubjects] = useState<any[]>([]);
-  const [chapters, setChapters] = useState<any[]>([]);
-  const [topics, setTopics] = useState<any[]>([]);
+  const [categories, setCategories] = useState<TaxonomyNode[]>([]);
+  const [subcategories, setSubcategories] = useState<TaxonomyNode[]>([]);
+  const [exams, setExams] = useState<TaxonomyNode[]>([]);
+  const [subjects, setSubjects] = useState<TaxonomyNode[]>([]);
+  const [chapters, setChapters] = useState<TaxonomyNode[]>([]);
+  const [topics, setTopics] = useState<TaxonomyNode[]>([]);
 
   // Selection States
   const [selectedCat, setSelectedCat] = useState(initialValues?.category || '');
@@ -78,7 +75,7 @@ export function ExamTaxonomySelector({
     const loadCats = async () => {
       setLoading(p => ({ ...p, cat: true }));
       try {
-        const data = await getCategories();
+        const data = await getTaxonomyNodesByType('competitive', 'category');
         setCategories(data);
       } finally {
         setLoading(p => ({ ...p, cat: false }));
@@ -96,7 +93,7 @@ export function ExamTaxonomySelector({
     const loadSubs = async () => {
       setLoading(p => ({ ...p, sub: true }));
       try {
-        const data = await getSubcategories(selectedCat);
+        const data = await getTaxonomyNodesByParent(selectedCat);
         setSubcategories(data);
       } finally {
         setLoading(p => ({ ...p, sub: false }));
@@ -113,7 +110,7 @@ export function ExamTaxonomySelector({
     const loadExams = async () => {
       setLoading(p => ({ ...p, exam: true }));
       try {
-        const data = await getExams(selectedSub);
+        const data = await getTaxonomyNodesByParent(selectedSub);
         setExams(data);
       } finally {
         setLoading(p => ({ ...p, exam: false }));
@@ -130,7 +127,7 @@ export function ExamTaxonomySelector({
     const loadSubjs = async () => {
       setLoading(p => ({ ...p, subj: true }));
       try {
-        const data = await getSubjects(selectedExam);
+        const data = await getTaxonomyNodesByParent(selectedExam);
         setSubjects(data);
       } finally {
         setLoading(p => ({ ...p, subj: false }));
@@ -147,7 +144,7 @@ export function ExamTaxonomySelector({
     const loadChapters = async () => {
       setLoading(p => ({ ...p, chap: true }));
       try {
-        const data = await getChapters(selectedSubj);
+        const data = await getTaxonomyNodesByParent(selectedSubj);
         setChapters(data);
       } finally {
         setLoading(p => ({ ...p, chap: false }));
@@ -164,7 +161,7 @@ export function ExamTaxonomySelector({
     const loadTopics = async () => {
       setLoading(p => ({ ...p, topic: true }));
       try {
-        const data = await getTopics(selectedChapter);
+        const data = await getTaxonomyNodesByParent(selectedChapter);
         setTopics(data);
       } finally {
         setLoading(p => ({ ...p, topic: false }));
@@ -191,7 +188,7 @@ export function ExamTaxonomySelector({
             <SelectValue placeholder={loading.cat ? "Loading..." : "Select Category"} />
           </SelectTrigger>
           <SelectContent>
-            {categories.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
+            {categories.map(c => <SelectItem key={c.id} value={c.id}>{c.title}</SelectItem>)}
           </SelectContent>
         </Select>
       </div>
@@ -208,7 +205,7 @@ export function ExamTaxonomySelector({
             <SelectValue placeholder={!selectedCat ? "Select Category First" : loading.sub ? "Loading..." : "Select Subcategory"} />
           </SelectTrigger>
           <SelectContent>
-            {subcategories.map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}
+            {subcategories.map(s => <SelectItem key={s.id} value={s.id}>{s.title}</SelectItem>)}
           </SelectContent>
         </Select>
       </div>
@@ -225,7 +222,7 @@ export function ExamTaxonomySelector({
             <SelectValue placeholder={!selectedSub ? "Select Subcategory First" : loading.exam ? "Loading..." : "Select Exam"} />
           </SelectTrigger>
           <SelectContent>
-            {exams.map(e => <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>)}
+            {exams.map(e => <SelectItem key={e.id} value={e.id}>{e.title}</SelectItem>)}
           </SelectContent>
         </Select>
       </div>
@@ -242,7 +239,7 @@ export function ExamTaxonomySelector({
             <SelectValue placeholder={!selectedExam ? "Select Exam First" : loading.subj ? "Loading..." : "Select Subject"} />
           </SelectTrigger>
           <SelectContent>
-            {subjects.map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}
+            {subjects.map(s => <SelectItem key={s.id} value={s.id}>{s.title}</SelectItem>)}
           </SelectContent>
         </Select>
       </div>
@@ -259,7 +256,7 @@ export function ExamTaxonomySelector({
             <SelectValue placeholder={!selectedSubj ? "Select Subject First" : loading.chap ? "Loading..." : "Select Chapter"} />
           </SelectTrigger>
           <SelectContent>
-            {chapters.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
+            {chapters.map(c => <SelectItem key={c.id} value={c.id}>{c.title}</SelectItem>)}
           </SelectContent>
         </Select>
       </div>
@@ -276,7 +273,7 @@ export function ExamTaxonomySelector({
             <SelectValue placeholder={!selectedChapter ? "Select Chapter First" : loading.topic ? "Loading..." : "Select Topic"} />
           </SelectTrigger>
           <SelectContent>
-            {topics.map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
+            {topics.map(t => <SelectItem key={t.id} value={t.id}>{t.title}</SelectItem>)}
           </SelectContent>
         </Select>
       </div>

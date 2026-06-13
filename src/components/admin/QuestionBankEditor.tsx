@@ -20,6 +20,7 @@ import { collection, getDocs } from 'firebase/firestore';
 import { db, storage } from '@/lib/firebase/client';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { createQuestion, updateQuestion, bulkCreateQuestions } from '@/lib/firebase/question-bank';
+import { getTaxonomyNodesByTrack } from '@/lib/firebase/taxonomy';
 import dynamic from 'next/dynamic';
 
 const TiptapEditor = dynamic(() => import('@/components/admin/TiptapEditor').then(mod => mod.TiptapEditor), {
@@ -147,36 +148,33 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
 
   useEffect(() => {
     const fetchTaxonomies = async () => {
-        const fetchGuideCol = async (colName: string, isGuide: boolean) => {
-            try {
+        try {
+            const allAcademic = await getTaxonomyNodesByTrack('academic');
+            const allCompetitive = await getTaxonomyNodesByTrack('competitive');
+            
+            // Map the unified `title` field back to `name` which the Editor expects for its internal UI state.
+            const mapNodes = (nodes: any[]) => nodes.map(n => ({ ...n, name: n.title || n.name }));
+            
+            setBoards(mapNodes(allAcademic.filter((n: any) => n.type === 'board')));
+            setClasses(mapNodes(allAcademic.filter((n: any) => n.type === 'class')));
+            setSubjects(mapNodes(allAcademic.filter((n: any) => n.type === 'subject')));
+            setTextbooks(mapNodes(allAcademic.filter((n: any) => n.type === 'textbook')));
+            setChapters(mapNodes(allAcademic.filter((n: any) => n.type === 'chapter')));
+            setTopics(mapNodes(allAcademic.filter((n: any) => n.type === 'topic')));
+            
+            // For Exams
+            setExams(mapNodes(allCompetitive.filter((n: any) => n.type === 'exam')));
+            
+            // Years and tags were never migrated to taxonomy_nodes. Fetch them directly.
+            const fetchCol = async (colName: string) => {
                 const snap = await getDocs(collection(db, colName));
-                return snap.docs.map(d => {
-                    const data = d.data();
-                    return { id: d.id, name: data.title || data.name, isGuide, ...data };
-                });
-            } catch(e) {
-                return [];
-            }
-        };
-
-        const fetchCombinedCol = async (guideCol: string, questionCol: string) => {
-            const [g, q] = await Promise.all([fetchGuideCol(guideCol, true), fetchGuideCol(questionCol, false)]);
-            return [...g, ...q];
-        };
-
-        const [b, c, s, t, ch, tp, ex, yr, tg] = await Promise.all([
-            fetchCombinedCol('guide_boards', 'question_boards'),
-            fetchCombinedCol('guide_classes', 'question_classes'),
-            fetchCombinedCol('guide_subjects', 'question_subjects'),
-            fetchCombinedCol('guide_textbooks', 'question_textbooks'),
-            fetchCombinedCol('guide_chapters', 'question_chapters'),
-            fetchCombinedCol('guide_topics', 'question_topics'),
-            fetchGuideCol('question_exams', false),
-            fetchGuideCol('question_years', false),
-            fetchGuideCol('question_tags', false)
-        ]);
-        setBoards(b as unknown as TaxonomyNode[]); setClasses(c as unknown as TaxonomyNode[]); setSubjects(s as unknown as TaxonomyNode[]);
-        setTextbooks(t as unknown as TaxonomyNode[]); setChapters(ch as unknown as TaxonomyNode[]); setTopics(tp as unknown as TaxonomyNode[]); setExams(ex as unknown as TaxonomyNode[]); setYears(yr as unknown as TaxonomyNode[]); setTags(tg as unknown as TaxonomyNode[]);
+                return snap.docs.map(d => ({ id: d.id, name: d.data().title || d.data().name, ...d.data() }));
+            };
+            setYears(await fetchCol('question_years') as unknown as TaxonomyNode[]);
+            setTags(await fetchCol('question_tags') as unknown as TaxonomyNode[]);
+        } catch (e) {
+            console.error("Failed to load taxonomy nodes", e);
+        }
     };
 
     fetchTaxonomies();
