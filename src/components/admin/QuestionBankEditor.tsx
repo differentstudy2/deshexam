@@ -10,7 +10,9 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Switch } from '@/components/ui/switch';
 import { QuestionBankEntry, TaxonomyNode } from '@/lib/question-bank-types';
-import { Loader2, ArrowLeft, Sparkles, Play, Image as ImageIcon, Video, ShieldCheck, Upload, Trash2, X, Plus } from 'lucide-react';
+import { Loader2, ArrowLeft, Sparkles, Play, Image as ImageIcon, Video, ShieldCheck, Upload, Trash2, X, Plus, Search, ChevronDown, CheckCircle2 } from 'lucide-react';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import { slugify, cn } from '@/lib/utils';
@@ -53,6 +55,27 @@ const VERIFICATION_LEVELS = [
   'Premium Verified Content'
 ];
 
+const MD3Input = ({ label, className, ...props }: React.InputHTMLAttributes<HTMLInputElement> & { label: string }) => (
+    <div className={cn("relative border border-[#c4d6c4] rounded-xl p-3 pt-4 focus-within:border-[#4a634a] focus-within:ring-1 focus-within:ring-[#4a634a] transition-colors bg-[#fdfefd]", className)}>
+        <label className="absolute top-0 left-3 -translate-y-1/2 bg-[#fdfefd] px-1 text-xs font-medium text-[#4a634a] pointer-events-none">
+            {label}
+        </label>
+        <Input className="border-0 focus-visible:ring-0 p-0 h-auto rounded-none bg-transparent shadow-none font-medium" {...props} />
+    </div>
+);
+
+const MD3SelectField = ({ label, value, placeholder, onClick, required }: { label: string, value: string, placeholder: string, onClick: () => void, required?: boolean }) => (
+    <div onClick={onClick} className="relative border border-[#c4d6c4] rounded-xl p-3 pt-4 cursor-pointer hover:bg-[#f4f8f4] transition-colors bg-[#fdfefd]">
+        <label className="absolute top-0 left-3 -translate-y-1/2 bg-[#fdfefd] px-1 text-xs font-medium text-[#4a634a] pointer-events-none">
+            {label} {required && <span className="text-red-500">*</span>}
+        </label>
+        <div className="flex items-center justify-between min-h-[20px] mt-0.5">
+            <span className={cn("font-medium", value ? "text-slate-900" : "text-slate-400")}>{value || placeholder}</span>
+            <ChevronDown className="h-4 w-4 text-slate-400" />
+        </div>
+    </div>
+);
+
 export interface QuestionBankEditorProps {
   initialData: Partial<QuestionBankEntry>;
   onSaveComplete: () => void;
@@ -85,7 +108,6 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
   const [uploadingPairImage, setUploadingPairImage] = useState<{idx: number, side: 'left'|'right'} | null>(null);
 
   // Taxonomies for dropdowns
-  const [showGuideTaxonomy, setShowGuideTaxonomy] = useState(false);
   const [boards, setBoards] = useState<TaxonomyNode[]>([]);
   const [classes, setClasses] = useState<TaxonomyNode[]>([]);
   const [subjects, setSubjects] = useState<TaxonomyNode[]>([]);
@@ -95,6 +117,15 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
   const [tags, setTags] = useState<TaxonomyNode[]>([]);
   const [exams, setExams] = useState<TaxonomyNode[]>([]);
   const [years, setYears] = useState<TaxonomyNode[]>([]);
+
+  // Sheet State
+  const [taxonomySheet, setTaxonomySheet] = useState<{ isOpen: boolean, type: string, title: string, items: TaxonomyNode[], value: string, onSelect: (id: string) => void }>({ isOpen: false, type: '', title: '', items: [], value: '', onSelect: () => {} });
+  const [sheetSearch, setSheetSearch] = useState('');
+
+  const openTaxonomySheet = (type: string, title: string, items: TaxonomyNode[], value: string, onSelect: (id: string) => void) => {
+      setSheetSearch('');
+      setTaxonomySheet({ isOpen: true, type, title, items, value, onSelect });
+  };
 
   useEffect(() => {
     // Only update if the ID changes to avoid overwriting ongoing edits
@@ -311,29 +342,29 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
   return (
       <div className="space-y-6 pb-24">
           {(title || breadcrumbs) && (
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-4">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#eef2ec] pb-4">
                   <div>
                       {breadcrumbs && (
-                          <div className="text-sm text-slate-500 mb-1 flex items-center gap-2">
+                          <div className="text-sm text-[#4a634a] font-medium mb-1 flex items-center gap-2">
                               {breadcrumbs.map((crumb, idx) => (
                                   <React.Fragment key={idx}>
                                       <span>{crumb}</span>
-                                      {idx < breadcrumbs.length - 1 && <span>/</span>}
+                                      {idx < breadcrumbs.length - 1 && <span className="opacity-50">/</span>}
                                   </React.Fragment>
                               ))}
                           </div>
                       )}
-                      {title && <h1 className="text-3xl font-bold tracking-tight">{title}</h1>}
+                      {title && <h1 className="text-3xl font-bold tracking-tight text-[#2d3b2d]">{title}</h1>}
                   </div>
                   <div className="flex items-center gap-3">
-                      <Button variant="outline" onClick={() => {
+                      <Button variant="outline" className="rounded-full border-[#4a634a] text-[#4a634a] bg-transparent hover:bg-[#f4f8f4] px-6" onClick={() => {
                           setEditData({...editData, status: 'Draft'});
                           handleSave();
                       }} disabled={isSaving}>
                           {isSaving && editData.status === 'Draft' ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
                           Save Draft
                       </Button>
-                      <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={() => {
+                      <Button className="rounded-full bg-[#3d5a3d] hover:bg-[#2d442d] text-white px-8 shadow-sm" onClick={() => {
                           setEditData({...editData, status: 'Published'});
                           handleSave();
                       }} disabled={isSaving}>
@@ -347,13 +378,17 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
               {/* Left Section (Content, Options, Explanation) */}
               <div className="lg:col-span-2 grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* --- CARD 1: Question Content --- */}
-                  <Card className="flex flex-col rounded-xl border-slate-200/60 shadow-sm bg-white h-full">
-                      <CardHeader className="pb-3"><CardTitle className="text-lg">Question Content</CardTitle></CardHeader>
-                      <CardContent className="space-y-4 flex-1 flex flex-col">
-                          <div>
-                              <label className="text-sm font-semibold mb-1 block">Question Type <span className="text-red-500">*</span></label>
-                              <Select value={editData.questionType || 'MCQ'} onValueChange={v => setEditData({...editData, questionType: v as any})}>
-                                  <SelectTrigger className="bg-green-50/50 border-green-200 text-green-900 focus:ring-green-500"><SelectValue placeholder="Select type" /></SelectTrigger>
+                  <Card className="flex flex-col rounded-[24px] border-[#d3e3d3] shadow-sm bg-[#fdfefd] h-full overflow-hidden">
+                      <CardHeader className="pb-3 border-b border-[#eef2ec] bg-[#f8faf8]">
+                          <CardTitle className="text-lg text-[#4a634a]">Question Content</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-6 flex-1 flex flex-col pt-6">
+                              <div className="relative border border-[#c4d6c4] rounded-xl pt-3 pb-1 hover:bg-[#f4f8f4] transition-colors bg-white focus-within:border-[#4a634a] focus-within:ring-1 focus-within:ring-[#4a634a]">
+                                  <label className="absolute top-0 left-3 -translate-y-1/2 bg-white px-1 text-xs font-medium text-[#4a634a] pointer-events-none">Question Type</label>
+                                  <Select value={editData.questionType || 'MCQ'} onValueChange={v => setEditData({...editData, questionType: v as any})}>
+                                      <SelectTrigger className="border-0 focus:ring-0 shadow-none h-8 pt-0 bg-transparent font-medium text-[#2d3b2d]">
+                                          <SelectValue placeholder="Select type" />
+                                      </SelectTrigger>
                                   <SelectContent>
                                       <SelectItem value="MCQ">MCQ</SelectItem>
                                       <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>
@@ -366,29 +401,35 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                                   </SelectContent>
                               </Select>
                           </div>
+                          <MD3Input 
+                              label="Question Title (Optional)" 
+                              placeholder="E.g. Newton's First Law" 
+                              value={editData.title || ''} 
+                              onChange={e => setEditData({...editData, title: e.target.value})} 
+                          />
                           <div className="flex-1 flex flex-col">
-                              <label className="text-sm font-semibold mb-1 block">Question Text <span className="text-red-500">*</span></label>
-                              <Textarea className="flex-1 min-h-[120px] resize-none" placeholder="Enter question content here..." value={editData.questionText || ''} onChange={e => setEditData({...editData, questionText: e.target.value})} />
+                              <label className="text-sm font-semibold mb-2 block text-[#4a634a]">Question Text <span className="text-red-500">*</span></label>
+                              <Textarea className="flex-1 min-h-[120px] resize-none border-[#c4d6c4] focus-visible:ring-[#4a634a] rounded-xl" placeholder="Enter question content here..." value={editData.questionText || ''} onChange={e => setEditData({...editData, questionText: e.target.value})} />
                           </div>
-                          <div className="pt-2">
-                              <label className="text-sm font-semibold mb-2 block">Attachments</label>
-                              <div className="flex gap-3">
+                          <div className="pt-2 border-t border-[#eef2ec]">
+                              <label className="text-sm font-semibold mb-3 block text-[#4a634a]">Media Attachments</label>
+                              <div className="flex flex-wrap gap-3">
                                   {/* Image Upload Button */}
-                                  <label className="flex flex-col items-center justify-center w-24 h-20 border rounded-xl cursor-pointer hover:bg-slate-50 transition-colors bg-white">
-                                      {isUploadingMedia ? <Loader2 className="h-5 w-5 animate-spin text-slate-400 mb-1"/> : <ImageIcon className="h-6 w-6 text-slate-700 mb-1"/>}
-                                      <span className="text-[10px] font-medium text-slate-600">Upload Image</span>
+                                  <label className="flex items-center gap-2 px-4 py-2 border border-[#c4d6c4] rounded-full cursor-pointer hover:bg-[#f4f8f4] transition-colors bg-white text-sm font-medium text-[#4a634a]">
+                                      {isUploadingMedia ? <Loader2 className="h-4 w-4 animate-spin"/> : <ImageIcon className="h-4 w-4"/>}
+                                      Image
                                       <input type="file" className="hidden" accept="image/*" onChange={e => handleMediaUpload(e, 'questionImage')} disabled={isUploadingMedia} />
                                   </label>
                                   {/* Audio Upload Button */}
-                                  <label className="flex flex-col items-center justify-center w-24 h-20 border rounded-xl cursor-pointer hover:bg-slate-50 transition-colors bg-white">
-                                      {isUploadingMedia ? <Loader2 className="h-5 w-5 animate-spin text-slate-400 mb-1"/> : <Play className="h-6 w-6 text-slate-700 mb-1"/>}
-                                      <span className="text-[10px] font-medium text-slate-600">Upload Audio</span>
+                                  <label className="flex items-center gap-2 px-4 py-2 border border-[#c4d6c4] rounded-full cursor-pointer hover:bg-[#f4f8f4] transition-colors bg-white text-sm font-medium text-[#4a634a]">
+                                      {isUploadingMedia ? <Loader2 className="h-4 w-4 animate-spin"/> : <Play className="h-4 w-4"/>}
+                                      Audio
                                       <input type="file" className="hidden" accept="audio/*" onChange={e => handleMediaUpload(e, 'questionAudio')} disabled={isUploadingMedia} />
                                   </label>
                                   {/* Video Upload Button */}
-                                  <label className="flex flex-col items-center justify-center w-24 h-20 border rounded-xl cursor-pointer hover:bg-slate-50 transition-colors bg-white">
-                                      {isUploadingMedia ? <Loader2 className="h-5 w-5 animate-spin text-slate-400 mb-1"/> : <Video className="h-6 w-6 text-slate-700 mb-1"/>}
-                                      <span className="text-[10px] font-medium text-slate-600">Upload Video</span>
+                                  <label className="flex items-center gap-2 px-4 py-2 border border-[#c4d6c4] rounded-full cursor-pointer hover:bg-[#f4f8f4] transition-colors bg-white text-sm font-medium text-[#4a634a]">
+                                      {isUploadingMedia ? <Loader2 className="h-4 w-4 animate-spin"/> : <Video className="h-4 w-4"/>}
+                                      Video
                                       <input type="file" className="hidden" accept="video/*" onChange={e => handleMediaUpload(e, 'questionVideo')} disabled={isUploadingMedia} />
                                   </label>
                               </div>
@@ -420,9 +461,11 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                   </Card>
 
                   {/* --- CARD 2: Options / Answer --- */}
-                  <Card className="flex flex-col rounded-xl border-slate-200/60 shadow-sm bg-white h-full">
-                      <CardHeader className="pb-3"><CardTitle className="text-lg">{editData.questionType === 'Matching' ? 'Matching Pairs' : 'Options / Answer'}</CardTitle></CardHeader>
-                      <CardContent className="space-y-4 flex-1">
+                  <Card className="flex flex-col rounded-[24px] border-[#d3e3d3] shadow-sm bg-[#fdfefd] h-full overflow-hidden">
+                      <CardHeader className="pb-3 border-b border-[#eef2ec] bg-[#f8faf8]">
+                          <CardTitle className="text-lg text-[#4a634a]">{editData.questionType === 'Matching' ? 'Matching Pairs' : 'Options / Answer'}</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4 flex-1 pt-6">
                           {editData.questionType === 'Matching' ? (
                               <div className="space-y-3">
                                   <div className="grid grid-cols-2 gap-4">
@@ -546,24 +589,31 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                                   {['A', 'B', 'C', 'D'].map((optKey) => (
                                       <div key={optKey} className="flex items-center gap-3">
                                           <button 
-                                              className={cn("w-5 h-5 rounded-full border flex items-center justify-center shrink-0 transition-colors", editData.correctAnswer?.toUpperCase() === optKey ? "border-green-600 bg-green-600" : "border-slate-300")}
+                                              className={cn("w-6 h-6 rounded-full border flex items-center justify-center shrink-0 transition-colors", editData.correctAnswer?.toUpperCase() === optKey ? "border-[#4a634a] border-2 bg-transparent" : "border-[#c4d6c4]")}
                                               onClick={() => setEditData({...editData, correctAnswer: optKey})}
                                           >
-                                              {editData.correctAnswer?.toUpperCase() === optKey && <div className="w-2 h-2 bg-white rounded-full" />}
+                                              {editData.correctAnswer?.toUpperCase() === optKey && <div className="w-3 h-3 bg-[#4a634a] rounded-full" />}
                                           </button>
-                                          <Input className="flex-1" placeholder={`Option ${optKey}`} value={editData.options?.[optKey.toLowerCase() as keyof typeof editData.options] || ''} onChange={e => setEditData({...editData, options: {...editData.options!, [optKey.toLowerCase()]: e.target.value}})} />
+                                          <div className="flex-1">
+                                              <MD3Input label={`Option ${optKey}`} placeholder={`Option ${optKey}`} value={editData.options?.[optKey.toLowerCase() as keyof typeof editData.options] || ''} onChange={e => setEditData({...editData, options: {...editData.options!, [optKey.toLowerCase()]: e.target.value}})} />
+                                          </div>
                                           <button className="text-slate-400 hover:text-slate-600 shrink-0 px-2" onClick={() => setEditData({...editData, options: {...editData.options!, [optKey.toLowerCase()]: ''}})}><X className="w-4 h-4" /></button>
                                       </div>
                                   ))}
-                                  <div className="flex items-center gap-3 pt-2">
-                                      <button 
-                                          className={cn("w-5 h-5 rounded-full border flex items-center justify-center shrink-0 transition-colors", editData.correctAnswer?.toUpperCase() === 'E' ? "border-green-600 bg-green-600" : "border-slate-300")}
-                                          onClick={() => setEditData({...editData, correctAnswer: 'E'})}
-                                      >
-                                          {editData.correctAnswer?.toUpperCase() === 'E' && <div className="w-2 h-2 bg-white rounded-full" />}
-                                      </button>
-                                      <Input className="flex-1" placeholder="Option E (optional)" value={editData.options?.e || ''} onChange={e => setEditData({...editData, options: {...editData.options!, e: e.target.value}})} />
-                                      <button className="text-green-600 hover:text-green-700 shrink-0 px-2"><Plus className="w-5 h-5" /></button>
+                                  <div className="flex flex-col gap-3 pt-2">
+                                      <div className="flex items-center gap-3">
+                                          <button 
+                                              className={cn("w-6 h-6 rounded-full border flex items-center justify-center shrink-0 transition-colors", editData.correctAnswer?.toUpperCase() === 'E' ? "border-[#4a634a] border-2 bg-transparent" : "border-[#c4d6c4]")}
+                                              onClick={() => setEditData({...editData, correctAnswer: 'E'})}
+                                          >
+                                              {editData.correctAnswer?.toUpperCase() === 'E' && <div className="w-3 h-3 bg-[#4a634a] rounded-full" />}
+                                          </button>
+                                          <div className="flex-1">
+                                              <MD3Input label="Option E (optional)" placeholder="Option E" value={editData.options?.e || ''} onChange={e => setEditData({...editData, options: {...editData.options!, e: e.target.value}})} />
+                                          </div>
+                                          <button className="text-[#4a634a] hover:text-emerald-700 shrink-0 px-2"><Plus className="w-5 h-5" /></button>
+                                      </div>
+                                      <Button variant="outline" className="w-fit mt-2 rounded-full border-[#d3e3d3] text-[#4a634a] bg-[#fdfefd] hover:bg-[#f4f8f4]">Add Option</Button>
                                   </div>
                               </div>
                           ) : ['True/False'].includes(editData.questionType || '') ? (
@@ -620,15 +670,15 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                   </Card>
 
                   {/* --- CARD 3: Explanation --- */}
-                  <Card className="lg:col-span-2 rounded-xl border-slate-200/60 shadow-sm bg-white">
-                      <CardHeader className="flex flex-row items-center justify-between pb-2 border-b">
-                          <CardTitle className="text-lg">Explanation</CardTitle>
-                          <Button variant="outline" size="sm" onClick={handleGenerateAI} disabled={isGeneratingAI} className="text-emerald-700 border-emerald-200 bg-emerald-50 hover:bg-emerald-100 rounded-md">
+                  <Card className="lg:col-span-2 rounded-[24px] border-[#d3e3d3] shadow-sm bg-[#fdfefd] overflow-hidden">
+                      <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-[#eef2ec] bg-[#f8faf8]">
+                          <CardTitle className="text-lg text-[#4a634a]">Explanation</CardTitle>
+                          <Button variant="outline" size="sm" onClick={handleGenerateAI} disabled={isGeneratingAI} className="rounded-full text-[#4a634a] border-[#c4d6c4] bg-[#fdfefd] hover:bg-[#f4f8f4]">
                               {isGeneratingAI ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Sparkles className="h-4 w-4 mr-2" />}
-                              Generate Explanation with AI
+                              Generate with AI
                           </Button>
                       </CardHeader>
-                      <CardContent className="pt-4">
+                      <CardContent className="pt-6">
                           <div className="prose-editor-container">
                               <TiptapEditor 
                                   content={editData.explanation || ''} 
@@ -642,82 +692,71 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
               {/* Right Column: Taxonomy and Meta */}
               <div className="space-y-6 flex flex-col">
                   {/* --- CARD 4: Academic Taxonomy --- */}
-                  <Card className="rounded-xl border-slate-200/60 shadow-sm bg-white">
-                      <CardHeader className="flex flex-row items-center justify-between pb-3">
-                          <CardTitle className="text-lg">Academic Taxonomy</CardTitle>
-                          <div className="flex items-center space-x-2">
-                              <Switch id="guide-mode" checked={showGuideTaxonomy} onCheckedChange={(v) => {
-                                  setShowGuideTaxonomy(v);
-                                  setEditData({...editData, boardId: '', classId: '', subjectId: '', textbookId: '', chapterId: '', topicId: ''});
-                              }} />
-                              <label htmlFor="guide-mode" className="text-[10px] font-medium leading-none cursor-pointer text-slate-500">
-                                  Guide Only
-                              </label>
-                          </div>
+                  <Card className="rounded-[24px] border-[#d3e3d3] shadow-sm bg-[#fdfefd] overflow-hidden">
+                      <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-[#eef2ec] bg-[#f8faf8]">
+                          <CardTitle className="text-lg text-[#4a634a]">Academic Taxonomy</CardTitle>
                       </CardHeader>
-                      <CardContent className="space-y-4">
+                      <CardContent className="space-y-4 pt-6">
                           <div className="grid grid-cols-2 gap-4">
-                              <div>
-                                  <label className="text-xs font-semibold mb-1 block">Board <span className="text-red-500">*</span></label>
-                                  <Select value={editData.boardId || ''} onValueChange={v => setEditData({...editData, boardId: v, classId: '', subjectId: '', textbookId: '', chapterId: '', topicId: ''})}>
-                                      <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Board" /></SelectTrigger>
-                                      <SelectContent>{boards.filter(b => !!(b as any).isGuide === showGuideTaxonomy).map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
-                                  </Select>
-                              </div>
-                              <div>
-                                  <label className="text-xs font-semibold mb-1 block">Class <span className="text-red-500">*</span></label>
-                                  <Select value={editData.classId || ''} onValueChange={v => setEditData({...editData, classId: v, subjectId: '', textbookId: '', chapterId: '', topicId: ''})}>
-                                      <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Class" /></SelectTrigger>
-                                      <SelectContent>{classes.filter(b => !!(b as any).isGuide === showGuideTaxonomy && (!editData.boardId || (b as any).boardId === editData.boardId)).map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
-                                  </Select>
-                              </div>
+                              <MD3SelectField 
+                                  label="Board" 
+                                  placeholder="Board" 
+                                  required
+                                  value={boards.find(b => b.id === editData.boardId)?.name || ''} 
+                                  onClick={() => openTaxonomySheet('board', 'Select Board', boards.filter(b => !!(b as any).isGuide === true), editData.boardId || '', (v) => setEditData({...editData, boardId: v, classId: '', subjectId: '', textbookId: '', chapterId: '', topicId: ''}))} 
+                              />
+                              <MD3SelectField 
+                                  label="Class" 
+                                  placeholder="Class" 
+                                  required
+                                  value={classes.find(b => b.id === editData.classId)?.name || ''} 
+                                  onClick={() => openTaxonomySheet('class', 'Select Class', classes.filter(b => !!(b as any).isGuide === true && (!editData.boardId || (b as any).boardId === editData.boardId)), editData.classId || '', (v) => setEditData({...editData, classId: v, subjectId: '', textbookId: '', chapterId: '', topicId: ''}))} 
+                              />
                           </div>
-                          <div>
-                              <label className="text-xs font-semibold mb-1 block">Subject <span className="text-red-500">*</span></label>
-                              <Select value={editData.subjectId || ''} onValueChange={v => setEditData({...editData, subjectId: v, textbookId: '', chapterId: '', topicId: ''})}>
-                                  <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Subject" /></SelectTrigger>
-                                  <SelectContent>{subjects.filter(b => !!(b as any).isGuide === showGuideTaxonomy && (!editData.classId || (b as any).classId === editData.classId)).map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
-                              </Select>
-                          </div>
+                          <MD3SelectField 
+                              label="Subject" 
+                              placeholder="Subject" 
+                              required
+                              value={subjects.find(b => b.id === editData.subjectId)?.name || ''} 
+                              onClick={() => openTaxonomySheet('subject', 'Select Subject', subjects.filter(b => !!(b as any).isGuide === true && (!editData.classId || (b as any).classId === editData.classId)), editData.subjectId || '', (v) => setEditData({...editData, subjectId: v, textbookId: '', chapterId: '', topicId: ''}))} 
+                          />
                           <div className="grid grid-cols-2 gap-4">
-                              <div>
-                                  <label className="text-xs font-semibold mb-1 block text-slate-500">Textbook</label>
-                                  <Select value={editData.textbookId || ''} onValueChange={v => setEditData({...editData, textbookId: v, chapterId: '', topicId: ''})}>
-                                      <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Textbook" /></SelectTrigger>
-                                      <SelectContent>{textbooks.filter(b => !!(b as any).isGuide === showGuideTaxonomy && (!editData.subjectId || (b as any).subjectId === editData.subjectId)).map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
-                                  </Select>
-                              </div>
-                              <div>
-                                  <label className="text-xs font-semibold mb-1 block text-slate-500">Book / Guide</label>
-                                  <Select value={editData.yearId || ''} onValueChange={v => setEditData({...editData, yearId: v})}>
-                                      <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Book / Guide" /></SelectTrigger>
-                                      <SelectContent>{years.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
-                                  </Select>
-                              </div>
+                              <MD3SelectField 
+                                  label="Textbook" 
+                                  placeholder="Textbook" 
+                                  value={textbooks.find(b => b.id === editData.textbookId)?.name || ''} 
+                                  onClick={() => openTaxonomySheet('textbook', 'Select Textbook', textbooks.filter(b => !!(b as any).isGuide === true && (!editData.subjectId || (b as any).subjectId === editData.subjectId)), editData.textbookId || '', (v) => setEditData({...editData, textbookId: v, chapterId: '', topicId: ''}))} 
+                              />
+                              <MD3SelectField 
+                                  label="Book / Guide" 
+                                  placeholder="Book / Guide" 
+                                  value={years.find(b => b.id === editData.yearId)?.name || ''} 
+                                  onClick={() => openTaxonomySheet('year', 'Select Book / Guide', years, editData.yearId || '', (v) => setEditData({...editData, yearId: v}))} 
+                              />
                           </div>
                           <div className="grid grid-cols-2 gap-4">
-                              <div>
-                                  <label className="text-xs font-semibold mb-1 block">Chapter <span className="text-red-500">*</span></label>
-                                  <Select value={editData.chapterId || ''} onValueChange={v => setEditData({...editData, chapterId: v, topicId: ''})}>
-                                      <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Chapter" /></SelectTrigger>
-                                      <SelectContent>{chapters.filter(b => !!(b as any).isGuide === showGuideTaxonomy && (!editData.textbookId || (b as any).textbookId === editData.textbookId)).map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
-                                  </Select>
-                              </div>
-                              <div>
-                                  <label className="text-xs font-semibold mb-1 block">Topic <span className="text-red-500">*</span></label>
-                                  <Select value={editData.topicId || ''} onValueChange={v => setEditData({...editData, topicId: v})}>
-                                      <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Topic" /></SelectTrigger>
-                                      <SelectContent>{topics.filter(b => !!(b as any).isGuide === showGuideTaxonomy && (!editData.chapterId || (b as any).chapterId === editData.chapterId)).map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
-                                  </Select>
-                              </div>
+                              <MD3SelectField 
+                                  label="Chapter" 
+                                  placeholder="Chapter" 
+                                  required
+                                  value={chapters.find(b => b.id === editData.chapterId)?.name || ''} 
+                                  onClick={() => openTaxonomySheet('chapter', 'Select Chapter', chapters.filter(b => !!(b as any).isGuide === true && (!editData.textbookId || (b as any).textbookId === editData.textbookId)), editData.chapterId || '', (v) => setEditData({...editData, chapterId: v, topicId: ''}))} 
+                              />
+                              <MD3SelectField 
+                                  label="Topic" 
+                                  placeholder="Topic" 
+                                  required
+                                  value={topics.find(b => b.id === editData.topicId)?.name || ''} 
+                                  onClick={() => openTaxonomySheet('topic', 'Select Topic', topics.filter(b => !!(b as any).isGuide === true && (!editData.chapterId || (b as any).chapterId === editData.chapterId)), editData.topicId || '', (v) => setEditData({...editData, topicId: v}))} 
+                              />
                           </div>
                       </CardContent>
                   </Card>
 
                   {/* --- CARD 5: Publish Settings --- */}
-                  <Card className="rounded-xl border-slate-200/60 shadow-sm bg-white">
-                      <CardHeader className="pb-3"><CardTitle className="text-lg">Publish Settings</CardTitle></CardHeader>
-                      <CardContent className="space-y-4">
+                  <Card className="rounded-[24px] border-[#d3e3d3] shadow-sm bg-[#fdfefd] overflow-hidden">
+                      <CardHeader className="pb-3 border-b border-[#eef2ec] bg-[#f8faf8]"><CardTitle className="text-lg text-[#4a634a]">Publish Settings</CardTitle></CardHeader>
+                      <CardContent className="space-y-4 pt-6">
                           <div>
                               <label className="text-xs font-semibold mb-2 block">Status</label>
                               <div className="flex items-center gap-4">
@@ -782,9 +821,9 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                   </Card>
 
                   {/* --- CARD 6: Exams Taxonomy --- */}
-                  <Card className="rounded-xl border-slate-200/60 shadow-sm bg-white">
-                      <CardHeader className="pb-3"><CardTitle className="text-lg">Exams Taxonomy</CardTitle></CardHeader>
-                      <CardContent>
+                  <Card className="rounded-[24px] border-[#d3e3d3] shadow-sm bg-[#fdfefd] overflow-hidden">
+                      <CardHeader className="pb-3 border-b border-[#eef2ec] bg-[#f8faf8]"><CardTitle className="text-lg text-[#4a634a]">Exams Taxonomy</CardTitle></CardHeader>
+                      <CardContent className="pt-6">
                           {exams.length === 0 ? (
                               <p className="text-xs text-slate-500">No exams defined in question_exams collection yet.</p>
                           ) : (
@@ -814,9 +853,9 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                   </Card>
 
                   {/* --- CARD 7: Quality Assurance --- */}
-                  <Card className="border-indigo-100 dark:border-indigo-900 shadow-sm">
-                      <CardHeader className="bg-indigo-50/50 dark:bg-indigo-900/20 pb-4">
-                          <CardTitle className="flex items-center gap-2 text-indigo-700 dark:text-indigo-400">
+                  <Card className="rounded-[24px] border-[#d3e3d3] shadow-sm bg-[#fdfefd] overflow-hidden">
+                      <CardHeader className="bg-indigo-50/50 dark:bg-indigo-900/20 pb-4 border-b border-[#eef2ec]">
+                          <CardTitle className="flex items-center gap-2 text-indigo-700 dark:text-indigo-400 text-lg">
                               <ShieldCheck className="w-5 h-5" />
                               Quality Assurance & Verification
                           </CardTitle>
@@ -906,25 +945,66 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
           </div>
 
           {/* Bottom Sticky Action Bar */}
-          <div className="fixed bottom-0 left-0 right-0 md:left-[250px] bg-white dark:bg-slate-950 border-t p-4 flex items-center justify-between z-40 shadow-lg">
-              <Button variant="ghost" onClick={onCancel}>Cancel</Button>
+          <div className="fixed bottom-0 left-0 right-0 md:left-[250px] bg-[#eef2ec]/90 backdrop-blur-md border-t border-[#d3e3d3] p-4 flex items-center justify-between z-40 shadow-[0_-4px_10px_rgba(0,0,0,0.02)]">
+              <Button variant="ghost" className="rounded-full text-[#4a634a] hover:bg-[#c4d6c4]" onClick={onCancel}>Cancel</Button>
               <div className="flex items-center gap-3">
-                  <Button variant="outline" onClick={() => {
+                  <Button variant="outline" className="rounded-full border-[#4a634a] text-[#4a634a] bg-transparent hover:bg-[#f4f8f4] px-6" onClick={() => {
                       setEditData({...editData, status: 'Draft'});
                       handleSave();
                   }} disabled={isSaving}>
                       {isSaving && editData.status === 'Draft' ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
                       Save Draft
                   </Button>
-                  <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={() => {
+                  <Button className="rounded-full bg-[#3d5a3d] hover:bg-[#2d442d] text-white px-8 shadow-sm" onClick={() => {
                       setEditData({...editData, status: 'Published'});
                       handleSave();
                   }} disabled={isSaving}>
-                      {isSaving && editData.status === 'Published' ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+                      {isSaving && editData.status === 'Published' ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <CheckCircle2 className="w-4 h-4 mr-2" />}
                       Publish
                   </Button>
               </div>
           </div>
+          
+          <Sheet open={taxonomySheet.isOpen} onOpenChange={(isOpen) => setTaxonomySheet(prev => ({...prev, isOpen}))}>
+              <SheetContent side="bottom" className="h-[85vh] sm:h-[60vh] rounded-t-[24px] px-0 flex flex-col pb-0">
+                  <SheetHeader className="px-6 pb-2 border-b">
+                      <SheetTitle className="text-xl font-bold text-slate-800">{taxonomySheet.title}</SheetTitle>
+                  </SheetHeader>
+                  <div className="p-4 border-b">
+                      <div className="relative">
+                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                          <Input 
+                              placeholder="Search..." 
+                              className="pl-9 bg-[#f0f4f0] border-transparent rounded-xl h-12 focus-visible:ring-emerald-600"
+                              value={sheetSearch}
+                              onChange={e => setSheetSearch(e.target.value)}
+                          />
+                      </div>
+                  </div>
+                  <div className="flex-1 overflow-y-auto px-6 py-4">
+                      <RadioGroup 
+                          value={taxonomySheet.value} 
+                          onValueChange={(val) => {
+                              taxonomySheet.onSelect(val);
+                              setTaxonomySheet(prev => ({...prev, isOpen: false}));
+                          }}
+                          className="flex flex-col space-y-4"
+                      >
+                          {taxonomySheet.items.filter(item => item.name.toLowerCase().includes(sheetSearch.toLowerCase())).map(item => (
+                              <div key={item.id} className="flex items-center space-x-3">
+                                  <RadioGroupItem value={item.id} id={`sheet-item-${item.id}`} className="text-emerald-700 border-emerald-700" />
+                                  <label htmlFor={`sheet-item-${item.id}`} className="text-sm font-medium leading-none cursor-pointer flex-1 py-1">
+                                      {item.name}
+                                  </label>
+                              </div>
+                          ))}
+                          {taxonomySheet.items.filter(item => item.name.toLowerCase().includes(sheetSearch.toLowerCase())).length === 0 && (
+                              <div className="text-center text-slate-500 py-8">No results found</div>
+                          )}
+                      </RadioGroup>
+                  </div>
+              </SheetContent>
+          </Sheet>
       </div>
   );
 }

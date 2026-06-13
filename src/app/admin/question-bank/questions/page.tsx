@@ -479,6 +479,11 @@ export default function QuestionBankQuestionsPage() {
                     </div>
                 </DialogContent>
             </Dialog>
+            <Link href="/admin/question-bank/academic-questions/add">
+                <Button variant="default" className="bg-indigo-600 hover:bg-indigo-700 text-white flex gap-2">
+                    <PlusCircle className="h-4 w-4" /> Add Academic Question
+                </Button>
+            </Link>
             <Button size="icon" onClick={() => { resetForm(); setView('editor'); }} title="Add Question">
                 <PlusCircle className="h-4 w-4" />
             </Button>
@@ -761,7 +766,13 @@ export default function QuestionBankQuestionsPage() {
                           <Link href={`/question/${q.slug || q.id}`} target="_blank" rel="noopener noreferrer">
                               <Button variant="ghost" size="sm" title="View Public Page"><Eye className="h-4 w-4 text-blue-500" /></Button>
                           </Link>
-                          <Button variant="ghost" size="sm" onClick={() => { setEditData(q); setView('editor'); }}><Pencil className="h-4 w-4" /></Button>
+                          {q.contentType === 'academic' ? (
+                              <Link href={`/admin/question-bank/academic-questions/${q.id}`}>
+                                  <Button variant="ghost" size="sm" title="Edit Academic Question"><Pencil className="h-4 w-4" /></Button>
+                              </Link>
+                          ) : (
+                              <Button variant="ghost" size="sm" onClick={() => { setEditData(q); setView('editor'); }}><Pencil className="h-4 w-4" /></Button>
+                          )}
                           <Button variant="ghost" size="sm" className="text-destructive" onClick={async () => {
                               await deleteQuestion(q.id);
                               fetchQuestions();

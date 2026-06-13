@@ -85,7 +85,7 @@ const MenuBar = ({ editor }: { editor: any }) => {
   };
 
   return (
-    <div className="flex flex-wrap gap-1 p-2 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 rounded-t-md">
+    <div className="flex flex-wrap gap-1 p-2 border-b border-[#eef2ec] bg-[#f8faf8]">
       <Toggle 
         size="sm" 
         pressed={editor.isActive('bold')} 
@@ -108,7 +108,7 @@ const MenuBar = ({ editor }: { editor: any }) => {
         <UnderlineIcon className="h-4 w-4" />
       </Toggle>
       
-      <div className="w-px h-6 bg-slate-300 dark:bg-slate-700 mx-1 my-auto" />
+      <div className="w-px h-6 bg-[#c4d6c4] mx-1 my-auto" />
 
       <Toggle 
         size="sm" 
@@ -132,7 +132,7 @@ const MenuBar = ({ editor }: { editor: any }) => {
         <Heading3 className="h-4 w-4" />
       </Toggle>
 
-      <div className="w-px h-6 bg-slate-300 dark:bg-slate-700 mx-1 my-auto" />
+      <div className="w-px h-6 bg-[#c4d6c4] mx-1 my-auto" />
 
       <Toggle 
         size="sm" 
@@ -163,7 +163,7 @@ const MenuBar = ({ editor }: { editor: any }) => {
         <Code className="h-4 w-4" />
       </Toggle>
       
-      <div className="w-px h-6 bg-slate-300 dark:bg-slate-700 mx-1 self-center" />
+      <div className="w-px h-6 bg-[#c4d6c4] mx-1 self-center" />
       
       <Dialog open={imageDialogOpen} onOpenChange={setImageDialogOpen}>
         <DialogTrigger asChild>
@@ -302,7 +302,7 @@ export function TiptapEditor({ content, onChange }: TiptapEditorProps) {
   }, [content, editor]);
 
   return (
-    <div className="border border-slate-200 dark:border-slate-800 rounded-md overflow-hidden bg-white dark:bg-slate-950">
+    <div className="border border-[#d3e3d3] rounded-[24px] overflow-hidden bg-[#fdfefd] focus-within:border-[#4a634a] focus-within:ring-1 focus-within:ring-[#4a634a] transition-colors">
       <MenuBar editor={editor} />
       <div className="p-4">
         <EditorContent editor={editor} />
