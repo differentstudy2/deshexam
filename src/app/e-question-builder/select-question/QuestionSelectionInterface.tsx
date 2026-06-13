@@ -522,7 +522,13 @@ export default function QuestionSelectionInterface({ initialFilters }: { initial
               {questions.map((q, index) => {
                  const isSelected = selectedIds.has(q.id);
                  return (
-                   <div key={q.id} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:border-blue-300 transition-colors">
+                   <div 
+                     key={q.id} 
+                     onClick={() => toggleSelect(q.id)}
+                     className={`bg-white border rounded-lg p-4 shadow-sm transition-colors cursor-pointer ${
+                       isSelected ? 'border-[#4caf50] ring-1 ring-[#4caf50] bg-[#f1f8e9]' : 'border-gray-200 hover:border-blue-300'
+                     }`}
+                   >
                      <div className="flex justify-between items-start gap-3">
                        <div className="flex items-start gap-3 flex-1">
                          <span className="font-bold text-gray-600 mt-0.5">{index + 1}.</span>
@@ -572,14 +578,21 @@ export default function QuestionSelectionInterface({ initialFilters }: { initial
                        
                        {/* ACTIONS (Right Side) */}
                        <div className="flex flex-col items-end justify-between h-full space-y-8">
-                         <Button variant="ghost" size="sm" className="h-7 text-xs text-blue-600 hover:text-blue-800 p-0 px-2 border border-transparent hover:border-blue-200">
+                         <Button 
+                           variant="ghost" 
+                           size="sm" 
+                           onClick={(e) => e.stopPropagation()}
+                           className="h-7 text-xs text-blue-600 hover:text-blue-800 p-0 px-2 border border-transparent hover:border-blue-200"
+                         >
                            <Edit className="w-3 h-3 mr-1" /> Edit
                          </Button>
-                         <Checkbox 
-                           checked={isSelected} 
-                           onCheckedChange={() => toggleSelect(q.id)}
-                           className="w-5 h-5 rounded border-gray-300 text-[#4caf50] focus:ring-[#4caf50]"
-                         />
+                         <div onClick={(e) => e.stopPropagation()}>
+                           <Checkbox 
+                             checked={isSelected} 
+                             onCheckedChange={() => toggleSelect(q.id)}
+                             className="w-5 h-5 rounded border-gray-300 text-[#4caf50] focus:ring-[#4caf50]"
+                           />
+                         </div>
                        </div>
                      </div>
                    </div>
