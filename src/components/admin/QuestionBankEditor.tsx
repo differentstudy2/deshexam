@@ -19,7 +19,7 @@ import { slugify, cn } from '@/lib/utils';
 import { collection, getDocs } from 'firebase/firestore';
 import { db, storage } from '@/lib/firebase/client';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
-import { createQuestion, updateQuestion } from '@/lib/firebase/question-bank';
+import { createQuestion, updateQuestion, bulkCreateQuestions } from '@/lib/firebase/question-bank';
 import dynamic from 'next/dynamic';
 
 const TiptapEditor = dynamic(() => import('@/components/admin/TiptapEditor').then(mod => mod.TiptapEditor), {
@@ -256,6 +256,91 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
       }
   };
 
+  const handleBulkImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+          try {
+              const content = event.target?.result as string;
+              const parsed = JSON.parse(content);
+              
+              if (!Array.isArray(parsed)) {
+                  throw new Error("JSON must be an array of questions.");
+              }
+              
+              setIsSaving(true);
+              
+              // Helper to map custom human-readable format to internal format
+              const mapCustomFormat = (raw: any) => {
+                  if (!raw["Question"] && !raw["Question Type"]) return raw;
+                  
+                  const qTypeMap: Record<string, string> = { "Multiple Choice": "MCQ", "Descriptive": "Descriptive", "True/False": "True/False" };
+                  const options: any = raw.options || {};
+                  if (raw["Option A"]) options.a = raw["Option A"];
+                  if (raw["Option B"]) options.b = raw["Option B"];
+                  if (raw["Option C"]) options.c = raw["Option C"];
+                  if (raw["Option D"]) options.d = raw["Option D"];
+                  if (raw["Option E"]) options.e = raw["Option E"];
+
+                  let correct = raw["Correct Answer"] || raw.correctAnswer || "";
+                  if (typeof correct === 'string') correct = correct.toLowerCase().trim();
+
+                  return {
+                      ...raw,
+                      questionText: raw["Question"] || raw.questionText,
+                      questionType: qTypeMap[raw["Question Type"]] || raw.questionType || "MCQ",
+                      options: Object.keys(options).length > 0 ? options : undefined,
+                      correctAnswer: correct,
+                      explanation: raw["Explanation"] || raw.explanation,
+                      difficulty: raw["Difficulty"] || raw.difficulty,
+                      // Custom tags to store the raw Subject/Chapter names if provided
+                      sourceSubject: raw["Subject"] || raw.sourceSubject,
+                      sourceChapter: raw["Chapter"] || raw.sourceChapter
+                  };
+              };
+
+              // Apply current taxonomy to imported questions
+              const questionsToImport = parsed.map((rawQ: any) => {
+                  const q = mapCustomFormat(rawQ);
+                  return {
+                      ...q,
+                      id: `q_${Date.now()}_${Math.floor(Math.random() * 1000000)}`,
+                      contentType: defaultContentType || 'general',
+                      boardId: editData.boardId || q.boardId,
+                      classId: editData.classId || q.classId,
+                      subjectId: editData.subjectId || q.subjectId,
+                      textbookId: editData.textbookId || q.textbookId,
+                      chapterId: editData.chapterId || q.chapterId,
+                      topicId: editData.topicId || q.topicId,
+                      yearId: editData.yearId || q.yearId,
+                      examIds: editData.examIds && editData.examIds.length > 0 ? editData.examIds : (q.examIds || []),
+                      sourceBoard: editData.boardId ? boards.find(b => b.id === editData.boardId)?.name : q.sourceBoard,
+                      sourceYear: editData.yearId ? years.find(y => y.id === editData.yearId)?.name : q.sourceYear,
+                      sourceExam: editData.examIds && editData.examIds.length > 0 ? exams.filter(ex => editData.examIds?.includes(ex.id)).map(ex => ex.name).join(', ') : q.sourceExam,
+                      status: q.status || 'Published',
+                      difficulty: q.difficulty || editData.difficulty || 'Medium',
+                      slug: q.slug || slugify(q.title || (q.questionText || '').replace(/<[^>]*>?/gm, '').substring(0, 50))
+                  };
+              });
+
+              // Strip undefined values
+              const cleanQuestions = JSON.parse(JSON.stringify(questionsToImport));
+              
+              await bulkCreateQuestions(cleanQuestions);
+              toast({ title: 'Success', description: `Successfully imported ${cleanQuestions.length} questions!` });
+              if (e.target) e.target.value = ''; // Reset input
+          } catch(err: any) {
+              console.error("Bulk import error:", err);
+              toast({ title: 'Import Failed', description: err.message, variant: 'destructive' });
+          } finally {
+              setIsSaving(false);
+          }
+      };
+      reader.readAsText(file);
+  };
+
   const handleSave = async () => {
       if (!editData.questionText) {
           toast({ title: 'Validation Error', description: 'Question Text is required.', variant: 'destructive' });
@@ -361,6 +446,16 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                       {title && <h1 className="text-xl font-bold tracking-tight text-[#2d3b2d]">{title}</h1>}
                   </div>
                   <div className="flex flex-row items-center gap-2 shrink-0">
+                      <label className="cursor-pointer">
+                          <input type="file" accept=".json" className="hidden" onChange={handleBulkImport} disabled={isSaving} />
+                          <div className={cn(
+                              "inline-flex items-center justify-center whitespace-nowrap text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+                              "h-8 rounded-full border border-[#4a634a] text-[#4a634a] bg-transparent hover:bg-[#f4f8f4] px-4"
+                          )}>
+                              <Upload className="w-3 h-3 mr-1.5" />
+                              Bulk Add (JSON)
+                          </div>
+                      </label>
                       <Button variant="outline" size="sm" className="h-8 text-xs rounded-full border-[#4a634a] text-[#4a634a] bg-transparent hover:bg-[#f4f8f4] px-4" onClick={() => {
                           setEditData({...editData, status: 'Draft'});
                           handleSave();

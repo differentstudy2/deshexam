@@ -318,3 +318,19 @@ export async function bulkDeleteQuestions(ids: string[]) {
   await batch.commit();
 }
 
+export async function bulkCreateQuestions(questions: Omit<QuestionBankEntry, 'createdAt' | 'updatedAt'>[]) {
+  // Firestore batches have a limit of 500 operations
+  const CHUNK_SIZE = 450;
+  for (let i = 0; i < questions.length; i += CHUNK_SIZE) {
+    const chunk = questions.slice(i, i + CHUNK_SIZE);
+    const batch = writeBatch(db);
+    
+    chunk.forEach(q => {
+      const docRef = doc(db, QUESTIONS_COLLECTION, q.id);
+      batch.set(docRef, { ...q, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
+    });
+    
+    await batch.commit();
+  }
+}
+
