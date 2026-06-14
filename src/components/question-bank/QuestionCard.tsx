@@ -412,11 +412,11 @@ export default function QuestionCard({ question, index, testMode = false, isList
                     ) : null}
                     
                     {/* Real tags */}
-                    {(question as any).taxonomyTags?.map((tag: string) => (
-                        <span key={tag} className="bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium rounded-md px-2.5 py-0.5 text-[11px] uppercase tracking-wide">{tag}</span>
+                    {(question as any).taxonomyTags?.map((tag: string, idx: number) => (
+                        <span key={`tax-${idx}`} className="bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium rounded-md px-2.5 py-0.5 text-[11px] uppercase tracking-wide">{tag}</span>
                     ))}
-                    {question.tags?.map((tag: string) => (
-                        <span key={tag} className="bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium rounded-md px-2.5 py-0.5 text-[11px] uppercase tracking-wide">{tag}</span>
+                    {question.tags?.map((tag: string, idx: number) => (
+                        <span key={`tag-${idx}`} className="bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium rounded-md px-2.5 py-0.5 text-[11px] uppercase tracking-wide">{tag}</span>
                     ))}
 
                     {/* Fallback example tags if none exist in the database for UI preview */}

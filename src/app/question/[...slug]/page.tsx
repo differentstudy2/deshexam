@@ -63,7 +63,12 @@ export default async function DynamicQuestionPage({ params }: Props) {
       const tryFetchTitle = async (id: string, col1: string, col2: string) => {
           if (!id) return null;
           try {
-              let snap = await getDoc(doc(db, col1, id));
+              // First try the new taxonomy_nodes collection
+              let snap = await getDoc(doc(db, 'taxonomy_nodes', id));
+              if (snap.exists()) return snap.data().title || snap.data().name;
+              
+              // Fallback to legacy collections
+              snap = await getDoc(doc(db, col1, id));
               if (snap.exists()) return snap.data().title || snap.data().name;
               snap = await getDoc(doc(db, col2, id));
               if (snap.exists()) return snap.data().title || snap.data().name;
@@ -128,7 +133,7 @@ export default async function DynamicQuestionPage({ params }: Props) {
 
   if (question) {
     const safeQuestion = JSON.parse(JSON.stringify(question));
-    safeQuestion.taxonomyTags = taxonomyTags;
+    safeQuestion.taxonomyTags = Array.from(new Set(taxonomyTags));
     const safeRelated = JSON.parse(JSON.stringify(relatedQuestions));
     return (
       <div className="container max-w-6xl mx-auto py-12 px-4 flex flex-col lg:flex-row gap-8">
@@ -141,12 +146,21 @@ export default async function DynamicQuestionPage({ params }: Props) {
             <ChevronRight className="w-3 h-3 md:w-4 md:h-4 mx-1 md:mx-2 shrink-0" />
             <Link href="/questions" className="hover:text-[#107c41] shrink-0">Question Bank</Link>
             
-            {slugArray.slice(0, -1).map((s, i) => (
-                <React.Fragment key={i}>
-                    <ChevronRight className="w-3 h-3 md:w-4 md:h-4 mx-1 md:mx-2 shrink-0" />
-                    <span className="capitalize text-slate-500">{decodeURIComponent(s).replace(/-/g, ' ')}</span>
-                </React.Fragment>
-            ))}
+            {safeQuestion.taxonomyTags.length > 0 ? (
+                safeQuestion.taxonomyTags.map((tag: string, i: number) => (
+                    <React.Fragment key={`tag-${i}`}>
+                        <ChevronRight className="w-3 h-3 md:w-4 md:h-4 mx-1 md:mx-2 shrink-0" />
+                        <span className="capitalize text-slate-500">{tag}</span>
+                    </React.Fragment>
+                ))
+            ) : (
+                slugArray.slice(0, -1).map((s, i) => (
+                    <React.Fragment key={`slug-${i}`}>
+                        <ChevronRight className="w-3 h-3 md:w-4 md:h-4 mx-1 md:mx-2 shrink-0" />
+                        <span className="capitalize text-slate-500">{decodeURIComponent(s).replace(/-/g, ' ')}</span>
+                    </React.Fragment>
+                ))
+            )}
 
             <ChevronRight className="w-3 h-3 md:w-4 md:h-4 mx-1 md:mx-2 shrink-0" />
             <span className="text-slate-800 dark:text-slate-200 font-medium truncate max-w-[200px] md:max-w-[400px]">
