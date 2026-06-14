@@ -3,11 +3,13 @@
 import React, { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { QuestionBankEntry } from '@/lib/question-bank-types';
-import { Heart, Share2, Eye, ChevronDown, ChevronUp, CheckCircle2, XCircle, ThumbsDown, Bookmark, Flag, Link as LinkIcon, Printer, Save, Download, ShieldCheck, ExternalLink, MoreVertical } from 'lucide-react';
+import { Heart, Share2, Eye, ChevronDown, ChevronUp, CheckCircle2, XCircle, ThumbsDown, Bookmark, Flag, Link as LinkIcon, Printer, Save, Download, ShieldCheck, ExternalLink, MoreVertical, Lightbulb } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
 import { recordQuestionAttempt } from '@/lib/firebase/student-analytics';
 import { toggleInteraction, getQuestionInteraction, incrementQuestionView } from '@/lib/firebase/question-bank';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { db } from '@/lib/firebase/client';
 import { useToast } from '@/hooks/use-toast';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
@@ -59,14 +61,35 @@ export default function QuestionCard({ question, index, testMode = false, isList
         views: (question as any).viewsCount || 0,
     });
 
-    // Fetch initial interaction state
+    // Fetch real-time interaction state
     useEffect(() => {
         if (user) {
-            getQuestionInteraction(question.id, user.uid).then(data => {
-                if (data) setInteraction(data as any);
+            const interactionId = `${user.uid}_${question.id}`;
+            const unsubscribe = onSnapshot(doc(db, 'question_interactions', interactionId), (snap) => {
+                if (snap.exists()) {
+                    setInteraction(snap.data() as any);
+                }
             });
+            return () => unsubscribe();
         }
     }, [user, question.id]);
+
+    // Fetch real-time counts
+    useEffect(() => {
+        const unsubscribe = onSnapshot(doc(db, 'question_bank', question.id), (snap) => {
+            if (snap.exists()) {
+                const data = snap.data();
+                setCounts(prev => ({
+                    ...prev,
+                    likes: data.likesCount || 0,
+                    dislikes: data.dislikesCount || 0,
+                    bookmarks: data.bookmarksCount || 0,
+                    views: data.viewsCount || 0
+                }));
+            }
+        });
+        return () => unsubscribe();
+    }, [question.id]);
 
     // Increment View Count once per session (simple implementation)
     useEffect(() => {
@@ -379,7 +402,7 @@ export default function QuestionCard({ question, index, testMode = false, isList
     }
 
     return (
-        <div id={`question-card-${question.id}`} className="w-full bg-white dark:bg-slate-950 p-4 md:p-5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm mb-4 transition-all hover:shadow-md relative overflow-hidden">
+        <div id={`question-card-${question.id}`} className="w-full bg-white dark:bg-slate-950 p-4 rounded-lg border border-slate-100 dark:border-slate-800 shadow-sm mb-4 transition-all hover:shadow-md relative overflow-hidden">
             
             {/* Top row: Taxonomy chips and Link */}
             <div className="flex items-start justify-between mb-4 gap-4">
@@ -459,7 +482,7 @@ export default function QuestionCard({ question, index, testMode = false, isList
                             />
                         </div>
                     ) : (
-                        <div className="text-lg md:text-xl font-bold text-slate-800 dark:text-slate-200 leading-snug whitespace-pre-wrap">
+                        <div className="text-[1rem] font-bold text-slate-800 dark:text-slate-200 leading-snug whitespace-pre-wrap">
                             <Link href={`/question/${question.slug || question.id}`} className="hover:text-blue-600 transition-colors">
                                 {question.questionText}
                             </Link>
@@ -490,13 +513,13 @@ export default function QuestionCard({ question, index, testMode = false, isList
                             }
                         } else {
                             // Test Mode
-                            if (selectedOption) {
-                                // User has made a choice
+                            if (selectedOption || showAnswer) {
+                                // User has made a choice or revealed the answer
                                 if (isCorrectAnswer) {
                                     containerClasses = "bg-[#f0fdf4] border border-[#22c55e] text-[#166534] dark:bg-green-900/20 dark:border-[#22c55e] dark:text-green-400";
                                     circleClasses = "bg-[#22c55e] text-white border-[#22c55e] dark:bg-[#22c55e] dark:border-[#22c55e]";
                                     Icon = CheckCircle2;
-                                } else if (selectedOption.toLowerCase() === key.toLowerCase()) {
+                                } else if (selectedOption?.toLowerCase() === key.toLowerCase()) {
                                     // User picked this wrong answer
                                     containerClasses = "bg-red-50 border border-red-500 text-red-800 dark:bg-red-900/20 dark:border-red-500/50 dark:text-red-400";
                                     circleClasses = "bg-red-500 text-white border-red-500 dark:bg-red-600 dark:border-red-600";
@@ -526,7 +549,7 @@ export default function QuestionCard({ question, index, testMode = false, isList
                                 )}>
                                     {Icon ? <Icon className="h-4 w-4" /> : getOptionLabel(key, question.language)}
                                 </div>
-                                <span className="text-[15px] flex-grow font-medium">
+                                <span className="text-[13px] flex-grow font-medium">
                                     {value}
                                 </span>
                             </div>
@@ -549,11 +572,11 @@ export default function QuestionCard({ question, index, testMode = false, isList
                                 Icon = CheckCircle2;
                             }
                         } else {
-                            if (selectedOption) {
+                            if (selectedOption || showAnswer) {
                                 if (isCorrectAnswer) {
                                     containerClasses = "bg-green-50 border-green-500 text-green-800 dark:bg-green-900/20 dark:border-green-500/50 dark:text-green-400";
                                     Icon = CheckCircle2;
-                                } else if (selectedOption.toLowerCase() === opt.toLowerCase()) {
+                                } else if (selectedOption?.toLowerCase() === opt.toLowerCase()) {
                                     containerClasses = "bg-red-50 border-red-500 text-red-800 dark:bg-red-900/20 dark:border-red-500/50 dark:text-red-400";
                                     Icon = XCircle;
                                 } else {
@@ -598,6 +621,17 @@ export default function QuestionCard({ question, index, testMode = false, isList
 
             {/* Tags moved to top row */}
 
+            {/* Explanation Section */}
+            {showAnswer && question.explanation && (
+                <div className="mt-1 mb-3 p-2.5 rounded-xl bg-blue-50/50 dark:bg-blue-900/10 !text-[0.8rem] text-slate-700 dark:text-slate-300 !leading-snug animate-in fade-in slide-in-from-top-2 duration-300 border border-blue-100 dark:border-blue-800/30">
+                    <div className="font-bold text-blue-900 dark:text-blue-300 flex items-center gap-1 mb-0.5">
+                        <Lightbulb className="w-3 h-3 text-amber-500" />
+                        Explanation
+                    </div>
+                    <div className="prose dark:prose-invert max-w-none opacity-90 !text-[0.8rem] prose-p:!text-[0.8rem] prose-p:!my-0.5 prose-headings:!text-[0.85rem] prose-headings:!my-1 prose-li:!text-[0.8rem] prose-li:!my-0" dangerouslySetInnerHTML={{ __html: question.explanation }} />
+                </div>
+            )}
+
             {/* Footer Actions */}
             {isListView ? (
                 <div className="flex w-full items-center justify-evenly pt-3 border-t border-slate-100 dark:border-slate-800 mt-1 print-hidden-actions text-slate-500 dark:text-slate-400 font-medium">
@@ -609,6 +643,11 @@ export default function QuestionCard({ question, index, testMode = false, isList
                     <button onClick={() => handleInteract('bookmark')} className={cn("flex flex-1 justify-center items-center gap-1.5 hover:text-yellow-500 transition-colors py-1", interaction.isBookmarked && "text-yellow-500")}>
                         <Bookmark className={cn("h-4 w-4", interaction.isBookmarked && "fill-current")} />
                         <span className="text-sm">{counts.bookmarks > 0 ? counts.bookmarks : 'Save'}</span>
+                    </button>
+
+                    <button onClick={() => setShowAnswer(!showAnswer)} className={cn("flex flex-1 justify-center items-center gap-1.5 hover:text-indigo-500 transition-colors py-1", showAnswer && "text-indigo-500")} title="Reveal Answer">
+                        <Eye className={cn("h-4 w-4", showAnswer && "fill-current")} />
+                        <span className="text-sm">Answer</span>
                     </button>
 
                     <button onClick={handleCopyLink} className="flex flex-1 justify-center items-center gap-1.5 hover:text-blue-500 transition-colors py-1" title="Share Question">
@@ -650,15 +689,7 @@ export default function QuestionCard({ question, index, testMode = false, isList
                 </div>
             )}
 
-            {/* Explanation Section */}
-            {showAnswer && question.explanation && (
-                <div className="mt-4 p-5 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 text-sm text-slate-700 dark:text-slate-300 leading-relaxed animate-in fade-in slide-in-from-top-2 duration-300 prose prose-sm dark:prose-invert max-w-none">
-                    <span className="font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2 mb-2 not-prose">
-                        Explanation
-                    </span>
-                    <div dangerouslySetInnerHTML={{ __html: question.explanation }} />
-                </div>
-            )}
+
 
             {/* QA Card */}
             {question.isVerified && (

@@ -1,5 +1,5 @@
 import { db } from './client';
-import { collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, query, where, orderBy, serverTimestamp, limit, increment, writeBatch, addDoc, documentId, startAfter } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, query, where, orderBy, serverTimestamp, limit, increment, writeBatch, addDoc, documentId, startAfter, getCountFromServer } from 'firebase/firestore';
 import { TaxonomyNode, QuestionBankEntry } from '@/lib/question-bank-types';
 
 export const TAXONOMY_COLLECTIONS = {
@@ -143,6 +143,28 @@ export async function getQuestion(id: string) {
   return { id: snap.id, ...snap.data() } as QuestionBankEntry;
 }
 
+export async function getTotalQuestionsCount(filters?: any) {
+  const colRef = collection(db, QUESTIONS_COLLECTION);
+  let q = query(colRef);
+  
+  if (filters && Object.keys(filters).length > 0) {
+      const conditions: any[] = [];
+      if (filters.board) conditions.push(where('board', '==', filters.board));
+      if (filters.class) conditions.push(where('class', '==', filters.class));
+      if (filters.subject) conditions.push(where('subject', '==', filters.subject));
+      if (filters.chapter) conditions.push(where('chapter', '==', filters.chapter));
+      if (filters.topic) conditions.push(where('topic', '==', filters.topic));
+      if (filters.year) conditions.push(where('sourceYear', '==', filters.year));
+      
+      if (conditions.length > 0) {
+          q = query(colRef, ...conditions);
+      }
+  }
+
+  const snapshot = await getCountFromServer(q);
+  return snapshot.data().count;
+}
+
 export async function getQuestionsByIds(ids: string[]) {
   if (!ids || ids.length === 0) return [];
   
@@ -269,6 +291,25 @@ export async function getQuestionInteraction(questionId: string, userId: string)
   const snap = await getDoc(docRef);
   if (!snap.exists()) return { isLiked: false, isDisliked: false, isBookmarked: false };
   return snap.data();
+}
+
+export async function getUserInteractions(userId: string) {
+  const colRef = collection(db, 'question_interactions');
+  const q = query(colRef, where('userId', '==', userId));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(doc => doc.data());
+}
+
+export async function getUserLikedQuestions(userId: string) {
+  const interactions = await getUserInteractions(userId);
+  const likedIds = interactions.filter((i: any) => i.isLiked).map((i: any) => i.questionId);
+  return getQuestionsByIds(likedIds);
+}
+
+export async function getUserBookmarkedQuestions(userId: string) {
+  const interactions = await getUserInteractions(userId);
+  const bookmarkedIds = interactions.filter((i: any) => i.isBookmarked).map((i: any) => i.questionId);
+  return getQuestionsByIds(bookmarkedIds);
 }
 
 // ----------------------------------------------------
