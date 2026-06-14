@@ -21,6 +21,7 @@ interface QuestionBankModalProps {
   initialFilters?: {
     boardId?: string;
     classId?: string;
+    textbookId?: string;
     subjectId?: string;
     chapterId?: string;
   };
@@ -32,12 +33,14 @@ export function QuestionBankModal({ isOpen, onClose, onAdd, appLanguage, initial
   // Taxonomy states
   const [boards, setBoards] = useState<TaxonomyNode[]>([]);
   const [classes, setClasses] = useState<TaxonomyNode[]>([]);
+  const [textbooks, setTextbooks] = useState<TaxonomyNode[]>([]);
   const [subjects, setSubjects] = useState<TaxonomyNode[]>([]);
   const [chapters, setChapters] = useState<TaxonomyNode[]>([]);
 
   // Selected filters
   const [selectedBoard, setSelectedBoard] = useState<string>('all');
   const [selectedClass, setSelectedClass] = useState<string>('all');
+  const [selectedTextbook, setSelectedTextbook] = useState<string>('all');
   const [selectedSubject, setSelectedSubject] = useState<string>('all');
   const [selectedChapter, setSelectedChapter] = useState<string>('all');
 
@@ -49,12 +52,14 @@ export function QuestionBankModal({ isOpen, onClose, onAdd, appLanguage, initial
   // Update selected filters when modal opens with initialFilters
   useEffect(() => {
     if (isOpen && initialFilters) {
-      if (initialFilters.boardId) setSelectedBoard(initialFilters.boardId);
-      if (initialFilters.classId) setSelectedClass(initialFilters.classId);
-      if (initialFilters.subjectId) setSelectedSubject(initialFilters.subjectId);
-      if (initialFilters.chapterId) setSelectedChapter(initialFilters.chapterId);
+      setSelectedBoard(initialFilters.boardId || 'all');
+      setSelectedClass(initialFilters.classId || 'all');
+      setSelectedTextbook(initialFilters.textbookId || 'all');
+      setSelectedSubject(initialFilters.subjectId || 'all');
+      setSelectedChapter(initialFilters.chapterId || 'all');
     }
-  }, [isOpen]); // Only run when modal opens
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]); // Run only when modal opens
 
   // Fetch boards and initial questions on mount
   useEffect(() => {
@@ -69,6 +74,7 @@ export function QuestionBankModal({ isOpen, onClose, onAdd, appLanguage, initial
           
           setBoards(allNodes.filter(n => n.type === 'board' || n.type === 'category'));
           setClasses(allNodes.filter(n => n.type === 'class' || n.type === 'subcategory'));
+          setTextbooks(allNodes.filter(n => n.type === 'textbook' || n.type === 'exam'));
           setSubjects(allNodes.filter(n => n.type === 'subject'));
           setChapters(allNodes.filter(n => n.type === 'chapter'));
         } catch(e) {
@@ -85,7 +91,7 @@ export function QuestionBankModal({ isOpen, onClose, onAdd, appLanguage, initial
     if (isOpen) {
       handleSearch();
     }
-  }, [isOpen, selectedBoard, selectedClass, selectedSubject, selectedChapter]);
+  }, [isOpen, selectedBoard, selectedClass, selectedTextbook, selectedSubject, selectedChapter]);
 
   const handleSearch = async () => {
     setIsLoading(true);
@@ -95,6 +101,7 @@ export function QuestionBankModal({ isOpen, onClose, onAdd, appLanguage, initial
     const filters: any = {};
     if (selectedBoard !== 'all') filters.boardId = selectedBoard;
     if (selectedClass !== 'all') filters.classId = selectedClass;
+    if (selectedTextbook !== 'all') filters.textbookId = selectedTextbook;
     if (selectedSubject !== 'all') filters.subjectId = selectedSubject;
     if (selectedChapter !== 'all') filters.chapterId = selectedChapter;
 
@@ -157,6 +164,11 @@ export function QuestionBankModal({ isOpen, onClose, onAdd, appLanguage, initial
     onClose();
   };
 
+  const filteredClasses = classes.filter(c => selectedBoard === 'all' || c.parentId === selectedBoard);
+  const filteredSubjects = subjects.filter(s => selectedClass === 'all' || s.parentId === selectedClass);
+  const filteredTextbooks = textbooks.filter(t => selectedSubject === 'all' || t.parentId === selectedSubject);
+  const filteredChapters = chapters.filter(c => selectedTextbook === 'all' ? (selectedSubject === 'all' || c.parentId === selectedSubject) : c.parentId === selectedTextbook);
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-4xl max-h-[85vh] flex flex-col">
@@ -167,7 +179,7 @@ export function QuestionBankModal({ isOpen, onClose, onAdd, appLanguage, initial
         </DialogHeader>
 
         {/* Filters */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-muted/30 p-4 rounded-lg">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 bg-muted/30 p-4 rounded-lg">
           <div>
             <label className="text-xs font-medium text-muted-foreground mb-1 block">{t('board', appLanguage)} ({boards.length})</label>
             <Select value={selectedBoard} onValueChange={setSelectedBoard}>
@@ -181,38 +193,50 @@ export function QuestionBankModal({ isOpen, onClose, onAdd, appLanguage, initial
             </Select>
           </div>
           <div>
-            <label className="text-xs font-medium text-muted-foreground mb-1 block">Class ({classes.length})</label>
+            <label className="text-xs font-medium text-muted-foreground mb-1 block">Class ({filteredClasses.length})</label>
             <Select value={selectedClass} onValueChange={setSelectedClass}>
               <SelectTrigger className="bg-background">
                 <SelectValue placeholder="All Classes" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Classes</SelectItem>
-                {classes.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
+                {filteredClasses.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
           <div>
-            <label className="text-xs font-medium text-muted-foreground mb-1 block">Subject ({subjects.length})</label>
+            <label className="text-xs font-medium text-muted-foreground mb-1 block">Textbook ({filteredTextbooks.length})</label>
+            <Select value={selectedTextbook} onValueChange={setSelectedTextbook}>
+              <SelectTrigger className="bg-background">
+                <SelectValue placeholder="All Textbooks" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Textbooks</SelectItem>
+                {filteredTextbooks.map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <label className="text-xs font-medium text-muted-foreground mb-1 block">Subject ({filteredSubjects.length})</label>
             <Select value={selectedSubject} onValueChange={setSelectedSubject}>
               <SelectTrigger className="bg-background">
                 <SelectValue placeholder="All Subjects" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Subjects</SelectItem>
-                {subjects.map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}
+                {filteredSubjects.map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
           <div>
-            <label className="text-xs font-medium text-muted-foreground mb-1 block">{t('chapter', appLanguage)} ({chapters.length})</label>
+            <label className="text-xs font-medium text-muted-foreground mb-1 block">{t('chapter', appLanguage)} ({filteredChapters.length})</label>
             <Select value={selectedChapter} onValueChange={setSelectedChapter}>
               <SelectTrigger className="bg-background">
                 <SelectValue placeholder="All Chapters" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Chapters</SelectItem>
-                {chapters.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
+                {filteredChapters.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
