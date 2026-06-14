@@ -70,18 +70,22 @@ export async function getQuestions(filters?: Record<string, any>, limitCount = 5
       }
     }
     if (conditions.length > 0) {
-      q = query(colRef, ...conditions, limit(limitCount));
+      q = query(colRef, ...conditions, limit(1000));
     }
   }
   
   const snapshot = await getDocs(q);
-  const results = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as QuestionBankEntry);
+  let results = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as QuestionBankEntry);
   if (filters) {
       results.sort((a, b) => {
           const timeA = (a.createdAt as any)?.seconds || ((a.createdAt as any)?.getTime?.() / 1000) || 0;
           const timeB = (b.createdAt as any)?.seconds || ((b.createdAt as any)?.getTime?.() / 1000) || 0;
           return timeB - timeA;
       });
+      // Client side slicing to ensure newest items are kept when returning
+      if (results.length > limitCount) {
+        results = results.slice(0, limitCount);
+      }
   }
   return results;
 }
@@ -102,7 +106,8 @@ export async function getQuestionsPaginated(filters?: Record<string, any>, limit
       if (startAfterDoc) {
           q = query(colRef, ...conditions, startAfter(startAfterDoc), limit(limitCount));
       } else {
-          q = query(colRef, ...conditions, limit(limitCount));
+          // Fetch more so client-side sorting can find the newest ones
+          q = query(colRef, ...conditions, limit(2000));
       }
   } else {
       if (startAfterDoc) {
@@ -113,7 +118,7 @@ export async function getQuestionsPaginated(filters?: Record<string, any>, limit
   }
   
   const snapshot = await getDocs(q);
-  const results = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as QuestionBankEntry);
+  let results = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as QuestionBankEntry);
   
   if (conditions.length > 0) {
       results.sort((a, b) => {
@@ -121,6 +126,8 @@ export async function getQuestionsPaginated(filters?: Record<string, any>, limit
           const timeB = (b.createdAt as any)?.seconds || ((b.createdAt as any)?.getTime?.() / 1000) || 0;
           return timeB - timeA;
       });
+      // If we fetched up to 2000, we don't slice because we want to show all on the first filtered page
+      // so the user doesn't have to paginate through improperly ordered filtered data.
   }
 
   return {

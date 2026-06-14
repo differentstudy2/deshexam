@@ -789,7 +789,7 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
               {/* Right Column: Taxonomy and Meta */}
               <div className="space-y-6 flex flex-col">
                   {/* --- CARD 4: Academic Taxonomy --- */}
-                  {editData.contentType === 'academic' && (
+                  {(editData.contentType === 'academic' || defaultContentType === 'academic' || (!editData.contentType && (editData.boardId || editData.classId || !editData.examIds?.length))) && (
                       <Card className="rounded-[24px] border-[#d3e3d3] shadow-sm bg-[#fdfefd] overflow-hidden">
                           <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-[#eef2ec] bg-[#f8faf8]">
                           <CardTitle className="text-lg text-[#4a634a]">Academic Taxonomy</CardTitle>
@@ -920,8 +920,8 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                   </Card>
 
                   {/* --- CARD 6: Exams Taxonomy --- */}
-                  {editData.contentType === 'exam' && (
-                      <Card className="rounded-[24px] border-[#d3e3d3] shadow-sm bg-[#fdfefd] overflow-hidden">
+                  {(editData.contentType === 'exam' || defaultContentType === 'exam' || (!editData.contentType && editData.examIds && editData.examIds.length > 0)) && (
+                      <Card className="rounded-[24px] border-[#d3e3d3] shadow-sm bg-[#fdfefd] overflow-hidden mt-6">
                           <CardHeader className="pb-3 border-b border-[#eef2ec] bg-[#f8faf8]"><CardTitle className="text-lg text-[#4a634a]">Exams Taxonomy</CardTitle></CardHeader>
                       <CardContent className="pt-6">
                           {exams.length === 0 ? (

@@ -2241,6 +2241,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
         onClose={() => setIsQuestionBankOpen(false)}
         onAdd={handleAddFromBank}
         appLanguage={appLanguage}
+        initialFilters={{ boardId, classId, textbookId, subjectId, chapterId }}
       />
       
       <AiQuestionGeneratorModal
