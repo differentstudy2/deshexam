@@ -8,8 +8,8 @@ export default function NotFound() {
   const router = useRouter();
 
   return (
-    <div className="min-h-[calc(100vh-8rem)] bg-slate-50/50 flex flex-col items-center justify-center p-4">
-      <div className="bg-white rounded-[2rem] shadow-[0_10px_40px_-10px_rgba(0,0,0,0.08)] p-8 md:p-12 max-w-[500px] w-full text-center border border-slate-100">
+    <div className="min-h-[calc(100vh-8rem)] bg-slate-50/50 dark:bg-slate-950 flex flex-col items-center justify-center p-4">
+      <div className="bg-white dark:bg-slate-900 rounded-[2rem] shadow-[0_10px_40px_-10px_rgba(0,0,0,0.08)] dark:shadow-none p-8 md:p-12 max-w-[500px] w-full text-center border border-slate-100 dark:border-slate-800">
         
         {/* Logo Area */}
         <div className="flex justify-center items-center mb-8">
@@ -22,12 +22,12 @@ export default function NotFound() {
         </h1>
         
         {/* Title */}
-        <h2 className="text-2xl md:text-3xl font-bold text-slate-800 mt-4 mb-3">
+        <h2 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-slate-100 mt-4 mb-3">
           পেজটি পাওয়া যায়নি
         </h2>
         
         {/* Description */}
-        <p className="text-slate-500 text-sm md:text-base leading-relaxed px-2">
+        <p className="text-slate-500 dark:text-slate-400 text-sm md:text-base leading-relaxed px-2">
           দুঃখিত, আপনি যে লিংকটি খুঁজছেন তা হয়তো সরানো হয়েছে অথবা এটি অস্তিত্বহীন।
         </p>
 
@@ -42,13 +42,13 @@ export default function NotFound() {
         <div className="flex items-center gap-4 mt-4">
           <button 
             onClick={() => router.back()} 
-            className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-sm py-4 rounded-xl transition-all active:scale-[0.98]"
+            className="flex-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium text-sm py-4 rounded-xl transition-all active:scale-[0.98]"
           >
             ← পেছনে যান
           </button>
           
           <Link href="/contact" className="flex-1">
-            <button className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-sm py-4 rounded-xl transition-all active:scale-[0.98]">
+            <button className="w-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium text-sm py-4 rounded-xl transition-all active:scale-[0.98]">
               যোগাযোগ
             </button>
           </Link>
