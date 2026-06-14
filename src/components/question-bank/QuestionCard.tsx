@@ -381,15 +381,42 @@ export default function QuestionCard({ question, index, testMode = false }: Ques
     return (
         <div id={`question-card-${question.id}`} className="w-full bg-white dark:bg-slate-950 p-5 md:p-8 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm mb-6 transition-all hover:shadow-md relative overflow-hidden">
             
-            <div className="flex flex-col gap-2 mb-6">
+            {/* Top row: Taxonomy chips */}
+            <div className="flex flex-wrap items-center gap-2.5 mb-6">
+                {question.sourceYear ? (
+                    <span className="bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium rounded-md px-3 py-1 text-[12px] uppercase tracking-wide">{question.sourceYear}</span>
+                ) : null}
+                
+                {/* Real tags */}
+                {(question as any).taxonomyTags?.map((tag: string) => (
+                    <span key={tag} className="bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium rounded-md px-3 py-1 text-[12px] uppercase tracking-wide">{tag}</span>
+                ))}
+                {question.tags?.map((tag: string) => (
+                    <span key={tag} className="bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium rounded-md px-3 py-1 text-[12px] uppercase tracking-wide">{tag}</span>
+                ))}
+
+                {/* Fallback example tags if none exist in the database for UI preview */}
+                {!question.sourceYear && !(question as any).taxonomyTags?.length && !question.tags?.length && (
+                    <>
+                        <span className="bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium rounded-md px-3 py-1 text-[12px] uppercase tracking-wide">WBBSE</span>
+                        <span className="bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium rounded-md px-3 py-1 text-[12px] uppercase tracking-wide">CLASS 10</span>
+                        <span className="bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium rounded-md px-3 py-1 text-[12px] uppercase tracking-wide">বাংলা</span>
+                        <span className="bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium rounded-md px-3 py-1 text-[12px] uppercase tracking-wide">MCQ</span>
+                        <span className="bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium rounded-md px-3 py-1 text-[12px] uppercase tracking-wide">2022</span>
+                    </>
+                )}
+                
                 {question.isVerified && (
-                    <div className="flex items-center gap-1.5 text-xs font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 w-fit px-2.5 py-1 rounded-full mb-2 border border-indigo-100 dark:border-indigo-500/20">
-                        <ShieldCheck className="w-3.5 h-3.5" />
-                        {question.verificationLevel || 'Verified Question'}
+                    <div className="flex items-center gap-1 text-[11px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 px-2.5 py-0.5 rounded border border-indigo-100 dark:border-indigo-500/20 ml-auto uppercase tracking-wide">
+                        <ShieldCheck className="w-3 h-3" />
+                        VERIFIED
                     </div>
                 )}
+            </div>
+
+            <div className="flex flex-col gap-2 mb-8">
                 <div className="flex items-start gap-2">
-                    {index !== undefined && <span className="text-lg font-bold text-slate-800 dark:text-slate-200 mt-0.5">{index}.</span>}
+                    {index !== undefined && <span className="text-xl font-bold text-slate-800 dark:text-slate-200 mt-0.5">{index}.</span>}
                     {isFillInTheBlank ? (
                         <div className="flex-1 w-full min-w-0">
                             <InteractiveFillInTheBlank 
@@ -407,15 +434,10 @@ export default function QuestionCard({ question, index, testMode = false }: Ques
                             />
                         </div>
                     ) : (
-                        <div className="text-lg font-semibold text-slate-800 dark:text-slate-200 leading-relaxed whitespace-pre-wrap">
+                        <div className="text-2xl font-bold text-slate-800 dark:text-slate-200 leading-tight whitespace-pre-wrap tracking-tight">
                             {question.questionText}
                         </div>
                     )}
-                </div>
-                <div className="text-[11px] text-slate-400 font-medium ml-6 md:ml-8 flex items-center gap-2">
-                    {question.createdAt && <span>Created: {formatDate(question.createdAt)}</span>}
-                    {question.createdAt && question.updatedAt && <span>|</span>}
-                    {question.updatedAt && <span>Updated: {formatDate(question.updatedAt)}</span>}
                 </div>
             </div>
 
@@ -428,15 +450,15 @@ export default function QuestionCard({ question, index, testMode = false }: Ques
                         
                         const isCorrectAnswer = question.correctAnswer?.toLowerCase() === key.toLowerCase();
                         
-                        let containerClasses = "bg-white border-slate-200 text-slate-700 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-300";
-                        let circleClasses = "bg-slate-100 text-slate-600 border border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700";
+                        let containerClasses = "bg-white border border-slate-200 text-slate-700 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-300";
+                        let circleClasses = "bg-[#f8fafc] text-slate-500 border border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700";
                         let Icon = null;
 
                         if (!testMode) {
                             // Reading Mode: Just highlight the correct answer statically
                             if (isCorrectAnswer) {
-                                containerClasses = "bg-green-50 border-green-500 text-green-800 dark:bg-green-900/20 dark:border-green-500/50 dark:text-green-400";
-                                circleClasses = "bg-green-500 text-white border-green-500 dark:bg-green-600 dark:border-green-600";
+                                containerClasses = "bg-[#f0fdf4] border border-[#22c55e] text-[#166534] dark:bg-green-900/20 dark:border-[#22c55e] dark:text-green-400";
+                                circleClasses = "bg-[#22c55e] text-white border-[#22c55e] dark:bg-[#22c55e] dark:border-[#22c55e]";
                                 Icon = CheckCircle2;
                             }
                         } else {
@@ -444,21 +466,21 @@ export default function QuestionCard({ question, index, testMode = false }: Ques
                             if (selectedOption) {
                                 // User has made a choice
                                 if (isCorrectAnswer) {
-                                    containerClasses = "bg-green-50 border-green-500 text-green-800 dark:bg-green-900/20 dark:border-green-500/50 dark:text-green-400";
-                                    circleClasses = "bg-green-500 text-white border-green-500 dark:bg-green-600 dark:border-green-600";
+                                    containerClasses = "bg-[#f0fdf4] border border-[#22c55e] text-[#166534] dark:bg-green-900/20 dark:border-[#22c55e] dark:text-green-400";
+                                    circleClasses = "bg-[#22c55e] text-white border-[#22c55e] dark:bg-[#22c55e] dark:border-[#22c55e]";
                                     Icon = CheckCircle2;
                                 } else if (selectedOption.toLowerCase() === key.toLowerCase()) {
                                     // User picked this wrong answer
-                                    containerClasses = "bg-red-50 border-red-500 text-red-800 dark:bg-red-900/20 dark:border-red-500/50 dark:text-red-400";
+                                    containerClasses = "bg-red-50 border border-red-500 text-red-800 dark:bg-red-900/20 dark:border-red-500/50 dark:text-red-400";
                                     circleClasses = "bg-red-500 text-white border-red-500 dark:bg-red-600 dark:border-red-600";
                                     Icon = XCircle;
                                 } else {
                                     // Neutral state for unpicked wrong answers
-                                    containerClasses = "bg-white border-slate-200 opacity-60 dark:bg-slate-900 dark:border-slate-800";
+                                    containerClasses = "bg-white border border-slate-200 opacity-60 dark:bg-slate-900 dark:border-slate-800";
                                 }
                             } else {
                                 // Hoverable state before choice
-                                containerClasses = "bg-white border-slate-200 hover:border-[#107c41] hover:bg-green-50 dark:bg-slate-900 dark:border-slate-700 dark:hover:border-green-500/50 dark:hover:bg-green-900/20 cursor-pointer";
+                                containerClasses = "bg-white border border-slate-200 hover:border-[#107c41] hover:bg-[#f0fdf4] dark:bg-slate-900 dark:border-slate-700 dark:hover:border-green-500/50 dark:hover:bg-green-900/20 cursor-pointer";
                             }
                         }
 
@@ -472,7 +494,7 @@ export default function QuestionCard({ question, index, testMode = false }: Ques
                                 onClick={() => handleOptionClick(key)}
                             >
                                 <div className={cn(
-                                    "flex items-center justify-center w-8 h-8 rounded-full text-sm font-semibold shrink-0 transition-colors",
+                                    "flex items-center justify-center w-[30px] h-[30px] rounded-full text-sm font-semibold shrink-0 transition-colors",
                                     circleClasses
                                 )}>
                                     {Icon ? <Icon className="h-5 w-5" /> : getOptionLabel(key, question.language)}
@@ -547,68 +569,63 @@ export default function QuestionCard({ question, index, testMode = false }: Ques
                 </div>
             )}
 
-            {/* Tags */}
-            <div className="flex flex-wrap gap-2 mb-6 ml-6 md:ml-8">
-                {question.sourceYear && <Badge variant="secondary" className="bg-slate-100 text-slate-600 hover:bg-slate-200 font-normal shadow-none border border-slate-200 rounded px-3 py-1">{question.sourceYear}</Badge>}
-                {(question as any).taxonomyTags?.map((tag: string) => (
-                    <Badge key={tag} variant="secondary" className="bg-slate-100 text-slate-600 hover:bg-slate-200 font-normal shadow-none border border-slate-200 rounded px-3 py-1">{tag}</Badge>
-                ))}
-                {question.tags?.map(tag => (
-                    <Badge key={tag} variant="secondary" className="bg-slate-100 text-slate-600 hover:bg-slate-200 font-normal shadow-none border border-slate-200 rounded px-3 py-1">{tag}</Badge>
-                ))}
-            </div>
+            {/* Tags moved to top row */}
 
             {/* Footer Actions */}
-            <div className="flex flex-wrap gap-4 justify-between items-center pt-4 border-t border-slate-100 dark:border-slate-800 mt-2 print-hidden-actions">
-                <button 
-                    onClick={() => setShowAnswer(!showAnswer)}
-                    className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/40"
-                >
-                    {showAnswer ? 'Hide Explanation' : 'Show Explanation'}
-                    {showAnswer ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                </button>
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-4 pt-5 border-t border-slate-100 dark:border-slate-800 mt-2 print-hidden-actions text-slate-500 dark:text-slate-400 font-medium">
                 
-                <div className="flex flex-wrap items-center gap-4 md:gap-6 text-slate-500 dark:text-slate-400 text-sm font-medium">
-                    <button onClick={() => handleInteract('like')} className={cn("flex items-center gap-1.5 hover:text-[#107c41] transition-colors", interaction.isLiked && "text-[#107c41]")}>
-                        <Heart className={cn("h-4 w-4", interaction.isLiked && "fill-current")} />
-                        <span>{counts.likes > 0 ? counts.likes : 'Like'}</span>
+                <div className="flex items-center gap-6">
+                    <button onClick={() => handleInteract('like')} className={cn("flex items-center gap-2 hover:text-[#107c41] transition-colors", interaction.isLiked && "text-[#107c41]")}>
+                        <Heart className={cn("h-5 w-5", interaction.isLiked && "fill-current")} />
+                        <span className="text-[15px]">{counts.likes > 0 ? counts.likes : 'Like'}</span>
                     </button>
-                    <button onClick={() => handleInteract('dislike')} className={cn("flex items-center gap-1.5 hover:text-red-500 transition-colors", interaction.isDisliked && "text-red-500")}>
-                        <ThumbsDown className={cn("h-4 w-4", interaction.isDisliked && "fill-current")} />
+                    <button onClick={() => handleInteract('dislike')} className={cn("flex items-center gap-2 hover:text-red-500 transition-colors", interaction.isDisliked && "text-red-500")}>
+                        <ThumbsDown className={cn("h-5 w-5", interaction.isDisliked && "fill-current")} />
                     </button>
-                    <button onClick={() => handleInteract('bookmark')} className={cn("flex items-center gap-1.5 hover:text-yellow-500 transition-colors", interaction.isBookmarked && "text-yellow-500")}>
-                        <Bookmark className={cn("h-4 w-4", interaction.isBookmarked && "fill-current")} />
-                        <span>{counts.bookmarks > 0 ? counts.bookmarks : 'Save'}</span>
+                    <button onClick={() => handleInteract('bookmark')} className={cn("flex items-center gap-2 hover:text-yellow-500 transition-colors", interaction.isBookmarked && "text-yellow-500")}>
+                        <Bookmark className={cn("h-5 w-5", interaction.isBookmarked && "fill-current")} />
+                        <span className="text-[15px]">{counts.bookmarks > 0 ? counts.bookmarks : 'Save'}</span>
                     </button>
-                    
-                    <div className="w-px h-4 bg-slate-200 dark:bg-slate-700 mx-1 hidden sm:block"></div>
-                    
-                    <button onClick={handleCopyLink} className="flex items-center gap-1.5 hover:text-blue-500 transition-colors" title="Copy Link">
-                        <LinkIcon className="h-4 w-4" />
+                </div>
+                
+                <div className="w-px h-5 bg-slate-200 dark:bg-slate-700 hidden sm:block"></div>
+                
+                <div className="flex items-center gap-5">
+                    <button onClick={handleCopyLink} className="flex items-center hover:text-blue-500 transition-colors" title="Copy Link">
+                        <LinkIcon className="h-[18px] w-[18px]" />
                     </button>
-                    <button onClick={handlePrint} className="flex items-center gap-1.5 hover:text-slate-800 dark:hover:text-slate-200 transition-colors" title="Print">
-                        <Printer className="h-4 w-4" />
+                    <button onClick={handlePrint} className="flex items-center hover:text-slate-800 dark:hover:text-slate-200 transition-colors" title="Print">
+                        <Printer className="h-[18px] w-[18px]" />
                     </button>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <button className="flex items-center gap-1.5 hover:text-blue-600 dark:hover:text-blue-400 transition-colors outline-none" title="Download as Image">
-                                <Download className="h-4 w-4" />
+                            <button className="flex items-center hover:text-blue-600 dark:hover:text-blue-400 transition-colors outline-none" title="Download as Image">
+                                <Download className="h-[18px] w-[18px]" />
                             </button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
+                        <DropdownMenuContent align="start">
                             <DropdownMenuItem onClick={() => handleDownloadImage('square')}>Instagram Square (1:1)</DropdownMenuItem>
                             <DropdownMenuItem onClick={() => handleDownloadImage('story')}>Mobile Story (9:16)</DropdownMenuItem>
                             <DropdownMenuItem onClick={() => handleDownloadImage('landscape')}>Desktop Landscape (16:9)</DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
-                    <button onClick={() => toast({ title: 'Reported', description: 'Thank you for reporting this question.' })} className="flex items-center gap-1.5 hover:text-red-500 transition-colors" title="Report Issue">
-                        <Flag className="h-4 w-4" />
+                    <button onClick={() => toast({ title: 'Reported', description: 'Thank you for reporting this question.' })} className="flex items-center hover:text-red-500 transition-colors" title="Report Issue">
+                        <Flag className="h-[18px] w-[18px]" />
                     </button>
-
-                    <div className="flex items-center gap-1.5 ml-2" title="Views">
-                        <Eye className="h-4 w-4" />
-                        <span>{counts.views}</span>
+                    <div className="flex items-center gap-1.5 ml-1" title="Views">
+                        <Eye className="h-[18px] w-[18px]" />
+                        <span className="text-[15px]">{counts.views}</span>
                     </div>
+                </div>
+
+                <div className="ml-auto">
+                    <button 
+                        onClick={() => setShowAnswer(!showAnswer)}
+                        className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/40"
+                    >
+                        {showAnswer ? 'Hide Explanation' : 'Show Explanation'}
+                        {showAnswer ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                    </button>
                 </div>
             </div>
 
