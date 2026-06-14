@@ -24,12 +24,15 @@ import { AiQuestionGeneratorModal } from './AiQuestionGeneratorModal';
 import 'katex/dist/katex.min.css';
 
 interface Props {
+  boardId?: string;
+  classId?: string;
+  textbookId?: string;
   subjectId?: string;
   chapterId?: string;
   paperName?: string;
 }
 
-export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }: Props) {
+export default function QuestionPaperBuilder({ boardId, classId, textbookId, subjectId, chapterId, paperName }: Props) {
   const router = useRouter();
   const [questions, setQuestions] = useState<QuestionBankEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -200,6 +203,35 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
       const { doc, getDoc } = await import('firebase/firestore');
       const { db } = await import('@/lib/firebase/client');
 
+      let boardName = '';
+      let classNameStr = '';
+      let textbookName = '';
+
+      if (boardId) {
+        const d = await getDoc(doc(db, 'taxonomy_nodes', boardId));
+        if (d.exists()) boardName = d.data().title || d.data().name || '';
+      }
+
+      if (classId) {
+        const d = await getDoc(doc(db, 'taxonomy_nodes', classId));
+        if (d.exists()) classNameStr = d.data().title || d.data().name || '';
+      }
+
+      if (textbookId) {
+        const d = await getDoc(doc(db, 'taxonomy_nodes', textbookId));
+        if (d.exists()) textbookName = d.data().title || d.data().name || '';
+      }
+
+      if (boardName || classNameStr || textbookName) {
+        // Convert current year to Bengali digits
+        const currentYear = new Date().getFullYear().toString();
+        const bnDigits: { [key: string]: string } = { '0': '০', '1': '১', '2': '২', '3': '৩', '4': '৪', '5': '৫', '6': '৬', '7': '৭', '8': '৮', '9': '৯' };
+        const bnYear = currentYear.replace(/[0-9]/g, w => bnDigits[w] || w);
+        
+        const combined = [boardName, classNameStr, textbookName].filter(Boolean).join(' - ');
+        setHeaderClassName(`${combined} - ${bnYear}`);
+      }
+
       if (subjectId) {
         const d = await getDoc(doc(db, 'taxonomy_nodes', subjectId));
         if (d.exists()) {
@@ -217,7 +249,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
       }
     };
     fetchTaxonomyNames();
-  }, [subjectId, chapterId]);
+  }, [boardId, classId, textbookId, subjectId, chapterId]);
   const [footerText, setFooterText] = useState('');
   const [questionOptionGap, setQuestionOptionGap] = useState(8);
   const [showExplanations, setShowExplanations] = useState(false);

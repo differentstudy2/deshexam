@@ -220,6 +220,9 @@ export default function QuestionSelectionInterface({ initialFilters }: { initial
     
     // Push to the new page with search parameters
     const params = new URLSearchParams();
+    if (initialFilters.boardId && initialFilters.boardId !== 'all') params.set('board_id', initialFilters.boardId);
+    if (initialFilters.classId && initialFilters.classId !== 'all') params.set('class_id', initialFilters.classId);
+    if (initialFilters.textbookId && initialFilters.textbookId !== 'all') params.set('textbook_id', initialFilters.textbookId);
     if (activeFilters.subjectId && activeFilters.subjectId !== 'all') params.set('subject_id', activeFilters.subjectId);
     if (activeFilters.chapterId && activeFilters.chapterId !== 'all') params.set('chapter_id', activeFilters.chapterId);
     if (paperName) params.set('paper_name', paperName);
