@@ -148,7 +148,7 @@ export function TopicQuestionManager({ topicId, tabType }: TopicQuestionManagerP
         
         toast({ title: 'Questions imported successfully!' });
         setBulkJson('');
-        setMode('list');
+        setMode('single');
         fetchTopicQuestions();
     } catch(e: any) {
         toast({ title: 'Invalid JSON format', description: e.message, variant: 'destructive' });
@@ -227,8 +227,8 @@ export function TopicQuestionManager({ topicId, tabType }: TopicQuestionManagerP
                       </Button>
                   </>
               )}
-              <Button onClick={() => setMode(mode === 'single' ? 'list' : 'single')} variant={mode === 'single' ? "outline" : "default"} className={mode !== 'single' ? "bg-[#107c41] hover:bg-[#0b5c30]" : ""}>
-                  {mode === 'single' ? "Cancel" : <><Plus className="w-4 h-4 mr-2" /> Add Single</>}
+              <Button onClick={() => setMode(mode === 'single' ? 'single' : 'single')} variant={mode === 'single' ? "outline" : "default"} className={mode !== 'single' ? "bg-[#107c41] hover:bg-[#0b5c30]" : ""}>
+                  <Plus className="w-4 h-4 mr-2" /> Add Question
               </Button>
               <Link href={`/admin/question-bank/questions?topicId=${topicId}`}>
                 <Button variant="secondary" className="shadow-sm">
@@ -256,7 +256,7 @@ export function TopicQuestionManager({ topicId, tabType }: TopicQuestionManagerP
                       fetchTopicQuestions();
                       // Keep the form open for the next question instead of closing it
                   }}
-                  onCancel={() => setMode('list')}
+                  onCancel={() => setMode('single')}
               />
           </div>
       )}
@@ -265,6 +265,7 @@ export function TopicQuestionManager({ topicId, tabType }: TopicQuestionManagerP
       {mode === 'edit' && editingQuestion && (
           <div className="animate-in fade-in slide-in-from-top-2 border rounded-xl overflow-hidden bg-white dark:bg-slate-950 shadow-md p-2">
               <QuestionBankEditor 
+                  defaultContentType="academic"
                   initialData={{
                       ...editingQuestion,
                       boardId: editingQuestion.boardId || hierarchy?.boardId || '',
@@ -275,12 +276,12 @@ export function TopicQuestionManager({ topicId, tabType }: TopicQuestionManagerP
                       topicId: editingQuestion.topicId || topicId,
                   }}
                   onSaveComplete={() => {
-                      setMode('list');
+                      setMode('single');
                       setEditingQuestion(null);
                       fetchTopicQuestions();
                   }}
                   onCancel={() => {
-                      setMode('list');
+                      setMode('single');
                       setEditingQuestion(null);
                   }}
               />
