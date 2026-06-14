@@ -31,19 +31,17 @@ export default function QuestionBuilderFilters() {
     const fetchTaxonomies = async () => {
       setLoading(true);
       try {
-        const fetchCol = async (col: string) => {
-          try {
-            const snap = await getDocs(collection(db, col));
-            return snap.docs.map(d => ({ id: d.id, ...d.data() }));
-          } catch {
-            return [];
-          }
-        };
-        const [b, c, s, t, ch, tp] = await Promise.all([
-          fetchCol('guide_boards'), fetchCol('guide_classes'), fetchCol('guide_subjects'),
-          fetchCol('guide_textbooks'), fetchCol('guide_chapters'), fetchCol('guide_topics')
-        ]);
-        setTaxonomies({ boards: b, classes: c, subjects: s, textbooks: t, chapters: ch, topics: tp });
+        const snap = await getDocs(collection(db, 'taxonomy_nodes'));
+        const allNodes = snap.docs.map(d => ({ id: d.id, ...d.data() as any }));
+        
+        setTaxonomies({
+          boards: allNodes.filter(n => n.type === 'board' || n.type === 'category'),
+          classes: allNodes.filter(n => n.type === 'class' || n.type === 'subcategory'),
+          subjects: allNodes.filter(n => n.type === 'subject'),
+          textbooks: allNodes.filter(n => n.type === 'textbook' || n.type === 'exam'),
+          chapters: allNodes.filter(n => n.type === 'chapter'),
+          topics: allNodes.filter(n => n.type === 'topic')
+        });
       } catch (error) {
         console.error("Failed to fetch taxonomies", error);
       } finally {
@@ -53,30 +51,30 @@ export default function QuestionBuilderFilters() {
     fetchTaxonomies();
   }, []);
 
-  // Cascading filter logic
+  // Cascading filter logic using parentId
   const filteredClasses = useMemo(() => {
     if (filters.boardId === 'all') return [];
-    return taxonomies.classes.filter(c => c.boardId === filters.boardId);
+    return taxonomies.classes.filter(c => c.parentId === filters.boardId);
   }, [taxonomies.classes, filters.boardId]);
 
   const filteredSubjects = useMemo(() => {
     if (filters.classId === 'all') return [];
-    return taxonomies.subjects.filter(s => s.classId === filters.classId);
+    return taxonomies.subjects.filter(s => s.parentId === filters.classId);
   }, [taxonomies.subjects, filters.classId]);
 
   const filteredTextbooks = useMemo(() => {
     if (filters.subjectId === 'all') return [];
-    return taxonomies.textbooks.filter(t => t.subjectId === filters.subjectId);
+    return taxonomies.textbooks.filter(t => t.parentId === filters.subjectId);
   }, [taxonomies.textbooks, filters.subjectId]);
 
   const filteredChapters = useMemo(() => {
     if (filters.textbookId === 'all') return [];
-    return taxonomies.chapters.filter(c => c.textbookId === filters.textbookId);
+    return taxonomies.chapters.filter(c => c.parentId === filters.textbookId);
   }, [taxonomies.chapters, filters.textbookId]);
 
   const filteredTopics = useMemo(() => {
     if (filters.chapterId === 'all') return [];
-    return taxonomies.topics.filter(t => t.chapterId === filters.chapterId);
+    return taxonomies.topics.filter(t => t.parentId === filters.chapterId);
   }, [taxonomies.topics, filters.chapterId]);
 
   // Handlers to reset children

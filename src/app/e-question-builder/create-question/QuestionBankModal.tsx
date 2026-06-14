@@ -43,36 +43,24 @@ export function QuestionBankModal({ isOpen, onClose, onAdd, appLanguage }: Quest
   // Fetch boards and initial questions on mount
   useEffect(() => {
     if (isOpen) {
-      const fetchGuideCol = async (colName: string) => {
+      const fetchTaxonomies = async () => {
         try {
-          const snap = await getDocs(collection(db, colName));
-          return snap.docs.map(d => {
+          const snap = await getDocs(collection(db, 'taxonomy_nodes'));
+          const allNodes = snap.docs.map(d => {
             const data = d.data();
-            return { id: d.id, name: data.title || data.name, ...data };
+            return { id: d.id, name: data.title || data.name, ...data } as TaxonomyNode;
           });
+          
+          setBoards(allNodes.filter(n => n.type === 'board' || n.type === 'category'));
+          setClasses(allNodes.filter(n => n.type === 'class' || n.type === 'subcategory'));
+          setSubjects(allNodes.filter(n => n.type === 'subject'));
+          setChapters(allNodes.filter(n => n.type === 'chapter'));
         } catch(e) {
-          console.error('Error fetching guide collection:', colName, e);
-          return [];
+          console.error('Error fetching taxonomy_nodes:', e);
         }
       };
 
-      const fetchCombinedCol = async (guideCol: string, questionCol: string) => {
-        const [g, q] = await Promise.all([fetchGuideCol(guideCol), fetchGuideCol(questionCol)]);
-        const combined = [...g, ...q];
-        return Array.from(new Map(combined.map(item => [item.id, item])).values()) as TaxonomyNode[];
-      };
-
-      Promise.all([
-        fetchCombinedCol('guide_boards', 'question_boards'),
-        fetchCombinedCol('guide_classes', 'question_classes'),
-        fetchCombinedCol('guide_subjects', 'question_subjects'),
-        fetchCombinedCol('guide_chapters', 'question_chapters')
-      ]).then(([b, c, s, ch]) => {
-        setBoards(b);
-        setClasses(c);
-        setSubjects(s);
-        setChapters(ch);
-      });
+      fetchTaxonomies();
     }
   }, [isOpen]);
 
