@@ -88,6 +88,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
   const [showTitle, setShowTitle] = useState(true);
   const [showAddress, setShowAddress] = useState(true);
   const [showClassName, setShowClassName] = useState(true);
+  const [showTextbookName, setShowTextbookName] = useState(true);
   const [showSubjectName, setShowSubjectName] = useState(true);
   const [showChapterName, setShowChapterName] = useState(true);
   const [showInstructions, setShowInstructions] = useState(true);
@@ -107,9 +108,10 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
 
   // Center & Exam Settings State
   const [headerSettingsEnabled, setHeaderSettingsEnabled] = useState(true);
-  const [headerTitle, setHeaderTitle] = useState('');
-  const [headerAddress, setHeaderAddress] = useState('');
+  const [headerTitle, setHeaderTitle] = useState('দেশ এক্সাম একাডেমী');
+  const [headerAddress, setHeaderAddress] = useState('দ্বারিকামারী, পেঁটলা, দিনহাটা, কোচবিহার');
   const [headerClassName, setHeaderClassName] = useState('অষ্টম শ্রেণি (মাধ্যমিক) - ২০২৬');
+  const [headerTextbookName, setHeaderTextbookName] = useState('');
   const [headerSubjectName, setHeaderSubjectName] = useState('');
   const [headerChapterName, setHeaderChapterName] = useState('');
 
@@ -217,19 +219,22 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
         if (d.exists()) classNameStr = d.data().title || d.data().name || '';
       }
 
-      if (textbookId) {
-        const d = await getDoc(doc(db, 'taxonomy_nodes', textbookId));
-        if (d.exists()) textbookName = d.data().title || d.data().name || '';
-      }
-
-      if (boardName || classNameStr || textbookName) {
+      if (boardName || classNameStr) {
         // Convert current year to Bengali digits
         const currentYear = new Date().getFullYear().toString();
         const bnDigits: { [key: string]: string } = { '0': '০', '1': '১', '2': '২', '3': '৩', '4': '৪', '5': '৫', '6': '৬', '7': '৭', '8': '৮', '9': '৯' };
         const bnYear = currentYear.replace(/[0-9]/g, w => bnDigits[w] || w);
         
-        const combined = [boardName, classNameStr, textbookName].filter(Boolean).join(' - ');
+        const combined = [boardName, classNameStr].filter(Boolean).join(' - ');
         setHeaderClassName(`${combined} - ${bnYear}`);
+      }
+
+      if (textbookId) {
+        const d = await getDoc(doc(db, 'taxonomy_nodes', textbookId));
+        if (d.exists()) {
+          const name = d.data().title || d.data().name || '';
+          if (name) setHeaderTextbookName(`বই: ${name}`);
+        }
       }
 
       if (subjectId) {
@@ -767,6 +772,10 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                   <Input value={headerClassName} onChange={e => setHeaderClassName(e.target.value)} className="h-10 text-[14px] bg-white text-gray-700 border-gray-200" placeholder={t('defaultHeaderClass', appLanguage)} />
                 </div>
                 <div>
+                  <label className="text-[13px] text-gray-700 mb-1.5 block">বইয়ের নাম</label>
+                  <Input value={headerTextbookName} onChange={e => setHeaderTextbookName(e.target.value)} className="h-10 text-[14px] bg-white text-gray-700 border-gray-200" placeholder="Textbook Name" />
+                </div>
+                <div>
                   <label className="text-[13px] text-gray-700 mb-1.5 block">{t('subject', appLanguage)}</label>
                   <Input value={headerSubjectName} onChange={e => setHeaderSubjectName(e.target.value)} className="h-10 text-[14px] bg-white text-gray-700 border-gray-200" placeholder={t('defaultHeaderSubject', appLanguage)} />
                 </div>
@@ -826,6 +835,10 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-700 flex items-center gap-3"><Landmark className="w-4 h-4 text-green-500" /> {t('classToggle', appLanguage)}</span>
                 <Switch checked={showClassName} onCheckedChange={setShowClassName} />
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-700 flex items-center gap-3"><Book className="w-4 h-4 text-green-500" /> বই টগল</span>
+                <Switch checked={showTextbookName} onCheckedChange={setShowTextbookName} />
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-700 flex items-center gap-3"><Book className="w-4 h-4 text-green-500" /> {t('subjectToggle', appLanguage)}</span>
@@ -1420,6 +1433,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                           {showTitle && <h1 {...getEditableProps("text-2xl font-bold text-gray-900 mb-1")}>{headerTitle || t('defaultHeaderTitle', appLanguage)}</h1>}
                           {showAddress && <p {...getEditableProps("text-[13px] text-gray-700 mb-1")}>{headerAddress || t('defaultHeaderAddress', appLanguage)}</p>}
                           {showClassName && <h2 {...getEditableProps("text-[15px] font-bold text-gray-800 mb-1")}>{headerClassName || t('defaultHeaderClass', appLanguage)}</h2>}
+                          {showTextbookName && headerTextbookName && <h3 {...getEditableProps("text-[14px] font-bold text-gray-800 mb-0.5")}>{headerTextbookName}</h3>}
                           {showSubjectName && <h3 {...getEditableProps("text-[14px] font-bold text-gray-800 mb-0.5")}>{headerSubjectName || t('defaultHeaderSubject', appLanguage)}</h3>}
                           {showChapterName && <h4 {...getEditableProps("text-[13px] text-gray-700")}>{headerChapterName || t('defaultHeaderChapter', appLanguage)}</h4>}
                         </div>
