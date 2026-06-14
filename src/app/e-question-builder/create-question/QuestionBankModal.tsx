@@ -99,11 +99,18 @@ export function QuestionBankModal({ isOpen, onClose, onAdd, appLanguage, initial
     // setQuestions([]);
     
     const filters: any = {};
-    if (selectedBoard !== 'all') filters.boardId = selectedBoard;
-    if (selectedClass !== 'all') filters.classId = selectedClass;
-    if (selectedTextbook !== 'all') filters.textbookId = selectedTextbook;
-    if (selectedSubject !== 'all') filters.subjectId = selectedSubject;
-    if (selectedChapter !== 'all') filters.chapterId = selectedChapter;
+    // Use only the most specific node to avoid missing questions if higher-up taxonomy tree is broken.
+    if (selectedChapter !== 'all') {
+        filters.chapterId = selectedChapter;
+    } else if (selectedSubject !== 'all') {
+        filters.subjectId = selectedSubject;
+    } else if (selectedTextbook !== 'all') {
+        filters.textbookId = selectedTextbook;
+    } else if (selectedClass !== 'all') {
+        filters.classId = selectedClass;
+    } else if (selectedBoard !== 'all') {
+        filters.boardId = selectedBoard;
+    }
 
     try {
       console.log('Fetching questions with filters:', filters);

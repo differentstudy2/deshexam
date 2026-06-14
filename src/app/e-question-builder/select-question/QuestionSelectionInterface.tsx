@@ -170,10 +170,16 @@ export default function QuestionSelectionInterface({ initialFilters }: { initial
     try {
       const qFilters: any = {};
       
-      // Map frontend filters to backend fields
-      if (activeFilters.subjectId !== 'all') qFilters.subjectId = activeFilters.subjectId;
-      if (activeFilters.chapterId !== 'all') qFilters.chapterId = activeFilters.chapterId;
-      if (activeFilters.topicId !== 'all') qFilters.topicId = activeFilters.topicId;
+      // Map frontend filters to backend fields. 
+      // Use only the most specific node to avoid missing questions if higher-up taxonomy tree is broken.
+      if (activeFilters.topicId && activeFilters.topicId !== 'all') {
+          qFilters.topicId = activeFilters.topicId;
+      } else if (activeFilters.chapterId && activeFilters.chapterId !== 'all') {
+          qFilters.chapterId = activeFilters.chapterId;
+      } else if (activeFilters.subjectId && activeFilters.subjectId !== 'all') {
+          qFilters.subjectId = activeFilters.subjectId;
+      }
+      
       if (activeFilters.difficulty !== 'all') qFilters.difficulty = activeFilters.difficulty;
       
       let data = await getQuestions(qFilters, 50);

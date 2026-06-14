@@ -341,3 +341,21 @@ export async function bulkCreateQuestions(questions: Omit<QuestionBankEntry, 'cr
   }
 }
 
+export async function bulkEditQuestions(updates: (Partial<QuestionBankEntry> & { id: string })[]) {
+  const CHUNK_SIZE = 450;
+  for (let i = 0; i < updates.length; i += CHUNK_SIZE) {
+    const chunk = updates.slice(i, i + CHUNK_SIZE);
+    const batch = writeBatch(db);
+    
+    chunk.forEach(q => {
+      const docRef = doc(db, QUESTIONS_COLLECTION, q.id);
+      const updateData = { ...q };
+      delete (updateData as any).id;
+      batch.update(docRef, { ...updateData, updatedAt: serverTimestamp() });
+    });
+    
+    await batch.commit();
+  }
+}
+
+

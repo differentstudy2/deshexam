@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Trash2, Edit, Save, ExternalLink, Loader2, Sparkles, Upload } from 'lucide-react';
-import { getQuestions, createQuestion, deleteQuestion } from '@/lib/firebase/question-bank';
+import { getQuestions, createQuestion, deleteQuestion, bulkEditQuestions } from '@/lib/firebase/question-bank';
 import { getTopicHierarchy } from '@/lib/firebase/guide';
 import { QuestionBankEditor } from '@/components/admin/QuestionBankEditor';
 import { QuestionBankEntry } from '@/lib/question-bank-types';
@@ -25,9 +25,10 @@ export function TopicQuestionManager({ topicId, tabType }: TopicQuestionManagerP
   const [questions, setQuestions] = useState<QuestionBankEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [hierarchy, setHierarchy] = useState<any>(null);
+  const [hierarchyLoading, setHierarchyLoading] = useState(true);
   
   // Editor mode state
-  const [mode, setMode] = useState<'list' | 'single' | 'bulk' | 'ai' | 'edit'>('single');
+  const [mode, setMode] = useState<'list' | 'single' | 'bulk' | 'bulk-edit' | 'ai' | 'edit'>('single');
   const [editingQuestion, setEditingQuestion] = useState<QuestionBankEntry | null>(null);
   
   // Minimal editor state
@@ -71,7 +72,11 @@ export function TopicQuestionManager({ topicId, tabType }: TopicQuestionManagerP
 
   useEffect(() => {
     fetchTopicQuestions();
-    getTopicHierarchy(topicId).then(setHierarchy);
+    setHierarchyLoading(true);
+    getTopicHierarchy(topicId).then((h) => {
+      setHierarchy(h);
+      setHierarchyLoading(false);
+    });
   }, [topicId, tabType, innerQType]);
 
   const handleSaveInline = async () => {
@@ -182,8 +187,51 @@ export function TopicQuestionManager({ topicId, tabType }: TopicQuestionManagerP
         setBulkJson('');
         setMode('single');
         fetchTopicQuestions();
-    } catch(e: any) {
-        toast({ title: 'Invalid JSON format', description: e.message, variant: 'destructive' });
+    } catch (error) {
+        console.error(error);
+        toast({ title: 'Error importing questions', variant: 'destructive' });
+    } finally {
+        setIsProcessing(false);
+    }
+  };
+
+  const enterBulkEditMode = () => {
+      const simplified = questions.map(q => ({
+          id: q.id,
+          questionText: q.questionText,
+          options: q.options || { a: '', b: '', c: '', d: '' },
+          correctAnswer: q.correctAnswer || 'a',
+          explanation: q.explanation || ''
+      }));
+      setBulkJson(JSON.stringify(simplified, null, 2));
+      setMode('bulk-edit');
+  };
+
+  const handleBulkEditUpdate = async () => {
+    try {
+        const parsed = JSON.parse(bulkJson);
+        if (!Array.isArray(parsed)) throw new Error("Must be a JSON array");
+        
+        setIsProcessing(true);
+        const updates = parsed.filter(item => item.id).map(item => ({
+            id: item.id,
+            questionText: item.questionText,
+            options: item.options,
+            correctAnswer: item.correctAnswer,
+            explanation: item.explanation
+        }));
+        
+        if (updates.length > 0) {
+            await bulkEditQuestions(updates);
+            toast({ title: `Successfully updated ${updates.length} questions!` });
+        }
+        
+        setBulkJson('');
+        setMode('list');
+        fetchTopicQuestions();
+    } catch (error) {
+        console.error(error);
+        toast({ title: 'Error updating questions', variant: 'destructive' });
     } finally {
         setIsProcessing(false);
     }
@@ -257,6 +305,11 @@ export function TopicQuestionManager({ topicId, tabType }: TopicQuestionManagerP
                       <Button onClick={() => setMode(mode === 'bulk' ? 'list' : 'bulk')} variant="outline">
                           {mode === 'bulk' ? "Cancel Bulk" : <><Upload className="w-4 h-4 mr-2" /> Bulk Import JSON</>}
                       </Button>
+                      {questions.length > 0 && (
+                          <Button onClick={() => mode === 'bulk-edit' ? setMode('list') : enterBulkEditMode()} variant="outline">
+                              {mode === 'bulk-edit' ? "Cancel Edit" : <><Edit className="w-4 h-4 mr-2" /> Bulk Edit JSON</>}
+                          </Button>
+                      )}
                   </>
               )}
               <Button onClick={() => setMode(mode === 'single' ? 'single' : 'single')} variant={mode === 'single' ? "outline" : "default"} className={mode !== 'single' ? "bg-[#107c41] hover:bg-[#0b5c30]" : ""}>
@@ -271,7 +324,7 @@ export function TopicQuestionManager({ topicId, tabType }: TopicQuestionManagerP
       </div>
 
       {/* SINGLE QUESTION EDITOR */}
-      {mode === 'single' && (
+      {mode === 'single' && !hierarchyLoading && (
           <div className="animate-in fade-in slide-in-from-top-2 border rounded-xl overflow-hidden bg-white dark:bg-slate-950 shadow-md p-2">
               <QuestionBankEditor 
                   defaultContentType="academic"
@@ -294,7 +347,7 @@ export function TopicQuestionManager({ topicId, tabType }: TopicQuestionManagerP
       )}
 
       {/* EDIT QUESTION EDITOR */}
-      {mode === 'edit' && editingQuestion && (
+      {mode === 'edit' && editingQuestion && !hierarchyLoading && (
           <div className="animate-in fade-in slide-in-from-top-2 border rounded-xl overflow-hidden bg-white dark:bg-slate-950 shadow-md p-2">
               <QuestionBankEditor 
                   defaultContentType="academic"
@@ -320,28 +373,59 @@ export function TopicQuestionManager({ topicId, tabType }: TopicQuestionManagerP
           </div>
       )}
 
-      {/* BULK IMPORT EDITOR */}
-      {mode === 'bulk' && (
-          <Card className="border-blue-200 dark:border-blue-900 shadow-md animate-in fade-in slide-in-from-top-2">
-              <CardHeader className="bg-blue-50/50 dark:bg-blue-900/20 pb-4">
-                  <CardTitle className="text-lg flex items-center gap-2">Bulk JSON Import</CardTitle>
-                  <p className="text-sm text-slate-500">Paste a JSON array containing your questions. Format: <code className="bg-white dark:bg-black px-1 rounded">[{`{"questionText": "...", "options": {"a":"...","b":"...","c":"...","d":"..."}, "correctAnswer": "a", "explanation": "..."}`}]</code></p>
+      {/* BULK IMPORT UI */}
+      {mode === 'bulk' && !hierarchyLoading && (
+          <div className="animate-in fade-in slide-in-from-top-2">
+              <Card>
+              <CardHeader className="bg-slate-50 dark:bg-slate-900 pb-4">
+                  <CardTitle className="text-lg flex items-center gap-2 text-[#107c41]">
+                      <Upload className="w-5 h-5" /> Bulk Import Questions (JSON)
+                  </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 pt-6">
                   <Textarea 
+                      disabled={isProcessing || hierarchyLoading}
                       value={bulkJson} 
                       onChange={e => setBulkJson(e.target.value)} 
                       placeholder="[\n  {\n    &quot;questionText&quot;: &quot;...&quot;,\n    &quot;options&quot;: { &quot;a&quot;: &quot;&quot;, &quot;b&quot;: &quot;&quot;, &quot;c&quot;: &quot;&quot;, &quot;d&quot;: &quot;&quot; },\n    &quot;correctAnswer&quot;: &quot;a&quot;,\n    &quot;explanation&quot;: &quot;...&quot;\n  }\n]"
                       className="min-h-[300px] font-mono text-sm bg-slate-900 text-slate-50"
                   />
                   <div className="flex justify-end">
-                      <Button onClick={handleBulkImport} disabled={isProcessing} className="bg-blue-600 hover:bg-blue-700 text-white">
+                      <Button onClick={handleBulkImport} disabled={isProcessing || !bulkJson || hierarchyLoading} className="bg-blue-600 hover:bg-blue-700 text-white">
                           {isProcessing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
                           Import Questions
                       </Button>
                   </div>
               </CardContent>
-          </Card>
+              </Card>
+          </div>
+      )}
+
+      {/* BULK EDIT UI */}
+      {mode === 'bulk-edit' && !hierarchyLoading && (
+          <div className="animate-in fade-in slide-in-from-top-2">
+              <Card>
+              <CardHeader className="bg-amber-50 dark:bg-amber-900/20 pb-4 border-b border-amber-100 dark:border-amber-900/50">
+                  <CardTitle className="text-lg flex items-center gap-2 text-amber-700 dark:text-amber-400">
+                      <Edit className="w-5 h-5" /> Bulk Edit Questions (JSON)
+                  </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4 pt-6">
+                  <Textarea 
+                      disabled={isProcessing || hierarchyLoading}
+                      value={bulkJson} 
+                      onChange={e => setBulkJson(e.target.value)} 
+                      className="min-h-[400px] font-mono text-sm bg-slate-900 text-slate-50"
+                  />
+                  <div className="flex justify-end">
+                      <Button onClick={handleBulkEditUpdate} disabled={isProcessing || !bulkJson || hierarchyLoading} className="bg-amber-600 hover:bg-amber-700 text-white">
+                          {isProcessing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+                          Save Changes
+                      </Button>
+                  </div>
+              </CardContent>
+              </Card>
+          </div>
       )}
 
       {/* AI GENERATION EDITOR */}
