@@ -24,10 +24,11 @@ jobs:
       - name: Build application
         run: npm run build
 
-      - name: Deploy to Firebase
-        uses: firebase/firebase-tools-action@v0.5.0
-        with:
-          command: apphosting:deploy
-          serviceAccount: ${{ secrets.GCP_SA_KEY }}
-          projectId: ${{ secrets.FIREBASE_PROJECT_ID }}
-          backend-secrets: GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
+      - name: Deploy to Firebase App Hosting
+        run: |
+          npm install -g firebase-tools
+          echo '${{ secrets.GCP_SA_KEY }}' > sa-key.json
+          export GOOGLE_APPLICATION_CREDENTIALS=$(pwd)/sa-key.json
+          firebase apphosting:deploy --project ${{ secrets.FIREBASE_PROJECT_ID }}
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
