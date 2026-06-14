@@ -18,9 +18,15 @@ interface QuestionBankModalProps {
   onClose: () => void;
   onAdd: (questions: any[]) => void;
   appLanguage: AppLanguage;
+  initialFilters?: {
+    boardId?: string;
+    classId?: string;
+    subjectId?: string;
+    chapterId?: string;
+  };
 }
 
-export function QuestionBankModal({ isOpen, onClose, onAdd, appLanguage }: QuestionBankModalProps) {
+export function QuestionBankModal({ isOpen, onClose, onAdd, appLanguage, initialFilters }: QuestionBankModalProps) {
   const { toast } = useToast();
 
   // Taxonomy states
@@ -39,6 +45,16 @@ export function QuestionBankModal({ isOpen, onClose, onAdd, appLanguage }: Quest
   const [questions, setQuestions] = useState<QuestionBankEntry[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedQuestionIds, setSelectedQuestionIds] = useState<Set<string>>(new Set());
+
+  // Update selected filters when modal opens with initialFilters
+  useEffect(() => {
+    if (isOpen && initialFilters) {
+      if (initialFilters.boardId) setSelectedBoard(initialFilters.boardId);
+      if (initialFilters.classId) setSelectedClass(initialFilters.classId);
+      if (initialFilters.subjectId) setSelectedSubject(initialFilters.subjectId);
+      if (initialFilters.chapterId) setSelectedChapter(initialFilters.chapterId);
+    }
+  }, [isOpen]); // Only run when modal opens
 
   // Fetch boards and initial questions on mount
   useEffect(() => {
