@@ -6,6 +6,8 @@ import { ReadingLayout } from '@/components/guide/ReadingLayout';
 import { SubjectDashboard } from '@/components/guide/SubjectDashboard';
 import { Metadata } from 'next';
 
+export const dynamic = 'force-dynamic';
+
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const resolvedParams = await params;
   const decodedId = decodeURIComponent(resolvedParams.id);

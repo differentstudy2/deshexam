@@ -81,7 +81,24 @@ export const createTaxonomyNode = async (data: Omit<TaxonomyNode, 'id' | 'create
 // UPDATE
 export const updateTaxonomyNode = async (id: string, data: Partial<TaxonomyNode>) => {
   const docRef = doc(db, 'taxonomy_nodes', id);
+  const existingDoc = await getDoc(docRef);
+  
   await updateDoc(docRef, { ...data, updatedAt: serverTimestamp() });
+
+  // Automatically sync updates to the new guide_* collections to prevent split-brain issues
+  if (existingDoc.exists() && data.title) {
+    const type = existingDoc.data().type;
+    // Only sync if it's an academic node type that exists in guide_* collections
+    if (['board', 'class', 'subject', 'textbook', 'chapter', 'topic'].includes(type)) {
+      try {
+        // Dynamic import to avoid circular dependencies if any
+        const { updateGuideNodeTitle } = await import('./guide');
+        await updateGuideNodeTitle(id, type, data.title, data.author);
+      } catch (e) {
+        console.error('Failed to sync to guide collections:', e);
+      }
+    }
+  }
 };
 
 export const updateTaxonomyNodeOrders = async (nodes: { id: string, orderIndex: number }[]) => {

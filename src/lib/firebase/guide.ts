@@ -56,11 +56,34 @@ export const getCurriculumBySubject = async (subjectId: string): Promise<Chapter
 
 export const getReadingContent = async (contentId: string): Promise<ReadingContentData | null> => {
   try {
-    let collectionPath = "guide_topics";
-    let topicDoc = await getDoc(doc(db, "guide_topics", contentId));
-    let topicData = topicDoc.exists() ? topicDoc.data() : null;
+    const { getTaxonomyNodeById } = await import('./taxonomy');
+    const taxNode = await getTaxonomyNodeById(contentId);
+    
+    let topicData: any = {};
+    if (taxNode) {
+      topicData = {
+        title: taxNode.title,
+        subtitle: taxNode.description || '',
+        featureImage: taxNode.featureImage || '',
+        author: taxNode.author || '',
+        createdAt: taxNode.createdAt,
+        updatedAt: taxNode.updatedAt,
+        type: taxNode.type
+      };
+    }
 
-    if (!topicData || !topicData.title) {
+    let collectionPath = "guide_topics";
+    if (taxNode && taxNode.type === 'chapter') {
+      collectionPath = "guide_chapters";
+    }
+
+    // Fetch from guide_* to get legacy fields and check for content_sections existence
+    const docSnap = await getDoc(doc(db, collectionPath, contentId));
+    if (docSnap.exists()) {
+      // Allow taxNode (which has the fresh title) to override old data
+      topicData = { ...docSnap.data(), ...topicData };
+    } else if (!taxNode) {
+      // If no taxNode and no docSnap, fallback to guide_chapters
       const chapterDoc = await getDoc(doc(db, "guide_chapters", contentId));
       if (chapterDoc.exists()) {
         topicData = { ...topicData, ...chapterDoc.data() };
@@ -267,6 +290,11 @@ export const getReadingContent = async (contentId: string): Promise<ReadingConte
 
 export const getTopicHierarchy = async (nodeId: string) => {
   try {
+    const { getTaxonomyNodeById } = await import('./taxonomy');
+    
+    let currentNode = await getTaxonomyNodeById(nodeId);
+    if (!currentNode) return null;
+
     let chapterId: string | null = null;
     let textbookId: string | null = null;
     let subjectId: string | null = null;
@@ -279,68 +307,27 @@ export const getTopicHierarchy = async (nodeId: string) => {
     let classTitle: string = 'Class';
     let boardTitle: string = 'Board';
 
-    const topicDoc = await getDoc(doc(db, "guide_topics", nodeId));
-    if (topicDoc.exists() && topicDoc.data().chapterId) {
-      chapterId = topicDoc.data().chapterId;
-    } else {
-      const chapterDoc = await getDoc(doc(db, "guide_chapters", nodeId));
-      if (chapterDoc.exists()) {
-        chapterId = nodeId;
-      } else {
-        const textbookDoc = await getDoc(doc(db, "guide_textbooks", nodeId));
-        if (textbookDoc.exists()) {
-          textbookId = nodeId;
-        } else {
-          const subjectDoc = await getDoc(doc(db, "guide_subjects", nodeId));
-          if (subjectDoc.exists()) {
-            subjectId = nodeId;
-          } else {
-            const classDoc = await getDoc(doc(db, "guide_classes", nodeId));
-            if (classDoc.exists()) {
-              classId = nodeId;
-            }
-          }
-        }
+    // Walk up the hierarchy tree using parentId
+    while (currentNode) {
+      if (currentNode.type === 'board') {
+        boardId = currentNode.id;
+        boardTitle = currentNode.title;
+      } else if (currentNode.type === 'class') {
+        classId = currentNode.id;
+        classTitle = currentNode.title;
+      } else if (currentNode.type === 'subject') {
+        subjectId = currentNode.id;
+        subjectTitle = currentNode.title;
+      } else if (currentNode.type === 'textbook') {
+        textbookId = currentNode.id;
+        textbookTitle = currentNode.title;
+      } else if (currentNode.type === 'chapter') {
+        chapterId = currentNode.id;
+        chapterTitle = currentNode.title;
       }
-    }
-
-    if (chapterId) {
-      const chapterDoc = await getDoc(doc(db, "guide_chapters", chapterId));
-      if (chapterDoc.exists()) {
-        chapterTitle = chapterDoc.data().title;
-        if (chapterDoc.data().textbookId) textbookId = chapterDoc.data().textbookId as string;
-      }
-    }
-
-    if (textbookId) {
-      const textbookDoc = await getDoc(doc(db, "guide_textbooks", textbookId));
-      if (textbookDoc.exists()) {
-        textbookTitle = textbookDoc.data().title;
-        if (textbookDoc.data().subjectId) subjectId = textbookDoc.data().subjectId as string;
-      }
-    }
-
-    if (subjectId) {
-      const subjectDoc = await getDoc(doc(db, "guide_subjects", subjectId));
-      if (subjectDoc.exists()) {
-        subjectTitle = subjectDoc.data().title;
-        if (subjectDoc.data().classId) classId = subjectDoc.data().classId as string;
-      }
-    }
-
-    if (classId) {
-      const classDoc = await getDoc(doc(db, "guide_classes", classId));
-      if (classDoc.exists()) {
-        classTitle = classDoc.data().title;
-        if (classDoc.data().boardId) boardId = classDoc.data().boardId as string;
-      }
-    }
-
-    if (boardId) {
-      const boardDoc = await getDoc(doc(db, "guide_boards", boardId));
-      if (boardDoc.exists()) {
-        boardTitle = boardDoc.data().title;
-      }
+      
+      if (!currentNode.parentId) break;
+      currentNode = await getTaxonomyNodeById(currentNode.parentId);
     }
 
     return { boardId, boardTitle, classId, classTitle, subjectId, subjectTitle, textbookId, textbookTitle, chapterId, chapterTitle };
@@ -1048,20 +1035,23 @@ export const incrementGuideNodeViews = async (nodeId: string) => {
   }
 };
 export async function findGuideNodeAnyLevel(idOrSlug: string): Promise<{ node: any, level: string } | null> {
-  const collections = [
-    { name: 'guide_topics', level: 'topic' },
-    { name: 'guide_chapters', level: 'chapter' },
-    { name: 'guide_textbooks', level: 'textbook' },
-    { name: 'guide_subjects', level: 'subject' },
-    { name: 'guide_classes', level: 'class' },
-    { name: 'guide_boards', level: 'board' }
-  ];
-
-  for (const coll of collections) {
-    const node = await getGuideNodeBySlugOrId(coll.name, idOrSlug);
-    if (node) {
-      return { node, level: coll.level };
+  const { getTaxonomyNodeById } = await import('./taxonomy');
+  
+  // Try ID first
+  let node: any = await getTaxonomyNodeById(idOrSlug);
+  
+  if (!node) {
+    // Try slug
+    const q = query(collection(db, 'taxonomy_nodes'), where('slug', '==', idOrSlug));
+    const querySnap = await getDocs(q);
+    if (!querySnap.empty) {
+      const d = querySnap.docs[0];
+      node = { id: d.id, ...d.data() };
     }
+  }
+
+  if (node) {
+    return { node, level: node.type };
   }
 
   return null;
