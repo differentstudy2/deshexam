@@ -193,6 +193,31 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
     if (isDefault(headerSubjectName, 'defaultHeaderSubject')) setHeaderSubjectName(t('defaultHeaderSubject', appLanguage));
     if (isDefault(headerChapterName, 'defaultHeaderChapter')) setHeaderChapterName(t('defaultHeaderChapter', appLanguage));
   }, [appLanguage, headerTitle, headerAddress, headerClassName, headerSubjectName, headerChapterName]);
+
+  // Auto-fetch Subject and Chapter names from taxonomy_nodes based on URL props
+  useEffect(() => {
+    const fetchTaxonomyNames = async () => {
+      const { doc, getDoc } = await import('firebase/firestore');
+      const { db } = await import('@/lib/firebase/client');
+
+      if (subjectId) {
+        const d = await getDoc(doc(db, 'taxonomy_nodes', subjectId));
+        if (d.exists()) {
+          const name = d.data().title || d.data().name;
+          if (name) setHeaderSubjectName(`বিষয়: ${name}`);
+        }
+      }
+
+      if (chapterId) {
+        const d = await getDoc(doc(db, 'taxonomy_nodes', chapterId));
+        if (d.exists()) {
+          const name = d.data().title || d.data().name;
+          if (name) setHeaderChapterName(name);
+        }
+      }
+    };
+    fetchTaxonomyNames();
+  }, [subjectId, chapterId]);
   const [footerText, setFooterText] = useState('');
   const [questionOptionGap, setQuestionOptionGap] = useState(8);
   const [showExplanations, setShowExplanations] = useState(false);

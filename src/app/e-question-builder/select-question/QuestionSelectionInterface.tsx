@@ -30,6 +30,44 @@ export default function QuestionSelectionInterface({ initialFilters }: { initial
   // Modal state
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [paperName, setPaperName] = useState('');
+
+  // Auto-fill paper name based on taxonomy
+  useEffect(() => {
+    const fetchDefaultPaperName = async () => {
+      const { doc, getDoc } = await import('firebase/firestore');
+      const { db } = await import('@/lib/firebase/client');
+
+      let isAcademic = false;
+
+      const fetchNodeName = async (id: string | undefined) => {
+        if (!id || id === 'all') return null;
+        const d = await getDoc(doc(db, 'taxonomy_nodes', id));
+        if (d.exists()) {
+           if (d.data().track === 'academic') isAcademic = true;
+           return d.data().title || d.data().name || '';
+        }
+        return null;
+      };
+
+      const boardName = await fetchNodeName(initialFilters.boardId);
+      const className = await fetchNodeName(initialFilters.classId);
+      const subName = await fetchNodeName(initialFilters.subjectId);
+      const chapName = await fetchNodeName(initialFilters.chapterId);
+
+      const names: string[] = [];
+      if (isAcademic) {
+        if (boardName) names.push(boardName);
+        if (className) names.push(className);
+      }
+      if (subName) names.push(subName);
+      if (chapName) names.push(chapName);
+      
+      if (names.length > 0) {
+        setPaperName(names.join(' - '));
+      }
+    };
+    fetchDefaultPaperName();
+  }, [initialFilters]);
   
   // Selections
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -660,17 +698,17 @@ export default function QuestionSelectionInterface({ initialFilters }: { initial
 
               <div className="bg-[#f8f9fa] rounded-md p-3 flex justify-between items-center font-bold text-[15px] border border-gray-100">
                 <span className="text-gray-800">আপনার ব্যালেন্স:</span>
-                <span className="text-gray-800">৳ 5</span>
+                <span className="text-gray-800">₹ 5</span>
               </div>
 
               <div className="border border-gray-200 rounded-md p-4 bg-white">
                 <div className="flex justify-between text-gray-500 font-medium mb-3 pb-3 border-b border-gray-100 text-sm">
                   <span>0.60 × {selectedIds.size} (প্রশ্ন)</span>
-                  <span className="font-bold text-gray-700">৳ {(0.60 * selectedIds.size).toFixed(2)}</span>
+                  <span className="font-bold text-gray-700">₹ {(0.60 * selectedIds.size).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between items-center font-bold text-lg text-[#03a9f4]">
                   <span>মোট:</span>
-                  <span>৳ {(0.60 * selectedIds.size).toFixed(2)}</span>
+                  <span>₹ {(0.60 * selectedIds.size).toFixed(2)}</span>
                 </div>
               </div>
 
@@ -696,7 +734,12 @@ export default function QuestionSelectionInterface({ initialFilters }: { initial
                 </Button>
                 <Button 
                   onClick={handleConfirm}
-                  className="flex-1 bg-[#7986cb] hover:bg-[#5c6bc0] text-white h-11 text-[15px]"
+                  disabled={!paperName.trim()}
+                  className={`flex-1 h-11 text-[15px] text-white transition-colors ${
+                    paperName.trim() 
+                      ? 'bg-[#4caf50] hover:bg-green-600 shadow-md' 
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  }`}
                 >
                   ✓ কনফার্ম করুন
                 </Button>
