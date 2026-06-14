@@ -126,9 +126,17 @@ export function TopicQuestionManager({ topicId, tabType }: TopicQuestionManagerP
         for (const item of parsed) {
             if (!item.questionText || !item.correctAnswer) continue;
 
+            const generateSlug = (text: string) => {
+                const noHtml = text.replace(/<[^>]*>?/gm, '');
+                const slugified = noHtml.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+                let truncated = slugified.substring(0, 60) || 'q';
+                if (truncated.endsWith('-')) truncated = truncated.slice(0, -1);
+                return `${truncated}-${Math.random().toString(36).substr(2, 5)}`;
+            };
+
             const newQuestion: Omit<QuestionBankEntry, 'createdAt' | 'updatedAt'> = {
                 id: `qb_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-                slug: `q-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+                slug: generateSlug(item.questionText),
                 topicId: topicId,
                 questionType: qType as any,
                 questionText: item.questionText,
