@@ -66,6 +66,7 @@
     "jspdf": "^2.5.1",
     "katex": "^0.17.0",
     "lucide-react": "^0.475.0",
+    "marked": "^18.0.5",
     "next": "15.3.8",
     "next-themes": "^0.3.0",
     "papaparse": "^5.5.3",

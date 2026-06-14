@@ -17,6 +17,7 @@ import { Color } from '@tiptap/extension-color';
 import Highlight from '@tiptap/extension-highlight';
 import Placeholder from '@tiptap/extension-placeholder';
 import { Markdown } from 'tiptap-markdown';
+import { marked } from 'marked';
 
 import { 
   Bold, Italic, Underline as UnderlineIcon, Heading1, Heading2, Heading3, 
@@ -305,18 +306,33 @@ export function TiptapEditor({ content, onChange }: TiptapEditorProps) {
     if (editor && content !== editor.getHTML()) {
       let cleanContent = content || '';
       
-      // If the content is wrapped in <p> tags but contains markdown, unwrap it
-      // so tiptap-markdown can properly parse the markdown formatting.
+      // Aggressively clean and parse markdown using `marked` for existing content
       let inner = cleanContent;
-      if (inner.startsWith('<p>')) {
+      let parsedHTML = inner;
+
+      // Handle old legacy content wrapped in <p> tags
+      if (inner.startsWith('<p>') && inner.endsWith('</p>')) {
         inner = inner.replace(/<p>/g, '').replace(/<\/p>/g, '\n').replace(/<br\s*\/?>/gi, '\n');
-        const hasMarkdown = /(^|\n)(#{1,6}|\*|-|>|\d+\.) /.test(inner) || /\*\*(.*?)\*\*/.test(inner);
-        if (hasMarkdown && !/<(div|span|table|ul|ol|h[1-6])/.test(inner)) {
-          cleanContent = inner.trim();
+      }
+      
+      // Fix escaped asterisks (e.g., '\*' or '\*\*') common in some old exported markdown
+      inner = inner.replace(/\\\*/g, '*');
+
+      // Check if the unwrapped (or raw) text has clear Markdown indicators
+      const hasMarkdown = /(^|\n)(#{1,6}|\*|-|>|\d+\.) /.test(inner) || /\*\*(.*?)\*\*/.test(inner);
+      
+      if (hasMarkdown && !/<(div|span|table|ul|ol|h[1-6])/.test(inner)) {
+        // Convert the Markdown string to standard HTML using `marked` 
+        // to guarantee Tiptap renders it correctly!
+        try {
+          // Use synchronous marked.parse (or await marked.parse if async, but it's sync by default)
+          parsedHTML = marked.parse(inner.trim()) as string;
+        } catch (e) {
+          console.error("Failed to parse markdown with marked", e);
         }
       }
       
-      editor.commands.setContent(cleanContent);
+      editor.commands.setContent(parsedHTML);
     }
   }, [content, editor]);
 
