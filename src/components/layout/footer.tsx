@@ -93,6 +93,29 @@ export function Footer() {
             </ul>
           </div>
         </div>
+
+        <div className="mt-16 pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="flex items-center">
+            <DeshExamLogo />
+          </div>
+          <div className="text-slate-500 text-sm">
+            &copy; {new Date().getFullYear()} DeshExam. All rights reserved.
+          </div>
+          <div className="flex items-center gap-4 text-slate-400">
+            <Link href="#" className="hover:text-white transition-colors">
+              <Twitter className="w-5 h-5" />
+              <span className="sr-only">Twitter</span>
+            </Link>
+            <Link href="#" className="hover:text-white transition-colors">
+              <Github className="w-5 h-5" />
+              <span className="sr-only">GitHub</span>
+            </Link>
+            <Link href="#" className="hover:text-white transition-colors">
+              <Linkedin className="w-5 h-5" />
+              <span className="sr-only">LinkedIn</span>
+            </Link>
+          </div>
+        </div>
       </div>
     </footer>
   );
