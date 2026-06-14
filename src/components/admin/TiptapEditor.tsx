@@ -269,7 +269,11 @@ export function TiptapEditor({ content, onChange }: TiptapEditorProps) {
   const editor = useEditor({
     extensions: [
       StarterKit,
-      Markdown,
+      Markdown.configure({
+        html: true,
+        transformPastedText: true,
+        transformCopiedText: true,
+      }),
       Heading.configure({ levels: [1, 2, 3] }),
       Underline,
       Table.configure({ resizable: true }),
@@ -299,7 +303,20 @@ export function TiptapEditor({ content, onChange }: TiptapEditorProps) {
 
   React.useEffect(() => {
     if (editor && content !== editor.getHTML()) {
-      editor.commands.setContent(content);
+      let cleanContent = content || '';
+      
+      // If the content is wrapped in <p> tags but contains markdown, unwrap it
+      // so tiptap-markdown can properly parse the markdown formatting.
+      let inner = cleanContent;
+      if (inner.startsWith('<p>')) {
+        inner = inner.replace(/<p>/g, '').replace(/<\/p>/g, '\n').replace(/<br\s*\/?>/gi, '\n');
+        const hasMarkdown = /(^|\n)(#{1,6}|\*|-|>|\d+\.) /.test(inner) || /\*\*(.*?)\*\*/.test(inner);
+        if (hasMarkdown && !/<(div|span|table|ul|ol|h[1-6])/.test(inner)) {
+          cleanContent = inner.trim();
+        }
+      }
+      
+      editor.commands.setContent(cleanContent);
     }
   }, [content, editor]);
 

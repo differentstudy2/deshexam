@@ -95,10 +95,14 @@ export function ReadingArticle({ data, hierarchy }: ReadingArticleProps) {
       </div>
       <div className="p-6 sm:p-10 flex flex-col gap-8">
         {data.content && typeof data.content === 'string' && (
-          <div 
-            className="prose dark:prose-invert max-w-none custom-reading-font"
-            dangerouslySetInnerHTML={{ __html: data.content }}
-          />
+          <div className="prose dark:prose-invert max-w-none custom-reading-font">
+            <ReactMarkdown 
+              remarkPlugins={[remarkGfm, remarkMath]} 
+              rehypePlugins={[rehypeRaw, rehypeKatex]}
+            >
+              {data.content}
+            </ReactMarkdown>
+          </div>
         )}
         {data.contentBlocks && data.contentBlocks.length > 0 && (
           <div className="flex flex-col gap-6 text-[15px] leading-relaxed text-slate-700 dark:text-slate-300">
