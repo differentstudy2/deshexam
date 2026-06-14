@@ -4,7 +4,7 @@ import React, { useState, useEffect, use } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Save, BookOpen, FileText, Type, Target, Info, User, Lightbulb, PenTool, HelpCircle, Brain, CheckSquare, FileArchive, FileImage, Video, Headphones, Plus, Trash2, ClipboardList, StickyNote, Key, Timer, Award } from 'lucide-react';
+import { ArrowLeft, Save, BookOpen, FileText, Type, Target, Info, User, Lightbulb, PenTool, HelpCircle, Brain, CheckSquare, FileArchive, FileImage, Video, Headphones, Plus, Trash2, ClipboardList, StickyNote, Key, Timer, Award, Bookmark } from 'lucide-react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { Input } from '@/components/ui/input';
@@ -46,6 +46,7 @@ const sectionCategories = [
     items: [
       { id: 'notes', label: 'Notes', icon: StickyNote },
       { id: 'solutions', label: 'Solutions', icon: Key },
+      { id: 'bookmark', label: 'Bookmark', icon: Bookmark },
       { id: 'pdf', label: 'PDF Notes', icon: FileImage },
       { id: 'video', label: 'Video Lectures', icon: Video },
       { id: 'audio', label: 'Audio Lessons', icon: Headphones },
@@ -313,7 +314,7 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
                 <div className="animate-in fade-in duration-300">
                   <TopicDocumentManager topicId={topicId} />
                 </div>
-              ) : ['lesson', 'guide_content', 'objective', 'introduction', 'author', 'explanation', 'exercise', 'notes', 'solutions'].includes(activeTab) ? (
+              ) : ['lesson', 'guide_content', 'objective', 'introduction', 'author', 'explanation', 'exercise', 'notes', 'solutions', 'bookmark'].includes(activeTab) ? (
                 <div className="animate-in fade-in duration-300">
                   <TiptapEditor 
                     key={activeTab}
