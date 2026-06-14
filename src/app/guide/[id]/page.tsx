@@ -1,6 +1,7 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
 import { findGuideNodeAnyLevel, getReadingContent, getCurriculumBySubject, getGuideSubjects, getTopicHierarchy } from '@/lib/firebase/guide';
+import { getTaxonomyNodeById } from '@/lib/firebase/taxonomy';
 import { ReadingLayout } from '@/components/guide/ReadingLayout';
 import { SubjectDashboard } from '@/components/guide/SubjectDashboard';
 import { Metadata } from 'next';
@@ -8,7 +9,12 @@ import { Metadata } from 'next';
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const resolvedParams = await params;
   const decodedId = decodeURIComponent(resolvedParams.id);
-  const result = await findGuideNodeAnyLevel(decodedId);
+  let result = await findGuideNodeAnyLevel(decodedId);
+
+  if (!result || !result.node) {
+    const taxNode = await getTaxonomyNodeById(decodedId);
+    if (taxNode) result = { node: taxNode, level: taxNode.type };
+  }
 
   if (!result || !result.node) return { title: 'Not Found' };
 
@@ -28,7 +34,12 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 export default async function GenericGuidePage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = await params;
   const decodedId = decodeURIComponent(resolvedParams.id);
-  const result = await findGuideNodeAnyLevel(decodedId);
+  let result = await findGuideNodeAnyLevel(decodedId);
+
+  if (!result || !result.node) {
+    const taxNode = await getTaxonomyNodeById(decodedId);
+    if (taxNode) result = { node: taxNode, level: taxNode.type };
+  }
 
   if (!result || !result.node) {
     notFound();
@@ -39,21 +50,13 @@ export default async function GenericGuidePage({ params }: { params: Promise<{ i
   const hierarchy = await getTopicHierarchy(node.id);
   
   // Try to find curriculum starting from the closest known subject
-  const subjectId = hierarchy?.subjectId || subjects[0]?.id || 'sahitya-kanika';
+  // If hierarchy is missing (e.g. for taxonomy_nodes), fallback to node.id if it's a subject
+  const subjectId = hierarchy?.subjectId || (level === 'subject' ? node.id : null) || subjects[0]?.id || 'sahitya-kanika';
   const fullCurriculum = await getCurriculumBySubject(subjectId);
   
   // If it's a topic or chapter, we show the ReadingLayout
   if (level === 'topic' || level === 'chapter') {
     const readingData = await getReadingContent(node.id);
-    
-    // Dynamically import to avoid cyclic deps if any, or just import at the top
-    const { getAssessmentsByTopic } = await import('@/lib/firebase/assessment');
-    const practiceSets = await getAssessmentsByTopic('practiceSets', node.id);
-    const quizzes = await getAssessmentsByTopic('quizzes', node.id);
-    const mockTests = await getAssessmentsByTopic('mockTests', node.id);
-    const examPapers = await getAssessmentsByTopic('examPapers', node.id);
-
-    const assessments = { practiceSets, quizzes, mockTests, examPapers };
     
     const curriculum = hierarchy?.textbookId 
       ? fullCurriculum.filter(c => c.id === hierarchy.textbookId)
@@ -63,7 +66,6 @@ export default async function GenericGuidePage({ params }: { params: Promise<{ i
       <ReadingLayout 
         id={node.id} 
         data={readingData}
-        assessments={assessments}
         subjects={subjects} 
         curriculum={curriculum} 
         boardTitle={hierarchy?.boardTitle || 'Board'}

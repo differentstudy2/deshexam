@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ChevronRight, Library, ArrowRight } from 'lucide-react';
 import { getTaxonomyNodeById, getTaxonomyNodesByParent } from '@/lib/firebase/taxonomy';
+import { getCurriculumBySubject, getGuideSubjects } from '@/lib/firebase/guide';
+import { SubjectDashboard } from '@/components/guide/SubjectDashboard';
 import { Metadata } from 'next';
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
@@ -12,23 +14,68 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
   if (!node) return { title: 'Not Found' };
 
+  if (node.type === 'subject') {
+    return {
+      title: `${node.seoTitle || node.title} - Academy Guide`,
+      description: node.description || `Explore the complete syllabus and guide for ${node.title}.`,
+      openGraph: {
+        title: node.seoTitle || node.title,
+        description: node.description,
+        ...(node.featureImage ? { images: [{ url: node.featureImage }] } : {})
+      }
+    };
+  }
+
   return {
     title: `Subjects for ${node.title} - Academy Guide`,
     description: `Browse all subjects available for ${node.title}.`,
   };
 }
 
-export default async function ClassSubjectsPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function SubjectsOrSingleSubjectPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = await params;
   const decodedId = decodeURIComponent(resolvedParams.id);
   
-  // 1. Fetch the class node
-  const classNode = await getTaxonomyNodeById(decodedId);
-  if (!classNode || classNode.type !== 'class') {
+  // 1. Fetch the node
+  const node = await getTaxonomyNodeById(decodedId);
+  if (!node || (node.type !== 'class' && node.type !== 'subject')) {
     notFound();
   }
 
-  // 2. Fetch the subjects belonging to this class
+  // 2. If it's a subject, render the single subject view (SubjectDashboard)
+  if (node.type === 'subject') {
+    const subjects = await getGuideSubjects();
+    const fullCurriculum = await getCurriculumBySubject(node.id);
+    
+    // Attempt to get class details if parentId exists
+    let classTitle = 'Class';
+    let boardTitle = 'Board';
+    if (node.parentId) {
+      const classNode = await getTaxonomyNodeById(node.parentId);
+      if (classNode) {
+        classTitle = classNode.title;
+        if (classNode.parentId) {
+          const boardNode = await getTaxonomyNodeById(classNode.parentId);
+          if (boardNode) boardTitle = boardNode.title;
+        }
+      }
+    }
+
+    return (
+      <SubjectDashboard 
+        id={node.id} 
+        pageType="subject"
+        subjects={subjects} 
+        curriculum={fullCurriculum} 
+        boardTitle={boardTitle}
+        classTitle={classTitle}
+        subjectTitle={node.title}
+      />
+    );
+  }
+
+  // 3. If it's a class, fetch the subjects belonging to this class
+  const classNode = node;
   const subjects = await getTaxonomyNodesByParent(decodedId);
 
   return (
@@ -82,7 +129,6 @@ export default async function ClassSubjectsPage({ params }: { params: Promise<{ 
                 className="group relative flex flex-col bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 hover:shadow-md hover:border-emerald-200 dark:hover:border-emerald-800/50 transition-all duration-200 ease-in-out hover:-translate-y-1"
               >
                 <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center mb-5 text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform">
-                  {/* Using an icon dynamically or default Library icon */}
                   <Library className="w-6 h-6" />
                 </div>
                 

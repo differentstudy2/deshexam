@@ -14,6 +14,7 @@ export interface TaxonomyNode {
   track: TaxonomyTrack;
   parentId: string | null;
   rootId?: string | null; // Optional: helps to quickly find all items under a main board/category
+  grandParentId?: string | null; // Optional: helps to find items using grandparent ID
   orderIndex: number;
   status: 'active' | 'inactive' | 'published' | 'draft';
   
