@@ -128,19 +128,30 @@ export function TopicQuestionManager({ topicId, tabType }: TopicQuestionManagerP
 
             const generateSlug = (text: string) => {
                 const noHtml = text.replace(/<[^>]*>?/gm, '');
-                const slugified = noHtml.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-                let truncated = slugified.substring(0, 60) || 'q';
-                if (truncated.endsWith('-')) truncated = truncated.slice(0, -1);
-                return `${truncated}-${Math.random().toString(36).substr(2, 5)}`;
+                // 1. Keep letters, numbers, marks, spaces, and format chars (ZWJ). Remove all other punctuation.
+                const cleanText = noHtml.replace(/[^\p{L}\p{N}\p{M}\p{Cf}\s]/gu, '');
+                // 2. Replace one or more spaces with a single dash
+                const slugified = cleanText.trim().replace(/\s+/g, '-').toLowerCase();
+                
+                // 3. Truncate up to 60 chars, but try not to cut in the middle of a word
+                let truncated = slugified;
+                if (truncated.length > 60) {
+                    truncated = truncated.substring(0, 60);
+                    const lastDash = truncated.lastIndexOf('-');
+                    if (lastDash > 0) {
+                        truncated = truncated.substring(0, lastDash);
+                    }
+                }
+                
+                return `${truncated || 'q'}-${Math.random().toString(36).substr(2, 5)}`;
             };
 
-            const newQuestion: Omit<QuestionBankEntry, 'createdAt' | 'updatedAt'> = {
+            const newQuestion: any = {
                 id: `qb_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
                 slug: generateSlug(item.questionText),
                 topicId: topicId,
-                questionType: qType as any,
+                questionType: qType,
                 questionText: item.questionText,
-                options: qType === 'MCQ' ? item.options : undefined,
                 correctAnswer: item.correctAnswer,
                 explanation: item.explanation || '',
                 difficulty: 'Medium',
@@ -149,9 +160,12 @@ export function TopicQuestionManager({ topicId, tabType }: TopicQuestionManagerP
                 examIds: [],
                 qaChecklist: [],
                 tags: []
-              };
-        
-              await createQuestion(newQuestion);
+            };
+
+            if (item.title) newQuestion.title = item.title;
+            if (qType === 'MCQ' && item.options) newQuestion.options = item.options;
+            
+            await createQuestion(newQuestion);
         }
         
         toast({ title: 'Questions imported successfully!' });
