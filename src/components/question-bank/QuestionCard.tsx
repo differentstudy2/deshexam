@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { QuestionBankEntry } from '@/lib/question-bank-types';
-import { Heart, Share2, Eye, ChevronDown, ChevronUp, CheckCircle2, XCircle, ThumbsDown, Bookmark, Flag, Link as LinkIcon, Printer, Save, Download, ShieldCheck } from 'lucide-react';
+import { Heart, Share2, Eye, ChevronDown, ChevronUp, CheckCircle2, XCircle, ThumbsDown, Bookmark, Flag, Link as LinkIcon, Printer, Save, Download, ShieldCheck, ExternalLink, MoreVertical } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
 import { recordQuestionAttempt } from '@/lib/firebase/student-analytics';
@@ -21,6 +21,7 @@ interface QuestionCardProps {
     question: QuestionBankEntry;
     index?: number;
     testMode?: boolean;
+    isListView?: boolean;
 }
 
 const getOptionLabel = (key: string, language: string = 'Bangla') => {
@@ -42,7 +43,7 @@ const formatDate = (dateValue: any) => {
     return `${day}/${month}/${year}`;
 };
 
-export default function QuestionCard({ question, index, testMode = false }: QuestionCardProps) {
+export default function QuestionCard({ question, index, testMode = false, isListView = false }: QuestionCardProps) {
     const [showAnswer, setShowAnswer] = useState(false);
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
     const [fillBlankAnswer, setFillBlankAnswer] = useState<string>('');
@@ -343,7 +344,6 @@ export default function QuestionCard({ question, index, testMode = false }: Ques
         if (selectedOption) return; // Already answered
         
         setSelectedOption(key);
-        setShowAnswer(true); // Automatically show explanation on answer
 
         if (user) {
             const isCorrectAnswer = question.correctAnswer?.toLowerCase() === key.toLowerCase();
@@ -379,44 +379,69 @@ export default function QuestionCard({ question, index, testMode = false }: Ques
     }
 
     return (
-        <div id={`question-card-${question.id}`} className="w-full bg-white dark:bg-slate-950 p-5 md:p-8 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm mb-6 transition-all hover:shadow-md relative overflow-hidden">
+        <div id={`question-card-${question.id}`} className="w-full bg-white dark:bg-slate-950 p-4 md:p-5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm mb-4 transition-all hover:shadow-md relative overflow-hidden">
             
-            {/* Top row: Taxonomy chips */}
-            <div className="flex flex-wrap items-center gap-2.5 mb-6">
-                {question.sourceYear ? (
-                    <span className="bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium rounded-md px-3 py-1 text-[12px] uppercase tracking-wide">{question.sourceYear}</span>
-                ) : null}
-                
-                {/* Real tags */}
-                {(question as any).taxonomyTags?.map((tag: string) => (
-                    <span key={tag} className="bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium rounded-md px-3 py-1 text-[12px] uppercase tracking-wide">{tag}</span>
-                ))}
-                {question.tags?.map((tag: string) => (
-                    <span key={tag} className="bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium rounded-md px-3 py-1 text-[12px] uppercase tracking-wide">{tag}</span>
-                ))}
+            {/* Top row: Taxonomy chips and Link */}
+            <div className="flex items-start justify-between mb-4 gap-4">
+                <div className="flex flex-wrap items-center gap-2">
+                    {question.sourceYear ? (
+                        <span className="bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium rounded-md px-2.5 py-0.5 text-[11px] uppercase tracking-wide">{question.sourceYear}</span>
+                    ) : null}
+                    
+                    {/* Real tags */}
+                    {(question as any).taxonomyTags?.map((tag: string) => (
+                        <span key={tag} className="bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium rounded-md px-2.5 py-0.5 text-[11px] uppercase tracking-wide">{tag}</span>
+                    ))}
+                    {question.tags?.map((tag: string) => (
+                        <span key={tag} className="bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium rounded-md px-2.5 py-0.5 text-[11px] uppercase tracking-wide">{tag}</span>
+                    ))}
 
-                {/* Fallback example tags if none exist in the database for UI preview */}
-                {!question.sourceYear && !(question as any).taxonomyTags?.length && !question.tags?.length && (
-                    <>
-                        <span className="bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium rounded-md px-3 py-1 text-[12px] uppercase tracking-wide">WBBSE</span>
-                        <span className="bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium rounded-md px-3 py-1 text-[12px] uppercase tracking-wide">CLASS 10</span>
-                        <span className="bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium rounded-md px-3 py-1 text-[12px] uppercase tracking-wide">বাংলা</span>
-                        <span className="bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium rounded-md px-3 py-1 text-[12px] uppercase tracking-wide">MCQ</span>
-                        <span className="bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium rounded-md px-3 py-1 text-[12px] uppercase tracking-wide">2022</span>
-                    </>
-                )}
+                    {/* Fallback example tags if none exist in the database for UI preview */}
+                    {!question.sourceYear && !(question as any).taxonomyTags?.length && !question.tags?.length && (
+                        <>
+                            <span className="bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium rounded-md px-2.5 py-0.5 text-[11px] uppercase tracking-wide">WBBSE</span>
+                            <span className="bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium rounded-md px-2.5 py-0.5 text-[11px] uppercase tracking-wide">CLASS 10</span>
+                            <span className="bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium rounded-md px-2.5 py-0.5 text-[11px] uppercase tracking-wide">বাংলা</span>
+                            <span className="bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium rounded-md px-2.5 py-0.5 text-[11px] uppercase tracking-wide">MCQ</span>
+                            <span className="bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium rounded-md px-2.5 py-0.5 text-[11px] uppercase tracking-wide">2022</span>
+                        </>
+                    )}
+                    
+                    {question.isVerified && (
+                        <div className="flex items-center gap-1 text-[10px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-100 dark:border-indigo-500/20 uppercase tracking-wide">
+                            <ShieldCheck className="w-3 h-3" />
+                            VERIFIED
+                        </div>
+                    )}
+                </div>
                 
-                {question.isVerified && (
-                    <div className="flex items-center gap-1 text-[11px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 px-2.5 py-0.5 rounded border border-indigo-100 dark:border-indigo-500/20 ml-auto uppercase tracking-wide">
-                        <ShieldCheck className="w-3 h-3" />
-                        VERIFIED
-                    </div>
-                )}
+                <div className="flex items-center gap-1">
+                    <Link href={`/question/${question.slug || question.id}`} className="text-slate-400 hover:text-blue-500 transition-colors p-1 shrink-0" title="Open Question Page">
+                        <ExternalLink className="h-4 w-4" />
+                    </Link>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <button className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors p-1 shrink-0 outline-none" title="More Options">
+                                <MoreVertical className="h-4 w-4" />
+                            </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={handlePrint} className="flex items-center gap-2 cursor-pointer">
+                                <Printer className="h-4 w-4" />
+                                <span>Print Question</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleDownloadImage('square')} className="flex items-center gap-2 cursor-pointer">
+                                <Download className="h-4 w-4" />
+                                <span>Download as Image</span>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
             </div>
 
-            <div className="flex flex-col gap-2 mb-8">
+            <div className="flex flex-col gap-2 mb-5">
                 <div className="flex items-start gap-2">
-                    {index !== undefined && <span className="text-xl font-bold text-slate-800 dark:text-slate-200 mt-0.5">{index}.</span>}
+                    {index !== undefined && <span className="text-lg font-bold text-slate-800 dark:text-slate-200 mt-0.5">{index}.</span>}
                     {isFillInTheBlank ? (
                         <div className="flex-1 w-full min-w-0">
                             <InteractiveFillInTheBlank 
@@ -434,8 +459,10 @@ export default function QuestionCard({ question, index, testMode = false }: Ques
                             />
                         </div>
                     ) : (
-                        <div className="text-2xl font-bold text-slate-800 dark:text-slate-200 leading-tight whitespace-pre-wrap tracking-tight">
-                            {question.questionText}
+                        <div className="text-lg md:text-xl font-bold text-slate-800 dark:text-slate-200 leading-snug whitespace-pre-wrap">
+                            <Link href={`/question/${question.slug || question.id}`} className="hover:text-blue-600 transition-colors">
+                                {question.questionText}
+                            </Link>
                         </div>
                     )}
                 </div>
@@ -443,7 +470,7 @@ export default function QuestionCard({ question, index, testMode = false }: Ques
 
             {/* MCQ Options */}
             {!isMatching && !isTrueFalse && !isFillInTheBlank && question.options && Object.values(question.options).some(o => !!o) && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-6 mb-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-4 mb-4">
                     {['a', 'b', 'c', 'd', 'e', 'f'].map(key => {
                         const value = (question.options as any)?.[key];
                         if (!value) return null;
@@ -494,12 +521,12 @@ export default function QuestionCard({ question, index, testMode = false }: Ques
                                 onClick={() => handleOptionClick(key)}
                             >
                                 <div className={cn(
-                                    "flex items-center justify-center w-[30px] h-[30px] rounded-full text-sm font-semibold shrink-0 transition-colors",
+                                    "flex items-center justify-center w-7 h-7 rounded-full text-sm font-semibold shrink-0 transition-colors",
                                     circleClasses
                                 )}>
-                                    {Icon ? <Icon className="h-5 w-5" /> : getOptionLabel(key, question.language)}
+                                    {Icon ? <Icon className="h-4 w-4" /> : getOptionLabel(key, question.language)}
                                 </div>
-                                <span className="text-base flex-grow font-medium">
+                                <span className="text-[15px] flex-grow font-medium">
                                     {value}
                                 </span>
                             </div>
@@ -572,62 +599,56 @@ export default function QuestionCard({ question, index, testMode = false }: Ques
             {/* Tags moved to top row */}
 
             {/* Footer Actions */}
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-4 pt-5 border-t border-slate-100 dark:border-slate-800 mt-2 print-hidden-actions text-slate-500 dark:text-slate-400 font-medium">
-                
-                <div className="flex items-center gap-6">
-                    <button onClick={() => handleInteract('like')} className={cn("flex items-center gap-2 hover:text-[#107c41] transition-colors", interaction.isLiked && "text-[#107c41]")}>
-                        <Heart className={cn("h-5 w-5", interaction.isLiked && "fill-current")} />
-                        <span className="text-[15px]">{counts.likes > 0 ? counts.likes : 'Like'}</span>
+            {isListView ? (
+                <div className="flex w-full items-center justify-evenly pt-3 border-t border-slate-100 dark:border-slate-800 mt-1 print-hidden-actions text-slate-500 dark:text-slate-400 font-medium">
+                    <button onClick={() => handleInteract('like')} className={cn("flex flex-1 justify-center items-center gap-1.5 hover:text-[#107c41] transition-colors py-1", interaction.isLiked && "text-[#107c41]")}>
+                        <Heart className={cn("h-4 w-4", interaction.isLiked && "fill-current")} />
+                        <span className="text-sm">{counts.likes > 0 ? counts.likes : 'Like'}</span>
                     </button>
-                    <button onClick={() => handleInteract('dislike')} className={cn("flex items-center gap-2 hover:text-red-500 transition-colors", interaction.isDisliked && "text-red-500")}>
-                        <ThumbsDown className={cn("h-5 w-5", interaction.isDisliked && "fill-current")} />
+                    
+                    <button onClick={() => handleInteract('bookmark')} className={cn("flex flex-1 justify-center items-center gap-1.5 hover:text-yellow-500 transition-colors py-1", interaction.isBookmarked && "text-yellow-500")}>
+                        <Bookmark className={cn("h-4 w-4", interaction.isBookmarked && "fill-current")} />
+                        <span className="text-sm">{counts.bookmarks > 0 ? counts.bookmarks : 'Save'}</span>
                     </button>
-                    <button onClick={() => handleInteract('bookmark')} className={cn("flex items-center gap-2 hover:text-yellow-500 transition-colors", interaction.isBookmarked && "text-yellow-500")}>
-                        <Bookmark className={cn("h-5 w-5", interaction.isBookmarked && "fill-current")} />
-                        <span className="text-[15px]">{counts.bookmarks > 0 ? counts.bookmarks : 'Save'}</span>
+
+                    <button onClick={handleCopyLink} className="flex flex-1 justify-center items-center gap-1.5 hover:text-blue-500 transition-colors py-1" title="Share Question">
+                        <Share2 className="h-4 w-4" />
+                        <span className="text-sm">Share</span>
                     </button>
                 </div>
-                
-                <div className="w-px h-5 bg-slate-200 dark:bg-slate-700 hidden sm:block"></div>
-                
-                <div className="flex items-center gap-5">
-                    <button onClick={handleCopyLink} className="flex items-center hover:text-blue-500 transition-colors" title="Copy Link">
-                        <LinkIcon className="h-[18px] w-[18px]" />
-                    </button>
-                    <button onClick={handlePrint} className="flex items-center hover:text-slate-800 dark:hover:text-slate-200 transition-colors" title="Print">
-                        <Printer className="h-[18px] w-[18px]" />
-                    </button>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <button className="flex items-center hover:text-blue-600 dark:hover:text-blue-400 transition-colors outline-none" title="Download as Image">
-                                <Download className="h-[18px] w-[18px]" />
-                            </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="start">
-                            <DropdownMenuItem onClick={() => handleDownloadImage('square')}>Instagram Square (1:1)</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleDownloadImage('story')}>Mobile Story (9:16)</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleDownloadImage('landscape')}>Desktop Landscape (16:9)</DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                    <button onClick={() => toast({ title: 'Reported', description: 'Thank you for reporting this question.' })} className="flex items-center hover:text-red-500 transition-colors" title="Report Issue">
-                        <Flag className="h-[18px] w-[18px]" />
-                    </button>
-                    <div className="flex items-center gap-1.5 ml-1" title="Views">
-                        <Eye className="h-[18px] w-[18px]" />
-                        <span className="text-[15px]">{counts.views}</span>
+            ) : (
+                <div className="flex flex-wrap items-center gap-x-5 gap-y-3 pt-3 border-t border-slate-100 dark:border-slate-800 mt-1 print-hidden-actions text-slate-500 dark:text-slate-400 font-medium">
+                    
+                    <div className="flex items-center gap-5">
+                        <button onClick={() => handleInteract('like')} className={cn("flex items-center gap-1.5 hover:text-[#107c41] transition-colors", interaction.isLiked && "text-[#107c41]")}>
+                            <Heart className={cn("h-4 w-4", interaction.isLiked && "fill-current")} />
+                            <span className="text-sm">{counts.likes > 0 ? counts.likes : 'Like'}</span>
+                        </button>
+                        <button onClick={() => handleInteract('dislike')} className={cn("flex items-center gap-1.5 hover:text-red-500 transition-colors", interaction.isDisliked && "text-red-500")}>
+                            <ThumbsDown className={cn("h-4 w-4", interaction.isDisliked && "fill-current")} />
+                        </button>
+                        <button onClick={() => handleInteract('bookmark')} className={cn("flex items-center gap-1.5 hover:text-yellow-500 transition-colors", interaction.isBookmarked && "text-yellow-500")}>
+                            <Bookmark className={cn("h-4 w-4", interaction.isBookmarked && "fill-current")} />
+                            <span className="text-sm">{counts.bookmarks > 0 ? counts.bookmarks : 'Save'}</span>
+                        </button>
+                    </div>
+                    
+                    <div className="w-px h-4 bg-slate-200 dark:bg-slate-700 hidden sm:block"></div>
+                    
+                    <div className="flex items-center gap-4">
+                        <button onClick={handleCopyLink} className="flex items-center hover:text-blue-500 transition-colors" title="Copy Link">
+                            <LinkIcon className="h-4 w-4" />
+                        </button>
+                        <button onClick={() => toast({ title: 'Reported', description: 'Thank you for reporting this question.' })} className="flex items-center hover:text-red-500 transition-colors" title="Report Issue">
+                            <Flag className="h-4 w-4" />
+                        </button>
+                        <div className="flex items-center gap-1.5 ml-1" title="Views">
+                            <Eye className="h-4 w-4" />
+                            <span className="text-sm">{counts.views}</span>
+                        </div>
                     </div>
                 </div>
-
-                <div className="ml-auto">
-                    <button 
-                        onClick={() => setShowAnswer(!showAnswer)}
-                        className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/40"
-                    >
-                        {showAnswer ? 'Hide Explanation' : 'Show Explanation'}
-                        {showAnswer ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                    </button>
-                </div>
-            </div>
+            )}
 
             {/* Explanation Section */}
             {showAnswer && question.explanation && (
