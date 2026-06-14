@@ -32,11 +32,8 @@ const sectionCategories = [
     title: '📚 Learning Content',
     items: [
       { id: 'lesson', label: 'Read Lesson', icon: BookOpen },
-      { id: 'guide_content', label: 'Guide Content', icon: FileText },
-      { id: 'word_meaning', label: 'Word Meaning', icon: Type },
-      { id: 'objective', label: 'Lesson Objective', icon: Target },
-      { id: 'introduction', label: 'Lesson Introduction', icon: Info },
       { id: 'author', label: 'Author Introduction', icon: User },
+      { id: 'word_meaning', label: 'Word Meaning', icon: Type },
       { id: 'explanation', label: 'Explanation', icon: Lightbulb },
       { id: 'exercise', label: 'Exercise', icon: PenTool },
     ]
@@ -45,9 +42,8 @@ const sectionCategories = [
     title: '📝 Study Resources',
     items: [
       { id: 'notes', label: 'Notes', icon: StickyNote },
-      { id: 'solutions', label: 'Solutions', icon: Key },
-      { id: 'bookmark', label: 'Bookmark', icon: Bookmark },
       { id: 'pdf', label: 'PDF Notes', icon: FileImage },
+      { id: 'solutions', label: 'Solutions', icon: Key },
       { id: 'video', label: 'Video Lectures', icon: Video },
       { id: 'audio', label: 'Audio Lessons', icon: Headphones },
     ]
@@ -55,9 +51,7 @@ const sectionCategories = [
   {
     title: '🎯 Practice & Assessment',
     items: [
-      { id: 'mcq', label: 'MCQ', icon: HelpCircle },
-      { id: 'short_question', label: 'Short Questions', icon: CheckSquare },
-      { id: 'creative_question', label: 'Creative Questions', icon: Brain },
+      { id: 'questions', label: 'Questions', icon: HelpCircle },
       { id: 'practice_sets', label: 'Practice Sets', icon: ClipboardList },
       { id: 'quizzes', label: 'Quizzes', icon: HelpCircle },
       { id: 'model_test', label: 'Model Test', icon: FileArchive },
@@ -405,7 +399,7 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
                     Add Another {activeTab.toUpperCase()}
                   </Button>
                 </div>
-              ) : ['mcq', 'creative_question', 'short_question'].includes(activeTab) ? (
+              ) : ['questions', 'mcq', 'creative_question', 'short_question'].includes(activeTab) ? (
                 <div className="animate-in fade-in duration-300">
                   <TopicQuestionManager topicId={topicId} tabType={activeTab} />
                 </div>

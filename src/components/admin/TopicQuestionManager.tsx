@@ -13,6 +13,7 @@ import { getTopicHierarchy } from '@/lib/firebase/guide';
 import { QuestionBankEditor } from '@/components/admin/QuestionBankEditor';
 import { QuestionBankEntry } from '@/lib/question-bank-types';
 import Link from 'next/link';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface TopicQuestionManagerProps {
   topicId: string;
@@ -26,7 +27,7 @@ export function TopicQuestionManager({ topicId, tabType }: TopicQuestionManagerP
   const [hierarchy, setHierarchy] = useState<any>(null);
   
   // Editor mode state
-  const [mode, setMode] = useState<'list' | 'single' | 'bulk' | 'ai' | 'edit'>('list');
+  const [mode, setMode] = useState<'list' | 'single' | 'bulk' | 'ai' | 'edit'>('single');
   const [editingQuestion, setEditingQuestion] = useState<QuestionBankEntry | null>(null);
   
   // Minimal editor state
@@ -39,8 +40,10 @@ export function TopicQuestionManager({ topicId, tabType }: TopicQuestionManagerP
   const [bulkJson, setBulkJson] = useState('');
   const [aiPrompt, setAiPrompt] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [innerQType, setInnerQType] = useState('MCQ');
   
   const mapTabToQuestionType = (tab: string) => {
+      if (tab === 'questions') return innerQType;
       if (tab === 'mcq') return 'MCQ';
       if (tab === 'creative_question') return 'Creative Question'; // Fixed to match QuestionType
       if (tab === 'short_question') return 'Short Question';       // Fixed to match QuestionType
@@ -68,9 +71,8 @@ export function TopicQuestionManager({ topicId, tabType }: TopicQuestionManagerP
 
   useEffect(() => {
     fetchTopicQuestions();
-    setMode('list');
     getTopicHierarchy(topicId).then(setHierarchy);
-  }, [topicId, tabType]);
+  }, [topicId, tabType, innerQType]);
 
   const handleSaveInline = async () => {
     if (!questionText) {
@@ -200,6 +202,15 @@ export function TopicQuestionManager({ topicId, tabType }: TopicQuestionManagerP
 
   return (
     <div className="space-y-6">
+      {tabType === 'questions' && (
+        <Tabs value={innerQType} onValueChange={setInnerQType}>
+          <TabsList className="grid w-full grid-cols-3 mb-4">
+            <TabsTrigger value="MCQ">MCQ</TabsTrigger>
+            <TabsTrigger value="Short Question">Short Questions</TabsTrigger>
+            <TabsTrigger value="Creative Question">Creative Questions</TabsTrigger>
+          </TabsList>
+        </Tabs>
+      )}
       <div className="flex flex-wrap gap-4 justify-between items-center bg-slate-50 dark:bg-slate-900/50 p-4 border rounded-lg">
           <div>
               <h3 className="text-lg font-semibold">{qType}s for this Topic</h3>
@@ -231,6 +242,7 @@ export function TopicQuestionManager({ topicId, tabType }: TopicQuestionManagerP
       {mode === 'single' && (
           <div className="animate-in fade-in slide-in-from-top-2 border rounded-xl overflow-hidden bg-white dark:bg-slate-950 shadow-md p-2">
               <QuestionBankEditor 
+                  defaultContentType="academic"
                   initialData={{
                       topicId,
                       questionType: qType as any,
@@ -241,8 +253,8 @@ export function TopicQuestionManager({ topicId, tabType }: TopicQuestionManagerP
                       chapterId: hierarchy?.chapterId || '',
                   }}
                   onSaveComplete={() => {
-                      setMode('list');
                       fetchTopicQuestions();
+                      // Keep the form open for the next question instead of closing it
                   }}
                   onCancel={() => setMode('list')}
               />
