@@ -14,11 +14,51 @@ type QuestionState = 'unvisited' | 'answered' | 'skipped' | 'review' | 'current'
 
 interface ExamClientProps {
   mockTest: MockTest;
-  questions: QuestionBankEntry[];
+  initialQuestions: QuestionBankEntry[];
 }
 
-export function ExamClient({ mockTest, questions }: ExamClientProps) {
+const shuffleArray = <T,>(array: T[]): T[] => {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+};
+
+export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
   const router = useRouter();
+  
+  const [questions] = useState<QuestionBankEntry[]>(() => {
+    let qs = [...initialQuestions];
+    
+    if (mockTest.shuffleQuestions) {
+      qs = shuffleArray(qs);
+    }
+    
+    if (mockTest.shuffleOptions) {
+      qs = qs.map(q => {
+        if (!q.options) return q;
+        const opts = Object.entries(q.options);
+        const shuffledOpts = shuffleArray(opts);
+        const newOptions = {} as { a: string; b: string; c: string; d: string; e?: string };
+        let newCorrectAnswer = q.correctAnswer;
+        const oldKeys = ['a', 'b', 'c', 'd', 'e'].slice(0, opts.length) as (keyof typeof newOptions)[];
+        
+        opts.forEach((opt, index) => {
+          const [oldKey, val] = opt;
+          const newKey = oldKeys[index];
+          if (newKey) newOptions[newKey] = val;
+          if (q.correctAnswer === oldKey) {
+            newCorrectAnswer = newKey;
+          }
+        });
+
+        return { ...q, options: newOptions, correctAnswer: newCorrectAnswer };
+      });
+    }
+    return qs;
+  });
   
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [timeLeft, setTimeLeft] = useState((mockTest.durationMin || 60) * 60);
@@ -30,6 +70,8 @@ export function ExamClient({ mockTest, questions }: ExamClientProps) {
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
   const [scoreData, setScoreData] = useState({ correct: 0, wrong: 0, skipped: 0, score: 0, total: 0 });
   const [isReviewMode, setIsReviewMode] = useState(false);
+  const [hasStarted, setHasStarted] = useState(false);
+  const [wasKicked, setWasKicked] = useState(false);
 
   useEffect(() => {
     const initialStates: Record<string, QuestionState> = {};
@@ -41,7 +83,7 @@ export function ExamClient({ mockTest, questions }: ExamClientProps) {
   }, [questions]);
 
   useEffect(() => {
-    if (isSubmitted) return;
+    if (isSubmitted || !hasStarted) return;
     const timer = setInterval(() => {
       setTimeLeft(prev => {
         if (prev <= 1) {
@@ -53,7 +95,7 @@ export function ExamClient({ mockTest, questions }: ExamClientProps) {
       });
     }, 1000);
     return () => clearInterval(timer);
-  }, [isSubmitted]);
+  }, [isSubmitted, hasStarted]);
 
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60);
@@ -63,32 +105,80 @@ export function ExamClient({ mockTest, questions }: ExamClientProps) {
 
   const isLowTime = timeLeft < 600;
 
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      const currentlyFullscreen = !!document.fullscreenElement;
+      setIsFullscreen(currentlyFullscreen);
+
+      if (!currentlyFullscreen && hasStarted && !isSubmitted && mockTest.isStrictMode !== false) {
+        // Anti-cheat kick out
+        setWasKicked(true);
+        setHasStarted(false);
+        setAnswers({});
+        setCurrentQuestionIndex(0);
+        setTimeLeft((mockTest.durationMin || 60) * 60);
+
+        const initialStates: Record<string, QuestionState> = {};
+        questions.forEach(q => initialStates[q.id] = 'unvisited');
+        if (questions.length > 0) {
+          initialStates[questions[0].id] = 'current';
+        }
+        setQuestionStates(initialStates);
+      }
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    
+    // Auto-start if already in fullscreen from previous page
+    if (document.fullscreenElement) {
+      setIsFullscreen(true);
+      setHasStarted(true);
+    }
+
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, [hasStarted, isSubmitted, questions, mockTest.durationMin]);
+
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen().catch(err => console.error(err));
-      setIsFullscreen(true);
     } else {
       if (document.exitFullscreen) {
         document.exitFullscreen();
-        setIsFullscreen(false);
       }
     }
   };
 
-  useEffect(() => {
-    const handleFullscreenChange = () => setIsFullscreen(!!document.fullscreenElement);
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
-  }, []);
+  const startExam = async () => {
+    if (mockTest.isStrictMode !== false) {
+      try {
+        if (!document.fullscreenElement) {
+          await document.documentElement.requestFullscreen();
+        }
+      } catch (err) {
+        console.error("Fullscreen request failed:", err);
+      }
+    }
+    setWasKicked(false);
+    setHasStarted(true);
+  };
+
+  const resumeFullscreen = async () => {
+    try {
+      if (!document.fullscreenElement) {
+        await document.documentElement.requestFullscreen();
+      }
+    } catch (err) {
+      console.error("Fullscreen request failed:", err);
+    }
+  };
 
   const handleOptionSelect = (optionId: string) => {
-    if (questions.length === 0 || isSubmitted) return;
+    if (questions.length === 0 || isSubmitted || !isFullscreen) return;
     const qId = questions[currentQuestionIndex].id;
     setAnswers(prev => ({ ...prev, [qId]: optionId }));
   };
 
   const updateStateAndNavigate = (newState: QuestionState, nextIndexOffset: number = 0) => {
-    if (questions.length === 0) return;
+    if (questions.length === 0 || !isFullscreen) return;
     const currentQId = questions[currentQuestionIndex].id;
     
     if (!isSubmitted) {
@@ -114,7 +204,7 @@ export function ExamClient({ mockTest, questions }: ExamClientProps) {
   };
 
   const handleSaveAndNext = () => {
-    if (questions.length === 0) return;
+    if (questions.length === 0 || !isFullscreen) return;
     if (isSubmitted) {
       updateStateAndNavigate('current', 1);
       return;
@@ -127,7 +217,7 @@ export function ExamClient({ mockTest, questions }: ExamClientProps) {
   const handleMarkReview = () => updateStateAndNavigate('review', 1);
 
   const handleClear = () => {
-    if (questions.length === 0 || isSubmitted) return;
+    if (questions.length === 0 || isSubmitted || !isFullscreen) return;
     const currentQId = questions[currentQuestionIndex].id;
     setAnswers(prev => {
       const updated = { ...prev };
@@ -137,7 +227,7 @@ export function ExamClient({ mockTest, questions }: ExamClientProps) {
   };
 
   const handlePrevious = () => {
-    if (questions.length === 0) return;
+    if (questions.length === 0 || !isFullscreen) return;
     if (isSubmitted) {
       updateStateAndNavigate('current', -1);
       return;
@@ -153,7 +243,7 @@ export function ExamClient({ mockTest, questions }: ExamClientProps) {
   };
 
   const jumpToQuestion = (index: number) => {
-    if (questions.length === 0) return;
+    if (questions.length === 0 || !isFullscreen) return;
     if (!isSubmitted) {
       const currentQId = questions[currentQuestionIndex].id;
       const isAnswered = !!answers[currentQId];
@@ -167,7 +257,7 @@ export function ExamClient({ mockTest, questions }: ExamClientProps) {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (questions.length === 0 || showSubmitConfirm) return;
+      if (questions.length === 0 || showSubmitConfirm || !isFullscreen) return;
       if (!isSubmitted && ['1','2','3','4'].includes(e.key)) {
         const optionIndex = parseInt(e.key) - 1;
         const currentQ = questions[currentQuestionIndex];
@@ -181,7 +271,7 @@ export function ExamClient({ mockTest, questions }: ExamClientProps) {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentQuestionIndex, answers, questions, isSubmitted, showSubmitConfirm]);
+  }, [currentQuestionIndex, answers, questions, isSubmitted, showSubmitConfirm, isFullscreen]);
 
   const handleSubmit = () => {
     let correct = 0;
@@ -213,6 +303,13 @@ export function ExamClient({ mockTest, questions }: ExamClientProps) {
       document.exitFullscreen().catch(e => console.error(e));
       setIsFullscreen(false);
     }
+  };
+
+  const handleExitExam = () => {
+    if (document.fullscreenElement && document.exitFullscreen) {
+      document.exitFullscreen().catch(e => console.error(e));
+    }
+    router.back();
   };
 
   const currentQ = questions[currentQuestionIndex];
@@ -281,12 +378,49 @@ export function ExamClient({ mockTest, questions }: ExamClientProps) {
     );
   }
 
+  if (!hasStarted) {
+    return (
+      <div className="fixed inset-0 z-[100] bg-[#F8FAFC] flex flex-col items-center justify-center p-6 text-slate-900 font-inter">
+        <div className="max-w-md w-full bg-white rounded-3xl p-8 text-center shadow-xl border border-slate-200">
+          {wasKicked ? (
+            <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
+              <AlertCircle className="w-8 h-8 text-red-600" />
+            </div>
+          ) : (
+            <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Maximize className="w-8 h-8 text-blue-600" />
+            </div>
+          )}
+          
+          <h2 className="text-2xl font-bold mb-3">{mockTest.title}</h2>
+          
+          {wasKicked ? (
+            <p className="text-red-500 font-medium mb-8 bg-red-50 p-4 rounded-xl border border-red-100">
+              Exam Terminated! You exited fullscreen mode. All progress has been lost and the exam has been reset. You must start over.
+            </p>
+          ) : (
+            <p className="text-slate-500 mb-8 leading-relaxed">
+              {mockTest.isStrictMode !== false 
+                ? "This exam must be taken in Fullscreen mode. Once started, the timer will begin and you will be locked into the exam environment." 
+                : "You are about to start the mock test. Ensure you have a stable internet connection before beginning."}
+            </p>
+          )}
+
+          <Button onClick={startExam} className="w-full h-12 text-[15px] font-semibold rounded-full bg-[#16A34A] hover:bg-green-700 text-white shadow-sm">
+            {wasKicked ? "Restart Exam" : mockTest.isStrictMode !== false ? "Start Exam in Fullscreen" : "Start Exam"}
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   const currentOptionsKeys = currentQ.options 
     ? Object.keys(currentQ.options).sort().slice(0, 4) 
     : [];
 
   return (
     <div className="fixed inset-0 z-[100] bg-[#F8FAFC] flex flex-col h-screen overflow-hidden text-slate-900 font-inter">
+
       <AnimatePresence>
         {showSubmitConfirm && (
           <motion.div 
@@ -310,7 +444,7 @@ export function ExamClient({ mockTest, questions }: ExamClientProps) {
 
       <header className="h-[72px] bg-white border-b border-slate-200 flex items-center justify-between px-6 z-20 flex-shrink-0">
         <div className="flex items-center gap-4 w-1/3">
-          <button onClick={() => isReviewMode ? setIsReviewMode(false) : router.back()} className="flex items-center text-slate-800 font-medium hover:text-slate-600 transition-colors">
+          <button onClick={() => isReviewMode ? setIsReviewMode(false) : handleExitExam()} className="flex items-center text-slate-800 font-medium hover:text-slate-600 transition-colors">
             <ArrowLeft className="w-5 h-5 mr-2" />
             {isReviewMode ? "Back to Results" : "Exit Exam"}
           </button>
@@ -472,7 +606,7 @@ export function ExamClient({ mockTest, questions }: ExamClientProps) {
                 <div className="w-full h-px bg-slate-100 mb-4"></div>
 
                 <div 
-                  className="text-xl leading-relaxed text-slate-900 mb-6 font-medium"
+                  className="leading-relaxed text-slate-900 mb-6 capitalize font-[700] text-[2.5rem]"
                   dangerouslySetInnerHTML={{ __html: currentQ.questionText || '' }}
                 />
 

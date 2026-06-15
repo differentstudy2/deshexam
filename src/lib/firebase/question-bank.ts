@@ -143,6 +143,8 @@ export async function getQuestion(id: string) {
   return { id: snap.id, ...snap.data() } as QuestionBankEntry;
 }
 
+
+
 export async function getTotalQuestionsCount(filters?: any) {
   const colRef = collection(db, QUESTIONS_COLLECTION);
   let q = query(colRef);

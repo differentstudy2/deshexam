@@ -56,6 +56,13 @@ export interface MockTest extends AssessmentBase {
   attemptsAllowed: number;
   instructions: string;
   examRules: string;
+  
+  // Advanced Configurations
+  isStrictMode?: boolean; // If true, enforces fullscreen and kicks out on exit
+  shuffleQuestions?: boolean; // If true, randomizes question order
+  shuffleOptions?: boolean; // If true, randomizes options for each question
+  isPremium?: boolean;
+  price?: number;
 }
 
 export interface ExamSeries {

@@ -25,5 +25,5 @@ export default async function TakeMockTestPage({ params }: { params: Promise<{ s
   const serializedMockTest = JSON.parse(JSON.stringify(mockTest));
   const serializedQuestions = JSON.parse(JSON.stringify(rawQuestions));
 
-  return <ExamClient mockTest={serializedMockTest} questions={serializedQuestions} />;
+  return <ExamClient mockTest={serializedMockTest} initialQuestions={serializedQuestions} />;
 }

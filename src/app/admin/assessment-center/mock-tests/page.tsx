@@ -7,12 +7,23 @@ import { Textarea } from '@/components/ui/textarea';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { PlusCircle, Pencil, Trash2, ArrowLeft, Loader2, ListPlus } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { PlusCircle, Pencil, Trash2, ArrowLeft, Loader2, ListPlus, Copy, GripVertical, Sparkles } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { MockTest } from '@/lib/assessment-types';
 import { getAssessments, saveAssessment, deleteAssessment } from '@/lib/firebase/assessment';
 import { QuestionPickerModal } from '@/components/assessment/QuestionPickerModal';
 import { QuestionBankEntry } from '@/lib/question-bank-types';
+import { getQuestionsByIds } from '@/lib/firebase/question-bank';
+import { generateMockTestMetadata } from './actions';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export default function MockTestsPage() {
     const { toast } = useToast();
@@ -20,11 +31,32 @@ export default function MockTestsPage() {
     const [mockTests, setMockTests] = useState<MockTest[]>([]);
     const [loading, setLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
+    const [isGeneratingAI, setIsGeneratingAI] = useState(false);
+    const [showAIDialog, setShowAIDialog] = useState(false);
+    const [aiTopic, setAiTopic] = useState('');
     
     const [editData, setEditData] = useState<Partial<MockTest>>({});
     
     // Question Picker State
     const [showPicker, setShowPicker] = useState(false);
+    
+    // New Advanced States
+    const [questionPreviews, setQuestionPreviews] = useState<Record<string, string>>({});
+    const [draggedIdx, setDraggedIdx] = useState<number | null>(null);
+
+    // Fetch Question Previews when editData.questionIds changes
+    useEffect(() => {
+        if (view === 'editor' && editData.questionIds && editData.questionIds.length > 0) {
+            const idsToFetch = editData.questionIds.filter(id => !questionPreviews[id]);
+            if (idsToFetch.length > 0) {
+                getQuestionsByIds(idsToFetch).then(questions => {
+                    const newMap = { ...questionPreviews };
+                    questions.forEach(q => newMap[q.id] = q.questionText);
+                    setQuestionPreviews(newMap);
+                }).catch(console.error);
+            }
+        }
+    }, [editData.questionIds, view]);
 
     useEffect(() => {
         fetchMockTests();
@@ -57,7 +89,12 @@ export default function MockTestsPage() {
             passingMarks: 40,
             attemptsAllowed: 1, // Strict for mock tests usually
             instructions: '',
-            examRules: ''
+            examRules: '',
+            isStrictMode: true,
+            shuffleQuestions: false,
+            shuffleOptions: false,
+            isPremium: false,
+            price: 0
         });
     };
 
@@ -75,6 +112,54 @@ export default function MockTestsPage() {
         } catch(e) {
             toast({ title: 'Delete failed', variant: 'destructive' });
         }
+    };
+
+    const handleClone = async (test: MockTest) => {
+        setIsSaving(true);
+        try {
+            const newId = `mt_${Date.now()}`;
+            const newTitle = `Copy of ${test.title}`;
+            const newSlug = newTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+            
+            const clonedTest: MockTest = {
+                ...test,
+                id: newId,
+                title: newTitle,
+                slug: newSlug,
+                status: 'Draft',
+                createdAt: undefined,
+                updatedAt: undefined
+            };
+            
+            await saveAssessment('mockTests', newId, clonedTest);
+            toast({ title: 'Mock test cloned successfully' });
+            fetchMockTests();
+        } catch(e) {
+            toast({ title: 'Clone failed', variant: 'destructive' });
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    // Drag and Drop handlers
+    const handleDragStart = (idx: number) => {
+        setDraggedIdx(idx);
+    };
+
+    const handleDragEnter = (idx: number) => {
+        if (draggedIdx === null || draggedIdx === idx) return;
+        
+        const newIds = [...(editData.questionIds || [])];
+        const draggedItem = newIds[draggedIdx];
+        newIds.splice(draggedIdx, 1);
+        newIds.splice(idx, 0, draggedItem);
+        
+        setDraggedIdx(idx);
+        setEditData({ ...editData, questionIds: newIds });
+    };
+
+    const handleDragEnd = () => {
+        setDraggedIdx(null);
     };
 
     const handleSave = async () => {
@@ -105,6 +190,39 @@ export default function MockTestsPage() {
         }
     };
 
+    const handleAIGenerate = () => {
+        setAiTopic('');
+        setShowAIDialog(true);
+    };
+
+    const confirmAIGenerate = async () => {
+        if (!aiTopic.trim()) return;
+
+        setIsGeneratingAI(true);
+        setShowAIDialog(false);
+        try {
+            const res = await generateMockTestMetadata(aiTopic);
+            if (res.success && res.data) {
+                setEditData(prev => ({
+                    ...prev,
+                    title: res.data.title,
+                    slug: res.data.slug,
+                    description: res.data.description,
+                    instructions: res.data.instructions,
+                }));
+                toast({ title: 'AI Generation Successful!' });
+            } else {
+                toast({ title: 'AI Generation Failed', description: res.error, variant: 'destructive' });
+            }
+        } catch (e: any) {
+            console.error(e);
+            toast({ title: 'AI Generation Failed', description: e.message || 'Unknown network error', variant: 'destructive' });
+        } finally {
+            setIsGeneratingAI(false);
+        }
+    };
+
+
     const handleQuestionsSelected = (questions: QuestionBankEntry[]) => {
         const newIds = questions.map(q => q.id);
         setEditData(prev => ({
@@ -124,7 +242,19 @@ export default function MockTestsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="md:col-span-2 space-y-6">
                         <Card>
-                            <CardHeader><CardTitle>Basic Details</CardTitle></CardHeader>
+                            <CardHeader className="flex flex-row items-center justify-between">
+                                <CardTitle>Basic Details</CardTitle>
+                                <Button 
+                                    variant="outline" 
+                                    size="sm" 
+                                    onClick={handleAIGenerate} 
+                                    disabled={isGeneratingAI}
+                                    className="text-purple-600 border-purple-200 hover:bg-purple-50"
+                                >
+                                    {isGeneratingAI ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Sparkles className="h-4 w-4 mr-2" />}
+                                    Auto-Generate with AI
+                                </Button>
+                            </CardHeader>
                             <CardContent className="space-y-4">
                                 <div>
                                     <label className="text-sm font-medium">Test Title</label>
@@ -160,15 +290,27 @@ export default function MockTestsPage() {
                                 ) : (
                                     <div className="space-y-2">
                                         {editData.questionIds.map((id, idx) => (
-                                            <div key={id} className="flex items-center justify-between p-3 border rounded bg-slate-50">
-                                                <div className="flex items-center gap-3">
-                                                    <span className="font-medium text-slate-500 w-6">{idx + 1}.</span>
-                                                    <span className="text-sm font-mono text-slate-600">{id}</span>
+                                            <div 
+                                                key={id} 
+                                                draggable
+                                                onDragStart={() => handleDragStart(idx)}
+                                                onDragEnter={() => handleDragEnter(idx)}
+                                                onDragEnd={handleDragEnd}
+                                                onDragOver={(e) => e.preventDefault()}
+                                                className={`flex items-center justify-between p-3 border rounded shadow-sm transition-colors cursor-move hover:border-blue-400 ${draggedIdx === idx ? 'opacity-50 border-blue-500 bg-blue-50' : 'bg-white border-slate-200'}`}
+                                            >
+                                                <div className="flex items-center gap-3 flex-1 min-w-0">
+                                                    <GripVertical className="text-slate-400 w-5 h-5 flex-shrink-0" />
+                                                    <span className="font-medium text-slate-500 w-6 flex-shrink-0">{idx + 1}.</span>
+                                                    <span className="text-sm font-mono text-slate-400 flex-shrink-0 w-24 truncate">{id}</span>
+                                                    <span className="text-sm text-slate-700 truncate line-clamp-1 ml-2 flex-1">
+                                                        {questionPreviews[id] ? questionPreviews[id] : <span className="text-slate-400 italic">Loading preview...</span>}
+                                                    </span>
                                                 </div>
                                                 <Button 
                                                     variant="ghost" 
                                                     size="sm" 
-                                                    className="text-red-500 h-8 w-8 p-0"
+                                                    className="text-red-500 h-8 w-8 p-0 flex-shrink-0 ml-4 hover:bg-red-50"
                                                     onClick={() => setEditData({...editData, questionIds: editData.questionIds?.filter(qid => qid !== id)})}
                                                 >
                                                     <Trash2 className="h-4 w-4" />
@@ -233,6 +375,61 @@ export default function MockTestsPage() {
                                     <Input type="number" value={editData.attemptsAllowed ?? 1} onChange={e => setEditData({...editData, attemptsAllowed: parseInt(e.target.value)})} />
                                     <p className="text-xs text-slate-500 mt-1">Set 0 for unlimited, 1 for strict simulation.</p>
                                 </div>
+                                
+                                <div className="space-y-4 pt-4 border-t">
+                                    <h4 className="font-semibold text-slate-900">Advanced Settings</h4>
+                                    
+                                    <div className="flex items-center justify-between">
+                                        <div className="space-y-0.5">
+                                            <label className="text-sm font-medium">Strict Anti-Cheat Mode</label>
+                                            <p className="text-xs text-slate-500">Enforces fullscreen and terminates on exit</p>
+                                        </div>
+                                        <Switch 
+                                            checked={editData.isStrictMode !== false} 
+                                            onCheckedChange={c => setEditData({...editData, isStrictMode: c})} 
+                                        />
+                                    </div>
+
+                                    <div className="flex items-center justify-between">
+                                        <div className="space-y-0.5">
+                                            <label className="text-sm font-medium">Shuffle Questions</label>
+                                            <p className="text-xs text-slate-500">Randomize question order for each student</p>
+                                        </div>
+                                        <Switch 
+                                            checked={!!editData.shuffleQuestions} 
+                                            onCheckedChange={c => setEditData({...editData, shuffleQuestions: c})} 
+                                        />
+                                    </div>
+
+                                    <div className="flex items-center justify-between">
+                                        <div className="space-y-0.5">
+                                            <label className="text-sm font-medium">Shuffle Options</label>
+                                            <p className="text-xs text-slate-500">Randomize MCQ options for each student</p>
+                                        </div>
+                                        <Switch 
+                                            checked={!!editData.shuffleOptions} 
+                                            onCheckedChange={c => setEditData({...editData, shuffleOptions: c})} 
+                                        />
+                                    </div>
+
+                                    <div className="flex items-center justify-between">
+                                        <div className="space-y-0.5">
+                                            <label className="text-sm font-medium">Premium Exam</label>
+                                            <p className="text-xs text-slate-500">Require payment to access</p>
+                                        </div>
+                                        <Switch 
+                                            checked={!!editData.isPremium} 
+                                            onCheckedChange={c => setEditData({...editData, isPremium: c})} 
+                                        />
+                                    </div>
+
+                                    {editData.isPremium && (
+                                        <div>
+                                            <label className="text-sm font-medium">Price (₹)</label>
+                                            <Input type="number" value={editData.price || 0} onChange={e => setEditData({...editData, price: parseFloat(e.target.value)})} />
+                                        </div>
+                                    )}
+                                </div>
 
                                 <Button className="w-full mt-4" onClick={handleSave} disabled={isSaving}>
                                     {isSaving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <PlusCircle className="h-4 w-4 mr-2" />}
@@ -249,6 +446,32 @@ export default function MockTestsPage() {
                     onSelectQuestions={handleQuestionsSelected}
                     preSelectedIds={editData.questionIds || []}
                 />
+
+                <Dialog open={showAIDialog} onOpenChange={setShowAIDialog}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Auto-Generate with AI</DialogTitle>
+                            <DialogDescription>
+                                Enter a topic and Gemini will write an SEO-optimized title, slug, meta description, and student instructions for you.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="py-4">
+                            <label className="text-sm font-medium mb-2 block">Topic / Subject</label>
+                            <Input 
+                                placeholder="E.g., SSC CGL Tier 1 Full Mock, WBCS History..." 
+                                value={aiTopic}
+                                onChange={(e) => setAiTopic(e.target.value)}
+                                autoFocus
+                            />
+                        </div>
+                        <DialogFooter>
+                            <Button variant="outline" onClick={() => setShowAIDialog(false)}>Cancel</Button>
+                            <Button onClick={confirmAIGenerate} disabled={!aiTopic.trim() || isGeneratingAI}>
+                                <Sparkles className="h-4 w-4 mr-2" /> Generate
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </div>
         );
     }
@@ -293,8 +516,9 @@ export default function MockTestsPage() {
                                         <TableCell>{test.status}</TableCell>
                                         <TableCell>
                                             <div className="flex gap-2">
-                                                <Button variant="ghost" size="sm" onClick={() => handleEdit(test)}><Pencil className="h-4 w-4" /></Button>
-                                                <Button variant="ghost" size="sm" className="text-red-500" onClick={() => handleDelete(test.id)}><Trash2 className="h-4 w-4" /></Button>
+                                                <Button variant="ghost" size="sm" onClick={() => handleEdit(test)} title="Edit"><Pencil className="h-4 w-4" /></Button>
+                                                <Button variant="ghost" size="sm" onClick={() => handleClone(test)} title="Clone"><Copy className="h-4 w-4" /></Button>
+                                                <Button variant="ghost" size="sm" className="text-red-500" onClick={() => handleDelete(test.id)} title="Delete"><Trash2 className="h-4 w-4" /></Button>
                                             </div>
                                         </TableCell>
                                     </TableRow>

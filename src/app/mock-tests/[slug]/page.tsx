@@ -4,10 +4,10 @@ import { notFound } from 'next/navigation';
 import { MockTest } from '@/lib/assessment-types';
 import { Metadata, ResolvingMetadata } from 'next';
 import { formatTitleForBrowser } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { Clock, HelpCircle, ShieldCheck, PlayCircle, FileText, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { Clock, HelpCircle, ShieldCheck, FileText, CheckCircle2, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
 import { AssessmentCard } from '@/components/assessment/AssessmentCard';
+import { StartTestButton } from './StartTestButton';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -122,11 +122,7 @@ export default async function MockTestLandingPage({ params }: Props) {
                   <li className="flex items-center"><AlertTriangle className="w-4 h-4 mr-2 text-red-500" /> Negative Marking applies</li>
                   <li className="flex items-center"><Clock className="w-4 h-4 mr-2 text-slate-400" /> Strictly timed exam</li>
                 </ul>
-                <Button className="w-full bg-blue-600 hover:bg-blue-700 h-14 text-lg rounded-xl" asChild>
-                  <Link href={`/mock-tests/${test.slug}/take`}>
-                    <PlayCircle className="w-5 h-5 mr-2" /> Start Mock Test
-                  </Link>
-                </Button>
+                <StartTestButton slug={test.slug} />
               </div>
             </div>
           </div>
