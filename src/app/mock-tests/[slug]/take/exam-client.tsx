@@ -476,7 +476,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
               <button onClick={handleExitExam} className="w-10 h-10 bg-white dark:bg-[#1e293b] shadow-sm flex items-center justify-center rounded-full border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 transition-colors">
                 <ArrowLeft className="w-5 h-5" />
               </button>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
                 <div className="w-10 h-10 rounded-full bg-white dark:bg-slate-800 flex items-center justify-center overflow-hidden border border-slate-200 dark:border-slate-700 shadow-sm transition-colors flex-shrink-0">
                   <img src="/favicon-bg.png" alt="DeshExam Logo" className="w-full h-full object-cover m-0 !mb-0 rounded-none" />
                 </div>
@@ -490,7 +490,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-1">
               <button onClick={toggleFullscreen}>
                 {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
               </button>
@@ -526,11 +526,11 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                 if (uAnswer && q.correctAnswer && uAnswer.toLowerCase() === q.correctAnswer.toLowerCase()) pillClass = "bg-white dark:bg-[#1e293b] border-[#16A34A] text-[#16A34A] dark:text-emerald-400";
                 else if (uAnswer) pillClass = "bg-white dark:bg-[#1e293b] border-[#DC2626] text-[#DC2626] dark:text-red-400";
               } else if (state === 'answered') {
-                pillClass = "bg-white dark:bg-[#1e293b] border-[#16A34A] text-[#16A34A] dark:text-emerald-400"; 
+                pillClass = "bg-white dark:bg-[#1e293b] border-[#16A34A] text-[#16A34A] dark:text-emerald-400";
               } else if (state === 'skipped') {
-                pillClass = "bg-white dark:bg-[#1e293b] border-[#DC2626] text-[#DC2626] dark:text-red-400"; 
+                pillClass = "bg-white dark:bg-[#1e293b] border-[#DC2626] text-[#DC2626] dark:text-red-400";
               } else if (state === 'review') {
-                pillClass = "bg-white dark:bg-[#1e293b] border-[#D97706] text-[#D97706] dark:text-amber-400"; 
+                pillClass = "bg-white dark:bg-[#1e293b] border-[#D97706] text-[#D97706] dark:text-amber-400";
               }
 
               return (
@@ -862,7 +862,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
 
             {/* Top Bar: Info & Mini Navigator */}
             <div className="flex items-center justify-between bg-white dark:bg-[#1e293b] rounded-[12px] px-4 py-2 shadow-sm border border-slate-100 dark:border-slate-700 transition-colors">
-              
+
               {/* Left Side Info */}
               <div className="flex items-center gap-2 flex-shrink-0 w-[150px] lg:w-[200px]">
                 <span className={cn(
@@ -891,7 +891,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                       }
 
                       let navClass = "bg-transparent text-[#0B476D] dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-slate-700";
-                      
+
                       if (isCurrent) {
                         navClass = "bg-[#166534] dark:bg-emerald-600 text-white shadow-sm";
                       } else if (isReviewMode) {

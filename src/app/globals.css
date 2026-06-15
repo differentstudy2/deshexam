@@ -384,6 +384,10 @@
     font-size: 1.5rem;
     line-height: 2rem;
   }
+
+  .rounded-2xl {
+    border-radius: 0.4rem;
+  }
 }
 
 h3.name.text-lg.font-semibold {
