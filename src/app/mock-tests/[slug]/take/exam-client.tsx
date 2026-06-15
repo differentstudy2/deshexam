@@ -29,6 +29,7 @@ export function ExamClient({ mockTest, questions }: ExamClientProps) {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
   const [scoreData, setScoreData] = useState({ correct: 0, wrong: 0, skipped: 0, score: 0, total: 0 });
+  const [isReviewMode, setIsReviewMode] = useState(false);
 
   useEffect(() => {
     const initialStates: Record<string, QuestionState> = {};
@@ -87,19 +88,22 @@ export function ExamClient({ mockTest, questions }: ExamClientProps) {
   };
 
   const updateStateAndNavigate = (newState: QuestionState, nextIndexOffset: number = 0) => {
-    if (questions.length === 0 || isSubmitted) return;
+    if (questions.length === 0) return;
     const currentQId = questions[currentQuestionIndex].id;
-    setQuestionStates(prev => {
-      const updated = { ...prev, [currentQId]: newState };
-      const nextIndex = currentQuestionIndex + nextIndexOffset;
-      if (nextIndex >= 0 && nextIndex < questions.length) {
-        const nextQId = questions[nextIndex].id;
-        if (updated[nextQId] !== 'answered' && updated[nextQId] !== 'review') {
-          updated[nextQId] = 'current';
+    
+    if (!isSubmitted) {
+      setQuestionStates(prev => {
+        const updated = { ...prev, [currentQId]: newState };
+        const nextIndex = currentQuestionIndex + nextIndexOffset;
+        if (nextIndex >= 0 && nextIndex < questions.length) {
+          const nextQId = questions[nextIndex].id;
+          if (updated[nextQId] !== 'answered' && updated[nextQId] !== 'review') {
+            updated[nextQId] = 'current';
+          }
         }
-      }
-      return updated;
-    });
+        return updated;
+      });
+    }
 
     if (nextIndexOffset !== 0) {
       const nextIndex = currentQuestionIndex + nextIndexOffset;
@@ -110,7 +114,11 @@ export function ExamClient({ mockTest, questions }: ExamClientProps) {
   };
 
   const handleSaveAndNext = () => {
-    if (questions.length === 0 || isSubmitted) return;
+    if (questions.length === 0) return;
+    if (isSubmitted) {
+      updateStateAndNavigate('current', 1);
+      return;
+    }
     const currentQId = questions[currentQuestionIndex].id;
     const hasAnswer = !!answers[currentQId];
     updateStateAndNavigate(hasAnswer ? 'answered' : 'skipped', 1);
@@ -129,7 +137,11 @@ export function ExamClient({ mockTest, questions }: ExamClientProps) {
   };
 
   const handlePrevious = () => {
-    if (questions.length === 0 || isSubmitted) return;
+    if (questions.length === 0) return;
+    if (isSubmitted) {
+      updateStateAndNavigate('current', -1);
+      return;
+    }
     const prevQId = questions[currentQuestionIndex].id;
     const isAnswered = !!answers[prevQId];
     const currentState = questionStates[prevQId];
@@ -141,20 +153,22 @@ export function ExamClient({ mockTest, questions }: ExamClientProps) {
   };
 
   const jumpToQuestion = (index: number) => {
-    if (questions.length === 0 || isSubmitted) return;
-    const currentQId = questions[currentQuestionIndex].id;
-    const isAnswered = !!answers[currentQId];
-    if (questionStates[currentQId] === 'current') {
-      setQuestionStates(prev => ({ ...prev, [currentQId]: isAnswered ? 'answered' : 'skipped' }));
+    if (questions.length === 0) return;
+    if (!isSubmitted) {
+      const currentQId = questions[currentQuestionIndex].id;
+      const isAnswered = !!answers[currentQId];
+      if (questionStates[currentQId] === 'current') {
+        setQuestionStates(prev => ({ ...prev, [currentQId]: isAnswered ? 'answered' : 'skipped' }));
+      }
+      setQuestionStates(prev => ({ ...prev, [questions[index].id]: 'current' }));
     }
     setCurrentQuestionIndex(index);
-    setQuestionStates(prev => ({ ...prev, [questions[index].id]: 'current' }));
   };
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (questions.length === 0 || isSubmitted || showSubmitConfirm) return;
-      if (['1','2','3','4'].includes(e.key)) {
+      if (questions.length === 0 || showSubmitConfirm) return;
+      if (!isSubmitted && ['1','2','3','4'].includes(e.key)) {
         const optionIndex = parseInt(e.key) - 1;
         const currentQ = questions[currentQuestionIndex];
         const optionsKeys = currentQ.options ? Object.keys(currentQ.options).sort() : [];
@@ -195,7 +209,6 @@ export function ExamClient({ mockTest, questions }: ExamClientProps) {
     setShowSubmitConfirm(false);
     setIsSubmitted(true);
     
-    // Exit fullscreen if active
     if (document.fullscreenElement && document.exitFullscreen) {
       document.exitFullscreen().catch(e => console.error(e));
       setIsFullscreen(false);
@@ -216,7 +229,7 @@ export function ExamClient({ mockTest, questions }: ExamClientProps) {
     );
   }
 
-  if (isSubmitted) {
+  if (isSubmitted && !isReviewMode) {
     const accuracy = scoreData.correct + scoreData.wrong > 0 
       ? Math.round((scoreData.correct / (scoreData.correct + scoreData.wrong)) * 100) 
       : 0;
@@ -256,7 +269,10 @@ export function ExamClient({ mockTest, questions }: ExamClientProps) {
             <Button onClick={() => router.back()} className="h-12 px-8 rounded-full font-semibold border-slate-300 text-slate-700 hover:bg-slate-50" variant="outline">
               Return to Dashboard
             </Button>
-            <Button className="h-12 px-8 rounded-full font-semibold bg-[#16A34A] hover:bg-green-700 text-white border-0 shadow-sm">
+            <Button 
+              onClick={() => setIsReviewMode(true)}
+              className="h-12 px-8 rounded-full font-semibold bg-[#16A34A] hover:bg-green-700 text-white border-0 shadow-sm"
+            >
               View Solutions
             </Button>
           </div>
@@ -265,14 +281,12 @@ export function ExamClient({ mockTest, questions }: ExamClientProps) {
     );
   }
 
-  // Parse Options - limit to 4
   const currentOptionsKeys = currentQ.options 
     ? Object.keys(currentQ.options).sort().slice(0, 4) 
     : [];
 
   return (
     <div className="fixed inset-0 z-[100] bg-[#F8FAFC] flex flex-col h-screen overflow-hidden text-slate-900 font-inter">
-      {/* Submit Confirmation Modal */}
       <AnimatePresence>
         {showSubmitConfirm && (
           <motion.div 
@@ -294,12 +308,11 @@ export function ExamClient({ mockTest, questions }: ExamClientProps) {
         )}
       </AnimatePresence>
 
-      {/* HEADER */}
       <header className="h-[72px] bg-white border-b border-slate-200 flex items-center justify-between px-6 z-20 flex-shrink-0">
         <div className="flex items-center gap-4 w-1/3">
-          <button onClick={() => router.back()} className="flex items-center text-slate-800 font-medium hover:text-slate-600 transition-colors">
+          <button onClick={() => isReviewMode ? setIsReviewMode(false) : router.back()} className="flex items-center text-slate-800 font-medium hover:text-slate-600 transition-colors">
             <ArrowLeft className="w-5 h-5 mr-2" />
-            Exit Exam
+            {isReviewMode ? "Back to Results" : "Exit Exam"}
           </button>
           <div className="h-4 w-px bg-slate-200 mx-2"></div>
           <button className="text-slate-500 hover:text-slate-800 transition-colors" title="Bookmark Question">
@@ -314,31 +327,43 @@ export function ExamClient({ mockTest, questions }: ExamClientProps) {
         </div>
 
         <div className="flex flex-col items-center justify-center w-1/3 text-center">
-          <h1 className="font-bold text-lg text-slate-900 line-clamp-1">{mockTest.title}</h1>
+          <h1 className="font-bold text-lg text-slate-900 line-clamp-1">
+            {isReviewMode ? "Reviewing Solutions" : mockTest.title}
+          </h1>
           <p className="text-sm text-slate-600">Question {currentQuestionIndex + 1} of {questions.length}</p>
         </div>
 
         <div className="flex items-center justify-end gap-5 w-1/3">
-          <div className="bg-[#E6F4EA] text-[#137333] px-3 py-1.5 rounded-full font-semibold text-[15px] border border-[#CEEAD6] flex items-center gap-1.5">
-            <Clock className="w-4 h-4" />
-            <span>{formatTime(timeLeft)}</span>
-          </div>
-          <div className="text-[15px] font-semibold text-slate-900">
-            Score: {mockTest.totalMarks || 0}
-          </div>
-          <Button 
-            onClick={() => setShowSubmitConfirm(true)}
-            className="bg-[#16A34A] hover:bg-green-700 text-white rounded-full px-6 shadow-sm font-medium"
-          >
-            Submit
-          </Button>
+          {!isReviewMode && (
+            <>
+              <div className="bg-[#E6F4EA] text-[#137333] px-3 py-1.5 rounded-full font-semibold text-[15px] border border-[#CEEAD6] flex items-center gap-1.5">
+                <Clock className="w-4 h-4" />
+                <span>{formatTime(timeLeft)}</span>
+              </div>
+              <div className="text-[15px] font-semibold text-slate-900">
+                Score: {mockTest.totalMarks || 0}
+              </div>
+              <Button 
+                onClick={() => setShowSubmitConfirm(true)}
+                className="bg-[#16A34A] hover:bg-green-700 text-white rounded-full px-6 shadow-sm font-medium"
+              >
+                Submit
+              </Button>
+            </>
+          )}
+          {isReviewMode && (
+             <Button 
+               onClick={() => setIsReviewMode(false)}
+               variant="outline"
+               className="rounded-full px-6 shadow-sm font-medium border-slate-300"
+             >
+               Close Review
+             </Button>
+          )}
         </div>
       </header>
 
-      {/* MAIN CONTENT */}
       <main className="flex-1 flex flex-col lg:flex-row gap-6 p-6 overflow-hidden max-w-[1920px] mx-auto w-full">
-        
-        {/* LEFT SIDEBAR (Question Navigator) */}
         <aside className="w-[280px] hidden lg:flex flex-col bg-white rounded-2xl shadow-sm border border-slate-200 p-5 overflow-hidden">
           <h2 className="font-bold text-lg mb-4 text-slate-900">Question Navigator</h2>
           
@@ -347,21 +372,33 @@ export function ExamClient({ mockTest, questions }: ExamClientProps) {
               <span>Total Questions</span>
               <span className="font-bold text-slate-900">{questions.length}</span>
             </div>
-            <div className="flex justify-between items-center text-slate-700">
-              <span>Answered</span>
-              <span className="font-bold text-[#16A34A]">{totalAttempted}</span>
-            </div>
-            <div className="flex justify-between items-center text-slate-700">
-              <span>Skipped</span>
-              <span className="font-bold text-slate-900">{totalSkipped}</span>
-            </div>
-            <div className="flex justify-between items-center text-slate-700">
-              <span>Remaining</span>
-              <span className="font-bold text-slate-500">{totalRemaining}</span>
-            </div>
+            {!isReviewMode && (
+              <>
+                <div className="flex justify-between items-center text-slate-700">
+                  <span>Answered</span>
+                  <span className="font-bold text-[#16A34A]">{totalAttempted}</span>
+                </div>
+                <div className="flex justify-between items-center text-slate-700">
+                  <span>Skipped</span>
+                  <span className="font-bold text-slate-900">{totalSkipped}</span>
+                </div>
+              </>
+            )}
+            {isReviewMode && (
+              <>
+                <div className="flex justify-between items-center text-slate-700">
+                  <span>Correct</span>
+                  <span className="font-bold text-[#16A34A]">{scoreData.correct}</span>
+                </div>
+                <div className="flex justify-between items-center text-slate-700">
+                  <span>Wrong</span>
+                  <span className="font-bold text-red-600">{scoreData.wrong}</span>
+                </div>
+              </>
+            )}
           </div>
 
-          <Progress value={(totalAttempted / questions.length) * 100} className="h-2 mb-6 bg-slate-100 [&>div]:bg-[#3B82F6]" />
+          <Progress value={isReviewMode ? ((scoreData.correct / questions.length) * 100) : ((totalAttempted / questions.length) * 100)} className="h-2 mb-6 bg-slate-100 [&>div]:bg-[#3B82F6]" />
 
           <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
             <div className="grid grid-cols-5 gap-2.5">
@@ -369,49 +406,37 @@ export function ExamClient({ mockTest, questions }: ExamClientProps) {
                 const state = questionStates[q.id] || 'unvisited';
                 const isCurrent = currentQuestionIndex === idx;
                 
+                let reviewClass = "";
+                if (isReviewMode) {
+                  const uAnswer = answers[q.id];
+                  if (!uAnswer) reviewClass = "bg-slate-200 text-slate-700";
+                  else if (q.correctAnswer && uAnswer.toLowerCase() === q.correctAnswer.toLowerCase()) reviewClass = "bg-[#16A34A] text-white";
+                  else reviewClass = "bg-red-500 text-white";
+                }
+
                 return (
                   <button
                     key={q.id}
                     onClick={() => jumpToQuestion(idx)}
                     className={cn(
                       "w-11 h-11 rounded-lg flex items-center justify-center text-sm font-medium transition-all relative",
-                      state === 'answered' && !isCurrent ? "bg-[#16A34A] text-white" : "",
-                      state === 'skipped' && !isCurrent ? "bg-slate-200 text-slate-700" : "",
-                      state === 'review' && !isCurrent ? "bg-[#F59E0B] text-white" : "",
-                      state === 'unvisited' && !isCurrent ? "bg-[#F1F5F9] text-slate-700 border border-slate-200" : "",
-                      isCurrent ? "bg-white text-[#2563EB] ring-2 ring-[#2563EB] shadow-sm z-10" : ""
+                      isReviewMode ? reviewClass : (
+                        state === 'answered' && !isCurrent ? "bg-[#16A34A] text-white" :
+                        state === 'skipped' && !isCurrent ? "bg-slate-200 text-slate-700" :
+                        state === 'review' && !isCurrent ? "bg-[#F59E0B] text-white" :
+                        state === 'unvisited' && !isCurrent ? "bg-[#F1F5F9] text-slate-700 border border-slate-200" : ""
+                      ),
+                      isCurrent ? "ring-2 ring-offset-1 ring-[#2563EB] shadow-sm z-10" : ""
                     )}
                   >
-                    {isCurrent && state === 'answered' && <div className="absolute inset-0 bg-green-50 rounded-lg -z-10"></div>}
                     <span className="relative z-10">{idx + 1}</span>
                   </button>
                 );
               })}
             </div>
           </div>
-
-          {/* Legend */}
-          <div className="mt-6 pt-4 border-t border-slate-100 grid grid-cols-2 gap-3 text-xs font-medium text-slate-600">
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-[#E2E8F0]"></div>
-              <span>Not visited</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded border-2 border-[#3B82F6] bg-white"></div>
-              <span>Current</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-[#16A34A]"></div>
-              <span>Answered</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-[#F59E0B]"></div>
-              <span>Review</span>
-            </div>
-          </div>
         </aside>
 
-        {/* CENTER QUESTION AREA */}
         <section className="flex-1 flex flex-col bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden relative">
           <div className="flex-1 overflow-y-auto p-5 md:p-6 custom-scrollbar">
             <AnimatePresence mode="wait">
@@ -423,7 +448,6 @@ export function ExamClient({ mockTest, questions }: ExamClientProps) {
                 transition={{ duration: 0.2 }}
                 className="flex flex-col h-full max-w-3xl mx-auto"
               >
-                {/* Question Top Row */}
                 <div className="flex items-center gap-4 mb-4">
                   <span className="text-lg font-bold text-slate-900">Question {currentQuestionIndex + 1} of {questions.length}</span>
                   <div className="flex items-center gap-2 text-sm">
@@ -447,43 +471,64 @@ export function ExamClient({ mockTest, questions }: ExamClientProps) {
 
                 <div className="w-full h-px bg-slate-100 mb-4"></div>
 
-                {/* Question Text */}
                 <div 
                   className="text-xl leading-relaxed text-slate-900 mb-6 font-medium"
                   dangerouslySetInnerHTML={{ __html: currentQ.questionText || '' }}
                 />
 
-                {/* Options UI */}
                 <h3 className="font-bold text-slate-900 mb-3">Options</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
                   {currentOptionsKeys.map((key) => {
                     const isSelected = answers[currentQ.id] === key;
                     const optionText = (currentQ.options as any)[key];
                     
+                    let optionClass = isSelected 
+                      ? "border-[#22C55E] bg-[#F0FDF4]" 
+                      : "border-slate-200 bg-white hover:border-[#86EFAC] hover:bg-[#F0FDF4]";
+                    
+                    let bubbleClass = isSelected 
+                      ? "border-[#22C55E] text-[#16A34A] bg-white shadow-sm" 
+                      : "border-slate-300 text-slate-500 bg-slate-50";
+
+                    let textClass = isSelected ? "text-[#16A34A]" : "text-slate-700";
+
+                    if (isReviewMode) {
+                      const isCorrectAnswer = currentQ.correctAnswer && key.toLowerCase() === currentQ.correctAnswer.toLowerCase();
+                      if (isCorrectAnswer) {
+                        optionClass = "border-[#22C55E] bg-[#F0FDF4]";
+                        bubbleClass = "border-[#22C55E] text-white bg-[#16A34A]";
+                        textClass = "text-[#16A34A]";
+                      } else if (isSelected && !isCorrectAnswer) {
+                        optionClass = "border-red-500 bg-red-50";
+                        bubbleClass = "border-red-500 text-white bg-red-500";
+                        textClass = "text-red-700";
+                      } else {
+                        optionClass = "border-slate-200 bg-white opacity-60";
+                        bubbleClass = "border-slate-300 text-slate-400 bg-slate-50";
+                        textClass = "text-slate-400";
+                      }
+                    }
+                    
                     return (
                       <motion.button
                         key={key}
-                        whileHover={{ scale: 1.01 }}
-                        whileTap={{ scale: 0.99 }}
+                        whileHover={{ scale: isReviewMode ? 1 : 1.01 }}
+                        whileTap={{ scale: isReviewMode ? 1 : 0.99 }}
                         onClick={() => handleOptionSelect(key)}
                         className={cn(
                           "flex items-center w-full min-h-[64px] p-3 rounded-xl border-2 text-left transition-colors duration-200",
-                          isSelected 
-                            ? "border-[#22C55E] bg-[#F0FDF4]" 
-                            : "border-slate-200 bg-white hover:border-[#86EFAC] hover:bg-[#F0FDF4]"
+                          optionClass
                         )}
                       >
                         <div className={cn(
                           "w-9 h-9 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-base mr-3 transition-colors border",
-                          isSelected 
-                            ? "border-[#22C55E] text-[#16A34A] bg-white shadow-sm" 
-                            : "border-slate-300 text-slate-500 bg-slate-50"
+                          bubbleClass
                         )}>
                           {key.toUpperCase()}
                         </div>
                         <span className={cn(
                           "text-base font-medium leading-snug",
-                          isSelected ? "text-[#16A34A]" : "text-slate-700"
+                          textClass
                         )}>
                           {optionText}
                         </span>
@@ -491,11 +536,26 @@ export function ExamClient({ mockTest, questions }: ExamClientProps) {
                     );
                   })}
                 </div>
+
+                {isReviewMode && currentQ.explanation && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                    className="bg-blue-50 border border-blue-100 rounded-xl p-5 mt-4"
+                  >
+                    <h4 className="font-bold text-blue-900 mb-2 flex items-center gap-2">
+                      <AlertCircle className="w-5 h-5 text-blue-600" />
+                      Explanation
+                    </h4>
+                    <div 
+                      className="text-blue-800 leading-relaxed text-sm"
+                      dangerouslySetInnerHTML={{ __html: currentQ.explanation }}
+                    />
+                  </motion.div>
+                )}
               </motion.div>
             </AnimatePresence>
           </div>
 
-          {/* Bottom Action Bar */}
           <div className="p-5 border-t border-slate-200 flex flex-wrap items-center justify-between gap-4">
             <Button 
               variant="outline" 
@@ -506,40 +566,47 @@ export function ExamClient({ mockTest, questions }: ExamClientProps) {
               Previous
             </Button>
             
-            <div className="flex items-center gap-3">
-              <Button 
-                onClick={handleMarkReview}
-                className="h-11 px-6 rounded-full font-semibold bg-[#D97706] hover:bg-amber-700 text-white border-0"
-              >
-                Mark for Review
-              </Button>
-              <Button 
-                onClick={handleClear}
-                className="h-11 px-6 rounded-full font-semibold bg-[#64748B] hover:bg-slate-600 text-white border-0"
-              >
-                Clear Response
-              </Button>
+            {!isReviewMode ? (
+              <div className="flex items-center gap-3">
+                <Button 
+                  onClick={handleMarkReview}
+                  className="h-11 px-6 rounded-full font-semibold bg-[#D97706] hover:bg-amber-700 text-white border-0"
+                >
+                  Mark for Review
+                </Button>
+                <Button 
+                  onClick={handleClear}
+                  className="h-11 px-6 rounded-full font-semibold bg-[#64748B] hover:bg-slate-600 text-white border-0"
+                >
+                  Clear Response
+                </Button>
+                <Button 
+                  onClick={handleSaveAndNext}
+                  className="h-11 px-8 rounded-full font-semibold bg-[#16A34A] hover:bg-green-700 text-white border-0 shadow-sm"
+                >
+                  Save & Next
+                </Button>
+              </div>
+            ) : (
               <Button 
                 onClick={handleSaveAndNext}
-                className="h-11 px-8 rounded-full font-semibold bg-[#16A34A] hover:bg-green-700 text-white border-0 shadow-sm"
+                disabled={currentQuestionIndex === questions.length - 1}
+                className="h-11 px-8 rounded-full font-semibold bg-[#2563EB] hover:bg-blue-700 text-white border-0 shadow-sm"
               >
-                Save & Next
+                Next Question
               </Button>
-            </div>
+            )}
           </div>
         </section>
 
-        {/* RIGHT SIDEBAR */}
         <aside className="w-[280px] hidden xl:flex flex-col gap-4 overflow-y-auto custom-scrollbar pb-2 pr-1">
-          {/* Timer Widget */}
-          <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-col items-center">
-            <h3 className="font-bold text-slate-900 w-full mb-3">Timer</h3>
-            <span className="text-xs font-medium text-slate-500 mb-1">Time Remaining</span>
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col items-center justify-center">
+            <span className="text-[15px] font-medium text-[#475569] mb-1.5">Time Remaining</span>
             <div 
               suppressHydrationWarning
               className={cn(
-                "text-3xl font-bold tracking-tight leading-none",
-                isLowTime ? "text-red-600" : "text-slate-800"
+                "text-[40px] font-extrabold tracking-tight leading-none",
+                isLowTime ? "text-red-600" : "text-[#1E293B]"
               )}
             >
               {formatTime(timeLeft)}
