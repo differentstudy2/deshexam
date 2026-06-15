@@ -1,25 +1,27 @@
 'use client';
 
 import React, { useState, useEffect, use } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Save, BookOpen, FileText, Type, Target, Info, User, Lightbulb, PenTool, HelpCircle, Brain, CheckSquare, FileArchive, FileImage, Video, Headphones, Plus, Trash2, ClipboardList, StickyNote, Key, Timer, Award, Bookmark } from 'lucide-react';
+import {
+  ArrowLeft, Save, BookOpen, FileText, Type, Target, Info, User,
+  Lightbulb, PenTool, HelpCircle, Brain, CheckSquare, FileArchive,
+  FileImage, Video, Headphones, Plus, Trash2, ClipboardList, StickyNote,
+  Key, Timer, Award, Bookmark, ChevronRight, LayoutDashboard
+} from 'lucide-react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { getTopicSections, saveTopicSections, updateTopicStatus } from '@/lib/firebase/guide';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { doc, getDoc } from 'firebase/firestore';
 import { db, storage } from '@/lib/firebase/client';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { useToast } from "@/hooks/use-toast";
+import { cn } from '@/lib/utils';
 
 const TiptapEditor = dynamic(() => import('@/components/admin/TiptapEditor').then(mod => mod.TiptapEditor), {
   ssr: false,
-  loading: () => <div className="min-h-[300px] flex items-center justify-center bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-md">Loading Editor...</div>
+  loading: () => <div className="min-h-[200px] flex items-center justify-center bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-sm text-slate-400">Loading Editor...</div>,
 });
 
 import { TopicVideoManager } from '@/components/admin/TopicVideoManager';
@@ -29,34 +31,43 @@ import { TopicAssessmentManager } from '@/components/admin/TopicAssessmentManage
 
 const sectionCategories = [
   {
-    title: '📚 Learning Content',
+    title: 'Learning',
+    color: 'text-emerald-600',
+    bg: 'bg-emerald-50 dark:bg-emerald-900/20',
+    dot: 'bg-emerald-500',
     items: [
-      { id: 'lesson', label: 'Read Lesson', icon: BookOpen },
-      { id: 'author', label: 'Author Introduction', icon: User },
-      { id: 'word_meaning', label: 'Word Meaning', icon: Type },
+      { id: 'lesson',      label: 'Lesson',      icon: BookOpen },
+      { id: 'author',      label: 'Author',      icon: User },
+      { id: 'word_meaning',label: 'Word Meaning',icon: Type },
       { id: 'explanation', label: 'Explanation', icon: Lightbulb },
-      { id: 'exercise', label: 'Exercise', icon: PenTool },
+      { id: 'exercise',    label: 'Exercise',    icon: PenTool },
     ]
   },
   {
-    title: '📝 Study Resources',
+    title: 'Resources',
+    color: 'text-blue-600',
+    bg: 'bg-blue-50 dark:bg-blue-900/20',
+    dot: 'bg-blue-500',
     items: [
-      { id: 'notes', label: 'Notes', icon: StickyNote },
-      { id: 'pdf', label: 'PDF Notes', icon: FileImage },
+      { id: 'notes',     label: 'Notes',     icon: StickyNote },
+      { id: 'pdf',       label: 'Documents', icon: FileImage },
       { id: 'solutions', label: 'Solutions', icon: Key },
-      { id: 'video', label: 'Video Lectures', icon: Video },
-      { id: 'audio', label: 'Audio Lessons', icon: Headphones },
+      { id: 'video',     label: 'Videos',    icon: Video },
+      { id: 'audio',     label: 'Audio',     icon: Headphones },
     ]
   },
   {
-    title: '🎯 Practice & Assessment',
+    title: 'Practice',
+    color: 'text-violet-600',
+    bg: 'bg-violet-50 dark:bg-violet-900/20',
+    dot: 'bg-violet-500',
     items: [
-      { id: 'questions', label: 'Questions', icon: HelpCircle },
-      { id: 'practice_sets', label: 'Practice Sets', icon: ClipboardList },
-      { id: 'quizzes', label: 'Quizzes', icon: HelpCircle },
-      { id: 'model_test', label: 'Model Test', icon: FileArchive },
-      { id: 'mock_tests', label: 'Mock Tests', icon: Timer },
-      { id: 'exams_papers', label: 'Exams & Papers', icon: Award },
+      { id: 'questions',    label: 'Questions',   icon: HelpCircle },
+      { id: 'practice_sets',label: 'Practice Sets',icon: ClipboardList },
+      { id: 'quizzes',      label: 'Quizzes',     icon: HelpCircle },
+      { id: 'model_test',   label: 'Model Test',  icon: FileArchive },
+      { id: 'mock_tests',   label: 'Mock Tests',  icon: Timer },
+      { id: 'exams_papers', label: 'Exam Papers', icon: Award },
     ]
   }
 ];
@@ -72,31 +83,22 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
   const [status, setStatus] = useState<'draft' | 'published'>('draft');
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false); // mobile drawer
 
-  // Initialize empty content and load from Firebase
   useEffect(() => {
     const loadContent = async () => {
       setLoading(true);
       try {
-        // Fetch topic status
         const { findGuideNodeAnyLevel } = await import('@/lib/firebase/guide');
         const nodeInfo = await findGuideNodeAnyLevel(topicId);
-        if (nodeInfo && nodeInfo.node && nodeInfo.node.status) {
-          setStatus(nodeInfo.node.status);
-        }
-
-        // Fetch sections
+        if (nodeInfo?.node?.status) setStatus(nodeInfo.node.status);
         const sections = await getTopicSections(topicId);
-        
         const initial: Record<string, any> = {};
         sectionTypes.forEach(s => {
           if (sections[s.id]) {
-            let loadedContent = sections[s.id].content || '';
-            // Clean up any accidentally saved hardcoded placeholders from previous versions
-            if (loadedContent === '<p>Start typing here...</p>') {
-              loadedContent = '';
-            }
-            initial[s.id] = loadedContent;
+            let content = sections[s.id].content || '';
+            if (content === '<p>Start typing here...</p>') content = '';
+            initial[s.id] = content;
           } else if (!['word_meaning', 'mcq', 'pdf', 'video', 'audio'].includes(s.id)) {
             initial[s.id] = '';
           }
@@ -118,16 +120,13 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
   const getMediaData = (type: string): any[] => {
     const val = contentMap[type];
     if (typeof val === 'string') {
-      if (val.startsWith('[')) {
-        try { return JSON.parse(val); } catch(e) { return []; }
-      } else if (val.startsWith('{')) {
-        try { 
-          const parsed = JSON.parse(val); 
-          if (parsed.url || parsed.title) {
-            return [{ ...parsed, id: Date.now().toString() }]; 
-          }
+      if (val.startsWith('[')) { try { return JSON.parse(val); } catch { return []; } }
+      if (val.startsWith('{')) {
+        try {
+          const parsed = JSON.parse(val);
+          if (parsed.url || parsed.title) return [{ ...parsed, id: Date.now().toString() }];
           return [];
-        } catch(e) { return []; }
+        } catch { return []; }
       }
     }
     return [];
@@ -144,283 +143,309 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
   const removeMediaItem = (type: string, index: number) => {
     const data = getMediaData(type);
     const item = data[index];
-    
-    if (item && item.url && item.url.includes('firebasestorage.googleapis.com')) {
-      const fileRef = ref(storage, item.url);
-      deleteObject(fileRef).catch(e => console.error('Failed to delete media from Firebase', e));
+    if (item?.url?.includes('firebasestorage.googleapis.com')) {
+      deleteObject(ref(storage, item.url)).catch(console.error);
     }
-    
     data.splice(index, 1);
     setContentMap(prev => ({ ...prev, [type]: JSON.stringify(data) }));
   };
 
   const addMediaItem = (type: string) => {
     const data = getMediaData(type);
-    data.push({ id: Date.now().toString() + Math.random().toString(), title: '', url: '', description: '', tags: '' });
+    data.push({ id: Date.now().toString() + Math.random(), title: '', url: '', description: '', tags: '' });
     setContentMap(prev => ({ ...prev, [type]: JSON.stringify(data) }));
   };
 
   const handleMediaUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: string, index: number) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    
     setLoading(true);
     try {
       const folder = type === 'audio' ? 'audio' : 'pdfs';
       const storageRef = ref(storage, `${folder}/${Date.now()}_${file.name}`);
       await uploadBytes(storageRef, file);
       const url = await getDownloadURL(storageRef);
-      
       updateMediaItem(type, index, 'url', url);
-      toast({ title: 'Success', description: `${type.toUpperCase()} uploaded successfully` });
-    } catch (error) {
-      console.error(error);
-      toast({ title: 'Error', description: `Failed to upload ${type}`, variant: 'destructive' });
+      toast({ title: 'Uploaded!' });
+    } catch {
+      toast({ title: 'Upload failed', variant: 'destructive' });
     } finally {
       setLoading(false);
     }
   };
-  
+
   const handleSave = async () => {
     setSaving(true);
     try {
-      const formattedSections: Record<string, any> = {};
-      Object.entries(contentMap).forEach(([key, value]) => {
-        formattedSections[key] = { content: value };
-      });
-      
-      await saveTopicSections(topicId, formattedSections);
+      const formatted: Record<string, any> = {};
+      Object.entries(contentMap).forEach(([k, v]) => { formatted[k] = { content: v }; });
+      await saveTopicSections(topicId, formatted);
       await updateTopicStatus(topicId, status);
-      
-      toast({
-        title: "Success",
-        description: "Content saved successfully!",
-      });
-    } catch (e) {
-      console.error(e);
-      toast({
-        title: "Error",
-        description: "Failed to save content",
-        variant: "destructive",
-      });
+      toast({ title: "Saved!", description: "Content saved successfully." });
+    } catch {
+      toast({ title: "Error", description: "Failed to save.", variant: "destructive" });
     } finally {
       setSaving(false);
     }
   };
 
+  const navigateTo = (id: string) => {
+    setActiveTab(id);
+    setSidebarOpen(false); // close mobile drawer when navigating
+  };
+
+  const activeSection = sectionTypes.find(s => s.id === activeTab);
+
+  // ── Sidebar nav content (shared between desktop sidebar + mobile drawer) ──
+  const SidebarNav = () => (
+    <div className="flex flex-col h-full overflow-y-auto">
+      {/* Brand / ID */}
+      <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-800">
+        <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">Topic ID</p>
+        <p className="text-xs font-mono text-slate-500 dark:text-slate-400 truncate">{topicId.slice(0, 20)}…</p>
+      </div>
+
+      {/* Status + Save */}
+      <div className="px-3 py-3 border-b border-slate-200 dark:border-slate-800 flex items-center gap-2">
+        <Select value={status} onValueChange={(val: any) => setStatus(val)}>
+          <SelectTrigger className="h-8 text-xs flex-1 rounded-lg border-slate-200 dark:border-slate-700">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="draft">Draft</SelectItem>
+            <SelectItem value="published">Published</SelectItem>
+          </SelectContent>
+        </Select>
+        <Button size="sm" className="h-8 text-xs px-3 rounded-lg bg-[#107c41] hover:bg-[#0b5c30] shrink-0 gap-1" onClick={handleSave} disabled={saving || loading}>
+          {saving ? <><span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Saving</> : <><Save className="w-3 h-3" /> Save</>}
+        </Button>
+      </div>
+
+      {/* Preview link */}
+      <div className="px-3 pt-2 pb-1">
+        <Link href={`/guide/${topicId}`} target="_blank">
+          <button className="w-full flex items-center justify-between text-xs text-[#107c41] font-semibold py-1.5 px-2 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors">
+            <span className="flex items-center gap-1.5"><BookOpen className="w-3.5 h-3.5" /> Preview Page</span>
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
+        </Link>
+      </div>
+
+      {/* Nav sections */}
+      <div className="flex-1 px-3 pt-1 pb-4 space-y-4">
+        {sectionCategories.map(cat => (
+          <div key={cat.title}>
+            <div className="flex items-center gap-1.5 mb-1.5 px-1">
+              <div className={cn("w-1.5 h-1.5 rounded-full", cat.dot)} />
+              <span className={cn("text-[10px] font-bold uppercase tracking-wider", cat.color)}>{cat.title}</span>
+            </div>
+            <div className="space-y-0.5">
+              {cat.items.map(section => {
+                const isActive = activeTab === section.id;
+                return (
+                  <button
+                    key={section.id}
+                    onClick={() => navigateTo(section.id)}
+                    className={cn(
+                      "w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm font-medium transition-all duration-150 text-left",
+                      isActive
+                        ? "bg-[#107c41] text-white shadow-sm"
+                        : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+                    )}
+                  >
+                    <section.icon className={cn("w-3.5 h-3.5 shrink-0", isActive ? "text-white" : "text-slate-400")} />
+                    {section.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  // ── Content panel ──
+  const ContentPanel = () => (
+    <div className="animate-in fade-in duration-200">
+      {activeTab === 'video' ? (
+        <TopicVideoManager topicId={topicId} />
+      ) : activeTab === 'pdf' ? (
+        <TopicDocumentManager topicId={topicId} />
+      ) : ['lesson','guide_content','objective','introduction','author','explanation','exercise','notes','solutions','bookmark','word_meaning'].includes(activeTab) ? (
+        <div className="bg-white dark:bg-[#1a1d27] rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+          <TiptapEditor key={activeTab} content={contentMap[activeTab] || ''} onChange={handleRichTextChange} />
+        </div>
+      ) : activeTab === 'audio' ? (
+        <div className="space-y-3">
+          {getMediaData(activeTab).map((item: any, index: number) => (
+            <div key={item.id} className="bg-white dark:bg-[#1a1d27] rounded-xl border border-slate-200 dark:border-slate-800 p-3 relative shadow-sm">
+              <button className="absolute top-2 right-2 w-7 h-7 flex items-center justify-center rounded-full bg-red-50 dark:bg-red-900/30 text-red-500" onClick={() => removeMediaItem(activeTab, index)}>
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+              <div className="space-y-3 pr-8">
+                <div>
+                  <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide">Title</label>
+                  <Input className="h-8 text-sm mt-1" placeholder="Audio title..." value={item.title || ''} onChange={e => updateMediaItem(activeTab, index, 'title', e.target.value)} />
+                </div>
+                <div>
+                  <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide">Upload Audio</label>
+                  <Input type="file" accept="audio/*" className="h-8 text-xs mt-1" onChange={e => handleMediaUpload(e, activeTab, index)} />
+                  {item.url && <audio controls src={item.url} className="mt-2 w-full h-8" />}
+                </div>
+              </div>
+            </div>
+          ))}
+          <button className="w-full flex items-center justify-center gap-2 py-3 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-500 hover:border-[#107c41] hover:text-[#107c41] transition-colors" onClick={() => addMediaItem(activeTab)}>
+            <Plus className="w-4 h-4" /> Add Audio
+          </button>
+        </div>
+      ) : ['questions','mcq','creative_question','short_question'].includes(activeTab) ? (
+        <TopicQuestionManager topicId={topicId} tabType={activeTab} />
+      ) : ['model_test','practice_sets','quizzes','mock_tests','exams_papers'].includes(activeTab) ? (
+        <TopicAssessmentManager topicId={topicId} tabType={activeTab} />
+      ) : (
+        <div className="flex flex-col items-center justify-center py-20 text-center text-slate-400">
+          <FileText className="w-10 h-10 mb-3 opacity-30" />
+          <p className="text-sm font-medium">{activeSection?.label} Editor</p>
+          <p className="text-xs mt-1 opacity-60">Sub-editor coming soon.</p>
+        </div>
+      )}
+    </div>
+  );
+
   return (
-    <div className="space-y-6">
-      
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Link href="/admin/guide-content/explorer">
-            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
-              <ArrowLeft className="w-4 h-4" />
+    <div className="flex flex-col min-h-screen bg-[#f4f6f9] dark:bg-[#0f1117]">
+
+      {/* ═══════════════════════════════════════════════════
+          STICKY TOP HEADER (shared for all breakpoints)
+      ═══════════════════════════════════════════════════ */}
+      <header className="sticky top-0 z-50 bg-white dark:bg-[#1a1d27] border-b border-slate-200 dark:border-slate-800 shadow-sm">
+        <div className="flex items-center justify-between px-3 lg:px-6 py-2.5 gap-3">
+          {/* Left: back + title */}
+          <div className="flex items-center gap-2.5 min-w-0">
+            <Link href="/admin/guide-content/explorer">
+              <button className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shrink-0">
+                <ArrowLeft className="w-4 h-4 text-slate-600 dark:text-slate-300" />
+              </button>
+            </Link>
+            {/* Section icon + label (desktop only header breadcrumb) */}
+            <div className="hidden lg:flex items-center gap-2 min-w-0">
+              {activeSection && React.createElement(activeSection.icon, { className: "w-4 h-4 text-[#107c41] shrink-0" })}
+              <div>
+                <h1 className="text-sm font-bold text-slate-800 dark:text-white leading-tight">Topic Editor</h1>
+                <p className="text-[10px] text-slate-400 leading-tight">{activeSection?.label}</p>
+              </div>
+            </div>
+            {/* Mobile title */}
+            <div className="lg:hidden min-w-0">
+              <h1 className="text-sm font-bold text-slate-800 dark:text-white truncate leading-tight">Topic Editor</h1>
+              <p className="text-[10px] text-slate-400 truncate leading-tight">{activeSection?.label}</p>
+            </div>
+          </div>
+
+          {/* Right: status + save */}
+          <div className="flex items-center gap-1.5 shrink-0">
+            <Select value={status} onValueChange={(val: any) => setStatus(val)}>
+              <SelectTrigger className="h-7 text-xs px-2 w-[92px] rounded-full border-slate-300 dark:border-slate-700">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="draft">Draft</SelectItem>
+                <SelectItem value="published">Published</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button size="sm" className="h-7 text-xs px-3 rounded-full bg-[#107c41] hover:bg-[#0b5c30] gap-1" onClick={handleSave} disabled={saving || loading}>
+              {saving ? (
+                <><span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Saving</>
+              ) : (
+                <><Save className="w-3 h-3" /> Save</>
+              )}
             </Button>
-          </Link>
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
-              Topic Editor
-              <Link href={`/guide/${topicId}`} target="_blank">
-                <Button variant="outline" size="sm" className="h-7 text-xs flex gap-1.5 px-2">
-                  <BookOpen className="w-3.5 h-3.5" />
-                  View Chapter
-                </Button>
-              </Link>
-            </h1>
-            <p className="text-sm text-slate-500">ID: {topicId}</p>
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <Select value={status} onValueChange={(val: any) => setStatus(val)}>
-            <SelectTrigger className="w-[120px]">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="draft">Draft</SelectItem>
-              <SelectItem value="published">Published</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button 
-            className="bg-[#107c41] hover:bg-[#0b5c30]" 
-            onClick={handleSave}
-            disabled={saving || loading}
-          >
-            {saving ? 'Saving...' : <><Save className="w-4 h-4 mr-2" /> Save All Sections</>}
-          </Button>
+
+        {/* ── Mobile-only: scrollable pill nav ── */}
+        <div className="lg:hidden overflow-x-auto no-scrollbar border-t border-slate-100 dark:border-slate-800">
+          <div className="flex gap-1 px-3 py-2 w-max">
+            {sectionCategories.map((cat, catIdx) => (
+              <React.Fragment key={catIdx}>
+                {catIdx > 0 && <div className="w-px bg-slate-200 dark:bg-slate-700 self-stretch mx-0.5" />}
+                {cat.items.map(section => {
+                  const isActive = activeTab === section.id;
+                  return (
+                    <button
+                      key={section.id}
+                      onClick={() => navigateTo(section.id)}
+                      className={cn(
+                        "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-150 shrink-0",
+                        isActive
+                          ? "bg-[#107c41] text-white shadow-sm"
+                          : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
+                      )}
+                    >
+                      <section.icon className="w-3 h-3" />
+                      {section.label}
+                    </button>
+                  );
+                })}
+              </React.Fragment>
+            ))}
+          </div>
         </div>
+      </header>
+
+      {/* ═══════════════════════════════════════════════════
+          BODY: mobile = single col, desktop = sidebar + content
+      ═══════════════════════════════════════════════════ */}
+      <div className="flex flex-1 min-h-0">
+
+        {/* ── Desktop Sidebar ── */}
+        <aside className="hidden lg:flex flex-col w-60 xl:w-64 shrink-0 bg-white dark:bg-[#1a1d27] border-r border-slate-200 dark:border-slate-800 sticky top-[73px] h-[calc(100vh-73px)] overflow-hidden">
+          <SidebarNav />
+        </aside>
+
+        {/* ── Main content ── */}
+        <main className="flex-1 min-w-0">
+          {/* Mobile: px-3 / desktop: wider padding + max-width */}
+          <div className="px-3 pt-3 pb-24 lg:px-8 lg:pt-6 lg:pb-10 lg:max-w-4xl xl:max-w-5xl lg:mx-auto">
+
+            {/* Desktop section header strip */}
+            <div className="hidden lg:flex items-center justify-between mb-5">
+              <div className="flex items-center gap-2">
+                {activeSection && React.createElement(activeSection.icon, { className: "w-5 h-5 text-[#107c41]" })}
+                <h2 className="text-lg font-bold text-slate-800 dark:text-white">{activeSection?.label}</h2>
+                <span className="text-xs text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full ml-1">
+                  {sectionCategories.find(c => c.items.some(i => i.id === activeTab))?.title}
+                </span>
+              </div>
+              <Link href={`/guide/${topicId}`} target="_blank">
+                <button className="flex items-center gap-1.5 text-sm text-[#107c41] font-semibold hover:underline">
+                  <BookOpen className="w-4 h-4" /> Preview <ChevronRight className="w-4 h-4" />
+                </button>
+              </Link>
+            </div>
+
+            {/* Mobile section mini-header */}
+            <div className="flex items-center gap-2 mb-3 lg:hidden">
+              {activeSection && React.createElement(activeSection.icon, { className: "w-4 h-4 text-[#107c41] shrink-0" })}
+              <span className="text-sm font-bold text-slate-700 dark:text-slate-200">{activeSection?.label}</span>
+              <Link href={`/guide/${topicId}`} target="_blank" className="ml-auto">
+                <button className="flex items-center gap-1 text-[10px] text-[#107c41] font-medium">
+                  <BookOpen className="w-3 h-3" /> Preview <ChevronRight className="w-3 h-3" />
+                </button>
+              </Link>
+            </div>
+
+            <ContentPanel />
+          </div>
+        </main>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-6">
-        
-        {/* Left Sidebar Tabs */}
-        <div className="w-full lg:w-64 shrink-0 lg:sticky lg:top-6 lg:self-start lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-slate-300 dark:[&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full">
-          <Card className="border-slate-200 dark:border-slate-800 shadow-sm min-h-min">
-            <CardContent className="p-3">
-              <div className="space-y-6">
-                {sectionCategories.map((category, catIdx) => (
-                  <div key={catIdx} className="space-y-2">
-                    <h3 className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider px-3">
-                      {category.title}
-                    </h3>
-                    <div className="space-y-1">
-                      {category.items.map((section) => (
-                        <button
-                          key={section.id}
-                          onClick={() => setActiveTab(section.id)}
-                          className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                            activeTab === section.id 
-                              ? 'bg-[#107c41]/10 text-[#107c41]' 
-                              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-                          }`}
-                        >
-                          <section.icon className={`w-4 h-4 shrink-0 ${activeTab === section.id ? 'text-[#107c41]' : 'text-slate-400'}`} />
-                          <span className="truncate">{section.label}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Main Editor Area */}
-        <div className="flex-1 min-w-0">
-          <Card className="border-slate-200 dark:border-slate-800 shadow-sm h-full min-h-[600px]">
-            <CardContent className="p-6">
-              
-              <div className="mb-6 flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-4">
-                {React.createElement(sectionTypes.find(s => s.id === activeTab)?.icon || FileText, { className: "w-6 h-6 text-[#107c41]" })}
-                <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">
-                  {sectionTypes.find(s => s.id === activeTab)?.label}
-                </h2>
-              </div>
-
-              {/* Dynamic Content Renderer based on type */}
-              {activeTab === 'video' ? (
-                <div className="animate-in fade-in duration-300">
-                  <TopicVideoManager topicId={topicId} />
-                </div>
-              ) : activeTab === 'pdf' ? (
-                <div className="animate-in fade-in duration-300">
-                  <TopicDocumentManager topicId={topicId} />
-                </div>
-              ) : ['lesson', 'guide_content', 'objective', 'introduction', 'author', 'explanation', 'exercise', 'notes', 'solutions', 'bookmark'].includes(activeTab) ? (
-                <div className="animate-in fade-in duration-300">
-                  <TiptapEditor 
-                    key={activeTab}
-                    content={contentMap[activeTab] || ''} 
-                    onChange={handleRichTextChange} 
-                  />
-                </div>
-              ) : ['pdf', 'audio'].includes(activeTab) ? (
-                <div className="space-y-6 max-w-2xl animate-in fade-in duration-300">
-                  {getMediaData(activeTab).map((item: any, index: number) => (
-                    <Card key={item.id} className="border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-visible">
-                      <Button
-                        variant="destructive"
-                        size="icon"
-                        className="absolute -right-3 -top-3 w-8 h-8 rounded-full shadow-md z-10"
-                        onClick={() => removeMediaItem(activeTab, index)}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                      <CardContent className="p-5 space-y-4">
-                        <div className="space-y-2">
-                          <Label>{activeTab.toUpperCase()} Title</Label>
-                          <Input 
-                            placeholder={`e.g. ${activeTab === 'video' ? 'Explanation of Poem' : 'Chapter 1 Summary'}`} 
-                            value={item.title || ''}
-                            onChange={(e) => updateMediaItem(activeTab, index, 'title', e.target.value)}
-                          />
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label>Description</Label>
-                          <Textarea 
-                            placeholder="Brief description of this media..." 
-                            value={item.description || ''}
-                            onChange={(e) => updateMediaItem(activeTab, index, 'description', e.target.value)}
-                            className="resize-none"
-                            rows={3}
-                          />
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label>Tags (comma-separated)</Label>
-                          <Input 
-                            placeholder="e.g. physics, chapter 1, revision" 
-                            value={item.tags || ''}
-                            onChange={(e) => updateMediaItem(activeTab, index, 'tags', e.target.value)}
-                          />
-                        </div>
-                        
-                        {activeTab === 'video' ? (
-                          <div className="space-y-2">
-                            <Label>YouTube Link</Label>
-                            <Input 
-                              placeholder="https://youtube.com/watch?v=..." 
-                              value={item.url}
-                              onChange={(e) => updateMediaItem(activeTab, index, 'url', e.target.value)}
-                            />
-                          </div>
-                        ) : (
-                          <div className="space-y-2">
-                            <Label>Upload {activeTab.toUpperCase()} File</Label>
-                            <Input 
-                              type="file" 
-                              accept={activeTab === 'pdf' ? '.pdf' : 'audio/*'} 
-                              onChange={(e) => handleMediaUpload(e, activeTab, index)} 
-                            />
-                            {item.url && (
-                              <div className="mt-2 text-sm text-emerald-600 font-medium">
-                                {activeTab === 'pdf' ? (
-                                  <a href={item.url} target="_blank" rel="noopener noreferrer">View current PDF</a>
-                                ) : (
-                                  <audio controls src={item.url} className="mt-2 w-full"></audio>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </CardContent>
-                    </Card>
-                  ))}
-
-                  <Button 
-                    variant="outline" 
-                    className="w-full border-dashed border-2 py-8 text-slate-500 hover:text-[#107c41] hover:border-[#107c41] transition-colors"
-                    onClick={() => addMediaItem(activeTab)}
-                  >
-                    <Plus className="w-5 h-5 mr-2" />
-                    Add Another {activeTab.toUpperCase()}
-                  </Button>
-                </div>
-              ) : ['questions', 'mcq', 'creative_question', 'short_question'].includes(activeTab) ? (
-                <div className="animate-in fade-in duration-300">
-                  <TopicQuestionManager topicId={topicId} tabType={activeTab} />
-                </div>
-              ) : ['model_test', 'practice_sets', 'quizzes', 'mock_tests', 'exams_papers'].includes(activeTab) ? (
-                <div className="animate-in fade-in duration-300">
-                  <TopicAssessmentManager topicId={topicId} tabType={activeTab} />
-                </div>
-              ) : (
-                <div className="p-8 text-center text-slate-500 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-lg animate-in fade-in duration-300">
-                  <h3 className="text-lg font-medium text-slate-700 dark:text-slate-300 mb-2">
-                    {sectionTypes.find(s => s.id === activeTab)?.label} Editor
-                  </h3>
-                  <p>Specialized sub-editor component will be injected here.</p>
-                </div>
-              )}
-
-            </CardContent>
-          </Card>
-        </div>
-
-      </div>
+      <style jsx>{`
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      `}</style>
     </div>
   );
 }

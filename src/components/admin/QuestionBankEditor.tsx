@@ -57,21 +57,21 @@ const VERIFICATION_LEVELS = [
 ];
 
 const MD3Input = ({ label, className, ...props }: React.InputHTMLAttributes<HTMLInputElement> & { label: string }) => (
-    <div className={cn("relative border border-[#c4d6c4] rounded-xl p-3 pt-4 focus-within:border-[#4a634a] focus-within:ring-1 focus-within:ring-[#4a634a] transition-colors bg-[#fdfefd]", className)}>
-        <label className="absolute top-0 left-3 -translate-y-1/2 bg-[#fdfefd] px-1 text-xs font-medium text-[#4a634a] pointer-events-none">
+    <div className={cn("relative border border-[#c4d6c4] rounded-lg p-2 pt-3 focus-within:border-[#4a634a] focus-within:ring-1 focus-within:ring-[#4a634a] transition-colors bg-[#fdfefd]", className)}>
+        <label className="absolute top-0 left-2 -translate-y-1/2 bg-[#fdfefd] px-1 text-[10px] font-medium text-[#4a634a] pointer-events-none">
             {label}
         </label>
-        <Input className="border-0 focus-visible:ring-0 p-0 h-auto rounded-none bg-transparent shadow-none font-medium" {...props} />
+        <Input className="border-0 focus-visible:ring-0 p-0 h-auto rounded-none bg-transparent shadow-none text-sm font-medium" {...props} />
     </div>
 );
 
 const MD3SelectField = ({ label, value, placeholder, onClick, required }: { label: string, value: string, placeholder: string, onClick: () => void, required?: boolean }) => (
-    <div onClick={onClick} className="relative border border-[#c4d6c4] rounded-xl p-3 pt-4 cursor-pointer hover:bg-[#f4f8f4] transition-colors bg-[#fdfefd]">
-        <label className="absolute top-0 left-3 -translate-y-1/2 bg-[#fdfefd] px-1 text-xs font-medium text-[#4a634a] pointer-events-none">
+    <div onClick={onClick} className="relative border border-[#c4d6c4] rounded-lg p-2 pt-3 cursor-pointer hover:bg-[#f4f8f4] transition-colors bg-[#fdfefd]">
+        <label className="absolute top-0 left-2 -translate-y-1/2 bg-[#fdfefd] px-1 text-[10px] font-medium text-[#4a634a] pointer-events-none">
             {label} {required && <span className="text-red-500">*</span>}
         </label>
-        <div className="flex items-center justify-between min-h-[20px] mt-0.5">
-            <span className={cn("font-medium", value ? "text-slate-900" : "text-slate-400")}>{value || placeholder}</span>
+        <div className="flex items-center justify-between min-h-[16px] mt-0.5">
+            <span className={cn("text-sm font-medium", value ? "text-slate-900" : "text-slate-400")}>{value || placeholder}</span>
             <ChevronDown className="h-4 w-4 text-slate-400" />
         </div>
     </div>
@@ -90,6 +90,13 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
   const { toast } = useToast();
   const { user } = useAuth();
   
+  const getDefaultMarks = (type?: string) => {
+      const t = (type || '').toLowerCase();
+      if (t === 'short question') return 3;
+      if (t === 'long question') return 5;
+      return 1;
+  };
+
   const [editData, setEditData] = useState<Partial<QuestionBankEntry>>({
       questionType: 'MCQ',
       difficulty: 'Medium',
@@ -98,6 +105,7 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
       contentType: defaultContentType || initialData.contentType,
       options: { a: '', b: '', c: '', d: '', e: '' },
       matchingPairs: [{ left: '', right: '' }, { left: '', right: '' }, { left: '', right: '' }, { left: '', right: '' }],
+      marks: initialData.marks || getDefaultMarks(initialData.questionType || 'MCQ'),
       examIds: [],
       qaChecklist: [],
       ...initialData
@@ -479,18 +487,21 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                   </div>
               </div>
           )}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 items-start">
               {/* Left Section (Content, Options, Explanation) */}
-              <div className="lg:col-span-2 flex flex-col gap-6">
+              <div className="lg:col-span-2 flex flex-col gap-2">
                   {/* --- CARD 1: Question Content --- */}
-                  <Card className="flex flex-col rounded-[24px] border-[#d3e3d3] shadow-sm bg-[#fdfefd] overflow-hidden">
-                      <CardHeader className="pb-3 border-b border-[#eef2ec] bg-[#f8faf8]">
-                          <CardTitle className="text-lg text-[#4a634a]">Question Content</CardTitle>
+                  <Card className="flex flex-col rounded-lg border-[#d3e3d3] shadow-sm bg-[#fdfefd] overflow-hidden">
+                      <CardHeader className="pb-2 border-b border-[#eef2ec] bg-[#f8faf8]">
+                          <CardTitle className="text-base text-[#4a634a]">Question Content</CardTitle>
                       </CardHeader>
-                      <CardContent className="space-y-6 flex-1 flex flex-col pt-6">
-                              <div className="relative border border-[#c4d6c4] rounded-xl pt-3 pb-1 hover:bg-[#f4f8f4] transition-colors bg-white focus-within:border-[#4a634a] focus-within:ring-1 focus-within:ring-[#4a634a]">
-                                  <label className="absolute top-0 left-3 -translate-y-1/2 bg-white px-1 text-xs font-medium text-[#4a634a] pointer-events-none">Question Type</label>
-                                  <Select value={editData.questionType || 'MCQ'} onValueChange={v => setEditData({...editData, questionType: v as any})}>
+                      <CardContent className="space-y-3 flex-1 flex flex-col pt-3">
+                              <div className="relative border border-[#c4d6c4] rounded-lg pt-2 pb-1 hover:bg-[#f4f8f4] transition-colors bg-white focus-within:border-[#4a634a] focus-within:ring-1 focus-within:ring-[#4a634a]">
+                                  <label className="absolute top-0 left-2 -translate-y-1/2 bg-white px-1 text-[10px] font-medium text-[#4a634a] pointer-events-none">Question Type</label>
+                                  <Select value={editData.questionType as string} onValueChange={v => {
+                                      const newMarks = getDefaultMarks(v);
+                                      setEditData({...editData, questionType: v as any, marks: newMarks});
+                                  }}>
                                       <SelectTrigger className="border-0 focus:ring-0 shadow-none h-8 pt-0 bg-transparent font-medium text-[#2d3b2d]">
                                           <SelectValue placeholder="Select type" />
                                       </SelectTrigger>
@@ -566,11 +577,11 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                   </Card>
 
                   {/* --- CARD 2: Options / Answer --- */}
-                  <Card className="flex flex-col rounded-[24px] border-[#d3e3d3] shadow-sm bg-[#fdfefd] overflow-hidden">
-                      <CardHeader className="pb-3 border-b border-[#eef2ec] bg-[#f8faf8]">
-                          <CardTitle className="text-lg text-[#4a634a]">{editData.questionType === 'Matching' ? 'Matching Pairs' : 'Options / Answer'}</CardTitle>
+                  <Card className="flex flex-col rounded-lg border-[#d3e3d3] shadow-sm bg-[#fdfefd] overflow-hidden">
+                      <CardHeader className="pb-2 border-b border-[#eef2ec] bg-[#f8faf8]">
+                          <CardTitle className="text-base text-[#4a634a]">{editData.questionType === 'Matching' ? 'Matching Pairs' : 'Options / Answer'}</CardTitle>
                       </CardHeader>
-                      <CardContent className="space-y-4 flex-1 pt-6">
+                      <CardContent className="space-y-3 flex-1 pt-3">
                           {editData.questionType === 'Matching' ? (
                               <div className="space-y-3">
                                   <div className="grid grid-cols-2 gap-4">
@@ -776,15 +787,15 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
 
                   {/* --- CARD 3: Explanation --- */}
                   {!['Short Question', 'Long Question', 'Creative Question'].includes(editData.questionType || '') && (
-                      <Card className="rounded-[24px] border-[#d3e3d3] shadow-sm bg-[#fdfefd] overflow-hidden">
-                          <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-[#eef2ec] bg-[#f8faf8]">
-                              <CardTitle className="text-lg text-[#4a634a]">Explanation</CardTitle>
-                              <Button variant="outline" size="sm" onClick={handleGenerateAI} disabled={isGeneratingAI} className="rounded-full text-[#4a634a] border-[#c4d6c4] bg-[#fdfefd] hover:bg-[#f4f8f4]">
-                                  {isGeneratingAI ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Sparkles className="h-4 w-4 mr-2" />}
+                      <Card className="rounded-lg border-[#d3e3d3] shadow-sm bg-[#fdfefd] overflow-hidden">
+                          <CardHeader className="flex flex-row items-center justify-between pb-2 border-b border-[#eef2ec] bg-[#f8faf8]">
+                              <CardTitle className="text-base text-[#4a634a]">Explanation</CardTitle>
+                              <Button variant="outline" size="sm" onClick={handleGenerateAI} disabled={isGeneratingAI} className="h-7 text-xs rounded-lg text-[#4a634a] border-[#c4d6c4] bg-[#fdfefd] hover:bg-[#f4f8f4]">
+                                  {isGeneratingAI ? <Loader2 className="h-3 w-3 mr-1.5 animate-spin" /> : <Sparkles className="h-3 w-3 mr-1.5" />}
                                   Generate with AI
                               </Button>
                           </CardHeader>
-                          <CardContent className="pt-6">
+                          <CardContent className="pt-3">
                               <div className="prose-editor-container">
                                   <TiptapEditor 
                                       content={editData.explanation || ''} 
@@ -797,14 +808,14 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
               </div>
 
               {/* Right Column: Taxonomy and Meta */}
-              <div className="space-y-6 flex flex-col">
+              <div className="space-y-2 flex flex-col">
                   {/* --- CARD 4: Academic Taxonomy --- */}
                   {(editData.contentType === 'academic' || defaultContentType === 'academic' || (!editData.contentType && (editData.boardId || editData.classId || !editData.examIds?.length))) && (
-                      <Card className="rounded-[24px] border-[#d3e3d3] shadow-sm bg-[#fdfefd] overflow-hidden">
-                          <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-[#eef2ec] bg-[#f8faf8]">
-                          <CardTitle className="text-lg text-[#4a634a]">Academic Taxonomy</CardTitle>
+                      <Card className="rounded-lg border-[#d3e3d3] shadow-sm bg-[#fdfefd] overflow-hidden">
+                          <CardHeader className="flex flex-row items-center justify-between pb-2 border-b border-[#eef2ec] bg-[#f8faf8]">
+                          <CardTitle className="text-base text-[#4a634a]">Academic Taxonomy</CardTitle>
                       </CardHeader>
-                      <CardContent className="space-y-4 pt-6">
+                      <CardContent className="space-y-3 pt-3">
                           <div className="grid grid-cols-2 gap-4">
                               <MD3SelectField 
                                   label="Board" 
@@ -863,9 +874,9 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                   )}
 
                   {/* --- CARD 5: Publish Settings --- */}
-                  <Card className="rounded-[24px] border-[#d3e3d3] shadow-sm bg-[#fdfefd] overflow-hidden">
-                      <CardHeader className="pb-3 border-b border-[#eef2ec] bg-[#f8faf8]"><CardTitle className="text-lg text-[#4a634a]">Publish Settings</CardTitle></CardHeader>
-                      <CardContent className="space-y-4 pt-6">
+                  <Card className="rounded-lg border-[#d3e3d3] shadow-sm bg-[#fdfefd] overflow-hidden">
+                      <CardHeader className="pb-2 border-b border-[#eef2ec] bg-[#f8faf8]"><CardTitle className="text-base text-[#4a634a]">Publish Settings</CardTitle></CardHeader>
+                      <CardContent className="space-y-3 pt-3">
                           <div>
                               <label className="text-xs font-semibold mb-2 block">Status</label>
                               <div className="flex items-center gap-4">
@@ -886,6 +897,17 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                                   <button onClick={() => setEditData({...editData, difficulty: 'Medium'})} className={cn("flex-1 text-xs py-1.5 rounded-full font-medium transition-colors", editData.difficulty === 'Medium' ? "bg-green-100 text-green-800 shadow-sm border border-green-200" : "text-slate-600 hover:text-slate-900")}>Medium</button>
                                   <button onClick={() => setEditData({...editData, difficulty: 'Hard'})} className={cn("flex-1 text-xs py-1.5 rounded-full font-medium transition-colors", editData.difficulty === 'Hard' ? "bg-green-100 text-green-800 shadow-sm border border-green-200" : "text-slate-600 hover:text-slate-900")}>Hard</button>
                               </div>
+                          </div>
+                          <div>
+                              <label className="text-xs font-semibold mb-2 block">Marks (Optional)</label>
+                              <Input 
+                                  type="number" 
+                                  min="1" 
+                                  placeholder="e.g. 3, 5, 10" 
+                                  value={editData.marks || ''} 
+                                  onChange={e => setEditData({...editData, marks: parseInt(e.target.value) || undefined})} 
+                                  className="h-8 text-xs"
+                              />
                           </div>
                           <div>
                               <label className="text-xs font-semibold mb-1 block">Language</label>
@@ -931,9 +953,9 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
 
                   {/* --- CARD 6: Exams Taxonomy --- */}
                   {(editData.contentType === 'exam' || defaultContentType === 'exam' || (!editData.contentType && editData.examIds && editData.examIds.length > 0)) && (
-                      <Card className="rounded-[24px] border-[#d3e3d3] shadow-sm bg-[#fdfefd] overflow-hidden mt-6">
-                          <CardHeader className="pb-3 border-b border-[#eef2ec] bg-[#f8faf8]"><CardTitle className="text-lg text-[#4a634a]">Exams Taxonomy</CardTitle></CardHeader>
-                      <CardContent className="pt-6">
+                      <Card className="rounded-lg border-[#d3e3d3] shadow-sm bg-[#fdfefd] overflow-hidden mt-2">
+                          <CardHeader className="pb-2 border-b border-[#eef2ec] bg-[#f8faf8]"><CardTitle className="text-base text-[#4a634a]">Exams Taxonomy</CardTitle></CardHeader>
+                      <CardContent className="pt-3">
                           {exams.length === 0 ? (
                               <p className="text-xs text-slate-500">No exams defined in question_exams collection yet.</p>
                           ) : (

@@ -336,352 +336,290 @@ export function TopicQuestionManager({ topicId, tabType }: TopicQuestionManagerP
   };
 
   if (loading) {
-      return <div className="flex justify-center p-8"><Loader2 className="animate-spin text-[#107c41]" /></div>;
+      return <div className="flex justify-center py-12"><Loader2 className="animate-spin text-[#107c41]" /></div>;
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-2">
+
+      {/* â”€â”€ Inner type sub-pills (Questions tab only) â”€â”€ */}
       {tabType === 'questions' && (
-        <Tabs value={innerQType} onValueChange={setInnerQType}>
-          <TabsList className="flex flex-wrap w-full h-auto p-1 bg-slate-100 dark:bg-slate-900 mb-4">
-            <TabsTrigger value="MCQ" className="flex-1 min-w-[100px] py-2">MCQ</TabsTrigger>
-            <TabsTrigger value="True/False" className="flex-1 min-w-[100px] py-2">True/False</TabsTrigger>
-            <TabsTrigger value="Fill in the Blank" className="flex-1 min-w-[100px] py-2">Fill Blanks</TabsTrigger>
-            <TabsTrigger value="Matching" className="flex-1 min-w-[100px] py-2">Matching</TabsTrigger>
-            <TabsTrigger value="Short Question" className="flex-1 min-w-[100px] py-2">Short Qs</TabsTrigger>
-            <TabsTrigger value="Long Question" className="flex-1 min-w-[100px] py-2">Long Qs</TabsTrigger>
-            <TabsTrigger value="Creative Question" className="flex-1 min-w-[100px] py-2">Creative Qs</TabsTrigger>
-          </TabsList>
-        </Tabs>
+        <div className="flex gap-1.5 overflow-x-auto no-scrollbar pb-1 lg:flex-wrap lg:overflow-x-visible lg:pb-0">
+          {['MCQ','True/False','Fill in the Blank','Matching','Short Question','Long Question','Creative Question'].map(t => (
+            <button key={t} onClick={() => setInnerQType(t)}
+              className={`px-3 py-1.5 rounded-full text-[11px] font-semibold whitespace-nowrap border transition-all ${
+                innerQType === t ? 'bg-[#107c41] text-white border-[#107c41]' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-500'
+              }`}>{t}</button>
+          ))}
+        </div>
       )}
-      <div className="flex flex-wrap gap-4 justify-between items-center bg-slate-50 dark:bg-slate-900/50 p-4 border rounded-lg">
-          <div>
-              <h3 className="text-lg font-semibold">{qType}s for this Topic</h3>
-              <p className="text-sm text-slate-500">These questions are centrally synced with the Question Bank.</p>
-          </div>
+
+      {/* â”€â”€ Mode action pills â”€â”€ */}
+      <div className="flex gap-1.5 overflow-x-auto no-scrollbar pb-1 lg:flex-wrap lg:overflow-x-visible lg:pb-0">
+        <button onClick={() => setMode('list')} className={`px-3.5 py-1.5 rounded-full text-[11px] font-semibold whitespace-nowrap border transition-all ${ mode === 'list' ? 'bg-slate-800 dark:bg-white text-white dark:text-slate-900 border-slate-800' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-500' }`}>
+          All ({questions.length})
+        </button>
+        <button onClick={() => { setMode('single'); }} className={`px-3.5 py-1.5 rounded-full text-[11px] font-semibold whitespace-nowrap border transition-all ${ mode === 'single' ? 'bg-[#107c41] text-white border-[#107c41]' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-500' }`}>
+          + Add
+        </button>
+        {qType === 'MCQ' && (
+          <>
+            <button onClick={() => setMode('ai')} className={`px-3.5 py-1.5 rounded-full text-[11px] font-semibold whitespace-nowrap border transition-all ${ mode === 'ai' ? 'bg-violet-600 text-white border-violet-600' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-500' }`}>âœ¦ AI</button>
+            <button onClick={() => setMode('bulk')} className={`px-3.5 py-1.5 rounded-full text-[11px] font-semibold whitespace-nowrap border transition-all ${ mode === 'bulk' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-500' }`}>â¬† Bulk</button>
+            {questions.length > 0 && <button onClick={enterBulkEditMode} className={`px-3.5 py-1.5 rounded-full text-[11px] font-semibold whitespace-nowrap border transition-all ${ mode === 'bulk-edit' ? 'bg-amber-500 text-white border-amber-500' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-500' }`}>âœ Edit All</button>}
+          </>
+        )}
       </div>
-      <Tabs value={mode} onValueChange={(val) => {
-          if (val === 'bulk-edit') enterBulkEditMode();
-          else setMode(val as any);
-          if (val !== 'list') {
-              setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 100);
-          }
-      }} className="w-full">
-          <TabsList className="flex flex-wrap w-full h-auto p-1 bg-slate-100 dark:bg-slate-900 mb-6">
-              <TabsTrigger value="list" className="flex-1 min-w-[120px] py-2">Questions List</TabsTrigger>
-              <TabsTrigger value="single" className="flex-1 min-w-[120px] py-2">Add Question</TabsTrigger>
-              {qType === 'MCQ' && (
-                  <>
-                      <TabsTrigger value="ai" className="flex-1 min-w-[120px] py-2"><Sparkles className="w-4 h-4 mr-2" /> AI Generate</TabsTrigger>
-                      <TabsTrigger value="bulk" className="flex-1 min-w-[120px] py-2"><Upload className="w-4 h-4 mr-2" /> Bulk Import</TabsTrigger>
-                      {questions.length > 0 && (
-                          <TabsTrigger value="bulk-edit" className="flex-1 min-w-[120px] py-2"><Edit className="w-4 h-4 mr-2" /> Bulk Edit</TabsTrigger>
-                      )}
-                  </>
+
+      {/* â”€â”€ QUESTION LIST â”€â”€ */}
+      {['list', 'bulk-edit'].includes(mode) && (
+        <div className="space-y-2">
+
+          {/* Bulk select bar */}
+          {questions.length > 0 && (
+            <div className="flex items-center gap-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-2.5 rounded-xl sticky top-0 z-10 shadow-sm">
+              <input type="checkbox" className="w-4 h-4 accent-[#107c41] rounded" checked={selectedIds.size > 0 && selectedIds.size === questions.length} onChange={toggleAllSelection} id="select-all" />
+              <label htmlFor="select-all" className="text-xs font-semibold text-slate-600 dark:text-slate-400 cursor-pointer flex-1">
+                {selectedIds.size > 0 ? `${selectedIds.size} selected` : `${questions.length} questions`}
+              </label>
+              {selectedIds.size > 0 && (
+                <div className="flex items-center gap-1.5">
+                  <Select onValueChange={(val) => handleBulkUpdateProperty('status', val)}>
+                    <SelectTrigger className="w-[80px] h-7 text-[11px] rounded-full"><SelectValue placeholder="Status" /></SelectTrigger>
+                    <SelectContent><SelectItem value="Published">Published</SelectItem><SelectItem value="Draft">Draft</SelectItem><SelectItem value="Archived">Archived</SelectItem></SelectContent>
+                  </Select>
+                  <Select onValueChange={(val) => handleBulkUpdateProperty('difficulty', val)}>
+                    <SelectTrigger className="w-[80px] h-7 text-[11px] rounded-full"><SelectValue placeholder="Level" /></SelectTrigger>
+                    <SelectContent><SelectItem value="Easy">Easy</SelectItem><SelectItem value="Medium">Medium</SelectItem><SelectItem value="Hard">Hard</SelectItem></SelectContent>
+                  </Select>
+                  <button onClick={handleBulkDeleteUI} className="w-7 h-7 flex items-center justify-center rounded-full bg-red-500 text-white">
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               )}
-          </TabsList>
-      </Tabs>
-
-      {/* --- 1. QUESTIONS LIST IS ALWAYS RENDERED FIRST --- */}
-      <div className="space-y-4">
-          {questions.length > 0 && (
-              <div className="flex items-center justify-between bg-white dark:bg-slate-900 border p-3 rounded-lg sticky top-4 z-10 shadow-sm">
-                  <div className="flex items-center gap-3">
-                      <Checkbox 
-                          checked={selectedIds.size > 0 && selectedIds.size === questions.length} 
-                          onCheckedChange={toggleAllSelection} 
-                          id="select-all" 
-                      />
-                      <label htmlFor="select-all" className="text-sm font-medium cursor-pointer">
-                          Select All ({selectedIds.size} selected)
-                      </label>
-                  </div>
-                  {selectedIds.size > 0 && (
-                      <div className="flex items-center gap-2 flex-wrap">
-                          <Select onValueChange={(val) => handleBulkUpdateProperty('status', val)}>
-                              <SelectTrigger className="w-[120px] h-9">
-                                  <SelectValue placeholder="Status..." />
-                              </SelectTrigger>
-                              <SelectContent>
-                                  <SelectItem value="Published">Published</SelectItem>
-                                  <SelectItem value="Draft">Draft</SelectItem>
-                                  <SelectItem value="Archived">Archived</SelectItem>
-                              </SelectContent>
-                          </Select>
-                          <Select onValueChange={(val) => handleBulkUpdateProperty('difficulty', val)}>
-                              <SelectTrigger className="w-[120px] h-9">
-                                  <SelectValue placeholder="Difficulty..." />
-                              </SelectTrigger>
-                              <SelectContent>
-                                  <SelectItem value="Easy">Easy</SelectItem>
-                                  <SelectItem value="Medium">Medium</SelectItem>
-                                  <SelectItem value="Hard">Hard</SelectItem>
-                                  <SelectItem value="Expert">Expert</SelectItem>
-                              </SelectContent>
-                          </Select>
-                          <Select onValueChange={(val) => handleBulkUpdateProperty('language', val)}>
-                              <SelectTrigger className="w-[120px] h-9">
-                                  <SelectValue placeholder="Language..." />
-                              </SelectTrigger>
-                              <SelectContent>
-                                  <SelectItem value="English">English</SelectItem>
-                                  <SelectItem value="Bangla">Bangla</SelectItem>
-                                  <SelectItem value="Hindi">Hindi</SelectItem>
-                                  <SelectItem value="Arabic">Arabic</SelectItem>
-                              </SelectContent>
-                          </Select>
-                          <Button variant="destructive" size="sm" className="h-9" onClick={handleBulkDeleteUI}>
-                              <Trash2 className="w-4 h-4 mr-2" /> Delete
-                          </Button>
-                      </div>
-                  )}
-              </div>
+            </div>
           )}
 
+          {/* Empty state */}
           {questions.length === 0 && (
-              <div className="text-center p-8 border-2 border-dashed rounded-lg text-slate-500">
-                  No {qType}s found for this topic yet.
-              </div>
+            <div className="flex flex-col items-center py-14 text-center border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl">
+              <p className="text-sm text-slate-400">No {qType}s yet</p>
+              <button onClick={() => setMode('single')} className="mt-3 px-4 py-2 text-xs font-semibold rounded-full bg-[#107c41] text-white">+ Add First Question</button>
+            </div>
           )}
 
-          {questions.length > 0 && (
-              <>
-                  {currentQuestions.map(q => (
-                      <Card key={q.id} className={`relative group transition-colors ${selectedIds.has(q.id) ? 'border-[#107c41] ring-1 ring-[#107c41] bg-emerald-50/20' : 'hover:border-[#107c41]/50'}`}>
-                          <div className="absolute left-3 top-3 z-10">
-                              <Checkbox checked={selectedIds.has(q.id)} onCheckedChange={() => toggleSelection(q.id)} />
-                          </div>
-                          <div className="absolute right-3 top-3 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2 z-10">
-                              <Link href={`/question/${q.slug || q.id}`} target="_blank">
-                                  <Button variant="outline" size="sm" className="h-8"><ExternalLink className="w-4 h-4" /></Button>
-                              </Link>
-                              <Button variant="outline" size="sm" className="h-8" onClick={() => { 
-                                  setEditingQuestion(q); 
-                                  setMode('edit'); 
-                                  setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 100);
-                              }}><Edit className="w-4 h-4" /></Button>
-                              <Button variant="destructive" size="sm" className="h-8" onClick={() => handleDelete(q.id)}><Trash2 className="w-4 h-4" /></Button>
-                          </div>
-                          <CardContent className="p-5 pl-10">
-                              <div className="font-medium mb-3 pr-20 text-slate-800 dark:text-slate-100" dangerouslySetInnerHTML={{__html: q.questionText}} />
-                              {q.questionType === 'MCQ' && q.options && (
-                                  <div className="grid grid-cols-2 gap-2 text-sm mt-3">
-                                      <div className={`p-2 rounded border ${q.correctAnswer === 'a' ? 'bg-emerald-50 border-emerald-200 dark:bg-emerald-900/30 dark:border-emerald-800' : 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-800'}`}>
-                                          <span className="font-semibold mr-2 text-slate-500">A</span> {q.options.a}
-                                      </div>
-                                      <div className={`p-2 rounded border ${q.correctAnswer === 'b' ? 'bg-emerald-50 border-emerald-200 dark:bg-emerald-900/30 dark:border-emerald-800' : 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-800'}`}>
-                                          <span className="font-semibold mr-2 text-slate-500">B</span> {q.options.b}
-                                      </div>
-                                      <div className={`p-2 rounded border ${q.correctAnswer === 'c' ? 'bg-emerald-50 border-emerald-200 dark:bg-emerald-900/30 dark:border-emerald-800' : 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-800'}`}>
-                                          <span className="font-semibold mr-2 text-slate-500">C</span> {q.options.c}
-                                      </div>
-                                      <div className={`p-2 rounded border ${q.correctAnswer === 'd' ? 'bg-emerald-50 border-emerald-200 dark:bg-emerald-900/30 dark:border-emerald-800' : 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-800'}`}>
-                                          <span className="font-semibold mr-2 text-slate-500">D</span> {q.options.d}
-                                      </div>
-                                  </div>
-                              )}
-                              {q.questionType === 'Matching' && q.matchingPairs && q.matchingPairs.length > 0 && (
-                                  <div className="mt-3 bg-slate-50 dark:bg-slate-900/50 p-3 rounded border border-slate-100 dark:border-slate-800">
-                                      <div className="grid grid-cols-2 gap-x-4 mb-2 font-bold text-slate-800 dark:text-slate-200 border-b border-slate-200 dark:border-slate-700 pb-2">
-                                          <div>Column A</div>
-                                          <div>Column B</div>
-                                      </div>
-                                      <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-slate-700 dark:text-slate-300">
-                                          {q.matchingPairs.map((pair: any, idx: number) => (
-                                              <React.Fragment key={idx}>
-                                                  <div className="font-medium flex items-start gap-2">
-                                                      <span className="text-slate-500">{idx + 1}.</span> {pair.left}
-                                                  </div>
-                                                  <div className="flex items-start gap-2">
-                                                      <span className="text-slate-500">{String.fromCharCode(65 + idx)}.</span> {pair.right}
-                                                  </div>
-                                              </React.Fragment>
-                                          ))}
-                                      </div>
-                                  </div>
-                              )}
-                              {q.questionType !== 'MCQ' && q.questionType !== 'Matching' && q.correctAnswer && (
-                                  <div className="mt-3 text-sm p-3 bg-slate-50 dark:bg-slate-900 rounded border">
-                                      <span className="font-semibold block mb-1">Answer Key:</span>
-                                      <div dangerouslySetInnerHTML={{__html: q.correctAnswer}} />
-                                  </div>
-                              )}
-                              {q.explanation && (
-                                  <div className="mt-4 text-sm p-3 bg-blue-50/50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900/50 rounded-md">
-                                      <span className="font-semibold text-blue-700 dark:text-blue-400 block mb-1">Explanation:</span>
-                                      <div dangerouslySetInnerHTML={{__html: q.explanation}} />
-                                  </div>
-                              )}
-                          </CardContent>
-                      </Card>
-                  ))}
-                  
-                  {totalPages > 1 && (
-                      <div className="flex items-center justify-between border-t pt-4 mt-6">
-                          <span className="text-sm text-slate-500">
-                              Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, questions.length)} of {questions.length} questions
-                          </span>
-                          <div className="flex items-center gap-2">
-                              <Button 
-                                  variant="outline" 
-                                  size="sm" 
-                                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                                  disabled={currentPage === 1}
-                              >
-                                  <ChevronLeft className="w-4 h-4 mr-1" /> Previous
-                              </Button>
-                              <span className="text-sm px-2 text-slate-600 font-medium">Page {currentPage} of {totalPages}</span>
-                              <Button 
-                                  variant="outline" 
-                                  size="sm" 
-                                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                                  disabled={currentPage === totalPages}
-                              >
-                                  Next <ChevronRight className="w-4 h-4 ml-1" />
-                              </Button>
-                          </div>
-                      </div>
+          {/* Question cards */}
+          <div className="space-y-2 lg:grid lg:grid-cols-2 lg:gap-3 lg:space-y-0">
+          {currentQuestions.map((q, qi) => (
+            <div key={q.id} className={`bg-white dark:bg-slate-900 border rounded-xl overflow-hidden shadow-sm transition-colors ${ selectedIds.has(q.id) ? 'border-[#107c41] ring-1 ring-[#107c41]/30' : 'border-slate-200 dark:border-slate-800' }`}>
+              <div className="flex items-start gap-2 p-2.5">
+                {/* Checkbox + number */}
+                <div className="flex items-center gap-1.5 shrink-0 pt-0.5">
+                  <input type="checkbox" className="w-3.5 h-3.5 accent-[#107c41] rounded" checked={selectedIds.has(q.id)} onChange={() => toggleSelection(q.id)} />
+                  <span className="text-[10px] font-bold text-slate-400 w-4 text-center">{(currentPage - 1) * itemsPerPage + qi + 1}</span>
+                </div>
+
+                {/* Question body */}
+                <div className="flex-1 min-w-0">
+                  {/* Marks badge + type */}
+                  <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+                    {q.marks && <span className="text-[10px] font-black text-amber-700 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 px-1.5 py-0.5 rounded-full">[{q.marks} Marks]</span>}
+                    <span className="text-[10px] font-semibold text-slate-400 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-full">{q.questionType}</span>
+                    {q.difficulty && <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${ q.difficulty === 'Easy' ? 'text-emerald-700 bg-emerald-50' : q.difficulty === 'Hard' ? 'text-red-600 bg-red-50' : 'text-amber-600 bg-amber-50' }`}>{q.difficulty}</span>}
+                    <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${ q.status === 'Published' ? 'text-emerald-700 bg-emerald-50' : 'text-slate-500 bg-slate-100' }`}>{q.status}</span>
+                  </div>
+
+                  {/* Question text */}
+                  <div className="text-sm font-medium text-slate-800 dark:text-slate-100 leading-snug line-clamp-3" dangerouslySetInnerHTML={{__html: q.questionText}} />
+
+                  {/* MCQ options */}
+                  {q.questionType === 'MCQ' && q.options && (
+                    <div className="grid grid-cols-2 gap-1 mt-2">
+                      {(['a','b','c','d'] as const).map(key => (
+                        <div key={key} className={`text-[11px] px-2 py-1 rounded-lg border leading-tight ${ q.correctAnswer === key ? 'bg-emerald-50 dark:bg-emerald-900/30 border-emerald-300 dark:border-emerald-800 font-semibold text-emerald-800 dark:text-emerald-300' : 'bg-slate-50 dark:bg-slate-800 border-slate-100 dark:border-slate-700 text-slate-600 dark:text-slate-400' }`}>
+                          <span className="font-bold uppercase mr-1">{key}.</span>{q.options[key]}
+                        </div>
+                      ))}
+                    </div>
                   )}
-              </>
+
+                  {/* Matching pairs */}
+                  {q.questionType === 'Matching' && q.matchingPairs && q.matchingPairs.length > 0 && (
+                    <div className="mt-2 bg-slate-50 dark:bg-slate-800 rounded-lg p-2">
+                      <div className="grid grid-cols-2 gap-1 text-[11px]">
+                        <div className="font-bold text-slate-500">Column A</div>
+                        <div className="font-bold text-slate-500">Column B</div>
+                        {q.matchingPairs.map((pair: any, idx: number) => (
+                          <React.Fragment key={idx}>
+                            <div className="text-slate-700 dark:text-slate-300">{idx+1}. {pair.left}</div>
+                            <div className="text-slate-700 dark:text-slate-300">{String.fromCharCode(65+idx)}. {pair.right}</div>
+                          </React.Fragment>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Short/Long/Creative answer */}
+                  {!['MCQ','Matching'].includes(q.questionType || '') && q.correctAnswer && (
+                    <div className="mt-2 text-[11px] p-2 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg">
+                      <span className="font-bold text-emerald-700 dark:text-emerald-400">Answer: </span>
+                      <span className="text-slate-700 dark:text-slate-300" dangerouslySetInnerHTML={{__html: q.correctAnswer}} />
+                    </div>
+                  )}
+                </div>
+
+                {/* Action buttons */}
+                <div className="flex flex-col gap-1 shrink-0">
+                  <button onClick={() => { setEditingQuestion(q); setMode('edit'); }} className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">
+                    <Edit className="w-3.5 h-3.5 text-slate-500" />
+                  </button>
+                  <Link href={`/question/${q.slug || q.id}`} target="_blank">
+                    <button className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">
+                      <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
+                    </button>
+                  </Link>
+                  <button onClick={() => handleDelete(q.id)} className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-red-50 dark:hover:bg-red-900/30">
+                    <Trash2 className="w-3.5 h-3.5 text-red-500" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+          </div>{/* end 2-col grid */}
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between pt-2">
+              <span className="text-[11px] text-slate-400">{(currentPage-1)*itemsPerPage+1}–{Math.min(currentPage*itemsPerPage, questions.length)} of {questions.length}</span>
+              <div className="flex items-center gap-1.5">
+                <button onClick={() => setCurrentPage(p => Math.max(1,p-1))} disabled={currentPage===1}
+                  className="px-3 py-1.5 text-[11px] font-semibold rounded-full border border-slate-200 disabled:opacity-40 bg-white dark:bg-slate-900">
+                  <ChevronLeft className="w-3 h-3 inline" /> Prev
+                </button>
+                <span className="text-[11px] text-slate-500 font-medium">{currentPage}/{totalPages}</span>
+                <button onClick={() => setCurrentPage(p => Math.min(totalPages,p+1))} disabled={currentPage===totalPages}
+                  className="px-3 py-1.5 text-[11px] font-semibold rounded-full border border-slate-200 disabled:opacity-40 bg-white dark:bg-slate-900">
+                  Next <ChevronRight className="w-3 h-3 inline" />
+                </button>
+              </div>
+            </div>
           )}
-      </div>
-
-      {/* --- 2. EDITORS AND FORMS APPEAR BELOW THE LIST --- */}
-
-      {/* SINGLE QUESTION EDITOR */}
-      {mode === 'single' && !hierarchyLoading && (
-          <div className="animate-in fade-in slide-in-from-top-2 border rounded-xl overflow-hidden bg-white dark:bg-slate-950 shadow-md p-2 mt-4">
-              <QuestionBankEditor 
-                  defaultContentType="academic"
-                  initialData={{
-                      topicId,
-                      questionType: qType as any,
-                      boardId: hierarchy?.boardId || '',
-                      classId: hierarchy?.classId || '',
-                      subjectId: hierarchy?.subjectId || '',
-                      textbookId: hierarchy?.textbookId || '',
-                      chapterId: hierarchy?.chapterId || '',
-                  }}
-                  onSaveComplete={() => {
-                      fetchTopicQuestions();
-                      // Keep the form open for the next question instead of closing it
-                  }}
-                  onCancel={() => setMode('list')}
-              />
-          </div>
+        </div>
       )}
 
-      {/* EDIT QUESTION EDITOR */}
-      {mode === 'edit' && editingQuestion && !hierarchyLoading && (
-          <div className="animate-in fade-in slide-in-from-top-2 border rounded-xl overflow-hidden bg-white dark:bg-slate-950 shadow-md p-2 mt-4">
-              <QuestionBankEditor 
-                  defaultContentType="academic"
-                  initialData={{
-                      ...editingQuestion,
-                      boardId: editingQuestion.boardId || hierarchy?.boardId || '',
-                      classId: editingQuestion.classId || hierarchy?.classId || '',
-                      subjectId: editingQuestion.subjectId || hierarchy?.subjectId || '',
-                      textbookId: editingQuestion.textbookId || hierarchy?.textbookId || '',
-                      chapterId: editingQuestion.chapterId || hierarchy?.chapterId || '',
-                      topicId: editingQuestion.topicId || topicId,
-                  }}
-                  onSaveComplete={() => {
-                      setMode('list');
-                      setEditingQuestion(null);
-                      fetchTopicQuestions();
-                  }}
-                  onCancel={() => {
-                      setMode('list');
-                      setEditingQuestion(null);
-                  }}
-              />
-          </div>
+      {/* â”€â”€ ADD / EDIT QUESTION EDITOR â”€â”€ */}
+      {(mode === 'single' || mode === 'edit') && !hierarchyLoading && (
+        <div className="animate-in fade-in duration-200 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden bg-white dark:bg-slate-950 shadow-sm mt-2">
+          {mode === 'edit' && (
+            <div className="flex items-center gap-2 px-3 py-2 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
+              <button onClick={() => { setMode('list'); setEditingQuestion(null); }} className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-slate-200 dark:hover:bg-slate-700">
+                <ChevronLeft className="w-4 h-4 text-slate-600" />
+              </button>
+              <span className="text-xs font-bold text-slate-600 dark:text-slate-300">Editing Question</span>
+            </div>
+          )}
+          <QuestionBankEditor
+            defaultContentType="academic"
+            initialData={mode === 'edit' && editingQuestion ? {
+              ...editingQuestion,
+              boardId: editingQuestion.boardId || hierarchy?.boardId || '',
+              classId: editingQuestion.classId || hierarchy?.classId || '',
+              subjectId: editingQuestion.subjectId || hierarchy?.subjectId || '',
+              textbookId: editingQuestion.textbookId || hierarchy?.textbookId || '',
+              chapterId: editingQuestion.chapterId || hierarchy?.chapterId || '',
+              topicId: editingQuestion.topicId || topicId,
+            } : {
+              topicId,
+              questionType: qType as any,
+              boardId: hierarchy?.boardId || '',
+              classId: hierarchy?.classId || '',
+              subjectId: hierarchy?.subjectId || '',
+              textbookId: hierarchy?.textbookId || '',
+              chapterId: hierarchy?.chapterId || '',
+            }}
+            onSaveComplete={() => {
+              fetchTopicQuestions();
+              if (mode === 'edit') { setMode('list'); setEditingQuestion(null); }
+            }}
+            onCancel={() => { setMode('list'); setEditingQuestion(null); }}
+          />
+        </div>
       )}
 
-      {/* BULK IMPORT UI */}
+      {/* â”€â”€ BULK IMPORT â”€â”€ */}
       {mode === 'bulk' && !hierarchyLoading && (
-          <div className="animate-in fade-in slide-in-from-top-2 mt-4">
-              <Card>
-              <CardHeader className="bg-slate-50 dark:bg-slate-900 pb-4">
-                  <CardTitle className="text-lg flex items-center gap-2 text-[#107c41]">
-                      <Upload className="w-5 h-5" /> Bulk Import Questions (JSON)
-                  </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4 pt-6">
-                  <Textarea 
-                      disabled={isProcessing || hierarchyLoading}
-                      value={bulkJson} 
-                      onChange={e => setBulkJson(e.target.value)} 
-                      placeholder="[\n  {\n    &quot;questionText&quot;: &quot;...&quot;,\n    &quot;options&quot;: { &quot;a&quot;: &quot;&quot;, &quot;b&quot;: &quot;&quot;, &quot;c&quot;: &quot;&quot;, &quot;d&quot;: &quot;&quot; },\n    &quot;correctAnswer&quot;: &quot;a&quot;,\n    &quot;explanation&quot;: &quot;...&quot;\n  }\n]"
-                      className="min-h-[300px] font-mono text-sm bg-slate-900 text-slate-50"
-                  />
-                  <div className="flex justify-end">
-                      <Button onClick={handleBulkImport} disabled={isProcessing || !bulkJson || hierarchyLoading} className="bg-blue-600 hover:bg-blue-700 text-white">
-                          {isProcessing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
-                          Import Questions
-                      </Button>
-                  </div>
-              </CardContent>
-              </Card>
+        <div className="animate-in fade-in duration-200 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm mt-2">
+          <div className="flex items-center gap-2 px-3 py-2.5 bg-blue-50 dark:bg-blue-900/20 border-b border-blue-100 dark:border-blue-900/50">
+            <Upload className="w-4 h-4 text-blue-600" />
+            <span className="text-xs font-bold text-blue-700 dark:text-blue-400">Bulk Import (JSON)</span>
           </div>
+          <div className="p-3 space-y-3">
+            <Textarea
+              disabled={isProcessing}
+              value={bulkJson}
+              onChange={e => setBulkJson(e.target.value)}
+              placeholder={`[\n  {\n    "questionText": "...",\n    "options": {"a":"","b":"","c":"","d":""},\n    "correctAnswer": "a",\n    "explanation": "..."\n  }\n]`}
+              className="min-h-[200px] font-mono text-xs bg-slate-900 text-slate-50 rounded-xl border-0"
+            />
+            <button onClick={handleBulkImport} disabled={isProcessing || !bulkJson}
+              className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold flex items-center justify-center gap-2 disabled:opacity-60">
+              {isProcessing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+              Import Questions
+            </button>
+          </div>
+        </div>
       )}
 
-      {/* BULK EDIT UI */}
+      {/* â”€â”€ BULK EDIT â”€â”€ */}
       {mode === 'bulk-edit' && !hierarchyLoading && (
-          <div className="animate-in fade-in slide-in-from-top-2 mt-4">
-              <Card>
-              <CardHeader className="bg-amber-50 dark:bg-amber-900/20 pb-4 border-b border-amber-100 dark:border-amber-900/50">
-                  <CardTitle className="text-lg flex items-center gap-2 text-amber-700 dark:text-amber-400">
-                      <Edit className="w-5 h-5" /> Bulk Edit Questions (JSON)
-                  </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4 pt-6">
-                  <Textarea 
-                      disabled={isProcessing || hierarchyLoading}
-                      value={bulkJson} 
-                      onChange={e => setBulkJson(e.target.value)} 
-                      className="min-h-[400px] font-mono text-sm bg-slate-900 text-slate-50"
-                  />
-                  <div className="flex justify-end">
-                      <Button onClick={handleBulkEditUpdate} disabled={isProcessing || !bulkJson || hierarchyLoading} className="bg-amber-600 hover:bg-amber-700 text-white">
-                          {isProcessing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
-                          Save Changes
-                      </Button>
-                  </div>
-              </CardContent>
-              </Card>
+        <div className="animate-in fade-in duration-200 bg-white dark:bg-slate-900 border border-amber-200 dark:border-amber-900 rounded-xl overflow-hidden shadow-sm mt-2">
+          <div className="flex items-center gap-2 px-3 py-2.5 bg-amber-50 dark:bg-amber-900/20 border-b border-amber-100 dark:border-amber-900/50">
+            <Edit className="w-4 h-4 text-amber-600" />
+            <span className="text-xs font-bold text-amber-700 dark:text-amber-400">Bulk Edit (JSON)</span>
           </div>
+          <div className="p-3 space-y-3">
+            <Textarea
+              disabled={isProcessing}
+              value={bulkJson}
+              onChange={e => setBulkJson(e.target.value)}
+              className="min-h-[240px] font-mono text-xs bg-slate-900 text-slate-50 rounded-xl border-0"
+            />
+            <button onClick={handleBulkEditUpdate} disabled={isProcessing || !bulkJson}
+              className="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-sm font-bold flex items-center justify-center gap-2 disabled:opacity-60">
+              {isProcessing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              Save Changes
+            </button>
+          </div>
+        </div>
       )}
 
-      {/* AI GENERATION EDITOR */}
+      {/* â”€â”€ AI GENERATE â”€â”€ */}
       {mode === 'ai' && (
-          <Card className="border-purple-200 dark:border-purple-900 shadow-md animate-in fade-in slide-in-from-top-2 mt-4">
-              <CardHeader className="bg-purple-50/50 dark:bg-purple-900/20 pb-4">
-                  <CardTitle className="text-lg flex items-center gap-2 text-purple-700 dark:text-purple-400">
-                      <Sparkles className="w-5 h-5" /> Generate MCQs with Google Gemini
-                  </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4 pt-6">
-                  <div className="space-y-2">
-                      <Label>What should the questions be about?</Label>
-                      <Textarea 
-                          value={aiPrompt} 
-                          onChange={e => setAiPrompt(e.target.value)} 
-                          placeholder="e.g., Generate 5 multiple choice questions about Newton's laws of motion. Make them difficult and conceptual."
-                          className="min-h-[120px]"
-                      />
-                  </div>
-                  <div className="flex justify-end">
-                      <Button onClick={handleGenerateAI} disabled={isProcessing} className="bg-purple-600 hover:bg-purple-700 text-white">
-                          {isProcessing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
-                          Generate Questions
-                      </Button>
-                  </div>
-              </CardContent>
-          </Card>
+        <div className="animate-in fade-in duration-200 bg-white dark:bg-slate-900 border border-violet-200 dark:border-violet-900 rounded-xl overflow-hidden shadow-sm mt-2">
+          <div className="flex items-center gap-2 px-3 py-2.5 bg-violet-50 dark:bg-violet-900/20 border-b border-violet-100 dark:border-violet-900/50">
+            <Sparkles className="w-4 h-4 text-violet-600" />
+            <span className="text-xs font-bold text-violet-700 dark:text-violet-400">Generate with AI</span>
+          </div>
+          <div className="p-3 space-y-3">
+            <div>
+              <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide">Prompt</label>
+              <Textarea
+                value={aiPrompt}
+                onChange={e => setAiPrompt(e.target.value)}
+                placeholder="e.g., Generate 5 MCQs about Newton's laws. Make them difficult and conceptual."
+                className="mt-1 min-h-[100px] text-sm rounded-xl"
+              />
+            </div>
+            <button onClick={handleGenerateAI} disabled={isProcessing}
+              className="w-full py-3 rounded-xl bg-violet-600 hover:bg-violet-700 text-white text-sm font-bold flex items-center justify-center gap-2 disabled:opacity-60">
+              {isProcessing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+              Generate Questions
+            </button>
+          </div>
+        </div>
       )}
 
-
+      <style jsx>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}`}</style>
     </div>
   );
 }

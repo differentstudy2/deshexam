@@ -408,6 +408,12 @@ export default function QuestionCard({ question, index, testMode = false, isList
             {/* Top row: Taxonomy chips and Link */}
             <div className="flex items-start justify-between mb-4 gap-4">
                 <div className="flex flex-wrap items-center gap-2">
+                    {question.marks && (
+                        <span className="bg-amber-100 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 font-bold rounded-md px-2.5 py-0.5 text-[12px] uppercase tracking-wide shadow-sm">
+                            {question.marks} Marks
+                        </span>
+                    )}
+                    
                     {question.sourceYear ? (
                         <span className="bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium rounded-md px-2.5 py-0.5 text-[11px] uppercase tracking-wide">{question.sourceYear}</span>
                     ) : null}

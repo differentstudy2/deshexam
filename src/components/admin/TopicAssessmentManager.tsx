@@ -1,12 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from "@/hooks/use-toast";
 import { PlusCircle, Pencil, Trash2, ArrowLeft, Loader2, ListPlus, ExternalLink } from 'lucide-react';
 import { getAssessmentsByTopic, saveAssessment, deleteAssessment, AssessmentCollectionType } from '@/lib/firebase/assessment';
@@ -14,12 +10,9 @@ import { getTopicHierarchy } from '@/lib/firebase/guide';
 import { QuestionPickerModal } from '@/components/assessment/QuestionPickerModal';
 import { QuestionBankEntry } from '@/lib/question-bank-types';
 import Link from 'next/link';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { cn } from '@/lib/utils';
 
-interface TopicAssessmentManagerProps {
-  topicId: string;
-  tabType: string;
-}
+interface TopicAssessmentManagerProps { topicId: string; tabType: string; }
 
 export function TopicAssessmentManager({ topicId, tabType }: TopicAssessmentManagerProps) {
   const { toast } = useToast();
@@ -28,294 +21,205 @@ export function TopicAssessmentManager({ topicId, tabType }: TopicAssessmentMana
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [hierarchy, setHierarchy] = useState<any>(null);
-  
   const [editData, setEditData] = useState<any>({});
   const [showPicker, setShowPicker] = useState(false);
-  const [attachedQuestions, setAttachedQuestions] = useState<QuestionBankEntry[]>([]);
 
   const mapTabToCollection = (tab: string): AssessmentCollectionType => {
-      if (tab === 'practice_sets') return 'practiceSets';
-      if (tab === 'quizzes') return 'quizzes';
-      if (tab === 'mock_tests' || tab === 'model_test') return 'mockTests';
-      if (tab === 'exams_papers') return 'examPapers';
-      return 'practiceSets';
+    if (tab === 'practice_sets') return 'practiceSets';
+    if (tab === 'quizzes') return 'quizzes';
+    if (tab === 'mock_tests' || tab === 'model_test') return 'mockTests';
+    if (tab === 'exams_papers') return 'examPapers';
+    return 'practiceSets';
   };
-  
   const collectionName = mapTabToCollection(tabType);
 
-  const fetchTopicAssessments = async () => {
+  const fetchAssessments = async () => {
     setLoading(true);
     try {
       const data = await getAssessmentsByTopic(collectionName, topicId);
       setAssessments(data);
-    } catch (error) {
-      toast({ title: 'Error fetching assessments', variant: 'destructive' });
-    } finally {
-      setLoading(false);
-    }
+    } catch { toast({ title: 'Error fetching', variant: 'destructive' }); }
+    finally { setLoading(false); }
   };
 
   useEffect(() => {
-    fetchTopicAssessments();
+    fetchAssessments();
     setView('list');
     getTopicHierarchy(topicId).then(setHierarchy);
   }, [topicId, tabType]);
 
-  const resetForm = () => {
-    setEditData({
-      title: '',
-      slug: '',
-      description: '',
-      questionIds: [],
-      difficulty: 'Medium',
-      status: 'Published',
-      topicId: topicId,
-      // Generic defaults
-      estimatedTimeMin: 15,
-      timeLimitMin: 15,
-      passingScorePercent: 40,
-      durationMin: 60,
-      totalMarks: 100
-    });
-    setAttachedQuestions([]);
-  };
+  const resetForm = () => setEditData({ title: '', slug: '', description: '', questionIds: [], difficulty: 'Medium', status: 'Published', topicId, estimatedTimeMin: 15, timeLimitMin: 15, passingScorePercent: 40, durationMin: 60, totalMarks: 100 });
 
-  const handleEdit = (item: any) => {
-    setEditData(item);
-    setView('editor');
-  };
+  const handleEdit = (item: any) => { setEditData(item); setView('editor'); };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this?')) return;
-    try {
-        await deleteAssessment(collectionName, id);
-        toast({ title: 'Deleted successfully' });
-        fetchTopicAssessments();
-    } catch(e) {
-        toast({ title: 'Delete failed', variant: 'destructive' });
-    }
+    if (!confirm('Delete this assessment?')) return;
+    try { await deleteAssessment(collectionName, id); toast({ title: 'Deleted' }); fetchAssessments(); }
+    catch { toast({ title: 'Delete failed', variant: 'destructive' }); }
   };
 
   const handleSave = async () => {
-    if (!editData.title) {
-        toast({ title: 'Title is required', variant: 'destructive' });
-        return;
-    }
+    if (!editData.title) { toast({ title: 'Title is required', variant: 'destructive' }); return; }
     setIsSaving(true);
     try {
-        const id = editData.id || `${collectionName}_${Date.now()}`;
-        const slug = editData.slug || editData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-        
-        await saveAssessment(collectionName, id, {
-            ...editData,
-            slug,
-            questionIds: editData.questionIds || [],
-            status: editData.status || 'Draft',
-            difficulty: editData.difficulty || 'Medium',
-            topicId: topicId,
-            // Attach hierarchy metadata
-            boardId: hierarchy?.boardId || '',
-            classId: hierarchy?.classId || '',
-            subjectId: hierarchy?.subjectId || '',
-            textbookId: hierarchy?.textbookId || '',
-            chapterId: hierarchy?.chapterId || '',
-        });
-        
-        toast({ title: 'Saved successfully' });
-        setView('list');
-        fetchTopicAssessments();
-    } catch(e) {
-        toast({ title: 'Save failed', variant: 'destructive' });
-    } finally {
-        setIsSaving(false);
-    }
+      const id = editData.id || `${collectionName}_${Date.now()}`;
+      const slug = editData.slug || editData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+      await saveAssessment(collectionName, id, { ...editData, slug, questionIds: editData.questionIds || [], status: editData.status || 'Draft', difficulty: editData.difficulty || 'Medium', topicId, boardId: hierarchy?.boardId || '', classId: hierarchy?.classId || '', subjectId: hierarchy?.subjectId || '', textbookId: hierarchy?.textbookId || '', chapterId: hierarchy?.chapterId || '' });
+      toast({ title: 'Saved!' });
+      setView('list');
+      fetchAssessments();
+    } catch { toast({ title: 'Save failed', variant: 'destructive' }); }
+    finally { setIsSaving(false); }
   };
 
-  const handleQuestionsSelected = (questions: QuestionBankEntry[]) => {
-    const newIds = questions.map(q => q.id);
-    setEditData((prev: any) => ({
-        ...prev,
-        questionIds: [...(prev.questionIds || []), ...newIds]
-    }));
-  };
+  const DIFFICULTY_COLORS: Record<string, string> = { Easy: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30', Medium: 'text-amber-600 bg-amber-50 dark:bg-amber-900/30', Hard: 'text-red-600 bg-red-50 dark:bg-red-900/30', Expert: 'text-purple-600 bg-purple-50 dark:bg-purple-900/30' };
+  const STATUS_COLORS: Record<string, string> = { Published: 'text-emerald-700 bg-emerald-50', Draft: 'text-slate-600 bg-slate-100', Archived: 'text-slate-400 bg-slate-50' };
 
+  // ── Editor View ──
   if (view === 'editor') {
     return (
-        <div className="space-y-6 animate-in fade-in slide-in-from-top-2">
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                    <Button variant="outline" size="sm" onClick={() => setView('list')}><ArrowLeft className="h-4 w-4 mr-2" /> Back</Button>
-                    <h3 className="text-xl font-bold">{editData.id ? 'Edit' : 'Create'} {tabType.replace('_', ' ')}</h3>
-                </div>
-                <Button className="bg-[#107c41] hover:bg-[#0b5c30]" onClick={handleSave} disabled={isSaving}>
-                    {isSaving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <PlusCircle className="h-4 w-4 mr-2" />}
-                    Save Assessment
-                </Button>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="md:col-span-2 space-y-6">
-                    <Card>
-                        <CardHeader><CardTitle>Basic Details</CardTitle></CardHeader>
-                        <CardContent className="space-y-4">
-                            <div>
-                                <Label>Title</Label>
-                                <Input value={editData.title || ''} onChange={e => setEditData({...editData, title: e.target.value})} placeholder="E.g., Chapter 1 Mock Test" />
-                            </div>
-                            <div>
-                                <Label>Description</Label>
-                                <Textarea value={editData.description || ''} onChange={e => setEditData({...editData, description: e.target.value})} rows={3} />
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between pb-4">
-                            <CardTitle>Attached Questions ({editData.questionIds?.length || 0})</CardTitle>
-                            <Button size="sm" variant="outline" onClick={() => setShowPicker(true)}>
-                                <ListPlus className="h-4 w-4 mr-2" /> Add Questions
-                            </Button>
-                        </CardHeader>
-                        <CardContent>
-                            {(!editData.questionIds || editData.questionIds.length === 0) ? (
-                                <div className="text-center py-8 text-slate-500 bg-slate-50 rounded-lg border border-dashed">
-                                    No questions attached yet.
-                                </div>
-                            ) : (
-                                <div className="space-y-2">
-                                    {editData.questionIds.map((id: string, idx: number) => (
-                                        <div key={id} className="flex items-center justify-between p-3 border rounded bg-slate-50">
-                                            <div className="flex items-center gap-3">
-                                                <span className="font-medium text-slate-500 w-6">{idx + 1}.</span>
-                                                <span className="text-sm font-mono text-slate-600">{id}</span>
-                                            </div>
-                                            <Button 
-                                                variant="ghost" 
-                                                size="sm" 
-                                                className="text-red-500 h-8 w-8 p-0"
-                                                onClick={() => setEditData({...editData, questionIds: editData.questionIds?.filter((qid: string) => qid !== id)})}
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                            </Button>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </CardContent>
-                    </Card>
-                </div>
-
-                <div className="space-y-6">
-                    <Card>
-                        <CardHeader><CardTitle>Settings</CardTitle></CardHeader>
-                        <CardContent className="space-y-4">
-                            <div>
-                                <Label>Status</Label>
-                                <Select value={editData.status || 'Draft'} onValueChange={v => setEditData({...editData, status: v})}>
-                                    <SelectTrigger><SelectValue /></SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="Published">Published</SelectItem>
-                                        <SelectItem value="Draft">Draft</SelectItem>
-                                        <SelectItem value="Archived">Archived</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div>
-                                <Label>Difficulty</Label>
-                                <Select value={editData.difficulty || 'Medium'} onValueChange={v => setEditData({...editData, difficulty: v})}>
-                                    <SelectTrigger><SelectValue /></SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="Easy">Easy</SelectItem>
-                                        <SelectItem value="Medium">Medium</SelectItem>
-                                        <SelectItem value="Hard">Hard</SelectItem>
-                                        <SelectItem value="Expert">Expert</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            {collectionName === 'practiceSets' && (
-                                <div>
-                                    <Label>Est. Time (Minutes)</Label>
-                                    <Input type="number" value={editData.estimatedTimeMin || ''} onChange={e => setEditData({...editData, estimatedTimeMin: parseInt(e.target.value)})} />
-                                </div>
-                            )}
-                            {collectionName === 'quizzes' && (
-                                <div>
-                                    <Label>Time Limit (Minutes)</Label>
-                                    <Input type="number" value={editData.timeLimitMin || ''} onChange={e => setEditData({...editData, timeLimitMin: parseInt(e.target.value)})} />
-                                </div>
-                            )}
-                            {collectionName === 'mockTests' && (
-                                <div>
-                                    <Label>Duration (Minutes)</Label>
-                                    <Input type="number" value={editData.durationMin || ''} onChange={e => setEditData({...editData, durationMin: parseInt(e.target.value)})} />
-                                </div>
-                            )}
-                        </CardContent>
-                    </Card>
-                </div>
-            </div>
-
-            <QuestionPickerModal 
-                open={showPicker} 
-                onOpenChange={setShowPicker} 
-                onSelectQuestions={handleQuestionsSelected}
-                preSelectedIds={editData.questionIds || []}
-            />
+      <div className="space-y-3 animate-in fade-in duration-200">
+        {/* Header */}
+        <div className="flex items-center gap-2">
+          <button onClick={() => setView('list')} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">
+            <ArrowLeft className="w-4 h-4 text-slate-600 dark:text-slate-300" />
+          </button>
+          <h3 className="text-sm font-bold text-slate-800 dark:text-white flex-1">{editData.id ? 'Edit' : 'Create'} {tabType.replace(/_/g, ' ')}</h3>
+          <button onClick={handleSave} disabled={isSaving}
+            className="px-4 py-1.5 text-xs font-bold rounded-full bg-[#107c41] text-white flex items-center gap-1.5 disabled:opacity-60">
+            {isSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <PlusCircle className="w-3.5 h-3.5" />}
+            Save
+          </button>
         </div>
+
+        {/* Basic Details */}
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 space-y-3">
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Basic Details</p>
+          <div className="space-y-1">
+            <label className="text-[10px] text-slate-500 font-semibold uppercase tracking-wide">Title *</label>
+            <Input className="h-9 text-sm" placeholder="e.g. Chapter 1 Mock Test" value={editData.title || ''} onChange={e => setEditData({ ...editData, title: e.target.value })} />
+          </div>
+          <div className="space-y-1">
+            <label className="text-[10px] text-slate-500 font-semibold uppercase tracking-wide">Description</label>
+            <Textarea className="text-sm resize-none" rows={2} value={editData.description || ''} onChange={e => setEditData({ ...editData, description: e.target.value })} />
+          </div>
+        </div>
+
+        {/* Settings */}
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 space-y-3">
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Settings</p>
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+            <div className="space-y-1">
+              <label className="text-[10px] text-slate-500 font-semibold uppercase tracking-wide">Status</label>
+              <select className="w-full h-9 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 text-sm" value={editData.status || 'Draft'} onChange={e => setEditData({ ...editData, status: e.target.value })}>
+                <option value="Published">Published</option>
+                <option value="Draft">Draft</option>
+                <option value="Archived">Archived</option>
+              </select>
+            </div>
+            <div className="space-y-1">
+              <label className="text-[10px] text-slate-500 font-semibold uppercase tracking-wide">Difficulty</label>
+              <select className="w-full h-9 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 text-sm" value={editData.difficulty || 'Medium'} onChange={e => setEditData({ ...editData, difficulty: e.target.value })}>
+                <option>Easy</option><option>Medium</option><option>Hard</option><option>Expert</option>
+              </select>
+            </div>
+            {collectionName === 'practiceSets' && (
+              <div className="space-y-1">
+                <label className="text-[10px] text-slate-500 font-semibold uppercase tracking-wide">Est. Time (min)</label>
+                <Input type="number" className="h-9 text-sm" value={editData.estimatedTimeMin || ''} onChange={e => setEditData({ ...editData, estimatedTimeMin: parseInt(e.target.value) })} />
+              </div>
+            )}
+            {collectionName === 'quizzes' && (
+              <div className="space-y-1">
+                <label className="text-[10px] text-slate-500 font-semibold uppercase tracking-wide">Time Limit (min)</label>
+                <Input type="number" className="h-9 text-sm" value={editData.timeLimitMin || ''} onChange={e => setEditData({ ...editData, timeLimitMin: parseInt(e.target.value) })} />
+              </div>
+            )}
+            {collectionName === 'mockTests' && (
+              <div className="space-y-1">
+                <label className="text-[10px] text-slate-500 font-semibold uppercase tracking-wide">Duration (min)</label>
+                <Input type="number" className="h-9 text-sm" value={editData.durationMin || ''} onChange={e => setEditData({ ...editData, durationMin: parseInt(e.target.value) })} />
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Questions */}
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Questions ({editData.questionIds?.length || 0})</p>
+            <button onClick={() => setShowPicker(true)} className="px-3 py-1 text-xs font-semibold rounded-full border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 flex items-center gap-1">
+              <ListPlus className="w-3.5 h-3.5" /> Add
+            </button>
+          </div>
+          {(!editData.questionIds || editData.questionIds.length === 0) ? (
+            <div className="py-8 text-center border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-400">
+              No questions attached yet. Tap "Add" to pick questions.
+            </div>
+          ) : (
+            <div className="space-y-1.5 max-h-[30vh] overflow-y-auto">
+              {editData.questionIds.map((id: string, idx: number) => (
+                <div key={id} className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 rounded-xl px-3 py-2">
+                  <span className="text-xs font-bold text-slate-400 w-5">{idx + 1}.</span>
+                  <span className="flex-1 text-xs text-slate-600 dark:text-slate-400 font-mono truncate">{id}</span>
+                  <button onClick={() => setEditData({ ...editData, questionIds: editData.questionIds?.filter((qid: string) => qid !== id) })} className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-red-100 dark:hover:bg-red-900/30">
+                    <Trash2 className="w-3 h-3 text-red-500" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <QuestionPickerModal open={showPicker} onOpenChange={setShowPicker} onSelectQuestions={(qs: QuestionBankEntry[]) => { const newIds = qs.map(q => q.id); setEditData((p: any) => ({ ...p, questionIds: [...(p.questionIds || []), ...newIds] })); }} preSelectedIds={editData.questionIds || []} />
+      </div>
     );
   }
 
+  // ── List View ──
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap gap-4 justify-between items-center bg-slate-50 dark:bg-slate-900/50 p-4 border rounded-lg">
-          <div>
-              <h3 className="text-lg font-semibold capitalize">{tabType.replace('_', ' ')}s for this Topic</h3>
-              <p className="text-sm text-slate-500">Manage assessments attached specifically to this topic.</p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-              <Button onClick={() => { resetForm(); setView('editor'); }} className="bg-[#107c41] hover:bg-[#0b5c30]">
-                  <PlusCircle className="w-4 h-4 mr-2" /> Create New
-              </Button>
-          </div>
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-bold text-slate-500 capitalize">{tabType.replace(/_/g, ' ')}s</p>
+        <button onClick={() => { resetForm(); setView('editor'); }}
+          className="px-3.5 py-1.5 text-xs font-bold rounded-full bg-[#107c41] text-white flex items-center gap-1.5">
+          <PlusCircle className="w-3.5 h-3.5" /> Create New
+        </button>
       </div>
 
-      <div className="space-y-4">
-          {loading ? (
-              <div className="flex justify-center p-8"><Loader2 className="animate-spin text-[#107c41]" /></div>
-          ) : assessments.length === 0 ? (
-              <div className="text-center p-8 border-2 border-dashed rounded-lg text-slate-500">
-                  No {tabType.replace('_', ' ')}s found for this topic yet.
+      {loading ? (
+        <div className="flex justify-center py-12"><Loader2 className="w-5 h-5 animate-spin text-[#107c41]" /></div>
+      ) : assessments.length === 0 ? (
+        <div className="flex flex-col items-center py-14 text-center border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl">
+          <p className="text-sm text-slate-400">No {tabType.replace(/_/g, ' ')}s yet</p>
+          <button onClick={() => { resetForm(); setView('editor'); }} className="mt-3 px-4 py-2 text-xs font-semibold rounded-full bg-[#107c41] text-white">Create First</button>
+        </div>
+      ) : (
+        <div className="space-y-2 lg:grid lg:grid-cols-2 lg:gap-3 lg:space-y-0">
+          {assessments.map(set => (
+            <div key={set.id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 shadow-sm">
+              <div className="flex items-start gap-2">
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-bold text-slate-800 dark:text-slate-100 truncate leading-tight">{set.title}</p>
+                  <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                    <span className={cn("text-[10px] font-bold px-2 py-0.5 rounded-full", DIFFICULTY_COLORS[set.difficulty] || DIFFICULTY_COLORS.Medium)}>{set.difficulty}</span>
+                    <span className={cn("text-[10px] font-bold px-2 py-0.5 rounded-full", STATUS_COLORS[set.status] || STATUS_COLORS.Draft)}>{set.status}</span>
+                    <span className="text-[10px] text-slate-400">{set.questionIds?.length || 0} Qs</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1 shrink-0">
+                  <button onClick={() => handleEdit(set)} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">
+                    <Pencil className="w-3.5 h-3.5 text-slate-500" />
+                  </button>
+                  <button onClick={() => handleDelete(set.id)} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-50 dark:hover:bg-red-900/30">
+                    <Trash2 className="w-3.5 h-3.5 text-red-500" />
+                  </button>
+                </div>
               </div>
-          ) : (
-              <Table>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead>Title</TableHead>
-                        <TableHead>Questions</TableHead>
-                        <TableHead>Difficulty</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Actions</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {assessments.map(set => (
-                        <TableRow key={set.id}>
-                            <TableCell className="font-medium">{set.title}</TableCell>
-                            <TableCell>{set.questionIds?.length || 0}</TableCell>
-                            <TableCell>{set.difficulty}</TableCell>
-                            <TableCell>{set.status}</TableCell>
-                            <TableCell>
-                                <div className="flex gap-2">
-                                    <Button variant="ghost" size="sm" onClick={() => handleEdit(set)}><Pencil className="h-4 w-4" /></Button>
-                                    <Button variant="ghost" size="sm" className="text-red-500" onClick={() => handleDelete(set.id)}><Trash2 className="h-4 w-4" /></Button>
-                                </div>
-                            </TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-          )}
-      </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
