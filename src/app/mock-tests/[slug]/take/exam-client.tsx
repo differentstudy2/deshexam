@@ -480,9 +480,6 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
               <button onClick={() => setShowMobileNav(true)}>
                 <LayoutGrid className="w-5 h-5" />
               </button>
-              <button>
-                <Bookmark className="w-5 h-5" />
-              </button>
               <div className="bg-[#DCFCE7] dark:bg-[#064e3b] text-[#166534] dark:text-[#34d399] px-3 py-1.5 rounded-full font-bold flex items-center gap-1.5 text-sm shadow-sm transition-colors">
                 <Clock className="w-4 h-4" />
                 <span>{formatTime(timeLeft)}</span>
