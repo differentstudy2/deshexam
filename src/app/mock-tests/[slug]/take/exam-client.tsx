@@ -602,7 +602,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                   )}>
                     {key.toUpperCase()}
                   </div>
-                  <span className={cn("text-[20px] transition-colors", textClass)}>
+                  <span className={cn("text-[18px] transition-colors", textClass)}>
                     {optionText}
                   </span>
                 </button>
@@ -620,6 +620,17 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
             </div>
           )}
         </div>
+
+        {/* Floating Submit Button (Mobile) */}
+        {!isReviewMode && (
+          <button
+            onClick={() => setShowSubmitConfirm(true)}
+            className="fixed bottom-24 right-4 z-30 flex items-center justify-center gap-1.5 bg-[#16A34A] dark:bg-emerald-600 text-white px-4 py-2.5 rounded-full shadow-lg shadow-green-900/20 dark:shadow-emerald-900/40 border border-white/20 font-bold text-sm transition-transform active:scale-95"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+            Submit
+          </button>
+        )}
 
         {/* Bottom Bar */}
         <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-[#F1F5F9] dark:from-[#0f172a] via-[#F1F5F9] dark:via-[#0f172a] to-transparent flex items-center justify-between gap-3 z-20 pb-6 transition-colors">
@@ -999,7 +1010,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                             )}>
                               {key.toUpperCase()}
                             </div>
-                            <span className={cn("text-[20px] pr-20 transition-colors", textClass)}>
+                            <span className={cn("text-[18px] pr-20 transition-colors", textClass)}>
                               {optionText}
                             </span>
                             <span className="absolute right-4 text-xs font-bold text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity">
