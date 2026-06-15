@@ -46,7 +46,8 @@ const formatDate = (dateValue: any) => {
 };
 
 export default function QuestionCard({ question, index, testMode = false, isListView = false }: QuestionCardProps) {
-    const [showAnswer, setShowAnswer] = useState(false);
+    const isDescriptive = ['short question', 'long question', 'creative question'].includes(question.questionType?.toLowerCase() || '');
+    const [showAnswer, setShowAnswer] = useState(isDescriptive);
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
     const [fillBlankAnswer, setFillBlankAnswer] = useState<string>('');
     const { user } = useAuth();
@@ -105,12 +106,12 @@ export default function QuestionCard({ question, index, testMode = false, isList
     useEffect(() => {
         if (!testMode) {
             setSelectedOption(null);
-            setShowAnswer(false);
+            setShowAnswer(isDescriptive);
         } else {
             setShowAnswer(false);
             setSelectedOption(null);
         }
-    }, [testMode, question.id]);
+    }, [testMode, question.id, isDescriptive]);
 
     const handleInteract = async (type: 'like' | 'dislike' | 'bookmark') => {
         if (!user) {
@@ -621,16 +622,6 @@ export default function QuestionCard({ question, index, testMode = false, isList
 
             {/* Tags moved to top row */}
 
-            {/* Explanation Section */}
-            {showAnswer && question.explanation && (
-                <div className="mt-1 mb-3 p-2.5 rounded-xl bg-blue-50/50 dark:bg-blue-900/10 !text-[0.8rem] text-slate-700 dark:text-slate-300 !leading-snug animate-in fade-in slide-in-from-top-2 duration-300 border border-blue-100 dark:border-blue-800/30">
-                    <div className="font-bold text-blue-900 dark:text-blue-300 flex items-center gap-1 mb-0.5">
-                        <Lightbulb className="w-3 h-3 text-amber-500" />
-                        Explanation
-                    </div>
-                    <div className="prose dark:prose-invert max-w-none opacity-90 !text-[0.8rem] prose-p:!text-[0.8rem] prose-p:!my-0.5 prose-headings:!text-[0.85rem] prose-headings:!my-1 prose-li:!text-[0.8rem] prose-li:!my-0" dangerouslySetInnerHTML={{ __html: question.explanation }} />
-                </div>
-            )}
 
             {/* Footer Actions */}
             {isListView ? (
@@ -686,6 +677,28 @@ export default function QuestionCard({ question, index, testMode = false, isList
                             <span className="text-sm">{counts.views}</span>
                         </div>
                     </div>
+                </div>
+            )}
+
+            {/* Descriptive Answer Section */}
+            {isDescriptive && showAnswer && question.correctAnswer && (
+                <div className="mt-4 mb-2 p-4 rounded-xl bg-green-50/50 dark:bg-green-900/10 !text-[0.8rem] text-slate-700 dark:text-slate-300 !leading-snug animate-in fade-in slide-in-from-top-2 duration-300 border border-green-100 dark:border-green-800/30">
+                    <div className="font-bold text-green-900 dark:text-green-300 flex items-center gap-1.5 mb-2 border-b border-green-200/50 dark:border-green-800/50 pb-2">
+                        <CheckCircle2 className="w-4 h-4 text-green-600" />
+                        Answer
+                    </div>
+                    <div className="prose dark:prose-invert max-w-none opacity-90 !text-[0.85rem] prose-p:!text-[0.85rem] prose-p:!my-1 prose-headings:!text-[0.95rem] prose-headings:!my-1.5 prose-li:!text-[0.85rem] prose-li:!my-0.5" dangerouslySetInnerHTML={{ __html: question.correctAnswer }} />
+                </div>
+            )}
+
+            {/* Explanation Section */}
+            {!isDescriptive && showAnswer && question.explanation && (
+                <div className="mt-4 mb-2 p-4 rounded-xl bg-blue-50/50 dark:bg-blue-900/10 !text-[0.8rem] text-slate-700 dark:text-slate-300 !leading-snug animate-in fade-in slide-in-from-top-2 duration-300 border border-blue-100 dark:border-blue-800/30">
+                    <div className="font-bold text-blue-900 dark:text-blue-300 flex items-center gap-1.5 mb-2 border-b border-blue-200/50 dark:border-blue-800/50 pb-2">
+                        <Lightbulb className="w-4 h-4 text-amber-500" />
+                        Explanation
+                    </div>
+                    <div className="prose dark:prose-invert max-w-none opacity-90 !text-[0.8rem] prose-p:!text-[0.8rem] prose-p:!my-0.5 prose-headings:!text-[0.85rem] prose-headings:!my-1 prose-li:!text-[0.8rem] prose-li:!my-0" dangerouslySetInnerHTML={{ __html: question.explanation }} />
                 </div>
             )}
 

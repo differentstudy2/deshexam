@@ -57,11 +57,14 @@
 @layer base {
   * {
     @apply border-border;
+    -webkit-tap-highlight-color: transparent;
   }
 
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-body);
+    user-select: none;
+    -webkit-user-select: none;
   }
 
   h1,
@@ -720,4 +723,21 @@ strong {
   .print-hidden-actions {
     display: none !important;
   }
+}
+
+/* Native App UI Helpers */
+.prose, input, textarea, [contenteditable="true"] {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+html {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }

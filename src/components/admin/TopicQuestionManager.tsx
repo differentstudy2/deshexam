@@ -343,10 +343,14 @@ export function TopicQuestionManager({ topicId, tabType }: TopicQuestionManagerP
     <div className="space-y-6">
       {tabType === 'questions' && (
         <Tabs value={innerQType} onValueChange={setInnerQType}>
-          <TabsList className="grid w-full grid-cols-3 mb-4">
-            <TabsTrigger value="MCQ">MCQ</TabsTrigger>
-            <TabsTrigger value="Short Question">Short Questions</TabsTrigger>
-            <TabsTrigger value="Creative Question">Creative Questions</TabsTrigger>
+          <TabsList className="flex flex-wrap w-full h-auto p-1 bg-slate-100 dark:bg-slate-900 mb-4">
+            <TabsTrigger value="MCQ" className="flex-1 min-w-[100px] py-2">MCQ</TabsTrigger>
+            <TabsTrigger value="True/False" className="flex-1 min-w-[100px] py-2">True/False</TabsTrigger>
+            <TabsTrigger value="Fill in the Blank" className="flex-1 min-w-[100px] py-2">Fill Blanks</TabsTrigger>
+            <TabsTrigger value="Matching" className="flex-1 min-w-[100px] py-2">Matching</TabsTrigger>
+            <TabsTrigger value="Short Question" className="flex-1 min-w-[100px] py-2">Short Qs</TabsTrigger>
+            <TabsTrigger value="Long Question" className="flex-1 min-w-[100px] py-2">Long Qs</TabsTrigger>
+            <TabsTrigger value="Creative Question" className="flex-1 min-w-[100px] py-2">Creative Qs</TabsTrigger>
           </TabsList>
         </Tabs>
       )}
@@ -476,7 +480,27 @@ export function TopicQuestionManager({ topicId, tabType }: TopicQuestionManagerP
                                       </div>
                                   </div>
                               )}
-                              {q.questionType !== 'MCQ' && q.correctAnswer && (
+                              {q.questionType === 'Matching' && q.matchingPairs && q.matchingPairs.length > 0 && (
+                                  <div className="mt-3 bg-slate-50 dark:bg-slate-900/50 p-3 rounded border border-slate-100 dark:border-slate-800">
+                                      <div className="grid grid-cols-2 gap-x-4 mb-2 font-bold text-slate-800 dark:text-slate-200 border-b border-slate-200 dark:border-slate-700 pb-2">
+                                          <div>Column A</div>
+                                          <div>Column B</div>
+                                      </div>
+                                      <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-slate-700 dark:text-slate-300">
+                                          {q.matchingPairs.map((pair: any, idx: number) => (
+                                              <React.Fragment key={idx}>
+                                                  <div className="font-medium flex items-start gap-2">
+                                                      <span className="text-slate-500">{idx + 1}.</span> {pair.left}
+                                                  </div>
+                                                  <div className="flex items-start gap-2">
+                                                      <span className="text-slate-500">{String.fromCharCode(65 + idx)}.</span> {pair.right}
+                                                  </div>
+                                              </React.Fragment>
+                                          ))}
+                                      </div>
+                                  </div>
+                              )}
+                              {q.questionType !== 'MCQ' && q.questionType !== 'Matching' && q.correctAnswer && (
                                   <div className="mt-3 text-sm p-3 bg-slate-50 dark:bg-slate-900 rounded border">
                                       <span className="font-semibold block mb-1">Answer Key:</span>
                                       <div dangerouslySetInnerHTML={{__html: q.correctAnswer}} />

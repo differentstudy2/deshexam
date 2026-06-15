@@ -762,36 +762,38 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                               </div>
                           ) : (
                               <div>
-                                  <label className="text-sm font-medium">Answer Key / Correct Answer</label>
-                                  <Textarea 
-                                      rows={4} 
-                                      value={editData.correctAnswer || ''} 
-                                      onChange={e => setEditData({...editData, correctAnswer: e.target.value})} 
-                                      placeholder="Provide the exact answer key or sample answer..."
-                                  />
+                                  <label className="text-sm font-medium">Answer / Answer Key</label>
+                                  <div className="prose-editor-container border border-[#c4d6c4] rounded-xl overflow-hidden mt-2">
+                                      <TiptapEditor 
+                                          content={editData.correctAnswer || ''} 
+                                          onChange={(html) => setEditData({...editData, correctAnswer: html})} 
+                                      />
+                                  </div>
                               </div>
                           )}
                       </CardContent>
                   </Card>
 
                   {/* --- CARD 3: Explanation --- */}
-                  <Card className="rounded-[24px] border-[#d3e3d3] shadow-sm bg-[#fdfefd] overflow-hidden">
-                      <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-[#eef2ec] bg-[#f8faf8]">
-                          <CardTitle className="text-lg text-[#4a634a]">Explanation</CardTitle>
-                          <Button variant="outline" size="sm" onClick={handleGenerateAI} disabled={isGeneratingAI} className="rounded-full text-[#4a634a] border-[#c4d6c4] bg-[#fdfefd] hover:bg-[#f4f8f4]">
-                              {isGeneratingAI ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Sparkles className="h-4 w-4 mr-2" />}
-                              Generate with AI
-                          </Button>
-                      </CardHeader>
-                      <CardContent className="pt-6">
-                          <div className="prose-editor-container">
-                              <TiptapEditor 
-                                  content={editData.explanation || ''} 
-                                  onChange={(html) => setEditData({...editData, explanation: html})} 
-                              />
-                          </div>
-                      </CardContent>
-                  </Card>
+                  {!['Short Question', 'Long Question', 'Creative Question'].includes(editData.questionType || '') && (
+                      <Card className="rounded-[24px] border-[#d3e3d3] shadow-sm bg-[#fdfefd] overflow-hidden">
+                          <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-[#eef2ec] bg-[#f8faf8]">
+                              <CardTitle className="text-lg text-[#4a634a]">Explanation</CardTitle>
+                              <Button variant="outline" size="sm" onClick={handleGenerateAI} disabled={isGeneratingAI} className="rounded-full text-[#4a634a] border-[#c4d6c4] bg-[#fdfefd] hover:bg-[#f4f8f4]">
+                                  {isGeneratingAI ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Sparkles className="h-4 w-4 mr-2" />}
+                                  Generate with AI
+                              </Button>
+                          </CardHeader>
+                          <CardContent className="pt-6">
+                              <div className="prose-editor-container">
+                                  <TiptapEditor 
+                                      content={editData.explanation || ''} 
+                                      onChange={(html) => setEditData({...editData, explanation: html})} 
+                                  />
+                              </div>
+                          </CardContent>
+                      </Card>
+                  )}
               </div>
 
               {/* Right Column: Taxonomy and Meta */}

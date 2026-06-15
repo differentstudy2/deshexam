@@ -1649,6 +1649,28 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                                         })}
                                       </div>
                                     )}
+
+                                    {/* MATCHING PAIRS (If Matching) */}
+                                    {q.questionType === 'Matching' && q.matchingPairs && q.matchingPairs.length > 0 && (
+                                      <div className="mt-3 pl-6">
+                                        <div className="grid grid-cols-2 gap-x-4 mb-2 font-bold text-gray-800 border-b border-gray-200 pb-2">
+                                          <div>Column A</div>
+                                          <div>Column B</div>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-gray-700">
+                                          {q.matchingPairs.map((pair: any, idx: number) => (
+                                            <React.Fragment key={idx}>
+                                              <div className="font-medium flex items-start gap-2">
+                                                <span className="text-gray-500">{idx + 1}.</span> {pair.left}
+                                              </div>
+                                              <div className="flex items-start gap-2">
+                                                <span className="text-gray-500">{String.fromCharCode(65 + idx)}.</span> {pair.right}
+                                              </div>
+                                            </React.Fragment>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )}
                                   </>
                                 )}
                               </div>
