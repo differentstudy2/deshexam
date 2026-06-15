@@ -470,9 +470,9 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
       {/* ── MOBILE UI ── */}
       <div className="md:hidden flex flex-col h-full w-full relative">
         {/* Top Section */}
-        <div className="pt-4 px-4 flex-shrink-0 z-10 flex flex-col gap-4 mb-4">
+        <div className="pt-4 px-2 flex-shrink-0 z-10 flex flex-col gap-4 mb-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1">
               <button onClick={handleExitExam} className="w-10 h-10 bg-white dark:bg-[#1e293b] shadow-sm flex items-center justify-center rounded-full border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 transition-colors">
                 <ArrowLeft className="w-5 h-5" />
               </button>
@@ -550,7 +550,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 overflow-y-auto px-3 pb-24 hide-scrollbar flex flex-col gap-3">
+        <div className="flex-1 overflow-y-auto px-2 pb-24 hide-scrollbar flex flex-col gap-3">
           <div className="bg-gradient-to-br from-white to-blue-50/30 dark:from-[#1e293b] dark:to-slate-900/80 rounded-2xl p-5 shadow-md border border-white/60 dark:border-slate-700/50 transition-colors">
             <div
               className="text-xl font-bold leading-snug text-slate-900 dark:text-slate-50 transition-colors"
