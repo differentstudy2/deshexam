@@ -318,6 +318,13 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
   const totalSkipped = Object.values(questionStates).filter(s => s === 'skipped').length;
   const totalRemaining = questions.length - totalAttempted - totalSkipped - totalReview;
 
+  // Real-time correct count (based on answered questions)
+  const liveCorrect = questions.filter(q => {
+    const ua = answers[q.id];
+    return ua && q.correctAnswer && ua.toLowerCase() === q.correctAnswer.toLowerCase();
+  }).length;
+  const liveAccuracy = totalAttempted > 0 ? Math.round((liveCorrect / totalAttempted) * 100) : 0;
+
   if (!questions || questions.length === 0) {
     return (
       <div className="flex items-center justify-center h-screen bg-slate-50 text-slate-500">
@@ -497,6 +504,16 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
         </div>
       </header>
 
+      {/* Progress bar under header */}
+      {!isReviewMode && (
+        <div className="h-1 bg-slate-100 flex-shrink-0">
+          <div
+            className="h-full bg-gradient-to-r from-blue-500 to-emerald-500 transition-all duration-300"
+            style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}
+          />
+        </div>
+      )}
+
       <main className="flex-1 flex flex-col lg:flex-row gap-6 p-6 overflow-hidden max-w-[1920px] mx-auto w-full">
         <aside className="w-[280px] hidden lg:flex flex-col bg-white rounded-2xl shadow-sm border border-slate-200 p-5 overflow-hidden">
           <h2 className="font-bold text-lg mb-4 text-slate-900">Question Navigator</h2>
@@ -509,11 +526,15 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
             {!isReviewMode && (
               <>
                 <div className="flex justify-between items-center text-slate-700">
-                  <span>Answered</span>
+                  <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-[#16A34A] inline-block" />Answered</span>
                   <span className="font-bold text-[#16A34A]">{totalAttempted}</span>
                 </div>
                 <div className="flex justify-between items-center text-slate-700">
-                  <span>Skipped</span>
+                  <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-[#F59E0B] inline-block" />Review</span>
+                  <span className="font-bold text-amber-600">{totalReview}</span>
+                </div>
+                <div className="flex justify-between items-center text-slate-700">
+                  <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-slate-200 inline-block" />Skipped</span>
                   <span className="font-bold text-slate-900">{totalSkipped}</span>
                 </div>
               </>
@@ -606,7 +627,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                 <div className="w-full h-px bg-slate-100 mb-4"></div>
 
                 <div 
-                  className="leading-relaxed text-slate-900 mb-6 capitalize font-[700] text-[2.5rem]"
+                  className="leading-relaxed text-slate-900 mb-6 text-xl md:text-2xl font-semibold"
                   dangerouslySetInnerHTML={{ __html: currentQ.questionText || '' }}
                 />
 
@@ -755,27 +776,27 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                 <span>Attempted</span>
                 <div className="flex items-center gap-3 w-1/2">
                   <div className="h-1.5 bg-slate-100 flex-1 rounded-full overflow-hidden">
-                    <div className="h-full bg-[#3B82F6] rounded-full" style={{ width: `${(totalAttempted / questions.length) * 100}%` }}></div>
+                    <div className="h-full bg-[#3B82F6] rounded-full transition-all duration-300" style={{ width: `${(totalAttempted / questions.length) * 100}%` }}></div>
                   </div>
-                  <span className="w-6 text-right">{totalAttempted}</span>
+                  <span className="w-6 text-right font-bold">{totalAttempted}</span>
                 </div>
               </div>
               <div className="flex items-center justify-between">
                 <span>Correct</span>
                 <div className="flex items-center gap-3 w-1/2">
                   <div className="h-1.5 bg-slate-100 flex-1 rounded-full overflow-hidden">
-                    <div className="h-full bg-[#22C55E] rounded-full" style={{ width: '0%' }}></div>
+                    <div className="h-full bg-[#22C55E] rounded-full transition-all duration-300" style={{ width: totalAttempted > 0 ? `${(liveCorrect / totalAttempted) * 100}%` : '0%' }}></div>
                   </div>
-                  <span className="w-6 text-right">0</span>
+                  <span className="w-6 text-right font-bold text-emerald-600">{liveCorrect}</span>
                 </div>
               </div>
               <div className="flex items-center justify-between">
                 <span>Accuracy %</span>
                 <div className="flex items-center gap-3 w-1/2">
                   <div className="h-1.5 bg-slate-100 flex-1 rounded-full overflow-hidden">
-                    <div className="h-full bg-[#22C55E] rounded-full" style={{ width: '0%' }}></div>
+                    <div className="h-full bg-[#22C55E] rounded-full transition-all duration-300" style={{ width: `${liveAccuracy}%` }}></div>
                   </div>
-                  <span className="w-6 text-right">0</span>
+                  <span className="w-6 text-right font-bold">{liveAccuracy}</span>
                 </div>
               </div>
             </div>
