@@ -34,13 +34,13 @@ const hindSiliguri = Hind_Siliguri({
 
 const ConditionalHeader = () => {
   const pathname = usePathname();
-  if (pathname?.startsWith('/admin') || pathname?.startsWith('/dashboard')) return null;
+  if (pathname?.startsWith('/admin') || pathname?.startsWith('/dashboard') || pathname?.includes('/take')) return null;
   return <Header />;
 };
 
 const ConditionalFooter = () => {
   const pathname = usePathname();
-  if (pathname?.startsWith('/admin') || pathname?.startsWith('/dashboard')) return null;
+  if (pathname?.startsWith('/admin') || pathname?.startsWith('/dashboard') || pathname?.includes('/take')) return null;
   return <Footer />;
 };
 
