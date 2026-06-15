@@ -415,7 +415,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
   }
 
   const currentOptionsKeys = currentQ.options 
-    ? Object.keys(currentQ.options).sort().slice(0, 4) 
+    ? Object.keys(currentQ.options).filter(k => currentQ.options![k as keyof typeof currentQ.options] && String(currentQ.options![k as keyof typeof currentQ.options]).trim() !== '').sort()
     : [];
 
   return (

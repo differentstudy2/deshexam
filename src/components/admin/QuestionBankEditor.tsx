@@ -379,6 +379,14 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
           // Firestore does not support undefined values. Strip them out.
           const cleanDataToSave = JSON.parse(JSON.stringify(dataToSave));
           
+          if (cleanDataToSave.options) {
+              Object.keys(cleanDataToSave.options).forEach(k => {
+                  if (!cleanDataToSave.options[k] || String(cleanDataToSave.options[k]).trim() === '') {
+                      delete cleanDataToSave.options[k];
+                  }
+              });
+          }
+          
           if (cleanDataToSave.id) {
               await updateQuestion(cleanDataToSave.id, cleanDataToSave as Partial<QuestionBankEntry>);
               toast({ title: 'Question updated successfully' });
