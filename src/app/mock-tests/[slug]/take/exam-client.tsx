@@ -600,13 +600,13 @@ export function ExamClient({ mockTest, questions }: ExamClientProps) {
         </section>
 
         <aside className="w-[280px] hidden xl:flex flex-col gap-4 overflow-y-auto custom-scrollbar pb-2 pr-1">
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col items-center justify-center">
-            <span className="text-[15px] font-medium text-[#475569] mb-1.5">Time Remaining</span>
+          <div className="bg-[#FFF4F4] rounded-2xl p-6 shadow-sm border border-[#FFE4E4] flex flex-col items-center justify-center">
+            <span className="text-[15px] font-medium text-slate-700 mb-1.5">Time Remaining</span>
             <div 
               suppressHydrationWarning
               className={cn(
                 "text-[40px] font-extrabold tracking-tight leading-none",
-                isLowTime ? "text-red-600" : "text-[#1E293B]"
+                isLowTime ? "text-red-600" : "text-black"
               )}
             >
               {formatTime(timeLeft)}
