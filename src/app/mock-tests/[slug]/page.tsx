@@ -8,6 +8,8 @@ import { Clock, HelpCircle, ShieldCheck, FileText, CheckCircle2, AlertTriangle }
 import Link from 'next/link';
 import { AssessmentCard } from '@/components/assessment/AssessmentCard';
 import { StartTestButton } from './StartTestButton';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -131,11 +133,15 @@ export default async function MockTestLandingPage({ params }: Props) {
         <div className="container max-w-5xl mx-auto px-4 py-12 space-y-16">
           <section>
             <h2 className="text-2xl font-bold mb-6">Instructions</h2>
-            <div className="prose prose-slate max-w-none text-slate-600">
-              <p>{test.instructions || "Please read the exam rules carefully before starting. Make sure you have a stable internet connection."}</p>
+            <div className="prose prose-slate max-w-none text-slate-600 prose-ul:list-disc prose-ol:list-decimal prose-li:my-1 prose-strong:font-semibold">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {test.instructions || "Please read the exam rules carefully before starting. Make sure you have a stable internet connection."}
+              </ReactMarkdown>
               {test.examRules && (
-                <div className="mt-4 p-4 bg-slate-100 rounded-lg whitespace-pre-wrap">
-                  {test.examRules}
+                <div className="mt-4 p-4 bg-slate-100 rounded-lg">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {test.examRules}
+                  </ReactMarkdown>
                 </div>
               )}
             </div>
