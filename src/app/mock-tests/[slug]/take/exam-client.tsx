@@ -3,13 +3,15 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Bookmark, Flag, Maximize, Minimize, AlertCircle, Clock, Moon, Sun, LayoutGrid, X, ToggleLeft, ToggleRight } from 'lucide-react';
+import { ArrowLeft, Bookmark, Flag, Maximize, Minimize, AlertCircle, Clock, Moon, Sun, LayoutGrid, X, ToggleLeft, ToggleRight, Lock, Loader2 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
 import { MockTest } from '@/lib/assessment-types';
 import { QuestionBankEntry } from '@/lib/question-bank-types';
+import { useAuth } from '@/hooks/use-auth';
+import { getUserProfile } from '@/lib/firebase/firestore';
 
 type QuestionState = 'unvisited' | 'answered' | 'skipped' | 'review' | 'current';
 
@@ -80,6 +82,48 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
   const [wasKicked, setWasKicked] = useState(false);
   const [showMobileNav, setShowMobileNav] = useState(false);
   const [autoSaveNext, setAutoSaveNext] = useState(false);
+
+  // --- ACCESS CONTROL STATE ---
+  const { user, loading: authLoading } = useAuth();
+  const [profileLoading, setProfileLoading] = useState(true);
+  const [hasAccess, setHasAccess] = useState(false);
+
+  useEffect(() => {
+    if (authLoading) return;
+    
+    // For free tests, no login required
+    if (mockTest.accessType === 'free' || !mockTest.accessType) {
+        setHasAccess(true);
+        setProfileLoading(false);
+        return;
+    }
+
+    if (!user) {
+      setHasAccess(false);
+      setProfileLoading(false);
+      return;
+    }
+
+    getUserProfile(user.uid).then(profile => {
+      const userPlan = profile?.subscriptionPlan || null;
+      const purchasedTests = profile?.purchasedTests || [];
+      const allowedPlans = mockTest.allowedSubscriptionPlans || [];
+      
+      let accessGranted = false;
+      
+      if (userPlan === 'pro') {
+          accessGranted = true;
+      } else if ((mockTest.accessType === 'subscription' || mockTest.accessType === 'both') && userPlan && allowedPlans.includes(userPlan)) {
+          accessGranted = true;
+      } else if ((mockTest.accessType === 'one_time' || mockTest.accessType === 'both') && purchasedTests.includes(mockTest.slug)) {
+          accessGranted = true;
+      }
+      
+      setHasAccess(accessGranted);
+    }).catch(console.error).finally(() => {
+      setProfileLoading(false);
+    });
+  }, [user, authLoading, mockTest.accessType, mockTest.allowedSubscriptionPlans, mockTest.slug]);
 
   useEffect(() => {
     const initialStates: Record<string, QuestionState> = {};
@@ -351,6 +395,36 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
     return ua && q.correctAnswer && ua.toLowerCase() === q.correctAnswer.toLowerCase();
   }).length;
   const liveAccuracy = totalAttempted > 0 ? Math.round((liveCorrect / totalAttempted) * 100) : 0;
+
+  if (authLoading || profileLoading) {
+    return (
+      <div className="fixed inset-0 z-[100] bg-[#F8FAFC] dark:bg-[#0f172a] flex flex-col items-center justify-center p-6 text-slate-900 font-inter transition-colors duration-300">
+        <div className="flex flex-col items-center justify-center space-y-4">
+          <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
+          <p className="text-slate-500 font-medium text-lg">Checking exam access...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!hasAccess) {
+    return (
+      <div className="fixed inset-0 z-[100] bg-[#F8FAFC] dark:bg-[#0f172a] flex flex-col items-center justify-center p-6 text-slate-900 font-inter transition-colors duration-300">
+        <div className="max-w-md w-full bg-white dark:bg-[#1e293b] rounded-3xl p-8 text-center shadow-xl border border-slate-200 dark:border-slate-700 transition-colors duration-300">
+          <div className="w-16 h-16 bg-amber-50 dark:bg-amber-900/30 rounded-full flex items-center justify-center mx-auto mb-6 transition-colors">
+            <Lock className="w-8 h-8 text-amber-600 dark:text-amber-500" />
+          </div>
+          <h2 className="text-2xl font-bold mb-3 dark:text-slate-50 transition-colors">Access Denied</h2>
+          <p className="text-slate-500 dark:text-slate-400 mb-8 leading-relaxed transition-colors">
+            You do not have access to this mock test. Please upgrade your subscription or purchase this test to proceed.
+          </p>
+          <Button onClick={() => router.replace(`/mock-tests/${mockTest.slug}`)} className="w-full h-12 text-[15px] font-semibold rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-colors">
+            View Access Options
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   if (!questions || questions.length === 0) {
     return (

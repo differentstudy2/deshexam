@@ -10,12 +10,6 @@ export const metadata = {
   description: 'Full-screen mock test environment for DeshExam',
 };
 
-const getCachedAssessment = unstable_cache(
-  async (slug: string) => getAssessmentBySlug('mockTests', slug),
-  ['assessment-by-slug'],
-  { revalidate: 86400, tags: ['mockTests'] }
-);
-
 const getCachedQuestions = unstable_cache(
   async (ids: string[]) => getQuestionsByIds(ids),
   ['questions-by-ids'],
@@ -25,8 +19,9 @@ const getCachedQuestions = unstable_cache(
 export default async function TakeMockTestPage({ params }: { params: Promise<{ slug: string }> }) {
   const unwrappedParams = await params;
   
-  // We use the cached version to reduce Firebase read limits drastically.
-  const mockTest = await getCachedAssessment(unwrappedParams.slug) as MockTest | null;
+  // We fetch the assessment freshly to ensure we have the latest accessType, price, etc.
+  // We still cache the questions to reduce Firebase read limits drastically.
+  const mockTest = await getAssessmentBySlug('mockTests', unwrappedParams.slug) as MockTest | null;
   
   if (!mockTest) {
     notFound();

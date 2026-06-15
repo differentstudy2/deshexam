@@ -7,7 +7,8 @@ import { formatTitleForBrowser } from '@/lib/utils';
 import {
   Clock, HelpCircle, ShieldCheck, FileText, CheckCircle2,
   AlertTriangle, BookOpen, Target, Award, ChevronRight, ArrowRight,
-  Zap, Users, BarChart3, Brain, Star
+  Zap, Users, BarChart3, Brain, Star, Maximize, LayoutGrid, ShieldAlert, MonitorPlay,
+  Trophy, Sparkles, LineChart, BookCheck, History, Smartphone, PieChart
 } from 'lucide-react';
 import Link from 'next/link';
 import { AssessmentCard } from '@/components/assessment/AssessmentCard';
@@ -46,9 +47,9 @@ export default async function MockTestLandingPage({ params }: Props) {
   };
 
   const DIFFICULTY_COLOR: Record<string, string> = {
-    Easy:   'text-emerald-700 bg-emerald-50 border-emerald-200',
+    Easy: 'text-emerald-700 bg-emerald-50 border-emerald-200',
     Medium: 'text-amber-700 bg-amber-50 border-amber-200',
-    Hard:   'text-red-700 bg-red-50 border-red-200',
+    Hard: 'text-red-700 bg-red-50 border-red-200',
     Expert: 'text-purple-700 bg-purple-50 border-purple-200',
   };
 
@@ -113,9 +114,9 @@ export default async function MockTestLandingPage({ params }: Props) {
                 <div className="flex flex-wrap gap-3">
                   {[
                     { icon: HelpCircle, label: `${test.questionIds?.length ?? 0} Questions`, color: 'text-blue-400' },
-                    { icon: Clock,       label: `${test.durationMin ?? 0} Minutes`,           color: 'text-violet-400' },
-                    { icon: FileText,   label: `${test.totalMarks ?? 0} Marks`,              color: 'text-amber-400' },
-                    { icon: AlertTriangle, label: `${test.negativeMarking ?? 0} Negative`,   color: 'text-red-400' },
+                    { icon: Clock, label: `${test.durationMin ?? 0} Minutes`, color: 'text-violet-400' },
+                    { icon: FileText, label: `${test.totalMarks ?? 0} Marks`, color: 'text-amber-400' },
+                    { icon: AlertTriangle, label: `${test.negativeMarking ?? 0} Negative`, color: 'text-red-400' },
                   ].map(({ icon: Icon, label, color }) => (
                     <div key={label} className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-3.5 py-2 text-sm font-semibold text-white backdrop-blur-sm">
                       <Icon className={`w-4 h-4 ${color}`} />
@@ -126,7 +127,7 @@ export default async function MockTestLandingPage({ params }: Props) {
 
                 {/* Mobile CTA */}
                 <div className="lg:hidden">
-                  <StartTestButton slug={test.slug} />
+                  <StartTestButton slug={test.slug} accessType={test.accessType} price={test.price} allowedSubscriptionPlans={test.allowedSubscriptionPlans} />
                 </div>
               </div>
 
@@ -149,11 +150,11 @@ export default async function MockTestLandingPage({ params }: Props) {
                   {/* Card body */}
                   <div className="p-5 space-y-3">
                     {[
-                      { icon: HelpCircle,    label: 'Questions',      value: `${test.questionIds?.length ?? 0}` },
-                      { icon: Clock,          label: 'Duration',       value: `${test.durationMin ?? 0} min` },
-                      { icon: Target,         label: 'Total Marks',    value: `${test.totalMarks ?? 0}` },
-                      { icon: CheckCircle2,   label: 'Passing Marks',  value: `${test.passingMarks ?? 0}` },
-                      { icon: AlertTriangle,  label: 'Negative Marks', value: `${test.negativeMarking ?? 0}` },
+                      { icon: HelpCircle, label: 'Questions', value: `${test.questionIds?.length ?? 0}` },
+                      { icon: Clock, label: 'Duration', value: `${test.durationMin ?? 0} min` },
+                      { icon: Target, label: 'Total Marks', value: `${test.totalMarks ?? 0}` },
+                      { icon: CheckCircle2, label: 'Passing Marks', value: `${test.passingMarks ?? 0}` },
+                      { icon: AlertTriangle, label: 'Negative Marks', value: `${test.negativeMarking ?? 0}` },
                     ].map(({ icon: Icon, label, value }) => (
                       <div key={label} className="flex items-center justify-between text-sm">
                         <span className="flex items-center gap-2 text-slate-500 font-medium">
@@ -165,7 +166,7 @@ export default async function MockTestLandingPage({ params }: Props) {
                     ))}
 
                     <div className="pt-2 border-t border-slate-100">
-                      <StartTestButton slug={test.slug} />
+                      <StartTestButton slug={test.slug} accessType={test.accessType} price={test.price} allowedSubscriptionPlans={test.allowedSubscriptionPlans} />
                     </div>
 
                     <p className="text-center text-[11px] text-slate-400">Strictly timed · Negative marking applies</p>
@@ -188,10 +189,10 @@ export default async function MockTestLandingPage({ params }: Props) {
               {/* Quick facts strip */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {[
-                  { icon: HelpCircle, label: 'Questions',   value: `${test.questionIds?.length ?? 0}`, color: 'bg-blue-50 border-blue-200 text-blue-700' },
-                  { icon: Clock,       label: 'Duration',    value: `${test.durationMin ?? 0} min`,     color: 'bg-violet-50 border-violet-200 text-violet-700' },
-                  { icon: Award,       label: 'Total Marks', value: `${test.totalMarks ?? 0}`,          color: 'bg-amber-50 border-amber-200 text-amber-700' },
-                  { icon: Target,      label: 'Pass Marks',  value: `${test.passingMarks ?? 0}`,        color: 'bg-emerald-50 border-emerald-200 text-emerald-700' },
+                  { icon: HelpCircle, label: 'Questions', value: `${test.questionIds?.length ?? 0}`, color: 'bg-blue-50 border-blue-200 text-blue-700' },
+                  { icon: Clock, label: 'Duration', value: `${test.durationMin ?? 0} min`, color: 'bg-violet-50 border-violet-200 text-violet-700' },
+                  { icon: Award, label: 'Total Marks', value: `${test.totalMarks ?? 0}`, color: 'bg-amber-50 border-amber-200 text-amber-700' },
+                  { icon: Target, label: 'Pass Marks', value: `${test.passingMarks ?? 0}`, color: 'bg-emerald-50 border-emerald-200 text-emerald-700' },
                 ].map(({ icon: Icon, label, value, color }) => (
                   <div key={label} className={`flex flex-col items-center justify-center p-4 rounded-2xl border text-center ${color}`}>
                     <Icon className="w-5 h-5 mb-1 opacity-70" />
@@ -208,9 +209,25 @@ export default async function MockTestLandingPage({ params }: Props) {
                   <h2 className="text-base font-bold text-slate-800">Instructions</h2>
                 </div>
                 <div className="p-6">
-                  <div className="prose prose-slate prose-sm max-w-none prose-ul:list-disc prose-ol:list-decimal prose-li:my-1 prose-strong:font-semibold">
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                      {test.instructions || "Please read the exam rules carefully before starting. Make sure you have a stable internet connection. Do not refresh the page during the exam."}
+                  <div className="prose prose-slate prose-sm max-w-none prose-ol:list-decimal prose-strong:font-semibold">
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      components={{
+                        ul: ({ node, ...props }) => <ul className="space-y-3 my-4" {...props} />,
+                        li: ({ node, ...props }) => (
+                          <li className="flex items-start gap-3">
+                            <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
+                            <span className="text-slate-700 leading-relaxed" {...props} />
+                          </li>
+                        )
+                      }}
+                    >
+                      {test.instructions || `* **Stable Connection Required:** Ensure you have a reliable and fast internet connection before starting.
+* **Do Not Refresh:** Never refresh the page or press F5 during the exam. Doing so may cause data loss or premature submission.
+* **Fullscreen Enforcement:** This test must be taken in strict fullscreen mode. Exiting fullscreen will trigger an anti-cheat violation.
+* **Navigation Palette:** Use the question palette on the right to easily track your progress and jump between questions.
+* **Mark for Review:** If you are unsure about an answer, you can mark the question for review and revisit it before the final submission.
+* **Auto-Submission:** The exam will automatically submit your recorded answers the moment the countdown timer reaches zero.`}
                     </ReactMarkdown>
                   </div>
                   {test.examRules && (
@@ -235,10 +252,18 @@ export default async function MockTestLandingPage({ params }: Props) {
                 </div>
                 <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {[
-                    { icon: BarChart3,    title: 'Detailed Score Report',  desc: 'Get a section-wise breakdown of your performance immediately after completion.' },
-                    { icon: Clock,        title: 'Timed Exam Mode',         desc: 'Simulate real exam pressure with a countdown timer for the full duration.' },
-                    { icon: AlertTriangle,title: 'Negative Marking',        desc: `Incorrect answers deduct ${test.negativeMarking ?? 0} marks — choose wisely.` },
-                    { icon: CheckCircle2, title: 'Instant Results',         desc: 'Review your answers and explanations right after you submit the test.' },
+                    { icon: Trophy, title: 'National Level Ranking', desc: 'Compare your score against thousands of aspirants and see exactly where you stand.' },
+                    { icon: MonitorPlay, title: 'Exam-Simulated Interface', desc: 'Experience the exact look and pressure of the real exam to conquer test-day anxiety.' },
+                    { icon: BookCheck, title: '100% Latest Syllabus', desc: 'Every question is strictly mapped to the latest exam pattern and official guidelines.' },
+                    { icon: History, title: 'Previous Year Questions', desc: 'Includes handpicked questions from past years to give you an authentic experience.' },
+                    { icon: LineChart, title: 'In-Depth AI Analytics', desc: 'Discover your weak areas with deep, section-wise performance and speed insights.' },
+                    { icon: PieChart, title: 'Strengths & Weaknesses', desc: 'Automatically categorizes topics so you know exactly what to study next.' },
+                    { icon: Sparkles, title: 'Expert-Crafted Solutions', desc: 'Access comprehensive, step-by-step explanations designed by top educators.' },
+                    { icon: Smartphone, title: 'Mobile-Optimized Testing', desc: 'Take the test anywhere, anytime with a flawlessly optimized mobile interface.' },
+                    { icon: Clock, title: 'Strict Time Management', desc: 'Master your speed with a relentless countdown timer that keeps you on your toes.' },
+                    { icon: ShieldAlert, title: 'Anti-Cheat Fullscreen', desc: 'A strict, lock-down fullscreen environment ensures a fair and distraction-free test.' },
+                    { icon: AlertTriangle, title: 'Negative Marking', desc: `Incorrect answers deduct ${test.negativeMarking ?? 0} marks — forcing you to choose wisely.` },
+                    { icon: Zap, title: 'Instant Results', desc: 'No waiting around. Review your accuracy and detailed report the second you hit submit.' },
                   ].map(({ icon: Icon, title, desc }) => (
                     <div key={title} className="flex items-start gap-3">
                       <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
@@ -262,14 +287,14 @@ export default async function MockTestLandingPage({ params }: Props) {
                   <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Quick Summary</p>
                   <div className="space-y-2.5">
                     {[
-                      { label: 'Type',        value: 'Mock Test' },
-                      { label: 'Difficulty',  value: test.difficulty || 'Mixed' },
-                      { label: 'Language',    value: 'English' },
-                      { label: 'Questions',   value: `${test.questionIds?.length ?? 0}` },
-                      { label: 'Duration',    value: `${test.durationMin ?? 0} minutes` },
+                      { label: 'Type', value: 'Mock Test' },
+                      { label: 'Difficulty', value: test.difficulty || 'Mixed' },
+                      { label: 'Language', value: 'English' },
+                      { label: 'Questions', value: `${test.questionIds?.length ?? 0}` },
+                      { label: 'Duration', value: `${test.durationMin ?? 0} minutes` },
                       { label: 'Total Marks', value: `${test.totalMarks ?? 0}` },
-                      { label: 'Pass Marks',  value: `${test.passingMarks ?? 0}` },
-                      { label: 'Negative',    value: `${test.negativeMarking ?? 0} per wrong answer` },
+                      { label: 'Pass Marks', value: `${test.passingMarks ?? 0}` },
+                      { label: 'Negative', value: `${test.negativeMarking ?? 0} per wrong answer` },
                     ].map(({ label, value }) => (
                       <div key={label} className="flex justify-between text-sm border-b border-slate-50 pb-1.5 last:border-0 last:pb-0">
                         <span className="text-slate-500 font-medium">{label}</span>
@@ -279,13 +304,11 @@ export default async function MockTestLandingPage({ params }: Props) {
                   </div>
                 </div>
 
-                <Link href={`/mock-tests/${test.slug}/take`}>
-                  <button className="w-full py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-700 hover:to-violet-700 text-white font-bold text-base flex items-center justify-center gap-2 shadow-lg shadow-blue-500/25 transition-all hover:scale-[1.02] active:scale-[0.98]">
-                    Start Test Now <ArrowRight className="w-5 h-5" />
-                  </button>
-                </Link>
+                <StartTestButton slug={test.slug} accessType={test.accessType} price={test.price} allowedSubscriptionPlans={test.allowedSubscriptionPlans} />
 
-                <p className="text-center text-[11px] text-slate-400">Free · No sign-up required to start</p>
+                {test.accessType !== 'subscription' && test.accessType !== 'both' && test.accessType !== 'one_time' && (
+                  <p className="text-center text-[11px] text-slate-400">Free · No sign-up required to start</p>
+                )}
               </div>
             </div>
           </div>
@@ -310,11 +333,7 @@ export default async function MockTestLandingPage({ params }: Props) {
 
         {/* Mobile sticky bottom CTA */}
         <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-md border-t border-slate-200 px-4 py-3 shadow-xl">
-          <Link href={`/mock-tests/${test.slug}/take`}>
-            <button className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-blue-600 to-violet-600 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-blue-500/25">
-              Start Mock Test <ArrowRight className="w-4 h-4" />
-            </button>
-          </Link>
+          <StartTestButton slug={test.slug} accessType={test.accessType} price={test.price} allowedSubscriptionPlans={test.allowedSubscriptionPlans} />
         </div>
       </div>
     </>

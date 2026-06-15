@@ -2,6 +2,7 @@
 
 export type AssessmentDifficulty = 'Easy' | 'Medium' | 'Hard' | 'Expert';
 export type AssessmentStatus = 'Draft' | 'Published' | 'Archived';
+export type AccessType = 'free' | 'subscription' | 'one_time' | 'both';
 
 // Base metadata shared across assessments
 export interface AssessmentBase {
@@ -33,6 +34,11 @@ export interface AssessmentBase {
   createdAt?: string;
   updatedAt?: string;
   createdBy?: string;
+
+  // Monetization
+  accessType?: AccessType;
+  price?: number;
+  allowedSubscriptionPlans?: string[]; // e.g., ['pro', 'pass']
 }
 
 export interface PracticeSet extends AssessmentBase {
@@ -61,8 +67,9 @@ export interface MockTest extends AssessmentBase {
   isStrictMode?: boolean; // If true, enforces fullscreen and kicks out on exit
   shuffleQuestions?: boolean; // If true, randomizes question order
   shuffleOptions?: boolean; // If true, randomizes options for each question
+  
+  /** @deprecated use accessType instead */
   isPremium?: boolean;
-  price?: number;
 }
 
 export interface ExamSeries {

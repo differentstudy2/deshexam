@@ -93,7 +93,8 @@ export default function MockTestsPage() {
             isStrictMode: true,
             shuffleQuestions: false,
             shuffleOptions: false,
-            isPremium: false,
+            accessType: 'free',
+            allowedSubscriptionPlans: [],
             price: 0
         });
     };
@@ -412,23 +413,50 @@ export default function MockTestsPage() {
                                         />
                                     </div>
 
-                                    <div className="flex items-center justify-between">
-                                        <div className="space-y-0.5">
-                                            <label className="text-sm font-medium">Premium Exam</label>
-                                            <p className="text-xs text-slate-500">Require payment to access</p>
+                                    <div className="space-y-3 pt-2">
+                                        <div className="space-y-1">
+                                            <label className="text-sm font-medium">Access Type</label>
+                                            <Select value={editData.accessType || 'free'} onValueChange={v => setEditData({...editData, accessType: v as any})}>
+                                                <SelectTrigger><SelectValue /></SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="free">Free for Everyone</SelectItem>
+                                                    <SelectItem value="subscription">Subscription Only</SelectItem>
+                                                    <SelectItem value="one_time">One-Time Purchase Only</SelectItem>
+                                                    <SelectItem value="both">Subscription or One-Time Purchase</SelectItem>
+                                                </SelectContent>
+                                            </Select>
                                         </div>
-                                        <Switch 
-                                            checked={!!editData.isPremium} 
-                                            onCheckedChange={c => setEditData({...editData, isPremium: c})} 
-                                        />
-                                    </div>
 
-                                    {editData.isPremium && (
-                                        <div>
-                                            <label className="text-sm font-medium">Price (₹)</label>
-                                            <Input type="number" value={editData.price || 0} onChange={e => setEditData({...editData, price: parseFloat(e.target.value)})} />
-                                        </div>
-                                    )}
+                                        {(editData.accessType === 'subscription' || editData.accessType === 'both') && (
+                                            <div className="space-y-2 pt-1 border-t">
+                                                <label className="text-sm font-medium">Included in Pass Plan?</label>
+                                                <div className="flex gap-2 items-center">
+                                                    <Button
+                                                        type="button"
+                                                        variant={editData.allowedSubscriptionPlans?.includes('pass') ? 'default' : 'outline'}
+                                                        size="sm"
+                                                        onClick={() => {
+                                                            const plans = editData.allowedSubscriptionPlans || [];
+                                                            if (plans.includes('pass')) setEditData({...editData, allowedSubscriptionPlans: plans.filter(p => p !== 'pass')});
+                                                            else setEditData({...editData, allowedSubscriptionPlans: [...plans, 'pass']});
+                                                        }}
+                                                    >
+                                                        Pass Plan
+                                                    </Button>
+                                                </div>
+                                                <p className="text-xs text-slate-500 italic mt-1">
+                                                    (Note: Pro Plan users automatically get access to all mock tests, so you don't need to select them here.)
+                                                </p>
+                                            </div>
+                                        )}
+
+                                        {(editData.accessType === 'one_time' || editData.accessType === 'both') && (
+                                            <div className="pt-1 border-t">
+                                                <label className="text-sm font-medium">Price (₹)</label>
+                                                <Input type="number" value={editData.price || 0} onChange={e => setEditData({...editData, price: parseFloat(e.target.value)})} className="mt-1" />
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
 
                                 <Button className="w-full mt-4" onClick={handleSave} disabled={isSaving}>
