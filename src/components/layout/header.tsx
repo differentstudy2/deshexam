@@ -166,6 +166,7 @@ const adminNavGroups = [
       { href: '/admin/plans', label: 'Plans', icon: <Package className="h-4 w-4" /> },
       { href: '/admin/orders', label: 'Orders', icon: <ShoppingCart className="h-4 w-4" /> },
       { href: '/admin/transactions', label: 'Transactions', icon: <Activity className="h-4 w-4" /> },
+      { href: '/admin/products', label: 'Products Store', icon: <Library className="h-4 w-4" /> },
     ]
   },
   {

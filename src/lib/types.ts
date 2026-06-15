@@ -168,3 +168,36 @@ export type Test = {
   access: "free" | "premium" | "pro";
   testType: string;
 };
+
+export type Product = {
+  id: string;
+  title: string;
+  slug?: string;
+  authorName: string;
+  authorId?: string;
+  authorBusinessName?: string;
+  price: number;
+  originalPrice: number;
+  discount: number; // percentage
+  rating: number;
+  reviewCount: number;
+  sales: number;
+  downloads: number;
+  publishedDate: string;
+  coverImage: string;
+  bookType: 'Hard Copy' | 'Soft Copy';
+  language: string;
+  classCategory: string; // e.g. "1 - 12 Class"
+  subject: string;
+  tags?: string[];
+  description?: string;
+  specifications?: {
+    title?: string;
+    authority?: string;
+    language?: string;
+    [key: string]: string | undefined;
+  };
+  features?: string[];
+  createdAt: any;
+  updatedAt: any;
+};
