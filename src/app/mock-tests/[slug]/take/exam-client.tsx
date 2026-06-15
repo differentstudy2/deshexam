@@ -526,7 +526,14 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
             </div>
           </div>
           {/* Horizontal Navigator Container */}
-          <div className="bg-gradient-to-r from-white via-slate-50 to-white dark:from-[#1e293b] dark:via-[#1e293b] dark:to-[#1e293b] rounded-2xl p-2.5 flex items-center justify-center gap-2 overflow-x-auto hide-scrollbar shadow-sm border border-white/60 dark:border-slate-700/50 transition-colors">
+          <div className="relative mt-2">
+            {!isReviewMode && (
+              <div className="absolute top-[0.4rem] right-1 z-30 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm text-slate-800 dark:text-slate-200 px-2.5 py-1 rounded-full shadow-sm border border-slate-200/50 dark:border-slate-700/50 font-bold flex items-center gap-1.5 text-xs transform -translate-y-full transition-colors">
+                <Clock className="w-3.5 h-3.5 text-[#16A34A] dark:text-emerald-500" />
+                <span>{formatTime(timeLeft)}</span>
+              </div>
+            )}
+            <div className="bg-gradient-to-r from-white via-slate-50 to-white dark:from-[#1e293b] dark:via-[#1e293b] dark:to-[#1e293b] rounded-2xl p-2.5 flex items-center justify-center gap-2 overflow-x-auto hide-scrollbar shadow-sm border border-white/60 dark:border-slate-700/50 transition-colors">
             {questions.map((q, idx) => {
               const state = questionStates[q.id] || 'unvisited';
               const isCurrent = currentQuestionIndex === idx;
@@ -565,6 +572,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                 </button>
               );
             })}
+          </div>
           </div>
         </div>
 
@@ -640,13 +648,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
           )}
         </div>
 
-        {/* Floating Timer (Mobile) */}
-        {!isReviewMode && (
-          <div className="fixed bottom-24 left-4 z-30 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md text-slate-800 dark:text-slate-200 px-3 py-2.5 rounded-full shadow-lg border border-slate-200/50 dark:border-slate-700/50 font-bold flex items-center gap-2 transition-colors">
-            <Clock className="w-4 h-4 text-[#16A34A] dark:text-emerald-500" />
-            <span className="text-sm tracking-wide">{formatTime(timeLeft)}</span>
-          </div>
-        )}
+
 
         {/* Floating Submit Button (Mobile) */}
         {!isReviewMode && (
