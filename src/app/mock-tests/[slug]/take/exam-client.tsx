@@ -72,6 +72,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
   const [isReviewMode, setIsReviewMode] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
   const [wasKicked, setWasKicked] = useState(false);
+  const [showMobileNav, setShowMobileNav] = useState(false);
 
   useEffect(() => {
     const initialStates: Record<string, QuestionState> = {};
@@ -161,24 +162,14 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
     setHasStarted(true);
   };
 
-  const resumeFullscreen = async () => {
-    try {
-      if (!document.fullscreenElement) {
-        await document.documentElement.requestFullscreen();
-      }
-    } catch (err) {
-      console.error("Fullscreen request failed:", err);
-    }
-  };
-
   const handleOptionSelect = (optionId: string) => {
-    if (questions.length === 0 || isSubmitted || !isFullscreen) return;
+    if (questions.length === 0 || isSubmitted) return;
     const qId = questions[currentQuestionIndex].id;
     setAnswers(prev => ({ ...prev, [qId]: optionId }));
   };
 
   const updateStateAndNavigate = (newState: QuestionState, nextIndexOffset: number = 0) => {
-    if (questions.length === 0 || !isFullscreen) return;
+    if (questions.length === 0) return;
     const currentQId = questions[currentQuestionIndex].id;
     
     if (!isSubmitted) {
@@ -204,7 +195,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
   };
 
   const handleSaveAndNext = () => {
-    if (questions.length === 0 || !isFullscreen) return;
+    if (questions.length === 0) return;
     if (isSubmitted) {
       updateStateAndNavigate('current', 1);
       return;
@@ -217,7 +208,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
   const handleMarkReview = () => updateStateAndNavigate('review', 1);
 
   const handleClear = () => {
-    if (questions.length === 0 || isSubmitted || !isFullscreen) return;
+    if (questions.length === 0 || isSubmitted) return;
     const currentQId = questions[currentQuestionIndex].id;
     setAnswers(prev => {
       const updated = { ...prev };
@@ -227,7 +218,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
   };
 
   const handlePrevious = () => {
-    if (questions.length === 0 || !isFullscreen) return;
+    if (questions.length === 0) return;
     if (isSubmitted) {
       updateStateAndNavigate('current', -1);
       return;
@@ -243,7 +234,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
   };
 
   const jumpToQuestion = (index: number) => {
-    if (questions.length === 0 || !isFullscreen) return;
+    if (questions.length === 0) return;
     if (!isSubmitted) {
       const currentQId = questions[currentQuestionIndex].id;
       const isAnswered = !!answers[currentQId];
@@ -257,7 +248,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (questions.length === 0 || showSubmitConfirm || !isFullscreen) return;
+      if (questions.length === 0 || showSubmitConfirm) return;
       if (!isSubmitted && ['1','2','3','4'].includes(e.key)) {
         const optionIndex = parseInt(e.key) - 1;
         const currentQ = questions[currentQuestionIndex];
@@ -271,7 +262,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentQuestionIndex, answers, questions, isSubmitted, showSubmitConfirm, isFullscreen]);
+  }, [currentQuestionIndex, answers, questions, isSubmitted, showSubmitConfirm, isFullscreen, mockTest.isStrictMode]);
 
   const handleSubmit = () => {
     let correct = 0;
@@ -318,7 +309,6 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
   const totalSkipped = Object.values(questionStates).filter(s => s === 'skipped').length;
   const totalRemaining = questions.length - totalAttempted - totalSkipped - totalReview;
 
-  // Real-time correct count (based on answered questions)
   const liveCorrect = questions.filter(q => {
     const ua = answers[q.id];
     return ua && q.correctAnswer && ua.toLowerCase() === q.correctAnswer.toLowerCase();
@@ -426,7 +416,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
     : [];
 
   return (
-    <div className="fixed inset-0 z-[100] bg-[#F8FAFC] flex flex-col h-screen overflow-hidden text-slate-900 font-inter">
+    <div className="fixed inset-0 z-[100] bg-[#F1F5F9] md:bg-[#F8FAFC] flex flex-col h-screen overflow-hidden text-slate-900 font-inter">
 
       <AnimatePresence>
         {showSubmitConfirm && (
@@ -449,376 +439,551 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
         )}
       </AnimatePresence>
 
-      <header className="h-[72px] bg-white border-b border-slate-200 flex items-center justify-between px-6 z-20 flex-shrink-0">
-        <div className="flex items-center gap-4 w-1/3">
-          <button onClick={() => isReviewMode ? setIsReviewMode(false) : handleExitExam()} className="flex items-center text-slate-800 font-medium hover:text-slate-600 transition-colors">
-            <ArrowLeft className="w-5 h-5 mr-2" />
-            {isReviewMode ? "Back to Results" : "Exit Exam"}
-          </button>
-          <div className="h-4 w-px bg-slate-200 mx-2"></div>
-          <button className="text-slate-500 hover:text-slate-800 transition-colors" title="Bookmark Question">
-            <Bookmark className="w-5 h-5" />
-          </button>
-          <button className="text-slate-500 hover:text-slate-800 transition-colors" title="Report Issue">
-            <AlertCircle className="w-5 h-5" />
-          </button>
-          <button onClick={toggleFullscreen} className="text-slate-500 hover:text-slate-800 transition-colors" title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}>
-            {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
-          </button>
+      {/* ── MOBILE UI ── */}
+      <div className="md:hidden flex flex-col h-full w-full relative">
+        {/* Top Section */}
+        <div className="pt-4 px-4 flex-shrink-0 z-10 flex flex-col gap-4 mb-4">
+          <div className="flex items-center justify-between">
+             <div className="flex items-center gap-3">
+                <button onClick={handleExitExam} className="w-10 h-10 bg-white shadow-sm flex items-center justify-center rounded-full border border-slate-200 text-slate-700">
+                   <ArrowLeft className="w-5 h-5" />
+                </button>
+                <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center overflow-hidden border border-slate-100 shadow-sm">
+                   {/* App Logo Placeholder / Palette */}
+                   <div className="w-6 h-6 bg-slate-800 rounded-full flex items-center justify-center relative">
+                     <div className="w-2 h-2 bg-blue-400 rounded-full absolute top-1 left-1"></div>
+                     <div className="w-2 h-2 bg-green-400 rounded-full absolute bottom-1 right-1"></div>
+                   </div>
+                </div>
+             </div>
+             <div className="flex items-center gap-3">
+                <button className="text-slate-700">
+                   <Bookmark className="w-6 h-6" />
+                </button>
+                <div className="bg-[#DCFCE7] text-[#166534] px-3 py-1.5 rounded-full font-bold flex items-center gap-1.5 text-sm shadow-sm">
+                   <Clock className="w-4 h-4" />
+                   <span>{formatTime(timeLeft)}</span>
+                </div>
+             </div>
+          </div>
+          {/* Horizontal Navigator Container */}
+          <div className="bg-white rounded-[20px] p-2 flex items-center gap-2 overflow-x-auto hide-scrollbar shadow-sm border border-slate-100">
+             <div className="text-slate-400 font-bold tracking-widest pl-2 pr-1">...</div>
+             {questions.map((q, idx) => {
+               const state = questionStates[q.id] || 'unvisited';
+               const isCurrent = currentQuestionIndex === idx;
+               
+               let pillClass = "bg-white border-slate-300 text-slate-700"; // unvisited default
+               
+               if (isCurrent) {
+                 pillClass = "bg-[#166534] border-[#166534] text-white"; // dark green solid
+               } else if (state === 'answered') {
+                 pillClass = "bg-white border-[#22C55E] text-slate-700"; // white bg, green border
+               } else if (state === 'skipped') {
+                 pillClass = "bg-white border-[#EF4444] text-slate-700"; // white bg, red border
+               } else if (state === 'review') {
+                 pillClass = "bg-white border-[#EAB308] text-slate-700"; // white bg, yellow border
+               }
+               
+               return (
+                 <button
+                   key={q.id}
+                   onClick={() => jumpToQuestion(idx)}
+                   className={cn(
+                     "w-8 h-8 rounded-lg border-2 flex items-center justify-center text-[13px] font-bold flex-shrink-0 transition-colors",
+                     pillClass
+                   )}
+                 >
+                   {idx + 1}
+                 </button>
+               );
+             })}
+          </div>
         </div>
 
-        <div className="flex flex-col items-center justify-center w-1/3 text-center">
-          <h1 className="font-bold text-lg text-slate-900 line-clamp-1">
-            {isReviewMode ? "Reviewing Solutions" : mockTest.title}
-          </h1>
-          <p className="text-sm text-slate-600">Question {currentQuestionIndex + 1} of {questions.length}</p>
-        </div>
+        {/* Content Area */}
+        <div className="flex-1 overflow-y-auto px-3 pb-24 hide-scrollbar flex flex-col gap-3">
+          <div className="bg-white rounded-[24px] p-5 shadow-sm">
+             <div 
+                className="text-xl font-bold leading-snug text-slate-900"
+                dangerouslySetInnerHTML={{ __html: currentQ.questionText || '' }}
+             />
+          </div>
+          <div className="bg-white rounded-[24px] p-4 shadow-sm flex flex-col gap-2">
+             {currentOptionsKeys.map((key) => {
+               const isSelected = answers[currentQ.id] === key;
+               const optionText = (currentQ.options as any)[key];
+               
+               let optionClass = "border-slate-300 bg-white";
+               let bubbleClass = "border-slate-400 text-slate-700 bg-transparent";
+               let textClass = "text-slate-800";
 
-        <div className="flex items-center justify-end gap-5 w-1/3">
-          {!isReviewMode && (
-            <>
-              <div className="bg-[#E6F4EA] text-[#137333] px-3 py-1.5 rounded-full font-semibold text-[15px] border border-[#CEEAD6] flex items-center gap-1.5">
-                <Clock className="w-4 h-4" />
-                <span>{formatTime(timeLeft)}</span>
-              </div>
-              <div className="text-[15px] font-semibold text-slate-900">
-                Score: {mockTest.totalMarks || 0}
-              </div>
-              <Button 
-                onClick={() => setShowSubmitConfirm(true)}
-                className="bg-[#16A34A] hover:bg-green-700 text-white rounded-full px-6 shadow-sm font-medium"
-              >
-                Submit
-              </Button>
-            </>
-          )}
-          {isReviewMode && (
-             <Button 
-               onClick={() => setIsReviewMode(false)}
-               variant="outline"
-               className="rounded-full px-6 shadow-sm font-medium border-slate-300"
-             >
-               Close Review
-             </Button>
-          )}
-        </div>
-      </header>
+               if (isSelected) {
+                 optionClass = "border-[#166534] bg-[#bbf7d0]";
+                 bubbleClass = "border-[#166534] text-white bg-[#166534]";
+                 textClass = "text-slate-900";
+               }
 
-      {/* Progress bar under header */}
-      {!isReviewMode && (
-        <div className="h-1 bg-slate-100 flex-shrink-0">
-          <div
-            className="h-full bg-gradient-to-r from-blue-500 to-emerald-500 transition-all duration-300"
-            style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}
-          />
-        </div>
-      )}
+               if (isReviewMode) {
+                 const isCorrectAnswer = currentQ.correctAnswer && key.toLowerCase() === currentQ.correctAnswer.toLowerCase();
+                 if (isCorrectAnswer) {
+                   optionClass = "border-[#166534] bg-[#bbf7d0]";
+                   bubbleClass = "border-[#166534] text-white bg-[#166534]";
+                   textClass = "text-slate-900";
+                 } else if (isSelected && !isCorrectAnswer) {
+                   optionClass = "border-[#991B1B] bg-[#FECACA]";
+                   bubbleClass = "border-[#991B1B] text-white bg-[#991B1B]";
+                   textClass = "text-slate-900";
+                 } else {
+                   optionClass = "border-slate-300 bg-white opacity-60";
+                 }
+               }
+               
+               return (
+                 <button
+                   key={key}
+                   onClick={() => handleOptionSelect(key)}
+                   className={cn(
+                     "flex items-center w-full min-h-[48px] p-2 rounded-[16px] border text-left transition-colors",
+                     optionClass
+                   )}
+                 >
+                   <div className={cn(
+                     "w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-base mr-3 border",
+                     bubbleClass
+                   )}>
+                     {key.toUpperCase()}
+                   </div>
+                   <span className={cn("text-base", textClass)}>
+                     {optionText}
+                   </span>
+                 </button>
+               );
+             })}
+          </div>
 
-      <main className="flex-1 flex flex-col lg:flex-row gap-6 p-6 overflow-hidden max-w-[1920px] mx-auto w-full">
-        <aside className="w-[280px] hidden lg:flex flex-col bg-white rounded-2xl shadow-sm border border-slate-200 p-5 overflow-hidden">
-          <h2 className="font-bold text-lg mb-4 text-slate-900">Question Navigator</h2>
-          
-          <div className="space-y-3 mb-4 text-sm font-medium">
-            <div className="flex justify-between items-center text-slate-700">
-              <span>Total Questions</span>
-              <span className="font-bold text-slate-900">{questions.length}</span>
+          {isReviewMode && currentQ.explanation && (
+            <div className="bg-blue-50 border border-blue-100 rounded-[24px] p-5 shadow-sm mt-1 mb-4">
+              <h4 className="font-bold text-blue-900 mb-2 flex items-center gap-2">
+                <AlertCircle className="w-5 h-5 text-blue-600" />
+                Explanation
+              </h4>
+              <div className="text-blue-800 leading-relaxed text-sm" dangerouslySetInnerHTML={{ __html: currentQ.explanation }} />
             </div>
+          )}
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-[#F1F5F9] via-[#F1F5F9] to-transparent flex items-center justify-between gap-3 z-20 pb-6">
+          <button 
+            onClick={handlePrevious} 
+            disabled={currentQuestionIndex === 0}
+            className="h-12 px-5 rounded-full border border-slate-400 bg-white font-medium text-slate-800 whitespace-nowrap disabled:opacity-50"
+          >
+            Previous
+          </button>
+          
+          {!isReviewMode ? (
+            <>
+              <button 
+                onClick={handleMarkReview} 
+                className="h-12 px-6 rounded-full bg-[#FDE047] font-medium text-slate-800 whitespace-nowrap border border-transparent hover:border-amber-400"
+              >
+                Preview
+              </button>
+              <button 
+                onClick={handleSaveAndNext} 
+                className="h-12 px-6 rounded-full bg-[#166534] text-white font-medium flex-1 flex items-center justify-center gap-1.5 whitespace-nowrap"
+              >
+                Save & Next
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
+              </button>
+            </>
+          ) : (
+            <button 
+              onClick={handleSaveAndNext}
+              disabled={currentQuestionIndex === questions.length - 1}
+              className="h-12 flex-1 px-8 rounded-full font-bold bg-[#2563EB] text-white shadow-sm"
+            >
+              Next Question
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* ── DESKTOP UI (preserved) ── */}
+      <div className="hidden md:flex flex-col h-full w-full">
+        <header className="h-[72px] bg-white border-b border-slate-200 flex items-center justify-between px-6 z-30 flex-shrink-0 shadow-sm">
+          <div className="flex items-center gap-4 w-1/3">
+            <button onClick={() => isReviewMode ? setIsReviewMode(false) : handleExitExam()} className="flex items-center text-slate-800 font-medium hover:text-slate-600 transition-colors rounded-full active:bg-slate-100">
+              <ArrowLeft className="w-5 h-5 mr-2" />
+              <span>{isReviewMode ? "Back to Results" : "Exit"}</span>
+            </button>
+            <div className="h-4 w-px bg-slate-200 mx-2"></div>
+            
+            <button className="text-slate-500 hover:text-slate-800 transition-colors" title="Bookmark Question">
+              <Bookmark className="w-5 h-5" />
+            </button>
+            <button className="text-slate-500 hover:text-slate-800 transition-colors" title="Report Issue">
+              <AlertCircle className="w-5 h-5" />
+            </button>
+            <button onClick={toggleFullscreen} className="text-slate-500 hover:text-slate-800 transition-colors" title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}>
+              {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
+            </button>
+          </div>
+
+          <div className="flex flex-col items-center justify-center w-1/3 text-center">
+            <h1 className="font-bold text-lg text-slate-900 line-clamp-1">
+              {isReviewMode ? "Reviewing Solutions" : mockTest.title}
+            </h1>
+            <p className="text-sm text-slate-600">Question {currentQuestionIndex + 1} of {questions.length}</p>
+          </div>
+
+          <div className="flex items-center justify-end gap-5 w-1/3">
             {!isReviewMode && (
               <>
-                <div className="flex justify-between items-center text-slate-700">
-                  <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-[#16A34A] inline-block" />Answered</span>
-                  <span className="font-bold text-[#16A34A]">{totalAttempted}</span>
+                <div className="bg-[#E6F4EA] text-[#137333] px-3 py-1.5 rounded-full font-semibold text-[15px] border border-[#CEEAD6] flex items-center gap-1.5">
+                  <Clock className="w-4 h-4" />
+                  <span>{formatTime(timeLeft)}</span>
                 </div>
-                <div className="flex justify-between items-center text-slate-700">
-                  <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-[#F59E0B] inline-block" />Review</span>
-                  <span className="font-bold text-amber-600">{totalReview}</span>
+                <div className="text-[15px] font-semibold text-slate-900">
+                  Score: {mockTest.totalMarks || 0}
                 </div>
-                <div className="flex justify-between items-center text-slate-700">
-                  <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-slate-200 inline-block" />Skipped</span>
-                  <span className="font-bold text-slate-900">{totalSkipped}</span>
-                </div>
+                <Button 
+                  onClick={() => setShowSubmitConfirm(true)}
+                  className="bg-[#16A34A] hover:bg-green-700 text-white rounded-full px-6 shadow-sm font-medium"
+                >
+                  Submit
+                </Button>
               </>
             )}
             {isReviewMode && (
-              <>
-                <div className="flex justify-between items-center text-slate-700">
-                  <span>Correct</span>
-                  <span className="font-bold text-[#16A34A]">{scoreData.correct}</span>
-                </div>
-                <div className="flex justify-between items-center text-slate-700">
-                  <span>Wrong</span>
-                  <span className="font-bold text-red-600">{scoreData.wrong}</span>
-                </div>
-              </>
+               <Button 
+                 onClick={() => setIsReviewMode(false)}
+                 variant="outline"
+                 className="rounded-full px-6 shadow-sm font-medium border-slate-300"
+               >
+                 Close Review
+               </Button>
             )}
           </div>
+        </header>
 
-          <Progress value={isReviewMode ? ((scoreData.correct / questions.length) * 100) : ((totalAttempted / questions.length) * 100)} className="h-2 mb-6 bg-slate-100 [&>div]:bg-[#3B82F6]" />
-
-          <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
-            <div className="grid grid-cols-5 gap-2.5">
-              {questions.map((q, idx) => {
-                const state = questionStates[q.id] || 'unvisited';
-                const isCurrent = currentQuestionIndex === idx;
-                
-                let reviewClass = "";
-                if (isReviewMode) {
-                  const uAnswer = answers[q.id];
-                  if (!uAnswer) reviewClass = "bg-slate-200 text-slate-700";
-                  else if (q.correctAnswer && uAnswer.toLowerCase() === q.correctAnswer.toLowerCase()) reviewClass = "bg-[#16A34A] text-white";
-                  else reviewClass = "bg-red-500 text-white";
-                }
-
-                return (
-                  <button
-                    key={q.id}
-                    onClick={() => jumpToQuestion(idx)}
-                    className={cn(
-                      "w-11 h-11 rounded-lg flex items-center justify-center text-sm font-medium transition-all relative",
-                      isReviewMode ? reviewClass : (
-                        state === 'answered' && !isCurrent ? "bg-[#16A34A] text-white" :
-                        state === 'skipped' && !isCurrent ? "bg-slate-200 text-slate-700" :
-                        state === 'review' && !isCurrent ? "bg-[#F59E0B] text-white" :
-                        state === 'unvisited' && !isCurrent ? "bg-[#F1F5F9] text-slate-700 border border-slate-200" : ""
-                      ),
-                      isCurrent ? "ring-2 ring-offset-1 ring-[#2563EB] shadow-sm z-10" : ""
-                    )}
-                  >
-                    <span className="relative z-10">{idx + 1}</span>
-                  </button>
-                );
-              })}
-            </div>
+        {!isReviewMode && (
+          <div className="h-1 bg-slate-100 flex-shrink-0">
+            <div
+              className="h-full bg-gradient-to-r from-blue-500 to-emerald-500 transition-all duration-300"
+              style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}
+            />
           </div>
-        </aside>
+        )}
 
-        <section className="flex-1 flex flex-col bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden relative">
-          <div className="flex-1 overflow-y-auto p-5 md:p-6 custom-scrollbar">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentQ.id}
-                initial={{ opacity: 0, x: 10 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -10 }}
-                transition={{ duration: 0.2 }}
-                className="flex flex-col h-full max-w-3xl mx-auto"
-              >
-                <div className="flex items-center gap-4 mb-4">
-                  <span className="text-lg font-bold text-slate-900">Question {currentQuestionIndex + 1} of {questions.length}</span>
-                  <div className="flex items-center gap-2 text-sm">
-                    <span className="text-slate-500 font-medium">Difficulty</span>
-                    <span className={cn(
-                      "px-2.5 py-0.5 rounded font-semibold",
-                      currentQ.difficulty === 'Easy' ? "bg-green-100 text-green-700" : 
-                      currentQ.difficulty === 'Medium' ? "bg-orange-100 text-orange-700" : 
-                      "bg-red-100 text-red-700"
-                    )}>{currentQ.difficulty || 'Medium'}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm ml-auto">
-                    <span className="text-slate-500 font-medium mr-1">Marks</span>
-                    <span className="bg-slate-100 text-slate-700 px-2.5 py-1 rounded-full font-semibold border border-slate-200 flex items-center gap-1.5 text-xs">
-                      <span className="text-slate-600">+{currentQ.marks || 1}</span>
-                      <span className="text-slate-300">|</span>
-                      <span className="text-slate-600">-{mockTest.negativeMarking || 0}</span>
-                    </span>
-                  </div>
-                </div>
-
-                <div className="w-full h-px bg-slate-100 mb-4"></div>
-
-                <div 
-                  className="leading-relaxed text-slate-900 mb-6 text-xl md:text-2xl font-semibold"
-                  dangerouslySetInnerHTML={{ __html: currentQ.questionText || '' }}
-                />
-
-                <h3 className="font-bold text-slate-900 mb-3">Options</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
-                  {currentOptionsKeys.map((key) => {
-                    const isSelected = answers[currentQ.id] === key;
-                    const optionText = (currentQ.options as any)[key];
-                    
-                    let optionClass = isSelected 
-                      ? "border-[#22C55E] bg-[#F0FDF4]" 
-                      : "border-slate-200 bg-white hover:border-[#86EFAC] hover:bg-[#F0FDF4]";
-                    
-                    let bubbleClass = isSelected 
-                      ? "border-[#22C55E] text-[#16A34A] bg-white shadow-sm" 
-                      : "border-slate-300 text-slate-500 bg-slate-50";
-
-                    let textClass = isSelected ? "text-[#16A34A]" : "text-slate-700";
-
-                    if (isReviewMode) {
-                      const isCorrectAnswer = currentQ.correctAnswer && key.toLowerCase() === currentQ.correctAnswer.toLowerCase();
-                      if (isCorrectAnswer) {
-                        optionClass = "border-[#22C55E] bg-[#F0FDF4]";
-                        bubbleClass = "border-[#22C55E] text-white bg-[#16A34A]";
-                        textClass = "text-[#16A34A]";
-                      } else if (isSelected && !isCorrectAnswer) {
-                        optionClass = "border-red-500 bg-red-50";
-                        bubbleClass = "border-red-500 text-white bg-red-500";
-                        textClass = "text-red-700";
-                      } else {
-                        optionClass = "border-slate-200 bg-white opacity-60";
-                        bubbleClass = "border-slate-300 text-slate-400 bg-slate-50";
-                        textClass = "text-slate-400";
-                      }
-                    }
-                    
-                    return (
-                      <motion.button
-                        key={key}
-                        whileHover={{ scale: isReviewMode ? 1 : 1.01 }}
-                        whileTap={{ scale: isReviewMode ? 1 : 0.99 }}
-                        onClick={() => handleOptionSelect(key)}
-                        className={cn(
-                          "flex items-center w-full min-h-[64px] p-3 rounded-xl border-2 text-left transition-colors duration-200",
-                          optionClass
-                        )}
-                      >
-                        <div className={cn(
-                          "w-9 h-9 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-base mr-3 transition-colors border",
-                          bubbleClass
-                        )}>
-                          {key.toUpperCase()}
-                        </div>
-                        <span className={cn(
-                          "text-base font-medium leading-snug",
-                          textClass
-                        )}>
-                          {optionText}
-                        </span>
-                      </motion.button>
-                    );
-                  })}
-                </div>
-
-                {isReviewMode && currentQ.explanation && (
-                  <motion.div 
-                    initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                    className="bg-blue-50 border border-blue-100 rounded-xl p-5 mt-4"
-                  >
-                    <h4 className="font-bold text-blue-900 mb-2 flex items-center gap-2">
-                      <AlertCircle className="w-5 h-5 text-blue-600" />
-                      Explanation
-                    </h4>
-                    <div 
-                      className="text-blue-800 leading-relaxed text-sm"
-                      dangerouslySetInnerHTML={{ __html: currentQ.explanation }}
-                    />
-                  </motion.div>
-                )}
-              </motion.div>
-            </AnimatePresence>
-          </div>
-
-          <div className="p-5 border-t border-slate-200 flex flex-wrap items-center justify-between gap-4">
-            <Button 
-              variant="outline" 
-              onClick={handlePrevious} 
-              disabled={currentQuestionIndex === 0}
-              className="h-11 px-6 rounded-full font-semibold border-slate-300 text-slate-700 hover:bg-slate-50"
-            >
-              Previous
-            </Button>
+        <main className="flex-1 flex gap-6 p-6 overflow-hidden max-w-[1920px] mx-auto w-full">
+          <aside className="w-[280px] flex flex-col bg-white rounded-2xl shadow-sm border border-slate-200 p-5 overflow-hidden">
+            <h2 className="font-bold text-lg mb-4 text-slate-900">Question Navigator</h2>
             
-            {!isReviewMode ? (
-              <div className="flex items-center gap-3">
-                <Button 
-                  onClick={handleMarkReview}
-                  className="h-11 px-6 rounded-full font-semibold bg-[#D97706] hover:bg-amber-700 text-white border-0"
+            <div className="space-y-3 mb-4 text-sm font-medium">
+              <div className="flex justify-between items-center text-slate-700">
+                <span>Total Questions</span>
+                <span className="font-bold text-slate-900">{questions.length}</span>
+              </div>
+              {!isReviewMode && (
+                <>
+                  <div className="flex justify-between items-center text-slate-700">
+                    <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-[#16A34A] inline-block" />Answered</span>
+                    <span className="font-bold text-[#16A34A]">{totalAttempted}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-slate-700">
+                    <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-[#F59E0B] inline-block" />Review</span>
+                    <span className="font-bold text-amber-600">{totalReview}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-slate-700">
+                    <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-slate-200 inline-block" />Skipped</span>
+                    <span className="font-bold text-slate-900">{totalSkipped}</span>
+                  </div>
+                </>
+              )}
+              {isReviewMode && (
+                <>
+                  <div className="flex justify-between items-center text-slate-700">
+                    <span>Correct</span>
+                    <span className="font-bold text-[#16A34A]">{scoreData.correct}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-slate-700">
+                    <span>Wrong</span>
+                    <span className="font-bold text-red-600">{scoreData.wrong}</span>
+                  </div>
+                </>
+              )}
+            </div>
+
+            <Progress value={isReviewMode ? ((scoreData.correct / questions.length) * 100) : ((totalAttempted / questions.length) * 100)} className="h-2 mb-6 bg-slate-100 [&>div]:bg-[#3B82F6]" />
+
+            <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
+              <div className="grid grid-cols-5 gap-2.5">
+                {questions.map((q, idx) => {
+                  const state = questionStates[q.id] || 'unvisited';
+                  const isCurrent = currentQuestionIndex === idx;
+                  
+                  let reviewClass = "";
+                  if (isReviewMode) {
+                    const uAnswer = answers[q.id];
+                    if (!uAnswer) reviewClass = "bg-slate-200 text-slate-700";
+                    else if (q.correctAnswer && uAnswer.toLowerCase() === q.correctAnswer.toLowerCase()) reviewClass = "bg-[#16A34A] text-white";
+                    else reviewClass = "bg-red-500 text-white";
+                  }
+
+                  return (
+                    <button
+                      key={q.id}
+                      onClick={() => jumpToQuestion(idx)}
+                      className={cn(
+                        "w-11 h-11 rounded-lg flex items-center justify-center text-sm font-medium transition-all relative",
+                        isReviewMode ? reviewClass : (
+                          state === 'answered' && !isCurrent ? "bg-[#16A34A] text-white" :
+                          state === 'skipped' && !isCurrent ? "bg-slate-200 text-slate-700" :
+                          state === 'review' && !isCurrent ? "bg-[#F59E0B] text-white" :
+                          state === 'unvisited' && !isCurrent ? "bg-[#F1F5F9] text-slate-700 border border-slate-200" : ""
+                        ),
+                        isCurrent ? "ring-2 ring-offset-1 ring-[#2563EB] shadow-sm z-10" : ""
+                      )}
+                    >
+                      <span className="relative z-10">{idx + 1}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </aside>
+
+          <section className="flex-1 flex flex-col bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden relative">
+            <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentQ.id}
+                  initial={{ opacity: 0, x: 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  transition={{ duration: 0.2 }}
+                  className="flex flex-col h-full max-w-3xl mx-auto"
                 >
-                  Mark for Review
-                </Button>
-                <Button 
-                  onClick={handleClear}
-                  className="h-11 px-6 rounded-full font-semibold bg-[#64748B] hover:bg-slate-600 text-white border-0"
-                >
-                  Clear Response
-                </Button>
+                  <div className="flex items-center gap-4 mb-4">
+                    <span className="text-lg font-bold text-slate-900">Question {currentQuestionIndex + 1} of {questions.length}</span>
+                    <div className="flex items-center gap-2 text-sm">
+                      <span className="text-slate-500 font-medium">Difficulty:</span>
+                      <span className={cn(
+                        "px-2 py-0.5 rounded font-bold",
+                        currentQ.difficulty === 'Easy' ? "bg-emerald-100 text-emerald-700" : 
+                        currentQ.difficulty === 'Medium' ? "bg-amber-100 text-amber-700" : 
+                        "bg-red-100 text-red-700"
+                      )}>{currentQ.difficulty || 'Medium'}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm ml-auto">
+                      <span className="text-slate-500 font-medium mr-0.5">Marks:</span>
+                      <span className="bg-slate-100 text-slate-700 px-2.5 py-1 rounded-full font-bold border border-slate-200 flex items-center gap-1 text-xs">
+                        <span className="text-emerald-600">+{currentQ.marks || 1}</span>
+                        <span className="text-slate-300">|</span>
+                        <span className="text-red-500">-{mockTest.negativeMarking || 0}</span>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="w-full h-px bg-slate-100 mb-4"></div>
+
+                  <div 
+                    className="leading-relaxed text-slate-900 mb-6 text-2xl font-semibold"
+                    dangerouslySetInnerHTML={{ __html: currentQ.questionText || '' }}
+                  />
+
+                  <h3 className="font-bold text-slate-900 mb-3">Options</h3>
+                  <div className="grid grid-cols-2 gap-3 mb-6">
+                    {currentOptionsKeys.map((key) => {
+                      const isSelected = answers[currentQ.id] === key;
+                      const optionText = (currentQ.options as any)[key];
+                      
+                      let optionClass = isSelected 
+                        ? "border-[#22C55E] bg-[#F0FDF4]" 
+                        : "border-slate-200 bg-white hover:border-[#86EFAC] hover:bg-[#F0FDF4]";
+                      
+                      let bubbleClass = isSelected 
+                        ? "border-[#22C55E] text-[#16A34A] bg-white shadow-sm" 
+                        : "border-slate-300 text-slate-500 bg-slate-50";
+
+                      let textClass = isSelected ? "text-[#16A34A]" : "text-slate-700";
+
+                      if (isReviewMode) {
+                        const isCorrectAnswer = currentQ.correctAnswer && key.toLowerCase() === currentQ.correctAnswer.toLowerCase();
+                        if (isCorrectAnswer) {
+                          optionClass = "border-[#22C55E] bg-[#F0FDF4]";
+                          bubbleClass = "border-[#22C55E] text-white bg-[#16A34A]";
+                          textClass = "text-[#16A34A]";
+                        } else if (isSelected && !isCorrectAnswer) {
+                          optionClass = "border-red-500 bg-red-50";
+                          bubbleClass = "border-red-500 text-white bg-red-500";
+                          textClass = "text-red-700";
+                        } else {
+                          optionClass = "border-slate-200 bg-white opacity-60";
+                          bubbleClass = "border-slate-300 text-slate-400 bg-slate-50";
+                          textClass = "text-slate-400";
+                        }
+                      }
+                      
+                      return (
+                        <motion.button
+                          key={key}
+                          whileHover={{ scale: isReviewMode ? 1 : 1.01 }}
+                          whileTap={{ scale: isReviewMode ? 1 : 0.99 }}
+                          onClick={() => handleOptionSelect(key)}
+                          className={cn(
+                            "flex items-center w-full min-h-[64px] p-3 rounded-xl border-2 text-left transition-colors duration-200",
+                            optionClass
+                          )}
+                        >
+                          <div className={cn(
+                            "w-9 h-9 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-base mr-3 transition-colors border",
+                            bubbleClass
+                          )}>
+                            {key.toUpperCase()}
+                          </div>
+                          <span className={cn(
+                            "text-base font-medium leading-snug",
+                            textClass
+                          )}>
+                            {optionText}
+                          </span>
+                        </motion.button>
+                      );
+                    })}
+                  </div>
+
+                  {isReviewMode && currentQ.explanation && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                      className="bg-blue-50 border border-blue-100 rounded-xl p-5 mt-4"
+                    >
+                      <h4 className="font-bold text-blue-900 mb-2 flex items-center gap-2">
+                        <AlertCircle className="w-5 h-5 text-blue-600" />
+                        Explanation
+                      </h4>
+                      <div 
+                        className="text-blue-800 leading-relaxed text-sm"
+                        dangerouslySetInnerHTML={{ __html: currentQ.explanation }}
+                      />
+                    </motion.div>
+                  )}
+                </motion.div>
+              </AnimatePresence>
+            </div>
+
+            <div className="p-5 border-t border-slate-200 flex flex-wrap items-center justify-between gap-4">
+              <Button 
+                variant="outline" 
+                onClick={handlePrevious} 
+                disabled={currentQuestionIndex === 0}
+                className="h-11 px-6 rounded-full font-semibold border-slate-300 text-slate-700 hover:bg-slate-50"
+              >
+                Previous
+              </Button>
+              
+              {!isReviewMode ? (
+                <div className="flex items-center gap-3">
+                  <Button 
+                    onClick={handleMarkReview}
+                    className="h-11 px-6 rounded-full font-semibold bg-[#D97706] hover:bg-amber-700 text-white border-0"
+                  >
+                    Mark for Review
+                  </Button>
+                  <Button 
+                    onClick={handleClear}
+                    className="h-11 px-6 rounded-full font-semibold bg-[#64748B] hover:bg-slate-600 text-white border-0"
+                  >
+                    Clear Response
+                  </Button>
+                  <Button 
+                    onClick={handleSaveAndNext}
+                    className="h-11 px-8 rounded-full font-semibold bg-[#16A34A] hover:bg-green-700 text-white border-0 shadow-sm"
+                  >
+                    Save & Next
+                  </Button>
+                </div>
+              ) : (
                 <Button 
                   onClick={handleSaveAndNext}
-                  className="h-11 px-8 rounded-full font-semibold bg-[#16A34A] hover:bg-green-700 text-white border-0 shadow-sm"
+                  disabled={currentQuestionIndex === questions.length - 1}
+                  className="h-11 px-8 rounded-full font-semibold bg-[#2563EB] hover:bg-blue-700 text-white border-0 shadow-sm"
                 >
-                  Save & Next
+                  Next Question
                 </Button>
-              </div>
-            ) : (
-              <Button 
-                onClick={handleSaveAndNext}
-                disabled={currentQuestionIndex === questions.length - 1}
-                className="h-11 px-8 rounded-full font-semibold bg-[#2563EB] hover:bg-blue-700 text-white border-0 shadow-sm"
-              >
-                Next Question
-              </Button>
-            )}
-          </div>
-        </section>
-
-        <aside className="w-[280px] hidden xl:flex flex-col gap-4 overflow-y-auto custom-scrollbar pb-2 pr-1">
-          <div className="bg-[#FFF4F4] rounded-2xl p-6 shadow-sm border border-[#FFE4E4] flex flex-col items-center justify-center">
-            <span className="text-[15px] font-medium text-slate-700 mb-1.5">Time Remaining</span>
-            <div 
-              suppressHydrationWarning
-              className={cn(
-                "text-[40px] font-extrabold tracking-tight leading-none",
-                isLowTime ? "text-red-600" : "text-black"
               )}
-            >
-              {formatTime(timeLeft)}
             </div>
-          </div>
+          </section>
 
-          {/* Performance Widget */}
-          <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
-            <h3 className="font-bold text-slate-900 mb-4">Performance</h3>
-            <div className="space-y-4 text-sm font-medium text-slate-700">
-              <div className="flex items-center justify-between">
-                <span>Attempted</span>
-                <div className="flex items-center gap-3 w-1/2">
-                  <div className="h-1.5 bg-slate-100 flex-1 rounded-full overflow-hidden">
-                    <div className="h-full bg-[#3B82F6] rounded-full transition-all duration-300" style={{ width: `${(totalAttempted / questions.length) * 100}%` }}></div>
-                  </div>
-                  <span className="w-6 text-right font-bold">{totalAttempted}</span>
-                </div>
-              </div>
-              <div className="flex items-center justify-between">
-                <span>Correct</span>
-                <div className="flex items-center gap-3 w-1/2">
-                  <div className="h-1.5 bg-slate-100 flex-1 rounded-full overflow-hidden">
-                    <div className="h-full bg-[#22C55E] rounded-full transition-all duration-300" style={{ width: totalAttempted > 0 ? `${(liveCorrect / totalAttempted) * 100}%` : '0%' }}></div>
-                  </div>
-                  <span className="w-6 text-right font-bold text-emerald-600">{liveCorrect}</span>
-                </div>
-              </div>
-              <div className="flex items-center justify-between">
-                <span>Accuracy %</span>
-                <div className="flex items-center gap-3 w-1/2">
-                  <div className="h-1.5 bg-slate-100 flex-1 rounded-full overflow-hidden">
-                    <div className="h-full bg-[#22C55E] rounded-full transition-all duration-300" style={{ width: `${liveAccuracy}%` }}></div>
-                  </div>
-                  <span className="w-6 text-right font-bold">{liveAccuracy}</span>
-                </div>
+          <aside className="w-[280px] hidden xl:flex flex-col gap-4 overflow-y-auto custom-scrollbar pb-2 pr-1">
+            <div className="bg-[#FFF4F4] rounded-2xl p-6 shadow-sm border border-[#FFE4E4] flex flex-col items-center justify-center">
+              <span className="text-[15px] font-medium text-slate-700 mb-1.5">Time Remaining</span>
+              <div 
+                suppressHydrationWarning
+                className={cn(
+                  "text-[40px] font-extrabold tracking-tight leading-none",
+                  isLowTime ? "text-red-600" : "text-black"
+                )}
+              >
+                {formatTime(timeLeft)}
               </div>
             </div>
-          </div>
 
-          {/* Instructions Widget */}
-          <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
-            <h3 className="font-bold text-slate-900 mb-3">Instructions</h3>
-            <ul className="space-y-2 text-sm font-medium text-slate-700">
-              <li>+{currentQ.marks || 1} for correct</li>
-              <li>-{mockTest.negativeMarking || 0} negative marking</li>
-              <li>Unanswered = 0</li>
-            </ul>
-          </div>
+            {/* Performance Widget */}
+            <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
+              <h3 className="font-bold text-slate-900 mb-4">Performance</h3>
+              <div className="space-y-4 text-sm font-medium text-slate-700">
+                <div className="flex items-center justify-between">
+                  <span>Attempted</span>
+                  <div className="flex items-center gap-3 w-1/2">
+                    <div className="h-1.5 bg-slate-100 flex-1 rounded-full overflow-hidden">
+                      <div className="h-full bg-[#3B82F6] rounded-full transition-all duration-300" style={{ width: `${(totalAttempted / questions.length) * 100}%` }}></div>
+                    </div>
+                    <span className="w-6 text-right font-bold">{totalAttempted}</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>Correct</span>
+                  <div className="flex items-center gap-3 w-1/2">
+                    <div className="h-1.5 bg-slate-100 flex-1 rounded-full overflow-hidden">
+                      <div className="h-full bg-[#22C55E] rounded-full transition-all duration-300" style={{ width: totalAttempted > 0 ? `${(liveCorrect / totalAttempted) * 100}%` : '0%' }}></div>
+                    </div>
+                    <span className="w-6 text-right font-bold text-emerald-600">{liveCorrect}</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>Accuracy %</span>
+                  <div className="flex items-center gap-3 w-1/2">
+                    <div className="h-1.5 bg-slate-100 flex-1 rounded-full overflow-hidden">
+                      <div className="h-full bg-[#22C55E] rounded-full transition-all duration-300" style={{ width: `${liveAccuracy}%` }}></div>
+                    </div>
+                    <span className="w-6 text-right font-bold">{liveAccuracy}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-        </aside>
-
-      </main>
+            {/* Instructions Widget */}
+            <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
+              <h3 className="font-bold text-slate-900 mb-3">Instructions</h3>
+              <ul className="space-y-2 text-sm font-medium text-slate-700">
+                <li>+{currentQ.marks || 1} for correct</li>
+                <li>-{mockTest.negativeMarking || 0} negative marking</li>
+                <li>Unanswered = 0</li>
+              </ul>
+            </div>
+          </aside>
+        </main>
+      </div>
 
       <style dangerouslySetInnerHTML={{__html: `
         body { background-color: #F8FAFC !important; overflow: hidden !important; }
         footer { display: none !important; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
