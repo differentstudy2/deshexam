@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Bookmark, Flag, Maximize, Minimize, AlertCircle, Clock, Moon, Sun, LayoutGrid, X } from 'lucide-react';
+import { ArrowLeft, Bookmark, Flag, Maximize, Minimize, AlertCircle, Clock, Moon, Sun, LayoutGrid, X, ToggleLeft, ToggleRight } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -79,6 +79,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
   const [hasStarted, setHasStarted] = useState(false);
   const [wasKicked, setWasKicked] = useState(false);
   const [showMobileNav, setShowMobileNav] = useState(false);
+  const [autoSaveNext, setAutoSaveNext] = useState(false);
 
   useEffect(() => {
     const initialStates: Record<string, QuestionState> = {};
@@ -189,6 +190,14 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
     if (questions.length === 0 || isSubmitted) return;
     const qId = questions[currentQuestionIndex].id;
     setAnswers(prev => ({ ...prev, [qId]: optionId }));
+
+    if (autoSaveNext) {
+      setTimeout(() => {
+        if (!isSubmitted) {
+          updateStateAndNavigate('answered', 1);
+        }
+      }, 400);
+    }
   };
 
   const updateStateAndNavigate = (newState: QuestionState, nextIndexOffset: number = 0) => {
@@ -500,10 +509,20 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
               <button onClick={() => setShowMobileNav(true)}>
                 <LayoutGrid className="w-5 h-5" />
               </button>
-              <div className="bg-[#DCFCE7] dark:bg-[#064e3b] text-[#166534] dark:text-[#34d399] px-3 py-1.5 rounded-full font-bold flex items-center gap-1.5 text-sm shadow-sm transition-colors">
-                <Clock className="w-4 h-4" />
-                <span>{formatTime(timeLeft)}</span>
-              </div>
+              {!isReviewMode && (
+                <button 
+                  onClick={() => setAutoSaveNext(!autoSaveNext)}
+                  className={cn(
+                    "flex items-center justify-center p-1.5 rounded-md border transition-colors",
+                    autoSaveNext 
+                      ? "bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800" 
+                      : "bg-white dark:bg-[#1e293b] text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700"
+                  )}
+                  title="Auto Save & Next"
+                >
+                  {autoSaveNext ? <ToggleRight className="w-5 h-5" /> : <ToggleLeft className="w-5 h-5" />}
+                </button>
+              )}
             </div>
           </div>
           {/* Horizontal Navigator Container */}
@@ -620,6 +639,14 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
             </div>
           )}
         </div>
+
+        {/* Floating Timer (Mobile) */}
+        {!isReviewMode && (
+          <div className="fixed bottom-24 left-4 z-30 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md text-slate-800 dark:text-slate-200 px-3 py-2.5 rounded-full shadow-lg border border-slate-200/50 dark:border-slate-700/50 font-bold flex items-center gap-2 transition-colors">
+            <Clock className="w-4 h-4 text-[#16A34A] dark:text-emerald-500" />
+            <span className="text-sm tracking-wide">{formatTime(timeLeft)}</span>
+          </div>
+        )}
 
         {/* Floating Submit Button (Mobile) */}
         {!isReviewMode && (
@@ -787,6 +814,18 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
 
             {!isReviewMode ? (
               <>
+                <button
+                  onClick={() => setAutoSaveNext(!autoSaveNext)}
+                  className={cn(
+                    "h-10 px-3 rounded-full font-bold text-sm flex items-center gap-1.5 border transition-colors shadow-sm",
+                    autoSaveNext 
+                      ? "bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800" 
+                      : "bg-white dark:bg-[#1e293b] text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700"
+                  )}
+                  title="Automatically save and go to next question"
+                >
+                  {autoSaveNext ? <ToggleRight className="w-5 h-5" /> : <ToggleLeft className="w-5 h-5" />}
+                </button>
                 <Button
                   onClick={() => setShowSubmitConfirm(true)}
                   className="bg-[#EF4444] hover:bg-red-600 text-white rounded-full px-6 font-bold shadow-sm"
