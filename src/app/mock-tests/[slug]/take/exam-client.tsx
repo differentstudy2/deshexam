@@ -113,11 +113,8 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
   const isLowTime = timeLeft < 600;
 
   useEffect(() => {
-    const handleFullscreenChange = () => {
-      const currentlyFullscreen = !!document.fullscreenElement;
-      setIsFullscreen(currentlyFullscreen);
-
-      if (!currentlyFullscreen && hasStarted && !isSubmitted && mockTest.isStrictMode !== false) {
+    const triggerAntiCheat = () => {
+      if (hasStarted && !isSubmitted && mockTest.isStrictMode !== false) {
         // Anti-cheat kick out
         setWasKicked(true);
         setHasStarted(false);
@@ -133,7 +130,24 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
         setQuestionStates(initialStates);
       }
     };
+
+    const handleFullscreenChange = () => {
+      const currentlyFullscreen = !!document.fullscreenElement;
+      setIsFullscreen(currentlyFullscreen);
+
+      if (!currentlyFullscreen) {
+        triggerAntiCheat();
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        triggerAntiCheat();
+      }
+    };
+
     document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     // Auto-start if already in fullscreen from previous page
     if (document.fullscreenElement) {
@@ -141,7 +155,10 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
       setHasStarted(true);
     }
 
-    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [hasStarted, isSubmitted, questions, mockTest.durationMin]);
 
   const toggleFullscreen = () => {
@@ -474,6 +491,9 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
               </div>
             </div>
             <div className="flex items-center gap-2.5">
+              <button onClick={toggleFullscreen}>
+                {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
+              </button>
               <button onClick={toggleTheme}>
                 {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
               </button>
