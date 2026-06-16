@@ -1,9 +1,27 @@
+require('dotenv').config({ path: '.env.local' });
 const admin = require('firebase-admin');
-const serviceAccount = require('../serviceAccountKey.json'); // Assumes existence, otherwise user will need to run it differently
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
+let serviceAccount;
+try {
+    if (process.env.GCP_SA_KEY) {
+        serviceAccount = JSON.parse(process.env.GCP_SA_KEY);
+        if (serviceAccount.private_key) {
+            // Fix literal \n escaping from .env
+            serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
+        }
+    } else {
+        serviceAccount = require('../serviceAccountKey.json');
+    }
+} catch (e) {
+    console.error("Error loading service account credentials. Make sure GCP_SA_KEY is in .env.local or serviceAccountKey.json exists.");
+    process.exit(1);
+}
+
+if (!admin.apps.length) {
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount)
+    });
+}
 
 const db = admin.firestore();
 
@@ -20,7 +38,7 @@ const mappings = {
 
 async function migrateQuestionTypes() {
     console.log("Starting migration of question types...");
-    const questionsRef = db.collection('questions'); // Adjust collection name if different
+    const questionsRef = db.collection('questions');
     let count = 0;
     let errors = 0;
 

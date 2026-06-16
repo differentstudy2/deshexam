@@ -304,7 +304,7 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
             <Plus className="w-4 h-4" /> Add Audio
           </button>
         </div>
-      ) : ['questions','mcq','creative_question','short_question'].includes(activeTab) ? (
+      ) : ['questions','mcq','creative_question','descriptive'].includes(activeTab) ? (
         <TopicQuestionManager topicId={topicId} tabType={activeTab} nodeLevel={nodeLevel} />
       ) : ['model_test','practice_sets','quizzes','mock_tests','exams_papers'].includes(activeTab) ? (
         <TopicAssessmentManager topicId={topicId} tabType={activeTab} nodeLevel={nodeLevel} />

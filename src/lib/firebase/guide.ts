@@ -136,7 +136,7 @@ export const getReadingContent = async (contentId: string): Promise<ReadingConte
       'mcq': 'MCQ',
       'quizzes': 'Quizzes',
       'creative_question': 'Creative Questions',
-      'short_question': 'Short Questions',
+      'descriptive': 'Descriptive Questions',
       'model_test': 'Model Test',
       'mock_tests': 'Mock Tests',
       'exams_papers': 'Exams & Papers',

@@ -60,7 +60,7 @@ export function TopicQuestionManager({ topicId, tabType, nodeLevel = 'topic' }: 
       if (tab === 'questions') return innerQType;
       if (tab === 'mcq') return 'MCQ';
       if (tab === 'creative_question') return 'CQ';
-      if (tab === 'short_question' || tab === 'descriptive') return 'Desc';
+      if (tab === 'descriptive') return 'Desc';
       if (tab === 'model_test') return 'Model Test';
       if (tab === 'practice_sets') return 'Practice Set';
       if (tab === 'quizzes') return 'Quiz';
