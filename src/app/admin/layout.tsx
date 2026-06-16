@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { getUserProfile } from '@/lib/firebase/firestore';
 import { Loader2, Bell } from 'lucide-react';
-import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset } from '@/components/ui/sidebar';
+import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset, useSidebar } from '@/components/ui/sidebar';
 import { AdminSidebar } from '@/components/layout/header';
 import { ThemeToggle } from '@/components/layout/theme-toggle';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -23,6 +23,11 @@ import { LogOut, UserIcon, Moon, Sun, Monitor } from "lucide-react";
 import Link from "next/link";
 import { useTheme } from "next-themes";
 import { AdminMobileBottomNav } from '@/components/layout/admin-mobile-bottom-nav';
+
+const AdminSidebarWrapper = ({ logOut }: { logOut: () => void }) => {
+  const { setOpenMobile, isMobile } = useSidebar();
+  return <AdminSidebar logOut={logOut} onLinkClick={isMobile ? () => setOpenMobile(false) : undefined} />;
+};
 
 export default function AdminLayout({
   children,
@@ -80,7 +85,7 @@ export default function AdminLayout({
     <SidebarProvider>
       <div className="flex min-h-[100dvh] w-full bg-slate-50 dark:bg-slate-900">
         <Sidebar className="hidden md:flex">
-          <AdminSidebar logOut={logOut} />
+          <AdminSidebarWrapper logOut={logOut} />
         </Sidebar>
         <div className="flex flex-col flex-1 w-full relative">
           <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-4 border-b border-slate-200 dark:border-slate-800 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:bg-slate-950/95 dark:supports-[backdrop-filter]:bg-slate-950/60 px-4 md:px-6 shadow-sm">

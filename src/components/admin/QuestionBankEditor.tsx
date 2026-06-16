@@ -485,10 +485,10 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
   }
 
   return (
-      <div className="space-y-6 pb-24">
+      <div className="space-y-4 md:space-y-6 pb-24 md:pb-8">
           {(title || breadcrumbs) && (
               <div className="flex flex-row flex-wrap items-start justify-between gap-4 border-b border-[#eef2ec] pb-3">
-                  <div>
+                  <div className="flex-1 min-w-[200px]">
                       {breadcrumbs && (
                           <div className="text-xs text-[#4a634a] font-medium mb-1 flex flex-wrap items-center gap-x-1.5 gap-y-1">
                               {breadcrumbs.map((crumb, idx) => (
@@ -501,7 +501,7 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                       )}
                       {title && <h1 className="text-xl font-bold tracking-tight text-[#2d3b2d]">{title}</h1>}
                   </div>
-                  <div className="flex flex-row items-center gap-2 shrink-0">
+                  <div className="flex flex-row flex-wrap items-center gap-2 shrink-0 mt-2 sm:mt-0">
                       <label className="cursor-pointer">
                           <input type="file" accept=".json" className="hidden" onChange={handleBulkImport} disabled={isSaving} />
                           <div className={cn(
@@ -512,14 +512,14 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                               Bulk Add (JSON)
                           </div>
                       </label>
-                      <Button variant="outline" size="sm" className="h-8 text-xs rounded-full border-[#4a634a] text-[#4a634a] bg-transparent hover:bg-[#f4f8f4] px-4" onClick={() => {
+                      <Button variant="outline" size="sm" className="flex h-8 text-xs rounded-full border-[#4a634a] text-[#4a634a] bg-transparent hover:bg-[#f4f8f4] px-4" onClick={() => {
                           setEditData({...editData, status: 'Draft'});
                           handleSave();
                       }} disabled={isSaving}>
                           {isSaving && editData.status === 'Draft' ? <Loader2 className="w-3 h-3 mr-1.5 animate-spin" /> : null}
                           Save Draft
                       </Button>
-                      <Button size="sm" className="h-8 text-xs rounded-full bg-[#3d5a3d] hover:bg-[#2d442d] text-white px-5 shadow-sm" onClick={() => {
+                      <Button size="sm" className="flex h-8 text-xs rounded-full bg-[#3d5a3d] hover:bg-[#2d442d] text-white px-5 shadow-sm" onClick={() => {
                           setEditData({...editData, status: 'Published'});
                           handleSave();
                       }} disabled={isSaving}>
@@ -1189,23 +1189,23 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
 
           {/* Sample JSON Dialog */}
           <Dialog open={showSampleJsonDialog} onOpenChange={setShowSampleJsonDialog}>
-              <DialogContent className="sm:max-w-[700px] rounded-[24px]">
+              <DialogContent className="w-[95vw] sm:w-full max-w-[95vw] sm:max-w-[700px] rounded-[24px] p-4 sm:p-6 overflow-hidden">
                   <DialogHeader>
                       <DialogTitle className="text-xl font-bold text-slate-800">
                           Sample JSON Format
                       </DialogTitle>
                   </DialogHeader>
                   <Tabs defaultValue="MCQ" className="w-full mt-2">
-                      <TabsList className="grid w-full grid-cols-5">
-                          <TabsTrigger value="MCQ">MCQ</TabsTrigger>
-                          <TabsTrigger value="T/F">T/F</TabsTrigger>
-                          <TabsTrigger value="FIB">FIB</TabsTrigger>
-                          <TabsTrigger value="Match">Match</TabsTrigger>
-                          <TabsTrigger value="Desc">Desc</TabsTrigger>
+                      <TabsList className="grid w-full grid-cols-5 p-1 h-auto bg-slate-100 rounded-lg">
+                          <TabsTrigger value="MCQ" className="text-[11px] sm:text-sm py-1.5 px-0">MCQ</TabsTrigger>
+                          <TabsTrigger value="T/F" className="text-[11px] sm:text-sm py-1.5 px-0">T/F</TabsTrigger>
+                          <TabsTrigger value="FIB" className="text-[11px] sm:text-sm py-1.5 px-0">FIB</TabsTrigger>
+                          <TabsTrigger value="Match" className="text-[11px] sm:text-sm py-1.5 px-0">Match</TabsTrigger>
+                          <TabsTrigger value="Desc" className="text-[11px] sm:text-sm py-1.5 px-0">Desc</TabsTrigger>
                       </TabsList>
                       {Object.entries(sampleJSONData).map(([key, val]) => (
-                          <TabsContent key={key} value={key}>
-                              <div className="bg-slate-900 rounded-xl p-4 overflow-x-auto max-h-[50vh] relative">
+                          <TabsContent key={key} value={key} className="min-w-0">
+                              <div className="bg-slate-900 rounded-xl p-4 overflow-x-auto max-h-[50vh] relative w-full">
                                   <Button 
                                       variant="ghost" 
                                       size="sm" 
@@ -1232,7 +1232,7 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
 
           {/* Bulk Import Dialog */}
           <Dialog open={showBulkImportDialog} onOpenChange={setShowBulkImportDialog}>
-              <DialogContent className="sm:max-w-[600px] rounded-[24px]">
+              <DialogContent className="w-[95vw] sm:w-full max-w-[95vw] sm:max-w-[600px] rounded-[24px] p-4 sm:p-6 overflow-hidden">
                   <DialogHeader>
                       <DialogTitle className="text-xl font-bold text-slate-800">
                           {previewQuestions ? "Preview Import" : "Bulk Import Questions"}

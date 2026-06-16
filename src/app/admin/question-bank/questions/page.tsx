@@ -449,7 +449,7 @@ export default function QuestionBankQuestionsPage() {
       );
   }
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 md:p-6 space-y-4 md:space-y-6 pb-24 md:pb-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <h1 className="text-3xl font-bold tracking-tight">Question Bank</h1>
         <div className="flex flex-wrap items-center gap-2 md:gap-3">
