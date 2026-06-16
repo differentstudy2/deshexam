@@ -837,7 +837,7 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                               value={subjects.find(b => b.id === editData.subjectId)?.name || ''} 
                               onClick={() => openTaxonomySheet('subject', 'Select Subject', subjects.filter(b => !editData.classId || b.parentId === editData.classId), editData.subjectId || '', (v) => setEditData({...editData, subjectId: v, textbookId: '', chapterId: '', topicId: ''}))} 
                           />
-                          <div className="grid grid-cols-2 gap-4">
+                          <div className="grid grid-cols-1 gap-4">
                               <MD3SelectField 
                                   label="Textbook" 
                                   placeholder="Textbook" 
@@ -851,7 +851,7 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                                   onClick={() => openTaxonomySheet('year', 'Select Book / Guide', years, editData.yearId || '', (v) => setEditData({...editData, yearId: v}))} 
                               />
                           </div>
-                          <div className="grid grid-cols-2 gap-4">
+                          <div className="grid grid-cols-1 gap-4">
                               <MD3SelectField 
                                   label="Chapter" 
                                   placeholder="Chapter" 

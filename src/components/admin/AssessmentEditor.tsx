@@ -429,7 +429,7 @@ export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock 
                                     value={subjects.find(b => b.id === editData.subjectId)?.name || ''} 
                                     onClick={() => openTaxonomySheet('subject', 'Select Subject', subjects.filter(b => !editData.classId || b.parentId === editData.classId), editData.subjectId || '', (v) => setEditData({...editData, subjectId: v, textbookId: '', chapterId: '', topicId: ''}))} 
                                 />
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 gap-4">
                                     <MD3SelectField 
                                         label="Textbook" 
                                         placeholder="Textbook" 
@@ -443,7 +443,7 @@ export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock 
                                         onClick={() => openTaxonomySheet('chapter', 'Select Chapter', chapters.filter(b => !editData.textbookId || b.parentId === editData.textbookId), editData.chapterId || '', (v) => setEditData({...editData, chapterId: v, topicId: ''}))} 
                                     />
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 gap-4">
                                     <MD3SelectField 
                                         label="Topic" 
                                         placeholder="Topic" 
