@@ -1,17 +1,19 @@
 'use client';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage } from '@/lib/firebase/client';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Heading from '@tiptap/extension-heading';
 import Underline from '@tiptap/extension-underline';
+import Strike from '@tiptap/extension-strike';
+import TextAlign from '@tiptap/extension-text-align';
+import TaskList from '@tiptap/extension-task-list';
+import TaskItem from '@tiptap/extension-task-item';
 import { Table } from '@tiptap/extension-table';
 import TableRow from '@tiptap/extension-table-row';
 import TableHeader from '@tiptap/extension-table-header';
 import TableCell from '@tiptap/extension-table-cell';
-import Image from '@tiptap/extension-image';
-import Youtube from '@tiptap/extension-youtube';
 import { TextStyle } from '@tiptap/extension-text-style';
 import { Color } from '@tiptap/extension-color';
 import Highlight from '@tiptap/extension-highlight';
@@ -19,67 +21,159 @@ import Placeholder from '@tiptap/extension-placeholder';
 import { Markdown } from 'tiptap-markdown';
 import { marked } from 'marked';
 
+// Our Custom Educational Extensions
+import { MathExtension } from './editor/extensions/MathExtension';
+import { CalloutExtension } from './editor/extensions/CalloutExtension';
+import { AssessmentExtension } from './editor/extensions/AssessmentExtension';
+import { MediaExtension } from './editor/extensions/MediaExtension';
+import { SlashCommand, renderItems } from './editor/extensions/SlashCommand';
+
 import { 
-  Bold, Italic, Underline as UnderlineIcon, Heading1, Heading2, Heading3, 
-  List, ListOrdered, Quote, Code, Image as ImageIcon, Video, Table as TableIcon 
+  Bold, Italic, Underline as UnderlineIcon, Strikethrough,
+  Heading1, Heading2, Heading3, 
+  List, ListOrdered, CheckSquare, Quote, Code, Image as ImageIcon, Video, FileText, Music, Table as TableIcon,
+  AlignLeft, AlignCenter, AlignRight, AlignJustify, Type, Info, Sigma, HelpCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Toggle } from '@/components/ui/toggle';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Loader2, UploadCloud, Link as LinkIcon } from 'lucide-react';
-
-interface TiptapEditorProps {
-  content: string;
-  onChange: (html: string) => void;
-}
-
 import { useToast } from "@/hooks/use-toast";
+
+// Implement the suggestion items for SlashCommands
+const getSuggestionItems = ({ query }: { query: string }) => {
+  return [
+    {
+      title: 'Heading 1',
+      description: 'Big section heading.',
+      icon: Heading1,
+      command: ({ editor, range }: any) => {
+        editor.chain().focus().deleteRange(range).setNode('heading', { level: 1 }).run();
+      },
+    },
+    {
+      title: 'Heading 2',
+      description: 'Medium section heading.',
+      icon: Heading2,
+      command: ({ editor, range }: any) => {
+        editor.chain().focus().deleteRange(range).setNode('heading', { level: 2 }).run();
+      },
+    },
+    {
+      title: 'Bullet List',
+      description: 'Create a simple bulleted list.',
+      icon: List,
+      command: ({ editor, range }: any) => {
+        editor.chain().focus().deleteRange(range).toggleBulletList().run();
+      },
+    },
+    {
+      title: 'Checklist',
+      description: 'Track tasks with a to-do list.',
+      icon: CheckSquare,
+      command: ({ editor, range }: any) => {
+        editor.chain().focus().deleteRange(range).toggleTaskList().run();
+      },
+    },
+    {
+      title: 'Table',
+      description: 'Insert an editable table.',
+      icon: TableIcon,
+      command: ({ editor, range }: any) => {
+        editor.chain().focus().deleteRange(range).insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
+      },
+    },
+    {
+      title: 'Math Equation',
+      description: 'Insert LaTeX math (e.g. fractions, algebra).',
+      icon: Sigma,
+      command: ({ editor, range }: any) => {
+        editor.chain().focus().deleteRange(range).setMath().run();
+      },
+    },
+    {
+      title: 'Callout (Info)',
+      description: 'Insert an informational callout box.',
+      icon: Info,
+      command: ({ editor, range }: any) => {
+        editor.chain().focus().deleteRange(range).setCallout({ type: 'info' }).run();
+      },
+    },
+    {
+      title: 'Multiple Choice (MCQ)',
+      description: 'Insert a multiple choice question block.',
+      icon: HelpCircle,
+      command: ({ editor, range }: any) => {
+        editor.chain().focus().deleteRange(range).setAssessment({ type: 'mcq' }).run();
+      },
+    },
+    {
+      title: 'Image',
+      description: 'Upload an image or embed a link.',
+      icon: ImageIcon,
+      command: ({ editor, range }: any) => {
+        editor.chain().focus().deleteRange(range).setMedia({ type: 'image' }).run(); // Note: they'd need to set src later
+      },
+    },
+    {
+      title: 'YouTube Video',
+      description: 'Embed a YouTube video.',
+      icon: Video,
+      command: ({ editor, range }: any) => {
+        const url = window.prompt('YouTube URL:');
+        if (url) {
+          editor.chain().focus().deleteRange(range).setMedia({ src: url, type: 'youtube' }).run();
+        } else {
+          editor.chain().focus().deleteRange(range).run();
+        }
+      },
+    },
+  ].filter(item => item.title.toLowerCase().startsWith(query.toLowerCase())).slice(0, 10);
+};
+
 
 const MenuBar = ({ editor }: { editor: any }) => {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = React.useState(false);
-  const [imageDialogOpen, setImageDialogOpen] = React.useState(false);
-  const [imageUrlInput, setImageUrlInput] = React.useState('');
-  const [youtubeDialogOpen, setYoutubeDialogOpen] = React.useState(false);
-  const [youtubeUrlInput, setYoutubeUrlInput] = React.useState('');
+  const [mediaDialogOpen, setMediaDialogOpen] = React.useState(false);
+  const [mediaUrlInput, setMediaUrlInput] = React.useState('');
+  const [mediaType, setMediaType] = React.useState<'image'|'video'|'audio'|'pdf'|'youtube'>('image');
   const { toast } = useToast();
 
   if (!editor) {
     return null;
   }
 
-  const handleAddImageUrl = () => {
-    if (imageUrlInput.trim()) {
-      editor.chain().focus().setImage({ src: imageUrlInput.trim() }).run();
-      setImageUrlInput('');
-      setImageDialogOpen(false);
+  const handleAddMediaUrl = () => {
+    if (mediaUrlInput.trim()) {
+      editor.chain().focus().setMedia({ src: mediaUrlInput.trim(), type: mediaType }).run();
+      setMediaUrlInput('');
+      setMediaDialogOpen(false);
     }
   };
 
-  const handleAddYoutube = () => {
-    if (youtubeUrlInput.trim()) {
-      editor.commands.setYoutubeVideo({ src: youtubeUrlInput.trim() });
-      setYoutubeUrlInput('');
-      setYoutubeDialogOpen(false);
-    }
-  };
-
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     try {
       setUploading(true);
-      const storageRef = ref(storage, `guide-images/${Date.now()}_${file.name}`);
+      const storageRef = ref(storage, `editor-media/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`);
       const snapshot = await uploadBytes(storageRef, file);
       const url = await getDownloadURL(snapshot.ref);
-      editor.chain().focus().setImage({ src: url }).run();
-      setImageDialogOpen(false);
-      toast({ title: "Image Uploaded", description: "Your image was successfully uploaded." });
+      
+      let type: 'image'|'video'|'audio'|'pdf' = 'image';
+      if (file.type.startsWith('video/')) type = 'video';
+      else if (file.type.startsWith('audio/')) type = 'audio';
+      else if (file.type === 'application/pdf') type = 'pdf';
+
+      editor.chain().focus().setMedia({ src: url, type }).run();
+      setMediaDialogOpen(false);
+      toast({ title: "Upload Success", description: "Your file was successfully uploaded." });
     } catch (error) {
-      console.error('Error uploading image:', error);
-      toast({ title: "Upload Failed", description: "Failed to upload image.", variant: "destructive" });
+      console.error('Error uploading file:', error);
+      toast({ title: "Upload Failed", description: "Failed to upload file.", variant: "destructive" });
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -87,113 +181,91 @@ const MenuBar = ({ editor }: { editor: any }) => {
   };
 
   return (
-    <div className="flex flex-wrap gap-1 p-2 border-b border-[#eef2ec] dark:border-[#2a3038] bg-[#f8faf8] dark:bg-[#15171e]">
-      <Toggle 
-        size="sm" 
-        pressed={editor.isActive('bold')} 
-        onPressedChange={() => editor.chain().focus().toggleBold().run()}
-      >
+    <div className="flex flex-wrap gap-1 p-2 border-b border-[#eef2ec] dark:border-slate-800 bg-[#f8faf8] dark:bg-slate-900 sticky top-0 z-40">
+      {/* Formatting */}
+      <Toggle size="sm" pressed={editor.isActive('bold')} onPressedChange={() => editor.chain().focus().toggleBold().run()}>
         <Bold className="h-4 w-4" />
       </Toggle>
-      <Toggle 
-        size="sm" 
-        pressed={editor.isActive('italic')} 
-        onPressedChange={() => editor.chain().focus().toggleItalic().run()}
-      >
+      <Toggle size="sm" pressed={editor.isActive('italic')} onPressedChange={() => editor.chain().focus().toggleItalic().run()}>
         <Italic className="h-4 w-4" />
       </Toggle>
-      <Toggle 
-        size="sm" 
-        pressed={editor.isActive('underline')} 
-        onPressedChange={() => editor.chain().focus().toggleUnderline().run()}
-      >
+      <Toggle size="sm" pressed={editor.isActive('underline')} onPressedChange={() => editor.chain().focus().toggleUnderline().run()}>
         <UnderlineIcon className="h-4 w-4" />
       </Toggle>
+      <Toggle size="sm" pressed={editor.isActive('strike')} onPressedChange={() => editor.chain().focus().toggleStrike().run()}>
+        <Strikethrough className="h-4 w-4" />
+      </Toggle>
+      <Toggle size="sm" pressed={editor.isActive('highlight')} onPressedChange={() => editor.chain().focus().toggleHighlight().run()}>
+        <Type className="h-4 w-4 text-yellow-500" />
+      </Toggle>
       
-      <div className="w-px h-6 bg-[#c4d6c4] dark:bg-[#323842] mx-1 my-auto" />
+      <div className="w-px h-6 bg-[#c4d6c4] dark:bg-slate-700 mx-1 my-auto" />
 
-      <Toggle 
-        size="sm" 
-        pressed={editor.isActive('heading', { level: 1 })} 
-        onPressedChange={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-      >
-        <Heading1 className="h-4 w-4" />
+      {/* Alignment */}
+      <Toggle size="sm" pressed={editor.isActive({ textAlign: 'left' })} onPressedChange={() => editor.chain().focus().setTextAlign('left').run()}>
+        <AlignLeft className="h-4 w-4" />
       </Toggle>
-      <Toggle 
-        size="sm" 
-        pressed={editor.isActive('heading', { level: 2 })} 
-        onPressedChange={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-      >
-        <Heading2 className="h-4 w-4" />
+      <Toggle size="sm" pressed={editor.isActive({ textAlign: 'center' })} onPressedChange={() => editor.chain().focus().setTextAlign('center').run()}>
+        <AlignCenter className="h-4 w-4" />
       </Toggle>
-      <Toggle 
-        size="sm" 
-        pressed={editor.isActive('heading', { level: 3 })} 
-        onPressedChange={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-      >
-        <Heading3 className="h-4 w-4" />
+      <Toggle size="sm" pressed={editor.isActive({ textAlign: 'right' })} onPressedChange={() => editor.chain().focus().setTextAlign('right').run()}>
+        <AlignRight className="h-4 w-4" />
+      </Toggle>
+      <Toggle size="sm" pressed={editor.isActive({ textAlign: 'justify' })} onPressedChange={() => editor.chain().focus().setTextAlign('justify').run()}>
+        <AlignJustify className="h-4 w-4" />
       </Toggle>
 
-      <div className="w-px h-6 bg-[#c4d6c4] dark:bg-[#323842] mx-1 my-auto" />
+      <div className="w-px h-6 bg-[#c4d6c4] dark:bg-slate-700 mx-1 my-auto" />
 
-      <Toggle 
-        size="sm" 
-        pressed={editor.isActive('bulletList')} 
-        onPressedChange={() => editor.chain().focus().toggleBulletList().run()}
-      >
+      {/* Lists & Blocks */}
+      <Toggle size="sm" pressed={editor.isActive('bulletList')} onPressedChange={() => editor.chain().focus().toggleBulletList().run()}>
         <List className="h-4 w-4" />
       </Toggle>
-      <Toggle 
-        size="sm" 
-        pressed={editor.isActive('orderedList')} 
-        onPressedChange={() => editor.chain().focus().toggleOrderedList().run()}
-      >
+      <Toggle size="sm" pressed={editor.isActive('orderedList')} onPressedChange={() => editor.chain().focus().toggleOrderedList().run()}>
         <ListOrdered className="h-4 w-4" />
       </Toggle>
-      <Toggle 
-        size="sm" 
-        pressed={editor.isActive('blockquote')} 
-        onPressedChange={() => editor.chain().focus().toggleBlockquote().run()}
-      >
-        <Quote className="h-4 w-4" />
-      </Toggle>
-      <Toggle 
-        size="sm" 
-        pressed={editor.isActive('codeBlock')} 
-        onPressedChange={() => editor.chain().focus().toggleCodeBlock().run()}
-      >
-        <Code className="h-4 w-4" />
+      <Toggle size="sm" pressed={editor.isActive('taskList')} onPressedChange={() => editor.chain().focus().toggleTaskList().run()}>
+        <CheckSquare className="h-4 w-4" />
       </Toggle>
       
-      <div className="w-px h-6 bg-[#c4d6c4] dark:bg-[#323842] mx-1 self-center" />
+      <div className="w-px h-6 bg-[#c4d6c4] dark:bg-slate-700 mx-1 my-auto" />
+
+      {/* Advanced Blocks */}
+      <Button variant="ghost" size="sm" title="Add Math" onClick={() => editor.chain().focus().setMath().run()}>
+        <Sigma className="h-4 w-4" />
+      </Button>
+      <Button variant="ghost" size="sm" title="Add Callout" onClick={() => editor.chain().focus().setCallout().run()}>
+        <Info className="h-4 w-4" />
+      </Button>
+      <Button variant="ghost" size="sm" title="Add Table" onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}>
+        <TableIcon className="h-4 w-4" />
+      </Button>
+
+      <div className="w-px h-6 bg-[#c4d6c4] dark:bg-slate-700 mx-1 my-auto" />
       
-      <Dialog open={imageDialogOpen} onOpenChange={setImageDialogOpen}>
+      {/* Media Dialog */}
+      <Dialog open={mediaDialogOpen} onOpenChange={setMediaDialogOpen}>
         <DialogTrigger asChild>
-          <Button variant="ghost" size="sm" title="Add Image">
+          <Button variant="ghost" size="sm" title="Add Media">
             <ImageIcon className="h-4 w-4" />
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Add Image</DialogTitle>
+            <DialogTitle>Add Media (Image, Video, Audio, PDF)</DialogTitle>
           </DialogHeader>
           <div className="flex flex-col gap-4 py-4">
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium">Upload from computer</label>
-              <Button 
-                onClick={() => fileInputRef.current?.click()} 
-                disabled={uploading} 
-                variant="outline" 
-                className="w-full"
-              >
+              <Button onClick={() => fileInputRef.current?.click()} disabled={uploading} variant="outline" className="w-full">
                 {uploading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <UploadCloud className="w-4 h-4 mr-2" />}
                 {uploading ? 'Uploading...' : 'Choose File'}
               </Button>
               <input 
                 type="file" 
                 ref={fileInputRef} 
-                onChange={handleImageUpload} 
-                accept="image/*" 
+                onChange={handleFileUpload} 
+                accept="image/*,video/*,audio/*,application/pdf" 
                 className="hidden" 
               />
             </div>
@@ -208,125 +280,141 @@ const MenuBar = ({ editor }: { editor: any }) => {
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium">Image URL</label>
-              <div className="flex gap-2">
+              <label className="text-sm font-medium">Embed URL</label>
+              <select 
+                className="text-sm border border-slate-200 dark:border-slate-800 rounded p-2 bg-transparent"
+                value={mediaType}
+                onChange={(e) => setMediaType(e.target.value as any)}
+              >
+                <option value="image">Image URL</option>
+                <option value="video">Video URL (.mp4)</option>
+                <option value="audio">Audio URL (.mp3)</option>
+                <option value="pdf">PDF URL</option>
+                <option value="youtube">YouTube URL</option>
+              </select>
+              <div className="flex gap-2 mt-1">
                 <Input 
-                  placeholder="https://example.com/image.jpg" 
-                  value={imageUrlInput}
-                  onChange={(e) => setImageUrlInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleAddImageUrl();
-                  }}
+                  placeholder="https://..." 
+                  value={mediaUrlInput}
+                  onChange={(e) => setMediaUrlInput(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') handleAddMediaUrl(); }}
                 />
-                <Button onClick={handleAddImageUrl} disabled={!imageUrlInput.trim()}>Add</Button>
+                <Button onClick={handleAddMediaUrl} disabled={!mediaUrlInput.trim()}>Add</Button>
               </div>
             </div>
           </div>
         </DialogContent>
       </Dialog>
-
-      <Dialog open={youtubeDialogOpen} onOpenChange={setYoutubeDialogOpen}>
-        <DialogTrigger asChild>
-          <Button variant="ghost" size="sm" title="Add YouTube Video">
-            <Video className="h-4 w-4" />
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Add YouTube Video</DialogTitle>
-          </DialogHeader>
-          <div className="flex flex-col gap-4 py-4">
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium">YouTube URL</label>
-              <div className="flex gap-2">
-                <Input 
-                  placeholder="https://www.youtube.com/watch?v=..." 
-                  value={youtubeUrlInput}
-                  onChange={(e) => setYoutubeUrlInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleAddYoutube();
-                  }}
-                  autoFocus
-                />
-                <Button onClick={handleAddYoutube} disabled={!youtubeUrlInput.trim()}>Add</Button>
-              </div>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}
-        title="Add Table"
-      >
-        <TableIcon className="h-4 w-4" />
-      </Button>
     </div>
   );
 };
 
-export function TiptapEditor({ content, onChange }: TiptapEditorProps) {
+export function TiptapEditor({ content, onChange }: { content: string, onChange: (html: string) => void }) {
+  const { toast } = useToast();
+
+  const handleDrop = useCallback(
+    (view: any, event: any, slice: any, moved: boolean) => {
+      if (!moved && event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files[0]) {
+        event.preventDefault();
+        const file = event.dataTransfer.files[0];
+        
+        const uploadFile = async () => {
+          try {
+            const storageRef = ref(storage, `editor-media/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`);
+            const snapshot = await uploadBytes(storageRef, file);
+            const url = await getDownloadURL(snapshot.ref);
+            
+            let type: 'image'|'video'|'audio'|'pdf' = 'image';
+            if (file.type.startsWith('video/')) type = 'video';
+            else if (file.type.startsWith('audio/')) type = 'audio';
+            else if (file.type === 'application/pdf') type = 'pdf';
+
+            // Insert media at current selection/drop point
+            const { schema } = view.state;
+            const node = schema.nodes.media.create({ src: url, type });
+            const tr = view.state.tr.replaceSelectionWith(node);
+            view.dispatch(tr);
+
+            toast({ title: "Upload Success", description: "Dropped file was uploaded." });
+          } catch (error) {
+            console.error("Drop upload failed", error);
+            toast({ title: "Upload Failed", description: "Failed to upload dropped file.", variant: "destructive" });
+          }
+        };
+
+        uploadFile();
+        return true; // Handled
+      }
+      return false; // Let tiptap handle it
+    },
+    [toast]
+  );
+
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        // Disable built-in image and youtube so they don't clash with our Media extension
+        heading: { levels: [1, 2, 3, 4] }
+      }),
       Markdown.configure({
         html: true,
         transformPastedText: true,
         transformCopiedText: true,
       }),
-      Heading.configure({ levels: [1, 2, 3] }),
       Underline,
+      Strike,
+      TextAlign.configure({ types: ['heading', 'paragraph'] }),
+      TaskList,
+      TaskItem.configure({ nested: true }),
       Table.configure({ resizable: true }),
       TableRow,
       TableHeader,
       TableCell,
-      Image.configure({ inline: true, allowBase64: true }),
-      Youtube,
       TextStyle,
       Color,
       Highlight,
+      MathExtension,
+      CalloutExtension,
+      AssessmentExtension,
+      MediaExtension,
+      SlashCommand.configure({
+        suggestion: {
+          items: getSuggestionItems,
+          render: renderItems,
+        }
+      }),
       Placeholder.configure({
-        placeholder: 'Start typing here...',
+        placeholder: 'Start typing here... or type / for commands',
         emptyEditorClass: 'is-editor-empty',
       })
     ],
     content: content,
+    editorProps: {
+      handleDrop,
+      attributes: {
+        class: 'prose prose-sm dark:prose-invert sm:prose-base lg:prose-lg xl:prose-xl mx-auto focus:outline-none min-h-[400px] pb-32 max-w-none',
+      },
+    },
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
-    },
-    editorProps: {
-      attributes: {
-        class: 'prose prose-sm dark:prose-invert sm:prose-base lg:prose-lg xl:prose-2xl m-5 focus:outline-none min-h-[300px] max-h-[600px] overflow-y-auto',
-      },
     },
   });
 
   React.useEffect(() => {
     if (editor && content !== editor.getHTML()) {
       let cleanContent = content || '';
-      
-      // Aggressively clean and parse markdown using `marked` for existing content
-      let inner = cleanContent;
-      let parsedHTML = inner;
+      let parsedHTML = cleanContent;
 
-      // Handle old legacy content wrapped in <p> tags
-      if (inner.startsWith('<p>') && inner.endsWith('</p>')) {
-        inner = inner.replace(/<p>/g, '').replace(/<\/p>/g, '\n').replace(/<br\s*\/?>/gi, '\n');
+      if (cleanContent.startsWith('<p>') && cleanContent.endsWith('</p>')) {
+        cleanContent = cleanContent.replace(/<p>/g, '').replace(/<\/p>/g, '\n').replace(/<br\s*\/?>/gi, '\n');
       }
-      
-      // Fix escaped asterisks (e.g., '\*' or '\*\*') common in some old exported markdown
-      inner = inner.replace(/\\\*/g, '*');
+      cleanContent = cleanContent.replace(/\\\*/g, '*');
 
-      // Check if the unwrapped (or raw) text has clear Markdown indicators
-      const hasMarkdown = /(^|\n)(#{1,6}|\*|-|>|\d+\.) /.test(inner) || /\*\*(.*?)\*\*/.test(inner);
+      const hasMarkdown = /(^|\n)(#{1,6}|\*|-|>|\d+\.) /.test(cleanContent) || /\*\*(.*?)\*\*/.test(cleanContent);
       
-      if (hasMarkdown && !/<(div|span|table|ul|ol|h[1-6])/.test(inner)) {
-        // Convert the Markdown string to standard HTML using `marked` 
-        // to guarantee Tiptap renders it correctly!
+      if (hasMarkdown && !/<(div|span|table|ul|ol|h[1-6])/.test(cleanContent)) {
         try {
-          // Use synchronous marked.parse (or await marked.parse if async, but it's sync by default)
-          parsedHTML = marked.parse(inner.trim()) as string;
+          parsedHTML = marked.parse(cleanContent.trim()) as string;
         } catch (e) {
           console.error("Failed to parse markdown with marked", e);
         }
@@ -337,9 +425,9 @@ export function TiptapEditor({ content, onChange }: TiptapEditorProps) {
   }, [content, editor]);
 
   return (
-    <div className="border border-[#d3e3d3] dark:border-[#2a3038] rounded-[24px] overflow-hidden bg-[#fdfefd] dark:bg-[#1a1d27] focus-within:border-[#4a634a] dark:focus-within:border-[#437553] focus-within:ring-1 focus-within:ring-[#4a634a] dark:focus-within:ring-[#437553] transition-colors">
+    <div className="border border-[#d3e3d3] dark:border-slate-800 rounded-2xl overflow-hidden bg-[#fdfefd] dark:bg-slate-950 focus-within:border-emerald-500 dark:focus-within:border-emerald-500 transition-colors shadow-sm">
       <MenuBar editor={editor} />
-      <div className="p-4">
+      <div className="p-4 sm:p-8 overflow-y-auto max-h-[70vh] scrollbar-thin">
         <EditorContent editor={editor} />
       </div>
     </div>
