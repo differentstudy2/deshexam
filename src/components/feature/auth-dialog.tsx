@@ -118,9 +118,6 @@ const GoogleOneTapButton = ({ isSignUp = false }: { isSignUp?: boolean }) => {
             { theme: 'outline', size: 'large', shape: 'pill', text: isSignUp ? 'signup_with' : 'continue_with', width: 340 }
           );
         }
-        
-        // Show the One Tap slide-down dialog too
-        (window as any).google.accounts.id.prompt();
       } else {
         attempts++;
         if (attempts < 20) {

@@ -105,6 +105,36 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
       setLoading(false);
+
+      if (!user) {
+        let attempts = 0;
+        const initGoogleGlobal = () => {
+          if (typeof window === 'undefined') return;
+          if ((window as any).google && (window as any).google.accounts) {
+            (window as any).google.accounts.id.initialize({
+              client_id: '643911224795-3l0qt8drad3ucfm0tmf8g77cbb972rjq.apps.googleusercontent.com',
+              callback: async (response: any) => {
+                try {
+                  const credential = GoogleAuthProvider.credential(response.credential);
+                  const result = await signInWithCredential(auth, credential);
+                  await handleNewUser(result);
+                } catch (error: any) {
+                  console.error("Global One Tap Login Failed:", error);
+                }
+              },
+              auto_select: true,
+            });
+            // Show the One Tap slide-down globally
+            (window as any).google.accounts.id.prompt();
+          } else {
+            attempts++;
+            if (attempts < 20) {
+              setTimeout(initGoogleGlobal, 100);
+            }
+          }
+        };
+        initGoogleGlobal();
+      }
     });
 
     return () => unsubscribe();
