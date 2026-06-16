@@ -1196,12 +1196,12 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                       </DialogTitle>
                   </DialogHeader>
                   <Tabs defaultValue="MCQ" className="w-full mt-2">
-                      <TabsList className="flex flex-wrap justify-center w-full p-1 h-auto bg-slate-100 dark:bg-slate-800 rounded-lg gap-1">
-                          <TabsTrigger value="MCQ" className="flex-1 min-w-[50px] sm:min-w-[60px] text-[11px] sm:text-sm py-1.5 px-2">MCQ</TabsTrigger>
-                          <TabsTrigger value="T/F" className="flex-1 min-w-[50px] sm:min-w-[60px] text-[11px] sm:text-sm py-1.5 px-2">T/F</TabsTrigger>
-                          <TabsTrigger value="FIB" className="flex-1 min-w-[50px] sm:min-w-[60px] text-[11px] sm:text-sm py-1.5 px-2">FIB</TabsTrigger>
-                          <TabsTrigger value="Match" className="flex-1 min-w-[50px] sm:min-w-[60px] text-[11px] sm:text-sm py-1.5 px-2">Match</TabsTrigger>
-                          <TabsTrigger value="Desc" className="flex-1 min-w-[50px] sm:min-w-[60px] text-[11px] sm:text-sm py-1.5 px-2">Desc</TabsTrigger>
+                      <TabsList className="flex overflow-x-auto justify-start w-full p-1 h-auto bg-slate-100 dark:bg-slate-800 rounded-lg gap-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                          <TabsTrigger value="MCQ" className="flex-1 shrink-0 min-w-[60px] sm:min-w-[80px] text-[11px] sm:text-sm py-1.5 px-3">MCQ</TabsTrigger>
+                          <TabsTrigger value="T/F" className="flex-1 shrink-0 min-w-[60px] sm:min-w-[80px] text-[11px] sm:text-sm py-1.5 px-3">T/F</TabsTrigger>
+                          <TabsTrigger value="FIB" className="flex-1 shrink-0 min-w-[60px] sm:min-w-[80px] text-[11px] sm:text-sm py-1.5 px-3">FIB</TabsTrigger>
+                          <TabsTrigger value="Match" className="flex-1 shrink-0 min-w-[60px] sm:min-w-[80px] text-[11px] sm:text-sm py-1.5 px-3">Match</TabsTrigger>
+                          <TabsTrigger value="Desc" className="flex-1 shrink-0 min-w-[60px] sm:min-w-[80px] text-[11px] sm:text-sm py-1.5 px-3">Desc</TabsTrigger>
                       </TabsList>
                       {Object.entries(sampleJSONData).map(([key, val]) => (
                           <TabsContent key={key} value={key} className="min-w-0 mt-3 w-full max-w-full overflow-hidden">
