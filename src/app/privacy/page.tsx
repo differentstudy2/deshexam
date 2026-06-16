@@ -46,9 +46,12 @@ export default function PrivacyPolicyPage() {
           <p>
             We may collect data related to your payment method (e.g., valid credit card number, card brand, expiration date) when you purchase a subscription. We store only very limited, if any, financial information that we collect. Otherwise, all financial information is stored by our payment processor, Razorpay, and you are encouraged to review their privacy policy and contact them directly for responses to your questions.
           </p>
-          <h4>d. Data from Social Networks</h4>
+          <h4>d. Data from Social Networks and Google APIs</h4>
           <p>
-            User information from social networking sites, such as Google, including your name, your social network username, location, gender, birth date, email address, and profile picture, if you connect your account to such social networks.
+            User information from social networking sites, such as Google, including your name, email address, and profile picture, if you connect your account using Google Sign-In.
+          </p>
+          <p className="mt-2">
+            <strong>Google API Services User Data Policy:</strong> DeshExam's use and transfer to any other app of information received from Google APIs will adhere to the <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener noreferrer" className="text-green-600 hover:underline">Google API Services User Data Policy</a>, including the Limited Use requirements. We only use this information to authenticate your account and personalize your experience. We do not use your Google data for targeted advertising or share it with unauthorized third parties.
           </p>
 
           <h2>3. How We Use Your Information</h2>
@@ -88,13 +91,13 @@ export default function PrivacyPolicyPage() {
             We use administrative, technical, and physical security measures to help protect your personal information. While we have taken reasonable steps to secure the personal information you provide to us, please be aware that despite our efforts, no security measures are perfect or impenetrable, and no method of data transmission can be guaranteed against any interception or other type of misuse.
           </p>
 
-          <h2>6. Your Rights and Choices</h2>
+          <h2>6. Your Rights and Data Deletion</h2>
           <p>
-            You have the right to access, correct, or delete your personal data. You can review or change the information in your account or terminate your account by:
+            You have the right to access, correct, or delete your personal data. You can review or change the information in your account or terminate your account and request full data deletion by:
           </p>
           <ul>
-            <li>Logging into your account settings and updating your account.</li>
-            <li>Contacting us using the contact information provided below.</li>
+            <li>Logging into your account settings and updating or deleting your account.</li>
+            <li>Contacting us to request complete erasure of your data, including any data obtained via Google Sign-In. We will process data deletion requests promptly in accordance with applicable laws.</li>
           </ul>
 
           <h2>7. Changes to This Privacy Policy</h2>
