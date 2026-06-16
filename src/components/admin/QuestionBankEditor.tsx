@@ -501,25 +501,25 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                       )}
                       {title && <h1 className="text-xl font-bold tracking-tight text-[#2d3b2d]">{title}</h1>}
                   </div>
-                  <div className="flex flex-row flex-wrap items-center gap-2 shrink-0 mt-2 sm:mt-0">
-                      <label className="cursor-pointer">
+                  <div className="grid grid-cols-2 sm:flex sm:flex-row items-center gap-2 shrink-0 mt-3 sm:mt-0 w-full sm:w-auto">
+                      <label className="cursor-pointer col-span-2 sm:col-span-1">
                           <input type="file" accept=".json" className="hidden" onChange={handleBulkImport} disabled={isSaving} />
                           <div className={cn(
-                              "inline-flex items-center justify-center whitespace-nowrap text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+                              "inline-flex w-full sm:w-auto items-center justify-center whitespace-nowrap text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
                               "h-8 rounded-full border border-[#4a634a] text-[#4a634a] bg-transparent hover:bg-[#f4f8f4] px-4"
                           )}>
                               <Upload className="w-3 h-3 mr-1.5" />
                               Bulk Add (JSON)
                           </div>
                       </label>
-                      <Button variant="outline" size="sm" className="flex h-8 text-xs rounded-full border-[#4a634a] text-[#4a634a] bg-transparent hover:bg-[#f4f8f4] px-4" onClick={() => {
+                      <Button variant="outline" size="sm" className="w-full sm:w-auto flex h-8 text-xs rounded-full border-[#4a634a] text-[#4a634a] bg-transparent hover:bg-[#f4f8f4] px-4" onClick={() => {
                           setEditData({...editData, status: 'Draft'});
                           handleSave();
                       }} disabled={isSaving}>
                           {isSaving && editData.status === 'Draft' ? <Loader2 className="w-3 h-3 mr-1.5 animate-spin" /> : null}
                           Save Draft
                       </Button>
-                      <Button size="sm" className="flex h-8 text-xs rounded-full bg-[#3d5a3d] hover:bg-[#2d442d] text-white px-5 shadow-sm" onClick={() => {
+                      <Button size="sm" className="w-full sm:w-auto flex h-8 text-xs rounded-full bg-[#3d5a3d] hover:bg-[#2d442d] text-white px-5 shadow-sm" onClick={() => {
                           setEditData({...editData, status: 'Published'});
                           handleSave();
                       }} disabled={isSaving}>
@@ -1189,27 +1189,27 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
 
           {/* Sample JSON Dialog */}
           <Dialog open={showSampleJsonDialog} onOpenChange={setShowSampleJsonDialog}>
-              <DialogContent className="w-[95vw] sm:w-full max-w-[95vw] sm:max-w-[700px] rounded-[24px] p-4 sm:p-6 overflow-hidden">
+              <DialogContent className="w-[95vw] sm:w-full max-w-[95vw] sm:max-w-[700px] rounded-2xl sm:rounded-[24px] p-3 sm:p-6 gap-2 sm:gap-4 overflow-hidden">
                   <DialogHeader>
-                      <DialogTitle className="text-xl font-bold text-slate-800">
+                      <DialogTitle className="text-lg sm:text-xl font-bold text-slate-800">
                           Sample JSON Format
                       </DialogTitle>
                   </DialogHeader>
                   <Tabs defaultValue="MCQ" className="w-full mt-2">
-                      <TabsList className="grid w-full grid-cols-5 p-1 h-auto bg-slate-100 rounded-lg">
-                          <TabsTrigger value="MCQ" className="text-[11px] sm:text-sm py-1.5 px-0">MCQ</TabsTrigger>
-                          <TabsTrigger value="T/F" className="text-[11px] sm:text-sm py-1.5 px-0">T/F</TabsTrigger>
-                          <TabsTrigger value="FIB" className="text-[11px] sm:text-sm py-1.5 px-0">FIB</TabsTrigger>
-                          <TabsTrigger value="Match" className="text-[11px] sm:text-sm py-1.5 px-0">Match</TabsTrigger>
-                          <TabsTrigger value="Desc" className="text-[11px] sm:text-sm py-1.5 px-0">Desc</TabsTrigger>
+                      <TabsList className="flex flex-wrap justify-center w-full p-1 h-auto bg-slate-100 rounded-lg gap-1">
+                          <TabsTrigger value="MCQ" className="flex-1 min-w-[50px] sm:min-w-[60px] text-[11px] sm:text-sm py-1.5 px-2">MCQ</TabsTrigger>
+                          <TabsTrigger value="T/F" className="flex-1 min-w-[50px] sm:min-w-[60px] text-[11px] sm:text-sm py-1.5 px-2">T/F</TabsTrigger>
+                          <TabsTrigger value="FIB" className="flex-1 min-w-[50px] sm:min-w-[60px] text-[11px] sm:text-sm py-1.5 px-2">FIB</TabsTrigger>
+                          <TabsTrigger value="Match" className="flex-1 min-w-[50px] sm:min-w-[60px] text-[11px] sm:text-sm py-1.5 px-2">Match</TabsTrigger>
+                          <TabsTrigger value="Desc" className="flex-1 min-w-[50px] sm:min-w-[60px] text-[11px] sm:text-sm py-1.5 px-2">Desc</TabsTrigger>
                       </TabsList>
                       {Object.entries(sampleJSONData).map(([key, val]) => (
-                          <TabsContent key={key} value={key} className="min-w-0">
-                              <div className="bg-slate-900 rounded-xl p-4 overflow-x-auto max-h-[50vh] relative w-full">
+                          <TabsContent key={key} value={key} className="min-w-0 mt-3 w-full max-w-full overflow-hidden">
+                              <div className="bg-slate-900 rounded-xl p-3 sm:p-4 overflow-auto max-h-[40vh] sm:max-h-[50vh] relative w-full max-w-full">
                                   <Button 
                                       variant="ghost" 
                                       size="sm" 
-                                      className="absolute top-2 right-2 text-slate-300 hover:text-white"
+                                      className="absolute top-2 right-2 text-slate-300 hover:text-white h-7 text-xs sm:text-sm"
                                       onClick={() => {
                                           navigator.clipboard.writeText(val);
                                           setCopiedSample(key);
@@ -1217,10 +1217,10 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                                           toast({ title: "Copied!", description: "Sample JSON copied to clipboard." });
                                       }}
                                   >
-                                      {copiedSample === key ? <Check className="w-4 h-4 mr-2" /> : <Copy className="w-4 h-4 mr-2" />}
+                                      {copiedSample === key ? <Check className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" /> : <Copy className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />}
                                       {copiedSample === key ? "Copied" : "Copy"}
                                   </Button>
-                                  <pre className="text-sm text-emerald-400 font-mono mt-8">
+                                  <pre className="text-[10px] sm:text-sm text-emerald-400 font-mono mt-10 sm:mt-8 pb-2 w-max min-w-full">
                                       {val}
                                   </pre>
                               </div>
@@ -1232,71 +1232,71 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
 
           {/* Bulk Import Dialog */}
           <Dialog open={showBulkImportDialog} onOpenChange={setShowBulkImportDialog}>
-              <DialogContent className="w-[95vw] sm:w-full max-w-[95vw] sm:max-w-[600px] rounded-[24px] p-4 sm:p-6 overflow-hidden">
+              <DialogContent className="w-[95vw] sm:w-full max-w-[95vw] sm:max-w-[600px] rounded-2xl sm:rounded-[24px] p-3 sm:p-6 gap-2 sm:gap-4 overflow-hidden">
                   <DialogHeader>
-                      <DialogTitle className="text-xl font-bold text-slate-800">
+                      <DialogTitle className="text-lg sm:text-xl font-bold text-slate-800">
                           {previewQuestions ? "Preview Import" : "Bulk Import Questions"}
                       </DialogTitle>
                   </DialogHeader>
                   
                   {!previewQuestions ? (
-                      <div className="space-y-4 pt-4">
-                          <div className="space-y-2">
-                              <label className="text-sm font-semibold text-slate-700">Upload JSON File</label>
-                              <div className="flex items-center gap-4">
-                                  <Input type="file" accept=".json" onChange={handleBulkImport} className="cursor-pointer file:text-[#4a634a] file:font-medium file:bg-[#f4f8f4] file:border-0 file:mr-4 file:px-4 file:py-2 file:rounded-full" />
+                      <div className="space-y-3 sm:space-y-4 pt-2 sm:pt-4">
+                          <div className="space-y-1.5 sm:space-y-2">
+                              <label className="text-xs sm:text-sm font-semibold text-slate-700">Upload JSON File</label>
+                              <div className="flex items-center gap-2 sm:gap-4">
+                                  <Input type="file" accept=".json" onChange={handleBulkImport} className="cursor-pointer text-[10px] sm:text-sm h-8 sm:h-10 file:text-[#4a634a] file:font-medium file:bg-[#f4f8f4] file:border-0 file:mr-2 sm:file:mr-4 file:px-3 sm:file:px-4 file:py-1 sm:file:py-2 file:rounded-full" />
                               </div>
                           </div>
                           
                           <div className="flex items-center gap-4">
                               <div className="h-px bg-slate-200 flex-1"></div>
-                              <span className="text-xs text-slate-400 font-medium uppercase">OR</span>
+                              <span className="text-[10px] sm:text-xs text-slate-400 font-medium uppercase">OR</span>
                               <div className="h-px bg-slate-200 flex-1"></div>
                           </div>
 
-                          <div className="space-y-2">
-                              <label className="text-sm font-semibold text-slate-700">Paste JSON Content</label>
+                          <div className="space-y-1.5 sm:space-y-2">
+                              <label className="text-xs sm:text-sm font-semibold text-slate-700">Paste JSON Content</label>
                               <Textarea 
                                   value={bulkImportText} 
                                   onChange={e => setBulkImportText(e.target.value)} 
                                   placeholder="Paste your JSON array of questions here..." 
-                                  className="h-48 font-mono text-xs p-3 border-[#c4d6c4] focus-visible:ring-[#4a634a]"
+                                  className="h-32 sm:h-48 font-mono text-[10px] sm:text-xs p-2 sm:p-3 border-[#c4d6c4] focus-visible:ring-[#4a634a]"
                               />
                           </div>
 
                           <Button 
-                              className="w-full rounded-full bg-[#3d5a3d] hover:bg-[#2d442d] text-white" 
+                              className="w-full rounded-full bg-[#3d5a3d] hover:bg-[#2d442d] text-white h-8 sm:h-10 text-xs sm:text-sm mt-2 sm:mt-0" 
                               disabled={!bulkImportText.trim()}
                               onClick={() => processBulkImportPreview(bulkImportText)}
                           >
-                              <Search className="w-4 h-4 mr-2" />
+                              <Search className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
                               Preview Questions
                           </Button>
                       </div>
                   ) : (
-                      <div className="space-y-4 pt-2">
-                          <div className="bg-[#f0f4f0] text-[#3d5a3d] text-sm p-3 rounded-lg font-medium flex justify-between items-center">
+                      <div className="space-y-3 sm:space-y-4 pt-1 sm:pt-2">
+                          <div className="bg-[#f0f4f0] text-[#3d5a3d] text-xs sm:text-sm p-2 sm:p-3 rounded-lg font-medium flex justify-between items-center">
                               <span>Ready to import {previewQuestions.length} questions.</span>
                           </div>
-                          <div className="max-h-[55vh] overflow-y-auto space-y-2 pr-2">
+                          <div className="max-h-[50vh] sm:max-h-[55vh] overflow-y-auto space-y-2 pr-1 sm:pr-2">
                               {previewQuestions.map((q, i) => (
-                                  <div key={i} className="p-3 border border-[#d3e3d3] rounded-xl bg-white shadow-sm">
-                                      <p className="font-semibold text-sm line-clamp-2 text-slate-800">{q.questionText}</p>
-                                      <div className="flex gap-2 mt-2">
-                                          <span className="text-[10px] font-bold uppercase tracking-wider bg-[#eef2ec] text-[#4a634a] px-2 py-0.5 rounded-full">{q.questionType}</span>
-                                          <span className="text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">{q.difficulty || 'Medium'}</span>
+                                  <div key={i} className="p-2 sm:p-3 border border-[#d3e3d3] rounded-xl bg-white shadow-sm">
+                                      <p className="font-semibold text-xs sm:text-sm line-clamp-2 text-slate-800">{q.questionText}</p>
+                                      <div className="flex gap-1.5 sm:gap-2 mt-1.5 sm:mt-2">
+                                          <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider bg-[#eef2ec] text-[#4a634a] px-1.5 sm:px-2 py-0.5 rounded-full">{q.questionType}</span>
+                                          <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-500 px-1.5 sm:px-2 py-0.5 rounded-full">{q.difficulty || 'Medium'}</span>
                                       </div>
                                   </div>
                               ))}
                           </div>
-                          <div className="flex gap-3 pt-2 border-t border-slate-100">
-                              <Button variant="outline" className="flex-1 rounded-full border-slate-300" onClick={() => setPreviewQuestions(null)}>Cancel</Button>
+                          <div className="flex gap-2 sm:gap-3 pt-2 border-t border-slate-100">
+                              <Button variant="outline" className="flex-1 rounded-full border-slate-300 h-8 sm:h-10 text-xs sm:text-sm" onClick={() => setPreviewQuestions(null)}>Cancel</Button>
                               <Button 
-                                  className="flex-1 rounded-full bg-[#3d5a3d] hover:bg-[#2d442d] text-white shadow-sm" 
+                                  className="flex-1 rounded-full bg-[#3d5a3d] hover:bg-[#2d442d] text-white shadow-sm h-8 sm:h-10 text-xs sm:text-sm" 
                                   onClick={confirmBulkImport}
                                   disabled={isSaving}
                               >
-                                  {isSaving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <CheckCircle2 className="w-4 h-4 mr-2" />}
+                                  {isSaving ? <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 animate-spin" /> : <CheckCircle2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />}
                                   Confirm & Import
                               </Button>
                           </div>
