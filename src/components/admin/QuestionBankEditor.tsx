@@ -59,8 +59,8 @@ const VERIFICATION_LEVELS = [
 ];
 
 const MD3Input = ({ label, className, ...props }: React.InputHTMLAttributes<HTMLInputElement> & { label: string }) => (
-    <div className={cn("relative border border-[#c4d6c4] rounded-lg p-2 pt-3 focus-within:border-[#4a634a] focus-within:ring-1 focus-within:ring-[#4a634a] transition-colors bg-[#fdfefd]", className)}>
-        <label className="absolute top-0 left-2 -translate-y-1/2 bg-[#fdfefd] px-1 text-[10px] font-medium text-[#4a634a] pointer-events-none">
+    <div className={cn("relative border border-[#c4d6c4] dark:border-emerald-800/50 rounded-lg p-2 pt-3 focus-within:border-[#4a634a] dark:border-emerald-500/50 focus-within:ring-1 focus-within:ring-[#4a634a] dark:focus-within:ring-emerald-500 transition-colors bg-[#fdfefd] dark:bg-slate-900", className)}>
+        <label className="absolute top-0 left-2 -translate-y-1/2 bg-[#fdfefd] dark:bg-slate-900 px-1 text-[10px] font-medium text-[#4a634a] dark:text-emerald-400 pointer-events-none">
             {label}
         </label>
         <Input className="border-0 focus-visible:ring-0 p-0 h-auto rounded-none bg-transparent shadow-none text-sm font-medium" {...props} />
@@ -68,13 +68,13 @@ const MD3Input = ({ label, className, ...props }: React.InputHTMLAttributes<HTML
 );
 
 const MD3SelectField = ({ label, value, placeholder, onClick, required }: { label: string, value: string, placeholder: string, onClick: () => void, required?: boolean }) => (
-    <div onClick={onClick} className="relative border border-[#c4d6c4] rounded-lg p-2 pt-3 cursor-pointer hover:bg-[#f4f8f4] transition-colors bg-[#fdfefd]">
-        <label className="absolute top-0 left-2 -translate-y-1/2 bg-[#fdfefd] px-1 text-[10px] font-medium text-[#4a634a] pointer-events-none">
+    <div onClick={onClick} className="relative border border-[#c4d6c4] dark:border-emerald-800/50 rounded-lg p-2 pt-3 cursor-pointer hover:bg-[#f4f8f4] dark:bg-emerald-900/20 transition-colors bg-[#fdfefd] dark:bg-slate-900">
+        <label className="absolute top-0 left-2 -translate-y-1/2 bg-[#fdfefd] dark:bg-slate-900 px-1 text-[10px] font-medium text-[#4a634a] dark:text-emerald-400 pointer-events-none">
             {label} {required && <span className="text-red-500">*</span>}
         </label>
         <div className="flex items-center justify-between min-h-[16px] mt-0.5">
-            <span className={cn("text-sm font-medium truncate pr-2", value ? "text-slate-900" : "text-slate-400")}>{value || placeholder}</span>
-            <ChevronDown className="h-4 w-4 shrink-0 text-slate-400" />
+            <span className={cn("text-sm font-medium truncate pr-2", value ? "text-slate-900" : "text-slate-400 dark:text-slate-500")}>{value || placeholder}</span>
+            <ChevronDown className="h-4 w-4 shrink-0 text-slate-400 dark:text-slate-500" />
         </div>
     </div>
 );
@@ -487,10 +487,10 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
   return (
       <div className="space-y-4 md:space-y-6 pb-24 md:pb-8">
           {(title || breadcrumbs) && (
-              <div className="flex flex-row flex-wrap items-start justify-between gap-4 border-b border-[#eef2ec] pb-3">
+              <div className="flex flex-row flex-wrap items-start justify-between gap-4 border-b border-[#eef2ec] dark:border-slate-800 pb-3">
                   <div className="flex-1 min-w-[200px]">
                       {breadcrumbs && (
-                          <div className="text-xs text-[#4a634a] font-medium mb-1 flex flex-wrap items-center gap-x-1.5 gap-y-1">
+                          <div className="text-xs text-[#4a634a] dark:text-emerald-400 font-medium mb-1 flex flex-wrap items-center gap-x-1.5 gap-y-1">
                               {breadcrumbs.map((crumb, idx) => (
                                   <React.Fragment key={idx}>
                                       <span>{crumb}</span>
@@ -499,27 +499,27 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                               ))}
                           </div>
                       )}
-                      {title && <h1 className="text-xl font-bold tracking-tight text-[#2d3b2d]">{title}</h1>}
+                      {title && <h1 className="text-xl font-bold tracking-tight text-[#2d3b2d] dark:text-emerald-200">{title}</h1>}
                   </div>
                   <div className="grid grid-cols-2 sm:flex sm:flex-row items-center gap-2 shrink-0 mt-3 sm:mt-0 w-full sm:w-auto">
                       <label className="cursor-pointer col-span-2 sm:col-span-1">
                           <input type="file" accept=".json" className="hidden" onChange={handleBulkImport} disabled={isSaving} />
                           <div className={cn(
                               "inline-flex w-full sm:w-auto items-center justify-center whitespace-nowrap text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
-                              "h-8 rounded-full border border-[#4a634a] text-[#4a634a] bg-transparent hover:bg-[#f4f8f4] px-4"
+                              "h-8 rounded-full border border-[#4a634a] dark:border-emerald-500/50 text-[#4a634a] dark:text-emerald-400 bg-transparent hover:bg-[#f4f8f4] dark:bg-emerald-900/20 px-4"
                           )}>
                               <Upload className="w-3 h-3 mr-1.5" />
                               Bulk Add (JSON)
                           </div>
                       </label>
-                      <Button variant="outline" size="sm" className="w-full sm:w-auto flex h-8 text-xs rounded-full border-[#4a634a] text-[#4a634a] bg-transparent hover:bg-[#f4f8f4] px-4" onClick={() => {
+                      <Button variant="outline" size="sm" className="w-full sm:w-auto flex h-8 text-xs rounded-full border-[#4a634a] dark:border-emerald-500/50 text-[#4a634a] dark:text-emerald-400 bg-transparent hover:bg-[#f4f8f4] dark:bg-emerald-900/20 px-4" onClick={() => {
                           setEditData({...editData, status: 'Draft'});
                           handleSave();
                       }} disabled={isSaving}>
                           {isSaving && editData.status === 'Draft' ? <Loader2 className="w-3 h-3 mr-1.5 animate-spin" /> : null}
                           Save Draft
                       </Button>
-                      <Button size="sm" className="w-full sm:w-auto flex h-8 text-xs rounded-full bg-[#3d5a3d] hover:bg-[#2d442d] text-white px-5 shadow-sm" onClick={() => {
+                      <Button size="sm" className="w-full sm:w-auto flex h-8 text-xs rounded-full bg-[#3d5a3d] dark:bg-emerald-600 hover:bg-[#2d442d] dark:bg-emerald-700 text-white px-5 shadow-sm" onClick={() => {
                           setEditData({...editData, status: 'Published'});
                           handleSave();
                       }} disabled={isSaving}>
@@ -533,26 +533,26 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
               {/* Left Section (Content, Options, Explanation) */}
               <div className="lg:col-span-2 flex flex-col gap-2">
                   {/* --- CARD 1: Question Content --- */}
-                  <Card className="flex flex-col rounded-lg border-[#d3e3d3] shadow-sm bg-[#fdfefd] overflow-hidden">
-                      <CardHeader className="flex flex-row items-center justify-between pb-2 border-b border-[#eef2ec] bg-[#f8faf8]">
-                          <CardTitle className="text-base text-[#4a634a]">Question Content</CardTitle>
+                  <Card className="flex flex-col rounded-lg border-[#d3e3d3] dark:border-emerald-900/50 shadow-sm bg-[#fdfefd] dark:bg-slate-900 overflow-hidden">
+                      <CardHeader className="flex flex-row items-center justify-between pb-2 border-b border-[#eef2ec] dark:border-slate-800 bg-[#f8faf8] dark:bg-slate-900">
+                          <CardTitle className="text-[#2d3b2d] dark:text-emerald-200ase text-[#4a634a] dark:text-emerald-400">Question Content</CardTitle>
                           <div className="flex gap-2">
-                              <Button variant="outline" size="icon" className="h-8 w-8 text-[#4a634a]" title="Sample JSON Format" onClick={() => setShowSampleJsonDialog(true)}>
+                              <Button variant="outline" size="icon" className="h-8 w-8 text-[#4a634a] dark:text-emerald-400" title="Sample JSON Format" onClick={() => setShowSampleJsonDialog(true)}>
                                   <FileJson className="w-4 h-4" />
                               </Button>
-                              <Button variant="outline" size="icon" className="h-8 w-8 text-[#4a634a]" title="Bulk Import Questions" onClick={() => setShowBulkImportDialog(true)}>
+                              <Button variant="outline" size="icon" className="h-8 w-8 text-[#4a634a] dark:text-emerald-400" title="Bulk Import Questions" onClick={() => setShowBulkImportDialog(true)}>
                                   <Upload className="w-4 h-4" />
                               </Button>
                           </div>
                       </CardHeader>
                       <CardContent className="space-y-3 flex-1 flex flex-col pt-3">
-                              <div className="relative border border-[#c4d6c4] rounded-lg pt-2 pb-1 hover:bg-[#f4f8f4] transition-colors bg-white focus-within:border-[#4a634a] focus-within:ring-1 focus-within:ring-[#4a634a]">
-                                  <label className="absolute top-0 left-2 -translate-y-1/2 bg-white px-1 text-[10px] font-medium text-[#4a634a] pointer-events-none">Question Type</label>
+                              <div className="relative border border-[#c4d6c4] dark:border-emerald-800/50 rounded-lg pt-2 pb-1 hover:bg-[#f4f8f4] dark:bg-emerald-900/20 transition-colors bg-white dark:bg-slate-950 focus-within:border-[#4a634a] dark:border-emerald-500/50 focus-within:ring-1 focus-within:ring-[#4a634a] dark:focus-within:ring-emerald-500">
+                                  <label className="absolute top-0 left-2 -translate-y-1/2 bg-white dark:bg-slate-950 px-1 text-[10px] font-medium text-[#4a634a] dark:text-emerald-400 pointer-events-none">Question Type</label>
                                   <Select value={editData.questionType as string} onValueChange={v => {
                                       const newMarks = getDefaultMarks(v);
                                       setEditData({...editData, questionType: v as any, marks: newMarks});
                                   }}>
-                                      <SelectTrigger className="border-0 focus:ring-0 shadow-none h-8 pt-0 bg-transparent font-medium text-[#2d3b2d]">
+                                      <SelectTrigger className="border-0 focus:ring-0 shadow-none h-8 pt-0 bg-transparent font-medium text-[#2d3b2d] dark:text-emerald-200">
                                           <SelectValue placeholder="Select type" />
                                       </SelectTrigger>
                                   <SelectContent>
@@ -572,26 +572,26 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                               onChange={e => setEditData({...editData, title: e.target.value})} 
                           />
                           <div className="flex-1 flex flex-col">
-                              <label className="text-sm font-semibold mb-2 block text-[#4a634a]">Question Text <span className="text-red-500">*</span></label>
-                              <Textarea className="flex-1 min-h-[120px] resize-none border-[#c4d6c4] focus-visible:ring-[#4a634a] rounded-xl" placeholder="Enter question content here..." value={editData.questionText || ''} onChange={e => setEditData({...editData, questionText: e.target.value})} />
+                              <label className="text-sm font-semibold mb-2 block text-[#4a634a] dark:text-emerald-400">Question Text <span className="text-red-500">*</span></label>
+                              <Textarea className="flex-1 min-h-[120px] resize-none border-[#c4d6c4] dark:border-emerald-800/50 focus-visible:ring-[#4a634a] dark:focus-visible:ring-emerald-500 rounded-xl" placeholder="Enter question content here..." value={editData.questionText || ''} onChange={e => setEditData({...editData, questionText: e.target.value})} />
                           </div>
-                          <div className="pt-2 border-t border-[#eef2ec]">
-                              <label className="text-sm font-semibold mb-3 block text-[#4a634a]">Media Attachments</label>
+                          <div className="pt-2 border-t border-[#eef2ec] dark:border-slate-800">
+                              <label className="text-sm font-semibold mb-3 block text-[#4a634a] dark:text-emerald-400">Media Attachments</label>
                               <div className="flex flex-wrap gap-3">
                                   {/* Image Upload Button */}
-                                  <label className="flex items-center gap-2 px-4 py-2 border border-[#c4d6c4] rounded-full cursor-pointer hover:bg-[#f4f8f4] transition-colors bg-white text-sm font-medium text-[#4a634a]">
+                                  <label className="flex items-center gap-2 px-4 py-2 border border-[#c4d6c4] dark:border-emerald-800/50 rounded-full cursor-pointer hover:bg-[#f4f8f4] dark:bg-emerald-900/20 transition-colors bg-white dark:bg-slate-950 text-sm font-medium text-[#4a634a] dark:text-emerald-400">
                                       {isUploadingMedia ? <Loader2 className="h-4 w-4 animate-spin"/> : <ImageIcon className="h-4 w-4"/>}
                                       Image
                                       <input type="file" className="hidden" accept="image/*" onChange={e => handleMediaUpload(e, 'questionImage')} disabled={isUploadingMedia} />
                                   </label>
                                   {/* Audio Upload Button */}
-                                  <label className="flex items-center gap-2 px-4 py-2 border border-[#c4d6c4] rounded-full cursor-pointer hover:bg-[#f4f8f4] transition-colors bg-white text-sm font-medium text-[#4a634a]">
+                                  <label className="flex items-center gap-2 px-4 py-2 border border-[#c4d6c4] dark:border-emerald-800/50 rounded-full cursor-pointer hover:bg-[#f4f8f4] dark:bg-emerald-900/20 transition-colors bg-white dark:bg-slate-950 text-sm font-medium text-[#4a634a] dark:text-emerald-400">
                                       {isUploadingMedia ? <Loader2 className="h-4 w-4 animate-spin"/> : <Play className="h-4 w-4"/>}
                                       Audio
                                       <input type="file" className="hidden" accept="audio/*" onChange={e => handleMediaUpload(e, 'questionAudio')} disabled={isUploadingMedia} />
                                   </label>
                                   {/* Video Upload Button */}
-                                  <label className="flex items-center gap-2 px-4 py-2 border border-[#c4d6c4] rounded-full cursor-pointer hover:bg-[#f4f8f4] transition-colors bg-white text-sm font-medium text-[#4a634a]">
+                                  <label className="flex items-center gap-2 px-4 py-2 border border-[#c4d6c4] dark:border-emerald-800/50 rounded-full cursor-pointer hover:bg-[#f4f8f4] dark:bg-emerald-900/20 transition-colors bg-white dark:bg-slate-950 text-sm font-medium text-[#4a634a] dark:text-emerald-400">
                                       {isUploadingMedia ? <Loader2 className="h-4 w-4 animate-spin"/> : <Video className="h-4 w-4"/>}
                                       Video
                                       <input type="file" className="hidden" accept="video/*" onChange={e => handleMediaUpload(e, 'questionVideo')} disabled={isUploadingMedia} />
@@ -601,19 +601,19 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                               {(editData.questionImage || editData.questionAudio || editData.questionVideo) && (
                                   <div className="mt-3 flex flex-col gap-2">
                                       {editData.questionImage && (
-                                          <div className="flex items-center justify-between bg-slate-50 p-2 rounded-md border text-sm">
+                                          <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-900 p-2 rounded-md border text-sm">
                                               <span className="truncate max-w-[150px]"><ImageIcon className="w-4 h-4 inline mr-1"/> Image</span>
                                               <Button variant="ghost" size="icon" className="h-6 w-6 text-red-500 hover:text-red-700 hover:bg-red-50" onClick={() => handleDeleteMedia(editData.questionImage, 'questionImage')}><Trash2 className="w-3 h-3" /></Button>
                                           </div>
                                       )}
                                       {editData.questionAudio && (
-                                          <div className="flex items-center justify-between bg-slate-50 p-2 rounded-md border text-sm">
+                                          <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-900 p-2 rounded-md border text-sm">
                                               <span className="truncate max-w-[150px]"><Play className="w-4 h-4 inline mr-1"/> Audio</span>
                                               <Button variant="ghost" size="icon" className="h-6 w-6 text-red-500 hover:text-red-700 hover:bg-red-50" onClick={() => handleDeleteMedia(editData.questionAudio, 'questionAudio')}><Trash2 className="w-3 h-3" /></Button>
                                           </div>
                                       )}
                                       {editData.questionVideo && (
-                                          <div className="flex items-center justify-between bg-slate-50 p-2 rounded-md border text-sm">
+                                          <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-900 p-2 rounded-md border text-sm">
                                               <span className="truncate max-w-[150px]"><Video className="w-4 h-4 inline mr-1"/> Video</span>
                                               <Button variant="ghost" size="icon" className="h-6 w-6 text-red-500 hover:text-red-700 hover:bg-red-50" onClick={() => handleDeleteMedia(editData.questionVideo, 'questionVideo')}><Trash2 className="w-3 h-3" /></Button>
                                           </div>
@@ -625,16 +625,16 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                   </Card>
 
                   {/* --- CARD 2: Options / Answer --- */}
-                  <Card className="flex flex-col rounded-lg border-[#d3e3d3] shadow-sm bg-[#fdfefd] overflow-hidden">
-                      <CardHeader className="pb-2 border-b border-[#eef2ec] bg-[#f8faf8]">
-                          <CardTitle className="text-base text-[#4a634a]">{editData.questionType === 'Match' ? 'Matching Pairs' : 'Options / Answer'}</CardTitle>
+                  <Card className="flex flex-col rounded-lg border-[#d3e3d3] dark:border-emerald-900/50 shadow-sm bg-[#fdfefd] dark:bg-slate-900 overflow-hidden">
+                      <CardHeader className="pb-2 border-b border-[#eef2ec] dark:border-slate-800 bg-[#f8faf8] dark:bg-slate-900">
+                          <CardTitle className="text-[#2d3b2d] dark:text-emerald-200ase text-[#4a634a] dark:text-emerald-400">{editData.questionType === 'Match' ? 'Matching Pairs' : 'Options / Answer'}</CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-3 flex-1 pt-3">
                           {editData.questionType === 'Match' ? (
                               <div className="space-y-3">
                                   <div className="grid grid-cols-2 gap-4">
-                                      <div className="text-sm font-medium text-slate-500">Left Column (Items)</div>
-                                      <div className="text-sm font-medium text-slate-500">Right Column (Matches)</div>
+                                      <div className="text-sm font-medium text-slate-500 dark:text-slate-400">Left Column (Items)</div>
+                                      <div className="text-sm font-medium text-slate-500 dark:text-slate-400">Right Column (Matches)</div>
                                   </div>
                                   {(editData.matchingPairs || []).map((pair, idx) => (
                                       <div key={idx} className="grid grid-cols-2 gap-4 mb-2 pb-2 border-b border-slate-100 dark:border-slate-800 last:border-0 last:pb-0 last:mb-0">
@@ -657,7 +657,7 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                                               ) : (
                                                   <Popover>
                                                       <PopoverTrigger asChild>
-                                                          <button className="w-9 h-9 shrink-0 border border-dashed rounded flex items-center justify-center cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-400">
+                                                          <button className="w-9 h-9 shrink-0 border border-[#d3e3d3] dark:border-emerald-900/50ashed rounded flex items-center justify-center cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-400 dark:text-slate-500">
                                                               {uploadingPairImage?.idx === idx && uploadingPairImage?.side === 'left' ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImageIcon className="w-4 h-4" />}
                                                           </button>
                                                       </PopoverTrigger>
@@ -665,7 +665,7 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                                                           <div className="space-y-3">
                                                               <div>
                                                                   <label className="text-xs font-medium mb-1 block">Upload from device</label>
-                                                                  <label className="flex items-center justify-center w-full h-8 border border-dashed rounded text-xs cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800">
+                                                                  <label className="flex items-center justify-center w-full h-8 border border-[#d3e3d3] dark:border-emerald-900/50ashed rounded text-xs cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800">
                                                                       <Upload className="w-3 h-3 mr-2" />
                                                                       Choose file...
                                                                       <input type="file" className="hidden" accept="image/*" onChange={e => handlePairImageUpload(e, idx, 'left')} disabled={uploadingPairImage !== null} />
@@ -673,7 +673,7 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                                                               </div>
                                                               <div className="relative flex items-center py-1">
                                                                   <div className="flex-grow border-t border-slate-100 dark:border-slate-800"></div>
-                                                                  <span className="flex-shrink-0 mx-2 text-[10px] text-slate-400 uppercase">Or</span>
+                                                                  <span className="flex-shrink-0 mx-2 text-[10px] text-slate-400 dark:text-slate-500 uppercase">Or</span>
                                                                   <div className="flex-grow border-t border-slate-100 dark:border-slate-800"></div>
                                                               </div>
                                                               <div>
@@ -707,7 +707,7 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                                               ) : (
                                                   <Popover>
                                                       <PopoverTrigger asChild>
-                                                          <button className="w-9 h-9 shrink-0 border border-dashed rounded flex items-center justify-center cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-400">
+                                                          <button className="w-9 h-9 shrink-0 border border-[#d3e3d3] dark:border-emerald-900/50ashed rounded flex items-center justify-center cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-400 dark:text-slate-500">
                                                               {uploadingPairImage?.idx === idx && uploadingPairImage?.side === 'right' ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImageIcon className="w-4 h-4" />}
                                                           </button>
                                                       </PopoverTrigger>
@@ -715,7 +715,7 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                                                           <div className="space-y-3">
                                                               <div>
                                                                   <label className="text-xs font-medium mb-1 block">Upload from device</label>
-                                                                  <label className="flex items-center justify-center w-full h-8 border border-dashed rounded text-xs cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800">
+                                                                  <label className="flex items-center justify-center w-full h-8 border border-[#d3e3d3] dark:border-emerald-900/50ashed rounded text-xs cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800">
                                                                       <Upload className="w-3 h-3 mr-2" />
                                                                       Choose file...
                                                                       <input type="file" className="hidden" accept="image/*" onChange={e => handlePairImageUpload(e, idx, 'right')} disabled={uploadingPairImage !== null} />
@@ -723,7 +723,7 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                                                               </div>
                                                               <div className="relative flex items-center py-1">
                                                                   <div className="flex-grow border-t border-slate-100 dark:border-slate-800"></div>
-                                                                  <span className="flex-shrink-0 mx-2 text-[10px] text-slate-400 uppercase">Or</span>
+                                                                  <span className="flex-shrink-0 mx-2 text-[10px] text-slate-400 dark:text-slate-500 uppercase">Or</span>
                                                                   <div className="flex-grow border-t border-slate-100 dark:border-slate-800"></div>
                                                               </div>
                                                               <div>
@@ -743,17 +743,17 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                                   ))}
                                   <Button variant="outline" size="sm" onClick={() => {
                                       setEditData({...editData, matchingPairs: [...(editData.matchingPairs || []), { left: '', right: '' }]});
-                                  }} className="mt-2 text-blue-600 border-blue-200 hover:bg-blue-50">
+                                  }} className="mt-2 text-[#2d3b2d] dark:text-emerald-200lue-600 border-blue-200 hover:bg-blue-50">
                                       + Add Pair
                                   </Button>
-                                  <p className="text-xs text-slate-500 mt-2">Pairs will be shuffled automatically when displayed to students.</p>
+                                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">Pairs will be shuffled automatically when displayed to students.</p>
                               </div>
                           ) : ['MCQ'].includes(editData.questionType || 'MCQ') ? (
                               <div className="space-y-3">
                                   {['A', 'B', 'C', 'D'].map((optKey) => (
                                       <div key={optKey} className="flex items-center gap-3">
                                           <button 
-                                              className={cn("w-6 h-6 rounded-full border flex items-center justify-center shrink-0 transition-colors", editData.correctAnswer?.toUpperCase() === optKey ? "border-[#4a634a] border-2 bg-transparent" : "border-[#c4d6c4]")}
+                                              className={cn("w-6 h-6 rounded-full border flex items-center justify-center shrink-0 transition-colors", editData.correctAnswer?.toUpperCase() === optKey ? "border-[#4a634a] dark:border-emerald-500/50 border-[#eef2ec] dark:border-slate-800 bg-transparent" : "border-[#c4d6c4] dark:border-emerald-800/50")}
                                               onClick={() => setEditData({...editData, correctAnswer: optKey})}
                                           >
                                               {editData.correctAnswer?.toUpperCase() === optKey && <div className="w-3 h-3 bg-[#4a634a] rounded-full" />}
@@ -761,13 +761,13 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                                           <div className="flex-1">
                                               <MD3Input label={`Option ${optKey}`} placeholder={`Option ${optKey}`} value={editData.options?.[optKey.toLowerCase() as keyof typeof editData.options] || ''} onChange={e => setEditData({...editData, options: {...editData.options!, [optKey.toLowerCase()]: e.target.value}})} />
                                           </div>
-                                          <button className="text-slate-400 hover:text-slate-600 shrink-0 px-2" onClick={() => setEditData({...editData, options: {...editData.options!, [optKey.toLowerCase()]: ''}})}><X className="w-4 h-4" /></button>
+                                          <button className="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:text-slate-400 shrink-0 px-2" onClick={() => setEditData({...editData, options: {...editData.options!, [optKey.toLowerCase()]: ''}})}><X className="w-4 h-4" /></button>
                                       </div>
                                   ))}
                                   <div className="flex flex-col gap-3 pt-2">
                                       <div className="flex items-center gap-3">
                                           <button 
-                                              className={cn("w-6 h-6 rounded-full border flex items-center justify-center shrink-0 transition-colors", editData.correctAnswer?.toUpperCase() === 'E' ? "border-[#4a634a] border-2 bg-transparent" : "border-[#c4d6c4]")}
+                                              className={cn("w-6 h-6 rounded-full border flex items-center justify-center shrink-0 transition-colors", editData.correctAnswer?.toUpperCase() === 'E' ? "border-[#4a634a] dark:border-emerald-500/50 border-[#eef2ec] dark:border-slate-800 bg-transparent" : "border-[#c4d6c4] dark:border-emerald-800/50")}
                                               onClick={() => setEditData({...editData, correctAnswer: 'E'})}
                                           >
                                               {editData.correctAnswer?.toUpperCase() === 'E' && <div className="w-3 h-3 bg-[#4a634a] rounded-full" />}
@@ -775,33 +775,33 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                                           <div className="flex-1">
                                               <MD3Input label="Option E (optional)" placeholder="Option E" value={editData.options?.e || ''} onChange={e => setEditData({...editData, options: {...editData.options!, e: e.target.value}})} />
                                           </div>
-                                          <button className="text-[#4a634a] hover:text-emerald-700 shrink-0 px-2"><Plus className="w-5 h-5" /></button>
+                                          <button className="text-[#4a634a] dark:text-emerald-400 hover:text-emerald-700 dark:text-emerald-400 shrink-0 px-2"><Plus className="w-5 h-5" /></button>
                                       </div>
-                                      <Button variant="outline" className="w-fit mt-2 rounded-full border-[#d3e3d3] text-[#4a634a] bg-[#fdfefd] hover:bg-[#f4f8f4]">Add Option</Button>
+                                      <Button variant="outline" className="w-fit mt-2 rounded-full border-[#d3e3d3] dark:border-emerald-900/50 text-[#4a634a] dark:text-emerald-400 bg-[#fdfefd] dark:bg-slate-900 hover:bg-[#f4f8f4] dark:bg-emerald-900/20">Add Option</Button>
                                   </div>
                               </div>
                           ) : ['T/F'].includes(editData.questionType || '') ? (
                               <div className="space-y-4">
                                   <label className="text-sm font-medium">Select Correct Answer</label>
                                   <div className="flex gap-4">
-                                      <label className={cn("flex flex-1 items-center gap-3 p-4 border rounded-lg cursor-pointer hover:bg-slate-50", editData.correctAnswer === 'True' && "border-blue-500 bg-blue-50")}>
-                                          <input type="radio" name="correctAnswer" checked={editData.correctAnswer === 'True'} onChange={() => setEditData({...editData, correctAnswer: 'True'})} className="w-4 h-4 text-blue-600" />
-                                          <span className="font-semibold text-slate-700">True</span>
+                                      <label className={cn("flex flex-1 items-center gap-3 p-4 border rounded-lg cursor-pointer hover:bg-slate-50 dark:bg-slate-900", editData.correctAnswer === 'True' && "border-blue-500 bg-blue-50")}>
+                                          <input type="radio" name="correctAnswer" checked={editData.correctAnswer === 'True'} onChange={() => setEditData({...editData, correctAnswer: 'True'})} className="w-4 h-4 text-[#2d3b2d] dark:text-emerald-200lue-600" />
+                                          <span className="font-semibold text-slate-700 dark:text-slate-300">True</span>
                                       </label>
-                                      <label className={cn("flex flex-1 items-center gap-3 p-4 border rounded-lg cursor-pointer hover:bg-slate-50", editData.correctAnswer === 'False' && "border-blue-500 bg-blue-50")}>
-                                          <input type="radio" name="correctAnswer" checked={editData.correctAnswer === 'False'} onChange={() => setEditData({...editData, correctAnswer: 'False'})} className="w-4 h-4 text-blue-600" />
-                                          <span className="font-semibold text-slate-700">False</span>
+                                      <label className={cn("flex flex-1 items-center gap-3 p-4 border rounded-lg cursor-pointer hover:bg-slate-50 dark:bg-slate-900", editData.correctAnswer === 'False' && "border-blue-500 bg-blue-50")}>
+                                          <input type="radio" name="correctAnswer" checked={editData.correctAnswer === 'False'} onChange={() => setEditData({...editData, correctAnswer: 'False'})} className="w-4 h-4 text-[#2d3b2d] dark:text-emerald-200lue-600" />
+                                          <span className="font-semibold text-slate-700 dark:text-slate-300">False</span>
                                       </label>
                                   </div>
                               </div>
                           ) : ['FIB'].includes(editData.questionType || '') ? (
                               <div className="space-y-4">
-                                  <div className="p-3 bg-blue-50 border border-blue-200 text-blue-800 rounded-lg text-sm dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-300">
-                                      <strong>How to create blanks:</strong> Type <code className="bg-white dark:bg-slate-800 px-1 rounded text-blue-600 dark:text-blue-400">[blank]</code> anywhere in the Question Text above to create a gap. You can add multiple blanks.
+                                  <div className="p-3 bg-blue-50 border border-blue-200 text-[#2d3b2d] dark:text-emerald-200lue-800 rounded-lg text-sm dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-300">
+                                      <strong>How to create blanks:</strong> Type <code className="bg-white dark:bg-slate-800 px-1 rounded text-[#2d3b2d] dark:text-emerald-200lue-600 dark:text-blue-400">[blank]</code> anywhere in the Question Text above to create a gap. You can add multiple blanks.
                                   </div>
                                   <div>
                                       <label className="text-sm font-medium">Correct Answer(s) in Order</label>
-                                      <p className="text-xs text-slate-500 mb-2">Separate answers for each blank with commas (e.g. "Paris, Tokyo").</p>
+                                      <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">Separate answers for each blank with commas (e.g. "Paris, Tokyo").</p>
                                       <Input 
                                           value={editData.correctAnswer || ''} 
                                           onChange={e => setEditData({...editData, correctAnswer: e.target.value})} 
@@ -810,7 +810,7 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                                   </div>
                                   <div className="pt-2">
                                       <label className="text-sm font-medium">Word Bank Distractors (Optional)</label>
-                                      <p className="text-xs text-slate-500 mb-2">Add extra wrong words to the drag-and-drop word bank to make it harder.</p>
+                                      <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">Add extra wrong words to the drag-and-drop word bank to make it harder.</p>
                                       <div className="grid grid-cols-2 gap-3">
                                           <Input placeholder="Distractor 1" value={editData.options?.a || ''} onChange={e => setEditData({...editData, options: {...editData.options!, a: e.target.value}})} />
                                           <Input placeholder="Distractor 2" value={editData.options?.b || ''} onChange={e => setEditData({...editData, options: {...editData.options!, b: e.target.value}})} />
@@ -822,7 +822,7 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                           ) : (
                               <div>
                                   <label className="text-sm font-medium">Answer / Answer Key</label>
-                                  <div className="prose-editor-container border border-[#c4d6c4] rounded-xl overflow-hidden mt-2">
+                                  <div className="prose-editor-container border border-[#c4d6c4] dark:border-emerald-800/50 rounded-xl overflow-hidden mt-2">
                                       <TiptapEditor 
                                           content={editData.correctAnswer || ''} 
                                           onChange={(html) => setEditData({...editData, correctAnswer: html})} 
@@ -835,10 +835,10 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
 
                   {/* --- CARD 3: Explanation --- */}
                   {!['Desc', 'CQ'].includes(editData.questionType || '') && (
-                      <Card className="rounded-lg border-[#d3e3d3] shadow-sm bg-[#fdfefd] overflow-hidden">
-                          <CardHeader className="flex flex-row items-center justify-between pb-2 border-b border-[#eef2ec] bg-[#f8faf8]">
-                              <CardTitle className="text-base text-[#4a634a]">Explanation</CardTitle>
-                              <Button variant="outline" size="sm" onClick={handleGenerateAI} disabled={isGeneratingAI} className="h-7 text-xs rounded-lg text-[#4a634a] border-[#c4d6c4] bg-[#fdfefd] hover:bg-[#f4f8f4]">
+                      <Card className="rounded-lg border-[#d3e3d3] dark:border-emerald-900/50 shadow-sm bg-[#fdfefd] dark:bg-slate-900 overflow-hidden">
+                          <CardHeader className="flex flex-row items-center justify-between pb-2 border-b border-[#eef2ec] dark:border-slate-800 bg-[#f8faf8] dark:bg-slate-900">
+                              <CardTitle className="text-[#2d3b2d] dark:text-emerald-200ase text-[#4a634a] dark:text-emerald-400">Explanation</CardTitle>
+                              <Button variant="outline" size="sm" onClick={handleGenerateAI} disabled={isGeneratingAI} className="h-7 text-xs rounded-lg text-[#4a634a] dark:text-emerald-400 border-[#c4d6c4] dark:border-emerald-800/50 bg-[#fdfefd] dark:bg-slate-900 hover:bg-[#f4f8f4] dark:bg-emerald-900/20">
                                   {isGeneratingAI ? <Loader2 className="h-3 w-3 mr-1.5 animate-spin" /> : <Sparkles className="h-3 w-3 mr-1.5" />}
                                   Generate with AI
                               </Button>
@@ -859,9 +859,9 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
               <div className="space-y-2 flex flex-col">
                   {/* --- CARD 4: Academic Taxonomy --- */}
                   {(editData.contentType === 'academic' || defaultContentType === 'academic' || (!editData.contentType && (editData.boardId || editData.classId || !editData.examIds?.length))) && (
-                      <Card className="rounded-lg border-[#d3e3d3] shadow-sm bg-[#fdfefd] overflow-hidden">
-                          <CardHeader className="flex flex-row items-center justify-between pb-2 border-b border-[#eef2ec] bg-[#f8faf8]">
-                          <CardTitle className="text-base text-[#4a634a]">Academic Taxonomy</CardTitle>
+                      <Card className="rounded-lg border-[#d3e3d3] dark:border-emerald-900/50 shadow-sm bg-[#fdfefd] dark:bg-slate-900 overflow-hidden">
+                          <CardHeader className="flex flex-row items-center justify-between pb-2 border-b border-[#eef2ec] dark:border-slate-800 bg-[#f8faf8] dark:bg-slate-900">
+                          <CardTitle className="text-[#2d3b2d] dark:text-emerald-200ase text-[#4a634a] dark:text-emerald-400">Academic Taxonomy</CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-3 pt-3">
                           <div className="grid grid-cols-2 gap-4">
@@ -922,8 +922,8 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                   )}
 
                   {/* --- CARD 5: Publish Settings --- */}
-                  <Card className="rounded-lg border-[#d3e3d3] shadow-sm bg-[#fdfefd] overflow-hidden">
-                      <CardHeader className="pb-2 border-b border-[#eef2ec] bg-[#f8faf8]"><CardTitle className="text-base text-[#4a634a]">Publish Settings</CardTitle></CardHeader>
+                  <Card className="rounded-lg border-[#d3e3d3] dark:border-emerald-900/50 shadow-sm bg-[#fdfefd] dark:bg-slate-900 overflow-hidden">
+                      <CardHeader className="pb-2 border-b border-[#eef2ec] dark:border-slate-800 bg-[#f8faf8] dark:bg-slate-900"><CardTitle className="text-[#2d3b2d] dark:text-emerald-200ase text-[#4a634a] dark:text-emerald-400">Publish Settings</CardTitle></CardHeader>
                       <CardContent className="space-y-3 pt-3">
                           <div>
                               <label className="text-xs font-semibold mb-2 block">Status</label>
@@ -940,10 +940,10 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                           </div>
                           <div>
                               <label className="text-xs font-semibold mb-2 block">Difficulty</label>
-                              <div className="flex bg-slate-100 rounded-full p-1 w-full border">
-                                  <button onClick={() => setEditData({...editData, difficulty: 'Easy'})} className={cn("flex-1 text-xs py-1.5 rounded-full font-medium transition-colors", editData.difficulty === 'Easy' ? "bg-green-100 text-green-800 shadow-sm border border-green-200" : "text-slate-600 hover:text-slate-900")}>Easy</button>
-                                  <button onClick={() => setEditData({...editData, difficulty: 'Medium'})} className={cn("flex-1 text-xs py-1.5 rounded-full font-medium transition-colors", editData.difficulty === 'Medium' ? "bg-green-100 text-green-800 shadow-sm border border-green-200" : "text-slate-600 hover:text-slate-900")}>Medium</button>
-                                  <button onClick={() => setEditData({...editData, difficulty: 'Hard'})} className={cn("flex-1 text-xs py-1.5 rounded-full font-medium transition-colors", editData.difficulty === 'Hard' ? "bg-green-100 text-green-800 shadow-sm border border-green-200" : "text-slate-600 hover:text-slate-900")}>Hard</button>
+                              <div className="flex bg-slate-100 dark:bg-slate-800 rounded-full p-1 w-full border">
+                                  <button onClick={() => setEditData({...editData, difficulty: 'Easy'})} className={cn("flex-1 text-xs py-1.5 rounded-full font-medium transition-colors", editData.difficulty === 'Easy' ? "bg-green-100 text-green-800 shadow-sm border border-green-200" : "text-slate-600 dark:text-slate-400 hover:text-slate-900")}>Easy</button>
+                                  <button onClick={() => setEditData({...editData, difficulty: 'Medium'})} className={cn("flex-1 text-xs py-1.5 rounded-full font-medium transition-colors", editData.difficulty === 'Medium' ? "bg-green-100 text-green-800 shadow-sm border border-green-200" : "text-slate-600 dark:text-slate-400 hover:text-slate-900")}>Medium</button>
+                                  <button onClick={() => setEditData({...editData, difficulty: 'Hard'})} className={cn("flex-1 text-xs py-1.5 rounded-full font-medium transition-colors", editData.difficulty === 'Hard' ? "bg-green-100 text-green-800 shadow-sm border border-green-200" : "text-slate-600 dark:text-slate-400 hover:text-slate-900")}>Hard</button>
                               </div>
                           </div>
                           <div>
@@ -972,13 +972,13 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                           <div>
                               <label className="text-xs font-semibold mb-2 block">Tags</label>
                               {tags.length === 0 ? (
-                                  <p className="text-xs text-slate-500">No tags defined yet.</p>
+                                  <p className="text-xs text-slate-500 dark:text-slate-400">No tags defined yet.</p>
                               ) : (
                                   <div className="flex flex-wrap gap-2 max-h-[150px] overflow-y-auto">
                                       {tags.map(tag => (
                                           <div key={tag.id} 
                                                className={cn("text-xs flex items-center gap-1 px-2 py-1 rounded-full border cursor-pointer select-none transition-colors", 
-                                                 (editData.tags || []).includes(tag.name) ? "bg-slate-200 border-slate-300 text-slate-700 font-medium" : "bg-white border-slate-200 text-slate-500 hover:bg-slate-50"
+                                                 (editData.tags || []).includes(tag.name) ? "bg-slate-200 dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 font-medium" : "bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:bg-slate-900"
                                                )}
                                                onClick={() => {
                                                    const currentTags = editData.tags || [];
@@ -990,7 +990,7 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                                                }}
                                           >
                                               {tag.name}
-                                              {(editData.tags || []).includes(tag.name) && <X className="w-3 h-3 text-slate-400 hover:text-slate-600" />}
+                                              {(editData.tags || []).includes(tag.name) && <X className="w-3 h-3 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:text-slate-400" />}
                                           </div>
                                       ))}
                                   </div>
@@ -1001,11 +1001,11 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
 
                   {/* --- CARD 6: Exams Taxonomy --- */}
                   {(editData.contentType === 'exam' || defaultContentType === 'exam' || (!editData.contentType && editData.examIds && editData.examIds.length > 0)) && (
-                      <Card className="rounded-lg border-[#d3e3d3] shadow-sm bg-[#fdfefd] overflow-hidden mt-2">
-                          <CardHeader className="pb-2 border-b border-[#eef2ec] bg-[#f8faf8]"><CardTitle className="text-base text-[#4a634a]">Exams Taxonomy</CardTitle></CardHeader>
+                      <Card className="rounded-lg border-[#d3e3d3] dark:border-emerald-900/50 shadow-sm bg-[#fdfefd] dark:bg-slate-900 overflow-hidden mt-2">
+                          <CardHeader className="pb-2 border-b border-[#eef2ec] dark:border-slate-800 bg-[#f8faf8] dark:bg-slate-900"><CardTitle className="text-[#2d3b2d] dark:text-emerald-200ase text-[#4a634a] dark:text-emerald-400">Exams Taxonomy</CardTitle></CardHeader>
                       <CardContent className="pt-3">
                           {exams.length === 0 ? (
-                              <p className="text-xs text-slate-500">No exams defined in question_exams collection yet.</p>
+                              <p className="text-xs text-slate-500 dark:text-slate-400">No exams defined in question_exams collection yet.</p>
                           ) : (
                               <div className="grid grid-cols-2 gap-3 max-h-[300px] overflow-y-auto pr-2">
                                   {exams.map(exam => (
@@ -1034,8 +1034,8 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                   )}
 
                   {/* --- CARD 7: Quality Assurance --- */}
-                  <Card className="rounded-[24px] border-[#d3e3d3] shadow-sm bg-[#fdfefd] overflow-hidden">
-                      <CardHeader className="bg-indigo-50/50 dark:bg-indigo-900/20 pb-4 border-b border-[#eef2ec]">
+                  <Card className="rounded-[24px] border-[#d3e3d3] dark:border-emerald-900/50 shadow-sm bg-[#fdfefd] dark:bg-slate-900 overflow-hidden">
+                      <CardHeader className="bg-indigo-50/50 dark:bg-indigo-900/20 pb-4 border-b border-[#eef2ec] dark:border-slate-800">
                           <CardTitle className="flex items-center gap-2 text-indigo-700 dark:text-indigo-400 text-lg">
                               <ShieldCheck className="w-5 h-5" />
                               Quality Assurance & Verification
@@ -1126,17 +1126,17 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
           </div>
 
           {/* Bottom Sticky Action Bar */}
-          <div className="fixed bottom-0 left-0 right-0 md:left-[250px] bg-[#eef2ec]/90 backdrop-blur-md border-t border-[#d3e3d3] p-4 flex items-center justify-between z-40 shadow-[0_-4px_10px_rgba(0,0,0,0.02)]">
-              <Button variant="ghost" className="rounded-full text-[#4a634a] hover:bg-[#c4d6c4]" onClick={onCancel}>Cancel</Button>
+          <div className="fixed bottom-0 left-0 right-0 md:left-[250px] bg-[#eef2ec] dark:bg-emerald-900/50/90 backdrop-blur-md border-t border-[#d3e3d3] dark:border-emerald-900/50 p-4 flex items-center justify-between z-40 shadow-[0_-4px_10px_rgba(0,0,0,0.02)]">
+              <Button variant="ghost" className="rounded-full text-[#4a634a] dark:text-emerald-400 hover:bg-[#c4d6c4]" onClick={onCancel}>Cancel</Button>
               <div className="flex items-center gap-3">
-                  <Button variant="outline" className="rounded-full border-[#4a634a] text-[#4a634a] bg-transparent hover:bg-[#f4f8f4] px-6" onClick={() => {
+                  <Button variant="outline" className="rounded-full border-[#4a634a] dark:border-emerald-500/50 text-[#4a634a] dark:text-emerald-400 bg-transparent hover:bg-[#f4f8f4] dark:bg-emerald-900/20 px-6" onClick={() => {
                       setEditData({...editData, status: 'Draft'});
                       handleSave();
                   }} disabled={isSaving}>
                       {isSaving && editData.status === 'Draft' ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
                       Save Draft
                   </Button>
-                  <Button className="rounded-full bg-[#3d5a3d] hover:bg-[#2d442d] text-white px-8 shadow-sm" onClick={() => {
+                  <Button className="rounded-full bg-[#3d5a3d] dark:bg-emerald-600 hover:bg-[#2d442d] dark:bg-emerald-700 text-white px-8 shadow-sm" onClick={() => {
                       setEditData({...editData, status: 'Published'});
                       handleSave();
                   }} disabled={isSaving}>
@@ -1149,14 +1149,14 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
           <Dialog open={taxonomySheet.isOpen} onOpenChange={(isOpen) => setTaxonomySheet(prev => ({...prev, isOpen}))}>
               <DialogContent className="sm:max-w-[425px] h-[80vh] rounded-[24px] px-0 flex flex-col pb-0 overflow-hidden">
                   <DialogHeader className="px-6 pb-2 border-b">
-                      <DialogTitle className="text-xl font-bold text-slate-800">{taxonomySheet.title}</DialogTitle>
+                      <DialogTitle className="text-xl font-bold text-slate-800 dark:text-slate-200">{taxonomySheet.title}</DialogTitle>
                   </DialogHeader>
                   <div className="p-4 border-b">
                       <div className="relative">
-                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 dark:text-slate-500" />
                           <Input 
                               placeholder="Search..." 
-                              className="pl-9 bg-[#f0f4f0] border-transparent rounded-xl h-12 focus-visible:ring-emerald-600"
+                              className="pl-9 bg-[#f0f4f0] dark:bg-emerald-950/30 border-transparent rounded-xl h-12 focus-visible:ring-emerald-600"
                               value={sheetSearch}
                               onChange={e => setSheetSearch(e.target.value)}
                           />
@@ -1173,14 +1173,14 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                       >
                           {taxonomySheet.items.filter(item => item.name.toLowerCase().includes(sheetSearch.toLowerCase())).map(item => (
                               <div key={item.id} className="flex items-center space-x-3">
-                                  <RadioGroupItem value={item.id} id={`sheet-item-${item.id}`} className="text-emerald-700 border-emerald-700" />
+                                  <RadioGroupItem value={item.id} id={`sheet-item-${item.id}`} className="text-emerald-700 dark:text-emerald-400 border-[#eef2ec] dark:border-slate-800merald-700" />
                                   <label htmlFor={`sheet-item-${item.id}`} className="text-sm font-medium leading-none cursor-pointer flex-1 py-1">
                                       {item.name}
                                   </label>
                               </div>
                           ))}
                           {taxonomySheet.items.filter(item => item.name.toLowerCase().includes(sheetSearch.toLowerCase())).length === 0 && (
-                              <div className="text-center text-slate-500 py-8">No results found</div>
+                              <div className="text-center text-slate-500 dark:text-slate-400 py-8">No results found</div>
                           )}
                       </RadioGroup>
                   </div>
@@ -1191,12 +1191,12 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
           <Dialog open={showSampleJsonDialog} onOpenChange={setShowSampleJsonDialog}>
               <DialogContent className="w-[95vw] sm:w-full max-w-[95vw] sm:max-w-[700px] rounded-2xl sm:rounded-[24px] p-3 sm:p-6 gap-2 sm:gap-4 overflow-hidden">
                   <DialogHeader>
-                      <DialogTitle className="text-lg sm:text-xl font-bold text-slate-800">
+                      <DialogTitle className="text-lg sm:text-xl font-bold text-slate-800 dark:text-slate-200">
                           Sample JSON Format
                       </DialogTitle>
                   </DialogHeader>
                   <Tabs defaultValue="MCQ" className="w-full mt-2">
-                      <TabsList className="flex flex-wrap justify-center w-full p-1 h-auto bg-slate-100 rounded-lg gap-1">
+                      <TabsList className="flex flex-wrap justify-center w-full p-1 h-auto bg-slate-100 dark:bg-slate-800 rounded-lg gap-1">
                           <TabsTrigger value="MCQ" className="flex-1 min-w-[50px] sm:min-w-[60px] text-[11px] sm:text-sm py-1.5 px-2">MCQ</TabsTrigger>
                           <TabsTrigger value="T/F" className="flex-1 min-w-[50px] sm:min-w-[60px] text-[11px] sm:text-sm py-1.5 px-2">T/F</TabsTrigger>
                           <TabsTrigger value="FIB" className="flex-1 min-w-[50px] sm:min-w-[60px] text-[11px] sm:text-sm py-1.5 px-2">FIB</TabsTrigger>
@@ -1205,7 +1205,7 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                       </TabsList>
                       {Object.entries(sampleJSONData).map(([key, val]) => (
                           <TabsContent key={key} value={key} className="min-w-0 mt-3 w-full max-w-full overflow-hidden">
-                              <div className="bg-slate-900 rounded-xl p-3 sm:p-4 overflow-auto max-h-[40vh] sm:max-h-[50vh] relative w-full max-w-full">
+                              <div className="bg-slate-900 dark:bg-slate-950 rounded-xl p-3 sm:p-4 overflow-auto max-h-[40vh] sm:max-h-[50vh] relative w-full max-w-full">
                                   <Button 
                                       variant="ghost" 
                                       size="sm" 
@@ -1234,7 +1234,7 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
           <Dialog open={showBulkImportDialog} onOpenChange={setShowBulkImportDialog}>
               <DialogContent className="w-[95vw] sm:w-full max-w-[95vw] sm:max-w-[600px] rounded-2xl sm:rounded-[24px] p-3 sm:p-6 gap-2 sm:gap-4 overflow-hidden">
                   <DialogHeader>
-                      <DialogTitle className="text-lg sm:text-xl font-bold text-slate-800">
+                      <DialogTitle className="text-lg sm:text-xl font-bold text-slate-800 dark:text-slate-200">
                           {previewQuestions ? "Preview Import" : "Bulk Import Questions"}
                       </DialogTitle>
                   </DialogHeader>
@@ -1242,30 +1242,30 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                   {!previewQuestions ? (
                       <div className="space-y-3 sm:space-y-4 pt-2 sm:pt-4">
                           <div className="space-y-1.5 sm:space-y-2">
-                              <label className="text-xs sm:text-sm font-semibold text-slate-700">Upload JSON File</label>
+                              <label className="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">Upload JSON File</label>
                               <div className="flex items-center gap-2 sm:gap-4">
-                                  <Input type="file" accept=".json" onChange={handleBulkImport} className="cursor-pointer text-[10px] sm:text-sm h-8 sm:h-10 file:text-[#4a634a] file:font-medium file:bg-[#f4f8f4] file:border-0 file:mr-2 sm:file:mr-4 file:px-3 sm:file:px-4 file:py-1 sm:file:py-2 file:rounded-full" />
+                                  <Input type="file" accept=".json" onChange={handleBulkImport} className="cursor-pointer text-[10px] sm:text-sm h-8 sm:h-10 file:text-[#4a634a] dark:text-emerald-400 file:font-medium file:bg-[#f4f8f4] dark:bg-emerald-900/20 file:border-0 file:mr-2 sm:file:mr-4 file:px-3 sm:file:px-4 file:py-1 sm:file:py-2 file:rounded-full" />
                               </div>
                           </div>
                           
                           <div className="flex items-center gap-4">
-                              <div className="h-px bg-slate-200 flex-1"></div>
-                              <span className="text-[10px] sm:text-xs text-slate-400 font-medium uppercase">OR</span>
-                              <div className="h-px bg-slate-200 flex-1"></div>
+                              <div className="h-px bg-slate-200 dark:bg-slate-700 flex-1"></div>
+                              <span className="text-[10px] sm:text-xs text-slate-400 dark:text-slate-500 font-medium uppercase">OR</span>
+                              <div className="h-px bg-slate-200 dark:bg-slate-700 flex-1"></div>
                           </div>
 
                           <div className="space-y-1.5 sm:space-y-2">
-                              <label className="text-xs sm:text-sm font-semibold text-slate-700">Paste JSON Content</label>
+                              <label className="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">Paste JSON Content</label>
                               <Textarea 
                                   value={bulkImportText} 
                                   onChange={e => setBulkImportText(e.target.value)} 
                                   placeholder="Paste your JSON array of questions here..." 
-                                  className="h-32 sm:h-48 font-mono text-[10px] sm:text-xs p-2 sm:p-3 border-[#c4d6c4] focus-visible:ring-[#4a634a]"
+                                  className="h-32 sm:h-48 font-mono text-[10px] sm:text-xs p-2 sm:p-3 border-[#c4d6c4] dark:border-emerald-800/50 focus-visible:ring-[#4a634a] dark:focus-visible:ring-emerald-500"
                               />
                           </div>
 
                           <Button 
-                              className="w-full rounded-full bg-[#3d5a3d] hover:bg-[#2d442d] text-white h-8 sm:h-10 text-xs sm:text-sm mt-2 sm:mt-0" 
+                              className="w-full rounded-full bg-[#3d5a3d] dark:bg-emerald-600 hover:bg-[#2d442d] dark:bg-emerald-700 text-white h-8 sm:h-10 text-xs sm:text-sm mt-2 sm:mt-0" 
                               disabled={!bulkImportText.trim()}
                               onClick={() => processBulkImportPreview(bulkImportText)}
                           >
@@ -1275,24 +1275,24 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                       </div>
                   ) : (
                       <div className="space-y-3 sm:space-y-4 pt-1 sm:pt-2">
-                          <div className="bg-[#f0f4f0] text-[#3d5a3d] text-xs sm:text-sm p-2 sm:p-3 rounded-lg font-medium flex justify-between items-center">
+                          <div className="bg-[#f0f4f0] dark:bg-emerald-950/30 text-[#3d5a3d] dark:text-emerald-300 text-xs sm:text-sm p-2 sm:p-3 rounded-lg font-medium flex justify-between items-center">
                               <span>Ready to import {previewQuestions.length} questions.</span>
                           </div>
                           <div className="max-h-[50vh] sm:max-h-[55vh] overflow-y-auto space-y-2 pr-1 sm:pr-2">
                               {previewQuestions.map((q, i) => (
-                                  <div key={i} className="p-2 sm:p-3 border border-[#d3e3d3] rounded-xl bg-white shadow-sm">
-                                      <p className="font-semibold text-xs sm:text-sm line-clamp-2 text-slate-800">{q.questionText}</p>
+                                  <div key={i} className="p-2 sm:p-3 border border-[#d3e3d3] dark:border-emerald-900/50 rounded-xl bg-white dark:bg-slate-950 shadow-sm">
+                                      <p className="font-semibold text-xs sm:text-sm line-clamp-2 text-slate-800 dark:text-slate-200">{q.questionText}</p>
                                       <div className="flex gap-1.5 sm:gap-2 mt-1.5 sm:mt-2">
-                                          <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider bg-[#eef2ec] text-[#4a634a] px-1.5 sm:px-2 py-0.5 rounded-full">{q.questionType}</span>
-                                          <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-500 px-1.5 sm:px-2 py-0.5 rounded-full">{q.difficulty || 'Medium'}</span>
+                                          <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider bg-[#eef2ec] dark:bg-emerald-900/50 text-[#4a634a] dark:text-emerald-400 px-1.5 sm:px-2 py-0.5 rounded-full">{q.questionType}</span>
+                                          <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-1.5 sm:px-2 py-0.5 rounded-full">{q.difficulty || 'Medium'}</span>
                                       </div>
                                   </div>
                               ))}
                           </div>
                           <div className="flex gap-2 sm:gap-3 pt-2 border-t border-slate-100">
-                              <Button variant="outline" className="flex-1 rounded-full border-slate-300 h-8 sm:h-10 text-xs sm:text-sm" onClick={() => setPreviewQuestions(null)}>Cancel</Button>
+                              <Button variant="outline" className="flex-1 rounded-full border-slate-300 dark:border-slate-600 h-8 sm:h-10 text-xs sm:text-sm" onClick={() => setPreviewQuestions(null)}>Cancel</Button>
                               <Button 
-                                  className="flex-1 rounded-full bg-[#3d5a3d] hover:bg-[#2d442d] text-white shadow-sm h-8 sm:h-10 text-xs sm:text-sm" 
+                                  className="flex-1 rounded-full bg-[#3d5a3d] dark:bg-emerald-600 hover:bg-[#2d442d] dark:bg-emerald-700 text-white shadow-sm h-8 sm:h-10 text-xs sm:text-sm" 
                                   onClick={confirmBulkImport}
                                   disabled={isSaving}
                               >

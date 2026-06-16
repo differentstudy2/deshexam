@@ -12,7 +12,7 @@ export default function AddAcademicQuestionPage() {
   const [initialData] = useState<Partial<QuestionBankEntry>>({});
 
   return (
-    <div className="p-4 md:p-6 bg-[#f8fafc] min-h-screen">
+    <div className="p-4 md:p-6 bg-[#f8fafc] dark:bg-slate-950 min-h-screen">
       <QuestionBankEditor
         initialData={initialData}
         defaultContentType="academic"
