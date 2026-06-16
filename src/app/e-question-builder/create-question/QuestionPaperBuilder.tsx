@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
-import { Download, Settings, FileText, Shuffle, Save, ArrowLeft, Edit, Book, Monitor, Lightbulb, User, Tag, Star, Grid3X3, Columns, Barcode, Hash, LayoutGrid, FileDigit, Heading, MapPin, Landmark, Layers, HelpCircle, RefreshCw, Printer, Languages, QrCode, ImageIcon, Waves, PlusCircle, Plus, CheckCircle, CircleDot, Zap, Loader2, GripVertical, Trash2, Database, Sparkles , ZoomIn, ZoomOut } from 'lucide-react';
+import { Download, Settings, FileText, Shuffle, Save, ArrowLeft, Edit, Book, Monitor, Lightbulb, User, Tag, Star, Grid3X3, Columns, Barcode, Hash, LayoutGrid, FileDigit, Heading, MapPin, Landmark, Layers, HelpCircle, RefreshCw, Printer, Languages, QrCode, ImageIcon, Waves, PlusCircle, Plus, CheckCircle, CircleDot, Zap, Loader2, GripVertical, Trash2, Database, Sparkles , ZoomIn, ZoomOut, Lock } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { getQuestionsByIds, getTaxonomyNodes } from '@/lib/firebase/question-bank';
 import { QuestionBankEntry } from '@/lib/question-bank-types';
@@ -25,6 +25,7 @@ import 'katex/dist/katex.min.css';
 import { useAuth } from '@/hooks/use-auth';
 import { getUserProfile } from '@/lib/firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
+import { useAuthDialog } from '@/hooks/use-auth-dialog';
 
 interface Props {
   boardId?: string;
@@ -39,6 +40,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
   const router = useRouter();
   const { user } = useAuth();
   const { toast } = useToast();
+  const { openAuthDialog } = useAuthDialog();
   const [userTier, setUserTier] = useState<'free' | 'pass' | 'pro'>('free');
 
   useEffect(() => {
@@ -53,24 +55,51 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
     }
   }, [user]);
 
-  const requirePremium = (requiredTier: 'pass' | 'pro', featureName: string) => {
-    if (requiredTier === 'pro' && userTier !== 'pro') {
-      toast({
-        title: 'Premium Feature Locked 🔒',
-        description: `Please upgrade your subscription to Pro Pass to unlock ${featureName}.`,
-        variant: 'destructive',
-      });
-      return false;
+  const [hasUsedAiGen, setHasUsedAiGen] = useState(false);
+  const [hasUsedBulkImport, setHasUsedBulkImport] = useState(false);
+  const [paywallFeatures, setPaywallFeatures] = useState<{feature: string, tier: 'pass' | 'pro'}[]>([]);
+  const [isPaywallOpen, setIsPaywallOpen] = useState(false);
+
+  const checkExportPermissions = () => {
+    const premiumUsage: {feature: string, tier: 'pass' | 'pro'}[] = [];
+    if (questions.length > 20) premiumUsage.push({feature: 'More than 20 questions', tier: 'pass'});
+    if (watermarkText && watermarkText !== translations['bn']?.['defaultHeaderTitle'] && watermarkText !== translations['en']?.['defaultHeaderTitle']) premiumUsage.push({feature: 'Custom Watermark Text', tier: 'pass'});
+    if (watermarkImage) premiumUsage.push({feature: 'Custom Watermark Image', tier: 'pro'});
+    if (headerImage) premiumUsage.push({feature: 'Custom Header Image', tier: 'pro'});
+    if (showOMR || showOMRSheetAttachment) premiumUsage.push({feature: 'OMR Generator', tier: 'pass'});
+    if (hasUsedAiGen) premiumUsage.push({feature: 'AI Question Generator', tier: 'pro'});
+    if (hasUsedBulkImport) premiumUsage.push({feature: 'Bulk Question Import', tier: 'pass'});
+
+    return premiumUsage;
+  };
+
+  const handleInterceptedExport = (exportFn: () => void) => {
+    const usage = checkExportPermissions();
+    if (usage.length > 0 && (!user || userTier === 'free')) {
+      setPaywallFeatures(usage);
+      setIsPaywallOpen(true);
+      return;
     }
-    if (requiredTier === 'pass' && userTier === 'free') {
-      toast({
-        title: 'Premium Feature Locked 🔒',
-        description: `Please upgrade your subscription to Pass or Pro Pass to unlock ${featureName}.`,
-        variant: 'destructive',
-      });
-      return false;
+    exportFn();
+  };
+
+  const handleRemovePremiumFeaturesAndExport = () => {
+    if (questions.length > 20) {
+      setQuestions(questions.slice(0, 20));
     }
-    return true;
+    setWatermarkText(translations[appLanguage]?.['defaultHeaderTitle'] || "দেশ এক্সাম একাডেমী");
+    setWatermarkImage(null);
+    setHeaderImage(null);
+    setShowOMR(false);
+    setShowOMRSheetAttachment(false);
+    setHasUsedAiGen(false);
+    setHasUsedBulkImport(false);
+    
+    setIsPaywallOpen(false);
+    toast({
+      title: "Premium Features Removed",
+      description: "You can now print or download your paper for free. Click Export again.",
+    });
   };
 
   const [questions, setQuestions] = useState<QuestionBankEntry[]>([]);
@@ -313,7 +342,6 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
 
   // Template Management
   const handleSaveTemplate = () => {
-    if (!requirePremium('pass', 'Saving Templates')) return;
     const settings = {
       format, optionStyle, paperColumns, optionShape, optionLabelType,
       optionColumns, rowGap, colGap, fontFamily, fontSize, questionOptionGap,
@@ -373,36 +401,40 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
 
   // Export Handlers
   const handleExportPDF = async () => {
-    const element = document.getElementById('printable-paper');
-    if (!element) return;
-    const canvas = await html2canvas(element, { scale: 2, useCORS: true });
-    const imgData = canvas.toDataURL('image/jpeg', 1.0);
-    const pdf = new jsPDF({
-      orientation: orientation === 'Landscape' ? 'landscape' : 'portrait',
-      unit: 'in',
-      format: paperSize === 'A4' ? 'a4' : paperSize === 'Letter' ? 'letter' : 'legal'
+    handleInterceptedExport(async () => {
+      const element = document.getElementById('printable-paper');
+      if (!element) return;
+      const canvas = await html2canvas(element, { scale: 2, useCORS: true });
+      const imgData = canvas.toDataURL('image/jpeg', 1.0);
+      const pdf = new jsPDF({
+        orientation: orientation === 'Landscape' ? 'landscape' : 'portrait',
+        unit: 'in',
+        format: paperSize === 'A4' ? 'a4' : paperSize === 'Letter' ? 'letter' : 'legal'
+      });
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save((paperName || 'Question_Paper') + '.pdf');
     });
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-    pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
-    pdf.save((paperName || 'Question_Paper') + '.pdf');
   };
 
   const handleExportWord = () => {
-    const element = document.getElementById('printable-paper');
-    if (!element) return;
-    const htmlContent = element.innerHTML;
-    const header = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-    <head><meta charset='utf-8'><title>Export Document</title></head><body>`;
-    const footer = `</body></html>`;
-    const sourceHTML = header + htmlContent + footer;
-    const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
-    const fileDownload = document.createElement("a");
-    document.body.appendChild(fileDownload);
-    fileDownload.href = source;
-    fileDownload.download = (paperName || 'Question_Paper') + '.doc';
-    fileDownload.click();
-    document.body.removeChild(fileDownload);
+    handleInterceptedExport(() => {
+      const element = document.getElementById('printable-paper');
+      if (!element) return;
+      const htmlContent = element.innerHTML;
+      const header = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+      <head><meta charset='utf-8'><title>Export Document</title></head><body>`;
+      const footer = `</body></html>`;
+      const sourceHTML = header + htmlContent + footer;
+      const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
+      const fileDownload = document.createElement("a");
+      document.body.appendChild(fileDownload);
+      fileDownload.href = source;
+      fileDownload.download = (paperName || 'Question_Paper') + '.doc';
+      fileDownload.click();
+      document.body.removeChild(fileDownload);
+    });
   };
 
   const handleDragStart = (e: React.DragEvent, index: number) => {
@@ -467,7 +499,8 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
 
       try {
         const parsed = JSON.parse(bulkQuestionText);
-        if (Array.isArray(parsed)) {
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setHasUsedBulkImport(true);
           newQuestions = parsed.map((item, idx) => ({
             id: `custom_bulk_${Date.now()}_${idx}`,
             questionText: item.questionText || '',
@@ -597,20 +630,17 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
   }, []);
 
   const handlePrint = () => {
-    window.print();
+    handleInterceptedExport(() => {
+      window.print();
+    });
   };
 
   const handleShuffle = () => {
-    if (!requirePremium('pro', 'Question Shuffling')) return;
     const shuffled = [...questions].sort(() => Math.random() - 0.5);
     setQuestions(shuffled);
   };
 
   const handleSaveSet = () => {
-    if (!requirePremium('pro', 'Saving Multiple Sets')) {
-      setIsSetCodeOpen(false);
-      return;
-    }
     setActiveSetCode(tempSetCode);
     setSavedSets(prev => {
       const filtered = prev.filter(s => s.code !== tempSetCode);
@@ -661,10 +691,6 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
   };
 
   const handleWatermarkImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!requirePremium('pro', 'Custom Watermark Image')) {
-      e.target.value = '';
-      return;
-    }
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       const url = URL.createObjectURL(file);
@@ -673,10 +699,6 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
   };
 
   const handleHeaderImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!requirePremium('pro', 'Custom Header Image')) {
-      e.target.value = '';
-      return;
-    }
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       const url = URL.createObjectURL(file);
@@ -1143,13 +1165,9 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                     <label className="text-[13px] text-gray-700 mb-2 block">{t('watermarkText', appLanguage)}</label>
                     <Input
                       value={watermarkText}
-                      onChange={e => {
-                        if (!requirePremium('pass', 'Custom Watermark Text')) return;
-                        setWatermarkText(e.target.value);
-                      }}
+                      onChange={e => setWatermarkText(e.target.value)}
                       placeholder={t('defaultHeaderTitle', appLanguage)}
                       className="h-10 text-[14px] bg-white text-gray-700 border-gray-200"
-                      disabled={userTier === 'free'}
                     />
                   </div>
 
@@ -2308,6 +2326,38 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
       </Dialog>
 
       {/* Modals */}
+      <Dialog open={isPaywallOpen} onOpenChange={setIsPaywallOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold flex items-center gap-2">
+              <Lock className="w-5 h-5 text-indigo-600" /> Premium Features Detected
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-4 text-gray-700">
+            <p className="mb-4 text-[15px]">Your question paper looks great! However, it contains Premium features. You need to log in and upgrade your plan to export.</p>
+            <div className="bg-indigo-50/50 rounded-lg p-4 border border-indigo-100">
+              <p className="font-semibold text-indigo-900 mb-2 text-[13px] uppercase tracking-wide">Premium features used:</p>
+              <ul className="space-y-2">
+                {paywallFeatures.map((f, i) => (
+                  <li key={i} className="flex items-center gap-2 text-sm text-indigo-800">
+                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+                    {f.feature} <span className="text-xs font-bold px-1.5 py-0.5 bg-indigo-100 rounded text-indigo-700">{f.tier.toUpperCase()}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+          <DialogFooter className="flex-col gap-2 sm:flex-col sm:space-x-0">
+            {!user ? (
+               <Button className="w-full bg-indigo-600 hover:bg-indigo-700 h-11" onClick={() => { setIsPaywallOpen(false); openAuthDialog("sign-in"); }}>Log In / Sign Up</Button>
+            ) : (
+               <Button className="w-full bg-indigo-600 hover:bg-indigo-700 h-11" onClick={() => { setIsPaywallOpen(false); router.push('/pricing'); }}>Upgrade to Premium</Button>
+            )}
+            <Button variant="outline" className="w-full h-11 text-gray-600" onClick={handleRemovePremiumFeaturesAndExport}>Remove Premium Features & Download Free</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={isAddQuestionOpen} onOpenChange={setIsAddQuestionOpen}>
         <DialogContent className="max-w-xl">
           <DialogHeader>
@@ -2456,7 +2506,10 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
       <AiQuestionGeneratorModal
         isOpen={isAiGeneratorOpen}
         onClose={() => setIsAiGeneratorOpen(false)}
-        onAdd={handleAddFromBank}
+        onAdd={(qs) => {
+          setHasUsedAiGen(true);
+          handleAddFromBank(qs);
+        }}
         appLanguage={appLanguage}
       />
 
@@ -2466,7 +2519,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
           <Settings className="w-5 h-5 text-gray-600" />
           <span className="text-[10px] text-gray-500 font-medium">Settings</span>
         </Button>
-        <Button variant="ghost" className="flex flex-col items-center gap-1 h-auto py-1 text-indigo-600" onClick={() => { if (!requirePremium('pro', 'AI Question Generator')) return; setIsAiGeneratorOpen(true); setEditingMode(true); }}>
+        <Button variant="ghost" className="flex flex-col items-center gap-1 h-auto py-1 text-indigo-600" onClick={() => { setIsAiGeneratorOpen(true); setEditingMode(true); }}>
           <Sparkles className="w-5 h-5 text-indigo-600" />
           <span className="text-[10px] font-medium">AI Gen</span>
         </Button>
