@@ -684,10 +684,10 @@ export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock 
                         </DialogFooter>
                     </DialogContent>
                 </Dialog>
-                <Sheet open={taxonomySheet.isOpen} onOpenChange={(open) => setTaxonomySheet({...taxonomySheet, isOpen: open})}>
-                    <SheetContent side="right" className="w-[400px] sm:w-[540px] flex flex-col p-0 bg-white dark:bg-slate-900">
-                        <SheetHeader className="p-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 shrink-0">
-                            <SheetTitle className="text-lg text-slate-800 dark:text-slate-100">{taxonomySheet.title}</SheetTitle>
+                <Dialog open={taxonomySheet.isOpen} onOpenChange={(open) => setTaxonomySheet({...taxonomySheet, isOpen: open})}>
+                    <DialogContent className="sm:max-w-[540px] h-[80vh] flex flex-col p-0 bg-white dark:bg-slate-900 overflow-hidden">
+                        <DialogHeader className="p-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 shrink-0">
+                            <DialogTitle className="text-lg text-slate-800 dark:text-slate-100">{taxonomySheet.title}</DialogTitle>
                             <div className="relative mt-2">
                                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400 dark:text-slate-500" />
                                 <Input 
@@ -697,7 +697,7 @@ export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock 
                                     onChange={e => setSheetSearch(e.target.value)}
                                 />
                             </div>
-                        </SheetHeader>
+                        </DialogHeader>
                         <div className="flex-1 overflow-y-auto p-2">
                             <div className="space-y-1">
                                 {taxonomySheet.items
@@ -723,8 +723,8 @@ export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock 
                                 )}
                             </div>
                         </div>
-                    </SheetContent>
-                </Sheet>
+                    </DialogContent>
+                </Dialog>
             </div>
         );
 }

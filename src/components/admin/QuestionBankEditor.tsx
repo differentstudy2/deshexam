@@ -11,7 +11,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Switch } from '@/components/ui/switch';
 import { QuestionBankEntry, TaxonomyNode } from '@/lib/question-bank-types';
 import { Loader2, ArrowLeft, Sparkles, Play, Image as ImageIcon, Video, ShieldCheck, Upload, Trash2, X, Plus, Search, ChevronDown, CheckCircle2 } from 'lucide-react';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
@@ -1096,11 +1096,11 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
               </div>
           </div>
           
-          <Sheet open={taxonomySheet.isOpen} onOpenChange={(isOpen) => setTaxonomySheet(prev => ({...prev, isOpen}))}>
-              <SheetContent side="bottom" className="h-[85vh] sm:h-[60vh] rounded-t-[24px] px-0 flex flex-col pb-0">
-                  <SheetHeader className="px-6 pb-2 border-b">
-                      <SheetTitle className="text-xl font-bold text-slate-800">{taxonomySheet.title}</SheetTitle>
-                  </SheetHeader>
+          <Dialog open={taxonomySheet.isOpen} onOpenChange={(isOpen) => setTaxonomySheet(prev => ({...prev, isOpen}))}>
+              <DialogContent className="sm:max-w-[425px] h-[80vh] rounded-[24px] px-0 flex flex-col pb-0 overflow-hidden">
+                  <DialogHeader className="px-6 pb-2 border-b">
+                      <DialogTitle className="text-xl font-bold text-slate-800">{taxonomySheet.title}</DialogTitle>
+                  </DialogHeader>
                   <div className="p-4 border-b">
                       <div className="relative">
                           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
@@ -1134,8 +1134,8 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                           )}
                       </RadioGroup>
                   </div>
-              </SheetContent>
-          </Sheet>
+              </DialogContent>
+          </Dialog>
       </div>
   );
 }
