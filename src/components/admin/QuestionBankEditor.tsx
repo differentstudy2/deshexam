@@ -71,8 +71,8 @@ const MD3SelectField = ({ label, value, placeholder, onClick, required }: { labe
             {label} {required && <span className="text-red-500">*</span>}
         </label>
         <div className="flex items-center justify-between min-h-[16px] mt-0.5">
-            <span className={cn("text-sm font-medium", value ? "text-slate-900" : "text-slate-400")}>{value || placeholder}</span>
-            <ChevronDown className="h-4 w-4 text-slate-400" />
+            <span className={cn("text-sm font-medium truncate pr-2", value ? "text-slate-900" : "text-slate-400")}>{value || placeholder}</span>
+            <ChevronDown className="h-4 w-4 shrink-0 text-slate-400" />
         </div>
     </div>
 );
