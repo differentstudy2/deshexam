@@ -60,16 +60,16 @@ export default function DashboardLayout({
 
   return (
     <SidebarProvider>
-        <div className="flex min-h-screen w-full bg-[#f8f9fa]">
+        <div className="flex min-h-screen w-full bg-[#f8f9fa] dark:bg-slate-950 transition-colors duration-300">
             <Sidebar>
                 <DashboardSidebar user={user} logOut={logOut} />
             </Sidebar>
             <div className="flex flex-col flex-1 w-full relative">
                 {/* Custom Top Navbar for Dashboard */}
-                <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-2 border-b border-slate-200 bg-white px-4 md:px-6 shadow-sm">
+                <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-2 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 md:px-6 shadow-sm transition-colors duration-300">
                     <SidebarTrigger className="-ml-1" />
                     
-                    <h1 className="text-xl font-bold text-slate-800 ml-2 tracking-tight">
+                    <h1 className="text-xl font-bold text-slate-800 dark:text-slate-100 ml-2 tracking-tight">
                         {pageTitle}
                     </h1>
                     
@@ -78,61 +78,61 @@ export default function DashboardLayout({
                             <span className="text-orange-500">🔥</span> 30 XP
                         </div>
                         
-                        <Button variant="ghost" size="icon" className="text-slate-500 hover:text-slate-800 hidden sm:flex rounded-full">
+                        <Button variant="ghost" size="icon" className="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 hidden sm:flex rounded-full">
                             <Moon className="h-5 w-5" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="text-slate-500 hover:text-slate-800 rounded-full">
+                        <Button variant="ghost" size="icon" className="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 rounded-full">
                             <Search className="h-5 w-5" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="text-slate-500 hover:text-slate-800 rounded-full relative">
+                        <Button variant="ghost" size="icon" className="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 rounded-full relative">
                             <Bell className="h-5 w-5" />
                             <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-red-500 border-2 border-white"></span>
                         </Button>
                         
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Avatar className="h-8 w-8 border border-slate-200 cursor-pointer ml-2">
+                                <Avatar className="h-8 w-8 border border-slate-200 dark:border-slate-700 cursor-pointer ml-2">
                                     <AvatarImage src={user?.photoURL || `https://picsum.photos/seed/${user?.uid}/40/40`} />
                                     <AvatarFallback>{user?.displayName?.[0] || 'U'}</AvatarFallback>
                                 </Avatar>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent className="w-64 p-2 bg-white border-slate-200 shadow-lg rounded-xl" align="end" forceMount>
+                            <DropdownMenuContent className="w-64 p-2 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-lg rounded-xl" align="end" forceMount>
                                 <div className="flex flex-col space-y-1 p-2">
                                     <div className="flex items-center justify-between">
-                                        <p className="text-sm font-semibold leading-none text-slate-800">{user?.displayName || "Jahanur Miah"}</p>
-                                        <div className="px-2 py-0.5 rounded-full bg-slate-100 text-[10px] font-bold text-slate-600 uppercase tracking-wider">
+                                        <p className="text-sm font-semibold leading-none text-slate-800 dark:text-slate-100">{user?.displayName || "Jahanur Miah"}</p>
+                                        <div className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
                                             FREE
                                         </div>
                                     </div>
-                                    <p className="text-xs leading-none text-slate-500 mt-1">
+                                    <p className="text-xs leading-none text-slate-500 dark:text-slate-400 mt-1">
                                         @{user?.displayName?.toLowerCase().replace(/\s+/g, '-') || "jahanur-miah"}
                                     </p>
                                     
-                                    <div className="mt-3 mb-1 px-3 py-1.5 border border-dashed border-slate-200 rounded-full flex justify-center items-center bg-transparent">
-                                        <p className="text-xs font-medium text-slate-700">Balance: ৳1.75</p>
+                                    <div className="mt-3 mb-1 px-3 py-1.5 border border-dashed border-slate-200 dark:border-slate-700 rounded-full flex justify-center items-center bg-transparent">
+                                        <p className="text-xs font-medium text-slate-700 dark:text-slate-300">Balance: ৳1.75</p>
                                     </div>
                                 </div>
-                                <DropdownMenuSeparator className="my-1 bg-slate-100" />
-                                <DropdownMenuItem asChild className="p-2.5 cursor-pointer rounded-md hover:bg-slate-50 focus:bg-slate-50">
+                                <DropdownMenuSeparator className="my-1 bg-slate-100 dark:bg-slate-800" />
+                                <DropdownMenuItem asChild className="p-2.5 cursor-pointer rounded-md hover:bg-slate-50 focus:bg-slate-50 dark:hover:bg-slate-800 dark:focus:bg-slate-800">
                                     <Link href="/dashboard/profile">
-                                        <UserIcon className="mr-3 h-4 w-4 text-slate-700" />
-                                        <span className="text-slate-700 font-medium">Profile</span>
+                                        <UserIcon className="mr-3 h-4 w-4 text-slate-700 dark:text-slate-300" />
+                                        <span className="text-slate-700 dark:text-slate-300 font-medium">Profile</span>
                                     </Link>
                                 </DropdownMenuItem>
-                                <DropdownMenuItem asChild className="p-2.5 cursor-pointer rounded-md hover:bg-slate-50 focus:bg-slate-50">
+                                <DropdownMenuItem asChild className="p-2.5 cursor-pointer rounded-md hover:bg-slate-50 focus:bg-slate-50 dark:hover:bg-slate-800 dark:focus:bg-slate-800">
                                     <Link href="/dashboard/settings">
-                                        <SettingsIcon className="mr-3 h-4 w-4 text-slate-700" />
-                                        <span className="text-slate-700 font-medium">Settings</span>
+                                        <SettingsIcon className="mr-3 h-4 w-4 text-slate-700 dark:text-slate-300" />
+                                        <span className="text-slate-700 dark:text-slate-300 font-medium">Settings</span>
                                     </Link>
                                 </DropdownMenuItem>
-                                <DropdownMenuItem asChild className="p-2.5 cursor-pointer rounded-md hover:bg-slate-50 focus:bg-slate-50">
+                                <DropdownMenuItem asChild className="p-2.5 cursor-pointer rounded-md hover:bg-slate-50 focus:bg-slate-50 dark:hover:bg-slate-800 dark:focus:bg-slate-800">
                                     <Link href="/dashboard/business">
-                                        <Briefcase className="mr-3 h-4 w-4 text-slate-700" />
-                                        <span className="text-slate-700 font-medium">Business Accounts</span>
+                                        <Briefcase className="mr-3 h-4 w-4 text-slate-700 dark:text-slate-300" />
+                                        <span className="text-slate-700 dark:text-slate-300 font-medium">Business Accounts</span>
                                     </Link>
                                 </DropdownMenuItem>
-                                <DropdownMenuSeparator className="my-1 bg-slate-100" />
-                                <DropdownMenuItem onClick={logOut} className="p-2.5 cursor-pointer rounded-md hover:bg-red-50 focus:bg-red-50 text-red-600 focus:text-red-600">
+                                <DropdownMenuSeparator className="my-1 bg-slate-100 dark:bg-slate-800" />
+                                <DropdownMenuItem onClick={logOut} className="p-2.5 cursor-pointer rounded-md hover:bg-red-50 focus:bg-red-50 dark:hover:bg-red-900/20 dark:focus:bg-red-900/20 text-red-600 focus:text-red-600 dark:text-red-400 dark:focus:text-red-400">
                                     <LogOut className="mr-3 h-4 w-4" />
                                     <span className="font-medium">Logout</span>
                                 </DropdownMenuItem>

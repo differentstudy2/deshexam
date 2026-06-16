@@ -1,9 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useAuth } from '@/hooks/use-auth';
+import { getUserProfile } from '@/lib/firebase/firestore';
+import { getAssessmentBySlug } from '@/lib/firebase/assessment';
+import { AssessmentCard } from '@/components/assessment/AssessmentCard';
 import { 
   Search, 
   ChevronLeft, 
@@ -15,7 +19,8 @@ import {
   ArrowLeft,
   ChevronDown,
   Star,
-  Users
+  Users,
+  Loader2
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -30,9 +35,11 @@ const statusTabs = [
 ];
 
 const accessTabs = [
-  { name: 'Free', active: false },
-  { name: 'Paid', active: false },
-  { name: 'Subscribed', active: false },
+  'All',
+  'Purchased',
+  'Free',
+  'Paid',
+  'Subscribed',
 ];
 
 const subjectTabs = [
@@ -87,6 +94,32 @@ const latestPackages = [
 ];
 
 export default function ExamsPage() {
+  const { user } = useAuth();
+  const [activeAccessTab, setActiveAccessTab] = useState('All');
+  const [purchasedExams, setPurchasedExams] = useState<any[]>([]);
+  const [isLoadingPurchases, setIsLoadingPurchases] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    const fetchPurchased = async () => {
+      setIsLoadingPurchases(true);
+      try {
+        const profile = await getUserProfile(user.uid);
+        const slugs = profile?.purchasedTests || [];
+        if (slugs.length > 0) {
+          const promises = slugs.map((slug: string) => getAssessmentBySlug('mockTests', slug));
+          const tests = await Promise.all(promises);
+          setPurchasedExams(tests.filter(Boolean));
+        }
+      } catch (err) {
+        console.error("Failed to load purchased tests", err);
+      } finally {
+        setIsLoadingPurchases(false);
+      }
+    };
+    fetchPurchased();
+  }, [user]);
+
   return (
     <div className="w-full max-w-[1400px] mx-auto pb-12 text-slate-800 dark:text-slate-100">
       
@@ -132,9 +165,14 @@ export default function ExamsPage() {
             {accessTabs.map((tab, i) => (
               <button
                 key={i}
-                className={`px-4 py-1.5 rounded-full text-[13px] font-semibold transition-colors bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800`}
+                onClick={() => setActiveAccessTab(tab)}
+                className={`px-4 py-1.5 rounded-full text-[13px] font-semibold transition-colors ${
+                  activeAccessTab === tab 
+                    ? 'bg-slate-800 dark:bg-slate-100 text-white dark:text-slate-900' 
+                    : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                }`}
               >
-                {tab.name}
+                {tab}
               </button>
             ))}
           </div>
@@ -158,44 +196,62 @@ export default function ExamsPage() {
         {/* LEFT COLUMN: Main Exam Grid */}
         <div className="flex-1 w-full space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-            {exams.map((exam, i) => (
-              <Card key={i} className="bg-white dark:bg-slate-900 shadow-sm border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden hover:shadow-md transition-shadow group flex flex-col p-4">
-                <div className="flex justify-end mb-1">
-                   <div className="w-5 h-5 bg-slate-100 dark:bg-slate-800 rounded-md flex items-center justify-center">
-                     <span className="text-[10px] font-bold text-slate-400">bd</span>
-                   </div>
+            {activeAccessTab === 'Purchased' ? (
+              isLoadingPurchases ? (
+                <div className="col-span-full flex flex-col items-center justify-center h-48 text-slate-500">
+                  <Loader2 className="w-8 h-8 animate-spin mb-4" />
+                  <p>Loading your purchases...</p>
                 </div>
-                <h3 className="font-bold text-[13px] text-slate-800 dark:text-slate-100 line-clamp-3 mb-4 leading-snug flex-1">
-                  {exam.title}
-                </h3>
-                
-                <div className="flex items-center gap-4 text-slate-500 dark:text-slate-400 text-[11px] font-semibold mb-5">
-                  <div className="flex items-center gap-1.5">
-                    <HelpCircle className="w-3.5 h-3.5" /> {exam.ques} Ques
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5" /> {exam.mins} Mins
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Award className="w-3.5 h-3.5" /> {exam.marks} Marks
-                  </div>
+              ) : purchasedExams.length > 0 ? (
+                purchasedExams.map((test, i) => (
+                  <AssessmentCard key={i} assessment={{...test, type: 'Mock Test'}} href={`/mock-tests/${test.slug}`} type="Mock Test" />
+                ))
+              ) : (
+                <div className="col-span-full flex flex-col items-center justify-center h-48 text-slate-500">
+                  <Award className="w-10 h-10 mb-4 opacity-50" />
+                  <p>You haven't purchased any tests yet.</p>
                 </div>
-                
-                <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800">
-                  <div className="flex items-center gap-1.5 text-[11px] font-bold text-green-600">
-                    <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span> {exam.status}
+              )
+            ) : (
+              exams.map((exam, i) => (
+                <Card key={i} className="bg-white dark:bg-slate-900 shadow-sm border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden hover:shadow-md transition-shadow group flex flex-col p-4">
+                  <div className="flex justify-end mb-1">
+                     <div className="w-5 h-5 bg-slate-100 dark:bg-slate-800 rounded-md flex items-center justify-center">
+                       <span className="text-[10px] font-bold text-slate-400">bd</span>
+                     </div>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <Button className="h-7 px-3 bg-[#00a651] hover:bg-[#008f45] text-white text-[11px] font-bold rounded flex items-center gap-1">
-                      Start Exam <Play className="w-2.5 h-2.5 fill-current" />
-                    </Button>
-                    <Button variant="outline" size="icon" className="h-7 w-7 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 rounded">
-                      <ChevronDown className="w-3.5 h-3.5 text-slate-500" />
-                    </Button>
+                  <h3 className="font-bold text-[13px] text-slate-800 dark:text-slate-100 line-clamp-3 mb-4 leading-snug flex-1">
+                    {exam.title}
+                  </h3>
+                  
+                  <div className="flex items-center gap-4 text-slate-500 dark:text-slate-400 text-[11px] font-semibold mb-5">
+                    <div className="flex items-center gap-1.5">
+                      <HelpCircle className="w-3.5 h-3.5" /> {exam.ques} Ques
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5" /> {exam.mins} Mins
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Award className="w-3.5 h-3.5" /> {exam.marks} Marks
+                    </div>
                   </div>
-                </div>
-              </Card>
-            ))}
+                  
+                  <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800">
+                    <div className="flex items-center gap-1.5 text-[11px] font-bold text-green-600">
+                      <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span> {exam.status}
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Button className="h-7 px-3 bg-[#00a651] hover:bg-[#008f45] text-white text-[11px] font-bold rounded flex items-center gap-1">
+                        Start Exam <Play className="w-2.5 h-2.5 fill-current" />
+                      </Button>
+                      <Button variant="outline" size="icon" className="h-7 w-7 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 rounded">
+                        <ChevronDown className="w-3.5 h-3.5 text-slate-500" />
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+              ))
+            )}
           </div>
 
           {/* Pagination */}

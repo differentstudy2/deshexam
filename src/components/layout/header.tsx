@@ -477,12 +477,12 @@ export const DashboardSidebar = ({ onLinkClick, user, logOut }: { onLinkClick?: 
   }, [user]);
 
   return (
-    <div className="flex flex-col h-full bg-white text-slate-800 border-r border-slate-200">
-        <div className="p-4 flex items-center h-16 shrink-0 border-b border-slate-100">
+    <div className="flex flex-col h-full bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-200 border-r border-slate-200 dark:border-slate-800 transition-colors duration-300">
+        <div className="p-4 flex items-center h-16 shrink-0 border-b border-slate-100 dark:border-slate-800">
             <Link href="/dashboard" onClick={onLinkClick} className="flex items-center gap-2">
                 <div className="font-extrabold text-2xl tracking-tighter flex items-center">
                     <span className="text-green-600">DESH </span>
-                    <span className="text-slate-800 ml-1">EXAM</span>
+                    <span className="text-slate-800 dark:text-slate-100 ml-1">EXAM</span>
                 </div>
             </Link>
         </div>
@@ -511,12 +511,12 @@ export const DashboardSidebar = ({ onLinkClick, user, logOut }: { onLinkClick?: 
                           className={cn(
                             "justify-start w-full h-9 px-3 py-1.5 text-sm font-medium rounded-md transition-colors duration-200",
                             pathname === item.href
-                              ? "bg-slate-100 text-slate-900 font-semibold"
-                              : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                              ? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-semibold"
+                              : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-100"
                           )}
                         >
                           <Link href={item.href} onClick={onLinkClick}>
-                            <span className={pathname === item.href ? "text-green-600" : "text-slate-400"}>{item.icon}</span>
+                            <span className={pathname === item.href ? "text-green-600" : "text-slate-400 dark:text-slate-500"}>{item.icon}</span>
                             <span className="ml-3">{item.label}</span>
                           </Link>
                         </Button>
@@ -534,11 +534,11 @@ export const DashboardSidebar = ({ onLinkClick, user, logOut }: { onLinkClick?: 
                   variant="ghost"
                   className={cn(
                     "justify-start w-full h-9 px-3 py-1.5 text-sm font-medium rounded-md transition-colors duration-200",
-                    "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                    "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-100"
                   )}
                 >
                   <Link href="/admin" onClick={onLinkClick}>
-                    <ShieldCheck className="h-4 w-4 text-slate-400" />
+                    <ShieldCheck className="h-4 w-4 text-slate-400 dark:text-slate-500" />
                     <span className="ml-3">Admin Dashboard</span>
                   </Link>
                 </Button>
@@ -546,25 +546,25 @@ export const DashboardSidebar = ({ onLinkClick, user, logOut }: { onLinkClick?: 
             )}
           </div>
         </ScrollArea>
-        <div className="p-4 border-t border-slate-100 space-y-3 shrink-0">
-             <Button variant="outline" className="w-full justify-between rounded-full bg-white shadow-sm border-slate-200 text-slate-700 h-10" asChild>
+        <div className="p-4 border-t border-slate-100 dark:border-slate-800 space-y-3 shrink-0">
+             <Button variant="outline" className="w-full justify-between rounded-full bg-white dark:bg-slate-900 shadow-sm border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 h-10" asChild>
                  <Link href="/pricing">
                     Upgrade Plan <ChevronRight className="h-4 w-4 text-slate-400" />
                  </Link>
              </Button>
              
-             <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50 border border-slate-100 cursor-pointer hover:bg-slate-100 transition-colors">
+             <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                 <div className="flex items-center gap-3">
-                    <Avatar className="h-9 w-9 border border-slate-200">
+                    <Avatar className="h-9 w-9 border border-slate-200 dark:border-slate-700">
                         <AvatarImage src={user?.photoURL || `https://picsum.photos/seed/${user?.uid}/40/40`} />
                         <AvatarFallback>{user?.displayName?.[0] || 'U'}</AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
-                        <span className="text-sm font-bold text-slate-800 leading-tight">{user?.displayName || "User"}</span>
-                        <span className="text-[10px] text-slate-500 leading-tight mt-0.5">Free Plan</span>
+                        <span className="text-sm font-bold text-slate-800 dark:text-slate-200 leading-tight">{user?.displayName || "User"}</span>
+                        <span className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight mt-0.5">Free Plan</span>
                     </div>
                 </div>
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-red-500 hover:bg-red-50" onClick={logOut}>
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/50" onClick={logOut}>
                     <LogOut className="h-4 w-4"/>
                 </Button>
              </div>
