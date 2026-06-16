@@ -4,13 +4,16 @@ import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from "@/hooks/use-toast";
-import { PlusCircle, Pencil, Trash2, ArrowLeft, Loader2, ListPlus, ExternalLink } from 'lucide-react';
+import { PlusCircle, Pencil, Trash2, ArrowLeft, Loader2, ListPlus, ExternalLink, ImageIcon, LinkIcon, Upload, Wand2, Sparkles, Copy } from 'lucide-react';
 import { getAssessmentsByNode, saveAssessment, deleteAssessment, AssessmentCollectionType } from '@/lib/firebase/assessment';
 import { getTopicHierarchy } from '@/lib/firebase/guide';
 import { QuestionPickerModal } from '@/components/assessment/QuestionPickerModal';
 import { QuestionBankEntry } from '@/lib/question-bank-types';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { storage } from '@/lib/firebase/client';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 
 interface TopicAssessmentManagerProps { topicId: string; tabType: string; nodeLevel?: 'chapter' | 'topic'; }
 
@@ -23,6 +26,14 @@ export function TopicAssessmentManager({ topicId, tabType, nodeLevel = 'topic' }
   const [hierarchy, setHierarchy] = useState<any>(null);
   const [editData, setEditData] = useState<any>({});
   const [showPicker, setShowPicker] = useState(false);
+
+  // Feature Image States
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
+  const [aiImagePrompt, setAiImagePrompt] = useState('');
+  const [isGeneratingImagePrompt, setIsGeneratingImagePrompt] = useState(false);
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const mapTabToCollection = (tab: string): AssessmentCollectionType => {
     if (tab === 'practice_sets') return 'practiceSets';
@@ -61,6 +72,94 @@ export function TopicAssessmentManager({ topicId, tabType, nodeLevel = 'topic' }
     if (!confirm('Delete this assessment?')) return;
     try { await deleteAssessment(collectionName, id); toast({ title: 'Deleted' }); fetchAssessments(); }
     catch { toast({ title: 'Delete failed', variant: 'destructive' }); }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setIsUploading(true);
+      const storageRef = ref(storage, `assessments/thumbnails/${Date.now()}_${file.name}`);
+      const uploadTask = uploadBytesResumable(storageRef, file);
+
+      uploadTask.on('state_changed', 
+        (snapshot) => {
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          setUploadProgress(progress);
+        },
+        (error) => {
+          console.error("Upload error", error);
+          toast({ title: 'Upload failed', variant: 'destructive' });
+          setIsUploading(false);
+        },
+        async () => {
+          const url = await getDownloadURL(uploadTask.snapshot.ref);
+          setEditData((prev: any) => ({ ...prev, thumbnail: url }));
+          setIsUploading(false);
+          setUploadProgress(0);
+          toast({ title: 'Image uploaded successfully' });
+        }
+      );
+    } catch (e) {
+      console.error(e);
+      setIsUploading(false);
+    }
+  };
+
+  const handleGenerateImagePrompt = async () => {
+    if (!editData.title) {
+        toast({ title: "Please enter a test title first.", variant: "destructive" });
+        return;
+    }
+    
+    setIsGeneratingImagePrompt(true);
+    try {
+        const res = await fetch('/api/ai/generate-prompt', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                title: editData.title,
+                description: editData.description || 'A mock test for competitive exams'
+            })
+        });
+        
+        const data = await res.json();
+        if (data.success) {
+            setAiImagePrompt(data.prompt);
+        } else {
+            toast({ title: "Prompt generation failed", description: data.error, variant: "destructive" });
+        }
+    } catch(e) {
+        toast({ title: "Prompt generation failed", variant: "destructive" });
+    } finally {
+        setIsGeneratingImagePrompt(false);
+    }
+  };
+
+  const handleGenerateImage = async () => {
+    if (!aiImagePrompt) return;
+    
+    setIsGeneratingImage(true);
+    try {
+        const res = await fetch('/api/ai/generate-image', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt: aiImagePrompt })
+        });
+        
+        const data = await res.json();
+        if (data.success && data.imageUrl) {
+            setEditData((prev: any) => ({ ...prev, thumbnail: data.imageUrl }));
+            toast({ title: "Image generated and applied!" });
+        } else {
+            toast({ title: "Image generation failed", description: data.error || "No image returned", variant: "destructive" });
+        }
+    } catch(e) {
+        toast({ title: "Image generation failed", variant: "destructive" });
+    } finally {
+        setIsGeneratingImage(false);
+    }
   };
 
   const handleSave = async () => {
@@ -108,6 +207,86 @@ export function TopicAssessmentManager({ topicId, tabType, nodeLevel = 'topic' }
             <label className="text-[10px] text-slate-500 font-semibold uppercase tracking-wide">Description</label>
             <Textarea className="text-sm resize-none" rows={2} value={editData.description || ''} onChange={e => setEditData({ ...editData, description: e.target.value })} />
           </div>
+        </div>
+
+        {/* Feature Image Card */}
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 space-y-3">
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide flex items-center gap-2"><ImageIcon className="w-3.5 h-3.5" /> Feature Image</p>
+          
+          {editData.thumbnail && (
+              <div className="relative w-full h-40 bg-slate-100 rounded-xl overflow-hidden border border-slate-200">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={editData.thumbnail} alt="Thumbnail Preview" className="w-full h-full object-cover" />
+                  <button className="absolute top-2 right-2 w-7 h-7 flex items-center justify-center bg-white/90 rounded-full hover:bg-red-50" onClick={() => setEditData({...editData, thumbnail: ''})}>
+                      <Trash2 className="w-4 h-4 text-red-500" />
+                  </button>
+              </div>
+          )}
+          
+          <Tabs defaultValue="upload" className="w-full">
+              <TabsList className="grid w-full grid-cols-3 h-9">
+                  <TabsTrigger value="upload" className="flex items-center gap-2 text-[11px]"><Upload className="w-3.5 h-3.5"/> Upload</TabsTrigger>
+                  <TabsTrigger value="url" className="flex items-center gap-2 text-[11px]"><LinkIcon className="w-3.5 h-3.5"/> URL</TabsTrigger>
+                  <TabsTrigger value="ai" className="flex items-center gap-2 text-[11px] text-purple-600"><Wand2 className="w-3.5 h-3.5"/> AI Generate</TabsTrigger>
+              </TabsList>
+              <TabsContent value="upload" className="pt-2 space-y-2">
+                  <div className="flex items-center gap-2">
+                      <Input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileUpload} disabled={isUploading} className="flex-1 h-8 text-xs" />
+                      {isUploading && <Loader2 className="w-4 h-4 animate-spin text-blue-600" />}
+                  </div>
+                  {isUploading && (
+                      <div className="w-full bg-slate-100 rounded-full h-1.5 mt-1">
+                          <div className="bg-blue-600 h-1.5 rounded-full transition-all duration-300" style={{ width: `${uploadProgress}%` }}></div>
+                      </div>
+                  )}
+              </TabsContent>
+              <TabsContent value="url" className="pt-2">
+                  <Input 
+                      placeholder="Paste image URL here..." 
+                      className="h-8 text-xs"
+                      value={editData.thumbnail || ''} 
+                      onChange={(e) => setEditData({...editData, thumbnail: e.target.value})}
+                  />
+              </TabsContent>
+              <TabsContent value="ai" className="pt-2 space-y-3 bg-purple-50/50 p-3 rounded-lg border border-purple-100 mt-2">
+                  <p className="text-[11px] text-slate-600">Let Gemini generate a stunning feature image prompt based on your test title.</p>
+                  
+                  {!aiImagePrompt ? (
+                      <button onClick={handleGenerateImagePrompt} disabled={isGeneratingImagePrompt || !editData.title} className="w-full py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded text-[11px] font-bold flex items-center justify-center disabled:opacity-50">
+                          {isGeneratingImagePrompt ? <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" /> : <Wand2 className="w-3.5 h-3.5 mr-1.5" />}
+                          Generate Prompt Idea
+                      </button>
+                  ) : (
+                      <div className="space-y-3 animate-in fade-in">
+                          <div className="space-y-1">
+                              <label className="text-[10px] font-bold text-slate-500 uppercase">Image Prompt</label>
+                              <Textarea 
+                                  value={aiImagePrompt} 
+                                  onChange={(e) => setAiImagePrompt(e.target.value)} 
+                                  rows={3} 
+                                  className="text-[11px] leading-relaxed resize-none p-2"
+                              />
+                          </div>
+                          <div className="flex gap-2">
+                              <button className="flex-1 py-1.5 border border-slate-300 rounded text-[11px] font-bold flex items-center justify-center hover:bg-slate-50" onClick={() => {
+                                  navigator.clipboard.writeText(aiImagePrompt);
+                                  toast({ title: "Prompt copied!" });
+                              }}>
+                                  <Copy className="w-3.5 h-3.5 mr-1.5" /> Copy
+                              </button>
+                              <button 
+                                  className="flex-1 py-1.5 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded text-[11px] font-bold flex items-center justify-center disabled:opacity-50" 
+                                  onClick={handleGenerateImage} 
+                                  disabled={isGeneratingImage}
+                              >
+                                  {isGeneratingImage ? <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5 mr-1.5" />}
+                                  Generate & Apply
+                              </button>
+                          </div>
+                      </div>
+                  )}
+              </TabsContent>
+          </Tabs>
         </div>
 
         {/* Settings */}
