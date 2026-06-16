@@ -22,6 +22,7 @@ export interface TaxonomyNode {
   name: string;
   slug: string;
   description?: string;
+  parentId?: string | null;
   
   // SEO Metadata
   metaTitle?: string;
