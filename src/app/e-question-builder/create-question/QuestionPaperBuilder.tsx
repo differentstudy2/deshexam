@@ -22,6 +22,9 @@ import rehypeKatex from 'rehype-katex';
 import { QuestionBankModal } from './QuestionBankModal';
 import { AiQuestionGeneratorModal } from './AiQuestionGeneratorModal';
 import 'katex/dist/katex.min.css';
+import { useAuth } from '@/hooks/use-auth';
+import { getUserProfile } from '@/lib/firebase/firestore';
+import { useToast } from '@/hooks/use-toast';
 
 interface Props {
   boardId?: string;
@@ -34,6 +37,42 @@ interface Props {
 
 export default function QuestionPaperBuilder({ boardId, classId, textbookId, subjectId, chapterId, paperName }: Props) {
   const router = useRouter();
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [userTier, setUserTier] = useState<'free' | 'pass' | 'pro'>('free');
+
+  useEffect(() => {
+    if (user) {
+      getUserProfile(user.uid).then(profile => {
+        if (profile?.subscriptionPlan === 'pro') setUserTier('pro');
+        else if (profile?.subscriptionPlan === 'pass') setUserTier('pass');
+        else setUserTier('free');
+      }).catch(console.error);
+    } else {
+      setUserTier('free');
+    }
+  }, [user]);
+
+  const requirePremium = (requiredTier: 'pass' | 'pro', featureName: string) => {
+    if (requiredTier === 'pro' && userTier !== 'pro') {
+      toast({
+        title: 'Premium Feature Locked 🔒',
+        description: `Please upgrade your subscription to Pro Pass to unlock ${featureName}.`,
+        variant: 'destructive',
+      });
+      return false;
+    }
+    if (requiredTier === 'pass' && userTier === 'free') {
+      toast({
+        title: 'Premium Feature Locked 🔒',
+        description: `Please upgrade your subscription to Pass or Pro Pass to unlock ${featureName}.`,
+        variant: 'destructive',
+      });
+      return false;
+    }
+    return true;
+  };
+
   const [questions, setQuestions] = useState<QuestionBankEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -108,9 +147,9 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
 
   // Center & Exam Settings State
   const [headerSettingsEnabled, setHeaderSettingsEnabled] = useState(true);
-  const [headerTitle, setHeaderTitle] = useState('দেশ এক্সাম একাডেমী');
-  const [headerAddress, setHeaderAddress] = useState('দ্বারিকামারী, পেঁটলা, দিনহাটা, কোচবিহার');
-  const [headerClassName, setHeaderClassName] = useState('অষ্টম শ্রেণি (মাধ্যমিক) - ২০২৬');
+  const [headerTitle, setHeaderTitle] = useState(translations['bn']['defaultHeaderTitle']);
+  const [headerAddress, setHeaderAddress] = useState(translations['bn']['defaultHeaderAddress']);
+  const [headerClassName, setHeaderClassName] = useState(translations['bn']['defaultHeaderClass']);
   const [headerTextbookName, setHeaderTextbookName] = useState('');
   const [headerSubjectName, setHeaderSubjectName] = useState('');
   const [headerChapterName, setHeaderChapterName] = useState('');
@@ -161,6 +200,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
   const [isSectionHeaderOpen, setIsSectionHeaderOpen] = useState(false);
   const [forceNewColumn, setForceNewColumn] = useState(false);
   const [sectionHeaderText, setSectionHeaderText] = useState('');
+  const [sectionHeaderCols, setSectionHeaderCols] = useState(1);
   
   // Question Bank Modal
   const [isQuestionBankOpen, setIsQuestionBankOpen] = useState(false);
@@ -273,6 +313,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
 
   // Template Management
   const handleSaveTemplate = () => {
+    if (!requirePremium('pass', 'Saving Templates')) return;
     const settings = {
       format, optionStyle, paperColumns, optionShape, optionLabelType,
       optionColumns, rowGap, colGap, fontFamily, fontSize, questionOptionGap,
@@ -522,7 +563,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
     const newQ: QuestionBankEntry = {
       id: 'section-' + Date.now(),
       questionType: 'Exam Paper',
-      questionText: `[[SECTION_HEADER]]${sectionHeaderText}`,
+      questionText: `[[SECTION_HEADER|cols:${sectionHeaderCols}]]${sectionHeaderText}`,
       correctAnswer: 'a',
       difficulty: 'Medium',
       status: 'Published',
@@ -560,11 +601,16 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
   };
 
   const handleShuffle = () => {
+    if (!requirePremium('pro', 'Question Shuffling')) return;
     const shuffled = [...questions].sort(() => Math.random() - 0.5);
     setQuestions(shuffled);
   };
 
   const handleSaveSet = () => {
+    if (!requirePremium('pro', 'Saving Multiple Sets')) {
+      setIsSetCodeOpen(false);
+      return;
+    }
     setActiveSetCode(tempSetCode);
     setSavedSets(prev => {
       const filtered = prev.filter(s => s.code !== tempSetCode);
@@ -615,6 +661,10 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
   };
 
   const handleWatermarkImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!requirePremium('pro', 'Custom Watermark Image')) {
+      e.target.value = '';
+      return;
+    }
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       const url = URL.createObjectURL(file);
@@ -623,6 +673,10 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
   };
 
   const handleHeaderImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!requirePremium('pro', 'Custom Header Image')) {
+      e.target.value = '';
+      return;
+    }
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       const url = URL.createObjectURL(file);
@@ -1089,9 +1143,13 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                     <label className="text-[13px] text-gray-700 mb-2 block">{t('watermarkText', appLanguage)}</label>
                     <Input
                       value={watermarkText}
-                      onChange={e => setWatermarkText(e.target.value)}
+                      onChange={e => {
+                        if (!requirePremium('pass', 'Custom Watermark Text')) return;
+                        setWatermarkText(e.target.value);
+                      }}
                       placeholder={t('defaultHeaderTitle', appLanguage)}
                       className="h-10 text-[14px] bg-white text-gray-700 border-gray-200"
+                      disabled={userTier === 'free'}
                     />
                   </div>
 
@@ -1534,14 +1592,85 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                           })}
                         </div>
                       ) : (
-                        <div
-                          className="text-justify"
-                          style={{ columnCount: paperColumns, columnRule: showColumnDivider ? '1px solid #e5e7eb' : 'none', columnGap: `${colGap}px` }}
-                        >
-                          {questions.map((q, index) => {
-                            const isSectionHeader = q.questionText.startsWith('[[SECTION_HEADER]]');
-                            const sectionTitle = isSectionHeader ? q.questionText.replace('[[SECTION_HEADER]]', '') : '';
-                            const actualQuestionIndex = questions.slice(0, index + 1).filter(q => !q.questionText.startsWith('[[SECTION_HEADER]]')).length - 1;
+                        <div>
+                          {(() => {
+                            const groupedSections: any[] = [];
+                            let currentSection = { header: null as any, questions: [] as any[], columns: paperColumns };
+                            questions.forEach((q, index) => {
+                                if (q.questionText.startsWith('[[SECTION_HEADER')) {
+                                    if (currentSection.questions.length > 0 || currentSection.header) {
+                                        groupedSections.push(currentSection);
+                                    }
+                                    const match = q.questionText.match(/^\[\[SECTION_HEADER(?:\|cols:(\d+))?\]\](.*)$/);
+                                    const cols = match && match[1] ? parseInt(match[1]) : paperColumns;
+                                    const title = match ? match[2] : q.questionText.replace('[[SECTION_HEADER]]', '');
+                                    
+                                    currentSection = {
+                                        header: { ...q, sectionTitle: title, originalIndex: index },
+                                        columns: cols,
+                                        questions: []
+                                    };
+                                } else {
+                                    currentSection.questions.push({ ...q, originalIndex: index });
+                                }
+                            });
+                            if (currentSection.questions.length > 0 || currentSection.header) {
+                                groupedSections.push(currentSection);
+                            }
+
+                            return groupedSections.map((section, sIdx) => (
+                              <div key={sIdx} className="mb-0">
+                                {section.header && (
+                                  <div
+                                    key={section.header.id}
+                                    className={`relative break-inside-avoid ${draggedIndex === section.header.originalIndex ? 'opacity-50' : ''}`}
+                                    style={{ columnSpan: 'all', WebkitColumnSpan: 'all' as any }}
+                                    draggable={editingMode}
+                                    onDragStart={(e) => handleDragStart(e, section.header.originalIndex)}
+                                    onDragEnd={handleDragEnd}
+                                    onDragOver={(e) => handleDragOver(e, section.header.originalIndex)}
+                                  >
+                                    {editingMode && (
+                                      <div className="absolute -left-8 top-0 flex flex-col gap-1 print:hidden opacity-50 hover:opacity-100 transition-opacity">
+                                        <button className="cursor-grab hover:text-blue-500"><GripVertical className="w-4 h-4" /></button>
+                                        <button onClick={() => handleDeleteQuestion(section.header.originalIndex)} className="hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
+                                      </div>
+                                    )}
+                                    <div className="font-bold text-center my-4 pb-1 border-b-2 border-gray-800 text-[110%] print:break-after-avoid relative">
+                                      {section.header.sectionTitle}
+                                      {editingMode && (
+                                        <div className="absolute right-0 top-1/2 -translate-y-1/2 print:hidden flex items-center gap-1.5 bg-white p-1 rounded shadow-sm border border-gray-200">
+                                          <Columns className="w-3.5 h-3.5 text-gray-500" />
+                                          <select
+                                            value={section.columns}
+                                            onChange={(e) => {
+                                              const newQ = [...questions];
+                                              newQ[section.header.originalIndex] = { ...newQ[section.header.originalIndex], questionText: `[[SECTION_HEADER|cols:${e.target.value}]]${section.header.sectionTitle}` };
+                                              setQuestions(newQ);
+                                            }}
+                                            className="text-[11px] font-normal border border-gray-300 rounded px-1 py-0.5 bg-white text-gray-700 outline-none"
+                                          >
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                          </select>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
+                                
+                                {section.questions.length > 0 && (
+                                  <div
+                                    className="text-justify"
+                                    style={{ columnCount: section.columns, columnRule: showColumnDivider ? '1px solid #e5e7eb' : 'none', columnGap: `${colGap}px` }}
+                                  >
+                                    {section.questions.map((q: any) => {
+                                      const index = q.originalIndex;
+                                      const actualQuestionIndex = questions.slice(0, index + 1).filter((qx: any) => !qx.questionText.startsWith('[[SECTION_HEADER')).length - 1;
+                                      const isSectionHeader = false;
+                                      const sectionTitle = '';
 
                             return (
                               <div
@@ -1591,8 +1720,8 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                                             {q.difficulty && <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">[{q.difficulty}]</span>}
                                             {(q.sourceBoard || (q.boardId && boardMap[q.boardId])) && <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">[{q.sourceBoard || boardMap[q.boardId!]}]</span>}
                                             {(q.sourceYear || (q.yearId && yearMap[q.yearId])) && <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">[{q.sourceYear || yearMap[q.yearId!]}]</span>}
-                                            {(q.sourceExam || (q.examIds?.length ? q.examIds.map(id => examMap[id]).filter(Boolean).join(', ') : '')) && <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">[{q.sourceExam || (q.examIds?.length ? q.examIds.map(id => examMap[id]).filter(Boolean).join(', ') : '')}]</span>}
-                                            {q.tags && q.tags.length > 0 && q.tags.map(t => <span key={t} className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">#{t}</span>)}
+                                            {(q.sourceExam || (q.examIds?.length ? q.examIds.map((id: string) => examMap[id]).filter(Boolean).join(', ') : '')) && <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">[{q.sourceExam || (q.examIds?.length ? q.examIds.map((id: string) => examMap[id]).filter(Boolean).join(', ') : '')}]</span>}
+                                            {q.tags && q.tags.length > 0 && q.tags.map((t: string) => <span key={t} className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">#{t}</span>)}
                                           </div>
                                         )}
                                       </div>
@@ -1715,9 +1844,14 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                                   </>
                                 )}
                               </div>
-                            );
-                          })}
-                        </div>
+                                    );
+                                  })}
+                                </div>
+                              )}
+                            </div>
+                          ));
+                        })()}
+                      </div>
                       )}
 
                       {editingMode && (
@@ -2278,6 +2412,18 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
               <Input value={sectionHeaderText} onChange={e => setSectionHeaderText(e.target.value)} placeholder={t('sectionNamePlaceholder', appLanguage)} />
             </div>
             <div>
+              <label className="text-sm font-medium mb-1.5 block">কলাম সংখ্যা (Columns)</label>
+              <Select value={sectionHeaderCols.toString()} onValueChange={v => setSectionHeaderCols(parseInt(v))}>
+                <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">1 Column</SelectItem>
+                  <SelectItem value="2">2 Columns</SelectItem>
+                  <SelectItem value="3">3 Columns</SelectItem>
+                  <SelectItem value="4">4 Columns</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
               <label className="text-xs text-gray-500 mb-2 block">{t('quickSelect', appLanguage)}</label>
               <div className="flex flex-wrap gap-2">
                 {[t('mcqPreset', appLanguage), t('creativePreset', appLanguage), t('sectionA', appLanguage), t('sectionB', appLanguage), t('answerAnyFive', appLanguage), t('allQuestionsEqual', appLanguage)].map(preset => (
@@ -2320,7 +2466,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
           <Settings className="w-5 h-5 text-gray-600" />
           <span className="text-[10px] text-gray-500 font-medium">Settings</span>
         </Button>
-        <Button variant="ghost" className="flex flex-col items-center gap-1 h-auto py-1 text-indigo-600" onClick={() => { setIsAiGeneratorOpen(true); setEditingMode(true); }}>
+        <Button variant="ghost" className="flex flex-col items-center gap-1 h-auto py-1 text-indigo-600" onClick={() => { if (!requirePremium('pro', 'AI Question Generator')) return; setIsAiGeneratorOpen(true); setEditingMode(true); }}>
           <Sparkles className="w-5 h-5 text-indigo-600" />
           <span className="text-[10px] font-medium">AI Gen</span>
         </Button>
