@@ -227,14 +227,6 @@ const UserNav = () => {
   if (user) {
     return (
       <div className="flex items-center gap-2">
-         {profile?.role === 'admin' && (
-            <Button asChild size="icon" className="hidden md:flex">
-              <Link href="/admin/add-content">
-                <PlusCircle className="h-5 w-5" />
-                <span className="sr-only">Add Content</span>
-              </Link>
-            </Button>
-          )}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-8 w-8 rounded-full">
@@ -289,12 +281,8 @@ const UserNav = () => {
     <>
       <div className="hidden md:flex items-center gap-2">
         <Button variant="ghost" onClick={() => openAuthDialog('sign-in')}>
-          <LogIn />
+          <LogIn className="mr-2 h-4 w-4" />
           Sign In
-        </Button>
-        <Button onClick={() => openAuthDialog('sign-up')}>
-          <UserPlus />
-          Sign Up
         </Button>
       </div>
        <div className="md:hidden">
@@ -611,6 +599,12 @@ export function Header() {
         <MainNav isScrolled={isScrolled} />
 
         <div className="flex flex-1 items-center justify-end space-x-2">
+          <Button asChild size="sm" variant="outline" className="hidden md:flex h-8 px-3 text-xs font-semibold bg-gradient-to-r from-amber-100 to-yellow-100 dark:from-amber-900/30 dark:to-yellow-900/30 text-amber-700 dark:text-amber-400 border-amber-300/50 dark:border-amber-700/50 hover:bg-amber-50">
+            <Link href="/pricing">
+              <Sparkles className="h-3 w-3 mr-1.5 text-amber-500" />
+              Premium Upgrade
+            </Link>
+          </Button>
           <ThemeToggle />
           <div className="hidden md:flex">
              <UserNav />
@@ -638,8 +632,7 @@ export function Header() {
                             <div className="mt-auto border-t p-4">
                             {!loading && !user && (
                                 <div className="flex flex-col gap-2">
-                                <Button variant="ghost" onClick={() => { openAuthDialog('sign-in'); setIsSheetOpen(false); }}>Sign In</Button>
-                                <Button onClick={() => { openAuthDialog('sign-up'); setIsSheetOpen(false); }}>Sign Up</Button>
+                                <Button variant="ghost" className="bg-[#00a651] hover:bg-[#008f45] text-white" onClick={() => { openAuthDialog('sign-in'); setIsSheetOpen(false); }}>Sign In</Button>
                                 </div>
                             )}
                             </div>
