@@ -99,12 +99,22 @@ export default function PrivacyPolicyPage() {
             The security of your data is of paramount importance to us. We implement robust, industry-standard security measures including encryption, secure socket layer (SSL) technology, and secure cloud infrastructure to protect your personal information. However, please remember that no method of transmission over the Internet, or method of electronic storage, is 100% secure.
           </p>
 
-          <h2>7. Children's Privacy</h2>
+          <h2>7. Third-Party Advertising</h2>
+          <p>
+            We use third-party advertising companies, such as Google AdSense, to serve ads when you visit our Service. These companies may use information about your visits to this and other websites in order to provide advertisements about goods and services of interest to you.
+          </p>
+          <ul>
+            <li><strong>Google AdSense & Cookies:</strong> Third-party vendors, including Google, use cookies to serve ads based on your prior visits to our website or other websites.</li>
+            <li>Google's use of advertising cookies enables it and its partners to serve ads to you based on your visit to our site and/or other sites on the Internet.</li>
+            <li>You may opt out of personalized advertising by visiting <a href="https://myadcenter.google.com/" target="_blank" rel="noopener noreferrer" className="text-green-600 hover:underline">Google's Ads Settings</a>.</li>
+          </ul>
+
+          <h2>8. Children's Privacy</h2>
           <p>
             Our Service may be used by students under the age of 13. We are committed to complying with the Children's Online Privacy Protection Act (COPPA). We do not knowingly collect personally identifiable information from anyone under the age of 13 without verifiable parental consent. If you are a parent or guardian and you are aware that your child has provided us with Personal Data, please contact us. If we become aware that we have collected Personal Data from children without verification of parental consent, we take steps to remove that information from our servers.
           </p>
 
-          <h2>8. Your Privacy Rights (GDPR & CCPA)</h2>
+          <h2>9. Your Privacy Rights (GDPR & CCPA)</h2>
           <p>Depending on your location, you may have the following rights regarding your personal data:</p>
           <ul>
             <li>The right to access, update, or delete the information we have on you.</li>
@@ -114,12 +124,12 @@ export default function PrivacyPolicyPage() {
             <li>The right to withdraw consent at any time where we relied on your consent to process your personal information.</li>
           </ul>
 
-          <h2>9. Changes to This Privacy Policy</h2>
+          <h2>10. Changes to This Privacy Policy</h2>
           <p>
             We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last Updated" date at the top of this Privacy Policy. You are advised to review this Privacy Policy periodically for any changes.
           </p>
 
-          <h2>10. Contact Us</h2>
+          <h2>11. Contact Us</h2>
           <p>If you have any questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact us:</p>
           <ul>
             <li>By email: <strong>privacy@deshexam.com</strong></li>
