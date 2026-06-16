@@ -85,6 +85,7 @@ export default function RootLayout({
             </AuthProvider>
             <Toaster />
             <Script src="https://checkout.razorpay.com/v1/checkout.js" />
+            <Script src="https://accounts.google.com/gsi/client" strategy="beforeInteractive" />
           </AppProviders>
         </FirebaseProvider>
       </body>
