@@ -87,7 +87,7 @@ const MenuBar = ({ editor }: { editor: any }) => {
   };
 
   return (
-    <div className="flex flex-wrap gap-1 p-2 border-b border-[#eef2ec] bg-[#f8faf8]">
+    <div className="flex flex-wrap gap-1 p-2 border-b border-[#eef2ec] dark:border-[#2a3038] bg-[#f8faf8] dark:bg-[#15171e]">
       <Toggle 
         size="sm" 
         pressed={editor.isActive('bold')} 
@@ -110,7 +110,7 @@ const MenuBar = ({ editor }: { editor: any }) => {
         <UnderlineIcon className="h-4 w-4" />
       </Toggle>
       
-      <div className="w-px h-6 bg-[#c4d6c4] mx-1 my-auto" />
+      <div className="w-px h-6 bg-[#c4d6c4] dark:bg-[#323842] mx-1 my-auto" />
 
       <Toggle 
         size="sm" 
@@ -134,7 +134,7 @@ const MenuBar = ({ editor }: { editor: any }) => {
         <Heading3 className="h-4 w-4" />
       </Toggle>
 
-      <div className="w-px h-6 bg-[#c4d6c4] mx-1 my-auto" />
+      <div className="w-px h-6 bg-[#c4d6c4] dark:bg-[#323842] mx-1 my-auto" />
 
       <Toggle 
         size="sm" 
@@ -165,7 +165,7 @@ const MenuBar = ({ editor }: { editor: any }) => {
         <Code className="h-4 w-4" />
       </Toggle>
       
-      <div className="w-px h-6 bg-[#c4d6c4] mx-1 self-center" />
+      <div className="w-px h-6 bg-[#c4d6c4] dark:bg-[#323842] mx-1 self-center" />
       
       <Dialog open={imageDialogOpen} onOpenChange={setImageDialogOpen}>
         <DialogTrigger asChild>
@@ -337,7 +337,7 @@ export function TiptapEditor({ content, onChange }: TiptapEditorProps) {
   }, [content, editor]);
 
   return (
-    <div className="border border-[#d3e3d3] rounded-[24px] overflow-hidden bg-[#fdfefd] focus-within:border-[#4a634a] focus-within:ring-1 focus-within:ring-[#4a634a] transition-colors">
+    <div className="border border-[#d3e3d3] dark:border-[#2a3038] rounded-[24px] overflow-hidden bg-[#fdfefd] dark:bg-[#1a1d27] focus-within:border-[#4a634a] dark:focus-within:border-[#437553] focus-within:ring-1 focus-within:ring-[#4a634a] dark:focus-within:ring-[#437553] transition-colors">
       <MenuBar editor={editor} />
       <div className="p-4">
         <EditorContent editor={editor} />

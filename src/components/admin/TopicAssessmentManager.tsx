@@ -5,16 +5,16 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from "@/hooks/use-toast";
 import { PlusCircle, Pencil, Trash2, ArrowLeft, Loader2, ListPlus, ExternalLink } from 'lucide-react';
-import { getAssessmentsByTopic, saveAssessment, deleteAssessment, AssessmentCollectionType } from '@/lib/firebase/assessment';
+import { getAssessmentsByNode, saveAssessment, deleteAssessment, AssessmentCollectionType } from '@/lib/firebase/assessment';
 import { getTopicHierarchy } from '@/lib/firebase/guide';
 import { QuestionPickerModal } from '@/components/assessment/QuestionPickerModal';
 import { QuestionBankEntry } from '@/lib/question-bank-types';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
-interface TopicAssessmentManagerProps { topicId: string; tabType: string; }
+interface TopicAssessmentManagerProps { topicId: string; tabType: string; nodeLevel?: 'chapter' | 'topic'; }
 
-export function TopicAssessmentManager({ topicId, tabType }: TopicAssessmentManagerProps) {
+export function TopicAssessmentManager({ topicId, tabType, nodeLevel = 'topic' }: TopicAssessmentManagerProps) {
   const { toast } = useToast();
   const [view, setView] = useState<'list' | 'editor'>('list');
   const [assessments, setAssessments] = useState<any[]>([]);
@@ -36,9 +36,14 @@ export function TopicAssessmentManager({ topicId, tabType }: TopicAssessmentMana
   const fetchAssessments = async () => {
     setLoading(true);
     try {
-      const data = await getAssessmentsByTopic(collectionName, topicId);
+      console.log(`[DEBUG] TopicAssessmentManager fetching for tabType=${tabType}, collectionName=${collectionName}, topicId=${topicId}, nodeLevel=${nodeLevel}`);
+      const data = await getAssessmentsByNode(collectionName, nodeLevel, topicId);
+      console.log(`[DEBUG] Fetched data:`, data);
       setAssessments(data);
-    } catch { toast({ title: 'Error fetching', variant: 'destructive' }); }
+    } catch (e) { 
+      console.error(e);
+      toast({ title: 'Error fetching', variant: 'destructive' }); 
+    }
     finally { setLoading(false); }
   };
 
@@ -177,10 +182,13 @@ export function TopicAssessmentManager({ topicId, tabType }: TopicAssessmentMana
   }
 
   // ── List View ──
+  const displayTab = tabType.replace(/_/g, ' ');
+  const tabTitle = displayTab.endsWith('s') ? displayTab : displayTab + 's';
+
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <p className="text-xs font-bold text-slate-500 capitalize">{tabType.replace(/_/g, ' ')}s</p>
+        <p className="text-xs font-bold text-slate-500 capitalize">{tabTitle}</p>
         <button onClick={() => { resetForm(); setView('editor'); }}
           className="px-3.5 py-1.5 text-xs font-bold rounded-full bg-[#107c41] text-white flex items-center gap-1.5">
           <PlusCircle className="w-3.5 h-3.5" /> Create New
@@ -191,7 +199,7 @@ export function TopicAssessmentManager({ topicId, tabType }: TopicAssessmentMana
         <div className="flex justify-center py-12"><Loader2 className="w-5 h-5 animate-spin text-[#107c41]" /></div>
       ) : assessments.length === 0 ? (
         <div className="flex flex-col items-center py-14 text-center border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl">
-          <p className="text-sm text-slate-400">No {tabType.replace(/_/g, ' ')}s yet</p>
+          <p className="text-sm text-slate-400 capitalize">No {tabTitle} yet</p>
           <button onClick={() => { resetForm(); setView('editor'); }} className="mt-3 px-4 py-2 text-xs font-semibold rounded-full bg-[#107c41] text-white">Create First</button>
         </div>
       ) : (

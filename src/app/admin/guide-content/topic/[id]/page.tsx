@@ -81,6 +81,7 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
   const [activeTab, setActiveTab] = useState('lesson');
   const [contentMap, setContentMap] = useState<Record<string, any>>({});
   const [status, setStatus] = useState<'draft' | 'published'>('draft');
+  const [nodeLevel, setNodeLevel] = useState<'chapter' | 'topic'>('topic');
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false); // mobile drawer
@@ -92,6 +93,9 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
         const { findGuideNodeAnyLevel } = await import('@/lib/firebase/guide');
         const nodeInfo = await findGuideNodeAnyLevel(topicId);
         if (nodeInfo?.node?.status) setStatus(nodeInfo.node.status);
+        if (nodeInfo?.level === 'chapter' || nodeInfo?.level === 'topic') {
+          setNodeLevel(nodeInfo.level);
+        }
         const sections = await getTopicSections(topicId);
         const initial: Record<string, any> = {};
         sectionTypes.forEach(s => {
@@ -301,9 +305,9 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
           </button>
         </div>
       ) : ['questions','mcq','creative_question','short_question'].includes(activeTab) ? (
-        <TopicQuestionManager topicId={topicId} tabType={activeTab} />
+        <TopicQuestionManager topicId={topicId} tabType={activeTab} nodeLevel={nodeLevel} />
       ) : ['model_test','practice_sets','quizzes','mock_tests','exams_papers'].includes(activeTab) ? (
-        <TopicAssessmentManager topicId={topicId} tabType={activeTab} />
+        <TopicAssessmentManager topicId={topicId} tabType={activeTab} nodeLevel={nodeLevel} />
       ) : (
         <div className="flex flex-col items-center justify-center py-20 text-center text-slate-400">
           <FileText className="w-10 h-10 mb-3 opacity-30" />

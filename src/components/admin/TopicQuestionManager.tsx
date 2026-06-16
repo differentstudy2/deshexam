@@ -20,9 +20,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 interface TopicQuestionManagerProps {
   topicId: string;
   tabType: string;
+  nodeLevel?: 'chapter' | 'topic';
 }
 
-export function TopicQuestionManager({ topicId, tabType }: TopicQuestionManagerProps) {
+export function TopicQuestionManager({ topicId, tabType, nodeLevel = 'topic' }: TopicQuestionManagerProps) {
   const { toast } = useToast();
   const [questions, setQuestions] = useState<QuestionBankEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -73,7 +74,8 @@ export function TopicQuestionManager({ topicId, tabType }: TopicQuestionManagerP
   const fetchTopicQuestions = async () => {
     setLoading(true);
     try {
-      const data = await getQuestions({ topicId, questionType: qType }, 500);
+      const field = nodeLevel === 'chapter' ? 'chapterId' : 'topicId';
+      const data = await getQuestions({ [field]: topicId, questionType: qType }, 500);
       setQuestions(data);
       setSelectedIds(new Set());
       setCurrentPage(1);

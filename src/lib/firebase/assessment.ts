@@ -21,10 +21,11 @@ export async function getAssessments(collectionName: AssessmentCollectionType) {
   return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 }
 
-// Fetch by Topic
-export async function getAssessmentsByTopic(collectionName: AssessmentCollectionType, topicId: string) {
+// Fetch by Node (Chapter or Topic)
+export async function getAssessmentsByNode(collectionName: AssessmentCollectionType, level: 'chapter' | 'topic', nodeId: string) {
   const colRef = collection(db, ASSESSMENT_COLLECTIONS[collectionName]);
-  const q = query(colRef, where('topicId', '==', topicId));
+  const fieldToMatch = level === 'chapter' ? 'chapterId' : 'topicId';
+  const q = query(colRef, where(fieldToMatch, '==', nodeId));
   const snapshot = await getDocs(q);
   if (snapshot.empty) return [];
   return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a: any, b: any) => {
