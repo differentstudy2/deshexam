@@ -1585,8 +1585,9 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                                             dangerouslySetInnerHTML={{ __html: q.questionText.replace(/\n/g, '<br/>') }}
                                           />
                                         )}
-                                        {(showQuestionTags && (q.tags || q.sourceExam || q.sourceYear || q.sourceBoard || q.difficulty || q.examIds?.length || q.yearId || q.boardId)) && (
+                                        {(showQuestionTags && (q.questionType || q.tags || q.sourceExam || q.sourceYear || q.sourceBoard || q.difficulty || q.examIds?.length || q.yearId || q.boardId)) && (
                                           <div className="flex gap-1 flex-wrap mt-1">
+                                            {q.questionType && <span className="px-1.5 py-0.5 bg-[#eef2ec] text-[#4a634a] font-bold text-[10px] uppercase rounded border border-[#c5e1a5]">[{q.questionType}]</span>}
                                             {q.difficulty && <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">[{q.difficulty}]</span>}
                                             {(q.sourceBoard || (q.boardId && boardMap[q.boardId])) && <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">[{q.sourceBoard || boardMap[q.boardId!]}]</span>}
                                             {(q.sourceYear || (q.yearId && yearMap[q.yearId])) && <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">[{q.sourceYear || yearMap[q.yearId!]}]</span>}
@@ -1601,7 +1602,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                                     </div>
 
                                     {/* Options */}
-                                    {q.options && (
+                                    {(!q.questionType || q.questionType === 'MCQ') && q.options && (
                                       <div
                                         className="grid gap-x-2 pl-6"
                                         style={{
@@ -1650,8 +1651,48 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                                       </div>
                                     )}
 
+                                    {/* TRUE / FALSE */}
+                                    {q.questionType === 'T/F' && (
+                                      <div className="flex gap-8 pl-6 mt-2">
+                                        <div className="flex items-center gap-2">
+                                          <span className={`inline-flex items-center justify-center w-[18px] h-[18px] rounded-full border border-gray-600 text-[11px] leading-none pb-[1px] ${format === 'qa' && q.correctAnswer?.toLowerCase() === 'true' ? 'bg-gray-800 text-white border-transparent' : ''}`}>
+                                            {format === 'qa' && q.correctAnswer?.toLowerCase() === 'true' ? '✓' : ''}
+                                          </span>
+                                          <span className={format === 'qa' && q.correctAnswer?.toLowerCase() === 'true' ? 'font-bold' : ''}>True</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                          <span className={`inline-flex items-center justify-center w-[18px] h-[18px] rounded-full border border-gray-600 text-[11px] leading-none pb-[1px] ${format === 'qa' && q.correctAnswer?.toLowerCase() === 'false' ? 'bg-gray-800 text-white border-transparent' : ''}`}>
+                                            {format === 'qa' && q.correctAnswer?.toLowerCase() === 'false' ? '✓' : ''}
+                                          </span>
+                                          <span className={format === 'qa' && q.correctAnswer?.toLowerCase() === 'false' ? 'font-bold' : ''}>False</span>
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    {/* FILL IN THE BLANK (FIB) */}
+                                    {q.questionType === 'FIB' && (
+                                      <div className="mt-2 pl-6">
+                                        {/* Show distractors (Word Bank) if any */}
+                                        {(q.options?.a || q.options?.b || q.options?.c || q.options?.d) && (
+                                          <div className="flex gap-4 flex-wrap text-sm mb-2 p-2 border border-dashed border-gray-300 bg-gray-50 rounded">
+                                            <span className="font-bold text-gray-700">Word Bank:</span>
+                                            {['a', 'b', 'c', 'd'].map(opt => q.options?.[opt as keyof typeof q.options] && (
+                                              <span key={opt} className="px-2">{q.options[opt as keyof typeof q.options]}</span>
+                                            ))}
+                                          </div>
+                                        )}
+                                        
+                                        {/* If qa format, show answers */}
+                                        {format === 'qa' && q.correctAnswer && (
+                                          <div className="mt-2 text-sm text-green-700 font-bold bg-green-50 px-2 py-1 rounded inline-block border border-green-200">
+                                            Ans: {q.correctAnswer}
+                                          </div>
+                                        )}
+                                      </div>
+                                    )}
+
                                     {/* MATCHING PAIRS (If Matching) */}
-                                    {q.questionType === 'Matching' && q.matchingPairs && q.matchingPairs.length > 0 && (
+                                    {q.questionType === 'Match' && q.matchingPairs && q.matchingPairs.length > 0 && (
                                       <div className="mt-3 pl-6">
                                         <div className="grid grid-cols-2 gap-x-4 mb-2 font-bold text-gray-800 border-b border-gray-200 pb-2">
                                           <div>Column A</div>

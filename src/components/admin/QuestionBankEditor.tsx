@@ -274,9 +274,9 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
   const sampleJSONData: Record<string, string> = {
     MCQ: `[\n  {\n    "Question Type": "MCQ",\n    "Question": "What is the capital of France?",\n    "Option A": "London",\n    "Option B": "Berlin",\n    "Option C": "Paris",\n    "Option D": "Madrid",\n    "Correct Answer": "c",\n    "Explanation": "Paris is the capital of France.",\n    "Difficulty": "Easy",\n    "Subject": "Geography",\n    "Chapter": "Europe"\n  }\n]`,
     "T/F": `[\n  {\n    "Question Type": "T/F",\n    "Question": "The earth is flat.",\n    "Correct Answer": "false"\n  }\n]`,
-    FIB: `[\n  {\n    "Question Type": "FIB",\n    "Question": "The color of the sky is [blank].",\n    "Correct Answer": "blue"\n  }\n]`,
+    FIB: `[\n  {\n    "Question Type": "FIB",\n    "Question": "The color of the sky is [blank] and the grass is [blank].",\n    "Correct Answer": "blue, green",\n    "Option A": "red",\n    "Option B": "yellow",\n    "Option C": "purple",\n    "Option D": "orange"\n  }\n]`,
     Match: `[\n  {\n    "Question Type": "Match",\n    "Question": "Match the following countries with their capitals",\n    "matchingPairs": [\n      { "left": "France", "right": "Paris" },\n      { "left": "UK", "right": "London" }\n    ]\n  }\n]`,
-    Desc: `[\n  {\n    "Question Type": "Desc",\n    "Question": "Explain Newton's first law of motion.",\n    "Correct Answer": "An object will remain at rest or in uniform motion...",\n    "Explanation": "Also known as the law of inertia."\n  }\n]`
+    Desc: `[\n  {\n    "Question Type": "Desc",\n    "Question": "Explain Newton's first law of motion.",\n    "Answer": "An object will remain at rest or in uniform motion...",\n    "Explanation": "Also known as the law of inertia."\n  }\n]`
   };
 
   const processBulkImportPreview = (content: string) => {
@@ -291,7 +291,14 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
           const mapCustomFormat = (raw: any) => {
               if (!raw["Question"] && !raw["Question Type"]) return raw;
               
-              const qTypeMap: Record<string, string> = { "Multiple Choice": "MCQ", "Descriptive": "Desc", "True/False": "T/F", "Fill in the Blank": "FIB", "Matching": "Match" };
+              const qTypeMap: Record<string, string> = { 
+                  "Multiple Choice": "MCQ", "MCQ": "MCQ", 
+                  "Descriptive": "Desc", "Desc": "Desc", 
+                  "True/False": "T/F", "T/F": "T/F", 
+                  "Fill in the Blank": "FIB", "FIB": "FIB", 
+                  "Matching": "Match", "Match": "Match",
+                  "CQ": "CQ"
+              };
               const options: any = raw.options || {};
               if (raw["Option A"]) options.a = raw["Option A"];
               if (raw["Option B"]) options.b = raw["Option B"];
@@ -299,13 +306,16 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
               if (raw["Option D"]) options.d = raw["Option D"];
               if (raw["Option E"]) options.e = raw["Option E"];
 
-              let correct = raw["Correct Answer"] || raw.correctAnswer || "";
-              if (typeof correct === 'string') correct = correct.toLowerCase().trim();
+              const mappedType = qTypeMap[raw["Question Type"]] || raw.questionType || "MCQ";
+              let correct = raw["Correct Answer"] || raw["Answer"] || raw["Answer Key"] || raw.correctAnswer || "";
+              if (typeof correct === 'string' && ['MCQ', 'T/F'].includes(mappedType)) {
+                  correct = correct.toLowerCase().trim();
+              }
 
               return {
                   ...raw,
                   questionText: raw["Question"] || raw.questionText,
-                  questionType: qTypeMap[raw["Question Type"]] || raw.questionType || "MCQ",
+                  questionType: mappedType,
                   options: Object.keys(options).length > 0 ? options : undefined,
                   correctAnswer: correct,
                   explanation: raw["Explanation"] || raw.explanation,
@@ -384,7 +394,7 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
           toast({ title: 'Validation Error', description: 'Question Text is required.', variant: 'destructive' });
           return;
       }
-      if (editData.questionType !== 'Match' && !editData.correctAnswer) {
+      if (!['Match', 'Desc', 'CQ'].includes(editData.questionType || 'MCQ') && !editData.correctAnswer) {
           toast({ title: 'Validation Error', description: 'Correct Answer is required.', variant: 'destructive' });
           return;
       }
@@ -1268,7 +1278,7 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                           <div className="bg-[#f0f4f0] text-[#3d5a3d] text-sm p-3 rounded-lg font-medium flex justify-between items-center">
                               <span>Ready to import {previewQuestions.length} questions.</span>
                           </div>
-                          <div className="max-h-[40vh] overflow-y-auto space-y-2 pr-2">
+                          <div className="max-h-[55vh] overflow-y-auto space-y-2 pr-2">
                               {previewQuestions.map((q, i) => (
                                   <div key={i} className="p-3 border border-[#d3e3d3] rounded-xl bg-white shadow-sm">
                                       <p className="font-semibold text-sm line-clamp-2 text-slate-800">{q.questionText}</p>
