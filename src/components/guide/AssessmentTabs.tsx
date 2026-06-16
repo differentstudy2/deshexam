@@ -25,12 +25,12 @@ export function AssessmentTabs({ chapterId }: AssessmentTabsProps) {
     async function loadData() {
       setLoading(true);
       try {
-        const { getAssessmentsByTopic } = await import('@/lib/firebase/assessment');
+        const { getAssessmentsByNode } = await import('@/lib/firebase/assessment');
         const [ps, qz, mt, ep] = await Promise.all([
-          getAssessmentsByTopic('practiceSets', chapterId),
-          getAssessmentsByTopic('quizzes', chapterId),
-          getAssessmentsByTopic('mockTests', chapterId),
-          getAssessmentsByTopic('examPapers', chapterId)
+          getAssessmentsByNode('practiceSets', 'chapter', chapterId),
+          getAssessmentsByNode('quizzes', 'chapter', chapterId),
+          getAssessmentsByNode('mockTests', 'chapter', chapterId),
+          getAssessmentsByNode('examPapers', 'chapter', chapterId)
         ]);
 
         const filterPublished = (arr: any[]) => arr.filter(a => a.status === 'Published');
