@@ -62,12 +62,13 @@ export default async function MockTestLandingPage({ params }: Props) {
         {/* ═══════════════════════════════════════════════
             HERO SECTION
         ═══════════════════════════════════════════════ */}
-        <div className="relative bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#0f2444]">
+        <div className="relative bg-slate-950 overflow-hidden border-b border-white/5">
           {/* Background decoration */}
-          <div className="absolute inset-0 pointer-events-none overflow-hidden">
-            <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-blue-500/10 blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-80 h-80 rounded-full bg-violet-500/10 blur-3xl" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-px bg-gradient-to-r from-transparent via-blue-400/20 to-transparent" />
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute -top-[20%] right-[0%] w-[60%] h-[60%] rounded-full bg-violet-600/20 blur-[120px] mix-blend-screen" />
+            <div className="absolute top-[40%] -left-[10%] w-[50%] h-[50%] rounded-full bg-blue-600/20 blur-[120px] mix-blend-screen" />
+            <div className="absolute -bottom-[20%] left-[20%] w-[40%] h-[40%] rounded-full bg-fuchsia-600/10 blur-[100px] mix-blend-screen" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-px bg-gradient-to-r from-transparent via-violet-400/20 to-transparent" />
           </div>
 
           <div className="relative container max-w-6xl mx-auto px-4 pt-6 pb-0">
@@ -113,12 +114,12 @@ export default async function MockTestLandingPage({ params }: Props) {
                 {/* Stats strip */}
                 <div className="flex flex-wrap gap-3">
                   {[
-                    { icon: HelpCircle, label: `${test.questionIds?.length ?? 0} Questions`, color: 'text-blue-400' },
-                    { icon: Clock, label: `${test.durationMin ?? 0} Minutes`, color: 'text-violet-400' },
-                    { icon: FileText, label: `${test.totalMarks ?? 0} Marks`, color: 'text-amber-400' },
-                    { icon: AlertTriangle, label: `${test.negativeMarking ?? 0} Negative`, color: 'text-red-400' },
-                  ].map(({ icon: Icon, label, color }) => (
-                    <div key={label} className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-3.5 py-2 text-sm font-semibold text-white backdrop-blur-sm">
+                    { icon: HelpCircle, label: `${test.questionIds?.length ?? 0} Questions`, color: 'text-blue-400', borderHover: 'hover:border-blue-500/30', bgHover: 'hover:bg-blue-500/10' },
+                    { icon: Clock, label: `${test.durationMin ?? 0} Minutes`, color: 'text-violet-400', borderHover: 'hover:border-violet-500/30', bgHover: 'hover:bg-violet-500/10' },
+                    { icon: FileText, label: `${test.totalMarks ?? 0} Marks`, color: 'text-amber-400', borderHover: 'hover:border-amber-500/30', bgHover: 'hover:bg-amber-500/10' },
+                    { icon: AlertTriangle, label: `${test.negativeMarking ?? 0} Negative`, color: 'text-red-400', borderHover: 'hover:border-red-500/30', bgHover: 'hover:bg-red-500/10' },
+                  ].map(({ icon: Icon, label, color, borderHover, bgHover }) => (
+                    <div key={label} className={`flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm font-semibold text-white backdrop-blur-md shadow-lg transition-all duration-300 ${borderHover} ${bgHover} cursor-default`}>
                       <Icon className={`w-4 h-4 ${color}`} />
                       {label}
                     </div>
@@ -132,17 +133,19 @@ export default async function MockTestLandingPage({ params }: Props) {
               </div>
 
               {/* Right: CTA card (desktop — floats into content below) */}
-              <div className="hidden lg:block w-80 shrink-0 -mb-16 relative z-10">
-                <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl shadow-black/30 border border-slate-100 dark:border-slate-800 overflow-hidden transition-colors duration-300">
+              <div className="hidden lg:block w-80 shrink-0 -mb-16 relative z-10 group">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl shadow-black/30 border border-slate-200/50 dark:border-slate-800/50 overflow-hidden transition-all duration-500 hover:shadow-violet-500/10 hover:-translate-y-1">
                   {/* Card header */}
-                  <div className="bg-gradient-to-br from-blue-600 to-violet-600 p-5">
-                    <div className="flex items-center gap-3 mb-1">
-                      <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                  <div className="bg-gradient-to-br from-violet-600 via-purple-600 to-blue-600 p-6 relative overflow-hidden">
+                    {/* Header shine effect */}
+                    <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out"></div>
+                    <div className="relative flex items-center gap-3 mb-2">
+                      <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-inner">
                         <Brain className="w-5 h-5 text-white" />
                       </div>
                       <div>
-                        <p className="text-xs text-blue-100 font-semibold">Start Now</p>
-                        <h3 className="text-lg font-extrabold text-white leading-tight">{test.title}</h3>
+                        <p className="text-xs text-blue-100 font-bold tracking-wider uppercase">Start Now</p>
+                        <h3 className="text-lg font-extrabold text-white leading-tight drop-shadow-sm line-clamp-2">{test.title}</h3>
                       </div>
                     </div>
                   </div>
@@ -214,10 +217,10 @@ export default async function MockTestLandingPage({ params }: Props) {
                       remarkPlugins={[remarkGfm]}
                       components={{
                         ul: ({ node, ...props }) => <ul className="space-y-3 my-4" {...props} />,
-                        li: ({ node, ...props }) => (
-                          <li className="flex items-start gap-3">
+                        li: ({ node, children, ...props }) => (
+                          <li className="flex items-start gap-3" {...props}>
                             <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
-                            <div className="text-slate-700 dark:text-slate-300 font-medium" {...props} />
+                            <div className="text-slate-700 dark:text-slate-300 font-medium">{children}</div>
                           </li>
                         )
                       }}

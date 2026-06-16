@@ -44,14 +44,16 @@ export function AssessmentCard({ assessment, type, href }: AssessmentCardProps) 
 
   return (
     <Card className="flex flex-col h-full overflow-hidden hover:shadow-lg transition-all duration-300 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-blue-500/50 dark:hover:border-blue-500/50 group">
-      {/* Thumbnail or colored top border */}
-      {assessment.thumbnail ? (
-        <div className="relative w-full h-40 bg-slate-100">
-          <Image src={assessment.thumbnail} alt={assessment.title} fill className="object-cover" />
-        </div>
-      ) : (
-        <div className={cn("h-2 w-full", typeColor.split(' ')[0])} />
-      )}
+      {/* Thumbnail or colored top border (DEMO IMAGE APPLIED) */}
+      <div className="relative w-full h-40 bg-slate-100 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-800 overflow-hidden">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img 
+          src={assessment.thumbnail || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&q=80"} 
+          alt={assessment.title} 
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+      </div>
 
       <CardHeader className="pb-3 flex-none">
         <div className="flex items-center justify-between mb-3">
