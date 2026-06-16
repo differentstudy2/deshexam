@@ -439,7 +439,7 @@ export function TopicQuestionManager({ topicId, tabType, nodeLevel = 'topic' }: 
                     <div className="grid grid-cols-2 gap-1 mt-2">
                       {(['a','b','c','d'] as const).map(key => (
                         <div key={key} className={`text-[11px] px-2 py-1 rounded-lg border leading-tight ${ q.correctAnswer === key ? 'bg-emerald-50 dark:bg-emerald-900/30 border-emerald-300 dark:border-emerald-800 font-semibold text-emerald-800 dark:text-emerald-300' : 'bg-slate-50 dark:bg-slate-800 border-slate-100 dark:border-slate-700 text-slate-600 dark:text-slate-400' }`}>
-                          <span className="font-bold uppercase mr-1">{key}.</span>{q.options[key]}
+                          <span className="font-bold uppercase mr-1">{key}.</span>{q.options?.[key]}
                         </div>
                       ))}
                     </div>
