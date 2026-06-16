@@ -8,16 +8,19 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { PlusCircle, Pencil, Trash2, ArrowLeft, Loader2, ListPlus, Copy, GripVertical, Sparkles, Upload, Link as LinkIcon, Image as ImageIcon, Wand2, Check } from 'lucide-react';
+import { PlusCircle, Pencil, Trash2, ArrowLeft, Loader2, ListPlus, Copy, GripVertical, Sparkles, Upload, Link as LinkIcon, Image as ImageIcon, Wand2, Check, ChevronDown, Search, CheckCircle2 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { useToast } from '@/hooks/use-toast';
 import { MockTest } from '@/lib/assessment-types';
 import { getAssessments, saveAssessment, deleteAssessment } from '@/lib/firebase/assessment';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { storage } from '@/lib/firebase/client';
 import { QuestionPickerModal } from '@/components/assessment/QuestionPickerModal';
-import { QuestionBankEntry } from '@/lib/question-bank-types';
+import { QuestionBankEntry, TaxonomyNode } from '@/lib/question-bank-types';
 import { getQuestionsByIds } from '@/lib/firebase/question-bank';
+import { getTaxonomyNodesByTrack } from '@/lib/firebase/taxonomy';
+import { cn } from '@/lib/utils';
 import { generateMockTestMetadata, generateImagePrompt, generateImageWithGemini } from './actions';
 import {
   Dialog,
@@ -27,6 +30,18 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+
+const MD3SelectField = ({ label, value, placeholder, onClick, required }: { label: string, value: string, placeholder: string, onClick: () => void, required?: boolean }) => (
+    <div onClick={onClick} className="relative border border-slate-200 rounded-lg p-2 pt-3 cursor-pointer hover:bg-slate-50 transition-colors bg-white">
+        <label className="absolute top-0 left-2 -translate-y-1/2 bg-white px-1 text-[10px] font-medium text-slate-500 pointer-events-none">
+            {label} {required && <span className="text-red-500">*</span>}
+        </label>
+        <div className="flex items-center justify-between min-h-[16px] mt-0.5">
+            <span className={cn("text-sm font-medium", value ? "text-slate-900" : "text-slate-400")}>{value || placeholder}</span>
+            <ChevronDown className="h-4 w-4 text-slate-400" />
+        </div>
+    </div>
+);
 
 export default function MockTestsPage() {
     const { toast } = useToast();
@@ -54,6 +69,45 @@ export default function MockTestsPage() {
     const [isGeneratingImagePrompt, setIsGeneratingImagePrompt] = useState(false);
     const [isGeneratingImage, setIsGeneratingImage] = useState(false);
     const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+    // Taxonomy States
+    const [boards, setBoards] = useState<TaxonomyNode[]>([]);
+    const [classes, setClasses] = useState<TaxonomyNode[]>([]);
+    const [subjects, setSubjects] = useState<TaxonomyNode[]>([]);
+    const [textbooks, setTextbooks] = useState<TaxonomyNode[]>([]);
+    const [chapters, setChapters] = useState<TaxonomyNode[]>([]);
+    const [topics, setTopics] = useState<TaxonomyNode[]>([]);
+    const [exams, setExams] = useState<TaxonomyNode[]>([]);
+    const [taxonomySheet, setTaxonomySheet] = useState<{ isOpen: boolean, type: string, title: string, items: TaxonomyNode[], value: string, onSelect: (id: string) => void }>({ isOpen: false, type: '', title: '', items: [], value: '', onSelect: () => {} });
+    const [sheetSearch, setSheetSearch] = useState('');
+
+    const openTaxonomySheet = (type: string, title: string, items: TaxonomyNode[], value: string, onSelect: (id: string) => void) => {
+        setSheetSearch('');
+        setTaxonomySheet({ isOpen: true, type, title, items, value, onSelect });
+    };
+
+    useEffect(() => {
+        const fetchTaxonomies = async () => {
+            try {
+                const allAcademic = await getTaxonomyNodesByTrack('academic');
+                const allCompetitive = await getTaxonomyNodesByTrack('competitive');
+                
+                const mapNodes = (nodes: any[]) => nodes.map(n => ({ ...n, name: n.title || n.name }));
+                
+                setBoards(mapNodes(allAcademic.filter((n: any) => n.type === 'board')));
+                setClasses(mapNodes(allAcademic.filter((n: any) => n.type === 'class')));
+                setSubjects(mapNodes(allAcademic.filter((n: any) => n.type === 'subject')));
+                setTextbooks(mapNodes(allAcademic.filter((n: any) => n.type === 'textbook')));
+                setChapters(mapNodes(allAcademic.filter((n: any) => n.type === 'chapter')));
+                setTopics(mapNodes(allAcademic.filter((n: any) => n.type === 'topic')));
+                setExams(mapNodes(allCompetitive.filter((n: any) => n.type === 'exam')));
+            } catch (e) {
+                console.error("Failed to load taxonomy nodes", e);
+            }
+        };
+
+        fetchTaxonomies();
+    }, []);
 
     // Fetch Question Previews when editData.questionIds changes
     useEffect(() => {
@@ -244,13 +298,17 @@ export default function MockTestsPage() {
             const id = editData.id || `mt_${Date.now()}`;
             const slug = editData.slug || editData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
             
-            await saveAssessment('mockTests', id, {
+            const dataToSave = {
                 ...editData,
+                id,
                 slug,
                 questionIds: editData.questionIds || [],
                 status: editData.status || 'Draft',
                 difficulty: editData.difficulty || 'Hard'
-            });
+            };
+            const cleanData = JSON.parse(JSON.stringify(dataToSave));
+            
+            await saveAssessment('mockTests', id, cleanData);
             
             toast({ title: 'Saved successfully' });
             setView('list');
@@ -425,6 +483,62 @@ export default function MockTestsPage() {
                                         )}
                                     </TabsContent>
                                 </Tabs>
+                            </CardContent>
+                        </Card>
+
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="text-base text-slate-800">Content Mapping (Taxonomy)</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <MD3SelectField 
+                                        label="Board" 
+                                        placeholder="Board" 
+                                        value={boards.find(b => b.id === editData.boardId)?.name || ''} 
+                                        onClick={() => openTaxonomySheet('board', 'Select Board', boards, editData.boardId || '', (v) => setEditData({...editData, boardId: v, classId: '', subjectId: '', textbookId: '', chapterId: '', topicId: ''}))} 
+                                    />
+                                    <MD3SelectField 
+                                        label="Class" 
+                                        placeholder="Class" 
+                                        value={classes.find(b => b.id === editData.classId)?.name || ''} 
+                                        onClick={() => openTaxonomySheet('class', 'Select Class', classes.filter(b => !editData.boardId || (b as any).boardId === editData.boardId), editData.classId || '', (v) => setEditData({...editData, classId: v, subjectId: '', textbookId: '', chapterId: '', topicId: ''}))} 
+                                    />
+                                </div>
+                                <MD3SelectField 
+                                    label="Subject" 
+                                    placeholder="Subject" 
+                                    value={subjects.find(b => b.id === editData.subjectId)?.name || ''} 
+                                    onClick={() => openTaxonomySheet('subject', 'Select Subject', subjects.filter(b => !editData.classId || (b as any).classId === editData.classId), editData.subjectId || '', (v) => setEditData({...editData, subjectId: v, textbookId: '', chapterId: '', topicId: ''}))} 
+                                />
+                                <div className="grid grid-cols-2 gap-4">
+                                    <MD3SelectField 
+                                        label="Textbook" 
+                                        placeholder="Textbook" 
+                                        value={textbooks.find(b => b.id === editData.textbookId)?.name || ''} 
+                                        onClick={() => openTaxonomySheet('textbook', 'Select Textbook', textbooks.filter(b => !editData.subjectId || (b as any).subjectId === editData.subjectId), editData.textbookId || '', (v) => setEditData({...editData, textbookId: v, chapterId: '', topicId: ''}))} 
+                                    />
+                                    <MD3SelectField 
+                                        label="Chapter" 
+                                        placeholder="Chapter" 
+                                        value={chapters.find(b => b.id === editData.chapterId)?.name || ''} 
+                                        onClick={() => openTaxonomySheet('chapter', 'Select Chapter', chapters.filter(b => !editData.textbookId || (b as any).textbookId === editData.textbookId), editData.chapterId || '', (v) => setEditData({...editData, chapterId: v, topicId: ''}))} 
+                                    />
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <MD3SelectField 
+                                        label="Topic" 
+                                        placeholder="Topic" 
+                                        value={topics.find(b => b.id === editData.topicId)?.name || ''} 
+                                        onClick={() => openTaxonomySheet('topic', 'Select Topic', topics.filter(b => !editData.chapterId || (b as any).chapterId === editData.chapterId), editData.topicId || '', (v) => setEditData({...editData, topicId: v}))} 
+                                    />
+                                    <MD3SelectField 
+                                        label="Competitive Exam" 
+                                        placeholder="Select Exam" 
+                                        value={exams.find(b => b.id === (editData.examIds?.[0] || ''))?.name || ''} 
+                                        onClick={() => openTaxonomySheet('exam', 'Select Exam', exams, editData.examIds?.[0] || '', (v) => setEditData({...editData, examIds: [v]}))} 
+                                    />
+                                </div>
                             </CardContent>
                         </Card>
 
@@ -652,6 +766,47 @@ export default function MockTestsPage() {
                         </DialogFooter>
                     </DialogContent>
                 </Dialog>
+                <Sheet open={taxonomySheet.isOpen} onOpenChange={(open) => setTaxonomySheet({...taxonomySheet, isOpen: open})}>
+                    <SheetContent side="right" className="w-[400px] sm:w-[540px] flex flex-col p-0 bg-white">
+                        <SheetHeader className="p-4 border-b border-slate-100 bg-slate-50 shrink-0">
+                            <SheetTitle className="text-lg text-slate-800">{taxonomySheet.title}</SheetTitle>
+                            <div className="relative mt-2">
+                                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
+                                <Input 
+                                    className="pl-9 bg-white border-slate-200 focus-visible:ring-slate-500" 
+                                    placeholder={`Search ${taxonomySheet.type}...`}
+                                    value={sheetSearch}
+                                    onChange={e => setSheetSearch(e.target.value)}
+                                />
+                            </div>
+                        </SheetHeader>
+                        <div className="flex-1 overflow-y-auto p-2">
+                            <div className="space-y-1">
+                                {taxonomySheet.items
+                                    .filter(item => item.name.toLowerCase().includes(sheetSearch.toLowerCase()))
+                                    .map(item => (
+                                    <button 
+                                        key={item.id} 
+                                        onClick={() => {
+                                            taxonomySheet.onSelect(item.id);
+                                            setTaxonomySheet({...taxonomySheet, isOpen: false});
+                                        }}
+                                        className={cn(
+                                            "w-full flex items-center justify-between p-3 rounded-md text-sm text-left transition-colors",
+                                            taxonomySheet.value === item.id ? "bg-slate-100 text-slate-900 font-semibold" : "hover:bg-slate-50 text-slate-600"
+                                        )}
+                                    >
+                                        {item.name}
+                                        {taxonomySheet.value === item.id && <CheckCircle2 className="w-4 h-4 text-slate-700" />}
+                                    </button>
+                                ))}
+                                {taxonomySheet.items.filter(item => item.name.toLowerCase().includes(sheetSearch.toLowerCase())).length === 0 && (
+                                    <div className="text-center p-4 text-slate-500 text-sm">No items found matching "{sheetSearch}".</div>
+                                )}
+                            </div>
+                        </div>
+                    </SheetContent>
+                </Sheet>
             </div>
         );
     }
