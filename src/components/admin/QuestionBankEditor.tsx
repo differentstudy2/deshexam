@@ -12,7 +12,9 @@ import { Switch } from '@/components/ui/switch';
 import { QuestionBankEntry, TaxonomyNode } from '@/lib/question-bank-types';
 import { Loader2, ArrowLeft, Sparkles, Play, Image as ImageIcon, Video, ShieldCheck, Upload, Trash2, X, Plus, Search, ChevronDown, CheckCircle2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { FileJson, Copy, Check } from 'lucide-react';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import { slugify, cn } from '@/lib/utils';
@@ -115,6 +117,13 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
   const [isUploadingMedia, setIsUploadingMedia] = useState(false);
   const [uploadingPairImage, setUploadingPairImage] = useState<{idx: number, side: 'left'|'right'} | null>(null);
+
+  // Bulk Import State
+  const [showSampleJsonDialog, setShowSampleJsonDialog] = useState(false);
+  const [showBulkImportDialog, setShowBulkImportDialog] = useState(false);
+  const [bulkImportText, setBulkImportText] = useState('');
+  const [copiedSample, setCopiedSample] = useState<string | false>(false);
+  const [previewQuestions, setPreviewQuestions] = useState<any[] | null>(null);
 
   // Taxonomies for dropdowns
   const [boards, setBoards] = useState<TaxonomyNode[]>([]);
@@ -262,87 +271,110 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
       }
   };
 
+  const sampleJSONData: Record<string, string> = {
+    MCQ: `[\n  {\n    "Question Type": "MCQ",\n    "Question": "What is the capital of France?",\n    "Option A": "London",\n    "Option B": "Berlin",\n    "Option C": "Paris",\n    "Option D": "Madrid",\n    "Correct Answer": "c",\n    "Explanation": "Paris is the capital of France.",\n    "Difficulty": "Easy",\n    "Subject": "Geography",\n    "Chapter": "Europe"\n  }\n]`,
+    "T/F": `[\n  {\n    "Question Type": "T/F",\n    "Question": "The earth is flat.",\n    "Correct Answer": "false"\n  }\n]`,
+    FIB: `[\n  {\n    "Question Type": "FIB",\n    "Question": "The color of the sky is [blank].",\n    "Correct Answer": "blue"\n  }\n]`,
+    Match: `[\n  {\n    "Question Type": "Match",\n    "Question": "Match the following countries with their capitals",\n    "matchingPairs": [\n      { "left": "France", "right": "Paris" },\n      { "left": "UK", "right": "London" }\n    ]\n  }\n]`,
+    Desc: `[\n  {\n    "Question Type": "Desc",\n    "Question": "Explain Newton's first law of motion.",\n    "Correct Answer": "An object will remain at rest or in uniform motion...",\n    "Explanation": "Also known as the law of inertia."\n  }\n]`
+  };
+
+  const processBulkImportPreview = (content: string) => {
+      try {
+          const parsed = JSON.parse(content);
+          
+          if (!Array.isArray(parsed)) {
+              throw new Error("JSON must be an array of questions.");
+          }
+          
+          // Helper to map custom human-readable format to internal format
+          const mapCustomFormat = (raw: any) => {
+              if (!raw["Question"] && !raw["Question Type"]) return raw;
+              
+              const qTypeMap: Record<string, string> = { "Multiple Choice": "MCQ", "Descriptive": "Desc", "True/False": "T/F", "Fill in the Blank": "FIB", "Matching": "Match" };
+              const options: any = raw.options || {};
+              if (raw["Option A"]) options.a = raw["Option A"];
+              if (raw["Option B"]) options.b = raw["Option B"];
+              if (raw["Option C"]) options.c = raw["Option C"];
+              if (raw["Option D"]) options.d = raw["Option D"];
+              if (raw["Option E"]) options.e = raw["Option E"];
+
+              let correct = raw["Correct Answer"] || raw.correctAnswer || "";
+              if (typeof correct === 'string') correct = correct.toLowerCase().trim();
+
+              return {
+                  ...raw,
+                  questionText: raw["Question"] || raw.questionText,
+                  questionType: qTypeMap[raw["Question Type"]] || raw.questionType || "MCQ",
+                  options: Object.keys(options).length > 0 ? options : undefined,
+                  correctAnswer: correct,
+                  explanation: raw["Explanation"] || raw.explanation,
+                  difficulty: raw["Difficulty"] || raw.difficulty,
+                  // Custom tags to store the raw Subject/Chapter names if provided
+                  sourceSubject: raw["Subject"] || raw.sourceSubject,
+                  sourceChapter: raw["Chapter"] || raw.sourceChapter
+              };
+          };
+
+          // Apply current taxonomy to imported questions
+          const questionsToImport = parsed.map((rawQ: any) => {
+              const q = mapCustomFormat(rawQ);
+              return {
+                  ...q,
+                  id: `q_${Date.now()}_${Math.floor(Math.random() * 1000000)}`,
+                  contentType: defaultContentType || 'general',
+                  boardId: editData.boardId || q.boardId,
+                  classId: editData.classId || q.classId,
+                  subjectId: editData.subjectId || q.subjectId,
+                  textbookId: editData.textbookId || q.textbookId,
+                  chapterId: editData.chapterId || q.chapterId,
+                  topicId: editData.topicId || q.topicId,
+                  yearId: editData.yearId || q.yearId,
+                  examIds: editData.examIds && editData.examIds.length > 0 ? editData.examIds : (q.examIds || []),
+                  sourceBoard: editData.boardId ? boards.find(b => b.id === editData.boardId)?.name : q.sourceBoard,
+                  sourceYear: editData.yearId ? years.find(y => y.id === editData.yearId)?.name : q.sourceYear,
+                  sourceExam: editData.examIds && editData.examIds.length > 0 ? exams.filter(ex => editData.examIds?.includes(ex.id)).map(ex => ex.name).join(', ') : q.sourceExam,
+                  status: q.status || 'Published',
+                  difficulty: q.difficulty || editData.difficulty || 'Medium',
+                  slug: q.slug || slugify(q.title || (q.questionText || '').replace(/<[^>]*>?/gm, '').substring(0, 50))
+              };
+          });
+
+          // Strip undefined values
+          const cleanQuestions = JSON.parse(JSON.stringify(questionsToImport));
+          setPreviewQuestions(cleanQuestions);
+      } catch(err: any) {
+          console.error("Bulk import error:", err);
+          toast({ title: 'Invalid JSON', description: err.message, variant: 'destructive' });
+      }
+  };
+
+  const confirmBulkImport = async () => {
+      if (!previewQuestions || previewQuestions.length === 0) return;
+      setIsSaving(true);
+      try {
+          await bulkCreateQuestions(previewQuestions);
+          toast({ title: 'Success', description: `Successfully imported ${previewQuestions.length} questions!` });
+          setShowBulkImportDialog(false);
+          setBulkImportText('');
+          setPreviewQuestions(null);
+      } catch(err: any) {
+          console.error("Bulk import error:", err);
+          toast({ title: 'Import Failed', description: err.message, variant: 'destructive' });
+      } finally {
+          setIsSaving(false);
+      }
+  };
+
   const handleBulkImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (!file) return;
       
       const reader = new FileReader();
       reader.onload = async (event) => {
-          try {
-              const content = event.target?.result as string;
-              const parsed = JSON.parse(content);
-              
-              if (!Array.isArray(parsed)) {
-                  throw new Error("JSON must be an array of questions.");
-              }
-              
-              setIsSaving(true);
-              
-              // Helper to map custom human-readable format to internal format
-              const mapCustomFormat = (raw: any) => {
-                  if (!raw["Question"] && !raw["Question Type"]) return raw;
-                  
-                  const qTypeMap: Record<string, string> = { "Multiple Choice": "MCQ", "Descriptive": "Descriptive", "True/False": "True/False" };
-                  const options: any = raw.options || {};
-                  if (raw["Option A"]) options.a = raw["Option A"];
-                  if (raw["Option B"]) options.b = raw["Option B"];
-                  if (raw["Option C"]) options.c = raw["Option C"];
-                  if (raw["Option D"]) options.d = raw["Option D"];
-                  if (raw["Option E"]) options.e = raw["Option E"];
-
-                  let correct = raw["Correct Answer"] || raw.correctAnswer || "";
-                  if (typeof correct === 'string') correct = correct.toLowerCase().trim();
-
-                  return {
-                      ...raw,
-                      questionText: raw["Question"] || raw.questionText,
-                      questionType: qTypeMap[raw["Question Type"]] || raw.questionType || "MCQ",
-                      options: Object.keys(options).length > 0 ? options : undefined,
-                      correctAnswer: correct,
-                      explanation: raw["Explanation"] || raw.explanation,
-                      difficulty: raw["Difficulty"] || raw.difficulty,
-                      // Custom tags to store the raw Subject/Chapter names if provided
-                      sourceSubject: raw["Subject"] || raw.sourceSubject,
-                      sourceChapter: raw["Chapter"] || raw.sourceChapter
-                  };
-              };
-
-              // Apply current taxonomy to imported questions
-              const questionsToImport = parsed.map((rawQ: any) => {
-                  const q = mapCustomFormat(rawQ);
-                  return {
-                      ...q,
-                      id: `q_${Date.now()}_${Math.floor(Math.random() * 1000000)}`,
-                      contentType: defaultContentType || 'general',
-                      boardId: editData.boardId || q.boardId,
-                      classId: editData.classId || q.classId,
-                      subjectId: editData.subjectId || q.subjectId,
-                      textbookId: editData.textbookId || q.textbookId,
-                      chapterId: editData.chapterId || q.chapterId,
-                      topicId: editData.topicId || q.topicId,
-                      yearId: editData.yearId || q.yearId,
-                      examIds: editData.examIds && editData.examIds.length > 0 ? editData.examIds : (q.examIds || []),
-                      sourceBoard: editData.boardId ? boards.find(b => b.id === editData.boardId)?.name : q.sourceBoard,
-                      sourceYear: editData.yearId ? years.find(y => y.id === editData.yearId)?.name : q.sourceYear,
-                      sourceExam: editData.examIds && editData.examIds.length > 0 ? exams.filter(ex => editData.examIds?.includes(ex.id)).map(ex => ex.name).join(', ') : q.sourceExam,
-                      status: q.status || 'Published',
-                      difficulty: q.difficulty || editData.difficulty || 'Medium',
-                      slug: q.slug || slugify(q.title || (q.questionText || '').replace(/<[^>]*>?/gm, '').substring(0, 50))
-                  };
-              });
-
-              // Strip undefined values
-              const cleanQuestions = JSON.parse(JSON.stringify(questionsToImport));
-              
-              await bulkCreateQuestions(cleanQuestions);
-              toast({ title: 'Success', description: `Successfully imported ${cleanQuestions.length} questions!` });
-              if (e.target) e.target.value = ''; // Reset input
-          } catch(err: any) {
-              console.error("Bulk import error:", err);
-              toast({ title: 'Import Failed', description: err.message, variant: 'destructive' });
-          } finally {
-              setIsSaving(false);
-          }
+          const content = event.target?.result as string;
+          processBulkImportPreview(content);
+          if (e.target) e.target.value = ''; // Reset input
       };
       reader.readAsText(file);
   };
@@ -492,8 +524,16 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
               <div className="lg:col-span-2 flex flex-col gap-2">
                   {/* --- CARD 1: Question Content --- */}
                   <Card className="flex flex-col rounded-lg border-[#d3e3d3] shadow-sm bg-[#fdfefd] overflow-hidden">
-                      <CardHeader className="pb-2 border-b border-[#eef2ec] bg-[#f8faf8]">
+                      <CardHeader className="flex flex-row items-center justify-between pb-2 border-b border-[#eef2ec] bg-[#f8faf8]">
                           <CardTitle className="text-base text-[#4a634a]">Question Content</CardTitle>
+                          <div className="flex gap-2">
+                              <Button variant="outline" size="icon" className="h-8 w-8 text-[#4a634a]" title="Sample JSON Format" onClick={() => setShowSampleJsonDialog(true)}>
+                                  <FileJson className="w-4 h-4" />
+                              </Button>
+                              <Button variant="outline" size="icon" className="h-8 w-8 text-[#4a634a]" title="Bulk Import Questions" onClick={() => setShowBulkImportDialog(true)}>
+                                  <Upload className="w-4 h-4" />
+                              </Button>
+                          </div>
                       </CardHeader>
                       <CardContent className="space-y-3 flex-1 flex flex-col pt-3">
                               <div className="relative border border-[#c4d6c4] rounded-lg pt-2 pb-1 hover:bg-[#f4f8f4] transition-colors bg-white focus-within:border-[#4a634a] focus-within:ring-1 focus-within:ring-[#4a634a]">
@@ -1134,6 +1174,124 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                           )}
                       </RadioGroup>
                   </div>
+              </DialogContent>
+          </Dialog>
+
+          {/* Sample JSON Dialog */}
+          <Dialog open={showSampleJsonDialog} onOpenChange={setShowSampleJsonDialog}>
+              <DialogContent className="sm:max-w-[700px] rounded-[24px]">
+                  <DialogHeader>
+                      <DialogTitle className="text-xl font-bold text-slate-800">
+                          Sample JSON Format
+                      </DialogTitle>
+                  </DialogHeader>
+                  <Tabs defaultValue="MCQ" className="w-full mt-2">
+                      <TabsList className="grid w-full grid-cols-5">
+                          <TabsTrigger value="MCQ">MCQ</TabsTrigger>
+                          <TabsTrigger value="T/F">T/F</TabsTrigger>
+                          <TabsTrigger value="FIB">FIB</TabsTrigger>
+                          <TabsTrigger value="Match">Match</TabsTrigger>
+                          <TabsTrigger value="Desc">Desc</TabsTrigger>
+                      </TabsList>
+                      {Object.entries(sampleJSONData).map(([key, val]) => (
+                          <TabsContent key={key} value={key}>
+                              <div className="bg-slate-900 rounded-xl p-4 overflow-x-auto max-h-[50vh] relative">
+                                  <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="absolute top-2 right-2 text-slate-300 hover:text-white"
+                                      onClick={() => {
+                                          navigator.clipboard.writeText(val);
+                                          setCopiedSample(key);
+                                          setTimeout(() => setCopiedSample(false), 2000);
+                                          toast({ title: "Copied!", description: "Sample JSON copied to clipboard." });
+                                      }}
+                                  >
+                                      {copiedSample === key ? <Check className="w-4 h-4 mr-2" /> : <Copy className="w-4 h-4 mr-2" />}
+                                      {copiedSample === key ? "Copied" : "Copy"}
+                                  </Button>
+                                  <pre className="text-sm text-emerald-400 font-mono mt-8">
+                                      {val}
+                                  </pre>
+                              </div>
+                          </TabsContent>
+                      ))}
+                  </Tabs>
+              </DialogContent>
+          </Dialog>
+
+          {/* Bulk Import Dialog */}
+          <Dialog open={showBulkImportDialog} onOpenChange={setShowBulkImportDialog}>
+              <DialogContent className="sm:max-w-[600px] rounded-[24px]">
+                  <DialogHeader>
+                      <DialogTitle className="text-xl font-bold text-slate-800">
+                          {previewQuestions ? "Preview Import" : "Bulk Import Questions"}
+                      </DialogTitle>
+                  </DialogHeader>
+                  
+                  {!previewQuestions ? (
+                      <div className="space-y-4 pt-4">
+                          <div className="space-y-2">
+                              <label className="text-sm font-semibold text-slate-700">Upload JSON File</label>
+                              <div className="flex items-center gap-4">
+                                  <Input type="file" accept=".json" onChange={handleBulkImport} className="cursor-pointer file:text-[#4a634a] file:font-medium file:bg-[#f4f8f4] file:border-0 file:mr-4 file:px-4 file:py-2 file:rounded-full" />
+                              </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-4">
+                              <div className="h-px bg-slate-200 flex-1"></div>
+                              <span className="text-xs text-slate-400 font-medium uppercase">OR</span>
+                              <div className="h-px bg-slate-200 flex-1"></div>
+                          </div>
+
+                          <div className="space-y-2">
+                              <label className="text-sm font-semibold text-slate-700">Paste JSON Content</label>
+                              <Textarea 
+                                  value={bulkImportText} 
+                                  onChange={e => setBulkImportText(e.target.value)} 
+                                  placeholder="Paste your JSON array of questions here..." 
+                                  className="h-48 font-mono text-xs p-3 border-[#c4d6c4] focus-visible:ring-[#4a634a]"
+                              />
+                          </div>
+
+                          <Button 
+                              className="w-full rounded-full bg-[#3d5a3d] hover:bg-[#2d442d] text-white" 
+                              disabled={!bulkImportText.trim()}
+                              onClick={() => processBulkImportPreview(bulkImportText)}
+                          >
+                              <Search className="w-4 h-4 mr-2" />
+                              Preview Questions
+                          </Button>
+                      </div>
+                  ) : (
+                      <div className="space-y-4 pt-2">
+                          <div className="bg-[#f0f4f0] text-[#3d5a3d] text-sm p-3 rounded-lg font-medium flex justify-between items-center">
+                              <span>Ready to import {previewQuestions.length} questions.</span>
+                          </div>
+                          <div className="max-h-[40vh] overflow-y-auto space-y-2 pr-2">
+                              {previewQuestions.map((q, i) => (
+                                  <div key={i} className="p-3 border border-[#d3e3d3] rounded-xl bg-white shadow-sm">
+                                      <p className="font-semibold text-sm line-clamp-2 text-slate-800">{q.questionText}</p>
+                                      <div className="flex gap-2 mt-2">
+                                          <span className="text-[10px] font-bold uppercase tracking-wider bg-[#eef2ec] text-[#4a634a] px-2 py-0.5 rounded-full">{q.questionType}</span>
+                                          <span className="text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">{q.difficulty || 'Medium'}</span>
+                                      </div>
+                                  </div>
+                              ))}
+                          </div>
+                          <div className="flex gap-3 pt-2 border-t border-slate-100">
+                              <Button variant="outline" className="flex-1 rounded-full border-slate-300" onClick={() => setPreviewQuestions(null)}>Cancel</Button>
+                              <Button 
+                                  className="flex-1 rounded-full bg-[#3d5a3d] hover:bg-[#2d442d] text-white shadow-sm" 
+                                  onClick={confirmBulkImport}
+                                  disabled={isSaving}
+                              >
+                                  {isSaving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <CheckCircle2 className="w-4 h-4 mr-2" />}
+                                  Confirm & Import
+                              </Button>
+                          </div>
+                      </div>
+                  )}
               </DialogContent>
           </Dialog>
       </div>
