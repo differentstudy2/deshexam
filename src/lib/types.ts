@@ -94,7 +94,7 @@ export type Question = {
     text: string;
     image?: string;
     audio?: string;
-    type: 'Multiple Choice' | 'True/False' | 'Short Answer' | 'Fill in the Blank' | 'Matching' | 'Grouped' | 'Descriptive';
+    type: 'MCQ' | 'T/F' | 'FIB' | 'Match' | 'Desc' | 'CQ' | 'Multiple Choice' | 'True/False' | 'Short Answer' | 'Fill in the Blank' | 'Matching' | 'Grouped' | 'Descriptive';
     marks: number;
     options?: {text: string, explanation?: string, image?: string, audio?: string}[];
     matchingOptions?: {

@@ -3,13 +3,11 @@ export type QuestionDifficulty = 'Easy' | 'Medium' | 'Hard' | 'Expert';
 export type QuestionLanguage = 'Bangla' | 'English' | 'Hindi' | 'Arabic';
 export type QuestionType = 
   | 'MCQ'
-  | 'Multiple Choice'
-  | 'True/False'
-  | 'Fill in the Blank'
-  | 'Matching'
-  | 'Creative Question'
-  | 'Short Question'
-  | 'Long Question'
+  | 'T/F'
+  | 'FIB'
+  | 'Match'
+  | 'CQ'
+  | 'Desc'
   | 'Model Test'
   | 'Practice Set'
   | 'Quiz'

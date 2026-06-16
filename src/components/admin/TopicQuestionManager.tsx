@@ -59,8 +59,8 @@ export function TopicQuestionManager({ topicId, tabType, nodeLevel = 'topic' }: 
   const mapTabToQuestionType = (tab: string) => {
       if (tab === 'questions') return innerQType;
       if (tab === 'mcq') return 'MCQ';
-      if (tab === 'creative_question') return 'Creative Question'; // Fixed to match QuestionType
-      if (tab === 'short_question') return 'Short Question';       // Fixed to match QuestionType
+      if (tab === 'creative_question') return 'CQ';
+      if (tab === 'short_question' || tab === 'descriptive') return 'Desc';
       if (tab === 'model_test') return 'Model Test';
       if (tab === 'practice_sets') return 'Practice Set';
       if (tab === 'quizzes') return 'Quiz';
@@ -347,7 +347,7 @@ export function TopicQuestionManager({ topicId, tabType, nodeLevel = 'topic' }: 
       {/* â”€â”€ Inner type sub-pills (Questions tab only) â”€â”€ */}
       {tabType === 'questions' && (
         <div className="flex gap-1.5 overflow-x-auto no-scrollbar pb-1 lg:flex-wrap lg:overflow-x-visible lg:pb-0">
-          {['MCQ','True/False','Fill in the Blank','Matching','Short Question','Long Question','Creative Question'].map(t => (
+          {['MCQ','T/F','FIB','Match','Desc','CQ'].map(t => (
             <button key={t} onClick={() => setInnerQType(t)}
               className={`px-3 py-1.5 rounded-full text-[11px] font-semibold whitespace-nowrap border transition-all ${
                 innerQType === t ? 'bg-[#107c41] text-white border-[#107c41]' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-500'
@@ -446,7 +446,7 @@ export function TopicQuestionManager({ topicId, tabType, nodeLevel = 'topic' }: 
                   )}
 
                   {/* Matching pairs */}
-                  {q.questionType === 'Matching' && q.matchingPairs && q.matchingPairs.length > 0 && (
+                  {q.questionType === 'Match' && q.matchingPairs && q.matchingPairs.length > 0 && (
                     <div className="mt-2 bg-slate-50 dark:bg-slate-800 rounded-lg p-2">
                       <div className="grid grid-cols-2 gap-1 text-[11px]">
                         <div className="font-bold text-slate-500">Column A</div>
@@ -462,7 +462,7 @@ export function TopicQuestionManager({ topicId, tabType, nodeLevel = 'topic' }: 
                   )}
 
                   {/* Short/Long/Creative answer */}
-                  {!['MCQ','Matching'].includes(q.questionType || '') && q.correctAnswer && (
+                  {!['MCQ','Match'].includes(q.questionType || '') && q.correctAnswer && (
                     <div className="mt-2 text-[11px] p-2 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg">
                       <span className="font-bold text-emerald-700 dark:text-emerald-400">Answer: </span>
                       <span className="text-slate-700 dark:text-slate-300" dangerouslySetInnerHTML={{__html: q.correctAnswer}} />

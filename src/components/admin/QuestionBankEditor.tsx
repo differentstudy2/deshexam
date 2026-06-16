@@ -92,8 +92,8 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
   
   const getDefaultMarks = (type?: string) => {
       const t = (type || '').toLowerCase();
-      if (t === 'short question') return 3;
-      if (t === 'long question') return 5;
+      if (t === 'desc') return 3;
+      if (t === 'cq') return 5;
       return 1;
   };
 
@@ -352,11 +352,11 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
           toast({ title: 'Validation Error', description: 'Question Text is required.', variant: 'destructive' });
           return;
       }
-      if (editData.questionType !== 'Matching' && !editData.correctAnswer) {
+      if (editData.questionType !== 'Match' && !editData.correctAnswer) {
           toast({ title: 'Validation Error', description: 'Correct Answer is required.', variant: 'destructive' });
           return;
       }
-      if (editData.questionType === 'Matching') {
+      if (editData.questionType === 'Match') {
           const validPairs = editData.matchingPairs?.filter(p => p.left && p.right) || [];
           if (validPairs.length === 0) {
               toast({ title: 'Validation Error', description: 'At least one matching pair is required.', variant: 'destructive' });
@@ -507,13 +507,11 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                                       </SelectTrigger>
                                   <SelectContent>
                                       <SelectItem value="MCQ">MCQ</SelectItem>
-                                      <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>
-                                      <SelectItem value="True/False">True/False</SelectItem>
-                                      <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>
-                                      <SelectItem value="Matching">Matching</SelectItem>
-                                      <SelectItem value="Creative Question">Creative Question</SelectItem>
-                                      <SelectItem value="Short Question">Short Question</SelectItem>
-                                      <SelectItem value="Long Question">Long Question</SelectItem>
+                                      <SelectItem value="T/F">T/F</SelectItem>
+                                      <SelectItem value="FIB">FIB</SelectItem>
+                                      <SelectItem value="Match">Match</SelectItem>
+                                      <SelectItem value="CQ">CQ</SelectItem>
+                                      <SelectItem value="Desc">Desc</SelectItem>
                                   </SelectContent>
                               </Select>
                           </div>
@@ -579,10 +577,10 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                   {/* --- CARD 2: Options / Answer --- */}
                   <Card className="flex flex-col rounded-lg border-[#d3e3d3] shadow-sm bg-[#fdfefd] overflow-hidden">
                       <CardHeader className="pb-2 border-b border-[#eef2ec] bg-[#f8faf8]">
-                          <CardTitle className="text-base text-[#4a634a]">{editData.questionType === 'Matching' ? 'Matching Pairs' : 'Options / Answer'}</CardTitle>
+                          <CardTitle className="text-base text-[#4a634a]">{editData.questionType === 'Match' ? 'Matching Pairs' : 'Options / Answer'}</CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-3 flex-1 pt-3">
-                          {editData.questionType === 'Matching' ? (
+                          {editData.questionType === 'Match' ? (
                               <div className="space-y-3">
                                   <div className="grid grid-cols-2 gap-4">
                                       <div className="text-sm font-medium text-slate-500">Left Column (Items)</div>
@@ -700,7 +698,7 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                                   </Button>
                                   <p className="text-xs text-slate-500 mt-2">Pairs will be shuffled automatically when displayed to students.</p>
                               </div>
-                          ) : ['MCQ', 'Multiple Choice'].includes(editData.questionType || 'MCQ') ? (
+                          ) : ['MCQ'].includes(editData.questionType || 'MCQ') ? (
                               <div className="space-y-3">
                                   {['A', 'B', 'C', 'D'].map((optKey) => (
                                       <div key={optKey} className="flex items-center gap-3">
@@ -732,7 +730,7 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                                       <Button variant="outline" className="w-fit mt-2 rounded-full border-[#d3e3d3] text-[#4a634a] bg-[#fdfefd] hover:bg-[#f4f8f4]">Add Option</Button>
                                   </div>
                               </div>
-                          ) : ['True/False'].includes(editData.questionType || '') ? (
+                          ) : ['T/F'].includes(editData.questionType || '') ? (
                               <div className="space-y-4">
                                   <label className="text-sm font-medium">Select Correct Answer</label>
                                   <div className="flex gap-4">
@@ -746,7 +744,7 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                                       </label>
                                   </div>
                               </div>
-                          ) : ['Fill in the Blank'].includes(editData.questionType || '') ? (
+                          ) : ['FIB'].includes(editData.questionType || '') ? (
                               <div className="space-y-4">
                                   <div className="p-3 bg-blue-50 border border-blue-200 text-blue-800 rounded-lg text-sm dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-300">
                                       <strong>How to create blanks:</strong> Type <code className="bg-white dark:bg-slate-800 px-1 rounded text-blue-600 dark:text-blue-400">[blank]</code> anywhere in the Question Text above to create a gap. You can add multiple blanks.
@@ -786,7 +784,7 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                   </Card>
 
                   {/* --- CARD 3: Explanation --- */}
-                  {!['Short Question', 'Long Question', 'Creative Question'].includes(editData.questionType || '') && (
+                  {!['Desc', 'CQ'].includes(editData.questionType || '') && (
                       <Card className="rounded-lg border-[#d3e3d3] shadow-sm bg-[#fdfefd] overflow-hidden">
                           <CardHeader className="flex flex-row items-center justify-between pb-2 border-b border-[#eef2ec] bg-[#f8faf8]">
                               <CardTitle className="text-base text-[#4a634a]">Explanation</CardTitle>
