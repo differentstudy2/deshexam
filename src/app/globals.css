@@ -728,7 +728,10 @@ strong {
 }
 
 /* Native App UI Helpers */
-.prose, input, textarea, [contenteditable="true"] {
+.prose,
+input,
+textarea,
+[contenteditable="true"] {
   user-select: text;
   -webkit-user-select: text;
 }
@@ -740,6 +743,13 @@ strong {
 
 /* Hide scrollbar for IE, Edge and Firefox */
 html {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.prose {
+  font-size: 1rem !important;
+
 }

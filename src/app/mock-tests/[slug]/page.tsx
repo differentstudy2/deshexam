@@ -57,14 +57,14 @@ export default async function MockTestLandingPage({ params }: Props) {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-      <div className="min-h-screen bg-[#f5f7fa]">
+      <div className="min-h-screen bg-[#f5f7fa] dark:bg-slate-950 transition-colors duration-300">
 
         {/* ═══════════════════════════════════════════════
             HERO SECTION
         ═══════════════════════════════════════════════ */}
-        <div className="relative bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#0f2444] overflow-hidden">
+        <div className="relative bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#0f2444]">
           {/* Background decoration */}
-          <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
             <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-blue-500/10 blur-3xl" />
             <div className="absolute bottom-0 left-0 w-80 h-80 rounded-full bg-violet-500/10 blur-3xl" />
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-px bg-gradient-to-r from-transparent via-blue-400/20 to-transparent" />
@@ -133,7 +133,7 @@ export default async function MockTestLandingPage({ params }: Props) {
 
               {/* Right: CTA card (desktop — floats into content below) */}
               <div className="hidden lg:block w-80 shrink-0 -mb-16 relative z-10">
-                <div className="bg-white rounded-2xl shadow-2xl shadow-black/30 border border-slate-100 overflow-hidden">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl shadow-black/30 border border-slate-100 dark:border-slate-800 overflow-hidden transition-colors duration-300">
                   {/* Card header */}
                   <div className="bg-gradient-to-br from-blue-600 to-violet-600 p-5">
                     <div className="flex items-center gap-3 mb-1">
@@ -157,15 +157,15 @@ export default async function MockTestLandingPage({ params }: Props) {
                       { icon: AlertTriangle, label: 'Negative Marks', value: `${test.negativeMarking ?? 0}` },
                     ].map(({ icon: Icon, label, value }) => (
                       <div key={label} className="flex items-center justify-between text-sm">
-                        <span className="flex items-center gap-2 text-slate-500 font-medium">
-                          <Icon className="w-3.5 h-3.5 text-slate-400" />
+                        <span className="flex items-center gap-2 text-slate-500 dark:text-slate-400 font-medium">
+                          <Icon className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
                           {label}
                         </span>
-                        <span className="font-bold text-slate-800">{value}</span>
+                        <span className="font-bold text-slate-800 dark:text-slate-100">{value}</span>
                       </div>
                     ))}
 
-                    <div className="pt-2 border-t border-slate-100">
+                    <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
                       <StartTestButton slug={test.slug} accessType={test.accessType} price={test.price} allowedSubscriptionPlans={test.allowedSubscriptionPlans} />
                     </div>
 
@@ -189,27 +189,27 @@ export default async function MockTestLandingPage({ params }: Props) {
               {/* Quick facts strip */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {[
-                  { icon: HelpCircle, label: 'Questions', value: `${test.questionIds?.length ?? 0}`, color: 'bg-blue-50 border-blue-200 text-blue-700' },
-                  { icon: Clock, label: 'Duration', value: `${test.durationMin ?? 0} min`, color: 'bg-violet-50 border-violet-200 text-violet-700' },
-                  { icon: Award, label: 'Total Marks', value: `${test.totalMarks ?? 0}`, color: 'bg-amber-50 border-amber-200 text-amber-700' },
-                  { icon: Target, label: 'Pass Marks', value: `${test.passingMarks ?? 0}`, color: 'bg-emerald-50 border-emerald-200 text-emerald-700' },
+                  { icon: HelpCircle, label: 'Questions', value: `${test.questionIds?.length ?? 0}`, color: 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-400' },
+                  { icon: Clock, label: 'Duration', value: `${test.durationMin ?? 0} min`, color: 'bg-violet-50 dark:bg-violet-900/20 border-violet-200 dark:border-violet-800 text-violet-700 dark:text-violet-400' },
+                  { icon: Award, label: 'Total Marks', value: `${test.totalMarks ?? 0}`, color: 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400' },
+                  { icon: Target, label: 'Pass Marks', value: `${test.passingMarks ?? 0}`, color: 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400' },
                 ].map(({ icon: Icon, label, value, color }) => (
-                  <div key={label} className={`flex flex-col items-center justify-center p-4 rounded-2xl border text-center ${color}`}>
+                  <div key={label} className={`flex flex-col items-center justify-center p-4 rounded-2xl border text-center transition-colors duration-300 ${color}`}>
                     <Icon className="w-5 h-5 mb-1 opacity-70" />
-                    <p className="text-2xl font-extrabold">{value}</p>
+                    <p className="text-2xl font-extrabold dark:text-slate-100">{value}</p>
                     <p className="text-[11px] font-semibold uppercase tracking-wide opacity-70">{label}</p>
                   </div>
                 ))}
               </div>
 
               {/* Instructions */}
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-100 bg-slate-50">
-                  <BookOpen className="w-5 h-5 text-[#107c41]" />
-                  <h2 className="text-base font-bold text-slate-800">Instructions</h2>
+              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-colors duration-300">
+                <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+                  <BookOpen className="w-5 h-5 text-[#107c41] dark:text-[#22c55e]" />
+                  <h2 className="text-base font-bold text-slate-800 dark:text-slate-100">Instructions</h2>
                 </div>
                 <div className="p-6">
-                  <div className="prose prose-slate prose-sm max-w-none prose-ol:list-decimal prose-strong:font-semibold">
+                  <div className="prose prose-slate dark:prose-invert max-w-none !prose-p:my-0 !prose-p:text-[1rem] !prose-p:leading-relaxed prose-ol:list-decimal prose-strong:font-semibold">
                     <ReactMarkdown
                       remarkPlugins={[remarkGfm]}
                       components={{
@@ -217,7 +217,7 @@ export default async function MockTestLandingPage({ params }: Props) {
                         li: ({ node, ...props }) => (
                           <li className="flex items-start gap-3">
                             <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
-                            <span className="text-slate-700 leading-relaxed" {...props} />
+                            <div className="text-slate-700 dark:text-slate-300 font-medium" {...props} />
                           </li>
                         )
                       }}
@@ -231,12 +231,12 @@ export default async function MockTestLandingPage({ params }: Props) {
                     </ReactMarkdown>
                   </div>
                   {test.examRules && (
-                    <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                    <div className="mt-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/30 rounded-xl">
                       <div className="flex items-center gap-2 mb-2">
-                        <AlertTriangle className="w-4 h-4 text-amber-600" />
-                        <span className="text-sm font-bold text-amber-700">Exam Rules</span>
+                        <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-500" />
+                        <span className="text-sm font-bold text-amber-700 dark:text-amber-400">Exam Rules</span>
                       </div>
-                      <div className="prose prose-sm prose-amber max-w-none text-amber-800">
+                      <div className="prose prose-sm prose-amber dark:prose-invert max-w-none text-amber-800 dark:text-amber-300">
                         <ReactMarkdown remarkPlugins={[remarkGfm]}>{test.examRules}</ReactMarkdown>
                       </div>
                     </div>
@@ -245,10 +245,10 @@ export default async function MockTestLandingPage({ params }: Props) {
               </div>
 
               {/* What to expect */}
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-100 bg-slate-50">
+              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-colors duration-300">
+                <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
                   <Star className="w-5 h-5 text-amber-500" />
-                  <h2 className="text-base font-bold text-slate-800">What to Expect</h2>
+                  <h2 className="text-base font-bold text-slate-800 dark:text-slate-100">What to Expect</h2>
                 </div>
                 <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {[
@@ -266,12 +266,12 @@ export default async function MockTestLandingPage({ params }: Props) {
                     { icon: Zap, title: 'Instant Results', desc: 'No waiting around. Review your accuracy and detailed report the second you hit submit.' },
                   ].map(({ icon: Icon, title, desc }) => (
                     <div key={title} className="flex items-start gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
-                        <Icon className="w-4.5 h-4.5 text-slate-600" />
+                      <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
+                        <Icon className="w-4.5 h-4.5 text-slate-600 dark:text-slate-400" />
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-slate-800">{title}</p>
-                        <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{desc}</p>
+                        <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{title}</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">{desc}</p>
                       </div>
                     </div>
                   ))}
@@ -283,7 +283,7 @@ export default async function MockTestLandingPage({ params }: Props) {
             {/* Desktop sticky sidebar (repeats CTA below the hero card on scroll) */}
             <div className="hidden lg:block w-72 shrink-0">
               <div className="sticky top-6 space-y-4">
-                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 transition-colors duration-300">
                   <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Quick Summary</p>
                   <div className="space-y-2.5">
                     {[
@@ -296,9 +296,9 @@ export default async function MockTestLandingPage({ params }: Props) {
                       { label: 'Pass Marks', value: `${test.passingMarks ?? 0}` },
                       { label: 'Negative', value: `${test.negativeMarking ?? 0} per wrong answer` },
                     ].map(({ label, value }) => (
-                      <div key={label} className="flex justify-between text-sm border-b border-slate-50 pb-1.5 last:border-0 last:pb-0">
-                        <span className="text-slate-500 font-medium">{label}</span>
-                        <span className="font-bold text-slate-800 text-right">{value}</span>
+                      <div key={label} className="flex justify-between text-sm border-b border-slate-50 dark:border-slate-800/50 pb-1.5 last:border-0 last:pb-0">
+                        <span className="text-slate-500 dark:text-slate-400 font-medium">{label}</span>
+                        <span className="font-bold text-slate-800 dark:text-slate-200 text-right">{value}</span>
                       </div>
                     ))}
                   </div>
@@ -317,8 +317,8 @@ export default async function MockTestLandingPage({ params }: Props) {
           {related.length > 0 && (
             <section className="mt-16">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-slate-800">Related Mock Tests</h2>
-                <Link href="/mock-tests" className="text-sm font-semibold text-blue-600 flex items-center gap-1 hover:underline">
+                <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">Related Mock Tests</h2>
+                <Link href="/mock-tests" className="text-sm font-semibold text-blue-600 dark:text-blue-400 flex items-center gap-1 hover:underline">
                   View All <ChevronRight className="w-4 h-4" />
                 </Link>
               </div>
@@ -332,7 +332,7 @@ export default async function MockTestLandingPage({ params }: Props) {
         </div>
 
         {/* Mobile sticky bottom CTA */}
-        <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-md border-t border-slate-200 px-4 py-3 shadow-xl">
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 px-4 py-3 shadow-xl transition-colors duration-300">
           <StartTestButton slug={test.slug} accessType={test.accessType} price={test.price} allowedSubscriptionPlans={test.allowedSubscriptionPlans} />
         </div>
       </div>

@@ -151,9 +151,9 @@ export function StartTestButton({ slug, accessType = 'free', price = 0, allowedS
         <Button 
           onClick={handlePurchase} 
           disabled={isProcessingPayment}
-          className="w-full bg-slate-900 hover:bg-slate-800 h-14 text-lg rounded-xl transition-all shadow-md"
+          className="w-full bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-900 hover:to-black dark:from-slate-700 dark:to-slate-800 dark:hover:from-slate-600 dark:hover:to-slate-700 h-14 text-lg rounded-xl transition-all shadow-lg text-white font-bold border border-slate-700 dark:border-slate-600"
         >
-          {isProcessingPayment ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : <ShoppingCart className="w-5 h-5 mr-2" />}
+          {isProcessingPayment ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : <ShoppingCart className="w-5 h-5 mr-2 text-slate-300" />}
           {isProcessingPayment ? 'Processing...' : `Buy for ₹${price}`}
         </Button>
       );
@@ -172,9 +172,9 @@ export function StartTestButton({ slug, accessType = 'free', price = 0, allowedS
             variant="outline"
             onClick={handlePurchase} 
             disabled={isProcessingPayment}
-            className="w-full h-12 text-md rounded-xl transition-all border-2 border-slate-200"
+            className="w-full h-12 text-md rounded-xl transition-all border-2 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800"
             >
-            {isProcessingPayment ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <ShoppingCart className="w-4 h-4 mr-2 text-slate-500" />}
+            {isProcessingPayment ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <ShoppingCart className="w-4 h-4 mr-2 text-slate-500 dark:text-slate-400" />}
             {isProcessingPayment ? 'Processing...' : `Or buy for ₹${price}`}
             </Button>
         </div>
@@ -186,7 +186,7 @@ export function StartTestButton({ slug, accessType = 'free', price = 0, allowedS
     <Button 
       onClick={handleStart} 
       disabled={isStarting}
-      className="w-full bg-blue-600 hover:bg-blue-700 h-14 text-lg rounded-xl transition-all font-bold shadow-md shadow-blue-600/20"
+      className="w-full bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-700 hover:to-violet-700 h-14 text-lg rounded-xl transition-all font-bold shadow-lg shadow-blue-600/25 text-white"
     >
       {isStarting ? (
         <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Launching Exam...</>
