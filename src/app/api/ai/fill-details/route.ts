@@ -32,7 +32,8 @@ export async function POST(request: Request) {
     2. Total Enrollment (a number, roughly estimated if exact is not available, e.g. 1500)
     3. Official Social Media Profiles (Facebook, Twitter/X, LinkedIn, Instagram, YouTube)
     4. Full Description: Write a high-quality, comprehensive article-style overview (about 400 to 500 words) detailing the history, academic curriculum, campus facilities, notable achievements, and overall reputation of the institution. Structure it with clear paragraphs separated by double newlines.
-    5. High Quality SEO Description: Write a compelling, concise meta description (max 160 characters) summarizing the institution for search engines.
+    5. High Quality SEO Title: Write an optimized, catchy page title (max 60 characters) including the institution name and primary location.
+    6. High Quality SEO Description: Write a compelling, concise meta description (max 160 characters) summarizing the institution for search engines.
     
     Respond STRICTLY in JSON format with exactly these keys:
     {
@@ -46,6 +47,7 @@ export async function POST(request: Request) {
         "youtube": "url or null"
       },
       "description": "string or null",
+      "seoTitle": "string or null",
       "seoDescription": "string or null"
     }
     `;

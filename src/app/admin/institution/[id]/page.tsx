@@ -151,6 +151,7 @@ export default function InstitutionEditPage() {
         establishedYear: data.establishedYear || prev.establishedYear,
         totalEnrollment: data.totalEnrollment || prev.totalEnrollment,
         description: data.description || prev.description,
+        seoTitle: data.seoTitle || prev.seoTitle,
         seoDescription: data.seoDescription || prev.seoDescription,
         socialProfiles: {
           facebook: data.socialProfiles?.facebook || prev.socialProfiles?.facebook || '',
