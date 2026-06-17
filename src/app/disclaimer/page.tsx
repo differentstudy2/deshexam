@@ -43,7 +43,7 @@ export default function DisclaimerPage() {
 
           <h2>2. Educational and Test Preparation Disclaimer</h2>
           <p>
-            DeshExam is an educational platform designed to assist students in their academic preparation for various exams (including but not limited to HSC, SSC, University Admission, and Government Job exams in Bangladesh and India).
+            DeshExam is an educational platform designed to assist students in their academic preparation for various exams (including but not limited to WBBSE Madhyamik, WBCHSE Uccha Madhyamik, WBJEE, CBSE, ICSE, ISC, JEE Main, NEET, CUET, State Public Service Commissions such as WBPSC, UPSC, SSC, Banking, and other University Admission and Government Job exams in India).
           </p>
           <ul>
             <li><strong>No Guarantee of Success:</strong> While our mock tests, question banks, and courses are curated by subject matter experts, using our platform does not guarantee admission to any university, passing any board exam, or securing any job. Success depends on individual effort, actual exam difficulty, and other external factors.</li>
