@@ -12,6 +12,9 @@ if (!getApps().some(app => app.name === adminAppName)) {
     let serviceAccount;
     try {
         serviceAccount = JSON.parse(serviceAccountStr);
+        if (serviceAccount.private_key) {
+            serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
+        }
     } catch (e) {
         console.warn("Could not parse GCP_SA_KEY", e);
         serviceAccount = {}; // Fallback, will fail if actually connecting to prod without keys

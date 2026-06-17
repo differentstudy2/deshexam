@@ -19,6 +19,9 @@ let adminApp: App;
 
 if (!getApps().some(app => app.name === adminAppName)) {
     const serviceAccount = JSON.parse(process.env.GCP_SA_KEY || '{}');
+    if (serviceAccount.private_key) {
+        serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
+    }
     
     adminApp = initializeApp({
         credential: cert(serviceAccount),
