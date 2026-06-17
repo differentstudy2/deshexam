@@ -2,7 +2,7 @@ import { collection, query, orderBy, getDocs, doc, setDoc, deleteDoc, serverTime
 import { db } from "@/lib/firebase/client";
 
 export type TaxonomyTrack = 'academic' | 'competitive';
-export type AcademicNodeType = 'board' | 'class' | 'subject' | 'textbook' | 'chapter' | 'topic' | 'section';
+export type AcademicNodeType = 'board' | 'institution' | 'class' | 'subject' | 'textbook' | 'chapter' | 'topic' | 'section';
 export type CompetitiveNodeType = 'category' | 'subcategory' | 'exam' | 'subject' | 'chapter' | 'topic';
 export type NodeType = AcademicNodeType | CompetitiveNodeType;
 
@@ -31,6 +31,14 @@ export interface TaxonomyNode {
   websiteUrl?: string;
   establishedYear?: string;
   headquarters?: string;
+  
+  // Physical Institution / Google Maps specific fields
+  placeId?: string;
+  address?: string;
+  latitude?: number;
+  longitude?: number;
+  rating?: number;
+  userRatingsTotal?: number;
   
   // SEO fields
   seoTitle?: string;

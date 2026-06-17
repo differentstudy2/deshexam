@@ -219,7 +219,7 @@ export function TaxonomyDataTable({ type, title }: Props) {
       if (type === 'chapter') parentId = filterTextbookId !== 'all' ? filterTextbookId : null;
       if (type === 'topic') parentId = filterChapterId !== 'all' ? filterChapterId : null;
       
-      if (type !== 'board' && !parentId) {
+      if (type !== 'board' && type !== 'institution' && !parentId) {
          alert(`Please select a specific parent filter first before adding a new ${type}.`);
          setIsSaving(false);
          return;
@@ -512,8 +512,14 @@ export function TaxonomyDataTable({ type, title }: Props) {
                             {node.status === 'active' || node.status === 'published' ? <CheckSquare className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                           </Button>
                           {type === 'board' ? (
-                            <Button asChild variant="ghost" size="icon" className="h-8 w-8 text-indigo-600 hover:bg-indigo-50" title="Edit Board / Institution Details">
+                            <Button asChild variant="ghost" size="icon" className="h-8 w-8 text-indigo-600 hover:bg-indigo-50" title="Edit Board Details">
                               <Link href={`/admin/board/${node.id}`}>
+                                <Edit2 className="w-4 h-4" />
+                              </Link>
+                            </Button>
+                          ) : type === 'institution' ? (
+                            <Button asChild variant="ghost" size="icon" className="h-8 w-8 text-indigo-600 hover:bg-indigo-50" title="Edit Institution Details">
+                              <Link href={`/admin/institution/${node.id}`}>
                                 <Edit2 className="w-4 h-4" />
                               </Link>
                             </Button>
