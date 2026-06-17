@@ -189,7 +189,10 @@ export default function ExamTaxonomyPage() {
     try {
       await deleteTaxonomyNode(id);
       fetchData();
-    } catch (e) { console.error(e); alert('Delete failed'); }
+    } catch (e: any) { 
+      console.error(e); 
+      alert(`Delete failed: ${e?.message || "Unknown error"}`); 
+    }
   };
 
   const renderTree = () => {
