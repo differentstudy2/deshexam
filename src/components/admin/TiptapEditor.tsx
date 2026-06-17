@@ -37,8 +37,10 @@ import {
 import { Button } from '@/components/ui/button';
 import { Toggle } from '@/components/ui/toggle';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Loader2, UploadCloud, Link as LinkIcon } from 'lucide-react';
+import { Loader2, UploadCloud, Link as LinkIcon, Sparkles } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 
 // Implement the suggestion items for SlashCommands
@@ -309,8 +311,13 @@ const MenuBar = ({ editor }: { editor: any }) => {
   );
 };
 
-export function TiptapEditor({ content, onChange }: { content: string, onChange: (html: string) => void }) {
+export function TiptapEditor({ content, onChange, maxHeight }: { content: string, onChange: (html: string) => void, maxHeight?: string }) {
   const { toast } = useToast();
+  const [viewMode, setViewMode] = React.useState<'visual' | 'html' | 'markdown' | 'text'>('visual');
+  const [rawContent, setRawContent] = React.useState(content);
+  const [aiDialogOpen, setAiDialogOpen] = React.useState(false);
+  const [aiPrompt, setAiPrompt] = React.useState('');
+  const [isGenerating, setIsGenerating] = React.useState(false);
 
   const handleDrop = useCallback(
     (view: any, event: any, slice: any, moved: boolean) => {
@@ -353,7 +360,6 @@ export function TiptapEditor({ content, onChange }: { content: string, onChange:
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
-        // Disable built-in image and youtube so they don't clash with our Media extension
         heading: { levels: [1, 2, 3, 4] }
       }),
       Markdown.configure({
@@ -397,6 +403,11 @@ export function TiptapEditor({ content, onChange }: { content: string, onChange:
     },
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
+      if (viewMode !== 'visual') {
+        if (viewMode === 'html') setRawContent(editor.getHTML());
+        if (viewMode === 'text') setRawContent(editor.getText());
+        if (viewMode === 'markdown') setRawContent((editor.storage as any).markdown.getMarkdown());
+      }
     },
   });
 
@@ -420,15 +431,135 @@ export function TiptapEditor({ content, onChange }: { content: string, onChange:
         }
       }
       
-      editor.commands.setContent(parsedHTML);
+      if (viewMode === 'visual') {
+        editor.commands.setContent(parsedHTML);
+      }
     }
-  }, [content, editor]);
+  }, [content, editor, viewMode]);
+
+  // Sync back raw content changes
+  const handleRawContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setRawContent(e.target.value);
+    onChange(e.target.value);
+    if (editor) {
+      if (viewMode === 'markdown') {
+        editor.commands.setContent(marked.parse(e.target.value) as string);
+      } else {
+        editor.commands.setContent(e.target.value);
+      }
+    }
+  };
+
+  const handleGenerateAI = async () => {
+    if (!aiPrompt.trim()) return;
+    setIsGenerating(true);
+    try {
+      const response = await fetch('/api/ai/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          prompt: `Generate the following content using rich HTML tags (e.g. <h1>, <h2>, <p>, <ul>, <li>, <strong>, <em>, <blockquote>, etc.) to make it look highly professional and well-formatted in a Rich Text Editor. DO NOT wrap the output in markdown code blocks like \`\`\`html. Output raw HTML only.\n\nUser Request: ${aiPrompt}` 
+        }),
+      });
+
+      if (!response.ok) throw new Error('AI Generation failed');
+      const data = await response.json();
+      
+      if (editor) {
+        editor.commands.insertContent(data.result);
+      }
+      setAiDialogOpen(false);
+      setAiPrompt('');
+      toast({ title: 'AI Content Generated', description: 'Content successfully inserted.' });
+    } catch (error) {
+      console.error(error);
+      toast({ variant: 'destructive', title: 'Generation Error', description: String(error) });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   return (
-    <div className="border border-[#d3e3d3] dark:border-slate-800 rounded-2xl overflow-hidden bg-[#fdfefd] dark:bg-slate-950 focus-within:border-emerald-500 dark:focus-within:border-emerald-500 transition-colors shadow-sm">
-      <MenuBar editor={editor} />
-      <div className="p-4 sm:p-8 overflow-y-auto max-h-[70vh] scrollbar-thin">
-        <EditorContent editor={editor} />
+    <div className="border border-[#d3e3d3] dark:border-slate-800 rounded-2xl overflow-hidden bg-[#fdfefd] dark:bg-slate-950 focus-within:border-emerald-500 dark:focus-within:border-emerald-500 transition-colors shadow-sm flex flex-col">
+      <div className="flex items-center justify-between bg-[#f8faf8] dark:bg-slate-900 border-b border-[#eef2ec] dark:border-slate-800 pr-4">
+        <MenuBar editor={editor} />
+        
+        <div className="flex items-center gap-2">
+          <Dialog open={aiDialogOpen} onOpenChange={setAiDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="ghost" size="sm" className="h-8 gap-1 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 hover:text-indigo-700">
+                <Sparkles className="w-4 h-4" />
+                <span className="hidden sm:inline">AI Generate</span>
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Generate Content with AI</DialogTitle>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="space-y-2">
+                  <Label>Prompt for AI</Label>
+                  <Textarea 
+                    placeholder="e.g. Write a 3 paragraph admission process for an engineering college..."
+                    value={aiPrompt}
+                    onChange={(e) => setAiPrompt(e.target.value)}
+                    rows={4}
+                  />
+                  <p className="text-xs text-slate-500">The AI is instructed to use rich HTML tags automatically for the best formatting.</p>
+                </div>
+                <Button onClick={handleGenerateAI} disabled={isGenerating || !aiPrompt.trim()} className="w-full">
+                  {isGenerating ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...</> : 'Generate'}
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          <select 
+            value={viewMode}
+            onChange={(e) => {
+              const newMode = e.target.value as any;
+              setViewMode(newMode);
+              if (editor) {
+                if (newMode === 'html') setRawContent(editor.getHTML());
+                if (newMode === 'text') setRawContent(editor.getText());
+                if (newMode === 'markdown') setRawContent((editor.storage as any).markdown.getMarkdown());
+              }
+            }}
+            className="text-xs border-none bg-transparent font-medium text-slate-600 focus:ring-0 cursor-pointer"
+          >
+            <option value="visual">Visual</option>
+            <option value="html">HTML</option>
+            <option value="markdown">Markdown</option>
+            <option value="text">Plain Text</option>
+          </select>
+        </div>
+      </div>
+      
+      <div 
+        className="p-4 sm:p-8 overflow-y-auto scrollbar-thin relative"
+        style={{ maxHeight: maxHeight || '70vh' }}
+      >
+        {isGenerating && (
+          <div className="absolute inset-0 z-10 bg-white/50 backdrop-blur-[1px] flex items-center justify-center">
+            <div className="bg-white p-4 rounded-xl shadow-lg border border-indigo-100 flex flex-col items-center gap-3 animate-in fade-in zoom-in duration-300">
+              <div className="w-10 h-10 bg-indigo-50 rounded-full flex items-center justify-center animate-pulse">
+                <Sparkles className="w-5 h-5 text-indigo-500" />
+              </div>
+              <p className="text-sm font-medium text-indigo-900">AI is writing...</p>
+            </div>
+          </div>
+        )}
+        
+        {viewMode === 'visual' ? (
+          <EditorContent editor={editor} />
+        ) : (
+          <textarea 
+            value={rawContent}
+            onChange={handleRawContentChange}
+            className="w-full h-full min-h-[400px] bg-transparent border-none focus:outline-none focus:ring-0 font-mono text-sm text-slate-700 dark:text-slate-300 resize-y"
+            placeholder={`Enter ${viewMode} content here...`}
+          />
+        )}
       </div>
     </div>
   );

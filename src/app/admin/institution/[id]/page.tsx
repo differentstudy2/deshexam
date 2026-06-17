@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Save, Upload, Shield, Image as ImageIcon, MapPin, Sparkles, X, Plus, Bold, Italic, List, Heading2 } from 'lucide-react';
+import { ArrowLeft, Save, Upload, Shield, Image as ImageIcon, MapPin, Sparkles, X, Plus, Bold, Italic, List, Heading2, BookOpen, Building, Trophy, Globe, FileText, Layers, LineChart, GraduationCap, LayoutDashboard, Search } from 'lucide-react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
@@ -28,6 +28,7 @@ export default function InstitutionEditPage() {
   const institutionId = params.id as string;
   const { toast } = useToast();
 
+  const [activeTab, setActiveTab] = useState('general');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -59,6 +60,49 @@ export default function InstitutionEditPage() {
     status: 'draft',
     seoTitle: '',
     seoDescription: '',
+    featureImage: '',
+    tags: [],
+    keywords: [],
+    seoAdvanced: {
+      focusKeyword: '',
+      canonicalUrl: '',
+      ogTitle: '',
+      ogDescription: '',
+      ogImage: '',
+      robotsIndex: true,
+      schemaEnabled: true,
+    },
+    admission: {
+      admissionOpen: false,
+      applicationStartDate: '',
+      applicationEndDate: '',
+      admissionMode: 'Both',
+      applicationFee: '',
+      admissionUrl: '',
+      requiredDocuments: [],
+      admissionProcess: ''
+    },
+    facilities: [],
+    placement: {
+      placementAvailable: false,
+      placementRate: '',
+      highestPackage: '',
+      averagePackage: '',
+      recruiters: [],
+      placementDescription: ''
+    },
+    brochure: {
+      pdfUrl: '',
+      title: '',
+      size: ''
+    },
+    metrics: {
+      views: 0,
+      brochureDownloads: 0,
+      callClicks: 0,
+      websiteClicks: 0,
+      admissionClicks: 0
+    },
     phoneNumber: '',
     internationalPhoneNumber: '',
     openingHours: [],
@@ -98,6 +142,49 @@ export default function InstitutionEditPage() {
             status: node.status || 'published',
             seoTitle: node.seoTitle || '',
             seoDescription: node.seoDescription || '',
+            featureImage: node.featureImage || '',
+            tags: node.tags || [],
+            keywords: node.keywords || [],
+            seoAdvanced: node.seoAdvanced || {
+              focusKeyword: '',
+              canonicalUrl: '',
+              ogTitle: '',
+              ogDescription: '',
+              ogImage: '',
+              robotsIndex: true,
+              schemaEnabled: true,
+            },
+            admission: node.admission || {
+              admissionOpen: false,
+              applicationStartDate: '',
+              applicationEndDate: '',
+              admissionMode: 'Both',
+              applicationFee: '',
+              admissionUrl: '',
+              requiredDocuments: [],
+              admissionProcess: ''
+            },
+            facilities: node.facilities || [],
+            placement: node.placement || {
+              placementAvailable: false,
+              placementRate: '',
+              highestPackage: '',
+              averagePackage: '',
+              recruiters: [],
+              placementDescription: ''
+            },
+            brochure: node.brochure || {
+              pdfUrl: '',
+              title: '',
+              size: ''
+            },
+            metrics: node.metrics || {
+              views: 0,
+              brochureDownloads: 0,
+              callClicks: 0,
+              websiteClicks: 0,
+              admissionClicks: 0
+            },
             phoneNumber: node.phoneNumber || '',
             internationalPhoneNumber: node.internationalPhoneNumber || '',
             openingHours: node.openingHours || [],
@@ -417,13 +504,39 @@ export default function InstitutionEditPage() {
         )}
       </AnimatePresence>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="flex flex-col md:flex-row gap-6">
         
-        {/* Left Column: Form Fields */}
-        <div className="md:col-span-2 space-y-6">
-          <Card>
-            <CardHeader className="border-b border-gray-100 bg-gray-50/50 flex flex-row items-center justify-between py-4">
-              <CardTitle className="text-lg">General Information</CardTitle>
+        {/* Sidebar Tabs */}
+        <div className="w-full md:w-64 flex flex-col gap-1 shrink-0">
+          {[
+            { id: 'general', label: 'General Info', icon: <FileText className="w-4 h-4" /> },
+            { id: 'admission', label: 'Admission', icon: <GraduationCap className="w-4 h-4" /> },
+            { id: 'facilities', label: 'Facilities', icon: <Building className="w-4 h-4" /> },
+            { id: 'placement', label: 'Placement', icon: <Trophy className="w-4 h-4" /> },
+            { id: 'media', label: 'Media & Brochure', icon: <ImageIcon className="w-4 h-4" /> },
+            { id: 'seo', label: 'Advanced SEO', icon: <Search className="w-4 h-4" /> },
+            { id: 'subcollections', label: 'Courses & FAQs', icon: <Layers className="w-4 h-4" /> },
+            { id: 'analytics', label: 'Analytics', icon: <LineChart className="w-4 h-4" /> },
+          ].map(tab => (
+            <button 
+              key={tab.id} 
+              onClick={() => setActiveTab(tab.id)} 
+              className={`w-full text-left px-4 py-3 flex items-center gap-3 rounded-lg transition-colors text-sm font-medium border ${activeTab === tab.id ? 'bg-indigo-50 text-indigo-700 border-indigo-100' : 'border-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
+            >
+              {tab.icon} {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Main Content Area */}
+        <div className="flex-1 space-y-6 min-w-0">
+          
+          {/* --- GENERAL TAB --- */}
+          {activeTab === 'general' && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <Card>
+                <CardHeader className="border-b border-gray-100 bg-gray-50/50 flex flex-row items-center justify-between py-4">
+                  <CardTitle className="text-lg">General Information</CardTitle>
               <Button 
                 variant="secondary" 
                 size="sm" 
@@ -677,13 +790,609 @@ export default function InstitutionEditPage() {
               )}
             </CardContent>
           </Card>
+        </div>
+        )}
 
-          {/* New Card: Rich Imported Data */}
+        {/* --- ADMISSION TAB --- */}
+        {activeTab === 'admission' && (
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <Card>
+              <CardHeader className="border-b border-gray-100 bg-gray-50/50">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <GraduationCap className="w-5 h-5 text-indigo-500" />
+                  Admission Details
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-6 space-y-6">
+                
+                <div className="flex items-center gap-3 bg-indigo-50/50 p-4 rounded-md border border-indigo-100">
+                  <input
+                    type="checkbox"
+                    id="admissionOpen"
+                    checked={formData.admission?.admissionOpen || false}
+                    onChange={(e) => setFormData(prev => ({ ...prev, admission: { ...prev.admission, admissionOpen: e.target.checked } as any }))}
+                    className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500"
+                  />
+                  <Label htmlFor="admissionOpen" className="text-base font-semibold text-indigo-900 cursor-pointer">Admissions are currently OPEN</Label>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid gap-2">
+                    <Label htmlFor="applicationStartDate">Application Start Date</Label>
+                    <Input 
+                      type="date" 
+                      id="applicationStartDate" 
+                      value={formData.admission?.applicationStartDate || ''} 
+                      onChange={(e) => setFormData(prev => ({ ...prev, admission: { ...prev.admission, applicationStartDate: e.target.value } as any }))} 
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="applicationEndDate">Application End Date</Label>
+                    <Input 
+                      type="date" 
+                      id="applicationEndDate" 
+                      value={formData.admission?.applicationEndDate || ''} 
+                      onChange={(e) => setFormData(prev => ({ ...prev, admission: { ...prev.admission, applicationEndDate: e.target.value } as any }))} 
+                    />
+                  </div>
+                  
+                  <div className="grid gap-2">
+                    <Label htmlFor="admissionMode">Admission Mode</Label>
+                    <select
+                      id="admissionMode"
+                      value={formData.admission?.admissionMode || 'Both'}
+                      onChange={(e) => setFormData(prev => ({ ...prev, admission: { ...prev.admission, admissionMode: e.target.value } as any }))}
+                      className="h-10 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    >
+                      <option value="Merit">Merit Based</option>
+                      <option value="Entrance">Entrance Exam</option>
+                      <option value="Both">Merit & Entrance (Both)</option>
+                    </select>
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="applicationFee">Application Fee (₹)</Label>
+                    <Input 
+                      id="applicationFee" 
+                      placeholder="e.g. 1500"
+                      value={formData.admission?.applicationFee || ''} 
+                      onChange={(e) => setFormData(prev => ({ ...prev, admission: { ...prev.admission, applicationFee: e.target.value } as any }))} 
+                    />
+                  </div>
+                  
+                  <div className="grid gap-2 md:col-span-2">
+                    <Label htmlFor="admissionUrl">Admission Link / Apply URL</Label>
+                    <Input 
+                      id="admissionUrl" 
+                      type="url"
+                      placeholder="https://example.edu/apply"
+                      value={formData.admission?.admissionUrl || ''} 
+                      onChange={(e) => setFormData(prev => ({ ...prev, admission: { ...prev.admission, admissionUrl: e.target.value } as any }))} 
+                    />
+                  </div>
+
+                  <div className="grid gap-2 md:col-span-2">
+                    <Label htmlFor="requiredDocuments">Required Documents (comma separated)</Label>
+                    <Input 
+                      id="requiredDocuments" 
+                      placeholder="e.g. 10th Marksheet, 12th Marksheet, Aadhar Card, Photos"
+                      value={formData.admission?.requiredDocuments?.join(', ') || ''} 
+                      onChange={(e) => setFormData(prev => ({ ...prev, admission: { ...prev.admission, requiredDocuments: e.target.value.split(',').map(s=>s.trim()).filter(Boolean) } as any }))} 
+                    />
+                  </div>
+                </div>
+
+                <div className="grid gap-2 pt-4 border-t border-gray-100">
+                  <Label>Admission Process & Details</Label>
+                  <div className="min-h-[300px]">
+                    <TiptapEditor 
+                      content={formData.admission?.admissionProcess || ''} 
+                      onChange={(html) => setFormData(prev => ({ ...prev, admission: { ...prev.admission, admissionProcess: html } as any }))}
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* --- FACILITIES TAB --- */}
+        {activeTab === 'facilities' && (
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <Card>
+              <CardHeader className="border-b border-gray-100 bg-gray-50/50">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Building className="w-5 h-5 text-indigo-500" />
+                  Facilities & Infrastructure
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-6 space-y-6">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {[
+                    'Library', 'Hostel', 'Wi-Fi', 'Cafeteria', 'Transport', 
+                    'Sports Complex', 'Gym', 'Medical Facility', 'Auditorium', 
+                    'Labs', 'AC Classrooms', 'Swimming Pool', 'Smart Board'
+                  ].map(facility => (
+                    <div key={facility} className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        id={`facility-${facility}`}
+                        checked={(formData.facilities || []).includes(facility)}
+                        onChange={(e) => {
+                          const current = formData.facilities || [];
+                          if (e.target.checked) {
+                            setFormData(prev => ({ ...prev, facilities: [...current, facility] }));
+                          } else {
+                            setFormData(prev => ({ ...prev, facilities: current.filter(f => f !== facility) }));
+                          }
+                        }}
+                        className="w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500"
+                      />
+                      <Label htmlFor={`facility-${facility}`} className="text-sm cursor-pointer">{facility}</Label>
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="grid gap-2 pt-4 border-t border-gray-100">
+                  <Label htmlFor="customFacilities">Additional Facilities (Comma Separated)</Label>
+                  <Input 
+                    id="customFacilities"
+                    placeholder="e.g. Robotics Lab, Incubation Center"
+                    value={(formData.facilities || []).filter(f => ![
+                      'Library', 'Hostel', 'Wi-Fi', 'Cafeteria', 'Transport', 
+                      'Sports Complex', 'Gym', 'Medical Facility', 'Auditorium', 
+                      'Labs', 'AC Classrooms', 'Swimming Pool', 'Smart Board'
+                    ].includes(f)).join(', ')}
+                    onChange={(e) => {
+                      const standard = (formData.facilities || []).filter(f => [
+                        'Library', 'Hostel', 'Wi-Fi', 'Cafeteria', 'Transport', 
+                        'Sports Complex', 'Gym', 'Medical Facility', 'Auditorium', 
+                        'Labs', 'AC Classrooms', 'Swimming Pool', 'Smart Board'
+                      ].includes(f));
+                      const custom = e.target.value.split(',').map(s => s.trim()).filter(Boolean);
+                      setFormData(prev => ({ ...prev, facilities: [...standard, ...custom] }));
+                    }}
+                  />
+                  <p className="text-xs text-slate-500">Any standard facilities you uncheck will disappear from the list, while custom ones will appear here.</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* --- PLACEMENT TAB --- */}
+        {activeTab === 'placement' && (
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <Card>
+              <CardHeader className="border-b border-gray-100 bg-gray-50/50">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Trophy className="w-5 h-5 text-indigo-500" />
+                  Placement & Career Services
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-6 space-y-6">
+                
+                <div className="flex items-center gap-3 bg-indigo-50/50 p-4 rounded-md border border-indigo-100">
+                  <input
+                    type="checkbox"
+                    id="placementAvailable"
+                    checked={formData.placement?.placementAvailable || false}
+                    onChange={(e) => setFormData(prev => ({ ...prev, placement: { ...prev.placement, placementAvailable: e.target.checked } as any }))}
+                    className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500"
+                  />
+                  <Label htmlFor="placementAvailable" className="text-base font-semibold text-indigo-900 cursor-pointer">Placement Cell Available</Label>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="grid gap-2">
+                    <Label htmlFor="placementRate">Placement Rate</Label>
+                    <Input 
+                      id="placementRate" 
+                      placeholder="e.g. 95%"
+                      value={formData.placement?.placementRate || ''} 
+                      onChange={(e) => setFormData(prev => ({ ...prev, placement: { ...prev.placement, placementRate: e.target.value } as any }))} 
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="highestPackage">Highest Package (LPA)</Label>
+                    <Input 
+                      id="highestPackage" 
+                      placeholder="e.g. 45 LPA"
+                      value={formData.placement?.highestPackage || ''} 
+                      onChange={(e) => setFormData(prev => ({ ...prev, placement: { ...prev.placement, highestPackage: e.target.value } as any }))} 
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="averagePackage">Average Package (LPA)</Label>
+                    <Input 
+                      id="averagePackage" 
+                      placeholder="e.g. 12 LPA"
+                      value={formData.placement?.averagePackage || ''} 
+                      onChange={(e) => setFormData(prev => ({ ...prev, placement: { ...prev.placement, averagePackage: e.target.value } as any }))} 
+                    />
+                  </div>
+
+                  <div className="grid gap-2 md:col-span-3">
+                    <Label htmlFor="recruiters">Top Recruiters (comma separated)</Label>
+                    <Input 
+                      id="recruiters" 
+                      placeholder="e.g. Google, Microsoft, TCS, Infosys"
+                      value={formData.placement?.recruiters?.join(', ') || ''} 
+                      onChange={(e) => setFormData(prev => ({ ...prev, placement: { ...prev.placement, recruiters: e.target.value.split(',').map(s=>s.trim()).filter(Boolean) } as any }))} 
+                    />
+                  </div>
+                </div>
+
+                <div className="grid gap-2 pt-4 border-t border-gray-100">
+                  <Label>Placement Description</Label>
+                  <div className="min-h-[250px]">
+                    <TiptapEditor 
+                      content={formData.placement?.placementDescription || ''} 
+                      onChange={(html) => setFormData(prev => ({ ...prev, placement: { ...prev.placement, placementDescription: html } as any }))}
+                    />
+                  </div>
+                </div>
+
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* --- SEO TAB --- */}
+        {activeTab === 'seo' && (
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <Card>
+              <CardHeader className="border-b border-gray-100 bg-gray-50/50">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Search className="w-5 h-5 text-indigo-500" />
+                  Advanced SEO & Social Sharing
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-6 space-y-6">
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid gap-2">
+                    <Label htmlFor="focusKeyword">Focus Keyword</Label>
+                    <Input 
+                      id="focusKeyword" 
+                      placeholder="e.g. Best Engineering College in Delhi"
+                      value={formData.seoAdvanced?.focusKeyword || ''} 
+                      onChange={(e) => setFormData(prev => ({ ...prev, seoAdvanced: { ...prev.seoAdvanced, focusKeyword: e.target.value } as any }))} 
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="canonicalUrl">Canonical URL</Label>
+                    <Input 
+                      id="canonicalUrl" 
+                      type="url"
+                      placeholder="https://deshexam.com/institution/..."
+                      value={formData.seoAdvanced?.canonicalUrl || ''} 
+                      onChange={(e) => setFormData(prev => ({ ...prev, seoAdvanced: { ...prev.seoAdvanced, canonicalUrl: e.target.value } as any }))} 
+                    />
+                  </div>
+                  
+                  <div className="grid gap-2 md:col-span-2">
+                    <Label htmlFor="tags">Tags (comma separated)</Label>
+                    <Input 
+                      id="tags" 
+                      placeholder="e.g. engineering, delhi, computer science"
+                      value={formData.tags?.join(', ') || ''} 
+                      onChange={(e) => setFormData(prev => ({ ...prev, tags: e.target.value.split(',').map(s=>s.trim()).filter(Boolean) }))} 
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-gray-100">
+                  <h4 className="text-sm font-semibold mb-4 text-indigo-900">Open Graph (Social Media Sharing)</h4>
+                  <div className="grid grid-cols-1 gap-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="ogTitle">OG Title</Label>
+                      <Input 
+                        id="ogTitle" 
+                        placeholder="Title for Facebook/LinkedIn sharing"
+                        value={formData.seoAdvanced?.ogTitle || ''} 
+                        onChange={(e) => setFormData(prev => ({ ...prev, seoAdvanced: { ...prev.seoAdvanced, ogTitle: e.target.value } as any }))} 
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="ogDescription">OG Description</Label>
+                      <textarea 
+                        id="ogDescription" 
+                        rows={2}
+                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        placeholder="Description for social sharing..."
+                        value={formData.seoAdvanced?.ogDescription || ''} 
+                        onChange={(e) => setFormData(prev => ({ ...prev, seoAdvanced: { ...prev.seoAdvanced, ogDescription: e.target.value } as any }))} 
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="ogImage">OG Image URL (Fallback to Feature Image)</Label>
+                      <Input 
+                        id="ogImage" 
+                        type="url"
+                        placeholder="https://example.com/og-image.jpg"
+                        value={formData.seoAdvanced?.ogImage || ''} 
+                        onChange={(e) => setFormData(prev => ({ ...prev, seoAdvanced: { ...prev.seoAdvanced, ogImage: e.target.value } as any }))} 
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-gray-100 flex flex-col gap-4">
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      id="robotsIndex"
+                      checked={formData.seoAdvanced?.robotsIndex ?? true}
+                      onChange={(e) => setFormData(prev => ({ ...prev, seoAdvanced: { ...prev.seoAdvanced, robotsIndex: e.target.checked } as any }))}
+                      className="w-4 h-4 text-indigo-600 rounded border-gray-300"
+                    />
+                    <Label htmlFor="robotsIndex" className="cursor-pointer">Allow Search Engines to Index (robots: index, follow)</Label>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      id="schemaEnabled"
+                      checked={formData.seoAdvanced?.schemaEnabled ?? true}
+                      onChange={(e) => setFormData(prev => ({ ...prev, seoAdvanced: { ...prev.seoAdvanced, schemaEnabled: e.target.checked } as any }))}
+                      className="w-4 h-4 text-indigo-600 rounded border-gray-300"
+                    />
+                    <Label htmlFor="schemaEnabled" className="cursor-pointer">Enable Rich JSON-LD Schema (EducationalOrganization)</Label>
+                  </div>
+                </div>
+
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* --- SUBCOLLECTIONS TAB --- */}
+        {activeTab === 'subcollections' && (
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <Card>
+              <CardHeader className="border-b border-gray-100 bg-gray-50/50">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Layers className="w-5 h-5 text-indigo-500" />
+                  Manage Subcollections
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  
+                  <div className="border border-slate-200 rounded-xl p-6 flex flex-col items-center text-center hover:border-indigo-300 hover:shadow-md transition-all">
+                    <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mb-4">
+                      <GraduationCap className="w-6 h-6" />
+                    </div>
+                    <h3 className="font-semibold text-slate-900 mb-2">Courses</h3>
+                    <p className="text-sm text-slate-500 mb-6">Manage undergraduate, postgraduate, and diploma courses with fee structures.</p>
+                    <Button asChild className="w-full" variant={institutionId === 'new' ? 'secondary' : 'default'} disabled={institutionId === 'new'}>
+                      <Link href={`/admin/institution/${institutionId}/courses`}>
+                        Manage Courses
+                      </Link>
+                    </Button>
+                  </div>
+
+                  <div className="border border-slate-200 rounded-xl p-6 flex flex-col items-center text-center hover:border-indigo-300 hover:shadow-md transition-all">
+                    <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mb-4">
+                      <FileText className="w-6 h-6" />
+                    </div>
+                    <h3 className="font-semibold text-slate-900 mb-2">FAQs</h3>
+                    <p className="text-sm text-slate-500 mb-6">Add frequently asked questions and answers specifically for this institution.</p>
+                    <Button asChild className="w-full" variant={institutionId === 'new' ? 'secondary' : 'default'} disabled={institutionId === 'new'}>
+                      <Link href={`/admin/institution/${institutionId}/faqs`}>
+                        Manage FAQs
+                      </Link>
+                    </Button>
+                  </div>
+
+                  <div className="border border-slate-200 rounded-xl p-6 flex flex-col items-center text-center hover:border-indigo-300 hover:shadow-md transition-all">
+                    <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mb-4">
+                      <Trophy className="w-6 h-6" />
+                    </div>
+                    <h3 className="font-semibold text-slate-900 mb-2">Scholarships</h3>
+                    <p className="text-sm text-slate-500 mb-6">List available scholarships, amounts, criteria, and deadlines.</p>
+                    <Button asChild className="w-full" variant={institutionId === 'new' ? 'secondary' : 'default'} disabled={institutionId === 'new'}>
+                      <Link href={`/admin/institution/${institutionId}/scholarships`}>
+                        Manage Scholarships
+                      </Link>
+                    </Button>
+                  </div>
+
+                </div>
+                {institutionId === 'new' && (
+                  <p className="text-sm text-amber-600 mt-4 text-center bg-amber-50 p-2 rounded">
+                    Please save this institution first before managing its courses, FAQs, or scholarships.
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* --- ANALYTICS TAB --- */}
+        {activeTab === 'analytics' && (
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <Card>
+              <CardHeader className="border-b border-gray-100 bg-gray-50/50">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <LineChart className="w-5 h-5 text-indigo-500" />
+                  Performance Analytics
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-6">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center">
+                    <span className="text-3xl font-bold text-indigo-600">{formData.metrics?.views || 0}</span>
+                    <span className="text-sm font-medium text-slate-500 mt-1">Page Views</span>
+                  </div>
+                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center">
+                    <span className="text-3xl font-bold text-indigo-600">{formData.metrics?.brochureDownloads || 0}</span>
+                    <span className="text-sm font-medium text-slate-500 mt-1">Brochure Downloads</span>
+                  </div>
+                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center">
+                    <span className="text-3xl font-bold text-indigo-600">{formData.metrics?.admissionClicks || 0}</span>
+                    <span className="text-sm font-medium text-slate-500 mt-1">Apply Clicks</span>
+                  </div>
+                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center">
+                    <span className="text-3xl font-bold text-indigo-600">{formData.metrics?.websiteClicks || 0}</span>
+                    <span className="text-sm font-medium text-slate-500 mt-1">Website Clicks</span>
+                  </div>
+                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center">
+                    <span className="text-3xl font-bold text-indigo-600">{formData.metrics?.callClicks || 0}</span>
+                    <span className="text-sm font-medium text-slate-500 mt-1">Phone Reveals</span>
+                  </div>
+                </div>
+                <p className="text-xs text-slate-400 mt-6 text-center italic">Metrics are updated in real-time as users interact with the public page.</p>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* --- MEDIA & BROCHURE TAB --- */}
+        {activeTab === 'media' && (
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          
+          <Card>
+            <CardHeader className="border-b border-gray-100 bg-gray-50/50">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <ImageIcon className="w-5 h-5 text-indigo-500" />
+                Feature Image & Logo
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="flex flex-col items-center justify-center space-y-4">
+                
+                {/* Logo Preview */}
+                <div className="w-32 h-32 rounded-2xl bg-gray-50 border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden relative shadow-sm">
+                  {formData.logoUrl ? (
+                    <Image src={formData.logoUrl} alt="Institution Logo" fill className="object-contain p-2" unoptimized />
+                  ) : (
+                    <Shield className="w-12 h-12 text-gray-300" />
+                  )}
+                  {uploading && (
+                    <div className="absolute inset-0 bg-white/80 flex items-center justify-center backdrop-blur-sm">
+                      <span className="text-sm font-medium text-indigo-600 animate-pulse">Uploading...</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="w-full">
+                  <Label htmlFor="logo-upload" className="w-full">
+                    <div className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-600 border border-indigo-200 rounded-md cursor-pointer hover:bg-indigo-100 transition-colors font-medium text-sm">
+                      <Upload className="w-4 h-4" />
+                      {formData.logoUrl ? 'Change Image' : 'Upload Image'}
+                    </div>
+                  </Label>
+                  <input 
+                    id="logo-upload" 
+                    type="file" 
+                    accept="image/*" 
+                    className="hidden" 
+                    onChange={handleImageUpload}
+                    disabled={uploading}
+                  />
+                </div>
+                
+                {formData.logoUrl && (
+                  <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-700 hover:bg-red-50 mt-2" onClick={() => setFormData(prev => ({ ...prev, logoUrl: '' }))}>
+                    Remove Image
+                  </Button>
+                )}
+                
+                <div className="w-full pt-4 mt-4 border-t border-gray-100">
+                  <Label htmlFor="logoUrl" className="text-xs text-gray-500 mb-2 block">Or paste image URL directly:</Label>
+                  <Input 
+                    id="logoUrl" 
+                    name="logoUrl" 
+                    value={formData.logoUrl} 
+                    onChange={handleChange} 
+                    placeholder="https://example.com/logo.png" 
+                    className="text-sm"
+                  />
+                </div>
+                
+                <p className="text-xs text-gray-400 text-center mt-4">
+                  Recommended size: 1600x900px for Feature Image.<br/> PNG or WebP with transparent background.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="border-b border-gray-100 bg-gray-50/50">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <FileText className="w-5 h-5 text-indigo-500" />
+                Brochure & Prospectus
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="brochureTitle">Brochure Title</Label>
+                  <Input 
+                    id="brochureTitle" 
+                    placeholder="e.g. 2024 Engineering Prospectus"
+                    value={formData.brochure?.title || ''} 
+                    onChange={(e) => setFormData(prev => ({ ...prev, brochure: { ...prev.brochure, title: e.target.value } as any }))} 
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="brochureSize">File Size / Info</Label>
+                  <Input 
+                    id="brochureSize" 
+                    placeholder="e.g. PDF (2.4 MB)"
+                    value={formData.brochure?.size || ''} 
+                    onChange={(e) => setFormData(prev => ({ ...prev, brochure: { ...prev.brochure, size: e.target.value } as any }))} 
+                  />
+                </div>
+                <div className="grid gap-2 md:col-span-2">
+                  <Label htmlFor="brochurePdfUrl">PDF URL</Label>
+                  <div className="flex gap-2">
+                    <Input 
+                      id="brochurePdfUrl" 
+                      type="url"
+                      placeholder="https://example.com/brochure.pdf"
+                      value={formData.brochure?.pdfUrl || ''} 
+                      onChange={(e) => setFormData(prev => ({ ...prev, brochure: { ...prev.brochure, pdfUrl: e.target.value } as any }))} 
+                    />
+                    <Label className="cursor-pointer shrink-0">
+                      <div className="flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-700 border border-slate-200 rounded-md hover:bg-slate-200 transition-colors font-medium text-sm">
+                        <Upload className="w-4 h-4" /> Upload PDF
+                      </div>
+                      <input 
+                        type="file" 
+                        accept="application/pdf" 
+                        className="hidden" 
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file || !institutionId) return;
+                          try {
+                            setUploading(true);
+                            toast({ title: 'Uploading PDF...' });
+                            const storageRef = ref(storage, `institutions/${institutionId}/brochure_${Date.now()}.pdf`);
+                            await uploadBytes(storageRef, file);
+                            const url = await getDownloadURL(storageRef);
+                            setFormData(prev => ({ ...prev, brochure: { ...prev.brochure, pdfUrl: url, size: `PDF (${(file.size / 1024 / 1024).toFixed(1)} MB)` } as any }));
+                            toast({ title: 'PDF uploaded successfully' });
+                          } catch (err) {
+                            toast({ variant: 'destructive', title: 'Upload failed', description: String(err) });
+                          } finally {
+                            setUploading(false);
+                          }
+                        }}
+                        disabled={uploading}
+                      />
+                    </Label>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader className="border-b border-gray-100 bg-gray-50/50">
               <CardTitle className="text-lg flex items-center gap-2">
                 <Shield className="w-5 h-5 text-emerald-500" />
-                Rich Data (Google Maps)
+                Rich Data & Media
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6 space-y-4">
@@ -797,77 +1506,9 @@ export default function InstitutionEditPage() {
               </div>
             </CardContent>
           </Card>
+          </div>
+        )}
         </div>
-
-        {/* Right Column: Logo Upload */}
-        <div className="space-y-6">
-          <Card>
-            <CardHeader className="border-b border-gray-100 bg-gray-50/50">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <ImageIcon className="w-5 h-5 text-indigo-500" />
-                Institution Logo
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6">
-              <div className="flex flex-col items-center justify-center space-y-4">
-                
-                {/* Logo Preview */}
-                <div className="w-32 h-32 rounded-2xl bg-gray-50 border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden relative shadow-sm">
-                  {formData.logoUrl ? (
-                    <Image src={formData.logoUrl} alt="Institution Logo" fill className="object-contain p-2" unoptimized />
-                  ) : (
-                    <Shield className="w-12 h-12 text-gray-300" />
-                  )}
-                  {uploading && (
-                    <div className="absolute inset-0 bg-white/80 flex items-center justify-center backdrop-blur-sm">
-                      <span className="text-sm font-medium text-indigo-600 animate-pulse">Uploading...</span>
-                    </div>
-                  )}
-                </div>
-
-                <div className="w-full">
-                  <Label htmlFor="logo-upload" className="w-full">
-                    <div className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-600 border border-indigo-200 rounded-md cursor-pointer hover:bg-indigo-100 transition-colors font-medium text-sm">
-                      <Upload className="w-4 h-4" />
-                      {formData.logoUrl ? 'Change Logo' : 'Upload Logo'}
-                    </div>
-                  </Label>
-                  <input 
-                    id="logo-upload" 
-                    type="file" 
-                    accept="image/*" 
-                    className="hidden" 
-                    onChange={handleImageUpload}
-                    disabled={uploading}
-                  />
-                </div>
-                
-                {formData.logoUrl && (
-                  <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-700 hover:bg-red-50 mt-2" onClick={() => setFormData(prev => ({ ...prev, logoUrl: '' }))}>
-                    Remove Logo
-                  </Button>
-                )}
-                
-                <div className="w-full pt-4 mt-4 border-t border-gray-100">
-                  <Label htmlFor="logoUrl" className="text-xs text-gray-500 mb-2 block">Or paste image URL directly:</Label>
-                  <Input 
-                    id="logoUrl" 
-                    name="logoUrl" 
-                    value={formData.logoUrl} 
-                    onChange={handleChange} 
-                    placeholder="https://example.com/logo.png" 
-                    className="text-sm"
-                  />
-                </div>
-                
-                <p className="text-xs text-gray-400 text-center mt-4">
-                  Recommended size: 256x256px.<br/> PNG or WebP with transparent background.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
       </div>
     </div>
   );

@@ -13,7 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { Input } from '@/components/ui/input';
-
+import { Label } from '@/components/ui/label';
 type Question = {
     id: string;
     text: string;

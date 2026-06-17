@@ -61,12 +61,66 @@ export interface TaxonomyNode {
     youtube?: string;
   };
   
-  // SEO fields
+  // Module 2: Admission
+  admission?: {
+    admissionOpen?: boolean;
+    applicationStartDate?: string;
+    applicationEndDate?: string;
+    admissionMode?: 'Merit' | 'Entrance' | 'Both';
+    applicationFee?: string;
+    admissionUrl?: string;
+    requiredDocuments?: string[];
+    admissionProcess?: string; // Rich Text
+  };
+
+  // Module 4: Facilities
+  facilities?: {
+    title: string;
+    icon: string;
+    available: boolean;
+  }[];
+
+  // Module 7: Placement
+  placement?: {
+    placementAvailable?: boolean;
+    placementRate?: string;
+    highestPackage?: string;
+    averagePackage?: string;
+    recruiters?: string[];
+    placementDescription?: string;
+  };
+
+  // SEO fields & Module 8: SEO Advanced
   seoTitle?: string;
   seoDescription?: string;
-  featureImage?: string;
+  featureImage?: string; // Module 1
   tags?: string[];
   keywords?: string[];
+  seoAdvanced?: {
+    focusKeyword?: string;
+    canonicalUrl?: string;
+    ogTitle?: string;
+    ogDescription?: string;
+    ogImage?: string;
+    robotsIndex?: boolean;
+    schemaEnabled?: boolean;
+  };
+
+  // Module 10: Brochure / PDF
+  brochure?: {
+    pdfUrl?: string;
+    title?: string;
+    size?: string;
+  };
+
+  // Module 11: Analytics Counters
+  metrics?: {
+    views?: number;
+    brochureDownloads?: number;
+    callClicks?: number;
+    websiteClicks?: number;
+    admissionClicks?: number;
+  };
   
   createdAt?: any;
   updatedAt?: any;

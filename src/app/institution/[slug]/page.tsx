@@ -276,39 +276,131 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
           {/* 5. FACILITIES */}
           <Card className="border-none shadow-sm rounded-2xl bg-white">
             <CardContent className="p-8">
-              <h2 className="text-2xl font-bold text-slate-900 mb-6">Facilities</h2>
+              <h2 className="text-2xl font-bold text-slate-900 mb-6">Facilities & Infrastructure</h2>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-                {MOCK_FACILITIES.map((facility, idx) => (
-                  <div key={idx} className="flex flex-col items-center justify-center p-4 rounded-xl border border-slate-100 hover:border-emerald-200 hover:bg-emerald-50 transition-colors text-slate-600 hover:text-emerald-700 cursor-default">
-                    <div className="mb-3 p-3 bg-slate-50 rounded-full">{facility.icon}</div>
-                    <span className="text-sm font-semibold text-center">{facility.label}</span>
-                  </div>
-                ))}
+                {institution.facilities && institution.facilities.length > 0 ? (
+                  institution.facilities.map((facilityStr, idx) => {
+                    const iconMap: Record<string, React.ReactNode> = {
+                      'Library': <BookOpen className="w-6 h-6" />,
+                      'Hostel': <Bed className="w-6 h-6" />,
+                      'Wi-Fi': <Wifi className="w-6 h-6" />,
+                      'Cafeteria': <Coffee className="w-6 h-6" />,
+                      'Transport': <Bus className="w-6 h-6" />,
+                      'Sports Complex': <Trophy className="w-6 h-6" />,
+                      'Labs': <TestTube className="w-6 h-6" />,
+                      'Medical Facility': <PlusSquare className="w-6 h-6" />,
+                      'Auditorium': <Tent className="w-6 h-6" />,
+                      'Smart Board': <Monitor className="w-6 h-6" />
+                    };
+                    return (
+                      <div key={idx} className="flex flex-col items-center justify-center p-4 rounded-xl border border-slate-100 hover:border-emerald-200 hover:bg-emerald-50 transition-colors text-slate-600 hover:text-emerald-700 cursor-default">
+                        <div className="mb-3 p-3 bg-slate-50 rounded-full">{iconMap[facilityStr] || <Building className="w-6 h-6" />}</div>
+                        <span className="text-sm font-semibold text-center">{facilityStr}</span>
+                      </div>
+                    );
+                  })
+                ) : (
+                  MOCK_FACILITIES.map((facility, idx) => (
+                    <div key={idx} className="flex flex-col items-center justify-center p-4 rounded-xl border border-slate-100 hover:border-emerald-200 hover:bg-emerald-50 transition-colors text-slate-600 hover:text-emerald-700 cursor-default">
+                      <div className="mb-3 p-3 bg-slate-50 rounded-full">{facility.icon}</div>
+                      <span className="text-sm font-semibold text-center">{facility.label}</span>
+                    </div>
+                  ))
+                )}
               </div>
             </CardContent>
           </Card>
 
-          {/* 6. ADMISSION INFO (TIMELINE) */}
-          <Card className="border-none shadow-sm rounded-2xl bg-white">
-            <CardContent className="p-8">
-              <h2 className="text-2xl font-bold text-slate-900 mb-8">Admission Process</h2>
-              <div className="relative border-l-2 border-indigo-100 ml-3 md:ml-4 space-y-8">
-                {MOCK_ADMISSION_STEPS.map((step, idx) => (
-                  <div key={idx} className="relative pl-8 md:pl-10">
-                    <div className="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-indigo-500 border-4 border-white shadow-sm"></div>
-                    <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-4 mb-2">
-                      <Badge variant="outline" className="w-fit text-indigo-700 border-indigo-200 bg-indigo-50">{step.step}</Badge>
-                      <h3 className="text-lg font-bold text-slate-900">{step.title}</h3>
+          {/* PLACEMENT & RECRUITERS */}
+          {institution.placement && institution.placement.placementAvailable && (
+            <Card className="border-none shadow-sm rounded-2xl bg-white">
+              <CardContent className="p-8">
+                <h2 className="text-2xl font-bold text-slate-900 mb-6">Placement & Career Services</h2>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                  {institution.placement.placementRate && (
+                    <div className="bg-indigo-50 p-4 rounded-xl border border-indigo-100 flex flex-col items-center text-center">
+                      <span className="text-3xl font-bold text-indigo-600">{institution.placement.placementRate}</span>
+                      <span className="text-sm font-medium text-slate-600 mt-1">Placement Rate</span>
                     </div>
-                    <p className="text-slate-600 text-sm mb-2">{step.desc}</p>
-                    <div className="text-xs font-semibold text-slate-400 flex items-center gap-1">
-                      <Clock className="w-3 h-3" /> Tentative Date: {step.date}
+                  )}
+                  {institution.placement.highestPackage && (
+                    <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-100 flex flex-col items-center text-center">
+                      <span className="text-3xl font-bold text-emerald-600">{institution.placement.highestPackage}</span>
+                      <span className="text-sm font-medium text-slate-600 mt-1">Highest Package</span>
+                    </div>
+                  )}
+                  {institution.placement.averagePackage && (
+                    <div className="bg-amber-50 p-4 rounded-xl border border-amber-100 flex flex-col items-center text-center">
+                      <span className="text-3xl font-bold text-amber-600">{institution.placement.averagePackage}</span>
+                      <span className="text-sm font-medium text-slate-600 mt-1">Average Package</span>
+                    </div>
+                  )}
+                </div>
+
+                {institution.placement.placementDescription && (
+                  <div className="prose prose-sm max-w-none text-slate-600 mb-6 tiptap-content" dangerouslySetInnerHTML={{ __html: institution.placement.placementDescription }} />
+                )}
+
+                {institution.placement.recruiters && institution.placement.recruiters.length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-900 mb-3 uppercase tracking-wider">Top Recruiters</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {institution.placement.recruiters.map((recruiter: string, idx: number) => (
+                        <Badge key={idx} variant="outline" className="bg-white border-slate-200 text-slate-700 py-1.5 px-3">
+                          {recruiter}
+                        </Badge>
+                      ))}
                     </div>
                   </div>
-                ))}
-              </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* 6. ADMISSION INFO */}
+          <Card className="border-none shadow-sm rounded-2xl bg-white">
+            <CardContent className="p-8">
+              <h2 className="text-2xl font-bold text-slate-900 mb-6">Admission Process & Details</h2>
+              {institution.admission?.admissionProcess ? (
+                <div className="prose prose-slate max-w-none text-slate-600 tiptap-content" dangerouslySetInnerHTML={{ __html: institution.admission.admissionProcess }} />
+              ) : (
+                <div className="relative border-l-2 border-indigo-100 ml-3 md:ml-4 space-y-8">
+                  {MOCK_ADMISSION_STEPS.map((step, idx) => (
+                    <div key={idx} className="relative pl-8 md:pl-10">
+                      <div className="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-indigo-500 border-4 border-white shadow-sm"></div>
+                      <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-4 mb-2">
+                        <Badge variant="outline" className="w-fit text-indigo-700 border-indigo-200 bg-indigo-50">{step.step}</Badge>
+                        <h3 className="text-lg font-bold text-slate-900">{step.title}</h3>
+                      </div>
+                      <p className="text-slate-600 text-sm mb-2">{step.desc}</p>
+                      <div className="text-xs font-semibold text-slate-400 flex items-center gap-1">
+                        <Clock className="w-3 h-3" /> Tentative Date: {step.date}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {institution.admission?.requiredDocuments && institution.admission.requiredDocuments.length > 0 && (
+                <div className="mt-8 pt-6 border-t border-slate-100">
+                  <h3 className="font-bold text-slate-900 mb-3">Required Documents</h3>
+                  <ul className="list-disc pl-5 text-sm text-slate-600 space-y-1">
+                    {institution.admission.requiredDocuments.map((doc: string, idx: number) => (
+                      <li key={idx}>{doc}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
               <div className="mt-8 pt-6 border-t border-slate-100 flex justify-center">
-                <Button className="bg-indigo-600 hover:bg-indigo-700 text-white px-8">Start Application</Button>
+                <Button asChild className="bg-indigo-600 hover:bg-indigo-700 text-white px-8">
+                  {institution.admission?.admissionUrl ? (
+                    <a href={institution.admission.admissionUrl} target="_blank" rel="noopener noreferrer">Start Application</a>
+                  ) : (
+                    <Link href="#">Start Application</Link>
+                  )}
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -412,17 +504,28 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
         <div className="lg:col-span-4 space-y-6">
           
           {/* Admission Status Widget */}
-          <Card className="border-none shadow-sm rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white overflow-hidden relative">
+          <Card className={`border-none shadow-sm rounded-2xl text-white overflow-hidden relative ${institution.admission?.admissionOpen ? 'bg-gradient-to-br from-emerald-500 to-teal-600' : 'bg-gradient-to-br from-slate-500 to-slate-600'}`}>
             <div className="absolute right-0 top-0 opacity-10 transform translate-x-4 -translate-y-4">
-              <CheckCircle2 className="w-32 h-32" />
+              {institution.admission?.admissionOpen ? <CheckCircle2 className="w-32 h-32" /> : <Clock className="w-32 h-32" />}
             </div>
             <CardContent className="p-6 relative z-10">
-              <div className="text-emerald-100 text-sm font-semibold uppercase tracking-wider mb-1">Admission Status</div>
-              <div className="text-3xl font-extrabold mb-4">Open Now</div>
-              <p className="text-emerald-50 text-sm mb-6 opacity-90">Applications are currently being accepted for the 2024-2025 academic session.</p>
-              <Button className="w-full bg-white text-emerald-700 hover:bg-emerald-50 font-bold text-lg h-12 shadow-lg">
-                Apply Now
-              </Button>
+              <div className={`text-sm font-semibold uppercase tracking-wider mb-1 ${institution.admission?.admissionOpen ? 'text-emerald-100' : 'text-slate-200'}`}>Admission Status</div>
+              <div className="text-3xl font-extrabold mb-4">{institution.admission?.admissionOpen ? 'Open Now' : 'Currently Closed'}</div>
+              <p className={`text-sm mb-6 opacity-90 ${institution.admission?.admissionOpen ? 'text-emerald-50' : 'text-slate-200'}`}>
+                {institution.admission?.admissionOpen 
+                  ? 'Applications are currently being accepted for the upcoming academic session.' 
+                  : 'Admissions are not currently open for this institution.'}
+              </p>
+              
+              {institution.admission?.admissionOpen && (
+                <Button asChild className={`w-full font-bold text-lg h-12 shadow-lg ${institution.admission?.admissionUrl ? 'bg-white text-emerald-700 hover:bg-emerald-50' : 'bg-white/20 text-white hover:bg-white/30'}`}>
+                  {institution.admission?.admissionUrl ? (
+                    <a href={institution.admission.admissionUrl} target="_blank" rel="noopener noreferrer">Apply Now</a>
+                  ) : (
+                    <Link href="#">Contact Institution</Link>
+                  )}
+                </Button>
+              )}
             </CardContent>
           </Card>
 
@@ -431,18 +534,41 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
             <CardContent className="p-6">
               <h3 className="font-bold text-lg text-slate-900 mb-4 border-b pb-3">Important Dates</h3>
               <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <div className="text-slate-600 text-sm">Last Date to Apply</div>
-                  <div className="font-semibold text-slate-900 text-sm bg-slate-100 px-2 py-1 rounded">25 Sep 2023</div>
-                </div>
-                <div className="flex justify-between items-center">
-                  <div className="text-slate-600 text-sm">Entrance Exam</div>
-                  <div className="font-semibold text-slate-900 text-sm bg-slate-100 px-2 py-1 rounded">12 Oct 2023</div>
-                </div>
-                <div className="flex justify-between items-center">
-                  <div className="text-slate-600 text-sm">Result Declaration</div>
-                  <div className="font-semibold text-slate-900 text-sm bg-slate-100 px-2 py-1 rounded">01 Nov 2023</div>
-                </div>
+                {institution.admission?.applicationStartDate && (
+                  <div className="flex justify-between items-center">
+                    <div className="text-slate-600 text-sm">Applications Open</div>
+                    <div className="font-semibold text-slate-900 text-sm bg-slate-100 px-2 py-1 rounded">
+                      {new Date(institution.admission.applicationStartDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                    </div>
+                  </div>
+                )}
+                {institution.admission?.applicationEndDate ? (
+                  <div className="flex justify-between items-center">
+                    <div className="text-slate-600 text-sm">Applications Close</div>
+                    <div className="font-semibold text-slate-900 text-sm bg-slate-100 px-2 py-1 rounded text-red-600 bg-red-50">
+                      {new Date(institution.admission.applicationEndDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex justify-between items-center">
+                    <div className="text-slate-600 text-sm">Last Date to Apply</div>
+                    <div className="font-semibold text-slate-900 text-sm bg-slate-100 px-2 py-1 rounded text-slate-400">TBA</div>
+                  </div>
+                )}
+                
+                {/* Fallback to mock data if not available */}
+                {!institution.admission?.applicationStartDate && !institution.admission?.applicationEndDate && (
+                  <>
+                    <div className="flex justify-between items-center">
+                      <div className="text-slate-600 text-sm">Entrance Exam</div>
+                      <div className="font-semibold text-slate-900 text-sm bg-slate-100 px-2 py-1 rounded">TBA</div>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <div className="text-slate-600 text-sm">Result Declaration</div>
+                      <div className="font-semibold text-slate-900 text-sm bg-slate-100 px-2 py-1 rounded">TBA</div>
+                    </div>
+                  </>
+                )}
               </div>
             </CardContent>
           </Card>
