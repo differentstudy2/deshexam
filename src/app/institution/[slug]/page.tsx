@@ -14,6 +14,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 // Ensure this page works dynamically
 export const dynamic = 'force-dynamic';
@@ -222,7 +224,9 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
                 <h2 className="text-2xl font-bold text-slate-900 mb-3">About Institution</h2>
                 <div className="prose prose-slate max-w-none text-slate-600 leading-relaxed">
                   {institution.description ? (
-                    <div dangerouslySetInnerHTML={{ __html: institution.description }} />
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {institution.description}
+                    </ReactMarkdown>
                   ) : (
                     <p>
                       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
