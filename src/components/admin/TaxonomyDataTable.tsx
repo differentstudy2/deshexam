@@ -11,7 +11,7 @@ import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { updateTaxonomyNode } from '@/lib/firebase/taxonomy';
+import { updateTaxonomyNode, generateSlug } from '@/lib/firebase/taxonomy';
 
 interface Props {
   type: NodeType;
@@ -203,7 +203,11 @@ export function TaxonomyDataTable({ type, title }: Props) {
               <Label>Title</Label>
               <Input 
                 value={editForm.title} 
-                onChange={(e) => setEditForm({ ...editForm, title: e.target.value })} 
+                onChange={(e) => setEditForm({ 
+                  ...editForm, 
+                  title: e.target.value,
+                  slug: generateSlug(e.target.value)
+                })} 
                 placeholder="Title" 
               />
             </div>
