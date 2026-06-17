@@ -6,7 +6,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Search, Layers, Calendar, Hash, Tag, Activity, Edit2, Trash2, ChevronLeft, ChevronRight, Filter, Eye, EyeOff, PlusCircle, CheckSquare } from 'lucide-react';
+import { 
+  Plus, Edit2, Trash2, Hash, FileText, CheckSquare, EyeOff, LayoutGrid, 
+  ChevronRight, Filter, Database, BookOpen, Layers, Target, Eye, ChevronLeft, Calendar, Activity, PlusCircle, Search, Tag 
+} from 'lucide-react';
+import Link from 'next/link';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -497,6 +501,13 @@ export function TaxonomyDataTable({ type, title }: Props) {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end items-center gap-1">
+                          {type === 'textbook' && (
+                            <Button asChild variant="ghost" size="icon" className="h-8 w-8 text-blue-600 hover:bg-blue-50" title="View Details">
+                              <Link href={`/admin/textbook/${node.id}`}>
+                                <Eye className="w-4 h-4" />
+                              </Link>
+                            </Button>
+                          )}
                           <Button variant="ghost" size="icon" onClick={() => handleToggleStatus(node)} className="h-8 w-8 text-emerald-600 hover:bg-emerald-50" title="Toggle Status">
                             {node.status === 'active' || node.status === 'published' ? <CheckSquare className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                           </Button>
