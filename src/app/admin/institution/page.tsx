@@ -99,6 +99,8 @@ export default function InstitutionManagerPage() {
       if (selectedPlaceDetails.internationalPhoneNumber) newNodeData.internationalPhoneNumber = selectedPlaceDetails.internationalPhoneNumber;
       if (selectedPlaceDetails.openingHours) newNodeData.openingHours = selectedPlaceDetails.openingHours;
       if (selectedPlaceDetails.reviews) newNodeData.reviews = selectedPlaceDetails.reviews;
+      if (selectedPlaceDetails.headquarters) newNodeData.headquarters = selectedPlaceDetails.headquarters;
+      if (selectedPlaceDetails.stateRegion) newNodeData.stateRegion = selectedPlaceDetails.stateRegion;
 
       // Process Photos: Upload to Firebase Storage
       if (selectedPlaceDetails.photoReferences && selectedPlaceDetails.photoReferences.length > 0) {

@@ -1,0 +1,64 @@
+import { NextResponse } from 'next/server';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+
+export async function POST(request: Request) {
+  try {
+    const { name, address } = await request.json();
+
+    if (!name) {
+      return NextResponse.json({ error: 'Institution name is required' }, { status: 400 });
+    }
+
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json({ error: 'GEMINI_API_KEY is not configured' }, { status: 500 });
+    }
+
+    const genAI = new GoogleGenerativeAI(apiKey);
+    
+    // We use gemini-2.5-flash as it supports search grounding
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-2.5-flash',
+      tools: [{
+        googleSearchRetrieval: {}
+      }]
+    });
+
+    const prompt = `
+    Find the following information about the educational institution named "${name}" located at or near "${address || ''}".
+    Please use Google Search to find accurate, up-to-date data.
+    
+    1. Established Year (e.g. "1945")
+    2. Total Enrollment (a number, roughly estimated if exact is not available, e.g. 1500)
+    3. Official Social Media Profiles (Facebook, Twitter/X, LinkedIn, Instagram, YouTube)
+    
+    Respond STRICTLY in JSON format with exactly these keys:
+    {
+      "establishedYear": "string or null",
+      "totalEnrollment": number or null,
+      "socialProfiles": {
+        "facebook": "url or null",
+        "twitter": "url or null",
+        "linkedin": "url or null",
+        "instagram": "url or null",
+        "youtube": "url or null"
+      }
+    }
+    `;
+
+    const result = await model.generateContent({
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      generationConfig: {
+        responseMimeType: 'application/json',
+      }
+    });
+
+    const responseText = result.response.text();
+    const data = JSON.parse(responseText);
+
+    return NextResponse.json(data);
+  } catch (error) {
+    console.error('AI fill-details error:', error);
+    return NextResponse.json({ error: 'Failed to process AI request' }, { status: 500 });
+  }
+}

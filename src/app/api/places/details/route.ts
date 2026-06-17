@@ -27,7 +27,8 @@ export async function GET(request: Request) {
       'reviews',
       'photos',
       'website',
-      'place_id'
+      'place_id',
+      'address_components'
     ].join(',');
 
     const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=${fields}&key=${apiKey}`;
@@ -56,6 +57,20 @@ export async function GET(request: Request) {
     // Process Opening Hours
     const openingHours = place.opening_hours?.weekday_text || [];
 
+    // Extract City and State from address components
+    let headquarters = '';
+    let stateRegion = '';
+    if (place.address_components) {
+      for (const component of place.address_components) {
+        if (component.types.includes('locality')) {
+          headquarters = component.long_name;
+        }
+        if (component.types.includes('administrative_area_level_1')) {
+          stateRegion = component.long_name;
+        }
+      }
+    }
+
     const detailedResult = {
       placeId: place.place_id,
       name: place.name,
@@ -67,6 +82,8 @@ export async function GET(request: Request) {
       websiteUrl: place.website,
       phoneNumber: place.formatted_phone_number,
       internationalPhoneNumber: place.international_phone_number,
+      headquarters,
+      stateRegion,
       openingHours,
       reviews,
       photoReferences: photos, // Array of Google Maps photo references

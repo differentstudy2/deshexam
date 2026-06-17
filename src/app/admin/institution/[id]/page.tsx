@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Save, Upload, Shield, Image as ImageIcon, MapPin } from 'lucide-react';
+import { ArrowLeft, Save, Upload, Shield, Image as ImageIcon, MapPin, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
@@ -24,6 +24,7 @@ export default function InstitutionEditPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [isAiLoading, setIsAiLoading] = useState(false);
   
   const [formData, setFormData] = useState<Partial<TaxonomyNode>>({
     title: '',
@@ -48,6 +49,14 @@ export default function InstitutionEditPage() {
     openingHours: [],
     galleryImages: [],
     reviews: [],
+    totalEnrollment: undefined,
+    socialProfiles: {
+      facebook: '',
+      twitter: '',
+      linkedin: '',
+      instagram: '',
+      youtube: '',
+    }
   });
 
   useEffect(() => {
@@ -79,6 +88,14 @@ export default function InstitutionEditPage() {
             openingHours: node.openingHours || [],
             galleryImages: node.galleryImages || [],
             reviews: node.reviews || [],
+            totalEnrollment: node.totalEnrollment,
+            socialProfiles: {
+              facebook: node.socialProfiles?.facebook || '',
+              twitter: node.socialProfiles?.twitter || '',
+              linkedin: node.socialProfiles?.linkedin || '',
+              instagram: node.socialProfiles?.instagram || '',
+              youtube: node.socialProfiles?.youtube || '',
+            }
           });
         }
       } catch (error) {
@@ -93,7 +110,60 @@ export default function InstitutionEditPage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    if (name.startsWith('social_')) {
+      const socialKey = name.replace('social_', '');
+      setFormData(prev => ({
+        ...prev,
+        socialProfiles: {
+          ...prev.socialProfiles,
+          [socialKey]: value
+        }
+      }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handleAutoFill = async () => {
+    if (!formData.title) {
+      toast({ variant: 'destructive', title: 'Institution name required to use AI' });
+      return;
+    }
+    
+    setIsAiLoading(true);
+    toast({ title: 'AI is searching...', description: 'Please wait while AI gathers data from the web.' });
+    
+    try {
+      const res = await fetch('/api/ai/fill-details', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: formData.title, address: formData.address || formData.headquarters }),
+      });
+      
+      if (!res.ok) throw new Error('AI request failed');
+      
+      const data = await res.json();
+      
+      setFormData(prev => ({
+        ...prev,
+        establishedYear: data.establishedYear || prev.establishedYear,
+        totalEnrollment: data.totalEnrollment || prev.totalEnrollment,
+        socialProfiles: {
+          facebook: data.socialProfiles?.facebook || prev.socialProfiles?.facebook || '',
+          twitter: data.socialProfiles?.twitter || prev.socialProfiles?.twitter || '',
+          linkedin: data.socialProfiles?.linkedin || prev.socialProfiles?.linkedin || '',
+          instagram: data.socialProfiles?.instagram || prev.socialProfiles?.instagram || '',
+          youtube: data.socialProfiles?.youtube || prev.socialProfiles?.youtube || '',
+        }
+      }));
+      
+      toast({ title: 'AI Auto-Fill Complete!', description: 'Review the new data before saving.' });
+    } catch (error) {
+      console.error(error);
+      toast({ variant: 'destructive', title: 'AI failed to gather data' });
+    } finally {
+      setIsAiLoading(false);
+    }
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -177,8 +247,18 @@ export default function InstitutionEditPage() {
         {/* Left Column: Form Fields */}
         <div className="md:col-span-2 space-y-6">
           <Card>
-            <CardHeader className="border-b border-gray-100 bg-gray-50/50">
+            <CardHeader className="border-b border-gray-100 bg-gray-50/50 flex flex-row items-center justify-between py-4">
               <CardTitle className="text-lg">General Information</CardTitle>
+              <Button 
+                variant="secondary" 
+                size="sm" 
+                onClick={handleAutoFill} 
+                disabled={isAiLoading || !formData.title}
+                className="bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200"
+              >
+                <Sparkles className={`w-4 h-4 mr-2 ${isAiLoading ? 'animate-pulse text-indigo-400' : 'text-indigo-500'}`} />
+                {isAiLoading ? 'AI is thinking...' : 'Auto-Fill with AI'}
+              </Button>
             </CardHeader>
             <CardContent className="p-6 space-y-4">
               <div className="grid gap-2">
@@ -294,11 +374,42 @@ export default function InstitutionEditPage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="grid gap-2">
                   <Label htmlFor="establishedYear">Established Year</Label>
-                  <Input id="establishedYear" name="establishedYear" value={formData.establishedYear} onChange={handleChange} placeholder="e.g. 1929" />
+                  <Input id="establishedYear" name="establishedYear" value={formData.establishedYear || ''} onChange={handleChange} placeholder="e.g. 1945" />
                 </div>
-                <div className="grid gap-2 md:col-span-2">
+                <div className="grid gap-2">
+                  <Label htmlFor="totalEnrollment">Total Enrollment</Label>
+                  <Input id="totalEnrollment" name="totalEnrollment" type="number" value={formData.totalEnrollment || ''} onChange={handleChange} placeholder="e.g. 1500" />
+                </div>
+                <div className="grid gap-2">
                   <Label htmlFor="headquarters">Headquarters (City)</Label>
-                  <Input id="headquarters" name="headquarters" value={formData.headquarters} onChange={handleChange} placeholder="e.g. New Delhi, India" />
+                  <Input id="headquarters" name="headquarters" value={formData.headquarters || ''} onChange={handleChange} placeholder="e.g. New Delhi, India" />
+                </div>
+              </div>
+
+              {/* Social Profiles */}
+              <div className="grid gap-4 pt-4 border-t border-gray-100">
+                <Label className="text-base flex items-center gap-2">Social Media Profiles</Label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="social_facebook" className="text-xs text-slate-500">Facebook URL</Label>
+                    <Input id="social_facebook" name="social_facebook" type="url" value={formData.socialProfiles?.facebook || ''} onChange={handleChange} placeholder="https://facebook.com/..." />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="social_twitter" className="text-xs text-slate-500">Twitter/X URL</Label>
+                    <Input id="social_twitter" name="social_twitter" type="url" value={formData.socialProfiles?.twitter || ''} onChange={handleChange} placeholder="https://twitter.com/..." />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="social_linkedin" className="text-xs text-slate-500">LinkedIn URL</Label>
+                    <Input id="social_linkedin" name="social_linkedin" type="url" value={formData.socialProfiles?.linkedin || ''} onChange={handleChange} placeholder="https://linkedin.com/school/..." />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="social_instagram" className="text-xs text-slate-500">Instagram URL</Label>
+                    <Input id="social_instagram" name="social_instagram" type="url" value={formData.socialProfiles?.instagram || ''} onChange={handleChange} placeholder="https://instagram.com/..." />
+                  </div>
+                  <div className="grid gap-2 md:col-span-2">
+                    <Label htmlFor="social_youtube" className="text-xs text-slate-500">YouTube Channel URL</Label>
+                    <Input id="social_youtube" name="social_youtube" type="url" value={formData.socialProfiles?.youtube || ''} onChange={handleChange} placeholder="https://youtube.com/..." />
+                  </div>
                 </div>
               </div>
 

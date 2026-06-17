@@ -50,6 +50,14 @@ export interface TaxonomyNode {
     time: string;
     authorPhotoUrl: string;
   }[];
+  totalEnrollment?: number;
+  socialProfiles?: {
+    facebook?: string;
+    twitter?: string;
+    linkedin?: string;
+    instagram?: string;
+    youtube?: string;
+  };
   
   // SEO fields
   seoTitle?: string;
