@@ -51,6 +51,8 @@ export interface TaxonomyNode {
     authorPhotoUrl: string;
   }[];
   totalEnrollment?: number;
+  mediumOfInstruction?: string[];
+  aiReviewSummary?: string;
   socialProfiles?: {
     facebook?: string;
     twitter?: string;

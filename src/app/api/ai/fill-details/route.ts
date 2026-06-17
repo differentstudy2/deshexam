@@ -30,15 +30,17 @@ export async function POST(request: Request) {
     
     1. Established Year (e.g. "1945")
     2. Total Enrollment (a number, roughly estimated if exact is not available, e.g. 1500)
-    3. Official Social Media Profiles (Facebook, Twitter/X, LinkedIn, Instagram, YouTube)
-    4. Full Description: Write a high-quality, comprehensive article-style overview (about 400 to 500 words) detailing the history, academic curriculum, campus facilities, notable achievements, and overall reputation of the institution. Structure it with clear paragraphs separated by double newlines.
-    5. High Quality SEO Title: Write an optimized, catchy page title (max 60 characters) including the institution name and primary location.
-    6. High Quality SEO Description: Write a compelling, concise meta description (max 160 characters) summarizing the institution for search engines.
+    3. Medium of Instruction (e.g. ["English", "Bengali", "Hindi"])
+    4. Official Social Media Profiles (Facebook, Twitter/X, LinkedIn, Instagram, YouTube)
+    5. Full Description: Write a high-quality, comprehensive article-style overview (about 400 to 500 words) detailing the history, academic curriculum, campus facilities, notable achievements, and overall reputation of the institution. Format the response beautifully using **HTML tags** (such as <h2>, <p>, <ul>, <li>, <strong>, <em>). Do not use Markdown, strictly use HTML tags.
+    6. High Quality SEO Title: Write an optimized, catchy page title (max 60 characters) including the institution name and primary location.
+    7. High Quality SEO Description: Write a compelling, concise meta description (max 160 characters) summarizing the institution for search engines.
     
     Respond STRICTLY in JSON format with exactly these keys:
     {
       "establishedYear": "string or null",
       "totalEnrollment": number or null,
+      "mediumOfInstruction": ["string"],
       "socialProfiles": {
         "facebook": "url or null",
         "twitter": "url or null",
@@ -57,11 +59,16 @@ export async function POST(request: Request) {
     });
 
     const responseText = result.response.text();
-    // Strip markdown formatting if the model wraps it in ```json ... ```
-    const cleanText = responseText.replace(/```json/gi, '').replace(/```/gi, '').trim();
-    const data = JSON.parse(cleanText);
+    let cleanText = responseText.replace(/```json/gi, '').replace(/```/gi, '').trim();
+    
+    try {
+      const data = JSON.parse(cleanText);
+      return NextResponse.json(data);
+    } catch (parseError) {
+      console.error('Failed to parse AI JSON:', cleanText);
+      return NextResponse.json({ error: 'AI returned invalid JSON format', details: cleanText }, { status: 500 });
+    }
 
-    return NextResponse.json(data);
   } catch (error) {
     console.error('AI fill-details error:', error);
     return NextResponse.json({ error: 'Failed to process AI request', details: String(error) }, { status: 500 });

@@ -10,8 +10,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Save, Upload, Shield, Image as ImageIcon, MapPin, Sparkles, X, Plus } from 'lucide-react';
+import { ArrowLeft, Save, Upload, Shield, Image as ImageIcon, MapPin, Sparkles, X, Plus, Bold, Italic, List, Heading2 } from 'lucide-react';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
+import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
 
@@ -25,7 +27,11 @@ export default function InstitutionEditPage() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [isAiLoading, setIsAiLoading] = useState(false);
+  const [isSummarizing, setIsSummarizing] = useState(false);
   const [newGalleryUrl, setNewGalleryUrl] = useState('');
+  const [draggedGalleryIdx, setDraggedGalleryIdx] = useState<number | null>(null);
+  const [initialLoadDone, setInitialLoadDone] = useState(false);
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
   
   const [formData, setFormData] = useState<Partial<TaxonomyNode>>({
     title: '',
@@ -42,6 +48,8 @@ export default function InstitutionEditPage() {
     address: '',
     latitude: undefined,
     longitude: undefined,
+    totalEnrollment: undefined,
+    mediumOfInstruction: [],
     rating: undefined,
     status: 'draft',
     seoTitle: '',
@@ -51,7 +59,6 @@ export default function InstitutionEditPage() {
     openingHours: [],
     galleryImages: [],
     reviews: [],
-    totalEnrollment: undefined,
     socialProfiles: {
       facebook: '',
       twitter: '',
@@ -74,7 +81,7 @@ export default function InstitutionEditPage() {
             boardType: node.boardType || 'Public School',
             stateRegion: node.stateRegion || '',
             description: node.description || '',
-            logoUrl: node.logoUrl || node.featureImage || '', // fallback to featureImage if logoUrl is empty
+            logoUrl: node.logoUrl || node.featureImage || '', 
             websiteUrl: node.websiteUrl || '',
             establishedYear: node.establishedYear || '',
             headquarters: node.headquarters || '',
@@ -91,7 +98,9 @@ export default function InstitutionEditPage() {
             openingHours: node.openingHours || [],
             galleryImages: node.galleryImages || [],
             reviews: node.reviews || [],
+            aiReviewSummary: node.aiReviewSummary || '',
             totalEnrollment: node.totalEnrollment,
+            mediumOfInstruction: node.mediumOfInstruction || [],
             socialProfiles: {
               facebook: node.socialProfiles?.facebook || '',
               twitter: node.socialProfiles?.twitter || '',
@@ -106,10 +115,38 @@ export default function InstitutionEditPage() {
         toast({ variant: 'destructive', title: 'Error loading institution data' });
       } finally {
         setLoading(false);
+        setInitialLoadDone(true);
       }
     }
     loadInstitution();
   }, [institutionId, toast]);
+
+  // Auto-Save Effect
+  useEffect(() => {
+    if (!initialLoadDone || !institutionId || institutionId === 'new') return;
+
+    const timeoutId = setTimeout(async () => {
+      setSaving(true);
+      try {
+        const payload: any = { ...formData };
+        if (payload.logoUrl) payload.featureImage = payload.logoUrl;
+        Object.keys(payload).forEach(key => {
+          if (payload[key] === undefined) {
+            delete payload[key];
+          }
+        });
+
+        await updateTaxonomyNode(institutionId, payload);
+        setLastSaved(new Date());
+      } catch (error) {
+        console.error('Auto-save failed:', error);
+      } finally {
+        setSaving(false);
+      }
+    }, 2000);
+
+    return () => clearTimeout(timeoutId);
+  }, [formData, initialLoadDone, institutionId]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -125,6 +162,13 @@ export default function InstitutionEditPage() {
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
     }
+  };
+  const handleMediumChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setFormData(prev => ({
+      ...prev,
+      mediumOfInstruction: val.split(',').map(s => s.trim()).filter(Boolean)
+    }));
   };
 
   const handleAutoFill = async () => {
@@ -143,7 +187,10 @@ export default function InstitutionEditPage() {
         body: JSON.stringify({ name: formData.title, address: formData.address || formData.headquarters }),
       });
       
-      if (!res.ok) throw new Error('AI request failed');
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || errorData.details || 'AI request failed');
+      }
       
       const data = await res.json();
       
@@ -151,6 +198,7 @@ export default function InstitutionEditPage() {
         ...prev,
         establishedYear: data.establishedYear || prev.establishedYear,
         totalEnrollment: data.totalEnrollment || prev.totalEnrollment,
+        mediumOfInstruction: data.mediumOfInstruction || prev.mediumOfInstruction || [],
         description: data.description || prev.description,
         seoTitle: data.seoTitle || prev.seoTitle,
         seoDescription: data.seoDescription || prev.seoDescription,
@@ -166,9 +214,30 @@ export default function InstitutionEditPage() {
       toast({ title: 'AI Auto-Fill Complete!', description: 'Review the new data before saving.' });
     } catch (error) {
       console.error(error);
-      toast({ variant: 'destructive', title: 'AI failed to gather data' });
+      toast({ variant: 'destructive', title: 'AI Request Failed', description: error instanceof Error ? error.message : 'Unknown error' });
     } finally {
       setIsAiLoading(false);
+    }
+  };
+
+  const handleSummarizeReviews = async () => {
+    if (!formData.reviews || formData.reviews.length === 0) return;
+    setIsSummarizing(true);
+    try {
+      const response = await fetch('/api/ai/summarize-reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reviews: formData.reviews, institutionName: formData.title || formData.acronym }),
+      });
+      if (!response.ok) throw new Error('Failed to summarize reviews');
+      const data = await response.json();
+      setFormData(prev => ({ ...prev, aiReviewSummary: data.summary }));
+      toast({ title: 'Reviews summarized!' });
+    } catch (error) {
+      console.error(error);
+      toast({ variant: 'destructive', title: 'AI failed to summarize' });
+    } finally {
+      setIsSummarizing(false);
     }
   };
 
@@ -229,20 +298,43 @@ export default function InstitutionEditPage() {
     }
   };
 
+  const handleGalleryDragStart = (idx: number) => {
+    setDraggedGalleryIdx(idx);
+  };
+
+  const handleGalleryDragOver = (e: React.DragEvent, idx: number) => {
+    e.preventDefault();
+    if (draggedGalleryIdx === null || draggedGalleryIdx === idx) return;
+    
+    setFormData(prev => {
+      if (!prev.galleryImages) return prev;
+      const newImages = [...prev.galleryImages];
+      const draggedImg = newImages[draggedGalleryIdx];
+      newImages.splice(draggedGalleryIdx, 1);
+      newImages.splice(idx, 0, draggedImg);
+      return { ...prev, galleryImages: newImages };
+    });
+    setDraggedGalleryIdx(idx);
+  };
+
   const handleSave = async () => {
     setSaving(true);
     try {
-      // Strip undefined values to prevent Firebase errors
-      const payload: any = { ...formData };
-      if (payload.logoUrl) payload.featureImage = payload.logoUrl;
-      Object.keys(payload).forEach(key => {
-        if (payload[key] === undefined) {
-          delete payload[key];
-        }
-      });
+      if (institutionId) {
+        const payload: any = { ...formData };
+        if (payload.logoUrl) payload.featureImage = payload.logoUrl;
+        Object.keys(payload).forEach(key => {
+          if (payload[key] === undefined) {
+            delete payload[key];
+          }
+        });
 
-      await updateTaxonomyNode(institutionId, payload);
-      toast({ title: 'Institution updated successfully!' });
+        await updateTaxonomyNode(institutionId, payload);
+        setLastSaved(new Date());
+        toast({ title: 'Institution updated successfully' });
+      } else {
+        // Handle create logic here if needed
+      }
       router.refresh();
     } catch (error) {
       console.error('Save failed:', error);
@@ -280,13 +372,47 @@ export default function InstitutionEditPage() {
                  className={formData.status === 'published' || formData.status === 'active' ? 'bg-emerald-100 text-emerald-800' : ''}>
             {formData.status}
           </Badge>
-          <Button onClick={handleSave} disabled={saving || uploading} className="bg-indigo-600 hover:bg-indigo-700">
-            {saving ? 'Saving...' : <><Save className="w-4 h-4 mr-2" /> Save Changes</>}
-          </Button>
+          <div className="flex items-center gap-4">
+              {lastSaved && (
+                <span className="text-sm text-slate-500 hidden sm:inline-block">
+                  Last saved: {lastSaved.toLocaleTimeString()}
+                </span>
+              )}
+              <Button onClick={handleSave} disabled={saving} className="bg-indigo-600 hover:bg-indigo-700">
+                <Save className="w-4 h-4 mr-2" />
+                {saving ? 'Saving...' : 'Save Changes'}
+              </Button>
+            </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <AnimatePresence>
+        {isAiLoading && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-white/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center"
+          >
+            <motion.div
+              animate={{ rotate: 360, scale: [1, 1.2, 1] }}
+              transition={{ repeat: Infinity, duration: 3, ease: "linear" }}
+            >
+              <Sparkles className="w-20 h-20 text-indigo-500" />
+            </motion.div>
+            <motion.h2 
+              animate={{ opacity: [0.4, 1, 0.4] }}
+              transition={{ repeat: Infinity, duration: 1.5 }}
+              className="mt-6 text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-600"
+            >
+              AI is crafting your content...
+            </motion.h2>
+            <p className="text-slate-500 mt-2 text-sm animate-pulse">Scouring the web for up-to-date information</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Left Column: Form Fields */}
         <div className="md:col-span-2 space-y-6">
@@ -322,15 +448,10 @@ export default function InstitutionEditPage() {
               </div>
 
               <div className="grid gap-2">
-                  <Label htmlFor="description">Description</Label>
-                <textarea 
-                  id="description" 
-                  name="description" 
-                  value={formData.description} 
-                  onChange={handleChange} 
-                  rows={4}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  placeholder="Brief description about the institution..."
+                <Label htmlFor="description">Description</Label>
+                <RichTextEditor 
+                  content={formData.description || ''} 
+                  onChange={({ html }) => setFormData(prev => ({ ...prev, description: html }))} 
                 />
               </div>
             </CardContent>
@@ -367,6 +488,20 @@ export default function InstitutionEditPage() {
                   <Input id="longitude" name="longitude" type="number" step="any" value={formData.longitude || ''} onChange={handleChange} placeholder="e.g. 77.2090" />
                 </div>
               </div>
+
+              {/* Map Preview */}
+              {formData.latitude && formData.longitude && (
+                <div className="w-full h-48 bg-slate-100 rounded-md overflow-hidden border border-slate-200 mt-2">
+                  <iframe
+                    width="100%"
+                    height="100%"
+                    frameBorder="0"
+                    style={{ border: 0 }}
+                    src={`https://maps.google.com/maps?q=${formData.latitude},${formData.longitude}&hl=en&z=14&output=embed`}
+                    allowFullScreen
+                  />
+                </div>
+              )}
               
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
@@ -428,6 +563,16 @@ export default function InstitutionEditPage() {
                   <Label htmlFor="headquarters">Headquarters (City)</Label>
                   <Input id="headquarters" name="headquarters" value={formData.headquarters || ''} onChange={handleChange} placeholder="e.g. New Delhi, India" />
                 </div>
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="mediumOfInstruction">Medium(s) of Instruction (comma separated)</Label>
+                <Input 
+                  id="mediumOfInstruction" 
+                  value={formData.mediumOfInstruction?.join(', ') || ''} 
+                  onChange={handleMediumChange} 
+                  placeholder="e.g. English, Bengali, Hindi" 
+                />
               </div>
 
               {/* Social Profiles */}
@@ -496,6 +641,33 @@ export default function InstitutionEditPage() {
                   placeholder="Compelling meta description for search engines..."
                 />
               </div>
+
+              {/* SEO Live Preview */}
+              {(formData.seoTitle || formData.seoDescription) && (
+                <div className="pt-2">
+                  <Label className="text-xs text-slate-500 mb-1 block">Google Search Preview (For Your DeshExam Page)</Label>
+                  <div className="bg-white p-4 border border-slate-200 rounded-md shadow-sm max-w-[600px]">
+                    <div className="text-sm text-slate-800 flex items-center gap-2 mb-1">
+                      <div className="w-6 h-6 bg-slate-100 rounded-full flex items-center justify-center border border-slate-200">
+                        {/* We use a generic icon or DeshExam logo here ideally, fallback to Shield for now */}
+                        <Shield className="w-3 h-3 text-slate-400" />
+                      </div>
+                      <div className="flex flex-col leading-none">
+                        <span className="text-[12px] truncate">DeshExam</span>
+                        <span className="text-[12px] text-slate-500 truncate">
+                          https://deshexam.com › institution › {formData.slug || formData.acronym?.toLowerCase() || 'details'}
+                        </span>
+                      </div>
+                    </div>
+                    <h3 className="text-[20px] text-[#1a0dab] group-hover:underline cursor-pointer truncate leading-tight pt-1">
+                      {formData.seoTitle || formData.title}
+                    </h3>
+                    <p className="text-[14px] text-[#4d5156] mt-1 line-clamp-2 leading-snug">
+                      {formData.seoDescription}
+                    </p>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -552,8 +724,15 @@ export default function InstitutionEditPage() {
                 {formData.galleryImages && formData.galleryImages.length > 0 ? (
                   <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
                     {formData.galleryImages.map((url, idx) => (
-                      <div key={idx} className="relative aspect-square rounded-md overflow-hidden border border-slate-200 group">
-                        <Image src={url} alt={`Gallery ${idx}`} fill className="object-cover" unoptimized />
+                      <div 
+                        key={url + idx} 
+                        draggable
+                        onDragStart={() => handleGalleryDragStart(idx)}
+                        onDragOver={(e) => handleGalleryDragOver(e, idx)}
+                        onDragEnd={() => setDraggedGalleryIdx(null)}
+                        className={`relative aspect-square rounded-md overflow-hidden border border-slate-200 group cursor-grab active:cursor-grabbing ${draggedGalleryIdx === idx ? 'opacity-50 border-indigo-500' : ''}`}
+                      >
+                        <Image src={url} alt={`Gallery ${idx}`} fill className="object-cover pointer-events-none" unoptimized />
                         <button 
                           onClick={() => handleRemoveGalleryImage(idx)}
                           className="absolute top-1 right-1 bg-black/50 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500"
@@ -570,7 +749,32 @@ export default function InstitutionEditPage() {
 
               {/* Reviews Summary */}
               <div className="grid gap-2 pt-4 border-t border-slate-100">
-                <Label>Imported Student Reviews</Label>
+                <div className="flex items-center justify-between">
+                  <Label>Imported Student Reviews</Label>
+                  {formData.reviews && formData.reviews.length > 0 && (
+                    <Button 
+                      type="button" 
+                      variant="secondary" 
+                      size="sm" 
+                      onClick={handleSummarizeReviews} 
+                      disabled={isSummarizing}
+                      className="h-8 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200"
+                    >
+                      <Sparkles className={`w-3 h-3 mr-2 ${isSummarizing ? 'animate-pulse text-indigo-400' : 'text-indigo-500'}`} />
+                      {isSummarizing ? 'Summarizing...' : 'AI Summarize'}
+                    </Button>
+                  )}
+                </div>
+
+                {formData.aiReviewSummary && (
+                  <div className="bg-indigo-50/50 border border-indigo-100 p-4 rounded-md mb-2">
+                    <h4 className="text-sm font-semibold text-indigo-900 mb-2 flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-indigo-500" /> AI Review Summary
+                    </h4>
+                    <div className="text-sm text-indigo-800 prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: formData.aiReviewSummary.replace(/\n/g, '<br/>') }} />
+                  </div>
+                )}
+
                 {formData.reviews && formData.reviews.length > 0 ? (
                   <div className="space-y-2">
                     {formData.reviews.map((r, idx) => (
