@@ -76,7 +76,7 @@ export default async function DocumentByIdPage({ params }: { params: Promise<{ i
       </div>
       
       {/* Mobile toolbar for small screens */}
-      <MobileToolbar documentUrl={flattenedItem.fileUrl} documentTitle={flattenedItem.title} />
+      <MobileToolbar documentUrl={flattenedItem.fileUrl} documentTitle={flattenedItem.title} documentId={flattenedItem.id} />
     </main>
   );
 }

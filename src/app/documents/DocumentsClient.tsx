@@ -44,7 +44,7 @@ const MOCK_DOCS = Array.from({ length: 18 }, (_, i) => ({
 }));
 
 // ─── PDF Preview Modal ─────────────────────────────────────────────────────────
-function PDFPreviewModal({ doc: documentData, onClose }: { doc: any; onClose: () => void }) {
+export function PDFPreviewModal({ doc: documentData, onClose }: { doc: any; onClose: () => void }) {
   const [page, setPage] = useState(1);
   const [zoom, setZoom] = useState(1);
   const totalPages = documentData.pages || 45;
@@ -149,7 +149,7 @@ function PDFPreviewModal({ doc: documentData, onClose }: { doc: any; onClose: ()
 }
 
 // ─── Document Card ─────────────────────────────────────────────────────────────
-function DocCard({ doc: documentData, onPreview, isSaved, onToggleSave }: { doc: any; onPreview: (d: any) => void; isSaved: boolean; onToggleSave: () => void }) {
+export function DocCard({ doc: documentData, onPreview, isSaved, onToggleSave }: { doc: any; onPreview: (d: any) => void; isSaved: boolean; onToggleSave: () => void }) {
   const docHref = documentData.slug
     ? `/documents/${documentData.slug}`
     : documentData.id && !documentData.id.startsWith('mock-')

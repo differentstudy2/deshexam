@@ -6,12 +6,15 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { BookOpen, Download, Bookmark, Share2, Eye, FileText, Globe, Clock, Tag } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { useSaveDocument } from '@/hooks/use-save-document';
 
 interface DocumentMetadataProps {
   document: any; 
 }
 
 export function DocumentMetadataCard({ document }: DocumentMetadataProps) {
+  const { isSaved, toggleSave } = useSaveDocument();
+
   const handleShare = async () => {
     if (typeof navigator !== 'undefined' && navigator.share) {
       navigator.share({
@@ -33,6 +36,7 @@ export function DocumentMetadataCard({ document }: DocumentMetadataProps) {
     : 'Unknown';
 
   const slug = document.slug || document.id;
+  const saved = isSaved(document.id);
 
   return (
     <Card className="border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden mb-8">
@@ -77,8 +81,13 @@ export function DocumentMetadataCard({ document }: DocumentMetadataProps) {
               <Download className="w-4 h-4 mr-2" /> Download PDF
             </Button>
           </Link>
-          <Button variant="ghost" className="text-slate-600 dark:text-slate-400">
-            <Bookmark className="w-4 h-4 mr-2" /> Bookmark
+          <Button 
+            variant={saved ? "default" : "ghost"} 
+            className={saved ? "bg-blue-600 hover:bg-blue-700 text-white" : "text-slate-600 dark:text-slate-400"}
+            onClick={() => toggleSave(document.id)}
+          >
+            <Bookmark className={`w-4 h-4 mr-2 ${saved ? 'fill-white' : ''}`} /> 
+            {saved ? 'Saved' : 'Bookmark'}
           </Button>
           <Button variant="ghost" onClick={handleShare} className="text-slate-600 dark:text-slate-400">
             <Share2 className="w-4 h-4 mr-2" /> Share

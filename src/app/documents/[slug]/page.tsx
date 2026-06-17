@@ -248,7 +248,7 @@ export default async function DocumentReaderPage({ params }: { params: Promise<{
       </div>
 
       {/* Mobile Sticky Toolbar */}
-      <MobileToolbar documentUrl={item.fileUrl || item.url} documentTitle={item.title} documentSlug={item.slug || item.id} />
+      <MobileToolbar documentUrl={item.fileUrl || item.url} documentTitle={item.title} documentSlug={item.slug || item.id} documentId={item.id} />
 
       {/* Trigger Analytics (Client side tracking) */}
       <script dangerouslySetInnerHTML={{
