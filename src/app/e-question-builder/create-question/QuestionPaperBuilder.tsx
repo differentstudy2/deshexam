@@ -221,7 +221,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
 
   // Custom Question Modal State
   const [isAddQuestionOpen, setIsAddQuestionOpen] = useState(false);
-  const [customQuestion, setCustomQuestion] = useState({ text: '', optA: '', optB: '', optC: '', optD: '', correctAnswer: 'a' });
+  const [customQuestion, setCustomQuestion] = useState({ text: '', optA: '', optB: '', optC: '', optD: '', correctAnswer: 'a', explanation: '', questionType: 'MCQ' });
   const [addQuestionMode, setAddQuestionMode] = useState<'single' | 'bulk'>('single');
   const [bulkQuestionText, setBulkQuestionText] = useState('');
 
@@ -480,7 +480,8 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
         questionText: customQuestion.text,
         options: { a: customQuestion.optA, b: customQuestion.optB, c: customQuestion.optC, d: customQuestion.optD },
         correctAnswer: customQuestion.correctAnswer,
-        explanation: '',
+        explanation: customQuestion.explanation,
+        questionType: customQuestion.questionType,
         difficulty: 'Medium',
         status: 'Published',
         createdAt: new Date(),
@@ -490,7 +491,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
       };
       setQuestions([...questions, newQuestion]);
       setIsAddQuestionOpen(false);
-      setCustomQuestion({ text: '', optA: '', optB: '', optC: '', optD: '', correctAnswer: 'a' });
+      setCustomQuestion({ text: '', optA: '', optB: '', optC: '', optD: '', correctAnswer: 'a', explanation: '', questionType: 'MCQ' });
       setForceNewColumn(false);
     } else {
       if (!bulkQuestionText.trim()) return;
@@ -755,10 +756,6 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="answer" id="fmt-ans" />
                   <label htmlFor="fmt-ans" className="text-sm text-gray-600 cursor-pointer">{t('answerKeyOnly', appLanguage)}</label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="suggestion" id="fmt-sug" />
-                  <label htmlFor="fmt-sug" className="text-sm text-gray-600 cursor-pointer">{t('suggestion', appLanguage)}</label>
                 </div>
               </RadioGroup>
             </div>
@@ -1859,6 +1856,20 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                                         </div>
                                       </div>
                                     )}
+
+                                    {/* Fallback for Answers of Desc, CQ, etc. */}
+                                    {format === 'qa' && q.correctAnswer && !['MCQ', 'T/F', 'FIB', 'Match'].includes(q.questionType || 'MCQ') && (
+                                      <div className="mt-2 text-[13px] text-green-800 bg-green-50 px-3 py-2 border border-green-200 rounded ml-6 max-w-[95%] text-justify break-words">
+                                        <span className="font-bold">উত্তর / Ans:</span> <span dangerouslySetInnerHTML={{ __html: q.correctAnswer.replace(/\n/g, '<br/>') }} />
+                                      </div>
+                                    )}
+
+                                    {/* Explanation */}
+                                    {showExplanations && q.explanation && (
+                                      <div className="mt-2 text-[13px] text-gray-600 font-normal border-l-2 border-gray-300 pl-2 ml-6">
+                                        <span className="font-bold text-gray-700">ব্যাখ্যা:</span> <span dangerouslySetInnerHTML={{ __html: q.explanation }} />
+                                      </div>
+                                    )}
                                   </>
                                 )}
                               </div>
@@ -2391,17 +2402,39 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                   <div><label className="text-xs mb-1 block">{t('optionC', appLanguage)}</label><Input value={customQuestion.optC} onChange={e => setCustomQuestion({ ...customQuestion, optC: e.target.value })} /></div>
                   <div><label className="text-xs mb-1 block">{t('optionD', appLanguage)}</label><Input value={customQuestion.optD} onChange={e => setCustomQuestion({ ...customQuestion, optD: e.target.value })} /></div>
                 </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium mb-1.5 block">{t('correctAnswerLabel', appLanguage)}</label>
+                    <Select value={customQuestion.correctAnswer} onValueChange={v => setCustomQuestion({ ...customQuestion, correctAnswer: v })}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="a">{t('a_ka', appLanguage)}</SelectItem>
+                        <SelectItem value="b">{t('b_kha', appLanguage)}</SelectItem>
+                        <SelectItem value="c">{t('c_ga', appLanguage)}</SelectItem>
+                        <SelectItem value="d">{t('d_gha', appLanguage)}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium mb-1.5 block">Question Type</label>
+                    <Select value={customQuestion.questionType} onValueChange={v => setCustomQuestion({ ...customQuestion, questionType: v })}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="MCQ">MCQ</SelectItem>
+                        <SelectItem value="T/F">True/False</SelectItem>
+                        <SelectItem value="FIB">Fill in the Blanks</SelectItem>
+                        <SelectItem value="Match">Matching</SelectItem>
+                        <SelectItem value="CQ">CQ</SelectItem>
+                        <SelectItem value="Desc">Desc</SelectItem>
+                        <SelectItem value="Short Question">Short Question</SelectItem>
+                        <SelectItem value="Broad Question">Broad Question</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
                 <div>
-                  <label className="text-sm font-medium mb-1.5 block">{t('correctAnswerLabel', appLanguage)}</label>
-                  <Select value={customQuestion.correctAnswer} onValueChange={v => setCustomQuestion({ ...customQuestion, correctAnswer: v })}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="a">{t('a_ka', appLanguage)}</SelectItem>
-                      <SelectItem value="b">{t('b_kha', appLanguage)}</SelectItem>
-                      <SelectItem value="c">{t('c_ga', appLanguage)}</SelectItem>
-                      <SelectItem value="d">{t('d_gha', appLanguage)}</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <label className="text-sm font-medium mb-1.5 block">Description / Explanation (Optional)</label>
+                  <Input value={customQuestion.explanation} onChange={e => setCustomQuestion({ ...customQuestion, explanation: e.target.value })} placeholder="Enter explanation for the answer..." />
                 </div>
               </>
             ) : (

@@ -72,11 +72,11 @@ export function QuestionBankModal({ isOpen, onClose, onAdd, appLanguage, initial
             return { id: d.id, name: data.title || data.name, ...data } as TaxonomyNode;
           });
           
-          setBoards(allNodes.filter(n => n.type === 'board' || n.type === 'category'));
-          setClasses(allNodes.filter(n => n.type === 'class' || n.type === 'subcategory'));
-          setTextbooks(allNodes.filter(n => n.type === 'textbook' || n.type === 'exam'));
-          setSubjects(allNodes.filter(n => n.type === 'subject'));
-          setChapters(allNodes.filter(n => n.type === 'chapter'));
+          setBoards(allNodes.filter(n => (n as any).type === 'board' || (n as any).type === 'category'));
+          setClasses(allNodes.filter(n => (n as any).type === 'class' || (n as any).type === 'subcategory'));
+          setTextbooks(allNodes.filter(n => (n as any).type === 'textbook' || (n as any).type === 'exam'));
+          setSubjects(allNodes.filter(n => (n as any).type === 'subject'));
+          setChapters(allNodes.filter(n => (n as any).type === 'chapter'));
         } catch(e) {
           console.error('Error fetching taxonomy_nodes:', e);
         }
@@ -148,20 +148,11 @@ export function QuestionBankModal({ isOpen, onClose, onAdd, appLanguage, initial
     const selectedQs = questions.filter(q => selectedQuestionIds.has(q.id));
     // Convert to QuestionBuilder format
     const formattedQs = selectedQs.map((q, idx) => ({
+      ...q,
       id: `bank_${Date.now()}_${q.id}`,
-      questionText: q.questionText,
-      options: {
-        a: q.options?.a || '',
-        b: q.options?.b || '',
-        c: q.options?.c || '',
-        d: q.options?.d || ''
-      },
+      originalId: q.id,
       correctAnswer: q.correctAnswer?.toLowerCase() || 'a',
       explanation: q.explanation || '',
-      difficulty: q.difficulty || 'Medium',
-      status: 'Published',
-      createdAt: new Date(),
-      updatedAt: new Date(),
       slug: `bank-${Date.now()}-${q.id}`,
       breakBeforeColumn: false
     }));
@@ -281,17 +272,35 @@ export function QuestionBankModal({ isOpen, onClose, onAdd, appLanguage, initial
               />
               <div className="flex-1">
                 <p className="font-medium text-sm text-gray-900 mb-2" dangerouslySetInnerHTML={{ __html: q.questionText }}></p>
-                {q.options && (
-                  <div className="grid grid-cols-2 gap-2 text-sm text-gray-600">
-                    <div dangerouslySetInnerHTML={{ __html: `(a) ${q.options.a}` }} />
-                    <div dangerouslySetInnerHTML={{ __html: `(b) ${q.options.b}` }} />
-                    <div dangerouslySetInnerHTML={{ __html: `(c) ${q.options.c}` }} />
-                    <div dangerouslySetInnerHTML={{ __html: `(d) ${q.options.d}` }} />
+                {q.options && (!q.questionType || q.questionType === 'MCQ') && (
+                  <div className="grid grid-cols-2 gap-2 text-sm text-gray-600 mb-2">
+                    <div className={q.correctAnswer?.toLowerCase() === 'a' ? 'font-bold text-green-700' : ''} dangerouslySetInnerHTML={{ __html: `(a) ${q.options.a}` }} />
+                    <div className={q.correctAnswer?.toLowerCase() === 'b' ? 'font-bold text-green-700' : ''} dangerouslySetInnerHTML={{ __html: `(b) ${q.options.b}` }} />
+                    <div className={q.correctAnswer?.toLowerCase() === 'c' ? 'font-bold text-green-700' : ''} dangerouslySetInnerHTML={{ __html: `(c) ${q.options.c}` }} />
+                    <div className={q.correctAnswer?.toLowerCase() === 'd' ? 'font-bold text-green-700' : ''} dangerouslySetInnerHTML={{ __html: `(d) ${q.options.d}` }} />
                   </div>
                 )}
-                <div className="mt-3 flex gap-2">
+                
+                {q.correctAnswer && (!q.options || q.questionType !== 'MCQ') && (
+                  <div className="text-sm font-medium text-green-700 mb-2 bg-green-50 p-1.5 rounded inline-block">
+                    Ans: {q.correctAnswer}
+                  </div>
+                )}
+
+                {q.explanation && (
+                  <div className="text-[12px] text-gray-600 mb-2 border-l-2 border-blue-300 pl-2">
+                    <strong>ব্যাখ্যা/Description:</strong> <span dangerouslySetInnerHTML={{ __html: q.explanation }} />
+                  </div>
+                )}
+
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {q.questionType && (
+                    <span className="text-[10px] px-2 py-0.5 bg-purple-50 text-purple-600 border border-purple-200 rounded-sm font-bold uppercase">
+                      {q.questionType}
+                    </span>
+                  )}
                   <span className="text-[10px] px-2 py-0.5 bg-gray-100 rounded-full text-gray-500 font-medium">
-                    {q.difficulty}
+                    {q.difficulty || 'Medium'}
                   </span>
                   {q.language && (
                     <span className="text-[10px] px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full font-medium">
