@@ -26,6 +26,8 @@ import { useAuth } from '@/hooks/use-auth';
 import { getUserProfile } from '@/lib/firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { useAuthDialog } from '@/hooks/use-auth-dialog';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase/client';
 
 interface Props {
   boardId?: string;
@@ -271,9 +273,6 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
   // Auto-fetch Subject and Chapter names from taxonomy_nodes based on URL props
   useEffect(() => {
     const fetchTaxonomyNames = async () => {
-      const { doc, getDoc } = await import('firebase/firestore');
-      const { db } = await import('@/lib/firebase/client');
-
       let boardName = '';
       let classNameStr = '';
       let textbookName = '';
