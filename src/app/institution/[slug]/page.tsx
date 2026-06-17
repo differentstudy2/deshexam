@@ -1,5 +1,6 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
+import { Metadata } from 'next';
 import { collection, query, where, getDocs, limit } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import { TaxonomyNode } from '@/lib/firebase/taxonomy';
@@ -30,6 +31,41 @@ async function getInstitutionBySlug(slug: string): Promise<TaxonomyNode | null> 
   const snap = await getDocs(q);
   if (snap.empty) return null;
   return { id: snap.docs[0].id, ...snap.docs[0].data() } as TaxonomyNode;
+}
+
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const institution = await getInstitutionBySlug(params.slug);
+  if (!institution) return { title: 'Not Found' };
+
+  const currentYear = new Date().getFullYear();
+  const seoInfo = (institution as any).seo || {};
+  
+  const title = seoInfo.seoTitle || `${institution.title} Admission ${currentYear}, Fees, Courses, Reviews | DeshExam`;
+  const description = seoInfo.seoDescription || `Explore ${institution.title} admission ${currentYear}, fees, courses, placement, scholarship, facilities, ranking, contact details and student reviews on DeshExam.`;
+  const keywords = seoInfo.seoKeywords || [seoInfo.focusKeyword || institution.title, `${institution.title} admission`, `${institution.title} fees`];
+  
+  const ogImage = seoInfo.ogImage || (institution as any).featureImage || (institution.galleryImages && institution.galleryImages[0]) || '';
+  const canonicalUrl = seoInfo.canonicalUrl || `https://deshexam.com/institution/${params.slug}`;
+
+  return {
+    title,
+    description,
+    keywords,
+    alternates: {
+      canonical: canonicalUrl,
+    },
+    openGraph: {
+      title: seoInfo.ogTitle || title,
+      description: seoInfo.ogDescription || description,
+      images: ogImage ? [ogImage] : [],
+      url: canonicalUrl,
+      type: 'website',
+    },
+    robots: {
+      index: seoInfo.robotsIndex !== false,
+      follow: seoInfo.robotsIndex !== false,
+    }
+  };
 }
 
 // ----------------------------------------------------------------------
@@ -96,22 +132,89 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
     notFound();
   }
 
+  const currentYear = new Date().getFullYear();
+  const stateStr = (institution as any).state || "West Bengal";
+  const cityStr = (institution as any).city || "City";
+
+  // Generate JSON-LD Schemas
+  const schemaInstitution = {
+    "@context":"https://schema.org",
+    "@type":"CollegeOrUniversity",
+    "name": institution.title,
+    "url": `https://deshexam.com/institution/${params.slug}`,
+    "telephone": institution.phoneNumber || "",
+    "address":{
+      "@type":"PostalAddress",
+      "addressLocality": cityStr,
+      "addressRegion": stateStr,
+      "addressCountry": "IN"
+    }
+  };
+
+  const schemaRating = institution.rating ? {
+    "@context":"https://schema.org",
+    "@type":"AggregateRating",
+    "itemReviewed": {
+      "@type": "CollegeOrUniversity",
+      "name": institution.title
+    },
+    "ratingValue": institution.rating,
+    "reviewCount": institution.userRatingsTotal || 1
+  } : null;
+
+  const schemaFAQ = {
+    "@context":"https://schema.org",
+    "@type":"FAQPage",
+    "mainEntity": MOCK_FAQS.map((faq) => ({
+      "@type": "Question",
+      "name": faq.q,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.a
+      }
+    }))
+  };
+
+  const schemaBreadcrumb = {
+    "@context":"https://schema.org",
+    "@type":"BreadcrumbList",
+    "itemListElement":[
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://deshexam.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Institutions", "item": "https://deshexam.com/institutions" },
+      { "@type": "ListItem", "position": 3, "name": stateStr, "item": `https://deshexam.com/institutions/${stateStr.toLowerCase().replace(/\s+/g, '-')}` },
+      { "@type": "ListItem", "position": 4, "name": cityStr, "item": `https://deshexam.com/institutions/${stateStr.toLowerCase().replace(/\s+/g, '-')}/${cityStr.toLowerCase().replace(/\s+/g, '-')}` },
+      { "@type": "ListItem", "position": 5, "name": institution.title, "item": `https://deshexam.com/institution/${params.slug}` }
+    ]
+  };
+
+  const schemas: any[] = [schemaInstitution, schemaFAQ, schemaBreadcrumb];
+  if (schemaRating) schemas.push(schemaRating);
+
   // Cover Image (Mocked if not present)
   const coverImage = 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=2000';
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#020817] pb-20 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemas) }} />
       
       {/* 1. HERO BANNER */}
       <div className="relative w-full min-h-[450px] md:h-[480px]">
-        <Image src={coverImage} alt="Campus" fill className="object-cover brightness-[0.4]" unoptimized />
+        <Image src={coverImage} alt={`${institution.title} campus building and facilities in ${cityStr}, ${stateStr}`} fill className="object-cover brightness-[0.4]" unoptimized />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/80 to-transparent" />
         
         <div className="absolute inset-0 pt-20 px-4 md:px-8 max-w-[1400px] mx-auto flex flex-col justify-end pb-12">
           <div className="flex justify-between items-start w-full">
-            <Link href="/institution" className="inline-flex items-center text-white/70 hover:text-white transition-colors text-sm font-medium mb-8 bg-white/10 px-3 py-1.5 rounded-full backdrop-blur-sm border border-white/10">
-              <ArrowLeft className="w-4 h-4 mr-2" /> Directory
-            </Link>
+            <div className="flex items-center gap-2 text-xs font-medium text-white/70 mb-8 flex-wrap">
+              <Link href="/" className="hover:text-white transition-colors">Home</Link>
+              <span className="text-white/40">/</span>
+              <Link href="/institutions" className="hover:text-white transition-colors">Institutions</Link>
+              <span className="text-white/40">/</span>
+              <Link href={`/institutions/${stateStr.toLowerCase().replace(/\s+/g, '-')}`} className="hover:text-white transition-colors">{stateStr}</Link>
+              <span className="text-white/40">/</span>
+              <Link href={`/institutions/${stateStr.toLowerCase().replace(/\s+/g, '-')}/${cityStr.toLowerCase().replace(/\s+/g, '-')}`} className="hover:text-white transition-colors">{cityStr}</Link>
+              <span className="text-white/40">/</span>
+              <span className="text-white font-semibold">{institution.title}</span>
+            </div>
           </div>
 
           <div className="flex flex-col lg:flex-row gap-10 items-start justify-between w-full">
@@ -120,16 +223,19 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
             <div className="flex flex-col sm:flex-row gap-6 items-start w-full lg:w-2/3">
               <div className="w-32 h-32 md:w-40 md:h-40 rounded-2xl bg-white shadow-2xl flex items-center justify-center overflow-hidden shrink-0 z-10 relative">
                 {institution.logoUrl || institution.featureImage ? (
-                  <Image src={institution.logoUrl || institution.featureImage || ''} alt={institution.title || ''} fill className="object-contain p-3" unoptimized />
+                  <Image src={institution.logoUrl || institution.featureImage || ''} alt={`${institution.title} official logo`} fill className="object-contain p-3" unoptimized />
                 ) : (
                   <Building className="w-16 h-16 text-slate-300" />
                 )}
               </div>
               
               <div className="text-white space-y-4 pt-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/50 backdrop-blur-md px-2 py-0.5 shadow-sm"><CheckCircle2 className="w-3.5 h-3.5 mr-1" /> Verified by DeshExam</Badge>
+                  <span className="text-xs text-white/70 font-medium ml-1">Updated on {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                </div>
                 <div className="flex items-center gap-3">
                   <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-white">{institution.title}</h1>
-                  <Badge className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/50 backdrop-blur-md px-2 py-0.5 shadow-sm"><CheckCircle2 className="w-3.5 h-3.5 mr-1" /> Verified</Badge>
                 </div>
                 
                 <div className="flex flex-wrap items-center gap-4 text-sm text-slate-300">
@@ -646,7 +752,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
               <div className="grid grid-cols-2 gap-2">
                 {(institution.galleryImages && institution.galleryImages.length > 0 ? institution.galleryImages : MOCK_GALLERY).slice(0, 4).map((img, idx) => (
                   <div key={idx} className="relative aspect-square rounded-lg overflow-hidden group">
-                    <Image src={img} alt="Mini gallery image" fill className="object-cover group-hover:scale-110 transition-transform duration-500" unoptimized />
+                    <Image src={img} alt={`${institution.title} campus gallery image ${idx + 1}`} fill className="object-cover group-hover:scale-110 transition-transform duration-500" unoptimized />
                   </div>
                 ))}
               </div>
