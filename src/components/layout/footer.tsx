@@ -25,38 +25,27 @@ export function Footer() {
     <footer className="bg-[#0b1120] text-slate-300 font-body py-16">
       <div className="container max-w-7xl mx-auto px-4">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 text-sm">
-          {/* EDUCATION */}
+          {/* PLATFORM */}
           <div className="space-y-4">
-            <h4 className="font-semibold text-slate-400 tracking-wider text-xs uppercase mb-6">Education</h4>
+            <h4 className="font-semibold text-slate-400 tracking-wider text-xs uppercase mb-6">Platform</h4>
             <ul className="space-y-3">
-              <li><Link href="#" className="hover:text-white transition-colors">Class 10 Notes</Link></li>
-              <li><Link href="#" className="hover:text-white transition-colors">HSC Preparation</Link></li>
-              <li><Link href="#" className="hover:text-white transition-colors">WBCS Guide</Link></li>
-              <li><Link href="#" className="hover:text-white transition-colors">MCQ Library</Link></li>
-              <li><Link href="#" className="hover:text-white transition-colors">Exam Updates</Link></li>
+              <li><Link href="/e-question-builder" className="hover:text-white transition-colors">E-Question Builder</Link></li>
+              <li><Link href="/mock-tests" className="hover:text-white transition-colors">Mock Tests</Link></li>
+              <li><Link href="/quizzes" className="hover:text-white transition-colors">Quizzes</Link></li>
+              <li><Link href="/assessment" className="hover:text-white transition-colors">Assessment</Link></li>
+              <li><Link href="/leaderboard" className="hover:text-white transition-colors">Leaderboard</Link></li>
             </ul>
           </div>
 
-          {/* KNOWLEDGE */}
+          {/* STUDY MATERIALS */}
           <div className="space-y-4">
-            <h4 className="font-semibold text-slate-400 tracking-wider text-xs uppercase mb-6">Knowledge</h4>
+            <h4 className="font-semibold text-slate-400 tracking-wider text-xs uppercase mb-6">Study Materials</h4>
             <ul className="space-y-3">
-              <li><Link href="#" className="hover:text-white transition-colors">Science & Tech</Link></li>
-              <li><Link href="#" className="hover:text-white transition-colors">History Hub</Link></li>
-              <li><Link href="#" className="hover:text-white transition-colors">GK Daily</Link></li>
-              <li><Link href="#" className="hover:text-white transition-colors">Glossary Index</Link></li>
-              <li><Link href="#" className="hover:text-white transition-colors">Academic Dictionary</Link></li>
-            </ul>
-          </div>
-
-          {/* SCHOLARSHIPS */}
-          <div className="space-y-4">
-            <h4 className="font-semibold text-slate-400 tracking-wider text-xs uppercase mb-6">Scholarships</h4>
-            <ul className="space-y-3">
-              <li><Link href="#" className="hover:text-white transition-colors">Govt Scholarships</Link></li>
-              <li><Link href="#" className="hover:text-white transition-colors">Study Abroad</Link></li>
-              <li><Link href="#" className="hover:text-white transition-colors">Private Grants</Link></li>
-              <li><Link href="#" className="hover:text-white transition-colors">Scholarship News</Link></li>
+              <li><Link href="/questions" className="hover:text-white transition-colors">Question Bank</Link></li>
+              <li><Link href="/previous-year-papers" className="hover:text-white transition-colors">Previous Papers</Link></li>
+              <li><Link href="/course" className="hover:text-white transition-colors">Courses</Link></li>
+              <li><Link href="/textbooks" className="hover:text-white transition-colors">Books & Textbooks</Link></li>
+              <li><Link href="/textbook-solutions" className="hover:text-white transition-colors">Textbook Solutions</Link></li>
             </ul>
           </div>
 
@@ -64,10 +53,23 @@ export function Footer() {
           <div className="space-y-4">
             <h4 className="font-semibold text-slate-400 tracking-wider text-xs uppercase mb-6">Resources</h4>
             <ul className="space-y-3">
-              <li><Link href="#" className="hover:text-white transition-colors">Question Papers</Link></li>
-              <li><Link href="#" className="hover:text-white transition-colors">Syllabus Guide</Link></li>
-              <li><Link href="#" className="hover:text-white transition-colors">PDF Downloads</Link></li>
-              <li><Link href="#" className="hover:text-white transition-colors">Carrier Roadmap</Link></li>
+              <li><Link href="/videos" className="hover:text-white transition-colors">Video Lessons</Link></li>
+              <li><Link href="/audio" className="hover:text-white transition-colors">Audio Lessons</Link></li>
+              <li><Link href="/documents" className="hover:text-white transition-colors">Documents & PDFs</Link></li>
+              <li><Link href="/guide" className="hover:text-white transition-colors">Student Guide</Link></li>
+              <li><Link href="/skill" className="hover:text-white transition-colors">Skill Development</Link></li>
+            </ul>
+          </div>
+
+          {/* PROGRAMS */}
+          <div className="space-y-4">
+            <h4 className="font-semibold text-slate-400 tracking-wider text-xs uppercase mb-6">Programs</h4>
+            <ul className="space-y-3">
+              <li><Link href="/academy" className="hover:text-white transition-colors">Academy</Link></li>
+              <li><Link href="/classes" className="hover:text-white transition-colors">Live Classes</Link></li>
+              <li><Link href="/kids-zone" className="hover:text-white transition-colors">Kids Zone</Link></li>
+              <li><Link href="/learn" className="hover:text-white transition-colors">Learn</Link></li>
+              <li><Link href="/practice" className="hover:text-white transition-colors">Practice Area</Link></li>
             </ul>
           </div>
 
@@ -75,10 +77,11 @@ export function Footer() {
           <div className="space-y-4">
             <h4 className="font-semibold text-slate-400 tracking-wider text-xs uppercase mb-6">Company</h4>
             <ul className="space-y-3">
-              <li><Link href="#" className="hover:text-white transition-colors">About Us</Link></li>
-              <li><Link href="#" className="hover:text-white transition-colors">Success Stories</Link></li>
-              <li><Link href="#" className="hover:text-white transition-colors">Work with Us</Link></li>
-              <li><Link href="#" className="hover:text-white transition-colors">Contact Us</Link></li>
+              <li><Link href="/about" className="hover:text-white transition-colors">About Us</Link></li>
+              <li><Link href="/contact" className="hover:text-white transition-colors">Contact Us</Link></li>
+              <li><Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link></li>
+              <li><Link href="/features" className="hover:text-white transition-colors">Features</Link></li>
+              <li><Link href="/faq" className="hover:text-white transition-colors">FAQ</Link></li>
             </ul>
           </div>
 
@@ -88,8 +91,6 @@ export function Footer() {
             <ul className="space-y-3">
               <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
               <li><Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
-              <li><Link href="#" className="hover:text-white transition-colors">Disclaimer</Link></li>
-              <li><Link href="#" className="hover:text-white transition-colors">Cookie Policy</Link></li>
             </ul>
           </div>
         </div>
