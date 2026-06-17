@@ -198,11 +198,11 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemas) }} />
       
       {/* 1. HERO BANNER */}
-      <div className="relative w-full min-h-[450px] md:h-[480px]">
+      <div className="relative w-full overflow-hidden">
         <Image src={coverImage} alt={`${institution.title} campus building and facilities in ${cityStr}, ${stateStr}`} fill className="object-cover brightness-[0.4]" unoptimized />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/80 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/80 to-slate-900/40" />
         
-        <div className="absolute inset-0 pt-20 px-4 md:px-8 max-w-[1400px] mx-auto flex flex-col justify-end pb-12">
+        <div className="relative pt-28 px-4 md:px-8 max-w-7xl mx-auto flex flex-col pb-12 z-10">
           <div className="flex justify-between items-start w-full">
             <div className="flex items-center gap-2 text-xs font-medium text-white/70 mb-8 flex-wrap">
               <Link href="/" className="hover:text-white transition-colors">Home</Link>
@@ -254,7 +254,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2 mt-2">
-                  <Badge variant="outline" className="text-slate-200 border-slate-600 bg-slate-800/50">Est: 2013</Badge>
+                  <Badge variant="outline" className="text-slate-200 border-slate-600 bg-slate-800/50">Est: {institution.establishedYear || '2013'}</Badge>
                   <Badge variant="outline" className="text-slate-200 border-slate-600 bg-slate-800/50">Medium: {institution.mediumOfInstruction ? (Array.isArray(institution.mediumOfInstruction) ? institution.mediumOfInstruction.join(', ') : institution.mediumOfInstruction) : 'English'}</Badge>
                   <Badge variant="outline" className="text-slate-200 border-slate-600 bg-slate-800/50">Institution Type: College</Badge>
                 </div>
@@ -296,13 +296,13 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
       </div>
 
       {/* PAGE LAYOUT */}
-      <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 pt-4 pb-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
         
         {/* LEFT COLUMN (MAIN CONTENT) - 70% */}
         <div className="lg:col-span-8 space-y-8">
           
           {/* 2. QUICK INFO BAR */}
-          <Card className="border-none shadow-sm rounded-2xl overflow-hidden bg-white mb-8">
+          <Card className="border-none shadow-sm rounded-2xl overflow-hidden bg-white">
             <CardContent className="p-0">
               <div className="grid grid-cols-3 md:grid-cols-7 divide-x divide-y md:divide-y-0 divide-slate-100 text-sm">
                 <div className="flex flex-col items-center justify-center text-center p-4">
