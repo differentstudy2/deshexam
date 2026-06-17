@@ -118,11 +118,11 @@ const adminNavGroups = [
       { href: '/admin/guide-content/explorer', label: 'Content Explorer', icon: <Compass className="h-4 w-4" /> },
       { href: '/admin/boards', label: 'Boards', icon: <Library className="h-4 w-4" /> },
       { href: '/admin/classes', label: 'Classes', icon: <Users className="h-4 w-4" /> },
-      { href: '/admin/textbooks', label: 'Textbooks (Manager)', icon: <BookOpen className="h-4 w-4" /> },
       { href: '/admin/textbook', label: 'Textbook Data', icon: <BookOpen className="h-4 w-4" /> },
       { href: '/admin/subjects', label: 'Subjects', icon: <Book className="h-4 w-4" /> },
       { href: '/admin/chapters', label: 'Chapters', icon: <FileText className="h-4 w-4" /> },
       { href: '/admin/topics', label: 'Topics', icon: <FileText className="h-4 w-4" /> },
+      { href: '/admin/textbooks', label: 'Textbooks (Manager)', icon: <BookOpen className="h-4 w-4" /> },
       { href: '/admin/guide-content', label: 'Guide Manager', icon: <Compass className="h-4 w-4" /> },
       { href: '/admin/kids-zone/manage', label: 'Kids Zone', icon: <ToyBrick className="h-4 w-4" /> },
     ]
