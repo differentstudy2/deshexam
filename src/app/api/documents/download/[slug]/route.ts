@@ -93,6 +93,7 @@ export async function GET(
     // 2. Increment download counter — fire-and-forget, never blocks the download
     if (docId) {
       import('@/lib/firebase/admin').then(({ adminDb }) => {
+        if (!adminDb) return;
         import('firebase-admin').then((admin) => {
           adminDb.collection('guide_documents').doc(docId).set({
             downloads: admin.firestore.FieldValue.increment(1),
@@ -148,6 +149,7 @@ export async function GET(
       const parsedSize = parseInt(upstreamLength, 10);
       if (!isNaN(parsedSize) && parsedSize > 0) {
         import('@/lib/firebase/admin').then(({ adminDb }) => {
+          if (!adminDb) return;
           adminDb.collection('guide_documents').doc(docId).set({
             fileSize: parsedSize
           }, { merge: true }).catch(() => { /* non-critical */ });

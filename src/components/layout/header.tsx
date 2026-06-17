@@ -114,6 +114,7 @@ const adminNavGroups = [
   {
     title: "Academic Content",
     items: [
+      { href: '/admin/documents', label: 'Documents', icon: <FileText className="h-4 w-4" /> },
       { href: '/admin/guide-content/explorer', label: 'Content Explorer', icon: <Compass className="h-4 w-4" /> },
       { href: '/admin/boards', label: 'Boards', icon: <Library className="h-4 w-4" /> },
       { href: '/admin/classes', label: 'Classes', icon: <Users className="h-4 w-4" /> },
