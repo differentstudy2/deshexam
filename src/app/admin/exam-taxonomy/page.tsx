@@ -111,7 +111,13 @@ export default function ExamTaxonomyPage() {
 
   const openEditModal = (type: any, item: any) => {
     setModalType(type); setModalAction('edit');
-    setFormData({ id: item.id, name: item.title, slug: item.slug || '', icon: item.icon || '', description: item.description || '' });
+    setFormData({ 
+      id: item.id, 
+      name: item.title, 
+      slug: item.slug || generateSlug(item.title), 
+      icon: item.icon || '', 
+      description: item.description || '' 
+    });
     setIsModalOpen(true);
   };
 
@@ -122,8 +128,11 @@ export default function ExamTaxonomyPage() {
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name = e.target.value;
-    if (modalAction === 'add') setFormData({ ...formData, name, slug: generateSlug(name) });
-    else setFormData({ ...formData, name });
+    setFormData(prev => ({ 
+      ...prev, 
+      name, 
+      slug: (modalAction === 'edit' && prev.id) ? prev.slug : generateSlug(name)
+    }));
   };
 
   const handleSave = async () => {

@@ -6,12 +6,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Search, Layers, Calendar, Hash, Tag, Activity, Edit2 } from 'lucide-react';
+import { Search, Layers, Calendar, Hash, Tag, Activity, Edit2, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { updateTaxonomyNode, generateSlug } from '@/lib/firebase/taxonomy';
+import { updateTaxonomyNode, generateSlug, deleteTaxonomyNode } from '@/lib/firebase/taxonomy';
 
 interface Props {
   type: NodeType;
@@ -56,7 +56,10 @@ export function TaxonomyDataTable({ type, title }: Props) {
 
   const handleEditClick = (node: TaxonomyNode) => {
     setEditingNode(node);
-    setEditForm({ title: node.title, slug: node.slug || '' });
+    setEditForm({ 
+      title: node.title, 
+      slug: node.slug || generateSlug(node.title) 
+    });
     setIsEditModalOpen(true);
   };
 
@@ -75,6 +78,19 @@ export function TaxonomyDataTable({ type, title }: Props) {
       alert("Failed to update");
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleDelete = async (node: TaxonomyNode) => {
+    if (!window.confirm(`Are you sure you want to delete "${node.title}" AND all of its sub-items? This cannot be undone.`)) {
+      return;
+    }
+    try {
+      await deleteTaxonomyNode(node.id);
+      fetchData(); // Refresh list after deletion
+    } catch (error) {
+      console.error("Failed to delete node", error);
+      alert("Failed to delete item.");
     }
   };
 
@@ -179,9 +195,14 @@ export function TaxonomyDataTable({ type, title }: Props) {
                         </div>
                       </TableCell>
                       <TableCell className="text-right">
-                        <Button variant="ghost" size="sm" onClick={() => handleEditClick(node)} className="h-8 px-2 text-indigo-600 hover:bg-indigo-50">
-                          <Edit2 className="w-4 h-4 mr-1" /> Edit
-                        </Button>
+                        <div className="flex justify-end items-center gap-1">
+                          <Button variant="ghost" size="sm" onClick={() => handleEditClick(node)} className="h-8 px-2 text-indigo-600 hover:bg-indigo-50">
+                            <Edit2 className="w-4 h-4 mr-1" /> Edit
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={() => handleDelete(node)} className="h-8 px-2 text-red-600 hover:bg-red-50">
+                            <Trash2 className="w-4 h-4 mr-1" /> Delete
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -203,11 +224,14 @@ export function TaxonomyDataTable({ type, title }: Props) {
               <Label>Title</Label>
               <Input 
                 value={editForm.title} 
-                onChange={(e) => setEditForm({ 
-                  ...editForm, 
-                  title: e.target.value,
-                  slug: generateSlug(e.target.value)
-                })} 
+                onChange={(e) => {
+                  const newTitle = e.target.value;
+                  setEditForm(prev => ({ 
+                    ...prev, 
+                    title: newTitle,
+                    slug: editingNode?.slug ? prev.slug : generateSlug(newTitle)
+                  }));
+                }} 
                 placeholder="Title" 
               />
             </div>
