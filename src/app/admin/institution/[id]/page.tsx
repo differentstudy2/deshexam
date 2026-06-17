@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Save, Upload, Shield, Image as ImageIcon, MapPin, Sparkles } from 'lucide-react';
+import { ArrowLeft, Save, Upload, Shield, Image as ImageIcon, MapPin, Sparkles, X, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
@@ -25,6 +25,7 @@ export default function InstitutionEditPage() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [isAiLoading, setIsAiLoading] = useState(false);
+  const [newGalleryUrl, setNewGalleryUrl] = useState('');
   
   const [formData, setFormData] = useState<Partial<TaxonomyNode>>({
     title: '',
@@ -182,6 +183,44 @@ export default function InstitutionEditPage() {
       const url = await getDownloadURL(storageRef);
       setFormData(prev => ({ ...prev, logoUrl: url }));
       toast({ title: 'Logo uploaded successfully' });
+    } catch (error) {
+      console.error('Upload failed:', error);
+      toast({ variant: 'destructive', title: 'Upload failed', description: String(error) });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleRemoveGalleryImage = (indexToRemove: number) => {
+    setFormData(prev => ({
+      ...prev,
+      galleryImages: prev.galleryImages?.filter((_, index) => index !== indexToRemove) || []
+    }));
+  };
+
+  const handleAddGalleryUrl = () => {
+    if (!newGalleryUrl.trim()) return;
+    setFormData(prev => ({
+      ...prev,
+      galleryImages: [...(prev.galleryImages || []), newGalleryUrl.trim()]
+    }));
+    setNewGalleryUrl('');
+  };
+
+  const handleUploadGalleryImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const storageRef = ref(storage, `institutions/gallery/${institutionId}_${Date.now()}_${file.name}`);
+      await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(storageRef);
+      setFormData(prev => ({
+        ...prev,
+        galleryImages: [...(prev.galleryImages || []), url]
+      }));
+      toast({ title: 'Gallery image uploaded successfully' });
     } catch (error) {
       console.error('Upload failed:', error);
       toast({ variant: 'destructive', title: 'Upload failed', description: String(error) });
@@ -485,17 +524,47 @@ export default function InstitutionEditPage() {
 
               {/* Gallery Images */}
               <div className="grid gap-2 pt-4 border-t border-slate-100">
-                <Label>Imported Gallery Images</Label>
+                <div className="flex items-center justify-between">
+                  <Label>Gallery Images</Label>
+                  <div className="flex gap-2">
+                    <Label className="cursor-pointer">
+                      <div className="flex items-center gap-1 px-2 py-1 bg-indigo-50 text-indigo-600 rounded text-xs font-medium hover:bg-indigo-100 transition-colors">
+                        <Upload className="w-3 h-3" />
+                        Upload
+                      </div>
+                      <input type="file" className="hidden" accept="image/*" onChange={handleUploadGalleryImage} disabled={uploading} />
+                    </Label>
+                  </div>
+                </div>
+
+                <div className="flex gap-2 mb-2">
+                  <Input 
+                    placeholder="Or paste an image URL..." 
+                    value={newGalleryUrl} 
+                    onChange={e => setNewGalleryUrl(e.target.value)} 
+                    className="h-8 text-sm"
+                  />
+                  <Button type="button" onClick={handleAddGalleryUrl} disabled={!newGalleryUrl.trim()} size="sm" variant="secondary" className="h-8">
+                    <Plus className="w-4 h-4 mr-1" /> Add
+                  </Button>
+                </div>
+
                 {formData.galleryImages && formData.galleryImages.length > 0 ? (
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
                     {formData.galleryImages.map((url, idx) => (
-                      <div key={idx} className="relative aspect-square rounded-md overflow-hidden border border-slate-200">
+                      <div key={idx} className="relative aspect-square rounded-md overflow-hidden border border-slate-200 group">
                         <Image src={url} alt={`Gallery ${idx}`} fill className="object-cover" unoptimized />
+                        <button 
+                          onClick={() => handleRemoveGalleryImage(idx)}
+                          className="absolute top-1 right-1 bg-black/50 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-slate-400 italic">No gallery images imported.</p>
+                  <p className="text-sm text-slate-400 italic">No gallery images yet.</p>
                 )}
               </div>
 
