@@ -4,6 +4,22 @@ export const metadata: Metadata = {
   title: 'Privacy Policy | DeshExam',
   description: 'Learn how DeshExam collects, uses, and protects your personal information and academic data.',
   keywords: ['privacy policy', 'data protection', 'user data', 'DeshExam privacy'],
+  openGraph: {
+    title: 'Privacy Policy | DeshExam',
+    description: 'Learn how DeshExam collects, uses, and protects your personal information and academic data.',
+    url: 'https://deshexam.com/privacy',
+    siteName: 'DeshExam',
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Privacy Policy | DeshExam',
+    description: 'Learn how DeshExam collects, uses, and protects your personal information and academic data.',
+  },
+  alternates: {
+    canonical: 'https://deshexam.com/privacy',
+  }
 };
 
 export default function PrivacyPolicyPage() {
