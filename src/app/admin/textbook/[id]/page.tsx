@@ -7,7 +7,7 @@ import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, BookOpen, Layers, Target, FileText, Activity } from 'lucide-react';
+import { ArrowLeft, BookOpen, Layers, Target, FileText, Activity, Eye, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
@@ -123,6 +123,13 @@ export default function TextbookDetailsPage() {
             <span className="text-sm border-l pl-2 border-gray-300">ID: {textbook.id}</span>
           </div>
         </div>
+        <div className="ml-auto flex items-center gap-2">
+          <Button asChild variant="outline" className="gap-2">
+            <Link href={`/textbook-solutions/${textbook.id}`} target="_blank">
+              <Eye className="w-4 h-4" /> View Client Page
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {/* Chapters & Topics Accordion */}
@@ -157,9 +164,16 @@ export default function TextbookDetailsPage() {
                         </div>
                         <span className="font-semibold text-lg text-gray-900 text-left">{chapter.title}</span>
                       </div>
-                      <Badge variant="secondary" className="bg-gray-100 text-gray-600">
-                        {chapter.topics.length} Topics
-                      </Badge>
+                      <div className="flex items-center gap-3">
+                        <Button asChild variant="ghost" size="icon" className="h-8 w-8 hover:bg-gray-200" onClick={(e) => e.stopPropagation()}>
+                          <Link href={`/textbook-solutions/${textbook.id}/chapter/${chapter.id}`} target="_blank">
+                            <ExternalLink className="h-4 w-4 text-gray-500" />
+                          </Link>
+                        </Button>
+                        <Badge variant="secondary" className="bg-gray-100 text-gray-600">
+                          {chapter.topics.length} Topics
+                        </Badge>
+                      </div>
                     </div>
                   </AccordionTrigger>
                   
@@ -176,6 +190,11 @@ export default function TextbookDetailsPage() {
                               <div className="flex items-center gap-3">
                                 <Target className="h-4 w-4 text-gray-400 group-hover:text-indigo-500 transition-colors" />
                                 <span className="font-medium text-gray-800">{topic.title}</span>
+                                <Button asChild variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <Link href={`/textbook-solutions/${textbook.id}/chapter/${chapter.id}/topic/${topic.id}`} target="_blank">
+                                    <ExternalLink className="h-3 w-3 text-indigo-600" />
+                                  </Link>
+                                </Button>
                               </div>
                               
                               {/* Contents Types & Counts */}
