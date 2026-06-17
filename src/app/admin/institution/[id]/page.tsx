@@ -43,6 +43,11 @@ export default function InstitutionEditPage() {
     rating: undefined,
     status: 'draft',
     seoTitle: '',
+    phoneNumber: '',
+    internationalPhoneNumber: '',
+    openingHours: [],
+    galleryImages: [],
+    reviews: [],
   });
 
   useEffect(() => {
@@ -69,6 +74,11 @@ export default function InstitutionEditPage() {
             rating: node.rating,
             status: node.status || 'published',
             seoTitle: node.seoTitle || '',
+            phoneNumber: node.phoneNumber || '',
+            internationalPhoneNumber: node.internationalPhoneNumber || '',
+            openingHours: node.openingHours || [],
+            galleryImages: node.galleryImages || [],
+            reviews: node.reviews || [],
           });
         }
       } catch (error) {
@@ -245,6 +255,17 @@ export default function InstitutionEditPage() {
                 </div>
               </div>
 
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="phoneNumber">Phone Number</Label>
+                  <Input id="phoneNumber" name="phoneNumber" value={formData.phoneNumber || ''} onChange={handleChange} placeholder="+91 98765 43210" />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="internationalPhoneNumber">International Phone</Label>
+                  <Input id="internationalPhoneNumber" name="internationalPhoneNumber" value={formData.internationalPhoneNumber || ''} onChange={handleChange} placeholder="+91 98765 43210" />
+                </div>
+              </div>
+
               <div className="grid grid-cols-2 gap-4 border-t border-gray-100 pt-4">
                 <div className="grid gap-2">
                   <Label htmlFor="boardType">Institution Type</Label>
@@ -307,6 +328,64 @@ export default function InstitutionEditPage() {
                   <Label htmlFor="seoTitle">SEO Title</Label>
                   <Input id="seoTitle" name="seoTitle" value={formData.seoTitle} onChange={handleChange} placeholder="Custom title for SEO" />
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* New Card: Rich Imported Data */}
+          <Card>
+            <CardHeader className="border-b border-gray-100 bg-gray-50/50">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Shield className="w-5 h-5 text-emerald-500" />
+                Rich Data (Google Maps)
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-6 space-y-4">
+              {/* Opening Hours */}
+              <div className="grid gap-2">
+                <Label>Opening Hours</Label>
+                {formData.openingHours && formData.openingHours.length > 0 ? (
+                  <ul className="text-sm text-slate-600 bg-slate-50 p-3 rounded-md border border-slate-100 space-y-1">
+                    {formData.openingHours.map((hour, idx) => (
+                      <li key={idx}>{hour}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-sm text-slate-400 italic">No opening hours imported.</p>
+                )}
+              </div>
+
+              {/* Gallery Images */}
+              <div className="grid gap-2 pt-4 border-t border-slate-100">
+                <Label>Imported Gallery Images</Label>
+                {formData.galleryImages && formData.galleryImages.length > 0 ? (
+                  <div className="grid grid-cols-3 gap-2">
+                    {formData.galleryImages.map((url, idx) => (
+                      <div key={idx} className="relative aspect-square rounded-md overflow-hidden border border-slate-200">
+                        <Image src={url} alt={`Gallery ${idx}`} fill className="object-cover" unoptimized />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-slate-400 italic">No gallery images imported.</p>
+                )}
+              </div>
+
+              {/* Reviews Summary */}
+              <div className="grid gap-2 pt-4 border-t border-slate-100">
+                <Label>Imported Student Reviews</Label>
+                {formData.reviews && formData.reviews.length > 0 ? (
+                  <div className="space-y-2">
+                    {formData.reviews.map((r, idx) => (
+                      <div key={idx} className="text-sm bg-slate-50 p-2 rounded border border-slate-100">
+                        <div className="font-semibold text-slate-800">{r.authorName} <span className="text-amber-500">({r.rating}★)</span></div>
+                        <p className="text-slate-600 italic line-clamp-2">"{r.text}"</p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-slate-400 italic">No reviews imported.</p>
+                )}
               </div>
             </CardContent>
           </Card>

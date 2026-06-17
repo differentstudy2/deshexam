@@ -34,16 +34,23 @@ export async function POST(request: Request) {
     const filename = `institutions/${placeId}/gallery_${Date.now()}_${Math.random().toString(36).substring(7)}.jpg`;
     const file = bucket.file(filename);
 
-    // Upload to Firebase Storage
+    // Generate a unique token for Firebase Storage download
+    const { randomUUID } = require('crypto');
+    const downloadToken = randomUUID();
+
+    // Upload to Firebase Storage with the download token
     await file.save(Buffer.from(buffer), {
-      metadata: { contentType: 'image/jpeg' },
-      public: true, // Make it public
+      metadata: { 
+        contentType: 'image/jpeg',
+        metadata: {
+          firebaseStorageDownloadTokens: downloadToken
+        }
+      }
     });
 
-    // Construct the public URL
-    // For firebasestorage.app buckets, the format is slightly different or we can use the download URL
+    // Construct the standard Firebase Storage public URL
     const encodedPath = encodeURIComponent(filename);
-    const publicUrl = `https://firebasestorage.googleapis.com/v0/b/studio-8356746366-699c1.firebasestorage.app/o/${encodedPath}?alt=media`;
+    const publicUrl = `https://firebasestorage.googleapis.com/v0/b/studio-8356746366-699c1.firebasestorage.app/o/${encodedPath}?alt=media&token=${downloadToken}`;
 
     return NextResponse.json({ url: publicUrl });
 

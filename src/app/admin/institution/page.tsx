@@ -88,7 +88,7 @@ export default function InstitutionManagerPage() {
         seoTitle: title,
       };
 
-      if (selectedPlaceDetails.formatted_address) newNodeData.address = selectedPlaceDetails.formatted_address;
+      if (selectedPlaceDetails.address) newNodeData.address = selectedPlaceDetails.address;
       if (selectedPlaceDetails.latitude !== undefined) newNodeData.latitude = selectedPlaceDetails.latitude;
       if (selectedPlaceDetails.longitude !== undefined) newNodeData.longitude = selectedPlaceDetails.longitude;
       if (selectedPlaceDetails.placeId) newNodeData.placeId = selectedPlaceDetails.placeId;
@@ -228,7 +228,7 @@ export default function InstitutionManagerPage() {
                       <Building className="w-5 h-5 text-emerald-600" />
                       {selectedPlaceDetails.name}
                     </h3>
-                    <p className="text-sm text-slate-600 mt-1">{selectedPlaceDetails.formatted_address}</p>
+                    <p className="text-sm text-slate-600 mt-1">{selectedPlaceDetails.address}</p>
                   </div>
                   {selectedPlaceDetails.rating && (
                     <div className="flex items-center gap-1 bg-white px-2 py-1 rounded-md shadow-sm border border-emerald-100">
@@ -248,7 +248,7 @@ export default function InstitutionManagerPage() {
                       </a>
                     </div>
                   )}
-                  {selectedPlaceDetails.geometry?.location && (
+                  {selectedPlaceDetails.latitude && selectedPlaceDetails.longitude && (
                     <div className="flex items-center gap-2 text-slate-600">
                       <MapPin className="w-4 h-4" />
                       Coordinates Ready
