@@ -327,6 +327,11 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
   const [footerText, setFooterText] = useState('');
   const [questionOptionGap, setQuestionOptionGap] = useState(8);
   const [showExplanations, setShowExplanations] = useState(false);
+  const [ansBgStyle, setAnsBgStyle] = useState('colored'); // 'plain' or 'colored'
+  const [explanationFontSize, setExplanationFontSize] = useState(13);
+  const [questionBold, setQuestionBold] = useState(false);
+  const [questionItalic, setQuestionItalic] = useState(false);
+  const [questionUnderline, setQuestionUnderline] = useState(false);
 
   const handleAddFromBank = (newQs: QuestionBankEntry[]) => {
     setQuestions([...questions, ...newQs]);
@@ -1137,6 +1142,39 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                   <button onClick={() => setFontSize(Math.min(32, fontSize + 1))} className="w-8 h-9 border border-gray-200 rounded-r-md bg-gray-50 flex items-center justify-center hover:bg-gray-100">+</button>
                 </div>
               </div>
+
+              <div className="flex items-center justify-between mt-4">
+                <span className="text-[13px] text-gray-700 w-auto">{t('ansBg', appLanguage) || 'Ans/Exp BG Color'}</span>
+                <div className="flex items-center gap-2">
+                  <Select value={ansBgStyle} onValueChange={setAnsBgStyle}>
+                    <SelectTrigger className="w-[100px] h-9"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="plain">{t('plain', appLanguage) || 'Plain'}</SelectItem>
+                      <SelectItem value="colored">{t('colored', appLanguage) || 'Colored'}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between mt-4">
+                <span className="text-[13px] text-gray-700 w-auto">{t('expSize', appLanguage) || 'Ans/Exp Size'}</span>
+                <div className="flex items-center">
+                  <button onClick={() => setExplanationFontSize(Math.max(8, explanationFontSize - 1))} className="w-8 h-9 border border-gray-200 rounded-l-md bg-gray-50 flex items-center justify-center hover:bg-gray-100">-</button>
+                  <div className="w-12 h-9 border-y border-gray-200 flex items-center justify-center text-[15px] font-bold bg-white text-gray-900">
+                    {localizeNumber(explanationFontSize, appLanguage)}
+                  </div>
+                  <button onClick={() => setExplanationFontSize(Math.min(32, explanationFontSize + 1))} className="w-8 h-9 border border-gray-200 rounded-r-md bg-gray-50 flex items-center justify-center hover:bg-gray-100">+</button>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between mt-4">
+                <span className="text-[13px] text-gray-700 w-auto">{t('qStyle', appLanguage) || 'Question Style'}</span>
+                <div className="flex gap-2">
+                  <button onClick={() => setQuestionBold(!questionBold)} className={`w-8 h-9 flex items-center justify-center border rounded ${questionBold ? 'bg-blue-100 border-blue-400 text-blue-700 font-bold' : 'bg-gray-50 border-gray-200 font-bold text-gray-700'}`}>B</button>
+                  <button onClick={() => setQuestionItalic(!questionItalic)} className={`w-8 h-9 flex items-center justify-center border rounded italic ${questionItalic ? 'bg-blue-100 border-blue-400 text-blue-700' : 'bg-gray-50 border-gray-200 text-gray-700'}`}>I</button>
+                  <button onClick={() => setQuestionUnderline(!questionUnderline)} className={`w-8 h-9 flex items-center justify-center border rounded underline ${questionUnderline ? 'bg-blue-100 border-blue-400 text-blue-700' : 'bg-gray-50 border-gray-200 text-gray-700'}`}>U</button>
+                </div>
+              </div>
             </div>
 
             {/* Branding Settings */}
@@ -1718,7 +1756,11 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                                       <span className="font-bold min-w-[18px]">{localizeNumber(actualQuestionIndex + 1, appLanguage)}.</span>
                                       <div className="flex-1 flex flex-col gap-1">
                                         {enableLatex && !editingMode ? (
-                                          <div className="react-markdown-math-wrapper">
+                                          <div className="react-markdown-math-wrapper" style={{
+                                              fontWeight: questionBold ? 'bold' : undefined,
+                                              fontStyle: questionItalic ? 'italic' : undefined,
+                                              textDecoration: questionUnderline ? 'underline' : undefined
+                                            }}>
                                             <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
                                               {formatLatex(q.questionText)}
                                             </ReactMarkdown>
@@ -1726,6 +1768,11 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                                         ) : (
                                           <div
                                             {...getEditableProps()}
+                                            style={{
+                                              fontWeight: questionBold ? 'bold' : undefined,
+                                              fontStyle: questionItalic ? 'italic' : undefined,
+                                              textDecoration: questionUnderline ? 'underline' : undefined
+                                            }}
                                             dangerouslySetInnerHTML={{ __html: q.questionText.replace(/\n/g, '<br/>') }}
                                           />
                                         )}
@@ -1828,8 +1875,11 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                                         
                                         {/* If qa format, show answers */}
                                         {format === 'qa' && q.correctAnswer && (
-                                          <div className="mt-2 text-sm text-green-700 font-bold bg-green-50 px-2 py-1 rounded inline-block border border-green-200">
-                                            Ans: {q.correctAnswer}
+                                          <div 
+                                            {...getEditableProps(`mt-2 font-bold inline-block border rounded ${ansBgStyle === 'colored' ? 'text-green-700 bg-green-50 px-2 py-1 border-green-200' : 'text-gray-800 bg-transparent px-0 py-0 border-transparent'}`)}
+                                            style={{ fontSize: `${explanationFontSize}px` }}
+                                          >
+                                            {appLanguage === 'bn' ? 'উত্তর :' : 'Ans :'} {q.correctAnswer}
                                           </div>
                                         )}
                                       </div>
@@ -1859,15 +1909,21 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
 
                                     {/* Fallback for Answers of Desc, CQ, etc. */}
                                     {format === 'qa' && q.correctAnswer && !['MCQ', 'T/F', 'FIB', 'Match'].includes(q.questionType || 'MCQ') && (
-                                      <div className="mt-2 text-[13px] text-green-800 bg-green-50 px-3 py-2 border border-green-200 rounded ml-6 max-w-[95%] text-justify break-words">
-                                        <span className="font-bold">উত্তর / Ans:</span> <span dangerouslySetInnerHTML={{ __html: q.correctAnswer.replace(/\n/g, '<br/>') }} />
+                                      <div 
+                                        {...getEditableProps(`mt-2 ml-6 max-w-[95%] text-justify break-words border rounded ${ansBgStyle === 'colored' ? 'text-green-800 bg-green-50 px-3 py-2 border-green-200' : 'text-gray-800 bg-transparent px-0 py-0 border-transparent'}`)}
+                                        style={{ fontSize: `${explanationFontSize}px` }}
+                                      >
+                                        <span className="font-bold">{appLanguage === 'bn' ? 'উত্তর :' : 'Ans :'}</span> <span dangerouslySetInnerHTML={{ __html: q.correctAnswer.replace(/\n/g, '<br/>') }} />
                                       </div>
                                     )}
 
                                     {/* Explanation */}
                                     {showExplanations && q.explanation && (
-                                      <div className="mt-2 text-[13px] text-gray-600 font-normal border-l-2 border-gray-300 pl-2 ml-6">
-                                        <span className="font-bold text-gray-700">ব্যাখ্যা:</span> <span dangerouslySetInnerHTML={{ __html: q.explanation }} />
+                                      <div 
+                                        {...getEditableProps(`mt-2 ml-6 font-normal pl-2 border rounded ${ansBgStyle === 'colored' ? 'text-gray-600 bg-blue-50/40 border-l-2 border-blue-300 border-t-transparent border-r-transparent border-b-transparent' : 'text-gray-600 bg-transparent border-gray-300 border-l-2 border-t-transparent border-r-transparent border-b-transparent'}`)}
+                                        style={{ fontSize: `${explanationFontSize}px` }}
+                                      >
+                                        <span className="font-bold text-gray-700">{appLanguage === 'bn' ? 'ব্যাখ্যা :' : 'Explanation :'}</span> <span dangerouslySetInnerHTML={{ __html: q.explanation }} />
                                       </div>
                                     )}
                                   </>
@@ -2370,7 +2426,15 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
       </Dialog>
 
       <Dialog open={isAddQuestionOpen} onOpenChange={setIsAddQuestionOpen}>
-        <DialogContent className="max-w-xl">
+        <DialogContent className="max-w-xl" style={{ 
+          fontFamily: fontFamily === 'solaimanlipi' ? '"SolaimanLipi", sans-serif' :
+            fontFamily === 'kalpurush' ? '"Kalpurush", sans-serif' :
+            fontFamily === 'nikosh' ? '"Nikosh", sans-serif' :
+            fontFamily === 'siyamrupali' ? '"Siyam Rupali", sans-serif' :
+            fontFamily === 'sutonnymj' ? '"SutonnyMJ", sans-serif' :
+            fontFamily === 'timesnewroman' ? '"Times New Roman", serif' :
+            fontFamily === 'arial' ? 'Arial, sans-serif' : 'inherit'
+        }}>
           <DialogHeader>
             <DialogTitle>{t('addCustomQuestion', appLanguage)}</DialogTitle>
           </DialogHeader>
