@@ -92,8 +92,12 @@ export async function GET(
 
     // 2. Increment download counter — fire-and-forget, never blocks the download
     if (docId) {
-      updateDoc(doc(db, 'guide_documents', docId), {
-        downloads: increment(1),
+      import('@/lib/firebase/admin').then(({ adminDb }) => {
+        import('firebase-admin').then((admin) => {
+          adminDb.collection('guide_documents').doc(docId).set({
+            downloads: admin.firestore.FieldValue.increment(1),
+          }, { merge: true }).catch(() => { /* non-critical */ });
+        });
       }).catch(() => { /* non-critical */ });
     }
 
@@ -143,8 +147,10 @@ export async function GET(
     if (docId && (!item.fileSize || item.fileSize === 0) && upstreamLength) {
       const parsedSize = parseInt(upstreamLength, 10);
       if (!isNaN(parsedSize) && parsedSize > 0) {
-        updateDoc(doc(db, 'guide_documents', docId), {
-          fileSize: parsedSize
+        import('@/lib/firebase/admin').then(({ adminDb }) => {
+          adminDb.collection('guide_documents').doc(docId).set({
+            fileSize: parsedSize
+          }, { merge: true }).catch(() => { /* non-critical */ });
         }).catch(() => { /* non-critical */ });
       }
     }

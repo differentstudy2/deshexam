@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/firebase/client'; // Assuming client or admin here. Client might be fine if increment is allowed by rules, else we use admin.
-import { doc, increment, setDoc } from 'firebase/firestore';
+import { adminDb } from '@/lib/firebase/admin';
+import * as admin from 'firebase-admin';
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -11,11 +11,11 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       return NextResponse.json({ error: 'Document ID is required' }, { status: 400 });
     }
 
-    const docRef = doc(db, 'guide_documents', documentId);
+    const docRef = adminDb.collection('guide_documents').doc(documentId);
     
-    // We use setDoc with merge to either update existing or create if somehow missing
-    await setDoc(docRef, {
-      views: increment(1)
+    // We use set with merge to either update existing or create if somehow missing
+    await docRef.set({
+      views: admin.firestore.FieldValue.increment(1)
     }, { merge: true });
 
     return NextResponse.json({ success: true, message: 'Analytics updated' });
