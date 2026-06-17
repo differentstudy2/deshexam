@@ -108,11 +108,16 @@ export default function InstitutionEditPage() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      // Create an update object, mapping logoUrl to featureImage as well for backwards compatibility if needed
-      await updateTaxonomyNode(institutionId, {
-        ...formData,
-        featureImage: formData.logoUrl // keep featureImage in sync
+      // Strip undefined values to prevent Firebase errors
+      const payload: any = { ...formData };
+      if (payload.logoUrl) payload.featureImage = payload.logoUrl;
+      Object.keys(payload).forEach(key => {
+        if (payload[key] === undefined) {
+          delete payload[key];
+        }
       });
+
+      await updateTaxonomyNode(institutionId, payload);
       toast({ title: 'Institution updated successfully!' });
       router.refresh();
     } catch (error) {
