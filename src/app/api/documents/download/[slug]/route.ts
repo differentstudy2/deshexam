@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { collection, query, where, getDocs, doc, getDoc, updateDoc, increment } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
+import { adminDb } from '@/lib/firebase/admin';
+import * as admin from 'firebase-admin';
 
 // MIME type map — used when upstream Content-Type is missing
 const MIME_MAP: Record<string, string> = {
@@ -91,15 +93,10 @@ export async function GET(
     }
 
     // 2. Increment download counter — fire-and-forget, never blocks the download
-    if (docId) {
-      import('@/lib/firebase/admin').then(({ adminDb }) => {
-        if (!adminDb) return;
-        import('firebase-admin').then((admin) => {
-          adminDb.collection('guide_documents').doc(docId).set({
-            downloads: admin.firestore.FieldValue.increment(1),
-          }, { merge: true }).catch(() => { /* non-critical */ });
-        });
-      }).catch(() => { /* non-critical */ });
+    if (docId && adminDb) {
+      adminDb.collection('guide_documents').doc(docId).set({
+        downloads: admin.firestore.FieldValue.increment(1),
+      }, { merge: true }).catch(() => { /* non-critical */ });
     }
 
     // 3. Build a filesystem-safe filename
@@ -147,13 +144,10 @@ export async function GET(
     // Auto-update fileSize if missing
     if (docId && (!item.fileSize || item.fileSize === 0) && upstreamLength) {
       const parsedSize = parseInt(upstreamLength, 10);
-      if (!isNaN(parsedSize) && parsedSize > 0) {
-        import('@/lib/firebase/admin').then(({ adminDb }) => {
-          if (!adminDb) return;
-          adminDb.collection('guide_documents').doc(docId).set({
-            fileSize: parsedSize
-          }, { merge: true }).catch(() => { /* non-critical */ });
-        }).catch(() => { /* non-critical */ });
+      if (!isNaN(parsedSize) && parsedSize > 0 && adminDb) {
+        adminDb.collection('guide_documents').doc(docId).set({
+          fileSize: parsedSize
+        }, { merge: true }).catch(() => { /* non-critical */ });
       }
     }
 

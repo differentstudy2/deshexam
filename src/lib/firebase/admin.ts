@@ -7,7 +7,7 @@ export function getAdminDb() {
       if (process.env.GCP_SA_KEY) {
         const parsed = JSON.parse(process.env.GCP_SA_KEY);
         if (parsed.private_key) {
-          parsed.private_key = parsed.private_key.replace(/\\n/g, '\n');
+          parsed.private_key = parsed.private_key.replace(/\\n/g, '\n').replace(/\\\\n/g, '\n');
         }
         credential = admin.credential.cert(parsed);
       } else {
