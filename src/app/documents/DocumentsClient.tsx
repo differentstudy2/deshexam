@@ -10,8 +10,10 @@ import {
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc, setDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
+import { useAuth } from '@/hooks/use-auth';
+import { useToast } from '@/hooks/use-toast';
 
 const TABS = [
   { id: 'all', label: 'All Documents', icon: BookOpen },
@@ -42,10 +44,10 @@ const MOCK_DOCS = Array.from({ length: 18 }, (_, i) => ({
 }));
 
 // ─── PDF Preview Modal ─────────────────────────────────────────────────────────
-function PDFPreviewModal({ doc, onClose }: { doc: any; onClose: () => void }) {
+function PDFPreviewModal({ doc: documentData, onClose }: { doc: any; onClose: () => void }) {
   const [page, setPage] = useState(1);
   const [zoom, setZoom] = useState(1);
-  const totalPages = doc.pages || 45;
+  const totalPages = documentData.pages || 45;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="modal-title">
@@ -56,7 +58,7 @@ function PDFPreviewModal({ doc, onClose }: { doc: any; onClose: () => void }) {
       >
         <header className="flex items-center justify-between px-5 py-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 shrink-0">
           <h2 id="modal-title" className="text-sm font-bold text-slate-800 dark:text-slate-200 truncate max-w-[70%]">
-            {doc.title} (PDF Preview)
+            {documentData.title} (PDF Preview)
           </h2>
           <div className="flex items-center gap-2">
             <span className="text-xs text-slate-500 font-medium" aria-hidden="true">Close</span>
@@ -111,22 +113,22 @@ function PDFPreviewModal({ doc, onClose }: { doc: any; onClose: () => void }) {
         </nav>
 
         <div className="flex-1 overflow-y-auto bg-slate-200 dark:bg-slate-800 flex items-start justify-center p-6">
-          {doc.url ? (
+          {documentData.url ? (
             <iframe
-              src={`${doc.url}#page=${page}`}
+              src={`${documentData.url}#page=${page}`}
               className="rounded-lg shadow-xl"
               style={{ width: `${zoom * 100}%`, height: '70vh', border: 'none' }}
-              title={`PDF viewer for ${doc.title}`}
+              title={`PDF viewer for ${documentData.title}`}
             />
           ) : (
             <div
               className="bg-white rounded-lg shadow-xl p-8 text-left"
               style={{ width: `${zoom * 560}px`, minHeight: '700px' }}
             >
-              <h2 className="text-xl font-bold text-slate-900 mb-4 border-b pb-3">{doc.title}</h2>
+              <h2 className="text-xl font-bold text-slate-900 mb-4 border-b pb-3">{documentData.title}</h2>
               <p className="text-slate-700 text-sm leading-relaxed mb-4">
                 This is a preview of the document content. The full document contains detailed
-                educational material covering all the important topics related to {doc.title}.
+                educational material covering all the important topics related to {documentData.title}.
               </p>
               {[...Array(8)].map((_, i) => (
                 <div key={i} className="mb-3">
@@ -147,22 +149,20 @@ function PDFPreviewModal({ doc, onClose }: { doc: any; onClose: () => void }) {
 }
 
 // ─── Document Card ─────────────────────────────────────────────────────────────
-function DocCard({ doc, onPreview }: { doc: any; onPreview: (d: any) => void }) {
-  const [bookmarked, setBookmarked] = useState(false);
-
-  const docHref = doc.slug
-    ? `/documents/${doc.slug}`
-    : doc.id && !doc.id.startsWith('mock-')
-      ? `/documents/id/${doc.id}`
+function DocCard({ doc: documentData, onPreview, isSaved, onToggleSave }: { doc: any; onPreview: (d: any) => void; isSaved: boolean; onToggleSave: () => void }) {
+  const docHref = documentData.slug
+    ? `/documents/${documentData.slug}`
+    : documentData.id && !documentData.id.startsWith('mock-')
+      ? `/documents/id/${documentData.id}`
       : null;
 
   return (
     <article className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-blue-200 dark:hover:border-blue-800 transition-all duration-200 flex flex-col overflow-hidden group">
       <div className="relative bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-950/20 dark:to-orange-950/20 pt-5 pb-3 px-4 flex items-center justify-center">
         {docHref ? (
-          <Link href={docHref} className="block" aria-label={`View ${doc.title}`}>
-            {doc.thumbnail ? (
-              <img src={doc.thumbnail} alt={`Thumbnail for ${doc.title}`} loading="lazy" className="w-14 h-16 object-cover rounded shadow hover:opacity-90 transition-opacity" />
+          <Link href={docHref} className="block" aria-label={`View ${documentData.title}`}>
+            {documentData.thumbnail ? (
+              <img src={documentData.thumbnail} alt={`Thumbnail for ${documentData.title}`} loading="lazy" className="w-14 h-16 object-cover rounded shadow hover:opacity-90 transition-opacity" />
             ) : (
               <div className="relative" aria-hidden="true">
                 <div className="w-14 h-16 bg-red-500 rounded-lg flex flex-col overflow-hidden shadow-md hover:bg-red-600 transition-colors">
@@ -178,8 +178,8 @@ function DocCard({ doc, onPreview }: { doc: any; onPreview: (d: any) => void }) 
             )}
           </Link>
         ) : (
-          doc.thumbnail ? (
-            <img src={doc.thumbnail} alt={`Thumbnail for ${doc.title}`} loading="lazy" className="w-14 h-16 object-cover rounded shadow" />
+          documentData.thumbnail ? (
+            <img src={documentData.thumbnail} alt={`Thumbnail for ${documentData.title}`} loading="lazy" className="w-14 h-16 object-cover rounded shadow" />
           ) : (
             <div className="relative" aria-hidden="true">
               <div className="w-14 h-16 bg-red-500 rounded-lg flex flex-col overflow-hidden shadow-md">
@@ -196,12 +196,12 @@ function DocCard({ doc, onPreview }: { doc: any; onPreview: (d: any) => void }) 
         )}
 
         <button
-          onClick={() => setBookmarked(b => !b)}
-          aria-label={bookmarked ? "Remove bookmark" : "Bookmark document"}
-          aria-pressed={bookmarked}
+          onClick={onToggleSave}
+          aria-label={isSaved ? "Remove bookmark" : "Bookmark document"}
+          aria-pressed={isSaved}
           className="absolute top-2 right-2 w-7 h-7 flex items-center justify-center rounded-full bg-white/80 dark:bg-slate-800/80 shadow-sm hover:bg-white transition-colors"
         >
-          <Bookmark className={`w-3.5 h-3.5 ${bookmarked ? 'fill-blue-500 text-blue-500' : 'text-slate-400'}`} aria-hidden="true" />
+          <Bookmark className={`w-3.5 h-3.5 ${isSaved ? 'fill-blue-500 text-blue-500' : 'text-slate-400'}`} aria-hidden="true" />
         </button>
       </div>
 
@@ -209,27 +209,27 @@ function DocCard({ doc, onPreview }: { doc: any; onPreview: (d: any) => void }) 
         {docHref ? (
           <Link href={docHref}>
             <h2 className="text-[13px] font-bold text-slate-800 dark:text-slate-100 line-clamp-2 mb-2 leading-snug hover:text-blue-700 dark:hover:text-blue-400 transition-colors cursor-pointer">
-              {doc.title}
+              {documentData.title}
             </h2>
           </Link>
         ) : (
           <h2 className="text-[13px] font-bold text-slate-800 dark:text-slate-100 line-clamp-2 mb-2 leading-snug">
-            {doc.title}
+            {documentData.title}
           </h2>
         )}
 
         <div className="text-[11px] text-slate-500 dark:text-slate-400 space-y-0.5 mb-3" aria-label="Document metadata">
           <div className="flex items-center gap-1">
             <FileText className="w-3 h-3" aria-hidden="true" />
-            <span>Pages: {doc.pages || 45}</span>
+            <span>Pages: {documentData.pages || 45}</span>
           </div>
           <div className="flex items-center gap-1">
             <Download className="w-3 h-3" aria-hidden="true" />
-            <span>File Size: {doc.fileSize || '12.3 MB'}</span>
+            <span>File Size: {documentData.fileSize || '12.3 MB'}</span>
           </div>
           <div className="flex items-center gap-1">
             <Download className="w-3 h-3" aria-hidden="true" />
-            <span>Downloads: {doc.downloads || '1.5k'}</span>
+            <span>Downloads: {documentData.downloads || '1.5k'}</span>
           </div>
         </div>
 
@@ -237,7 +237,7 @@ function DocCard({ doc, onPreview }: { doc: any; onPreview: (d: any) => void }) 
           {docHref ? (
             <Link
               href={docHref}
-              aria-label={`Read ${doc.title}`}
+              aria-label={`Read ${documentData.title}`}
               className="flex flex-col items-center gap-0.5 text-[10px] font-semibold text-slate-500 hover:text-blue-600 transition-colors px-2 py-1 rounded hover:bg-blue-50 dark:hover:bg-blue-900/20"
             >
               <BookOpenCheck className="w-4 h-4" aria-hidden="true" />
@@ -245,8 +245,8 @@ function DocCard({ doc, onPreview }: { doc: any; onPreview: (d: any) => void }) 
             </Link>
           ) : (
             <button
-              onClick={() => onPreview(doc)}
-              aria-label={`Preview ${doc.title}`}
+              onClick={() => onPreview(documentData)}
+              aria-label={`Preview ${documentData.title}`}
               className="flex flex-col items-center gap-0.5 text-[10px] font-semibold text-slate-500 hover:text-blue-600 transition-colors px-2 py-1 rounded hover:bg-blue-50 dark:hover:bg-blue-900/20"
             >
               <Eye className="w-4 h-4" aria-hidden="true" />
@@ -254,9 +254,9 @@ function DocCard({ doc, onPreview }: { doc: any; onPreview: (d: any) => void }) 
             </button>
           )}
           <button
-            aria-label={`Download ${doc.title}`}
+            aria-label={`Download ${documentData.title}`}
             className="flex flex-col items-center gap-0.5 text-[10px] font-semibold text-slate-500 hover:text-emerald-600 transition-colors px-2 py-1 rounded hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
-            onClick={() => doc.url && window.open(doc.url, '_blank')}
+            onClick={() => documentData.url && window.open(documentData.url, '_blank')}
           >
             <Download className="w-4 h-4" aria-hidden="true" />
             Download
@@ -269,13 +269,18 @@ function DocCard({ doc, onPreview }: { doc: any; onPreview: (d: any) => void }) 
 
 // ─── Main Client Page ────────────────────────────────────────────────────────
 export default function DocumentsClient() {
+  const { user } = useAuth();
+  const { toast } = useToast();
+  
   const [documents, setDocuments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('all');
   const [search, setSearch] = useState('');
   const [previewDoc, setPreviewDoc] = useState<any>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [savedDocs, setSavedDocs] = useState<string[]>([]);
 
+  // Fetch all documents
   useEffect(() => {
     const fetchDocs = async () => {
       try {
@@ -291,9 +296,55 @@ export default function DocumentsClient() {
     fetchDocs();
   }, []);
 
+  // Fetch saved document IDs for current user
+  useEffect(() => {
+    if (!user) {
+      setSavedDocs([]);
+      return;
+    }
+    const fetchSaved = async () => {
+      try {
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (userDoc.exists()) {
+          setSavedDocs(userDoc.data().savedDocuments || []);
+        }
+      } catch (error) {
+        console.error("Failed to load saved docs", error);
+      }
+    };
+    fetchSaved();
+  }, [user]);
+
+  const handleToggleSave = async (docId: string) => {
+    if (!user) {
+      toast({ title: "Login Required", description: "Please sign in to save documents.", variant: "destructive" });
+      return;
+    }
+    const isSaved = savedDocs.includes(docId);
+    
+    // Optimistic UI update
+    setSavedDocs(prev => isSaved ? prev.filter(id => id !== docId) : [...prev, docId]);
+
+    try {
+      const userRef = doc(db, "users", user.uid);
+      await setDoc(userRef, {
+        savedDocuments: isSaved ? arrayRemove(docId) : arrayUnion(docId)
+      }, { merge: true });
+      
+      if (!isSaved) {
+        toast({ title: "Saved!", description: "Document added to your saved list." });
+      }
+    } catch (error) {
+      // Revert UI on failure
+      setSavedDocs(prev => isSaved ? [...prev, docId] : prev.filter(id => id !== docId));
+      toast({ title: "Error", description: "Failed to update saved documents.", variant: "destructive" });
+      console.error("Toggle save error", error);
+    }
+  };
+
   const filtered = documents.filter(d => {
     const matchSearch = (d.title || '').toLowerCase().includes(search.toLowerCase());
-    const matchTab = activeTab === 'all' || d.category === activeTab;
+    const matchTab = activeTab === 'all' || d.category === activeTab || (activeTab === 'my_notes' && savedDocs.includes(d.id));
     return matchSearch && matchTab;
   });
 
@@ -402,7 +453,13 @@ export default function DocumentsClient() {
             }
           >
             {filtered.map(doc => (
-              <DocCard key={doc.id} doc={doc} onPreview={setPreviewDoc} />
+              <DocCard 
+                key={doc.id} 
+                doc={doc} 
+                onPreview={setPreviewDoc}
+                isSaved={savedDocs.includes(doc.id)}
+                onToggleSave={() => handleToggleSave(doc.id)}
+              />
             ))}
           </div>
         )}
