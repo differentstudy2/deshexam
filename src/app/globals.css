@@ -689,6 +689,11 @@ strong {
 
 /* Print Isolation CSS */
 @media print {
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
   body.print-isolation * {
     visibility: hidden;
   }

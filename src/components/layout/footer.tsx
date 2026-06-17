@@ -86,8 +86,8 @@ export function Footer() {
           <div className="space-y-4">
             <h4 className="font-semibold text-slate-400 tracking-wider text-xs uppercase mb-6">Legal</h4>
             <ul className="space-y-3">
-              <li><Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link></li>
-              <li><Link href="#" className="hover:text-white transition-colors">Terms of Service</Link></li>
+              <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+              <li><Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
               <li><Link href="#" className="hover:text-white transition-colors">Disclaimer</Link></li>
               <li><Link href="#" className="hover:text-white transition-colors">Cookie Policy</Link></li>
             </ul>

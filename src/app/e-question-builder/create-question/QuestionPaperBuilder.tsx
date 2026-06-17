@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
-import { Download, Settings, FileText, Shuffle, Save, ArrowLeft, Edit, Book, Monitor, Lightbulb, User, Tag, Star, Grid3X3, Columns, Barcode, Hash, LayoutGrid, FileDigit, Heading, MapPin, Landmark, Layers, HelpCircle, RefreshCw, Printer, Languages, QrCode, ImageIcon, Waves, PlusCircle, Plus, CheckCircle, CircleDot, Zap, Loader2, GripVertical, Trash2, Database, Sparkles , ZoomIn, ZoomOut, Lock } from 'lucide-react';
+import { Download, Settings, FileText, Shuffle, Save, ArrowLeft, Edit, Book, Monitor, Lightbulb, User, Tag, Star, Grid3X3, Columns, Barcode, Hash, LayoutGrid, FileDigit, Heading, MapPin, Landmark, Layers, HelpCircle, RefreshCw, Printer, Languages, QrCode, ImageIcon, Waves, PlusCircle, Plus, CheckCircle, CircleDot, Zap, Loader2, GripVertical, Trash2, Database, Sparkles, ZoomIn, ZoomOut, Lock, Copy } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { getQuestionsByIds, getTaxonomyNodes } from '@/lib/firebase/question-bank';
 import { QuestionBankEntry } from '@/lib/question-bank-types';
@@ -518,6 +518,8 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
             },
             correctAnswer: item.correctAnswer || 'a',
             explanation: item.explanation || '',
+            questionType: item.questionType || 'MCQ',
+            matchingPairs: item.matchingPairs,
             difficulty: 'Medium',
             status: 'Published',
             createdAt: new Date(),
@@ -527,28 +529,79 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
           }));
         }
       } catch (e) {
-        const blocks = bulkQuestionText.split(/\n\s*\n/);
+        const rawBlocks = bulkQuestionText.split(/\n\s*\n/);
+        const allBlocks: string[][] = [];
 
-        blocks.forEach((block, idx) => {
-          const lines = block.split('\n').map(l => l.trim()).filter(l => l);
+        rawBlocks.forEach(rawBlock => {
+          const lines = rawBlock.split('\n').map(l => l.trim()).filter(l => l);
+          let currentBlockLines: string[] = [];
+          
+          lines.forEach(line => {
+            if (/^[\d০-৯]+[\.\)]/.test(line) && currentBlockLines.length > 0) {
+              allBlocks.push([...currentBlockLines]);
+              currentBlockLines = [line];
+            } else {
+              currentBlockLines.push(line);
+            }
+          });
+          if (currentBlockLines.length > 0) allBlocks.push(currentBlockLines);
+        });
+
+        allBlocks.forEach((lines, idx) => {
           if (lines.length > 0) {
             let qTextLines: string[] = [];
             let optA = '', optB = '', optC = '', optD = '';
             let correctAns = 'a';
+            let qType = 'MCQ';
             
             const optionRegex = /^([a-dক-ঘ])[\.\)]\s*(.*)/i;
-            const answerRegex = /^(?:answer|উত্তর|সঠিক উত্তর|ans|ans\.)[\s:-]*([a-dক-ঘ])/i;
+            const answerRegex = /^(?:answer|উত্তর|সঠিক উত্তর|ans|ans\.)[\s:-]*(.*)/i;
+            const typeRegex = /^(?:type|টাইপ|question type|ধরণ)[\s:-]*(mcq|t\/f|fib|match|cq|desc|short question|broad question|short|broad|true\/false|fill in the blanks|matching|সত্য\/মিথ্যা|সংক্ষিপ্ত|রচনামূলক|শূন্যস্থান)/i;
+            const matchPairRegex = /^(?:[\d০-৯]+[\.\)]?|[-*])\s*(.+?)\s*(?:=|[-–—]+|->|\|)\s*(.+)/;
+            
+            let matchingPairs: { left: string, right: string }[] = [];
+
+            // Pre-pass to find question type
+            for (let i = 0; i < lines.length; i++) {
+              const typeMatch = lines[i].match(typeRegex);
+              if (typeMatch) {
+                const t = typeMatch[1].toLowerCase();
+                if (t.includes('mcq')) qType = 'MCQ';
+                else if (t.includes('t/f') || t.includes('true') || t.includes('সত্য')) qType = 'T/F';
+                else if (t.includes('fib') || t.includes('fill') || t.includes('শূন্যস্থান')) qType = 'FIB';
+                else if (t.includes('match')) qType = 'Match';
+                else if (t.includes('cq')) qType = 'CQ';
+                else if (t.includes('desc')) qType = 'Desc';
+                else if (t.includes('short') || t.includes('সংক্ষিপ্ত')) qType = 'Short Question';
+                else if (t.includes('broad') || t.includes('রচনামূলক')) qType = 'Broad Question';
+              }
+            }
 
             for (let i = 0; i < lines.length; i++) {
               const line = lines[i];
               
+              const typeMatch = line.match(typeRegex);
+              if (typeMatch) {
+                continue;
+              }
+
+              if (qType === 'Match') {
+                const pairMatch = line.match(matchPairRegex);
+                if (pairMatch) {
+                  matchingPairs.push({ left: pairMatch[1].trim(), right: pairMatch[2].trim() });
+                  continue;
+                }
+              }
+
               const ansMatch = line.match(answerRegex);
               if (ansMatch) {
-                const char = ansMatch[1].toLowerCase();
+                const val = ansMatch[1].trim();
+                const char = val.toLowerCase();
                 if (char === 'a' || char === 'ক') correctAns = 'a';
-                if (char === 'b' || char === 'খ') correctAns = 'b';
-                if (char === 'c' || char === 'গ') correctAns = 'c';
-                if (char === 'd' || char === 'ঘ') correctAns = 'd';
+                else if (char === 'b' || char === 'খ') correctAns = 'b';
+                else if (char === 'c' || char === 'গ') correctAns = 'c';
+                else if (char === 'd' || char === 'ঘ') correctAns = 'd';
+                else correctAns = val; // Store full answer for non-MCQ
                 continue;
               }
 
@@ -563,7 +616,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                 continue;
               }
 
-              // If it's not an answer and not an option, and we haven't found any options yet, it's a question line
+              // If it's not an answer, option, or type, it's a question line
               if (!optA && !optB && !optC && !optD) {
                 qTextLines.push(line);
               }
@@ -577,6 +630,8 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
               options: { a: optA, b: optB, c: optC, d: optD },
               correctAnswer: correctAns,
               explanation: '',
+              questionType: qType,
+              matchingPairs: matchingPairs.length > 0 ? matchingPairs : undefined,
               difficulty: 'Medium',
               status: 'Published',
               createdAt: new Date(),
@@ -1457,25 +1512,17 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                     {brandingEnabled && (
                       <div
                         className="absolute print:fixed print:inset-0 inset-0 pointer-events-none overflow-hidden z-0"
-                        style={{
-                          opacity: watermarkOpacity / 100
+                        style={{ 
+                          opacity: watermarkOpacity / 100,
+                          ...(watermarkRepeat ? {
+                            backgroundImage: watermarkImage ? `url("${watermarkImage}")` : `url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' transform='rotate(-45 200 200)' fill='rgba(150,150,150,1)' font-size='${watermarkSize}' font-family='${getWatermarkFontFamily().replace(/"/g, "%27")}'%3E${encodeURIComponent(watermarkText || 'দেশ এক্সাম একাডেমী')}%3C/text%3E%3C/svg%3E")`,
+                            backgroundRepeat: 'repeat',
+                            backgroundPosition: 'center',
+                            backgroundSize: watermarkImage ? `${watermarkSize}px` : '400px'
+                          } : {})
                         }}
                       >
-                        {watermarkRepeat ? (
-                          <div className="w-full h-full flex flex-wrap items-center justify-evenly content-evenly py-10 px-8">
-                            {Array.from({ length: watermarkRepeatCount }).map((_, i) => (
-                              <div key={i} className="-rotate-45 transform-gpu flex items-center justify-center p-4">
-                                {watermarkImage ? (
-                                  <img src={watermarkImage} alt="Watermark" style={{ width: `${watermarkSize}px`, height: 'auto' }} className="select-none" />
-                                ) : (
-                                  <span className="select-none text-gray-400 whitespace-nowrap" style={{ fontSize: `${watermarkSize}px`, fontFamily: getWatermarkFontFamily() }}>
-                                    {watermarkText || 'দেশ এক্সাম একাডেমী'}
-                                  </span>
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
+                        {!watermarkRepeat && (
                           <div className="w-full h-full flex items-center justify-center">
                             {watermarkImage ? (
                               <img src={watermarkImage} alt="Watermark" style={{ width: `${watermarkSize}px`, height: 'auto' }} className="select-none" />
@@ -1978,23 +2025,17 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                   {brandingEnabled && (
                     <div
                       className="absolute print:fixed print:inset-0 inset-0 pointer-events-none overflow-hidden z-0"
-                      style={{ opacity: watermarkOpacity / 100 }}
+                      style={{ 
+                        opacity: watermarkOpacity / 100,
+                        ...(watermarkRepeat ? {
+                          backgroundImage: watermarkImage ? `url("${watermarkImage}")` : `url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' transform='rotate(-45 200 200)' fill='rgba(150,150,150,1)' font-size='${watermarkSize}' font-family='${getWatermarkFontFamily().replace(/"/g, "%27")}'%3E${encodeURIComponent(watermarkText || 'দেশ এক্সাম একাডেমী')}%3C/text%3E%3C/svg%3E")`,
+                          backgroundRepeat: 'repeat',
+                          backgroundPosition: 'center',
+                          backgroundSize: watermarkImage ? `${watermarkSize}px` : '400px'
+                        } : {})
+                      }}
                     >
-                      {watermarkRepeat ? (
-                        <div className="w-full h-full flex flex-wrap items-center justify-evenly content-evenly py-10 px-8">
-                          {Array.from({ length: watermarkRepeatCount }).map((_, i) => (
-                            <div key={i} className="-rotate-45 transform-gpu flex items-center justify-center p-4">
-                              {watermarkImage ? (
-                                <img src={watermarkImage} alt="Watermark" style={{ width: `${watermarkSize}px`, height: 'auto' }} className="select-none" />
-                              ) : (
-                                <span className="select-none text-gray-400 whitespace-nowrap" style={{ fontSize: `${watermarkSize}px`, fontFamily: getWatermarkFontFamily() }}>
-                                  {watermarkText || 'দেশ এক্সাম একাডেমী'}
-                                </span>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
+                      {!watermarkRepeat && (
                         <div className="w-full h-full flex items-center justify-center">
                           {watermarkImage ? (
                             <img src={watermarkImage} alt="Watermark" style={{ width: `${watermarkSize}px`, height: 'auto' }} className="select-none" />
@@ -2426,7 +2467,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
       </Dialog>
 
       <Dialog open={isAddQuestionOpen} onOpenChange={setIsAddQuestionOpen}>
-        <DialogContent className="max-w-xl" style={{ 
+        <DialogContent className="w-[95vw] sm:max-w-xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 rounded-xl sm:rounded-lg" style={{ 
           fontFamily: fontFamily === 'solaimanlipi' ? '"SolaimanLipi", sans-serif' :
             fontFamily === 'kalpurush' ? '"Kalpurush", sans-serif' :
             fontFamily === 'nikosh' ? '"Nikosh", sans-serif' :
@@ -2458,15 +2499,15 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
               <>
                 <div>
                   <label className="text-sm font-medium mb-1.5 block">{t('questionLabel', appLanguage)}</label>
-                  <Input value={customQuestion.text} onChange={e => setCustomQuestion({ ...customQuestion, text: e.target.value })} placeholder={t('enterQuestion', appLanguage)} />
+                  <textarea value={customQuestion.text} onChange={e => setCustomQuestion({ ...customQuestion, text: e.target.value })} placeholder={t('enterQuestion', appLanguage)} className="w-full h-20 p-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div><label className="text-xs mb-1 block">{t('optionA', appLanguage)}</label><Input value={customQuestion.optA} onChange={e => setCustomQuestion({ ...customQuestion, optA: e.target.value })} /></div>
                   <div><label className="text-xs mb-1 block">{t('optionB', appLanguage)}</label><Input value={customQuestion.optB} onChange={e => setCustomQuestion({ ...customQuestion, optB: e.target.value })} /></div>
                   <div><label className="text-xs mb-1 block">{t('optionC', appLanguage)}</label><Input value={customQuestion.optC} onChange={e => setCustomQuestion({ ...customQuestion, optC: e.target.value })} /></div>
                   <div><label className="text-xs mb-1 block">{t('optionD', appLanguage)}</label><Input value={customQuestion.optD} onChange={e => setCustomQuestion({ ...customQuestion, optD: e.target.value })} /></div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
                     <label className="text-sm font-medium mb-1.5 block">{t('correctAnswerLabel', appLanguage)}</label>
                     <Select value={customQuestion.correctAnswer} onValueChange={v => setCustomQuestion({ ...customQuestion, correctAnswer: v })}>
@@ -2498,23 +2539,66 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                 </div>
                 <div>
                   <label className="text-sm font-medium mb-1.5 block">Description / Explanation (Optional)</label>
-                  <Input value={customQuestion.explanation} onChange={e => setCustomQuestion({ ...customQuestion, explanation: e.target.value })} placeholder="Enter explanation for the answer..." />
+                  <textarea value={customQuestion.explanation} onChange={e => setCustomQuestion({ ...customQuestion, explanation: e.target.value })} placeholder="Enter explanation for the answer..." className="w-full h-20 p-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
               </>
             ) : (
               <div>
                 <label className="text-sm font-medium mb-1.5 block">{t('pasteQuestions', appLanguage)}</label>
-                <div className="text-[13px] text-gray-600 mb-3 bg-blue-50/50 p-3 rounded border border-blue-100 max-h-48 overflow-y-auto">
-                  <span className="font-semibold text-blue-700">{t('textFormat', appLanguage)}</span> {t('textFormatTip', appLanguage)}
-                  <br />
-                  <span className="font-semibold text-blue-700 mt-2 block">{t('jsonFormat', appLanguage)}</span>
-                  <pre className="mt-1 bg-white p-2 rounded text-[11px] font-mono text-gray-700 border border-gray-200">
+                <div className="text-[13px] text-gray-600 mb-3 bg-blue-50/50 p-3 rounded border border-blue-100 max-h-40 overflow-y-auto">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="font-semibold text-blue-700">Supported Formats:</span>
+                    <button 
+                      onClick={() => {
+                        navigator.clipboard.writeText(`1. What is the capital of India?\nType: MCQ\nA. Dhaka\nB. New Delhi\nC. Kolkata\nD. Mumbai\nAnswer: B\n\n2. The sky is green.\nType: T/F\nAnswer: False\n\n3. Write a short note on History.\nType: Short Question\nAnswer: History is the study of the past.\n\n4. Match the following items:\nType: Match\n1. Apple - Red\n2. Banana = Yellow\n3. Sky -> Blue`);
+                        toast({ title: "Copied!", description: "Text format copied to clipboard." });
+                      }}
+                      className="text-xs flex items-center gap-1.5 text-blue-600 hover:text-blue-800 bg-white hover:bg-blue-50 px-2 py-1 rounded border border-blue-200 transition-colors whitespace-nowrap"
+                    >
+                      <Copy size={14} className="min-w-[14px]" /> <span className="hidden sm:inline">Copy Example</span><span className="sm:hidden">Copy</span>
+                    </button>
+                  </div>
+                  <pre className="mt-2 bg-white p-2 rounded text-[11px] sm:text-xs font-mono text-gray-700 border border-gray-200 leading-tight overflow-x-auto whitespace-pre-wrap">
+{`1. What is the capital of India?
+Type: MCQ
+A. Dhaka
+B. New Delhi
+C. Kolkata
+D. Mumbai
+Answer: B
+
+2. The sky is green.
+Type: T/F
+Answer: False
+
+3. Write a short note on History.
+Type: Short Question
+Answer: History is the study of the past.
+
+4. Match the following items:
+Type: Match
+1. Apple - Red
+2. Banana = Yellow
+3. Sky -> Blue`}
+                  </pre>
+                  <div className="flex justify-between items-center mt-4 mb-2">
+                    <span className="font-semibold text-blue-700">{t('jsonFormat', appLanguage)}</span>
+                    <button 
+                      onClick={() => {
+                        navigator.clipboard.writeText(`[\n  { "questionText": "What is the capital of India?", "options": { "a": "Dhaka", "b": "New Delhi", "c": "Kolkata", "d": "Mumbai" }, "correctAnswer": "b", "questionType": "MCQ" },\n  { "questionText": "The sky is green.", "correctAnswer": "False", "questionType": "T/F" },\n  { "questionText": "Write a short note on History.", "correctAnswer": "History is the study of the past.", "questionType": "Short Question" },\n  { "questionText": "Match the following items:", "matchingPairs": [{ "left": "Apple", "right": "Red" }, { "left": "Banana", "right": "Yellow" }], "questionType": "Match" }\n]`);
+                        toast({ title: "Copied!", description: "JSON format copied to clipboard." });
+                      }}
+                      className="text-xs flex items-center gap-1.5 text-blue-600 hover:text-blue-800 bg-white hover:bg-blue-50 px-2 py-1 rounded border border-blue-200 transition-colors whitespace-nowrap"
+                    >
+                      <Copy size={14} className="min-w-[14px]" /> <span className="hidden sm:inline">Copy Example</span><span className="sm:hidden">Copy</span>
+                    </button>
+                  </div>
+                  <pre className="mt-1 bg-white p-2 rounded text-[11px] sm:text-xs font-mono text-gray-700 border border-gray-200 overflow-x-auto whitespace-pre-wrap break-all">
                     {`[
-  {
-    "questionText": "ভারতের রাজধানী কী?",
-    "options": { "a": "ঢাকা", "b": "নয়াদিল্লি", "c": "কলকাতা", "d": "মুম্বাই" },
-    "correctAnswer": "b"
-  }
+  { "questionText": "What is the capital of India?", "options": { "a": "Dhaka", "b": "New Delhi", "c": "Kolkata", "d": "Mumbai" }, "correctAnswer": "b", "questionType": "MCQ" },
+  { "questionText": "The sky is green.", "correctAnswer": "False", "questionType": "T/F" },
+  { "questionText": "Write a short note on History.", "correctAnswer": "History is the study of the past.", "questionType": "Short Question" },
+  { "questionText": "Match the following items:", "matchingPairs": [{ "left": "Apple", "right": "Red" }, { "left": "Banana", "right": "Yellow" }], "questionType": "Match" }
 ]`}
                   </pre>
                 </div>
@@ -2522,7 +2606,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                   value={bulkQuestionText}
                   onChange={e => setBulkQuestionText(e.target.value)}
                   placeholder={t('bulkPlaceholder', appLanguage).replace(/\\n/g, '\n')}
-                  className="w-full h-64 p-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono whitespace-pre-wrap"
+                  className="w-full h-48 p-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono whitespace-pre-wrap"
                 />
               </div>
             )}
