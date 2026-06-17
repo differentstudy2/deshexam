@@ -197,7 +197,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
               <div className="flex flex-col items-center text-center px-2">
                 <Phone className="w-5 h-5 text-emerald-500 mb-2" />
                 <span className="font-semibold text-slate-800">Phone</span>
-                <span className="text-slate-500 text-xs mt-1">+91 98765 43210</span>
+                <span className="text-slate-500 text-xs mt-1">{institution.phoneNumber || '+91 98765 43210'}</span>
               </div>
               <div className="flex flex-col items-center text-center px-2">
                 <Mail className="w-5 h-5 text-amber-500 mb-2" />
@@ -320,7 +320,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
             <CardContent className="p-8">
               <h2 className="text-2xl font-bold text-slate-900 mb-6">Campus Gallery</h2>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {MOCK_GALLERY.map((img, idx) => (
+                {(institution.galleryImages && institution.galleryImages.length > 0 ? institution.galleryImages : MOCK_GALLERY).map((img, idx) => (
                   <div key={idx} className={`relative rounded-xl overflow-hidden group ${idx === 0 ? 'col-span-2 row-span-2 aspect-square md:aspect-auto' : 'aspect-square'}`}>
                     <Image src={img} alt="Gallery image" fill className="object-cover group-hover:scale-110 transition-transform duration-500" unoptimized />
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
@@ -348,13 +348,13 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                {MOCK_REVIEWS.map(review => (
-                  <div key={review.id} className="p-5 rounded-xl border border-slate-100 bg-slate-50">
+                {(institution.reviews && institution.reviews.length > 0 ? institution.reviews : MOCK_REVIEWS).map((review: any, idx) => (
+                  <div key={idx} className="p-5 rounded-xl border border-slate-100 bg-slate-50">
                     <div className="flex items-center gap-3 mb-3">
-                      <Image src={review.avatar} alt={review.name} width={40} height={40} className="rounded-full bg-slate-200" unoptimized />
+                      <Image src={review.authorPhotoUrl || review.avatar} alt={review.authorName || review.name} width={40} height={40} className="rounded-full bg-slate-200" unoptimized />
                       <div>
-                        <div className="font-bold text-slate-900 text-sm">{review.name}</div>
-                        <div className="text-xs text-slate-500">{review.course}</div>
+                        <div className="font-bold text-slate-900 text-sm">{review.authorName || review.name}</div>
+                        <div className="text-xs text-slate-500">{review.time || review.course}</div>
                       </div>
                       <div className="ml-auto flex items-center bg-white px-2 py-1 rounded shadow-sm border border-slate-100">
                         <Star className="w-3 h-3 text-amber-400 fill-amber-400 mr-1" />
@@ -436,9 +436,9 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
             <CardContent className="p-6">
               <h3 className="font-bold text-lg text-slate-900 mb-4 border-b pb-3">Contact Info</h3>
               <div className="space-y-3 mb-6">
-                <a href="tel:+919876543210" className="flex items-center gap-3 text-slate-600 hover:text-indigo-600 transition-colors p-2 rounded-lg hover:bg-slate-50">
+                <a href={`tel:${institution.internationalPhoneNumber || institution.phoneNumber || '+919876543210'}`} className="flex items-center gap-3 text-slate-600 hover:text-indigo-600 transition-colors p-2 rounded-lg hover:bg-slate-50">
                   <div className="bg-indigo-50 p-2 rounded-full text-indigo-600"><Phone className="w-4 h-4" /></div>
-                  <span className="text-sm font-medium">+91 98765 43210</span>
+                  <span className="text-sm font-medium">{institution.phoneNumber || '+91 98765 43210'}</span>
                 </a>
                 <a href="mailto:contact@institution.edu" className="flex items-center gap-3 text-slate-600 hover:text-rose-600 transition-colors p-2 rounded-lg hover:bg-slate-50">
                   <div className="bg-rose-50 p-2 rounded-full text-rose-600"><Mail className="w-4 h-4" /></div>

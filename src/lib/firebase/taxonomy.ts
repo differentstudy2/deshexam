@@ -39,6 +39,17 @@ export interface TaxonomyNode {
   longitude?: number;
   rating?: number;
   userRatingsTotal?: number;
+  phoneNumber?: string;
+  internationalPhoneNumber?: string;
+  openingHours?: string[];
+  galleryImages?: string[];
+  reviews?: {
+    authorName: string;
+    rating: number;
+    text: string;
+    time: string;
+    authorPhotoUrl: string;
+  }[];
   
   // SEO fields
   seoTitle?: string;

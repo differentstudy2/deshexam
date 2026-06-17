@@ -32,10 +32,10 @@ export default function InstitutionManagerPage() {
     const delayDebounceFn = setTimeout(async () => {
       setIsSearching(true);
       try {
-        const res = await fetch(`/api/places/autocomplete?input=${encodeURIComponent(searchQuery)}`);
+        const res = await fetch(`/api/places/search?q=${encodeURIComponent(searchQuery)}`);
         const data = await res.json();
-        if (data.predictions) {
-          setSuggestions(data.predictions);
+        if (data.results) {
+          setSuggestions(data.results);
         }
       } catch (error) {
         console.error('Failed to fetch suggestions:', error);
@@ -53,9 +53,9 @@ export default function InstitutionManagerPage() {
       const res = await fetch(`/api/places/details?placeId=${placeId}`);
       const data = await res.json();
       
-      if (data.result) {
+      if (data && !data.error) {
         setSelectedPlaceDetails({
-          ...data.result,
+          ...data,
           place_id: placeId
         });
         setSuggestions([]); // hide suggestions
@@ -89,12 +89,46 @@ export default function InstitutionManagerPage() {
       };
 
       if (selectedPlaceDetails.formatted_address) newNodeData.address = selectedPlaceDetails.formatted_address;
-      if (selectedPlaceDetails.geometry?.location?.lat !== undefined) newNodeData.latitude = selectedPlaceDetails.geometry.location.lat;
-      if (selectedPlaceDetails.geometry?.location?.lng !== undefined) newNodeData.longitude = selectedPlaceDetails.geometry.location.lng;
-      if (selectedPlaceDetails.place_id) newNodeData.placeId = selectedPlaceDetails.place_id;
-      if (selectedPlaceDetails.website) newNodeData.websiteUrl = selectedPlaceDetails.website;
+      if (selectedPlaceDetails.latitude !== undefined) newNodeData.latitude = selectedPlaceDetails.latitude;
+      if (selectedPlaceDetails.longitude !== undefined) newNodeData.longitude = selectedPlaceDetails.longitude;
+      if (selectedPlaceDetails.placeId) newNodeData.placeId = selectedPlaceDetails.placeId;
+      if (selectedPlaceDetails.websiteUrl) newNodeData.websiteUrl = selectedPlaceDetails.websiteUrl;
       if (selectedPlaceDetails.rating !== undefined) newNodeData.rating = selectedPlaceDetails.rating;
-      if (selectedPlaceDetails.user_ratings_total !== undefined) newNodeData.userRatingsTotal = selectedPlaceDetails.user_ratings_total;
+      if (selectedPlaceDetails.userRatingsTotal !== undefined) newNodeData.userRatingsTotal = selectedPlaceDetails.userRatingsTotal;
+      if (selectedPlaceDetails.phoneNumber) newNodeData.phoneNumber = selectedPlaceDetails.phoneNumber;
+      if (selectedPlaceDetails.internationalPhoneNumber) newNodeData.internationalPhoneNumber = selectedPlaceDetails.internationalPhoneNumber;
+      if (selectedPlaceDetails.openingHours) newNodeData.openingHours = selectedPlaceDetails.openingHours;
+      if (selectedPlaceDetails.reviews) newNodeData.reviews = selectedPlaceDetails.reviews;
+
+      // Process Photos: Upload to Firebase Storage
+      if (selectedPlaceDetails.photoReferences && selectedPlaceDetails.photoReferences.length > 0) {
+        toast({ title: 'Uploading photos...', description: `Processing ${selectedPlaceDetails.photoReferences.length} images. Please wait.` });
+        
+        const uploadedUrls: string[] = [];
+        // Only do up to 6 images to save time/bandwidth
+        const photosToUpload = selectedPlaceDetails.photoReferences.slice(0, 6);
+        
+        const uploadPromises = photosToUpload.map(async (ref: string) => {
+          try {
+            const res = await fetch('/api/places/photo', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ photoReference: ref, placeId: selectedPlaceDetails.placeId })
+            });
+            const data = await res.json();
+            if (data.url) uploadedUrls.push(data.url);
+          } catch (e) {
+            console.error('Failed to upload a photo:', e);
+          }
+        });
+        
+        await Promise.all(uploadPromises);
+        newNodeData.galleryImages = uploadedUrls;
+        
+        if (uploadedUrls.length > 0) {
+           newNodeData.featureImage = uploadedUrls[0]; // Set the first photo as feature image
+        }
+      }
 
       const newNodeId = await createTaxonomyNode(newNodeData);
 
@@ -174,12 +208,12 @@ export default function InstitutionManagerPage() {
               <div className="border border-gray-100 rounded-md shadow-sm max-h-[300px] overflow-y-auto bg-white divide-y divide-gray-50">
                 {suggestions.map((suggestion) => (
                   <button
-                    key={suggestion.place_id}
+                    key={suggestion.placeId}
                     className="w-full text-left px-4 py-3 hover:bg-slate-50 flex flex-col items-start transition-colors"
-                    onClick={() => handleSelectPlace(suggestion.place_id)}
+                    onClick={() => handleSelectPlace(suggestion.placeId)}
                   >
-                    <span className="font-medium text-slate-800">{suggestion.structured_formatting?.main_text}</span>
-                    <span className="text-sm text-slate-500 line-clamp-1">{suggestion.structured_formatting?.secondary_text}</span>
+                    <span className="font-medium text-slate-800">{suggestion.name}</span>
+                    <span className="text-sm text-slate-500 line-clamp-1">{suggestion.address}</span>
                   </button>
                 ))}
               </div>
