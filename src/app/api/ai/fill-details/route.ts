@@ -20,8 +20,8 @@ export async function POST(request: Request) {
     const model = genAI.getGenerativeModel({
       model: 'gemini-2.5-flash',
       tools: [{
-        googleSearchRetrieval: {}
-      }]
+        googleSearch: {}
+      } as any]
     });
 
     const prompt = `
@@ -52,17 +52,16 @@ export async function POST(request: Request) {
 
     const result = await model.generateContent({
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
-      generationConfig: {
-        responseMimeType: 'application/json',
-      }
     });
 
     const responseText = result.response.text();
-    const data = JSON.parse(responseText);
+    // Strip markdown formatting if the model wraps it in ```json ... ```
+    const cleanText = responseText.replace(/```json/gi, '').replace(/```/gi, '').trim();
+    const data = JSON.parse(cleanText);
 
     return NextResponse.json(data);
   } catch (error) {
     console.error('AI fill-details error:', error);
-    return NextResponse.json({ error: 'Failed to process AI request' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to process AI request', details: String(error) }, { status: 500 });
   }
 }
