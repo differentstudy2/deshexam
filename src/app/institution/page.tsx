@@ -21,8 +21,7 @@ export default function PublicInstitutionDirectory() {
       try {
         const q = query(
           collection(db, 'taxonomy_nodes'),
-          where('type', '==', 'institution'),
-          where('status', '==', 'published')
+          where('type', '==', 'institution')
         );
         const snap = await getDocs(q);
         const fetchedNodes = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as TaxonomyNode));
