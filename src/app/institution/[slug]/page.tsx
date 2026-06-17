@@ -202,7 +202,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
         <Image src={coverImage} alt={`${institution.title} campus building and facilities in ${cityStr}, ${stateStr}`} fill className="object-cover brightness-[0.4]" unoptimized />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/80 to-slate-900/40" />
         
-        <div className="relative pt-28 px-4 md:px-8 max-w-7xl mx-auto flex flex-col pb-12 z-10">
+        <div className="relative pt-8 px-4 md:px-8 max-w-7xl mx-auto flex flex-col pb-8 z-10">
           <div className="flex justify-between items-start w-full">
             <div className="flex items-center gap-2 text-xs font-medium text-white/70 mb-8 flex-wrap">
               <Link href="/" className="hover:text-white transition-colors">Home</Link>
@@ -219,75 +219,83 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
 
           <div className="flex flex-col lg:flex-row gap-10 items-start justify-between w-full">
             
-            {/* Left side: Logo & Title */}
-            <div className="flex flex-col sm:flex-row gap-6 items-start w-full lg:w-2/3">
-              <div className="w-32 h-32 md:w-40 md:h-40 rounded-2xl bg-white shadow-2xl flex items-center justify-center overflow-hidden shrink-0 z-10 relative">
+            {/* Left Column: Logo, Title, Badges, Buttons */}
+            <div className="w-full lg:w-2/3 flex flex-col">
+              
+              <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-center sm:items-start w-full text-center sm:text-left">
+              <div className="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-2xl bg-white shadow-2xl flex items-center justify-center overflow-hidden shrink-0 z-10 relative mx-auto sm:mx-0">
                 {institution.logoUrl || institution.featureImage ? (
-                  <Image src={institution.logoUrl || institution.featureImage || ''} alt={`${institution.title} official logo`} fill className="object-contain p-3" unoptimized />
+                  <Image src={institution.logoUrl || institution.featureImage || ''} alt={`${institution.title} official logo`} fill className="object-contain p-2 sm:p-3" unoptimized />
                 ) : (
-                  <Building className="w-16 h-16 text-slate-300" />
+                  <Building className="w-12 h-12 sm:w-16 sm:h-16 text-slate-300" />
                 )}
               </div>
               
-              <div className="text-white space-y-4 pt-2">
-                <div className="flex flex-wrap items-center gap-2">
+              <div className="text-white space-y-3 sm:space-y-4 pt-2 flex flex-col items-center sm:items-start w-full">
+                <div className="flex flex-wrap justify-center sm:justify-start items-center gap-2">
                   <Badge className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/50 backdrop-blur-md px-2 py-0.5 shadow-sm"><CheckCircle2 className="w-3.5 h-3.5 mr-1" /> Verified by DeshExam</Badge>
-                  <span className="text-xs text-white/70 font-medium ml-1">Updated on {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                  <span className="text-[10px] sm:text-xs text-white/70 font-medium ml-1">Updated on {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-white">{institution.title}</h1>
+                  <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tight text-white">{institution.title}</h1>
                 </div>
                 
-                <div className="flex flex-wrap items-center gap-4 text-sm text-slate-300">
+                <div className="flex flex-wrap justify-center sm:justify-start items-center gap-2 sm:gap-4 text-xs sm:text-sm text-slate-300">
                   {institution.boardType && (
-                    <span className="flex items-center gap-1.5 bg-white/10 px-3 py-1 rounded-full border border-white/10 backdrop-blur-sm"><Building className="w-4 h-4" /> {institution.boardType}</span>
+                    <span className="flex items-center gap-1.5 bg-white/10 px-3 py-1 rounded-full border border-white/10 backdrop-blur-sm"><Building className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> {institution.boardType}</span>
                   )}
                   {institution.rating && (
                     <span className="flex items-center gap-1.5 bg-amber-500/20 text-amber-300 border border-amber-500/30 px-3 py-1 rounded-full backdrop-blur-sm font-semibold">
-                      <Star className="w-4 h-4 fill-amber-400" /> {institution.rating} ({institution.userRatingsTotal || 0} reviews)
+                      <Star className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-amber-400" /> {institution.rating} ({institution.userRatingsTotal || 0} reviews)
                     </span>
                   )}
                 </div>
 
-                <div className="flex flex-wrap items-center gap-4 text-sm text-slate-300">
-                  <span className="flex items-center gap-1.5"><MapPin className="w-4 h-4 text-slate-400" /> {institution.address ? institution.address.split(',').slice(-2).join(',') : 'Location'}</span>
+                <div className="flex flex-wrap justify-center sm:justify-start items-center gap-4 text-xs sm:text-sm text-slate-300">
+                  <span className="flex items-center gap-1.5 text-center sm:text-left"><MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 shrink-0" /> {institution.address ? institution.address.split(',').slice(-2).join(',') : 'Location'}</span>
                 </div>
+              </div>
+              </div>
 
-                <div className="flex flex-wrap items-center gap-2 mt-2">
-                  <Badge variant="outline" className="text-slate-200 border-slate-600 bg-slate-800/50">Est: {institution.establishedYear || '2013'}</Badge>
-                  <Badge variant="outline" className="text-slate-200 border-slate-600 bg-slate-800/50">Medium: {institution.mediumOfInstruction ? (Array.isArray(institution.mediumOfInstruction) ? institution.mediumOfInstruction.join(', ') : institution.mediumOfInstruction) : 'English'}</Badge>
-                  <Badge variant="outline" className="text-slate-200 border-slate-600 bg-slate-800/50">Institution Type: College</Badge>
-                </div>
+              {/* Badges and Buttons moved below to align with the left edge of the logo */}
+              <div className="flex flex-col space-y-6 mt-6 sm:mt-8 w-full">
+              <div className="flex overflow-x-auto sm:overflow-visible pb-2 sm:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap items-center gap-2 no-scrollbar w-[100vw] sm:w-auto">
+                <Badge variant="outline" className="text-blue-200 border-blue-500/30 bg-blue-500/10 backdrop-blur-md whitespace-nowrap">Est: {institution.establishedYear || '2013'}</Badge>
+                <Badge variant="outline" className="text-purple-200 border-purple-500/30 bg-purple-500/10 backdrop-blur-md whitespace-nowrap">Medium: {institution.mediumOfInstruction ? (Array.isArray(institution.mediumOfInstruction) ? institution.mediumOfInstruction.join(', ') : institution.mediumOfInstruction) : 'English'}</Badge>
+                <Badge variant="outline" className="text-emerald-200 border-emerald-500/30 bg-emerald-500/10 backdrop-blur-md whitespace-nowrap">Institution Type: College</Badge>
+              </div>
 
-                <div className="flex flex-wrap gap-3 mt-6">
-                  <Button className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium shadow-lg px-6 h-10 rounded-lg">Get Admission Info</Button>
-                  <Button variant="outline" className="border-white/20 text-white hover:bg-white/10 backdrop-blur-sm font-medium h-10 rounded-lg">Download Brochure</Button>
+              <div className="flex flex-col sm:flex-row flex-wrap gap-3 w-full">
+                <Button className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-medium shadow-lg hover:shadow-emerald-500/25 px-6 h-12 sm:h-10 rounded-xl sm:rounded-lg transition-all border border-emerald-500/50 text-base sm:text-sm">Get Admission Info</Button>
+                <div className="grid grid-cols-2 gap-3 w-full sm:w-auto sm:flex sm:flex-wrap">
+                  <Button className="w-full sm:w-auto bg-indigo-500/20 border border-indigo-400/30 text-indigo-50 hover:bg-indigo-500/30 hover:border-indigo-400/50 backdrop-blur-md font-medium px-2 sm:px-5 h-12 sm:h-10 rounded-xl sm:rounded-lg shadow-lg shadow-indigo-500/10 transition-all text-[13px] sm:text-sm">Brochure</Button>
                   {institution.websiteUrl && (
-                    <Button variant="outline" asChild className="border-white/20 text-white hover:bg-white/10 backdrop-blur-sm font-medium h-10 rounded-lg">
-                      <a href={institution.websiteUrl} target="_blank" rel="noopener noreferrer"><Globe className="w-4 h-4 mr-2" /> Visit Website</a>
+                    <Button asChild className="w-full sm:w-auto bg-amber-500/20 border border-amber-400/30 text-amber-50 hover:bg-amber-500/30 hover:border-amber-400/50 backdrop-blur-md font-medium px-2 sm:px-5 h-12 sm:h-10 rounded-xl sm:rounded-lg shadow-lg shadow-amber-500/10 transition-all text-[13px] sm:text-sm">
+                      <a href={institution.websiteUrl} target="_blank" rel="noopener noreferrer"><Globe className="w-4 h-4 sm:mr-2 shrink-0" /> <span className="hidden sm:inline">Visit Website</span><span className="sm:hidden ml-1">Website</span></a>
                     </Button>
                   )}
                 </div>
               </div>
+              </div>
             </div>
 
             {/* Right side: Stats Cards */}
-            <div className="lg:w-1/3 w-full grid grid-cols-2 gap-3 pt-4 lg:pt-0">
-              <div className="bg-slate-900/60 backdrop-blur-md border border-white/10 rounded-2xl p-5 text-white flex flex-col items-center justify-center shadow-inner hover:bg-slate-800/60 transition-colors">
-                <div className="text-3xl font-bold mb-1">{institution.totalEnrollment || '3,25K'}</div>
-                <div className="text-sm text-slate-400 font-medium">Students</div>
+            <div className="lg:w-1/3 w-full grid grid-cols-2 gap-3 sm:gap-4 pt-4 lg:pt-0">
+              <div className="bg-blue-900/20 backdrop-blur-md border border-blue-500/20 rounded-2xl p-4 sm:p-5 text-blue-50 flex flex-col items-center justify-center shadow-inner hover:bg-blue-800/30 hover:border-blue-400/40 transition-all group">
+                <div className="text-2xl sm:text-3xl font-bold mb-1 group-hover:scale-105 transition-transform">{institution.totalEnrollment || '3,25K'}</div>
+                <div className="text-xs sm:text-sm text-blue-200/80 font-medium">Students</div>
               </div>
-              <div className="bg-slate-900/60 backdrop-blur-md border border-white/10 rounded-2xl p-5 text-white flex flex-col items-center justify-center shadow-inner hover:bg-slate-800/60 transition-colors">
-                <div className="flex items-center gap-2 text-3xl font-bold mb-1">{institution.rating || '4.7'}<Star className="w-6 h-6 fill-amber-400 text-amber-400" /></div>
-                <div className="text-sm text-slate-400 font-medium">Rating</div>
+              <div className="bg-amber-900/20 backdrop-blur-md border border-amber-500/20 rounded-2xl p-4 sm:p-5 text-amber-50 flex flex-col items-center justify-center shadow-inner hover:bg-amber-800/30 hover:border-amber-400/40 transition-all group">
+                <div className="flex items-center gap-1 sm:gap-2 text-2xl sm:text-3xl font-bold mb-1 group-hover:scale-105 transition-transform">{institution.rating || '4.7'}<Star className="w-5 h-5 sm:w-6 sm:h-6 fill-amber-400 text-amber-400" /></div>
+                <div className="text-xs sm:text-sm text-amber-200/80 font-medium">Rating</div>
               </div>
-              <div className="bg-slate-900/60 backdrop-blur-md border border-white/10 rounded-2xl p-5 text-white flex flex-col items-center justify-center shadow-inner hover:bg-slate-800/60 transition-colors">
-                <div className="text-3xl font-bold mb-1">{MOCK_COURSES.length}</div>
-                <div className="text-sm text-slate-400 font-medium">Courses</div>
+              <div className="bg-emerald-900/20 backdrop-blur-md border border-emerald-500/20 rounded-2xl p-4 sm:p-5 text-emerald-50 flex flex-col items-center justify-center shadow-inner hover:bg-emerald-800/30 hover:border-emerald-400/40 transition-all group">
+                <div className="text-2xl sm:text-3xl font-bold mb-1 group-hover:scale-105 transition-transform">{MOCK_COURSES.length}</div>
+                <div className="text-xs sm:text-sm text-emerald-200/80 font-medium">Courses</div>
               </div>
-              <div className="bg-slate-900/60 backdrop-blur-md border border-white/10 rounded-2xl p-5 text-white flex flex-col items-center justify-center shadow-inner hover:bg-slate-800/60 transition-colors">
-                <div className="text-3xl font-bold mb-1">{institution.userRatingsTotal || 232}</div>
-                <div className="text-sm text-slate-400 font-medium">Reviews</div>
+              <div className="bg-purple-900/20 backdrop-blur-md border border-purple-500/20 rounded-2xl p-4 sm:p-5 text-purple-50 flex flex-col items-center justify-center shadow-inner hover:bg-purple-800/30 hover:border-purple-400/40 transition-all group">
+                <div className="text-2xl sm:text-3xl font-bold mb-1 group-hover:scale-105 transition-transform">{institution.userRatingsTotal || 232}</div>
+                <div className="text-xs sm:text-sm text-purple-200/80 font-medium">Reviews</div>
               </div>
             </div>
 
