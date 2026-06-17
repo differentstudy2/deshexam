@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Search, Layers, Calendar, Hash, Tag, Activity, Edit2, Trash2 } from 'lucide-react';
+import { Search, Layers, Calendar, Hash, Tag, Activity, Edit2, Trash2, ChevronLeft, ChevronRight, Filter } from 'lucide-react';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -23,6 +23,9 @@ export function TaxonomyDataTable({ type, title }: Props) {
   const [nodes, setNodes] = useState<TaxonomyNode[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20;
 
   // Edit Modal State
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -49,10 +52,19 @@ export function TaxonomyDataTable({ type, title }: Props) {
     }
   };
 
-  const filteredNodes = nodes.filter(node => 
-    node.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (node.slug && node.slug.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, statusFilter]);
+
+  const filteredNodes = nodes.filter(node => {
+    const matchesSearch = node.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          (node.slug && node.slug.toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchesStatus = statusFilter === 'all' || node.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
+  const totalPages = Math.max(1, Math.ceil(filteredNodes.length / itemsPerPage));
+  const paginatedNodes = filteredNodes.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const handleEditClick = (node: TaxonomyNode) => {
     setEditingNode(node);
@@ -88,9 +100,9 @@ export function TaxonomyDataTable({ type, title }: Props) {
     try {
       await deleteTaxonomyNode(node.id);
       fetchData(); // Refresh list after deletion
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to delete node", error);
-      alert("Failed to delete item.");
+      alert(`Failed to delete item: ${error?.message || "Unknown error"}`);
     }
   };
 
@@ -137,27 +149,45 @@ export function TaxonomyDataTable({ type, title }: Props) {
             <CardTitle className="text-lg font-semibold text-gray-800 flex items-center gap-2">
               <DatabaseZap className="w-5 h-5 text-emerald-500" />
               Data Table
+              <Badge variant="secondary" className="ml-2 bg-gray-100 text-gray-600 font-mono">{filteredNodes.length} items</Badge>
             </CardTitle>
-            <div className="relative w-full sm:w-72">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <Input 
-                placeholder="Search by title or slug..." 
-                className="pl-9 h-9 bg-gray-50/50 border-gray-200"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <div className="relative w-full sm:w-64">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Input 
+                  placeholder="Search by title or slug..." 
+                  className="pl-9 h-9 bg-gray-50/50 border-gray-200 text-sm"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+              <div className="relative">
+                <select 
+                  className="h-9 px-3 py-1 bg-gray-50/50 border border-gray-200 rounded-md text-sm text-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none pr-8 cursor-pointer"
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                >
+                  <option value="all">All Statuses</option>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                  <option value="published">Published</option>
+                  <option value="draft">Draft</option>
+                </select>
+                <Filter className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+              </div>
             </div>
           </div>
         </CardHeader>
         <CardContent className="p-0">
           {loading ? (
             <div className="p-12 text-center text-gray-500 animate-pulse">Loading data...</div>
-          ) : filteredNodes.length === 0 ? (
+          ) : paginatedNodes.length === 0 ? (
             <div className="p-12 text-center text-gray-500">No records found.</div>
           ) : (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader className="bg-gray-50/50">
+            <div className="flex flex-col">
+              <div className="overflow-x-auto min-h-[400px]">
+                <Table>
+                  <TableHeader className="bg-gray-50/50">
                   <TableRow>
                     <TableHead className="w-[250px]">Title</TableHead>
                     {(type === 'chapter' || type === 'topic') && (
@@ -170,7 +200,7 @@ export function TaxonomyDataTable({ type, title }: Props) {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredNodes.map((node) => (
+                  {paginatedNodes.map((node) => (
                     <TableRow key={node.id} className="hover:bg-gray-50/50">
                       <TableCell className="font-medium text-gray-900">
                         {node.title}
@@ -208,6 +238,37 @@ export function TaxonomyDataTable({ type, title }: Props) {
                   ))}
                 </TableBody>
               </Table>
+              </div>
+              
+              {/* Pagination Controls */}
+              <div className="p-4 border-t border-gray-100 flex items-center justify-between bg-gray-50/30 rounded-b-xl">
+                <div className="text-sm text-gray-500">
+                  Showing <span className="font-medium text-gray-900">{filteredNodes.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0}</span> to <span className="font-medium text-gray-900">{Math.min(currentPage * itemsPerPage, filteredNodes.length)}</span> of <span className="font-medium text-gray-900">{filteredNodes.length}</span> results
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="h-8 text-xs bg-white"
+                  >
+                    <ChevronLeft className="w-3.5 h-3.5 mr-1" /> Previous
+                  </Button>
+                  <div className="flex items-center justify-center min-w-[30px] text-sm font-medium text-gray-700">
+                    {currentPage} / {totalPages}
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                    className="h-8 text-xs bg-white"
+                  >
+                    Next <ChevronRight className="w-3.5 h-3.5 ml-1" />
+                  </Button>
+                </div>
+              </div>
             </div>
           )}
         </CardContent>
