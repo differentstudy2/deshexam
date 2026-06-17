@@ -23,6 +23,12 @@ export interface TaxonomyNode {
   description?: string;
   author?: string;
   
+  // Board specific optional fields
+  acronym?: string;
+  boardType?: 'Central' | 'State';
+  stateRegion?: string;
+  logoUrl?: string;
+  
   // SEO fields
   seoTitle?: string;
   featureImage?: string;

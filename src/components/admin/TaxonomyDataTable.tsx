@@ -511,9 +511,17 @@ export function TaxonomyDataTable({ type, title }: Props) {
                           <Button variant="ghost" size="icon" onClick={() => handleToggleStatus(node)} className="h-8 w-8 text-emerald-600 hover:bg-emerald-50" title="Toggle Status">
                             {node.status === 'active' || node.status === 'published' ? <CheckSquare className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                           </Button>
-                          <Button variant="ghost" size="icon" onClick={() => handleEditClick(node)} className="h-8 w-8 text-indigo-600 hover:bg-indigo-50" title="Edit">
-                            <Edit2 className="w-4 h-4" />
-                          </Button>
+                          {type === 'board' ? (
+                            <Button asChild variant="ghost" size="icon" className="h-8 w-8 text-indigo-600 hover:bg-indigo-50" title="Edit Board Details">
+                              <Link href={`/admin/board/${node.id}`}>
+                                <Edit2 className="w-4 h-4" />
+                              </Link>
+                            </Button>
+                          ) : (
+                            <Button variant="ghost" size="icon" onClick={() => handleEditClick(node)} className="h-8 w-8 text-indigo-600 hover:bg-indigo-50" title="Edit">
+                              <Edit2 className="w-4 h-4" />
+                            </Button>
+                          )}
                           <Button variant="ghost" size="icon" onClick={() => handleDelete(node)} className="h-8 w-8 text-red-600 hover:bg-red-50" title="Delete">
                             <Trash2 className="w-4 h-4" />
                           </Button>
