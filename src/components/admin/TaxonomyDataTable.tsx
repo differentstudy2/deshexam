@@ -146,18 +146,7 @@ export function TaxonomyDataTable({ type, title }: Props) {
       current = parent;
     }
     
-    // Extract specifically Class and Textbook if available
-    const classNode = path.find(n => n.type === 'class');
-    const textbookNode = path.find(n => n.type === 'textbook');
-    const subjectNode = path.find(n => n.type === 'subject');
-
-    const parts = [];
-    if (classNode) parts.push(`Class: ${classNode.title}`);
-    if (subjectNode && !textbookNode) parts.push(`Subject: ${subjectNode.title}`);
-    if (textbookNode) parts.push(`Textbook: ${textbookNode.title}`);
-
-    if (parts.length === 0) return path.map(p => p.title).join(' > ');
-    return parts.join(' | ');
+    return path.map(p => p.title).join(' > ');
   };
 
   return (
@@ -175,20 +164,13 @@ export function TaxonomyDataTable({ type, title }: Props) {
       <Card className="border-gray-100 shadow-sm">
         <CardHeader className="pb-4 border-b border-gray-50 bg-white">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <CardTitle className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+            <CardTitle className="text-lg font-semibold text-gray-800 flex items-center gap-2 shrink-0">
               <DatabaseZap className="w-5 h-5 text-emerald-500" />
               Data Table
               <Badge variant="secondary" className="ml-2 bg-gray-100 text-gray-600 font-mono">{filteredNodes.length} items</Badge>
             </CardTitle>
-          </div>
-        </CardHeader>
-
-        {/* Dedicated Filters Section */}
-        <div className="p-4 border-b border-gray-100 bg-gray-50/30">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            <div className="space-y-1.5">
-              <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Search</Label>
-              <div className="relative">
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <div className="relative w-full sm:w-64">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <Input 
                   placeholder="Search by title or slug..." 
@@ -197,7 +179,28 @@ export function TaxonomyDataTable({ type, title }: Props) {
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
+              <div className="relative">
+                <select 
+                  className="h-9 px-3 py-1 bg-white border border-gray-200 rounded-md text-sm text-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none pr-8 cursor-pointer"
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                >
+                  <option value="all">All Statuses</option>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                  <option value="published">Published</option>
+                  <option value="draft">Draft</option>
+                </select>
+                <Filter className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+              </div>
             </div>
+          </div>
+        </CardHeader>
+
+        {/* Dedicated Filters Section */}
+        {['class', 'subject', 'textbook', 'chapter', 'topic'].includes(type) && (
+          <div className="p-4 border-b border-gray-100 bg-gray-50/30">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
 
             {['class', 'subject', 'textbook', 'chapter', 'topic'].includes(type) && (
               <div className="space-y-1.5">
@@ -299,26 +302,9 @@ export function TaxonomyDataTable({ type, title }: Props) {
                 </div>
               </div>
             )}
-
-            <div className="space-y-1.5">
-              <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Filter by Status</Label>
-              <div className="relative">
-                <select 
-                  className="h-9 w-full px-3 py-1 bg-white border border-gray-200 rounded-md text-sm text-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none pr-8 cursor-pointer"
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                >
-                  <option value="all">All Statuses</option>
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
-                  <option value="published">Published</option>
-                  <option value="draft">Draft</option>
-                </select>
-                <Filter className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
-              </div>
-            </div>
           </div>
         </div>
+        )}
 
         <CardContent className="p-0">
           {loading ? (
@@ -332,8 +318,8 @@ export function TaxonomyDataTable({ type, title }: Props) {
                   <TableHeader className="bg-gray-50/50">
                   <TableRow>
                     <TableHead className="w-[250px]">Title</TableHead>
-                    {(type === 'chapter' || type === 'topic') && (
-                      <TableHead>Context (Class / Textbook)</TableHead>
+                    {type !== 'board' && (
+                      <TableHead>Hierarchy Context</TableHead>
                     )}
                     <TableHead>Slug</TableHead>
                     <TableHead>Status</TableHead>
@@ -348,7 +334,7 @@ export function TaxonomyDataTable({ type, title }: Props) {
                         {node.title}
                         {node.icon && <span className="ml-2 text-xs text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">Icon: {node.icon}</span>}
                       </TableCell>
-                      {(type === 'chapter' || type === 'topic') && (
+                      {type !== 'board' && (
                         <TableCell className="text-gray-500 text-xs">
                           {getParentContext(node)}
                         </TableCell>
