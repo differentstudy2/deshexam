@@ -61,6 +61,7 @@ export interface TaxonomyNode {
   
   // SEO fields
   seoTitle?: string;
+  seoDescription?: string;
   featureImage?: string;
   tags?: string[];
   keywords?: string[];

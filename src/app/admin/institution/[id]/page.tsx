@@ -44,6 +44,7 @@ export default function InstitutionEditPage() {
     rating: undefined,
     status: 'draft',
     seoTitle: '',
+    seoDescription: '',
     phoneNumber: '',
     internationalPhoneNumber: '',
     openingHours: [],
@@ -83,6 +84,7 @@ export default function InstitutionEditPage() {
             rating: node.rating,
             status: node.status || 'published',
             seoTitle: node.seoTitle || '',
+            seoDescription: node.seoDescription || '',
             phoneNumber: node.phoneNumber || '',
             internationalPhoneNumber: node.internationalPhoneNumber || '',
             openingHours: node.openingHours || [],
@@ -148,6 +150,8 @@ export default function InstitutionEditPage() {
         ...prev,
         establishedYear: data.establishedYear || prev.establishedYear,
         totalEnrollment: data.totalEnrollment || prev.totalEnrollment,
+        description: data.description || prev.description,
+        seoDescription: data.seoDescription || prev.seoDescription,
         socialProfiles: {
           facebook: data.socialProfiles?.facebook || prev.socialProfiles?.facebook || '',
           twitter: data.socialProfiles?.twitter || prev.socialProfiles?.twitter || '',
@@ -439,6 +443,18 @@ export default function InstitutionEditPage() {
                   <Label htmlFor="seoTitle">SEO Title</Label>
                   <Input id="seoTitle" name="seoTitle" value={formData.seoTitle} onChange={handleChange} placeholder="Custom title for SEO" />
                 </div>
+              </div>
+              <div className="grid gap-2 pt-4">
+                <Label htmlFor="seoDescription">SEO Description</Label>
+                <textarea 
+                  id="seoDescription" 
+                  name="seoDescription" 
+                  value={formData.seoDescription || ''} 
+                  onChange={handleChange} 
+                  rows={2}
+                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  placeholder="Compelling meta description for search engines..."
+                />
               </div>
             </CardContent>
           </Card>
