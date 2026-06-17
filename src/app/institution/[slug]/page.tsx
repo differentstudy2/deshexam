@@ -3,10 +3,10 @@ import { notFound } from 'next/navigation';
 import { collection, query, where, getDocs, limit } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import { TaxonomyNode } from '@/lib/firebase/taxonomy';
-import { 
+import {
   MapPin, Globe, Star, Building, Navigation, ArrowLeft, Bookmark, CheckCircle2, 
   Users, BookOpen, Clock, Phone, Mail, FileText, Monitor, Bed, Bus, TestTube, 
-  Trophy, Wifi, Coffee, Tent, PlusSquare, ChevronDown, ChevronRight, Filter
+  Trophy, Wifi, Coffee, Tent, PlusSquare, ChevronDown, ChevronRight, Filter, Sparkles
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -138,7 +138,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
                 <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight">{institution.title}</h1>
                 <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-slate-300 mt-2">
                   <span className="flex items-center gap-1"><Building className="w-4 h-4" /> Type: {institution.boardType || 'Educational Institution'}</span>
-                  <span className="flex items-center gap-1"><BookOpen className="w-4 h-4" /> Medium: English</span>
+                  <span className="flex items-center gap-1"><BookOpen className="w-4 h-4" /> Medium: {institution.mediumOfInstruction ? (Array.isArray(institution.mediumOfInstruction) ? institution.mediumOfInstruction.join(', ') : institution.mediumOfInstruction) : 'English'}</span>
                   <span className="flex items-center gap-1"><MapPin className="w-4 h-4" /> Location: {institution.address ? institution.address.split(',')[0] : 'City'}</span>
                 </div>
                 <div className="flex gap-3 mt-4">
@@ -157,7 +157,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
               <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-4 text-white min-w-[140px]">
                 <Users className="w-6 h-6 text-emerald-400 mb-2" />
                 <div className="text-xs text-slate-300 uppercase tracking-wider font-semibold">Students</div>
-                <div className="text-2xl font-bold">5,200+</div>
+                <div className="text-2xl font-bold">{institution.totalEnrollment || '5,200+'}</div>
               </div>
               <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-4 text-white min-w-[140px]">
                 <BookOpen className="w-6 h-6 text-indigo-400 mb-2" />
@@ -224,9 +224,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
                 <h2 className="text-2xl font-bold text-slate-900 mb-3">About Institution</h2>
                 <div className="prose prose-slate max-w-none text-slate-600 leading-relaxed">
                   {institution.description ? (
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                      {institution.description}
-                    </ReactMarkdown>
+                    <div className="tiptap-content" dangerouslySetInnerHTML={{ __html: institution.description }} />
                   ) : (
                     <p>
                       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
@@ -347,6 +345,24 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
                 <Button variant="outline">Write Review</Button>
               </div>
 
+              {institution.aiReviewSummary && (
+                <div className="mb-8 bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-100 rounded-xl p-6 shadow-sm relative overflow-hidden">
+                  <div className="absolute top-0 right-0 p-4 opacity-10">
+                    <Sparkles className="w-24 h-24 text-indigo-500" />
+                  </div>
+                  <div className="relative z-10">
+                    <div className="flex items-center gap-2 text-indigo-700 font-bold mb-3">
+                      <Sparkles className="w-5 h-5" /> AI Review Summary
+                    </div>
+                    <div className="prose prose-sm prose-slate max-w-none">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {institution.aiReviewSummary}
+                      </ReactMarkdown>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {(institution.reviews && institution.reviews.length > 0 ? institution.reviews : MOCK_REVIEWS).map((review: any, idx) => (
                   <div key={idx} className="p-5 rounded-xl border border-slate-100 bg-slate-50">
@@ -453,11 +469,17 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
               </div>
               
               {institution.latitude && institution.longitude && (
-                <Button asChild variant="outline" className="w-full border-slate-200 text-slate-700 bg-slate-50 hover:bg-slate-100">
-                  <a href={`https://www.google.com/maps/search/?api=1&query=${institution.latitude},${institution.longitude}`} target="_blank" rel="noopener noreferrer">
-                    <MapPin className="w-4 h-4 mr-2 text-emerald-600" /> View on Map
-                  </a>
-                </Button>
+                <div className="mt-4 rounded-xl overflow-hidden border border-slate-200">
+                  <iframe 
+                    width="100%" 
+                    height="200" 
+                    frameBorder="0" 
+                    scrolling="no" 
+                    marginHeight={0} 
+                    marginWidth={0} 
+                    src={`https://maps.google.com/maps?q=${institution.latitude},${institution.longitude}&hl=en&z=14&output=embed`}
+                  ></iframe>
+                </div>
               )}
             </CardContent>
           </Card>

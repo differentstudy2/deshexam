@@ -10,9 +10,10 @@ export interface RichTextEditorProps {
   onChange: (data: { html: string; text: string; markdown: string }) => void;
   placeholder?: string;
   minHeight?: string;
+  maxHeight?: string;
 }
 
-export function RichTextEditor({ content, onChange, minHeight = '150px' }: RichTextEditorProps) {
+export function RichTextEditor({ content, onChange, minHeight = '150px', maxHeight }: RichTextEditorProps) {
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -74,7 +75,11 @@ export function RichTextEditor({ content, onChange, minHeight = '150px' }: RichT
       </div>
 
       {/* Editor Content */}
-      <div className="bg-white cursor-text w-full" onClick={() => editor.chain().focus().run()}>
+      <div 
+        className="bg-white cursor-text w-full overflow-y-auto" 
+        style={{ maxHeight }}
+        onClick={() => editor.chain().focus().run()}
+      >
         <EditorContent editor={editor} className="w-full" />
       </div>
     </div>

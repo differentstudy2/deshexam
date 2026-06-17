@@ -13,9 +13,14 @@ import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Save, Upload, Shield, Image as ImageIcon, MapPin, Sparkles, X, Plus, Bold, Italic, List, Heading2 } from 'lucide-react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RichTextEditor } from '@/components/ui/rich-text-editor';
+import dynamic from 'next/dynamic';
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
+
+const TiptapEditor = dynamic(() => import('@/components/admin/TiptapEditor').then(mod => mod.TiptapEditor), {
+  ssr: false,
+  loading: () => <div className="min-h-[200px] flex items-center justify-center bg-slate-50 border border-slate-200 rounded-md">Loading Editor...</div>
+});
 
 export default function InstitutionEditPage() {
   const params = useParams();
@@ -449,10 +454,12 @@ export default function InstitutionEditPage() {
 
               <div className="grid gap-2">
                 <Label htmlFor="description">Description</Label>
-                <RichTextEditor 
+                <div className="min-h-[400px]">
+                <TiptapEditor 
                   content={formData.description || ''} 
-                  onChange={({ html }) => setFormData(prev => ({ ...prev, description: html }))} 
+                  onChange={(html) => setFormData(prev => ({ ...prev, description: html }))}
                 />
+              </div>
               </div>
             </CardContent>
           </Card>
