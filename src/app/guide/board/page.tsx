@@ -8,7 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { createTaxonomyNode } from '@/lib/firebase/taxonomy';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '@/lib/firebase/client';
 import { useToast } from '@/hooks/use-toast';
 
 export default function GuideBoardPage() {
@@ -45,19 +46,25 @@ export default function GuideBoardPage() {
     let successCount = 0;
     try {
       for (const board of indianBoards) {
-        // Attempt to create. This is a very simple seed without duplication checks.
-        await createTaxonomyNode({
+        // Use setDoc with merge: true to avoid overwriting user edits like logoUrl
+        const docRef = doc(db, 'taxonomy_nodes', board.id);
+        await setDoc(docRef, {
           title: board.title,
+          acronym: board.acronym,
+          boardType: board.type,
+          stateRegion: board.state || '',
           slug: board.slug,
           type: 'board',
           track: 'academic',
           parentId: null,
           status: 'published',
-          description: `${board.type} Educational Board`
-        });
+          description: `${board.type} Educational Board`,
+          updatedAt: serverTimestamp()
+        }, { merge: true });
+        
         successCount++;
       }
-      toast({ title: 'Database Seeded!', description: `Successfully inserted ${successCount} boards.`});
+      toast({ title: 'Database Seeded & Updated!', description: `Successfully attached all data to ${successCount} boards.`});
     } catch (error) {
       toast({ variant: 'destructive', title: 'Error seeding database', description: String(error) });
     } finally {
@@ -74,10 +81,10 @@ export default function GuideBoardPage() {
             Academic Directory
           </Badge>
           <h1 className="text-4xl md:text-6xl font-extrabold text-white tracking-tight">
-            Explore All Educational Boards
+            Explore Boards & Institutions
           </h1>
           <p className="text-indigo-200 text-lg md:text-xl max-w-2xl mx-auto font-medium">
-            Find complete curriculum, syllabus, and study materials for over 50 Central and State Boards across India.
+            Find complete curriculum, syllabus, and study materials for over 50 Central Boards, State Boards, Colleges, and Institutions.
           </p>
 
           {/* Search Bar */}
@@ -88,7 +95,7 @@ export default function GuideBoardPage() {
               </div>
               <input
                 type="text"
-                placeholder="Search by board name, acronym (e.g., CBSE), or state..."
+                placeholder="Search by institution name, acronym (e.g., CBSE), or state..."
                 className="w-full pl-12 pr-4 py-4 md:py-5 rounded-2xl bg-white/95 backdrop-blur-xl border-2 border-indigo-100 shadow-xl focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 text-slate-800 text-lg transition-all"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}

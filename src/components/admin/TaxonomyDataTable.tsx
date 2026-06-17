@@ -512,7 +512,7 @@ export function TaxonomyDataTable({ type, title }: Props) {
                             {node.status === 'active' || node.status === 'published' ? <CheckSquare className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                           </Button>
                           {type === 'board' ? (
-                            <Button asChild variant="ghost" size="icon" className="h-8 w-8 text-indigo-600 hover:bg-indigo-50" title="Edit Board Details">
+                            <Button asChild variant="ghost" size="icon" className="h-8 w-8 text-indigo-600 hover:bg-indigo-50" title="Edit Board / Institution Details">
                               <Link href={`/admin/board/${node.id}`}>
                                 <Edit2 className="w-4 h-4" />
                               </Link>

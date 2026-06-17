@@ -23,11 +23,14 @@ export interface TaxonomyNode {
   description?: string;
   author?: string;
   
-  // Board specific optional fields
+  // Board / Institution specific optional fields
   acronym?: string;
-  boardType?: 'Central' | 'State';
+  boardType?: 'Central Board' | 'State Board' | 'Public School' | 'Private School' | 'College' | 'University' | 'Coaching Institute' | 'Other';
   stateRegion?: string;
   logoUrl?: string;
+  websiteUrl?: string;
+  establishedYear?: string;
+  headquarters?: string;
   
   // SEO fields
   seoTitle?: string;

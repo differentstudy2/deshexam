@@ -29,10 +29,13 @@ export default function BoardEditPage() {
     title: '',
     acronym: '',
     slug: '',
-    boardType: 'State',
+    boardType: 'State Board',
     stateRegion: '',
     description: '',
     logoUrl: '',
+    websiteUrl: '',
+    establishedYear: '',
+    headquarters: '',
     status: 'draft',
     seoTitle: '',
   });
@@ -47,10 +50,13 @@ export default function BoardEditPage() {
             title: node.title || '',
             acronym: node.acronym || '',
             slug: node.slug || '',
-            boardType: node.boardType || 'State',
+            boardType: node.boardType || 'State Board',
             stateRegion: node.stateRegion || '',
             description: node.description || '',
             logoUrl: node.logoUrl || node.featureImage || '', // fallback to featureImage if logoUrl is empty
+            websiteUrl: node.websiteUrl || '',
+            establishedYear: node.establishedYear || '',
+            headquarters: node.headquarters || '',
             status: node.status || 'published',
             seoTitle: node.seoTitle || '',
           });
@@ -124,7 +130,7 @@ export default function BoardEditPage() {
           </Button>
           <div>
             <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-              Edit Board: {formData.acronym || 'New Board'}
+              Edit Institution / Board: {formData.acronym || 'New Entry'}
             </h1>
             <p className="text-gray-500 text-sm">ID: {boardId}</p>
           </div>
@@ -151,8 +157,8 @@ export default function BoardEditPage() {
             </CardHeader>
             <CardContent className="p-6 space-y-4">
               <div className="grid gap-2">
-                <Label htmlFor="title">Full Board Name <span className="text-red-500">*</span></Label>
-                <Input id="title" name="title" value={formData.title} onChange={handleChange} placeholder="e.g. Central Board of Secondary Education" />
+                <Label htmlFor="title">Full Name <span className="text-red-500">*</span></Label>
+                <Input id="title" name="title" value={formData.title} onChange={handleChange} placeholder="e.g. Central Board of Secondary Education or Delhi Public School" />
               </div>
               
               <div className="grid grid-cols-2 gap-4">
@@ -167,7 +173,7 @@ export default function BoardEditPage() {
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="description">Description</Label>
+                  <Label htmlFor="description">Description</Label>
                 <textarea 
                   id="description" 
                   name="description" 
@@ -175,7 +181,7 @@ export default function BoardEditPage() {
                   onChange={handleChange} 
                   rows={4}
                   className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  placeholder="Brief description about the educational board..."
+                  placeholder="Brief description about the board or institution..."
                 />
               </div>
             </CardContent>
@@ -188,7 +194,7 @@ export default function BoardEditPage() {
             <CardContent className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="boardType">Board Type</Label>
+                  <Label htmlFor="boardType">Institution Type</Label>
                   <select 
                     id="boardType" 
                     name="boardType" 
@@ -196,8 +202,14 @@ export default function BoardEditPage() {
                     onChange={handleChange as any}
                     className="h-10 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
-                    <option value="State">State Board</option>
-                    <option value="Central">Central Board</option>
+                    <option value="Central Board">Central Board</option>
+                    <option value="State Board">State Board</option>
+                    <option value="Public School">Public School</option>
+                    <option value="Private School">Private School</option>
+                    <option value="College">College</option>
+                    <option value="University">University</option>
+                    <option value="Coaching Institute">Coaching Institute</option>
+                    <option value="Other">Other</option>
                   </select>
                 </div>
                 
@@ -206,8 +218,24 @@ export default function BoardEditPage() {
                   <Input id="stateRegion" name="stateRegion" value={formData.stateRegion} onChange={handleChange} placeholder="e.g. Uttar Pradesh" />
                 </div>
               </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="establishedYear">Established Year</Label>
+                  <Input id="establishedYear" name="establishedYear" value={formData.establishedYear} onChange={handleChange} placeholder="e.g. 1929" />
+                </div>
+                <div className="grid gap-2 md:col-span-2">
+                  <Label htmlFor="headquarters">Headquarters</Label>
+                  <Input id="headquarters" name="headquarters" value={formData.headquarters} onChange={handleChange} placeholder="e.g. New Delhi, India" />
+                </div>
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="websiteUrl">Official Website</Label>
+                <Input id="websiteUrl" name="websiteUrl" type="url" value={formData.websiteUrl} onChange={handleChange} placeholder="https://cbse.gov.in" />
+              </div>
               
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100">
                 <div className="grid gap-2">
                   <Label htmlFor="status">Status</Label>
                   <select 
@@ -239,7 +267,7 @@ export default function BoardEditPage() {
             <CardHeader className="border-b border-gray-100 bg-gray-50/50">
               <CardTitle className="text-lg flex items-center gap-2">
                 <ImageIcon className="w-5 h-5 text-indigo-500" />
-                Board Logo
+                Institution Logo
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6">
@@ -248,7 +276,7 @@ export default function BoardEditPage() {
                 {/* Logo Preview */}
                 <div className="w-32 h-32 rounded-2xl bg-gray-50 border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden relative shadow-sm">
                   {formData.logoUrl ? (
-                    <Image src={formData.logoUrl} alt="Board Logo" fill className="object-contain p-2" unoptimized />
+                    <Image src={formData.logoUrl} alt="Institution Logo" fill className="object-contain p-2" unoptimized />
                   ) : (
                     <Shield className="w-12 h-12 text-gray-300" />
                   )}
@@ -277,12 +305,24 @@ export default function BoardEditPage() {
                 </div>
                 
                 {formData.logoUrl && (
-                  <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-700 hover:bg-red-50" onClick={() => setFormData(prev => ({ ...prev, logoUrl: '' }))}>
+                  <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-700 hover:bg-red-50 mt-2" onClick={() => setFormData(prev => ({ ...prev, logoUrl: '' }))}>
                     Remove Logo
                   </Button>
                 )}
                 
-                <p className="text-xs text-gray-400 text-center">
+                <div className="w-full pt-4 mt-4 border-t border-gray-100">
+                  <Label htmlFor="logoUrl" className="text-xs text-gray-500 mb-2 block">Or paste image URL directly:</Label>
+                  <Input 
+                    id="logoUrl" 
+                    name="logoUrl" 
+                    value={formData.logoUrl} 
+                    onChange={handleChange} 
+                    placeholder="https://example.com/logo.png" 
+                    className="text-sm"
+                  />
+                </div>
+                
+                <p className="text-xs text-gray-400 text-center mt-4">
                   Recommended size: 256x256px.<br/> PNG or WebP with transparent background.
                 </p>
               </div>
