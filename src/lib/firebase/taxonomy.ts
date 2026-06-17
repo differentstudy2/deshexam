@@ -125,7 +125,13 @@ export const deleteTaxonomyNode = async (id: string) => {
 // -------------------------------------------------------------
 
 export const generateSlug = (name: string) => {
-  return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+  return name
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '-') // Replace spaces with -
+    .replace(/[^\p{L}\p{N}\p{M}-]/gu, '') // Remove all non-word chars except letters, numbers, marks, and hyphens (Supports Bengali/Unicode)
+    .replace(/-+/g, '-') // Replace multiple - with single -
+    .replace(/(^-|-$)+/g, ''); // Trim - from start and end
 };
 
 // A helper to quickly map the old Guide types to new ones if needed, or get child types
