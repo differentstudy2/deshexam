@@ -1,19 +1,14 @@
-
-"use client";
-
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/toaster";
-import { Header } from "@/components/layout/header";
 import { AuthProvider } from "@/hooks/use-auth";
 import { AppProviders } from "./providers";
 import { AuthDialogProvider } from "@/hooks/use-auth-dialog";
 import { AuthDialog } from "@/components/feature/auth-dialog";
 import { Inter, Lexend, Hind_Siliguri } from 'next/font/google';
-import { Footer } from "@/components/layout/footer";
 import { FirebaseProvider } from "@/hooks/use-firebase";
 import Script from 'next/script';
-import { usePathname } from 'next/navigation';
+import { ConditionalHeader, ConditionalFooter } from "@/components/layout/ConditionalLayout";
 
 const inter = Inter({
   subsets: ['latin'],
@@ -31,18 +26,6 @@ const hindSiliguri = Hind_Siliguri({
   variable: '--font-hind-siliguri',
   weight: ['400', '600', '700'],
 });
-
-const ConditionalHeader = () => {
-  const pathname = usePathname();
-  if (pathname?.startsWith('/admin') || pathname?.startsWith('/dashboard') || pathname?.includes('/take')) return null;
-  return <Header />;
-};
-
-const ConditionalFooter = () => {
-  const pathname = usePathname();
-  if (pathname?.startsWith('/admin') || pathname?.startsWith('/dashboard') || pathname?.includes('/take')) return null;
-  return <Footer />;
-};
 
 export default function RootLayout({
   children,
