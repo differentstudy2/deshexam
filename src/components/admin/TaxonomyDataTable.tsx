@@ -6,8 +6,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Search, Layers, Calendar, Hash, Tag, Activity } from 'lucide-react';
+import { Search, Layers, Calendar, Hash, Tag, Activity, Edit2 } from 'lucide-react';
 import { format } from 'date-fns';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { updateTaxonomyNode } from '@/lib/firebase/taxonomy';
 
 interface Props {
   type: NodeType;
@@ -15,28 +19,89 @@ interface Props {
 }
 
 export function TaxonomyDataTable({ type, title }: Props) {
+  const [allNodes, setAllNodes] = useState<TaxonomyNode[]>([]);
   const [nodes, setNodes] = useState<TaxonomyNode[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Edit Modal State
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingNode, setEditingNode] = useState<TaxonomyNode | null>(null);
+  const [editForm, setEditForm] = useState({ title: '', slug: '' });
+  const [isSaving, setIsSaving] = useState(false);
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await getTaxonomyNodesByType('academic', type);
-        setNodes(data);
-      } catch (error) {
-        console.error(`Error fetching taxonomy nodes of type ${type}:`, error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchData();
   }, [type]);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      // Fetch all to resolve parent hierarchies easily
+      const { getTaxonomyNodesByTrack } = await import('@/lib/firebase/taxonomy');
+      const data = await getTaxonomyNodesByTrack('academic');
+      setAllNodes(data);
+      setNodes(data.filter(n => n.type === type));
+    } catch (error) {
+      console.error(`Error fetching taxonomy nodes:`, error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredNodes = nodes.filter(node => 
     node.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     (node.slug && node.slug.toLowerCase().includes(searchQuery.toLowerCase()))
   );
+
+  const handleEditClick = (node: TaxonomyNode) => {
+    setEditingNode(node);
+    setEditForm({ title: node.title, slug: node.slug || '' });
+    setIsEditModalOpen(true);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingNode) return;
+    setIsSaving(true);
+    try {
+      await updateTaxonomyNode(editingNode.id, { 
+        title: editForm.title, 
+        slug: editForm.slug 
+      });
+      setIsEditModalOpen(false);
+      fetchData(); // Refresh
+    } catch (error) {
+      console.error("Failed to update node", error);
+      alert("Failed to update");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const getParentContext = (node: TaxonomyNode) => {
+    if (!node.parentId) return null;
+    let current = node;
+    const path: TaxonomyNode[] = [];
+    while (current.parentId) {
+      const parent = allNodes.find(n => n.id === current.parentId);
+      if (!parent) break;
+      path.unshift(parent);
+      current = parent;
+    }
+    
+    // Extract specifically Class and Textbook if available
+    const classNode = path.find(n => n.type === 'class');
+    const textbookNode = path.find(n => n.type === 'textbook');
+    const subjectNode = path.find(n => n.type === 'subject');
+
+    const parts = [];
+    if (classNode) parts.push(`Class: ${classNode.title}`);
+    if (subjectNode && !textbookNode) parts.push(`Subject: ${subjectNode.title}`);
+    if (textbookNode) parts.push(`Textbook: ${textbookNode.title}`);
+
+    if (parts.length === 0) return path.map(p => p.title).join(' > ');
+    return parts.join(' | ');
+  };
 
   return (
     <div className="max-w-6xl mx-auto p-4 md:p-6 space-y-6">
@@ -78,11 +143,14 @@ export function TaxonomyDataTable({ type, title }: Props) {
               <Table>
                 <TableHeader className="bg-gray-50/50">
                   <TableRow>
-                    <TableHead className="w-[300px]">Title</TableHead>
+                    <TableHead className="w-[250px]">Title</TableHead>
+                    {(type === 'chapter' || type === 'topic') && (
+                      <TableHead>Context (Class / Textbook)</TableHead>
+                    )}
                     <TableHead>Slug</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Order</TableHead>
-                    <TableHead className="text-right">Created At</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -92,6 +160,11 @@ export function TaxonomyDataTable({ type, title }: Props) {
                         {node.title}
                         {node.icon && <span className="ml-2 text-xs text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">Icon: {node.icon}</span>}
                       </TableCell>
+                      {(type === 'chapter' || type === 'topic') && (
+                        <TableCell className="text-gray-500 text-xs">
+                          {getParentContext(node)}
+                        </TableCell>
+                      )}
                       <TableCell className="text-gray-500 font-mono text-xs">{node.slug || 'N/A'}</TableCell>
                       <TableCell>
                         <Badge variant={node.status === 'active' || node.status === 'published' ? 'default' : 'secondary'} 
@@ -105,8 +178,10 @@ export function TaxonomyDataTable({ type, title }: Props) {
                           {node.orderIndex || 0}
                         </div>
                       </TableCell>
-                      <TableCell className="text-right text-gray-500 text-sm">
-                        {node.createdAt ? format(node.createdAt.toDate(), 'MMM dd, yyyy') : 'Unknown'}
+                      <TableCell className="text-right">
+                        <Button variant="ghost" size="sm" onClick={() => handleEditClick(node)} className="h-8 px-2 text-indigo-600 hover:bg-indigo-50">
+                          <Edit2 className="w-4 h-4 mr-1" /> Edit
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -116,6 +191,40 @@ export function TaxonomyDataTable({ type, title }: Props) {
           )}
         </CardContent>
       </Card>
+
+      {/* Edit Modal */}
+      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Edit {title.slice(0, -1)}</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label>Title</Label>
+              <Input 
+                value={editForm.title} 
+                onChange={(e) => setEditForm({ ...editForm, title: e.target.value })} 
+                placeholder="Title" 
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label>Slug</Label>
+              <Input 
+                value={editForm.slug} 
+                onChange={(e) => setEditForm({ ...editForm, slug: e.target.value })} 
+                placeholder="url-friendly-slug" 
+              />
+              <p className="text-xs text-gray-500">Updating the slug might break existing links. Use carefully.</p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancel</Button>
+            <Button onClick={handleSaveEdit} disabled={!editForm.title || isSaving} className="bg-indigo-600 hover:bg-indigo-700 text-white">
+              {isSaving ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
