@@ -6,9 +6,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Search, Layers, Calendar, Hash, Tag, Activity, Edit2, Trash2, ChevronLeft, ChevronRight, Filter } from 'lucide-react';
+import { Search, Layers, Calendar, Hash, Tag, Activity, Edit2, Trash2, ChevronLeft, ChevronRight, Filter, Eye, EyeOff, PlusCircle, CheckSquare } from 'lucide-react';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { updateTaxonomyNode, generateSlug, deleteTaxonomyNode } from '@/lib/firebase/taxonomy';
@@ -31,6 +32,13 @@ export function TaxonomyDataTable({ type, title }: Props) {
   const [filterChapterId, setFilterChapterId] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
+
+  // Bulk Selection State
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
+  // Add Modal State
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [addForm, setAddForm] = useState({ title: '', slug: '' });
 
   // Edit Modal State
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -59,6 +67,7 @@ export function TaxonomyDataTable({ type, title }: Props) {
 
   useEffect(() => {
     setCurrentPage(1);
+    setSelectedIds([]);
   }, [searchQuery, statusFilter, filterBoardId, filterClassId, filterSubjectId, filterTextbookId, filterChapterId]);
 
   const filteredNodes = nodes.filter(node => {
@@ -135,6 +144,102 @@ export function TaxonomyDataTable({ type, title }: Props) {
     }
   };
 
+  const handleToggleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(paginatedNodes.map(n => n.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const handleToggleSelect = (id: string, checked: boolean) => {
+    if (checked) {
+      setSelectedIds(prev => [...prev, id]);
+    } else {
+      setSelectedIds(prev => prev.filter(i => i !== id));
+    }
+  };
+
+  const handleBulkStatusUpdate = async (newStatus: string) => {
+    if (selectedIds.length === 0) return;
+    setIsSaving(true);
+    try {
+      const promises = selectedIds.map(id => updateTaxonomyNode(id, { status: newStatus as any }));
+      await Promise.all(promises);
+      setSelectedIds([]);
+      fetchData();
+    } catch (e) {
+      console.error(e);
+      alert("Failed to update items.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedIds.length === 0) return;
+    if (!window.confirm(`Are you sure you want to delete ${selectedIds.length} items AND all their sub-items?`)) return;
+    setIsSaving(true);
+    try {
+      const promises = selectedIds.map(id => deleteTaxonomyNode(id));
+      await Promise.all(promises);
+      setSelectedIds([]);
+      fetchData();
+    } catch (e) {
+      console.error(e);
+      alert("Failed to delete items.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleToggleStatus = async (node: TaxonomyNode) => {
+    const newStatus = (node.status === 'active' || node.status === 'published') ? 'inactive' : 'active';
+    try {
+      await updateTaxonomyNode(node.id, { status: newStatus });
+      fetchData();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleSaveAdd = async () => {
+    if (!addForm.title) return;
+    setIsSaving(true);
+    try {
+      const { createTaxonomyNode } = await import('@/lib/firebase/taxonomy');
+      let parentId = null;
+      if (type === 'class') parentId = filterBoardId !== 'all' ? filterBoardId : null;
+      if (type === 'subject') parentId = filterClassId !== 'all' ? filterClassId : null;
+      if (type === 'textbook') parentId = filterSubjectId !== 'all' ? filterSubjectId : null;
+      if (type === 'chapter') parentId = filterTextbookId !== 'all' ? filterTextbookId : null;
+      if (type === 'topic') parentId = filterChapterId !== 'all' ? filterChapterId : null;
+      
+      if (type !== 'board' && !parentId) {
+         alert(`Please select a specific parent filter first before adding a new ${type}.`);
+         setIsSaving(false);
+         return;
+      }
+
+      await createTaxonomyNode({
+        title: addForm.title,
+        slug: addForm.slug || generateSlug(addForm.title),
+        type: type,
+        track: 'academic',
+        parentId: parentId,
+        status: 'draft'
+      });
+      setIsAddModalOpen(false);
+      setAddForm({ title: '', slug: '' });
+      fetchData();
+    } catch (error) {
+      console.error("Failed to add node", error);
+      alert("Failed to add new item");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const getParentContext = (node: TaxonomyNode) => {
     if (!node.parentId) return null;
     let current = node;
@@ -170,6 +275,9 @@ export function TaxonomyDataTable({ type, title }: Props) {
               <Badge variant="secondary" className="ml-2 bg-gray-100 text-gray-600 font-mono">{filteredNodes.length} items</Badge>
             </CardTitle>
             <div className="flex items-center gap-2 w-full sm:w-auto">
+              <Button onClick={() => setIsAddModalOpen(true)} className="h-9 bg-indigo-600 hover:bg-indigo-700 text-white shrink-0">
+                <PlusCircle className="w-4 h-4 mr-2" /> Add New
+              </Button>
               <div className="relative w-full sm:w-64">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <Input 
@@ -196,6 +304,29 @@ export function TaxonomyDataTable({ type, title }: Props) {
             </div>
           </div>
         </CardHeader>
+
+        {/* Bulk Actions Toolbar */}
+        {selectedIds.length > 0 && (
+          <div className="px-4 py-3 bg-indigo-50/80 border-b border-indigo-100 flex items-center justify-between">
+            <span className="text-sm font-medium text-indigo-800">{selectedIds.length} items selected</span>
+            <div className="flex items-center gap-2">
+              <select 
+                className="h-8 px-2 py-1 bg-white border border-indigo-200 rounded-md text-sm text-indigo-700 outline-none"
+                onChange={(e) => handleBulkStatusUpdate(e.target.value)}
+                value=""
+              >
+                <option value="" disabled>Change Status...</option>
+                <option value="active">Set Active</option>
+                <option value="inactive">Set Inactive</option>
+                <option value="published">Set Published</option>
+                <option value="draft">Set Draft</option>
+              </select>
+              <Button variant="destructive" size="sm" className="h-8" onClick={handleBulkDelete}>
+                <Trash2 className="w-4 h-4 mr-1" /> Delete Selected
+              </Button>
+            </div>
+          </div>
+        )}
 
         {/* Dedicated Filters Section */}
         {['class', 'subject', 'textbook', 'chapter', 'topic'].includes(type) && (
@@ -317,6 +448,12 @@ export function TaxonomyDataTable({ type, title }: Props) {
                 <Table>
                   <TableHeader className="bg-gray-50/50">
                   <TableRow>
+                    <TableHead className="w-[40px] text-center">
+                      <Checkbox 
+                        checked={paginatedNodes.length > 0 && selectedIds.length === paginatedNodes.length}
+                        onCheckedChange={handleToggleSelectAll}
+                      />
+                    </TableHead>
                     <TableHead className="w-[250px]">Title</TableHead>
                     {type !== 'board' && (
                       <TableHead>Hierarchy Context</TableHead>
@@ -330,6 +467,12 @@ export function TaxonomyDataTable({ type, title }: Props) {
                 <TableBody>
                   {paginatedNodes.map((node) => (
                     <TableRow key={node.id} className="hover:bg-gray-50/50">
+                      <TableCell className="text-center">
+                        <Checkbox 
+                          checked={selectedIds.includes(node.id)}
+                          onCheckedChange={(checked) => handleToggleSelect(node.id, checked === true)}
+                        />
+                      </TableCell>
                       <TableCell className="font-medium text-gray-900">
                         {node.title}
                         {node.icon && <span className="ml-2 text-xs text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">Icon: {node.icon}</span>}
@@ -354,11 +497,14 @@ export function TaxonomyDataTable({ type, title }: Props) {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end items-center gap-1">
-                          <Button variant="ghost" size="sm" onClick={() => handleEditClick(node)} className="h-8 px-2 text-indigo-600 hover:bg-indigo-50">
-                            <Edit2 className="w-4 h-4 mr-1" /> Edit
+                          <Button variant="ghost" size="icon" onClick={() => handleToggleStatus(node)} className="h-8 w-8 text-emerald-600 hover:bg-emerald-50" title="Toggle Status">
+                            {node.status === 'active' || node.status === 'published' ? <CheckSquare className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                           </Button>
-                          <Button variant="ghost" size="sm" onClick={() => handleDelete(node)} className="h-8 px-2 text-red-600 hover:bg-red-50">
-                            <Trash2 className="w-4 h-4 mr-1" /> Delete
+                          <Button variant="ghost" size="icon" onClick={() => handleEditClick(node)} className="h-8 w-8 text-indigo-600 hover:bg-indigo-50" title="Edit">
+                            <Edit2 className="w-4 h-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" onClick={() => handleDelete(node)} className="h-8 w-8 text-red-600 hover:bg-red-50" title="Delete">
+                            <Trash2 className="w-4 h-4" />
                           </Button>
                         </div>
                       </TableCell>
@@ -438,6 +584,46 @@ export function TaxonomyDataTable({ type, title }: Props) {
             <Button variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancel</Button>
             <Button onClick={handleSaveEdit} disabled={!editForm.title || isSaving} className="bg-indigo-600 hover:bg-indigo-700 text-white">
               {isSaving ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Modal */}
+      <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Add New {title.slice(0, -1)}</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label>Title</Label>
+              <Input 
+                value={addForm.title} 
+                onChange={(e) => {
+                  const newTitle = e.target.value;
+                  setAddForm(prev => ({ 
+                    ...prev, 
+                    title: newTitle,
+                    slug: generateSlug(newTitle)
+                  }));
+                }} 
+                placeholder={`Enter ${type} title`} 
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label>Slug</Label>
+              <Input 
+                value={addForm.slug} 
+                onChange={(e) => setAddForm({ ...addForm, slug: e.target.value })} 
+                placeholder="url-friendly-slug" 
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAddModalOpen(false)}>Cancel</Button>
+            <Button onClick={handleSaveAdd} disabled={!addForm.title || isSaving} className="bg-indigo-600 hover:bg-indigo-700 text-white">
+              {isSaving ? 'Adding...' : 'Add Item'}
             </Button>
           </DialogFooter>
         </DialogContent>
