@@ -24,6 +24,11 @@ export function TaxonomyDataTable({ type, title }: Props) {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [filterBoardId, setFilterBoardId] = useState('all');
+  const [filterClassId, setFilterClassId] = useState('all');
+  const [filterSubjectId, setFilterSubjectId] = useState('all');
+  const [filterTextbookId, setFilterTextbookId] = useState('all');
+  const [filterChapterId, setFilterChapterId] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
 
@@ -54,14 +59,38 @@ export function TaxonomyDataTable({ type, title }: Props) {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, statusFilter]);
+  }, [searchQuery, statusFilter, filterBoardId, filterClassId, filterSubjectId, filterTextbookId, filterChapterId]);
 
   const filteredNodes = nodes.filter(node => {
     const matchesSearch = node.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           (node.slug && node.slug.toLowerCase().includes(searchQuery.toLowerCase()));
     const matchesStatus = statusFilter === 'all' || node.status === statusFilter;
-    return matchesSearch && matchesStatus;
+
+    // Check hierarchy matches
+    let current = node;
+    const pathIds: string[] = [node.id];
+    while (current.parentId) {
+      const parent = allNodes.find(n => n.id === current.parentId);
+      if (!parent) break;
+      pathIds.push(parent.id);
+      current = parent;
+    }
+
+    const matchesBoard = filterBoardId === 'all' || pathIds.includes(filterBoardId);
+    const matchesClass = filterClassId === 'all' || pathIds.includes(filterClassId);
+    const matchesSubject = filterSubjectId === 'all' || pathIds.includes(filterSubjectId);
+    const matchesTextbook = filterTextbookId === 'all' || pathIds.includes(filterTextbookId);
+    const matchesChapter = filterChapterId === 'all' || pathIds.includes(filterChapterId);
+
+    return matchesSearch && matchesStatus && matchesBoard && matchesClass && matchesSubject && matchesTextbook && matchesChapter;
   });
+
+  // Dynamically calculate dropdown options based on selections
+  const availableBoards = allNodes.filter(n => n.type === 'board');
+  const availableClasses = allNodes.filter(n => n.type === 'class' && (filterBoardId === 'all' || n.parentId === filterBoardId));
+  const availableSubjects = allNodes.filter(n => n.type === 'subject' && (filterClassId === 'all' || n.parentId === filterClassId));
+  const availableTextbooks = allNodes.filter(n => n.type === 'textbook' && (filterSubjectId === 'all' || n.parentId === filterSubjectId));
+  const availableChapters = allNodes.filter(n => n.type === 'chapter' && (filterTextbookId === 'all' || n.parentId === filterTextbookId));
 
   const totalPages = Math.max(1, Math.ceil(filteredNodes.length / itemsPerPage));
   const paginatedNodes = filteredNodes.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
@@ -144,26 +173,138 @@ export function TaxonomyDataTable({ type, title }: Props) {
       </div>
 
       <Card className="border-gray-100 shadow-sm">
-        <CardHeader className="pb-4 border-b border-gray-50">
+        <CardHeader className="pb-4 border-b border-gray-50 bg-white">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <CardTitle className="text-lg font-semibold text-gray-800 flex items-center gap-2">
               <DatabaseZap className="w-5 h-5 text-emerald-500" />
               Data Table
               <Badge variant="secondary" className="ml-2 bg-gray-100 text-gray-600 font-mono">{filteredNodes.length} items</Badge>
             </CardTitle>
-            <div className="flex items-center gap-2 w-full sm:w-auto">
-              <div className="relative w-full sm:w-64">
+          </div>
+        </CardHeader>
+
+        {/* Dedicated Filters Section */}
+        <div className="p-4 border-b border-gray-100 bg-gray-50/30">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Search</Label>
+              <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <Input 
                   placeholder="Search by title or slug..." 
-                  className="pl-9 h-9 bg-gray-50/50 border-gray-200 text-sm"
+                  className="pl-9 h-9 bg-white border-gray-200 text-sm w-full"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
+            </div>
+
+            {['class', 'subject', 'textbook', 'chapter', 'topic'].includes(type) && (
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Filter by Board</Label>
+                <div className="relative">
+                  <select 
+                    className="h-9 w-full px-3 py-1 bg-white border border-gray-200 rounded-md text-sm text-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none pr-8 cursor-pointer"
+                    value={filterBoardId}
+                    onChange={(e) => {
+                      setFilterBoardId(e.target.value);
+                      setFilterClassId('all'); setFilterSubjectId('all'); setFilterTextbookId('all'); setFilterChapterId('all');
+                    }}
+                  >
+                    <option value="all">All Boards</option>
+                    {availableBoards.map(b => <option key={b.id} value={b.id}>{b.title}</option>)}
+                  </select>
+                  <Filter className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+                </div>
+              </div>
+            )}
+
+            {['subject', 'textbook', 'chapter', 'topic'].includes(type) && (
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Filter by Class</Label>
+                <div className="relative">
+                  <select 
+                    className="h-9 w-full px-3 py-1 bg-white border border-gray-200 rounded-md text-sm text-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none pr-8 cursor-pointer disabled:opacity-50"
+                    value={filterClassId}
+                    onChange={(e) => {
+                      setFilterClassId(e.target.value);
+                      setFilterSubjectId('all'); setFilterTextbookId('all'); setFilterChapterId('all');
+                    }}
+                    disabled={filterBoardId !== 'all' && availableClasses.length === 0}
+                  >
+                    <option value="all">All Classes</option>
+                    {availableClasses.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
+                  </select>
+                  <Filter className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+                </div>
+              </div>
+            )}
+
+            {['textbook', 'chapter', 'topic'].includes(type) && (
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Filter by Subject</Label>
+                <div className="relative">
+                  <select 
+                    className="h-9 w-full px-3 py-1 bg-white border border-gray-200 rounded-md text-sm text-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none pr-8 cursor-pointer disabled:opacity-50"
+                    value={filterSubjectId}
+                    onChange={(e) => {
+                      setFilterSubjectId(e.target.value);
+                      setFilterTextbookId('all'); setFilterChapterId('all');
+                    }}
+                    disabled={filterClassId !== 'all' && availableSubjects.length === 0}
+                  >
+                    <option value="all">All Subjects</option>
+                    {availableSubjects.map(s => <option key={s.id} value={s.id}>{s.title}</option>)}
+                  </select>
+                  <Filter className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+                </div>
+              </div>
+            )}
+
+            {['chapter', 'topic'].includes(type) && (
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Filter by Textbook</Label>
+                <div className="relative">
+                  <select 
+                    className="h-9 w-full px-3 py-1 bg-white border border-gray-200 rounded-md text-sm text-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none pr-8 cursor-pointer disabled:opacity-50"
+                    value={filterTextbookId}
+                    onChange={(e) => {
+                      setFilterTextbookId(e.target.value);
+                      setFilterChapterId('all');
+                    }}
+                    disabled={filterSubjectId !== 'all' && availableTextbooks.length === 0}
+                  >
+                    <option value="all">All Textbooks</option>
+                    {availableTextbooks.map(t => <option key={t.id} value={t.id}>{t.title}</option>)}
+                  </select>
+                  <Filter className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+                </div>
+              </div>
+            )}
+
+            {['topic'].includes(type) && (
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Filter by Chapter</Label>
+                <div className="relative">
+                  <select 
+                    className="h-9 w-full px-3 py-1 bg-white border border-gray-200 rounded-md text-sm text-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none pr-8 cursor-pointer disabled:opacity-50"
+                    value={filterChapterId}
+                    onChange={(e) => setFilterChapterId(e.target.value)}
+                    disabled={filterTextbookId !== 'all' && availableChapters.length === 0}
+                  >
+                    <option value="all">All Chapters</option>
+                    {availableChapters.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
+                  </select>
+                  <Filter className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+                </div>
+              </div>
+            )}
+
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Filter by Status</Label>
               <div className="relative">
                 <select 
-                  className="h-9 px-3 py-1 bg-gray-50/50 border border-gray-200 rounded-md text-sm text-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none pr-8 cursor-pointer"
+                  className="h-9 w-full px-3 py-1 bg-white border border-gray-200 rounded-md text-sm text-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none pr-8 cursor-pointer"
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
                 >
@@ -177,7 +318,8 @@ export function TaxonomyDataTable({ type, title }: Props) {
               </div>
             </div>
           </div>
-        </CardHeader>
+        </div>
+
         <CardContent className="p-0">
           {loading ? (
             <div className="p-12 text-center text-gray-500 animate-pulse">Loading data...</div>
