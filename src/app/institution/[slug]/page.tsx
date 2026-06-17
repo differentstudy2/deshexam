@@ -6,7 +6,7 @@ import { TaxonomyNode } from '@/lib/firebase/taxonomy';
 import {
   MapPin, Globe, Star, Building, Navigation, ArrowLeft, Bookmark, CheckCircle2, 
   Users, BookOpen, Clock, Phone, Mail, FileText, Monitor, Bed, Bus, TestTube, 
-  Trophy, Wifi, Coffee, Tent, PlusSquare, ChevronDown, ChevronRight, Filter, Sparkles, Calendar
+  Trophy, Wifi, Coffee, Tent, PlusSquare, ChevronDown, ChevronRight, Filter, Sparkles, Calendar, XCircle
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -303,7 +303,9 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
               <h2 className="text-xl font-bold text-slate-900 mb-6">Facilities</h2>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {institution.facilities && institution.facilities.length > 0 ? (
-                  institution.facilities.map((facilityStr, idx) => {
+                  institution.facilities.map((facilityObj: any, idx) => {
+                    const facilityStr = typeof facilityObj === 'string' ? facilityObj : facilityObj.title;
+                    const available = typeof facilityObj === 'string' ? true : facilityObj.available !== false;
                     const iconMap: Record<string, React.ReactNode> = {
                       'Library': <BookOpen className="w-6 h-6" />,
                       'Hostel': <Bed className="w-6 h-6" />,
@@ -317,10 +319,10 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
                       'Smart Board': <Monitor className="w-6 h-6" />
                     };
                     return (
-                      <div key={idx} className="flex flex-col items-center justify-center p-4 rounded-xl border border-emerald-100 bg-emerald-50/50 hover:bg-emerald-50 transition-colors text-slate-800 cursor-default">
-                        <div className="mb-2 text-emerald-600">{iconMap[facilityStr] || <Building className="w-6 h-6" />}</div>
+                      <div key={idx} className={`flex flex-col items-center justify-center p-4 rounded-xl border transition-colors cursor-default ${available ? 'border-emerald-100 bg-emerald-50/50 hover:bg-emerald-50 text-slate-800' : 'border-slate-100 bg-slate-50 text-slate-400'}`}>
+                        <div className={`mb-2 ${available ? 'text-emerald-600' : 'text-slate-400'}`}>{iconMap[facilityStr] || <Building className="w-6 h-6" />}</div>
                         <span className="text-sm font-bold text-center mb-1">{facilityStr}</span>
-                        <span className="text-[10px] font-semibold text-emerald-600 tracking-wide uppercase">Available</span>
+                        <span className={`text-[10px] font-semibold tracking-wide uppercase ${available ? 'text-emerald-600' : 'text-slate-400'}`}>{available ? 'Available' : 'Not Available'}</span>
                       </div>
                     );
                   })
@@ -528,9 +530,58 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
                     <div className="flex items-center gap-2 text-indigo-700 font-bold mb-3">
                       <Sparkles className="w-5 h-5" /> AI Review Summary
                     </div>
-                    <div className="prose prose-sm prose-slate max-w-none">
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                        {institution.aiReviewSummary}
+                    <div className="prose prose-sm prose-slate max-w-none prose-p:leading-relaxed">
+                      <ReactMarkdown 
+                        remarkPlugins={[remarkGfm]}
+                        components={{
+                          ul: ({node, ...props}) => <ul className="list-none pl-0 space-y-3 my-4" {...props} />,
+                          li: ({node, children, ...props}) => {
+                            let isPro = false;
+                            let isCon = false;
+                            
+                            const processChildren = (childArray: any): any => {
+                              return React.Children.map(childArray, child => {
+                                if (typeof child === 'string') {
+                                  if (child.includes('[PRO] ')) {
+                                    isPro = true;
+                                    return child.replace('[PRO] ', '');
+                                  }
+                                  if (child.includes('[CON] ')) {
+                                    isCon = true;
+                                    return child.replace('[CON] ', '');
+                                  }
+                                }
+                                if (React.isValidElement(child) && child.props && 'children' in (child.props as any)) {
+                                    const newChildren = processChildren((child.props as any).children);
+                                    return React.cloneElement(child, { children: newChildren } as any);
+                                }
+                                return child;
+                              });
+                            };
+
+                            const newChildren = processChildren(children);
+
+                            return (
+                              <li className="flex items-start gap-2.5 m-0" {...props}>
+                                {isPro && <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-1 shrink-0" />}
+                                {isCon && <XCircle className="w-4 h-4 text-rose-500 mt-1 shrink-0" />}
+                                {!isPro && !isCon && <span className="w-1.5 h-1.5 bg-indigo-300 rounded-full mt-2.5 shrink-0" />}
+                                <div className="flex-1">{newChildren}</div>
+                              </li>
+                            );
+                          }
+                        }}
+                      >
+                        {(() => {
+                          let text = institution.aiReviewSummary || '';
+                          text = text.replace(/(Pros\s*:[\s\S]*?)(?=Cons\s*:|Overall Conclusion\s*:|$)/i, (match) => {
+                            return match.replace(/^[-*]\s+/gm, '- [PRO] ');
+                          });
+                          text = text.replace(/(Cons\s*:[\s\S]*?)(?=Overall Conclusion\s*:|$)/i, (match) => {
+                            return match.replace(/^[-*]\s+/gm, '- [CON] ');
+                          });
+                          return text;
+                        })()}
                       </ReactMarkdown>
                     </div>
                   </div>
@@ -652,15 +703,15 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
               <div className="grid grid-cols-2 gap-y-4 gap-x-2 text-sm">
                 <div className="flex flex-col">
                   <span className="text-[10px] text-slate-400 font-medium uppercase tracking-wider mb-1 flex items-center gap-1"><Building className="w-3 h-3"/> Ownership</span>
-                  <span className="font-semibold text-slate-800">{institution.ownershipType || 'Private'}</span>
+                  <span className="font-semibold text-slate-800">{(institution as any).ownershipType || 'Private'}</span>
                 </div>
                 <div className="flex flex-col">
                   <span className="text-[10px] text-slate-400 font-medium uppercase tracking-wider mb-1 flex items-center gap-1"><MapPin className="w-3 h-3"/> Area</span>
-                  <span className="font-semibold text-slate-800">{institution.campusArea || '50 Acres'}</span>
+                  <span className="font-semibold text-slate-800">{(institution as any).campusArea || '50 Acres'}</span>
                 </div>
                 <div className="flex flex-col">
                   <span className="text-[10px] text-slate-400 font-medium uppercase tracking-wider mb-1 flex items-center gap-1"><Users className="w-3 h-3"/> Faculty</span>
-                  <span className="font-semibold text-slate-800">{institution.facultyCount || '200+'}</span>
+                  <span className="font-semibold text-slate-800">{(institution as any).facultyCount || '200+'}</span>
                 </div>
                 <div className="flex flex-col">
                   <span className="text-[10px] text-slate-400 font-medium uppercase tracking-wider mb-1 flex items-center gap-1"><Calendar className="w-3 h-3"/> Est. Year</span>
