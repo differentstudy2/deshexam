@@ -129,8 +129,11 @@ export default function PublicInstitutionDirectory() {
                 <Card className="h-full border border-slate-200 hover:border-emerald-300 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-white overflow-hidden">
                   <CardContent className="p-0 flex flex-col h-full">
                     {/* Top Color Bar & Logo */}
-                    <div className={`h-24 bg-gradient-to-r ${getGradient(inst.title || 'A')} relative`}>
-                      <div className="absolute -bottom-8 left-6">
+                    <div className={`h-24 relative ${!(inst.galleryImages && inst.galleryImages.length > 0) ? `bg-gradient-to-r ${getGradient(inst.title || 'A')}` : 'bg-slate-800'}`}>
+                      {inst.galleryImages && inst.galleryImages.length > 0 && (
+                        <Image src={inst.galleryImages[0]} alt={inst.title || 'Cover'} fill className="object-cover opacity-80" unoptimized />
+                      )}
+                      <div className="absolute -bottom-8 left-6 z-10">
                         <div className="w-16 h-16 rounded-xl bg-white shadow-lg border-4 border-white flex items-center justify-center overflow-hidden">
                           {inst.logoUrl || inst.featureImage ? (
                             <Image src={inst.logoUrl || inst.featureImage || ''} alt={inst.title || ''} fill className="object-contain p-2" unoptimized />
@@ -139,7 +142,7 @@ export default function PublicInstitutionDirectory() {
                           )}
                         </div>
                       </div>
-                      <div className="absolute top-4 right-4">
+                      <div className="absolute top-4 right-4 z-10">
                         <Badge variant="secondary" className="bg-white/90 text-emerald-900 border-none shadow-sm backdrop-blur-sm">
                           {inst.boardType || 'Institution'}
                         </Badge>

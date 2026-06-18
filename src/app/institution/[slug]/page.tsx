@@ -189,7 +189,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
   }
 
   // Cover Image (Mocked if not present)
-  const coverImage = 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=2000';
+  const coverImage = (institution.galleryImages && institution.galleryImages.length > 0) ? institution.galleryImages[0] : 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=2000';
 
   // Generate JSON-LD Schemas
   const schemaInstitution = {
