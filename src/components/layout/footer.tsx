@@ -89,11 +89,11 @@ export function Footer() {
           <div className="space-y-4">
             <h4 className="font-semibold text-slate-400 tracking-wider text-xs uppercase mb-6">Legal</h4>
             <ul className="space-y-3">
-              <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
-              <li><Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
-              <li><Link href="/refund-policy" className="hover:text-white transition-colors">Refund Policy</Link></li>
-              <li><Link href="/cookie-policy" className="hover:text-white transition-colors">Cookie Policy</Link></li>
-              <li><Link href="/disclaimer" className="hover:text-white transition-colors">Disclaimer</Link></li>
+              <li><a href="https://deshexam.com/privacy" className="hover:text-white transition-colors">Privacy Policy</a></li>
+              <li><a href="https://deshexam.com/terms" className="hover:text-white transition-colors">Terms of Service</a></li>
+              <li><a href="https://deshexam.com/refund-policy" className="hover:text-white transition-colors">Refund Policy</a></li>
+              <li><a href="https://deshexam.com/cookie-policy" className="hover:text-white transition-colors">Cookie Policy</a></li>
+              <li><a href="https://deshexam.com/disclaimer" className="hover:text-white transition-colors">Disclaimer</a></li>
             </ul>
           </div>
         </div>
