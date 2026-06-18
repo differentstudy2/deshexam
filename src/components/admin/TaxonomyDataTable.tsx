@@ -510,7 +510,7 @@ export function TaxonomyDataTable({ type, title }: Props) {
                           )}
                           {type === 'institution' && node.slug && (
                             <Button asChild variant="ghost" size="icon" className="h-8 w-8 text-blue-600 hover:bg-blue-50" title="View Public Page">
-                              <Link href={`/institution/${node.slug}`} target="_blank">
+                              <Link href={`/institutions/${node.slug}`} target="_blank">
                                 <Eye className="w-4 h-4" />
                               </Link>
                             </Button>

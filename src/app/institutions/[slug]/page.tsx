@@ -78,7 +78,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   const keywords = seoInfo.seoKeywords || [seoInfo.focusKeyword || institution.title, `${institution.title} admission`, `${institution.title} fees`];
 
   const ogImage = seoInfo.ogImage || (institution as any).featureImage || (institution.galleryImages && institution.galleryImages[0]) || '';
-  const canonicalUrl = seoInfo.canonicalUrl || `https://deshexam.com/institution/${params.slug}`;
+  const canonicalUrl = seoInfo.canonicalUrl || `https://deshexam.com/institutions/${params.slug}`;
 
   return {
     title,
@@ -196,7 +196,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
     "@context": "https://schema.org",
     "@type": "CollegeOrUniversity",
     "name": institution.title,
-    "url": `https://deshexam.com/institution/${params.slug}`,
+    "url": `https://deshexam.com/institutions/${params.slug}`,
     "telephone": institution.phoneNumber || "",
     "image": institution.logoUrl || institution.featureImage || coverImage,
     "address": {
@@ -241,7 +241,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
       { "@type": "ListItem", "position": 2, "name": "Institutions", "item": "https://deshexam.com/institutions" },
       { "@type": "ListItem", "position": 3, "name": stateStr, "item": `https://deshexam.com/institutions/${stateStr.toLowerCase().replace(/\s+/g, '-')}` },
       { "@type": "ListItem", "position": 4, "name": cityStr, "item": `https://deshexam.com/institutions/${stateStr.toLowerCase().replace(/\s+/g, '-')}/${cityStr.toLowerCase().replace(/\s+/g, '-')}` },
-      { "@type": "ListItem", "position": 5, "name": institution.title, "item": `https://deshexam.com/institution/${params.slug}` }
+      { "@type": "ListItem", "position": 5, "name": institution.title, "item": `https://deshexam.com/institutions/${params.slug}` }
     ]
   };
 
@@ -1040,11 +1040,11 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
             <CardContent className="p-6">
               <div className="flex justify-between items-center mb-4 border-b pb-3">
                 <h3 className="font-bold text-lg text-slate-900">Nearby</h3>
-                <Link href="/institution" className="text-xs text-indigo-600 font-semibold hover:underline">View All</Link>
+                <Link href="/institutions" className="text-xs text-indigo-600 font-semibold hover:underline">View All</Link>
               </div>
               <div className="space-y-4">
                 {relatedInstitutions.length > 0 ? relatedInstitutions.map(related => (
-                  <Link href={`/institution/${related.slug}`} key={related.id} className="flex items-center gap-3 group">
+                  <Link href={`/institutions/${related.slug}`} key={related.id} className="flex items-center gap-3 group">
                     <div className="w-12 h-12 flex-shrink-0 bg-slate-100 rounded-sm overflow-hidden flex items-center justify-center border border-slate-200">
                       {related.logoUrl || related.featureImage ? (
                         <Image src={related.logoUrl || related.featureImage || ''} alt={related.title || ''} width={50} height={50} className="object-cover w-full h-full" unoptimized />
