@@ -17,6 +17,7 @@ import dynamic from 'next/dynamic';
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
 import ReactMarkdown from 'react-markdown';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 
 const TiptapEditor = dynamic(() => import('@/components/admin/TiptapEditor').then(mod => mod.TiptapEditor), {
   ssr: false,
@@ -43,6 +44,9 @@ export default function InstitutionEditPage() {
   const [initialLoadDone, setInitialLoadDone] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   
+  const [isBulkImportModalOpen, setIsBulkImportModalOpen] = useState(false);
+  const [bulkImportJson, setBulkImportJson] = useState(`[\n  {\n    "authorName": "Ramesh Kumar",\n    "rating": 5,\n    "text": "The teachers are extremely supportive and the infrastructure is top-notch."\n  },\n  {\n    "authorName": "Priya Sharma",\n    "rating": 4,\n    "text": "Good environment for studies, but sports facilities could be improved."\n  }\n]`);
+
   const [formData, setFormData] = useState<Partial<TaxonomyNode>>({
     title: '',
     acronym: '',
@@ -1538,32 +1542,7 @@ export default function InstitutionEditPage() {
                       type="button" 
                       variant="outline" 
                       size="sm" 
-                      onClick={() => {
-                        const demoJson = `[\n  {\n    "authorName": "Ramesh Kumar",\n    "rating": 5,\n    "text": "The teachers are extremely supportive and the infrastructure is top-notch."\n  },\n  {\n    "authorName": "Priya Sharma",\n    "rating": 4,\n    "text": "Good environment for studies, but sports facilities could be improved."\n  }\n]`;
-                        const jsonString = prompt("Paste a JSON array of reviews:\n\n" + demoJson, demoJson);
-                        if (jsonString) {
-                          try {
-                            const parsed = JSON.parse(jsonString);
-                            if (Array.isArray(parsed)) {
-                              const newReviews = parsed.map(r => ({
-                                id: crypto.randomUUID(),
-                                authorName: r.authorName || 'Anonymous',
-                                rating: r.rating || 5,
-                                text: r.text || '',
-                                time: r.time || new Date().toLocaleDateString('en-GB').replace(/\//g, '.'),
-                                authorPhotoUrl: r.authorPhotoUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(r.authorName || 'User')}&background=random`,
-                                isVerified: true,
-                                likedBy: [],
-                                dislikedBy: []
-                              }));
-                              setFormData(prev => ({ ...prev, reviews: [...(prev.reviews || []), ...newReviews] }));
-                              toast({ title: `Imported ${newReviews.length} reviews successfully.` });
-                            }
-                          } catch(e) {
-                            toast({ variant: 'destructive', title: 'Invalid JSON format' });
-                          }
-                        }
-                      }} 
+                      onClick={() => setIsBulkImportModalOpen(true)} 
                       className="h-8"
                     >
                       <Upload className="w-3 h-3 mr-2" /> Bulk Import
@@ -1724,6 +1703,61 @@ export default function InstitutionEditPage() {
         )}
         </div>
       </div>
+
+      {/* Bulk Import Modal */}
+      <Dialog open={isBulkImportModalOpen} onOpenChange={setIsBulkImportModalOpen}>
+        <DialogContent className="sm:max-w-[700px]">
+          <DialogHeader>
+            <DialogTitle>Bulk Import Reviews</DialogTitle>
+            <DialogDescription>
+              Paste a JSON array of reviews below. Each review object should at least contain <code>authorName</code>, <code>rating</code> (1-5), and <code>text</code>.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <textarea
+              className="w-full min-h-[300px] p-4 text-sm font-mono border rounded-md bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow"
+              value={bulkImportJson}
+              onChange={(e) => setBulkImportJson(e.target.value)}
+              placeholder='[ { "authorName": "John", "rating": 5, "text": "Great!" } ]'
+              spellCheck={false}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsBulkImportModalOpen(false)}>Cancel</Button>
+            <Button 
+              className="bg-indigo-600 hover:bg-indigo-700 text-white"
+              onClick={() => {
+                if (!bulkImportJson) return;
+                try {
+                  const parsed = JSON.parse(bulkImportJson);
+                  if (Array.isArray(parsed)) {
+                    const newReviews = parsed.map(r => ({
+                      id: crypto.randomUUID(),
+                      authorName: r.authorName || 'Anonymous',
+                      rating: r.rating || 5,
+                      text: r.text || '',
+                      time: r.time || new Date().toLocaleDateString('en-GB').replace(/\//g, '.'),
+                      authorPhotoUrl: r.authorPhotoUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(r.authorName || 'User')}&background=random`,
+                      isVerified: true,
+                      likedBy: [],
+                      dislikedBy: []
+                    }));
+                    setFormData(prev => ({ ...prev, reviews: [...(prev.reviews || []), ...newReviews] }));
+                    toast({ title: `Imported ${newReviews.length} reviews successfully.` });
+                    setIsBulkImportModalOpen(false);
+                  } else {
+                    toast({ variant: 'destructive', title: 'Input must be a JSON array' });
+                  }
+                } catch(e) {
+                  toast({ variant: 'destructive', title: 'Invalid JSON format' });
+                }
+              }}
+            >
+              Import JSON
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
