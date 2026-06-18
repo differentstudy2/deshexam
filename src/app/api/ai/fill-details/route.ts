@@ -5,9 +5,10 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
  *  extra prose, markdown fences, or search-grounding citations. */
 function extractJSON(text: string): string | null {
   // 1. Strip markdown code fences
-  let cleaned = text.replace(/```json[\s\S]*?```/gi, (m) =>
-    m.replace(/```json/gi, '').replace(/```/gi, '')
-  ).replace(/```[\s\S]*?```/gi, (m) => m.replace(/```/gi, '')).trim();
+  let cleaned = text
+    .replace(/```json[\s\S]*?```/gi, (m) => m.replace(/```json/gi, '').replace(/```/gi, ''))
+    .replace(/```[\s\S]*?```/gi, (m) => m.replace(/```/gi, ''))
+    .trim();
 
   // 2. Find the first '{' and last '}' — grab everything in between
   const start = cleaned.indexOf('{');
@@ -15,9 +16,38 @@ function extractJSON(text: string): string | null {
   if (start !== -1 && end !== -1 && end > start) {
     return cleaned.slice(start, end + 1);
   }
-
   return null;
 }
+
+const PROMPT = (name: string, address: string) => `
+Find the following information about the educational institution named "${name}" located at or near "${address}".
+Use Google Search to find accurate, up-to-date data.
+
+1. Established Year (e.g. "1945")
+2. Total Enrollment (a number, roughly estimated if exact is not available, e.g. 1500)
+3. Medium of Instruction (e.g. ["English", "Bengali", "Hindi"])
+4. Official Social Media Profiles (Facebook, Twitter/X, LinkedIn, Instagram, YouTube)
+5. Full Description: Write a high-quality, comprehensive article-style overview (about 400 to 500 words) detailing the history, academic curriculum, campus facilities, notable achievements, and overall reputation of the institution. Format the response beautifully using HTML tags. DO NOT write an overall main title or <h1> tag at the top. Start directly with content, divide into sections using <h2> tags. Do not use Markdown.
+6. High Quality SEO Title: Write an optimized, catchy page title (max 60 characters) including the institution name and primary location.
+7. High Quality SEO Description: Write a compelling meta description (max 160 characters) summarizing the institution for search engines.
+
+You MUST respond with ONLY a raw JSON object — no markdown, no code fences, no explanation before or after:
+{
+  "establishedYear": "string or null",
+  "totalEnrollment": number or null,
+  "mediumOfInstruction": ["string"],
+  "socialProfiles": {
+    "facebook": "url or null",
+    "twitter": "url or null",
+    "linkedin": "url or null",
+    "instagram": "url or null",
+    "youtube": "url or null"
+  },
+  "description": "string or null",
+  "seoTitle": "string or null",
+  "seoDescription": "string or null"
+}
+`;
 
 export async function POST(request: Request) {
   try {
@@ -33,52 +63,51 @@ export async function POST(request: Request) {
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
+    const prompt = PROMPT(name, address || '');
 
-    // gemini-2.5-flash supports search grounding
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-2.5-flash',
-      tools: [{ googleSearch: {} } as any],
-    });
+    let responseText: string | null = null;
 
-    const prompt = `
-    Find the following information about the educational institution named "${name}" located at or near "${address || ''}".
-    Please use Google Search to find accurate, up-to-date data.
-    
-    1. Established Year (e.g. "1945")
-    2. Total Enrollment (a number, roughly estimated if exact is not available, e.g. 1500)
-    3. Medium of Instruction (e.g. ["English", "Bengali", "Hindi"])
-    4. Official Social Media Profiles (Facebook, Twitter/X, LinkedIn, Instagram, YouTube)
-    5. Full Description: Write a high-quality, comprehensive article-style overview (about 400 to 500 words) detailing the history, academic curriculum, campus facilities, notable achievements, and overall reputation of the institution. Format the response beautifully using **HTML tags**. DO NOT write an overall main title or <h1> tag at the top of the description. Instead, start directly with the content and divide the text into logical sections using appropriate <h2> tags for section headers. Do not use Markdown, strictly use HTML tags.
-    6. High Quality SEO Title: Write an optimized, catchy page title (max 60 characters) including the institution name and primary location.
-    7. High Quality SEO Description: Write a compelling, concise meta description (max 160 characters) summarizing the institution for search engines.
-    
-    You MUST respond with ONLY a raw JSON object. No markdown, no code fences, no explanation text before or after. Just the JSON object:
-    {
-      "establishedYear": "string or null",
-      "totalEnrollment": number or null,
-      "mediumOfInstruction": ["string"],
-      "socialProfiles": {
-        "facebook": "url or null",
-        "twitter": "url or null",
-        "linkedin": "url or null",
-        "instagram": "url or null",
-        "youtube": "url or null"
-      },
-      "description": "string or null",
-      "seoTitle": "string or null",
-      "seoDescription": "string or null"
+    // ── Strategy 1: gemini-2.0-flash with Google Search grounding ─────────────
+    try {
+      const model = genAI.getGenerativeModel({
+        model: 'gemini-2.0-flash',
+        tools: [{ googleSearch: {} } as any],
+      });
+      const result = await model.generateContent({
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      });
+      responseText = result.response.text();
+    } catch (e1) {
+      console.warn('Strategy 1 (gemini-2.0-flash + search) failed:', String(e1));
+
+      // ── Strategy 2: gemini-1.5-flash with Google Search grounding ───────────
+      try {
+        const model = genAI.getGenerativeModel({
+          model: 'gemini-1.5-flash',
+          tools: [{ googleSearch: {} } as any],
+        });
+        const result = await model.generateContent({
+          contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        });
+        responseText = result.response.text();
+      } catch (e2) {
+        console.warn('Strategy 2 (gemini-1.5-flash + search) failed:', String(e2));
+
+        // ── Strategy 3: gemini-1.5-flash no grounding (pure knowledge) ─────────
+        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+        const result = await model.generateContent({
+          contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        });
+        responseText = result.response.text();
+      }
     }
-    `;
 
-    const result = await model.generateContent({
-      contents: [{ role: 'user', parts: [{ text: prompt }] }],
-    });
-
-    const responseText = result.response.text();
+    if (!responseText) {
+      return NextResponse.json({ error: 'AI returned empty response' }, { status: 500 });
+    }
 
     // Robustly extract JSON even when Gemini wraps with prose/citations
     const jsonStr = extractJSON(responseText);
-
     if (!jsonStr) {
       console.error('No JSON object found in AI response:', responseText);
       return NextResponse.json(
@@ -90,7 +119,7 @@ export async function POST(request: Request) {
     try {
       const data = JSON.parse(jsonStr);
       return NextResponse.json(data);
-    } catch (parseError) {
+    } catch {
       console.error('Failed to parse extracted JSON:', jsonStr);
       return NextResponse.json(
         { error: 'AI returned invalid JSON format', details: jsonStr },
@@ -99,9 +128,10 @@ export async function POST(request: Request) {
     }
 
   } catch (error) {
-    console.error('AI fill-details error:', error);
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error('AI fill-details fatal error:', msg);
     return NextResponse.json(
-      { error: 'Failed to process AI request', details: String(error) },
+      { error: 'Failed to process AI request', details: msg },
       { status: 500 }
     );
   }
