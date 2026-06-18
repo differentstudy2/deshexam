@@ -29,14 +29,35 @@ export default function InstitutionManagerPage() {
 
   // Initialize Map
   useEffect(() => {
-    if (!isModalOpen) return;
+    if (!isModalOpen) {
+      setMapInstance(null);
+      setMarkerInstance(null);
+      return;
+    }
 
     let isMounted = true;
     const initMap = async () => {
+      // Wait for mapRef to be attached
+      let attempts = 0;
+      while (!mapRef.current && attempts < 20) {
+        await new Promise(r => setTimeout(r, 100));
+        attempts++;
+      }
       if (!mapRef.current) return;
       
       const loadGoogleMaps = async () => {
         if ((window as any).google && (window as any).google.maps) return true;
+        
+        const existingScript = document.querySelector('script[src^="https://maps.googleapis.com/maps/api/js"]');
+        if (existingScript) {
+          let retries = 0;
+          while (!(window as any).google?.maps && retries < 50) {
+            await new Promise(r => setTimeout(r, 100));
+            retries++;
+          }
+          return !!(window as any).google?.maps;
+        }
+
         const key = await getGoogleMapsKey();
         if (!key) return false;
 
