@@ -45,9 +45,10 @@ function parseSlugSegments(slug: string[]): {
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string[] };
+  params: Promise<{ slug: string[] }>;
 }): Promise<Metadata> {
-  const { stateName, cityName } = parseSlugSegments(params.slug);
+  const { slug } = await params;
+  const { stateName, cityName } = parseSlugSegments(slug);
 
   if (!stateName) {
     return { title: 'Institutions | DeshExam' };
@@ -57,8 +58,8 @@ export async function generateMetadata({
   const title = `Top Schools, Colleges & Universities in ${location} 2026 | DeshExam`;
   const description = `Explore verified schools, colleges, universities and coaching institutes in ${location}. Compare courses, fees, admissions, facilities and reviews on DeshExam.`;
   const canonical = cityName
-    ? `https://deshexam.com/institutions/${params.slug[0]}/${params.slug[1]}`
-    : `https://deshexam.com/institutions/${params.slug[0]}`;
+    ? `https://deshexam.com/institutions/${slug[0]}/${slug[1]}`
+    : `https://deshexam.com/institutions/${slug[0]}`;
 
   return {
     title,
@@ -77,11 +78,10 @@ export async function generateMetadata({
 export default async function InstitutionsFilterPage({
   params,
 }: {
-  params: { slug: string[] };
+  params: Promise<{ slug: string[] }>;
 }) {
-  const { stateSlug, citySlug, stateName, cityName } = parseSlugSegments(
-    params.slug
-  );
+  const { slug } = await params;
+  const { stateSlug, citySlug, stateName, cityName } = parseSlugSegments(slug);
 
   // Too many slug segments → 404-style empty state handled in client
   if (!stateName) {

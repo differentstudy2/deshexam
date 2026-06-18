@@ -67,8 +67,9 @@ async function getRelatedInstitutions(boardType: string, currentId: string): Pro
     return [];
   }
 }
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const institution = await getInstitutionBySlug(params.slug);
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const institution = await getInstitutionBySlug(slug);
   if (!institution) return { title: 'Not Found' };
 
   const currentYear = new Date().getFullYear();
@@ -79,7 +80,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   const keywords = seoInfo.seoKeywords || [seoInfo.focusKeyword || institution.title, `${institution.title} admission`, `${institution.title} fees`];
 
   const ogImage = seoInfo.ogImage || (institution as any).featureImage || (institution.galleryImages && institution.galleryImages[0]) || '';
-  const canonicalUrl = seoInfo.canonicalUrl || `https://deshexam.com/institutions/${params.slug}`;
+  const canonicalUrl = seoInfo.canonicalUrl || `https://deshexam.com/institutions/${slug}`;
 
   return {
     title,
@@ -159,13 +160,14 @@ const MOCK_NEARBY = [
 ];
 // ----------------------------------------------------------------------
 
-export default async function InstitutionDetailsPage({ params }: { params: { slug: string } }) {
-  const institution = await getInstitutionBySlug(params.slug);
+export default async function InstitutionDetailsPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const institution = await getInstitutionBySlug(slug);
 
   // ── Fallback: treat slug as a location filter ──────────────────────────────
   // e.g. /institutions/west-bengal — no institution found, show filtered list
   if (!institution) {
-    const locationName = params.slug
+    const locationName = slug
       .split('-')
       .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
       .join(' ');
@@ -203,7 +205,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
     "@context": "https://schema.org",
     "@type": "CollegeOrUniversity",
     "name": institution.title,
-    "url": `https://deshexam.com/institutions/${params.slug}`,
+    "url": `https://deshexam.com/institutions/${slug}`,
     "telephone": institution.phoneNumber || "",
     "image": institution.logoUrl || institution.featureImage || coverImage,
     "address": {
@@ -252,7 +254,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
       { "@type": "ListItem", "position": 2, "name": "Institutions", "item": "https://deshexam.com/institutions" },
       { "@type": "ListItem", "position": 3, "name": stateStr, "item": `https://deshexam.com/institutions/${stateStr.toLowerCase().replace(/\s+/g, '-')}` },
       { "@type": "ListItem", "position": 4, "name": cityStr, "item": `https://deshexam.com/institutions/${stateStr.toLowerCase().replace(/\s+/g, '-')}/${cityStr.toLowerCase().replace(/\s+/g, '-')}` },
-      { "@type": "ListItem", "position": 5, "name": institution.title, "item": `https://deshexam.com/institutions/${params.slug}` }
+      { "@type": "ListItem", "position": 5, "name": institution.title, "item": `https://deshexam.com/institutions/${slug}` }
     ]
   };
 
