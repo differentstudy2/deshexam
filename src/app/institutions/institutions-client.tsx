@@ -51,7 +51,10 @@ export default function InstitutionsClient({
       (inst.acronym?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
       (inst.address?.toLowerCase() || '').includes(searchQuery.toLowerCase());
     
-    const matchesTab = activeTab === 'All' || inst.boardType === activeTab;
+    const matchesTab = 
+      activeTab === 'All' || 
+      inst.boardType === activeTab || 
+      (activeTab === 'School' && (inst.boardType === 'Public School' || inst.boardType === 'Private School'));
     
     let matchesLocation = true;
     if (initialLocationFilter && initialLocationFilter.toLowerCase() !== 'india') {
@@ -159,66 +162,79 @@ export default function InstitutionsClient({
       <div className="max-w-6xl mx-auto px-6 -mt-16 relative z-10 space-y-8">
         
         {/* Crawlable Quick Filters */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm pb-6">
-          <div className="flex items-center gap-2 mb-4">
-            <Map className="w-5 h-5 text-emerald-500" />
-            <h3 className="font-bold text-slate-800 text-lg">Quick Filters</h3>
-          </div>
-          
-          <div className="flex flex-col gap-5">
-            {/* Type */}
-            <div className="flex items-start gap-3">
-              <span className="text-sm font-semibold text-slate-500 w-24 shrink-0 pt-1.5">Type</span>
-              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide flex-grow">
-                <Link href={`/${currentPrefixSlug}institutions-in-${currentLocSlug}`} className={getFilterStyle(!initialTypeFilter || initialTypeFilter === 'All')}>All</Link>
-                <Link href={`/${currentPrefixSlug}schools-in-${currentLocSlug}`} className={getFilterStyle(initialTypeFilter === 'Public School' || initialTypeFilter === 'School')}>Schools</Link>
-                <Link href={`/${currentPrefixSlug}colleges-in-${currentLocSlug}`} className={getFilterStyle(initialTypeFilter === 'College')}>Colleges</Link>
-                <Link href={`/${currentPrefixSlug}universities-in-${currentLocSlug}`} className={getFilterStyle(initialTypeFilter === 'University')}>Universities</Link>
-                <Link href={`/${currentPrefixSlug}coaching-in-${currentLocSlug}`} className={getFilterStyle(initialTypeFilter === 'Coaching Institute')}>Coaching</Link>
-              </div>
+        <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <Map className="w-5 h-5 text-emerald-500" />
+              <h3 className="font-bold text-slate-800 text-lg whitespace-nowrap">Quick Filters</h3>
             </div>
             
-            {/* State */}
-            <div className="flex items-start gap-3">
-              <span className="text-sm font-semibold text-slate-500 w-24 shrink-0 pt-1.5">State</span>
-              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide flex-grow">
-                <Link href={`/${currentPrefixSlug}${currentTypeSlug}-in-india`} className={getFilterStyle(!initialLocationFilter || initialLocationFilter === 'India')}>All States</Link>
-                <Link href={`/${currentPrefixSlug}${currentTypeSlug}-in-west-bengal`} className={getFilterStyle(initialLocationFilter === 'West Bengal')}>West Bengal</Link>
-                <Link href={`/${currentPrefixSlug}${currentTypeSlug}-in-assam`} className={getFilterStyle(initialLocationFilter === 'Assam')}>Assam</Link>
-                <Link href={`/${currentPrefixSlug}${currentTypeSlug}-in-bihar`} className={getFilterStyle(initialLocationFilter === 'Bihar')}>Bihar</Link>
+            <div className="flex flex-wrap gap-3">
+              {/* Type Dropdown */}
+              <div className="relative group">
+                <button className="px-4 py-2 border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 bg-white group-hover:bg-slate-50 flex items-center gap-2 transition-colors">
+                  Type: <span className="text-emerald-600">{initialTypeFilter === 'School' ? 'Schools' : (initialTypeFilter || 'All')}</span> <ChevronRight className="w-4 h-4 rotate-90 text-slate-400 group-hover:text-slate-600" />
+                </button>
+                <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-slate-100 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 py-2">
+                  <Link href={`/${currentPrefixSlug}institutions-in-${currentLocSlug}`} className="block px-4 py-2 text-sm text-slate-600 hover:bg-emerald-50 hover:text-emerald-700">All Types</Link>
+                  <Link href={`/${currentPrefixSlug}schools-in-${currentLocSlug}`} className="block px-4 py-2 text-sm text-slate-600 hover:bg-emerald-50 hover:text-emerald-700">Schools</Link>
+                  <Link href={`/${currentPrefixSlug}colleges-in-${currentLocSlug}`} className="block px-4 py-2 text-sm text-slate-600 hover:bg-emerald-50 hover:text-emerald-700">Colleges</Link>
+                  <Link href={`/${currentPrefixSlug}universities-in-${currentLocSlug}`} className="block px-4 py-2 text-sm text-slate-600 hover:bg-emerald-50 hover:text-emerald-700">Universities</Link>
+                  <Link href={`/${currentPrefixSlug}coaching-in-${currentLocSlug}`} className="block px-4 py-2 text-sm text-slate-600 hover:bg-emerald-50 hover:text-emerald-700">Coaching</Link>
+                </div>
               </div>
-            </div>
-            
-            {/* City */}
-            <div className="flex items-start gap-3">
-              <span className="text-sm font-semibold text-slate-500 w-24 shrink-0 pt-1.5">City</span>
-              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide flex-grow">
-                <Link href={`/${currentPrefixSlug}${currentTypeSlug}-in-kolkata`} className={getFilterStyle(initialLocationFilter === 'Kolkata')}>Kolkata</Link>
-                <Link href={`/${currentPrefixSlug}${currentTypeSlug}-in-siliguri`} className={getFilterStyle(initialLocationFilter === 'Siliguri')}>Siliguri</Link>
-                <Link href={`/${currentPrefixSlug}${currentTypeSlug}-in-dinhata`} className={getFilterStyle(initialLocationFilter === 'Dinhata')}>Dinhata</Link>
+              
+              {/* State Dropdown */}
+              <div className="relative group">
+                <button className="px-4 py-2 border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 bg-white group-hover:bg-slate-50 flex items-center gap-2 transition-colors">
+                  State: <span className="text-emerald-600">{['West Bengal', 'Assam', 'Bihar'].includes(initialLocationFilter || '') ? initialLocationFilter : 'All'}</span> <ChevronRight className="w-4 h-4 rotate-90 text-slate-400 group-hover:text-slate-600" />
+                </button>
+                <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-slate-100 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 py-2">
+                  <Link href={`/${currentPrefixSlug}${currentTypeSlug}-in-india`} className="block px-4 py-2 text-sm text-slate-600 hover:bg-emerald-50 hover:text-emerald-700">All States</Link>
+                  <Link href={`/${currentPrefixSlug}${currentTypeSlug}-in-west-bengal`} className="block px-4 py-2 text-sm text-slate-600 hover:bg-emerald-50 hover:text-emerald-700">West Bengal</Link>
+                  <Link href={`/${currentPrefixSlug}${currentTypeSlug}-in-assam`} className="block px-4 py-2 text-sm text-slate-600 hover:bg-emerald-50 hover:text-emerald-700">Assam</Link>
+                  <Link href={`/${currentPrefixSlug}${currentTypeSlug}-in-bihar`} className="block px-4 py-2 text-sm text-slate-600 hover:bg-emerald-50 hover:text-emerald-700">Bihar</Link>
+                </div>
               </div>
-            </div>
+              
+              {/* City Dropdown */}
+              <div className="relative group">
+                <button className="px-4 py-2 border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 bg-white group-hover:bg-slate-50 flex items-center gap-2 transition-colors">
+                  City: <span className="text-emerald-600">{['Kolkata', 'Siliguri', 'Dinhata'].includes(initialLocationFilter || '') ? initialLocationFilter : 'All'}</span> <ChevronRight className="w-4 h-4 rotate-90 text-slate-400 group-hover:text-slate-600" />
+                </button>
+                <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-slate-100 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 py-2">
+                  <Link href={`/${currentPrefixSlug}${currentTypeSlug}-in-kolkata`} className="block px-4 py-2 text-sm text-slate-600 hover:bg-emerald-50 hover:text-emerald-700">Kolkata</Link>
+                  <Link href={`/${currentPrefixSlug}${currentTypeSlug}-in-siliguri`} className="block px-4 py-2 text-sm text-slate-600 hover:bg-emerald-50 hover:text-emerald-700">Siliguri</Link>
+                  <Link href={`/${currentPrefixSlug}${currentTypeSlug}-in-dinhata`} className="block px-4 py-2 text-sm text-slate-600 hover:bg-emerald-50 hover:text-emerald-700">Dinhata</Link>
+                </div>
+              </div>
 
-            {/* Ownership */}
-            <div className="flex items-start gap-3">
-              <span className="text-sm font-semibold text-slate-500 w-24 shrink-0 pt-1.5">Ownership</span>
-              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide flex-grow">
-                <Link href={`/${currentTypeSlug}-in-${currentLocSlug}`} className={getFilterStyle(!initialPrefixFilter)}>All</Link>
-                <Link href={`/government-${currentTypeSlug}-in-${currentLocSlug}`} className={getFilterStyle(initialPrefixFilter === 'Government')}>Government</Link>
-                <Link href={`/private-${currentTypeSlug}-in-${currentLocSlug}`} className={getFilterStyle(initialPrefixFilter === 'Private')}>Private</Link>
-                <Link href={`/semi-government-${currentTypeSlug}-in-${currentLocSlug}`} className={getFilterStyle(initialPrefixFilter === 'Semi Government' || initialPrefixFilter === 'Semi-government')}>Semi-government</Link>
+              {/* Ownership Dropdown */}
+              <div className="relative group">
+                <button className="px-4 py-2 border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 bg-white group-hover:bg-slate-50 flex items-center gap-2 transition-colors">
+                  Ownership: <span className="text-emerald-600">{['Government', 'Private', 'Semi Government', 'Semi-government'].includes(initialPrefixFilter || '') ? initialPrefixFilter : 'All'}</span> <ChevronRight className="w-4 h-4 rotate-90 text-slate-400 group-hover:text-slate-600" />
+                </button>
+                <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-slate-100 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 py-2">
+                  <Link href={`/${currentTypeSlug}-in-${currentLocSlug}`} className="block px-4 py-2 text-sm text-slate-600 hover:bg-emerald-50 hover:text-emerald-700">All Ownerships</Link>
+                  <Link href={`/government-${currentTypeSlug}-in-${currentLocSlug}`} className="block px-4 py-2 text-sm text-slate-600 hover:bg-emerald-50 hover:text-emerald-700">Government</Link>
+                  <Link href={`/private-${currentTypeSlug}-in-${currentLocSlug}`} className="block px-4 py-2 text-sm text-slate-600 hover:bg-emerald-50 hover:text-emerald-700">Private</Link>
+                  <Link href={`/semi-government-${currentTypeSlug}-in-${currentLocSlug}`} className="block px-4 py-2 text-sm text-slate-600 hover:bg-emerald-50 hover:text-emerald-700">Semi-government</Link>
+                </div>
               </div>
-            </div>
 
-            {/* Course */}
-            <div className="flex items-start gap-3">
-              <span className="text-sm font-semibold text-slate-500 w-24 shrink-0 pt-1.5">Course</span>
-              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide flex-grow">
-                <Link href={`/science-${currentTypeSlug}-in-${currentLocSlug}`} className={getFilterStyle(initialPrefixFilter === 'Science')}>Science</Link>
-                <Link href={`/commerce-${currentTypeSlug}-in-${currentLocSlug}`} className={getFilterStyle(initialPrefixFilter === 'Commerce')}>Commerce</Link>
-                <Link href={`/arts-${currentTypeSlug}-in-${currentLocSlug}`} className={getFilterStyle(initialPrefixFilter === 'Arts')}>Arts</Link>
-                <Link href={`/bsc-${currentTypeSlug}-in-${currentLocSlug}`} className={getFilterStyle(initialPrefixFilter === 'BSc')}>BSc</Link>
-                <Link href={`/btech-${currentTypeSlug}-in-${currentLocSlug}`} className={getFilterStyle(initialPrefixFilter === 'BTech')}>BTech</Link>
+              {/* Course Dropdown */}
+              <div className="relative group">
+                <button className="px-4 py-2 border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 bg-white group-hover:bg-slate-50 flex items-center gap-2 transition-colors">
+                  Course: <span className="text-emerald-600">{['Science', 'Commerce', 'Arts', 'BSc', 'BTech'].includes(initialPrefixFilter || '') ? initialPrefixFilter : 'All'}</span> <ChevronRight className="w-4 h-4 rotate-90 text-slate-400 group-hover:text-slate-600" />
+                </button>
+                <div className="absolute top-full right-0 mt-2 w-48 bg-white border border-slate-100 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 py-2">
+                  <Link href={`/${currentTypeSlug}-in-${currentLocSlug}`} className="block px-4 py-2 text-sm text-slate-600 hover:bg-emerald-50 hover:text-emerald-700">All Courses</Link>
+                  <Link href={`/science-${currentTypeSlug}-in-${currentLocSlug}`} className="block px-4 py-2 text-sm text-slate-600 hover:bg-emerald-50 hover:text-emerald-700">Science</Link>
+                  <Link href={`/commerce-${currentTypeSlug}-in-${currentLocSlug}`} className="block px-4 py-2 text-sm text-slate-600 hover:bg-emerald-50 hover:text-emerald-700">Commerce</Link>
+                  <Link href={`/arts-${currentTypeSlug}-in-${currentLocSlug}`} className="block px-4 py-2 text-sm text-slate-600 hover:bg-emerald-50 hover:text-emerald-700">Arts</Link>
+                  <Link href={`/bsc-${currentTypeSlug}-in-${currentLocSlug}`} className="block px-4 py-2 text-sm text-slate-600 hover:bg-emerald-50 hover:text-emerald-700">BSc</Link>
+                  <Link href={`/btech-${currentTypeSlug}-in-${currentLocSlug}`} className="block px-4 py-2 text-sm text-slate-600 hover:bg-emerald-50 hover:text-emerald-700">BTech</Link>
+                </div>
               </div>
             </div>
           </div>

@@ -6,7 +6,7 @@ import InstitutionsClient from '@/app/institutions/institutions-client';
 const typeMap: Record<string, string> = {
   'colleges': 'College',
   'universities': 'University',
-  'schools': 'All', // 'schools' is a bit generic, we map it to 'All' but filter by 'School' in the name ideally. For now, 'All' works or we could use 'Public School'
+  'schools': 'School',
   'public-schools': 'Public School',
   'private-schools': 'Private School',
   'institutions': 'All',
