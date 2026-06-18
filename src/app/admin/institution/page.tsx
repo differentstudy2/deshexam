@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Input } from '@/components/ui/input';
 import { createTaxonomyNode, generateSlug } from '@/lib/firebase/taxonomy';
 import { useRouter } from 'next/navigation';
+import { getGoogleMapsKey } from './actions';
 
 export default function InstitutionManagerPage() {
   const { toast } = useToast();
@@ -21,6 +22,85 @@ export default function InstitutionManagerPage() {
   const [isSearching, setIsSearching] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [selectedPlaceDetails, setSelectedPlaceDetails] = useState<any | null>(null);
+
+  const mapRef = React.useRef<HTMLDivElement>(null);
+  const [mapInstance, setMapInstance] = useState<any>(null);
+  const [markerInstance, setMarkerInstance] = useState<any>(null);
+
+  // Initialize Map
+  useEffect(() => {
+    if (!isModalOpen) return;
+
+    let isMounted = true;
+    const initMap = async () => {
+      if (!mapRef.current) return;
+      
+      const loadGoogleMaps = async () => {
+        if ((window as any).google && (window as any).google.maps) return true;
+        const key = await getGoogleMapsKey();
+        if (!key) return false;
+
+        return new Promise<boolean>((resolve) => {
+          const script = document.createElement('script');
+          script.src = `https://maps.googleapis.com/maps/api/js?key=${key}&libraries=places`;
+          script.async = true;
+          script.defer = true;
+          script.onload = () => resolve(true);
+          script.onerror = () => resolve(false);
+          document.head.appendChild(script);
+        });
+      };
+
+      const loaded = await loadGoogleMaps();
+      if (!loaded || !isMounted || !mapRef.current) return;
+
+      if (!mapInstance) {
+        const map = new (window as any).google.maps.Map(mapRef.current, {
+          center: { lat: 22.5726, lng: 88.3639 }, // Default to Kolkata/India
+          zoom: 12,
+          styles: [
+            { featureType: "poi", stylers: [{ visibility: "off" }] },
+            { featureType: "poi.school", stylers: [{ visibility: "on" }] },
+            { featureType: "poi.business", stylers: [{ visibility: "off" }] }
+          ]
+        });
+
+        map.addListener('click', (e: any) => {
+          if (e.placeId) {
+            if (typeof e.stop === 'function') e.stop();
+            handleSelectPlace(e.placeId);
+          }
+        });
+
+        setMapInstance(map);
+      }
+    };
+
+    initMap();
+
+    return () => { isMounted = false; };
+  }, [isModalOpen, mapInstance]);
+
+  // Update map marker when place is selected
+  useEffect(() => {
+    if (selectedPlaceDetails && selectedPlaceDetails.latitude && selectedPlaceDetails.longitude && mapInstance && (window as any).google) {
+      const position = { lat: selectedPlaceDetails.latitude, lng: selectedPlaceDetails.longitude };
+      mapInstance.panTo(position);
+      mapInstance.setZoom(16);
+
+      if (markerInstance) {
+        markerInstance.setMap(null);
+      }
+
+      const newMarker = new (window as any).google.maps.Marker({
+        position,
+        map: mapInstance,
+        title: selectedPlaceDetails.name,
+        animation: (window as any).google.maps.Animation.DROP
+      });
+      setMarkerInstance(newMarker);
+    }
+  }, [selectedPlaceDetails, mapInstance]);
 
   // Debounced Search
   useEffect(() => {
@@ -177,7 +257,7 @@ export default function InstitutionManagerPage() {
 
       {/* Google Maps Import Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="sm:max-w-[800px] h-[90vh] md:h-auto flex flex-col overflow-hidden">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-xl">
               <MapPin className="w-5 h-5 text-emerald-500" />
@@ -188,7 +268,7 @@ export default function InstitutionManagerPage() {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4 py-4">
+          <div className="flex-1 overflow-y-auto pr-2 space-y-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
               <Input 
@@ -207,7 +287,7 @@ export default function InstitutionManagerPage() {
 
             {/* Suggestions Dropdown */}
             {suggestions.length > 0 && !selectedPlaceDetails && (
-              <div className="border border-gray-100 rounded-md shadow-sm max-h-[300px] overflow-y-auto bg-white divide-y divide-gray-50">
+              <div className="absolute z-50 left-0 right-0 mt-1 border border-gray-100 rounded-md shadow-lg max-h-[300px] overflow-y-auto bg-white divide-y divide-gray-50">
                 {suggestions.map((suggestion) => (
                   <button
                     key={suggestion.placeId}
@@ -220,6 +300,21 @@ export default function InstitutionManagerPage() {
                 ))}
               </div>
             )}
+
+            {/* The Map */}
+            <div className="relative w-full h-[350px] rounded-xl overflow-hidden border border-slate-200 shadow-inner bg-slate-50">
+              <div ref={mapRef} className="w-full h-full" />
+              {!mapInstance && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Loader2 className="w-6 h-6 text-emerald-500 animate-spin" />
+                </div>
+              )}
+              {mapInstance && !selectedPlaceDetails && (
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full shadow-md text-sm font-medium text-slate-700 border border-slate-200 pointer-events-none whitespace-nowrap">
+                  Click on any school icon to select it
+                </div>
+              )}
+            </div>
 
             {/* Preview Card */}
             {selectedPlaceDetails && (
