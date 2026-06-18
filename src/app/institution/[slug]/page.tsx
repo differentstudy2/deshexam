@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { InstitutionReviewModal } from './institution-review-modal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -652,7 +653,10 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
           {/* REVIEWS */}
           <Card className="border-none shadow-sm rounded-sm bg-white">
             <CardContent className="p-6 md:p-8">
-              <h2 className="text-xl font-bold text-slate-900 mb-6">Reviews</h2>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-slate-900">Reviews</h2>
+                <InstitutionReviewModal institutionId={institution.id} />
+              </div>
               <div className="flex flex-col sm:flex-row gap-8 mb-8 border-b border-slate-100 pb-8">
                 <div className="flex flex-col items-center sm:items-start justify-center">
                   <div className="text-5xl font-bold text-slate-900 mb-2">{institution.rating || '4.5'}</div>
