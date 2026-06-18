@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     2. Total Enrollment (a number, roughly estimated if exact is not available, e.g. 1500)
     3. Medium of Instruction (e.g. ["English", "Bengali", "Hindi"])
     4. Official Social Media Profiles (Facebook, Twitter/X, LinkedIn, Instagram, YouTube)
-    5. Full Description: Write a high-quality, comprehensive article-style overview (about 400 to 500 words) detailing the history, academic curriculum, campus facilities, notable achievements, and overall reputation of the institution. Format the response beautifully using **HTML tags** (such as <h2>, <p>, <ul>, <li>, <strong>, <em>). Do not use Markdown, strictly use HTML tags.
+    5. Full Description: Write a high-quality, comprehensive article-style overview (about 400 to 500 words) detailing the history, academic curriculum, campus facilities, notable achievements, and overall reputation of the institution. Format the response beautifully using **HTML tags**. DO NOT write an overall main title or <h1> tag at the top of the description. Instead, start directly with the content and divide the text into logical sections using appropriate <h2> tags for section headers. Do not use Markdown, strictly use HTML tags.
     6. High Quality SEO Title: Write an optimized, catchy page title (max 60 characters) including the institution name and primary location.
     7. High Quality SEO Description: Write a compelling, concise meta description (max 160 characters) summarizing the institution for search engines.
     
