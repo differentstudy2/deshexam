@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import Image from 'next/image';
 import { Star, ThumbsUp, ThumbsDown, BadgeCheck, ChevronDown, ChevronUp } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/use-auth';
@@ -13,6 +12,54 @@ import { useToast } from '@/hooks/use-toast';
 interface ReviewItemProps {
   review: any;
   institutionId: string;
+}
+
+/** Generates a consistent color from a string */
+function stringToColor(str: string): string {
+  const colors = [
+    '#10b981', '#6366f1', '#f59e0b', '#ef4444',
+    '#8b5cf6', '#ec4899', '#14b8a6', '#f97316',
+  ];
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  return colors[Math.abs(hash) % colors.length];
+}
+
+/** Avatar: tries Google photo URL first, falls back to initials */
+function ReviewAvatar({ photoUrl, name }: { photoUrl?: string; name: string }) {
+  const [imgFailed, setImgFailed] = useState(false);
+  const initials = name
+    .split(' ')
+    .map((w) => w[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+  const bg = stringToColor(name);
+
+  if (photoUrl && !imgFailed) {
+    return (
+      // Use a plain <img> with referrerPolicy so Google serves the photo
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={photoUrl}
+        alt={name}
+        referrerPolicy="no-referrer"
+        width={40}
+        height={40}
+        className="rounded-full bg-slate-200 w-10 h-10 object-cover shrink-0"
+        onError={() => setImgFailed(true)}
+      />
+    );
+  }
+
+  return (
+    <div
+      className="rounded-full w-10 h-10 flex items-center justify-center text-white text-sm font-bold shrink-0"
+      style={{ backgroundColor: bg }}
+    >
+      {initials}
+    </div>
+  );
 }
 
 export function InstitutionReviewItem({ review, institutionId }: ReviewItemProps) {
@@ -40,7 +87,6 @@ export function InstitutionReviewItem({ review, institutionId }: ReviewItemProps
       if (!data) throw new Error("Institution not found");
       
       const reviews = data.reviews || [];
-      // If review has no ID, fallback to matching authorName and text
       const reviewIndex = reviews.findIndex((r: any) => 
         (localReview.id && r.id === localReview.id) || 
         (!localReview.id && r.authorName === localReview.authorName && r.text === localReview.text)
@@ -49,7 +95,6 @@ export function InstitutionReviewItem({ review, institutionId }: ReviewItemProps
       if (reviewIndex === -1) throw new Error("Review not found");
 
       const currentReview = reviews[reviewIndex];
-      // Generate ID for legacy reviews if missing
       if (!currentReview.id) {
         currentReview.id = crypto.randomUUID();
       }
@@ -62,26 +107,21 @@ export function InstitutionReviewItem({ review, institutionId }: ReviewItemProps
 
       if (actionType === 'like') {
         if (hasLiked) {
-          // Remove like
           currentReview.likedBy = likedBy.filter((uid: string) => uid !== user.uid);
         } else {
-          // Add like, remove dislike if exists
           currentReview.likedBy = [...likedBy, user.uid];
           currentReview.dislikedBy = dislikedBy.filter((uid: string) => uid !== user.uid);
         }
       } else {
         if (hasDisliked) {
-          // Remove dislike
           currentReview.dislikedBy = dislikedBy.filter((uid: string) => uid !== user.uid);
         } else {
-          // Add dislike, remove like if exists
           currentReview.dislikedBy = [...dislikedBy, user.uid];
           currentReview.likedBy = likedBy.filter((uid: string) => uid !== user.uid);
         }
       }
 
       reviews[reviewIndex] = currentReview;
-
       await updateDoc(institutionRef, { reviews });
       setLocalReview(currentReview);
 
@@ -106,20 +146,16 @@ export function InstitutionReviewItem({ review, institutionId }: ReviewItemProps
   const hasUserLiked = user && (localReview.likedBy || []).includes(user.uid);
   const hasUserDisliked = user && (localReview.dislikedBy || []).includes(user.uid);
 
+  const authorName = localReview.authorName || localReview.name || 'Anonymous';
+  const photoUrl = localReview.authorPhotoUrl || localReview.avatar;
+
   return (
     <div className="p-5 rounded-sm border border-slate-100 bg-white shadow-sm flex flex-col">
       <div className="flex items-start gap-3 mb-3">
-        <Image 
-          src={localReview.authorPhotoUrl || localReview.avatar} 
-          alt={localReview.authorName || localReview.name} 
-          width={40} 
-          height={40} 
-          className="rounded-full bg-slate-200" 
-          unoptimized 
-        />
+        <ReviewAvatar photoUrl={photoUrl} name={authorName} />
         <div>
           <div className="font-bold text-slate-900 text-sm flex items-center gap-1.5">
-            {localReview.authorName || localReview.name}
+            {authorName}
             {localReview.isVerified !== false && (
               <span title="Verified Review"><BadgeCheck className="w-4 h-4 text-emerald-500" /></span>
             )}
@@ -185,3 +221,4 @@ export function InstitutionReviewItem({ review, institutionId }: ReviewItemProps
     </div>
   );
 }
+
