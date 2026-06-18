@@ -44,11 +44,15 @@ export interface TaxonomyNode {
   openingHours?: string[];
   galleryImages?: string[];
   reviews?: {
+    id?: string;
     authorName: string;
     rating: number;
     text: string;
     time: string;
     authorPhotoUrl: string;
+    isVerified?: boolean;
+    likedBy?: string[];
+    dislikedBy?: string[];
   }[];
   totalEnrollment?: number;
   mediumOfInstruction?: string[];

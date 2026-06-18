@@ -12,6 +12,7 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 import { InstitutionReviewModal } from './institution-review-modal';
+import { InstitutionReviewItem } from './institution-review-item';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -746,24 +747,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
 
               <div className="space-y-4">
                 {(institution.reviews && institution.reviews.length > 0 ? institution.reviews : MOCK_REVIEWS).map((review: any, idx) => (
-                  <div key={idx} className="p-5 rounded-sm border border-slate-100 bg-white shadow-sm">
-                    <div className="flex items-start gap-3 mb-3">
-                      <Image src={review.authorPhotoUrl || review.avatar} alt={review.authorName || review.name} width={40} height={40} className="rounded-full bg-slate-200" unoptimized />
-                      <div>
-                        <div className="font-bold text-slate-900 text-sm flex items-center gap-2">
-                          {review.authorName || review.name}
-                        </div>
-                        <div className="text-xs text-slate-500 mt-0.5 flex items-center gap-1">
-                          Rating: <span className="flex text-amber-400"><Star className="w-3 h-3 fill-amber-400 text-amber-400 mr-0.5" /></span> {review.rating} • {review.time || '26.05.2023'}
-                        </div>
-                      </div>
-                    </div>
-                    <p className="text-sm text-slate-600 mb-3">{review.text}</p>
-                    <div className="flex gap-2">
-                      <Badge className="bg-emerald-50 text-emerald-600 border-emerald-100 hover:bg-emerald-100 font-normal text-[10px]">Positive</Badge>
-                      <Badge className="bg-amber-50 text-amber-600 border-amber-100 hover:bg-amber-100 font-normal text-[10px]">Neutral</Badge>
-                    </div>
-                  </div>
+                  <InstitutionReviewItem key={review.id || idx} review={review} institutionId={institution.id} />
                 ))}
               </div>
             </CardContent>

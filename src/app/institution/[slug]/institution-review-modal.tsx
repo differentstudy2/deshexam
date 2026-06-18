@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
 import { useAuthDialog } from '@/hooks/use-auth-dialog';
 import { db } from '@/lib/firebase/client';
-import { doc, updateDoc, arrayUnion } from 'firebase/firestore';
+import { doc, updateDoc, getDoc } from 'firebase/firestore';
 import { Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -73,17 +73,28 @@ export function InstitutionReviewModal({ institutionId }: Props) {
     setIsSubmitting(true);
     try {
       const institutionRef = doc(db, 'taxonomy_nodes', institutionId);
+      const docSnap = await getDoc(institutionRef);
+      const existingData = docSnap.data();
+      const existingReviews = existingData?.reviews || [];
       
       const newReview = {
+        id: crypto.randomUUID(),
         authorName: user.displayName || 'Anonymous User',
         rating,
         text: text.trim(),
         time: new Date().toLocaleDateString('en-GB'),
-        authorPhotoUrl: user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || 'U')}&background=random`
+        authorPhotoUrl: user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || 'U')}&background=random`,
+        isVerified: true,
+        likedBy: [],
+        dislikedBy: []
       };
 
+      const updatedReviews = [...existingReviews, newReview];
+      const newAvgRating = updatedReviews.reduce((sum, r) => sum + r.rating, 0) / updatedReviews.length;
+
       await updateDoc(institutionRef, {
-        reviews: arrayUnion(newReview)
+        reviews: updatedReviews,
+        rating: parseFloat(newAvgRating.toFixed(1))
       });
 
       toast({

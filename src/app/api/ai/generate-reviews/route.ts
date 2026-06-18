@@ -34,7 +34,13 @@ export async function POST(req: NextRequest) {
     // Clean up potential markdown code blocks if the AI accidentally adds them
     const cleanJson = textResponse.replace(/```json/g, '').replace(/```/g, '').trim();
     
-    const generatedReviews = JSON.parse(cleanJson);
+    const generatedReviews = JSON.parse(cleanJson).map((review: any) => ({
+      ...review,
+      id: crypto.randomUUID(),
+      isVerified: false,
+      likedBy: [],
+      dislikedBy: []
+    }));
 
     return NextResponse.json({ reviews: generatedReviews });
   } catch (error) {

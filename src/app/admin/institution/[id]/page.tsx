@@ -441,6 +441,12 @@ export default function InstitutionEditPage() {
       if (institutionId) {
         const payload: any = { ...formData };
         if (payload.logoUrl) payload.featureImage = payload.logoUrl;
+        
+        if (payload.reviews && payload.reviews.length > 0) {
+          const avg = payload.reviews.reduce((sum: number, r: any) => sum + r.rating, 0) / payload.reviews.length;
+          payload.rating = parseFloat(avg.toFixed(1));
+        }
+        
         Object.keys(payload).forEach(key => {
           if (payload[key] === undefined) {
             delete payload[key];
