@@ -453,17 +453,17 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
                 <div className="bg-slate-50 rounded-xl p-3"><span className="text-[10px] text-slate-400 font-semibold uppercase block mb-0.5">Start Date</span><span className="font-bold text-slate-800 text-sm">{institution.admission?.applicationStartDate ? new Date(institution.admission.applicationStartDate).toLocaleDateString('en-GB') : 'TBA'}</span></div>
                 <div className="bg-slate-50 rounded-xl p-3"><span className="text-[10px] text-slate-400 font-semibold uppercase block mb-0.5">End Date</span><span className="font-bold text-slate-800 text-sm">{institution.admission?.applicationEndDate ? new Date(institution.admission.applicationEndDate).toLocaleDateString('en-GB') : 'TBA'}</span></div>
                 <div className="bg-slate-50 rounded-xl p-3"><span className="text-[10px] text-slate-400 font-semibold uppercase block mb-0.5">Mode</span><span className="font-bold text-slate-800 text-sm">{institution.admission?.admissionMode || 'Online'}</span></div>
-                <div className="bg-slate-50 rounded-xl p-3"><span className="text-[10px] text-slate-400 font-semibold uppercase block mb-0.5">App. Fee</span><span className="font-bold text-slate-800 text-sm">{institution.admission?.applicationFee ? `â‚¹${institution.admission.applicationFee}` : 'Free'}</span></div>
+                <div className="bg-slate-50 rounded-xl p-3"><span className="text-[10px] text-slate-400 font-semibold uppercase block mb-0.5">App. Fee</span><span className="font-bold text-slate-800 text-sm">{institution.admission?.applicationFee ? `\u20B9${institution.admission.applicationFee}` : 'Free'}</span></div>
               </div>
               <Button asChild className="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-sm h-12 font-bold text-base">
-                {institution.admission?.admissionUrl ? (<a href={institution.admission.admissionUrl} target="_blank" rel="noopener noreferrer">Apply Now â†’</a>) : (<Link href="#">Apply Now â†’</Link>)}
+                {institution.admission?.admissionUrl ? (<a href={institution.admission.admissionUrl} target="_blank" rel="noopener noreferrer">Apply Now &rarr;</a>) : (<Link href="#">Apply Now &rarr;</Link>)}
               </Button>
             </div>
           </div>
 
           <div className="h-2 sm:h-0 bg-slate-100 sm:bg-transparent" />
 
-          {/* GALLERY â€” horizontal scroll strip */}
+          {/* GALLERY — horizontal scroll strip */}
           <div className="bg-white sm:rounded-2xl sm:shadow-sm overflow-hidden">
             <div className="px-4 pt-5 pb-3 flex items-center justify-between border-b border-slate-100">
               <h2 className="text-base font-bold text-slate-900">Gallery</h2>
