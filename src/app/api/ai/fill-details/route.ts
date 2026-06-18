@@ -80,27 +80,31 @@ export async function POST(request: Request) {
     } catch (e1) {
       console.warn('Strategy 1 (gemini-2.0-flash + search) failed:', String(e1));
 
-      // ── Strategy 2: gemini-1.5-flash with Google Search grounding ───────────
+      // ── Strategy 2: gemini-2.0-flash without grounding ──────────────────────
       try {
-        const model = genAI.getGenerativeModel({
-          model: 'gemini-1.5-flash',
-          tools: [{ googleSearch: {} } as any],
-        });
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
         const result = await model.generateContent({
           contents: [{ role: 'user', parts: [{ text: prompt }] }],
         });
         responseText = result.response.text();
       } catch (e2) {
-        console.warn('Strategy 2 (gemini-1.5-flash + search) failed:', String(e2));
+        console.warn('Strategy 2 (gemini-2.0-flash no search) failed:', String(e2));
 
-        // ── Strategy 3: gemini-1.5-flash no grounding (pure knowledge) ─────────
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-        const result = await model.generateContent({
-          contents: [{ role: 'user', parts: [{ text: prompt }] }],
-        });
-        responseText = result.response.text();
+        // ── Strategy 3: gemini-2.5-flash-lite (latest lightweight model) ────────
+        try {
+          const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite' });
+          const result = await model.generateContent({
+            contents: [{ role: 'user', parts: [{ text: prompt }] }],
+          });
+          responseText = result.response.text();
+        } catch (e3) {
+          console.warn('Strategy 3 (gemini-2.5-flash-lite) failed:', String(e3));
+          // Re-throw the last error so outer catch captures it
+          throw e3;
+        }
       }
     }
+
 
     if (!responseText) {
       return NextResponse.json({ error: 'AI returned empty response' }, { status: 500 });

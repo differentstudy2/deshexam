@@ -81,8 +81,8 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
-import { generateMetadata } from '@/ai/flows/ai-metadata-generator';
-import type { AIMetadataGeneratorOutput, AIMetadataGeneratorInput } from '@/ai/flows/ai-metadata-generator';
+import { generateMetadata, type AIMetadataGeneratorOutput, type AIMetadataGeneratorInput } from '@/ai/flows/ai-metadata-generator';
+
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 
@@ -259,9 +259,9 @@ const DependentMetafieldManager = ({
     childTitle: string;
     parentItems: MetafieldItem[];
     fetchChildren: (parentId: string) => Promise<MetafieldItem[]>;
-    onAdd: (parentId: string, data: any) => Promise<void>;
-    onUpdate: (parentId: string, childId: string, data: any) => Promise<void>;
-    onDelete: (parentId: string, childId: string) => Promise<void>;
+    onAdd: (parentId: string, data: any) => Promise<any>;
+    onUpdate: (parentId: string, childId: string, data: any) => Promise<any>;
+    onDelete: (parentId: string, childId: string) => Promise<any>;
     defaultValue?: string;
     onSetDefault: (name: string) => void;
 }) => {
@@ -579,7 +579,7 @@ export default function AdminSettingsPage() {
       setGeneratedItems([]);
       try {
           const input: AIMetadataGeneratorInput = {
-              metafieldType: data.metafieldType,
+              metafieldType: data.metafieldType as AIMetadataGeneratorInput['metafieldType'],
               count: data.count,
               topic: data.topic,
           };

@@ -4,11 +4,10 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { getCategories, getSubcategories, getExams, getSubjects as getExamSubjects, getChapters as getExamChapters, getTopics as getExamTopics } from '@/lib/firebase/exam-taxonomy';
-import { getGuideBoards, getGuideClasses, getGuideAllChapters, getGuideTextbooks, getGuideTopicsByChapter } from '@/lib/firebase/guide';
+import { getGuideBoards, getGuideClasses, getGuideAllChapters, getGuideTextbooks, getGuideTopicsByChapter, migrateOldTextbooksToGuide } from '@/lib/firebase/guide';
 import { collection, query, getDocs, doc, setDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import { createTaxonomyNode } from '@/lib/firebase/taxonomy';
-import { migrateOldTextbooksToGuide } from '@/lib/firebase/guide';
 import { Loader2 } from 'lucide-react';
 
 export default function MigrateTaxonomyPage() {

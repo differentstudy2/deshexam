@@ -259,51 +259,53 @@ export function TaxonomyDataTable({ type, title }: Props) {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-4 md:p-6 space-y-6">
+    <div className="max-w-6xl mx-auto p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <Layers className="w-7 h-7 text-indigo-600" />
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-slate-100 flex items-center gap-2">
+            <Layers className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
             {title}
           </h1>
-          <p className="text-sm text-gray-500 mt-1">View and manage all academic {title.toLowerCase()} in the database.</p>
+          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">View and manage all academic {title.toLowerCase()} in the database.</p>
         </div>
       </div>
 
-      <Card className="border-gray-100 shadow-sm">
-        <CardHeader className="pb-4 border-b border-gray-50 bg-white">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <CardTitle className="text-lg font-semibold text-gray-800 flex items-center gap-2 shrink-0">
-              <DatabaseZap className="w-5 h-5 text-emerald-500" />
-              Data Table
-              <Badge variant="secondary" className="ml-2 bg-gray-100 text-gray-600 font-mono">{filteredNodes.length} items</Badge>
-            </CardTitle>
-            <div className="flex items-center gap-2 w-full sm:w-auto">
-              <Button onClick={() => setIsAddModalOpen(true)} className="h-9 bg-indigo-600 hover:bg-indigo-700 text-white shrink-0">
-                <PlusCircle className="w-4 h-4 mr-2" /> Add New
+      <Card className="border-gray-100 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-900">
+        <CardHeader className="pb-4 border-b border-gray-100 dark:border-slate-700/60 bg-white dark:bg-slate-800/50">
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base font-semibold text-gray-800 dark:text-slate-200 flex items-center gap-2">
+                <DatabaseZap className="w-5 h-5 text-emerald-500 dark:text-emerald-400" />
+                Data Table
+                <Badge variant="secondary" className="ml-1 bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 font-mono text-xs">{filteredNodes.length}</Badge>
+              </CardTitle>
+              <Button onClick={() => setIsAddModalOpen(true)} className="h-9 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white text-sm">
+                <PlusCircle className="w-4 h-4 mr-1.5" /> Add New
               </Button>
-              <div className="relative w-full sm:w-64">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <Input 
-                  placeholder="Search by title or slug..." 
-                  className="pl-9 h-9 bg-white border-gray-200 text-sm w-full"
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500 w-4 h-4" />
+                <Input
+                  placeholder="Search by title or slug..."
+                  className="pl-9 h-9 bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-600 text-sm w-full text-slate-900 dark:text-slate-100 placeholder:text-gray-400 dark:placeholder:text-slate-500"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
-              <div className="relative">
-                <select 
-                  className="h-9 px-3 py-1 bg-white border border-gray-200 rounded-md text-sm text-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none pr-8 cursor-pointer"
+              <div className="relative shrink-0">
+                <select
+                  className="h-9 pl-3 pr-8 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-md text-sm text-gray-700 dark:text-slate-300 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none cursor-pointer"
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
                 >
-                  <option value="all">All Statuses</option>
+                  <option value="all">All</option>
                   <option value="active">Active</option>
                   <option value="inactive">Inactive</option>
                   <option value="published">Published</option>
                   <option value="draft">Draft</option>
                 </select>
-                <Filter className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+                <Filter className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 dark:text-slate-500 pointer-events-none" />
               </div>
             </div>
           </div>
@@ -311,22 +313,22 @@ export function TaxonomyDataTable({ type, title }: Props) {
 
         {/* Bulk Actions Toolbar */}
         {selectedIds.length > 0 && (
-          <div className="px-4 py-3 bg-indigo-50/80 border-b border-indigo-100 flex items-center justify-between">
-            <span className="text-sm font-medium text-indigo-800">{selectedIds.length} items selected</span>
+          <div className="px-4 py-2.5 bg-indigo-50/80 dark:bg-indigo-900/20 border-b border-indigo-100 dark:border-indigo-800/50 flex flex-wrap items-center justify-between gap-2">
+            <span className="text-sm font-medium text-indigo-800 dark:text-indigo-300">{selectedIds.length} selected</span>
             <div className="flex items-center gap-2">
-              <select 
-                className="h-8 px-2 py-1 bg-white border border-indigo-200 rounded-md text-sm text-indigo-700 outline-none"
+              <select
+                className="h-8 px-2 bg-white dark:bg-slate-800 border border-indigo-200 dark:border-indigo-700 rounded-md text-xs text-indigo-700 dark:text-indigo-300 outline-none"
                 onChange={(e) => handleBulkStatusUpdate(e.target.value)}
                 value=""
               >
-                <option value="" disabled>Change Status...</option>
-                <option value="active">Set Active</option>
-                <option value="inactive">Set Inactive</option>
-                <option value="published">Set Published</option>
-                <option value="draft">Set Draft</option>
+                <option value="" disabled>Set Status...</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+                <option value="published">Published</option>
+                <option value="draft">Draft</option>
               </select>
-              <Button variant="destructive" size="sm" className="h-8" onClick={handleBulkDelete}>
-                <Trash2 className="w-4 h-4 mr-1" /> Delete Selected
+              <Button variant="destructive" size="sm" className="h-8 text-xs" onClick={handleBulkDelete}>
+                <Trash2 className="w-3.5 h-3.5 mr-1" /> Delete
               </Button>
             </div>
           </div>
@@ -334,15 +336,15 @@ export function TaxonomyDataTable({ type, title }: Props) {
 
         {/* Dedicated Filters Section */}
         {['class', 'subject', 'textbook', 'chapter', 'topic'].includes(type) && (
-          <div className="p-4 border-b border-gray-100 bg-gray-50/30">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          <div className="p-3 sm:p-4 border-b border-gray-100 dark:border-slate-700/60 bg-gray-50/30 dark:bg-slate-800/30">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-4">
 
             {['class', 'subject', 'textbook', 'chapter', 'topic'].includes(type) && (
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Filter by Board</Label>
+                <Label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Filter by Board</Label>
                 <div className="relative">
                   <select 
-                    className="h-9 w-full px-3 py-1 bg-white border border-gray-200 rounded-md text-sm text-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none pr-8 cursor-pointer"
+                    className="h-9 w-full px-3 py-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-md text-sm text-gray-700 dark:text-slate-300 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none pr-8 cursor-pointer"
                     value={filterBoardId}
                     onChange={(e) => {
                       setFilterBoardId(e.target.value);
@@ -352,17 +354,17 @@ export function TaxonomyDataTable({ type, title }: Props) {
                     <option value="all">All Boards</option>
                     {availableBoards.map(b => <option key={b.id} value={b.id}>{b.title}</option>)}
                   </select>
-                  <Filter className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+                  <Filter className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 dark:text-slate-500 pointer-events-none" />
                 </div>
               </div>
             )}
 
             {['subject', 'textbook', 'chapter', 'topic'].includes(type) && (
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Filter by Class</Label>
+                <Label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Filter by Class</Label>
                 <div className="relative">
                   <select 
-                    className="h-9 w-full px-3 py-1 bg-white border border-gray-200 rounded-md text-sm text-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none pr-8 cursor-pointer disabled:opacity-50"
+                    className="h-9 w-full px-3 py-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-md text-sm text-gray-700 dark:text-slate-300 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none pr-8 cursor-pointer disabled:opacity-50"
                     value={filterClassId}
                     onChange={(e) => {
                       setFilterClassId(e.target.value);
@@ -373,17 +375,17 @@ export function TaxonomyDataTable({ type, title }: Props) {
                     <option value="all">All Classes</option>
                     {availableClasses.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
                   </select>
-                  <Filter className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+                  <Filter className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 dark:text-slate-500 pointer-events-none" />
                 </div>
               </div>
             )}
 
             {['textbook', 'chapter', 'topic'].includes(type) && (
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Filter by Subject</Label>
+                <Label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Filter by Subject</Label>
                 <div className="relative">
                   <select 
-                    className="h-9 w-full px-3 py-1 bg-white border border-gray-200 rounded-md text-sm text-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none pr-8 cursor-pointer disabled:opacity-50"
+                    className="h-9 w-full px-3 py-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-md text-sm text-gray-700 dark:text-slate-300 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none pr-8 cursor-pointer disabled:opacity-50"
                     value={filterSubjectId}
                     onChange={(e) => {
                       setFilterSubjectId(e.target.value);
@@ -394,17 +396,17 @@ export function TaxonomyDataTable({ type, title }: Props) {
                     <option value="all">All Subjects</option>
                     {availableSubjects.map(s => <option key={s.id} value={s.id}>{s.title}</option>)}
                   </select>
-                  <Filter className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+                  <Filter className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 dark:text-slate-500 pointer-events-none" />
                 </div>
               </div>
             )}
 
             {['chapter', 'topic'].includes(type) && (
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Filter by Textbook</Label>
+                <Label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Filter by Textbook</Label>
                 <div className="relative">
                   <select 
-                    className="h-9 w-full px-3 py-1 bg-white border border-gray-200 rounded-md text-sm text-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none pr-8 cursor-pointer disabled:opacity-50"
+                    className="h-9 w-full px-3 py-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-md text-sm text-gray-700 dark:text-slate-300 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none pr-8 cursor-pointer disabled:opacity-50"
                     value={filterTextbookId}
                     onChange={(e) => {
                       setFilterTextbookId(e.target.value);
@@ -415,17 +417,17 @@ export function TaxonomyDataTable({ type, title }: Props) {
                     <option value="all">All Textbooks</option>
                     {availableTextbooks.map(t => <option key={t.id} value={t.id}>{t.title}</option>)}
                   </select>
-                  <Filter className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+                  <Filter className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 dark:text-slate-500 pointer-events-none" />
                 </div>
               </div>
             )}
 
             {['topic'].includes(type) && (
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Filter by Chapter</Label>
+                <Label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Filter by Chapter</Label>
                 <div className="relative">
                   <select 
-                    className="h-9 w-full px-3 py-1 bg-white border border-gray-200 rounded-md text-sm text-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none pr-8 cursor-pointer disabled:opacity-50"
+                    className="h-9 w-full px-3 py-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-md text-sm text-gray-700 dark:text-slate-300 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none pr-8 cursor-pointer disabled:opacity-50"
                     value={filterChapterId}
                     onChange={(e) => setFilterChapterId(e.target.value)}
                     disabled={filterTextbookId !== 'all' && availableChapters.length === 0}
@@ -433,7 +435,7 @@ export function TaxonomyDataTable({ type, title }: Props) {
                     <option value="all">All Chapters</option>
                     {availableChapters.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
                   </select>
-                  <Filter className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+                  <Filter className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 dark:text-slate-500 pointer-events-none" />
                 </div>
               </div>
             )}
@@ -443,99 +445,102 @@ export function TaxonomyDataTable({ type, title }: Props) {
 
         <CardContent className="p-0">
           {loading ? (
-            <div className="p-12 text-center text-gray-500 animate-pulse">Loading data...</div>
+            <div className="p-12 text-center text-gray-500 dark:text-slate-400 animate-pulse">Loading data...</div>
           ) : paginatedNodes.length === 0 ? (
-            <div className="p-12 text-center text-gray-500">No records found.</div>
+            <div className="p-12 text-center text-gray-500 dark:text-slate-400">No records found.</div>
           ) : (
             <div className="flex flex-col">
-              <div className="overflow-x-auto min-h-[400px]">
+              <div className="overflow-x-auto -mx-px">
                 <Table>
-                  <TableHeader className="bg-gray-50/50">
-                  <TableRow>
-                    <TableHead className="w-[40px] text-center">
-                      <Checkbox 
+                  <TableHeader className="bg-gray-50/50 dark:bg-slate-800/80">
+                  <TableRow className="border-b border-gray-100 dark:border-slate-700">
+                    <TableHead className="w-10 text-center">
+                      <Checkbox
                         checked={paginatedNodes.length > 0 && selectedIds.length === paginatedNodes.length}
                         onCheckedChange={handleToggleSelectAll}
                       />
                     </TableHead>
-                    <TableHead className="w-[250px]">Title</TableHead>
+                    <TableHead className="text-xs font-semibold text-gray-600 dark:text-slate-400 uppercase tracking-wide min-w-[160px]">Title</TableHead>
                     {type !== 'board' && (
-                      <TableHead>Hierarchy Context</TableHead>
+                      <TableHead className="text-xs font-semibold text-gray-600 dark:text-slate-400 uppercase tracking-wide hidden sm:table-cell">Context</TableHead>
                     )}
-                    <TableHead>Slug</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Order</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead className="text-xs font-semibold text-gray-600 dark:text-slate-400 uppercase tracking-wide hidden md:table-cell">Slug</TableHead>
+                    <TableHead className="text-xs font-semibold text-gray-600 dark:text-slate-400 uppercase tracking-wide">Status</TableHead>
+                    <TableHead className="text-xs font-semibold text-gray-600 dark:text-slate-400 uppercase tracking-wide hidden lg:table-cell">#</TableHead>
+                    <TableHead className="text-right text-xs font-semibold text-gray-600 dark:text-slate-400 uppercase tracking-wide">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {paginatedNodes.map((node) => (
-                    <TableRow key={node.id} className="hover:bg-gray-50/50">
-                      <TableCell className="text-center">
-                        <Checkbox 
+                    <TableRow key={node.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/50 border-b border-gray-100 dark:border-slate-700/50">
+                      <TableCell className="text-center py-2 pl-3 pr-1">
+                        <Checkbox
                           checked={selectedIds.includes(node.id)}
                           onCheckedChange={(checked) => handleToggleSelect(node.id, checked === true)}
                         />
                       </TableCell>
-                      <TableCell className="font-medium text-gray-900">
-                        {node.title}
-                        {node.icon && <span className="ml-2 text-xs text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">Icon: {node.icon}</span>}
+                      <TableCell className="py-2 pr-2">
+                        <div className="font-medium text-sm text-gray-900 dark:text-slate-200 line-clamp-2">{node.title}</div>
+                        {node.icon && <span className="text-xs text-gray-400 dark:text-slate-500 bg-gray-100 dark:bg-slate-700 px-1.5 py-0.5 rounded mt-0.5 inline-block">Icon: {node.icon}</span>}
+                        {/* Mobile: show context & slug inline */}
+                        {type !== 'board' && (
+                          <div className="text-xs text-gray-400 dark:text-slate-500 sm:hidden mt-0.5 line-clamp-1">{getParentContext(node)}</div>
+                        )}
+                        <div className="text-xs text-gray-400 dark:text-slate-500 md:hidden font-mono mt-0.5 line-clamp-1">{node.slug}</div>
                       </TableCell>
                       {type !== 'board' && (
-                        <TableCell className="text-gray-500 text-xs">
-                          {getParentContext(node)}
+                        <TableCell className="py-2 text-gray-500 dark:text-slate-400 text-xs hidden sm:table-cell max-w-[160px]">
+                          <span className="line-clamp-2">{getParentContext(node)}</span>
                         </TableCell>
                       )}
-                      <TableCell className="text-gray-500 font-mono text-xs">{node.slug || 'N/A'}</TableCell>
-                      <TableCell>
-                        <Badge variant={node.status === 'active' || node.status === 'published' ? 'default' : 'secondary'} 
-                               className={node.status === 'active' || node.status === 'published' ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200' : ''}>
+                      <TableCell className="py-2 text-gray-500 dark:text-slate-400 font-mono text-xs hidden md:table-cell max-w-[140px]">
+                        <span className="truncate block">{node.slug || '—'}</span>
+                      </TableCell>
+                      <TableCell className="py-2">
+                        <Badge
+                          variant={node.status === 'active' || node.status === 'published' ? 'default' : 'secondary'}
+                          className={`text-xs ${
+                            node.status === 'published' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300' :
+                            node.status === 'active' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300' :
+                            node.status === 'draft' ? 'bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-400' :
+                            'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
+                          }`}
+                        >
                           {node.status}
                         </Badge>
                       </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-1 text-gray-500 text-sm">
-                          <Hash className="w-3 h-3" />
-                          {node.orderIndex || 0}
-                        </div>
+                      <TableCell className="py-2 hidden lg:table-cell">
+                        <span className="text-xs text-gray-400 dark:text-slate-500 font-mono">#{node.orderIndex || 0}</span>
                       </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end items-center gap-1">
+                      <TableCell className="py-2 text-right pr-3">
+                        <div className="flex justify-end items-center gap-0.5">
                           {type === 'textbook' && (
-                            <Button asChild variant="ghost" size="icon" className="h-8 w-8 text-blue-600 hover:bg-blue-50" title="View Details">
-                              <Link href={`/admin/textbook/${node.id}`}>
-                                <Eye className="w-4 h-4" />
-                              </Link>
+                            <Button asChild variant="ghost" size="icon" className="h-8 w-8 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20" title="View Details">
+                              <Link href={`/admin/textbook/${node.id}`}><Eye className="w-4 h-4" /></Link>
                             </Button>
                           )}
                           {type === 'institution' && node.slug && (
-                            <Button asChild variant="ghost" size="icon" className="h-8 w-8 text-blue-600 hover:bg-blue-50" title="View Public Page">
-                              <Link href={`/institutions/${node.slug}`} target="_blank">
-                                <Eye className="w-4 h-4" />
-                              </Link>
+                            <Button asChild variant="ghost" size="icon" className="h-8 w-8 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20" title="View Public Page">
+                              <Link href={`/institutions/${node.slug}`} target="_blank"><Eye className="w-4 h-4" /></Link>
                             </Button>
                           )}
-                          <Button variant="ghost" size="icon" onClick={() => handleToggleStatus(node)} className="h-8 w-8 text-emerald-600 hover:bg-emerald-50" title="Toggle Status">
+                          <Button variant="ghost" size="icon" onClick={() => handleToggleStatus(node)} className="h-8 w-8 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20" title="Toggle Status">
                             {node.status === 'active' || node.status === 'published' ? <CheckSquare className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                           </Button>
                           {type === 'board' ? (
-                            <Button asChild variant="ghost" size="icon" className="h-8 w-8 text-indigo-600 hover:bg-indigo-50" title="Edit Board Details">
-                              <Link href={`/admin/board/${node.id}`}>
-                                <Edit2 className="w-4 h-4" />
-                              </Link>
+                            <Button asChild variant="ghost" size="icon" className="h-8 w-8 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20" title="Edit">
+                              <Link href={`/admin/board/${node.id}`}><Edit2 className="w-4 h-4" /></Link>
                             </Button>
                           ) : type === 'institution' ? (
-                            <Button asChild variant="ghost" size="icon" className="h-8 w-8 text-indigo-600 hover:bg-indigo-50" title="Edit Institution Details">
-                              <Link href={`/admin/institution/${node.id}`}>
-                                <Edit2 className="w-4 h-4" />
-                              </Link>
+                            <Button asChild variant="ghost" size="icon" className="h-8 w-8 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20" title="Edit">
+                              <Link href={`/admin/institution/${node.id}`}><Edit2 className="w-4 h-4" /></Link>
                             </Button>
                           ) : (
-                            <Button variant="ghost" size="icon" onClick={() => handleEditClick(node)} className="h-8 w-8 text-indigo-600 hover:bg-indigo-50" title="Edit">
+                            <Button variant="ghost" size="icon" onClick={() => handleEditClick(node)} className="h-8 w-8 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20" title="Edit">
                               <Edit2 className="w-4 h-4" />
                             </Button>
                           )}
-                          <Button variant="ghost" size="icon" onClick={() => handleDelete(node)} className="h-8 w-8 text-red-600 hover:bg-red-50" title="Delete">
+                          <Button variant="ghost" size="icon" onClick={() => handleDelete(node)} className="h-8 w-8 text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20" title="Delete">
                             <Trash2 className="w-4 h-4" />
                           </Button>
                         </div>
@@ -547,31 +552,33 @@ export function TaxonomyDataTable({ type, title }: Props) {
               </div>
               
               {/* Pagination Controls */}
-              <div className="p-4 border-t border-gray-100 flex items-center justify-between bg-gray-50/30 rounded-b-xl">
-                <div className="text-sm text-gray-500">
-                  Showing <span className="font-medium text-gray-900">{filteredNodes.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0}</span> to <span className="font-medium text-gray-900">{Math.min(currentPage * itemsPerPage, filteredNodes.length)}</span> of <span className="font-medium text-gray-900">{filteredNodes.length}</span> results
+              <div className="px-3 sm:px-4 py-3 border-t border-gray-100 dark:border-slate-700 flex items-center justify-between bg-gray-50/30 dark:bg-slate-800/30">
+                <div className="text-xs text-gray-500 dark:text-slate-400">
+                  <span className="font-medium text-gray-700 dark:text-slate-300">{filteredNodes.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0}–{Math.min(currentPage * itemsPerPage, filteredNodes.length)}</span>
+                  {' '}of{' '}
+                  <span className="font-medium text-gray-700 dark:text-slate-300">{filteredNodes.length}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
+                <div className="flex items-center gap-1.5">
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                     disabled={currentPage === 1}
-                    className="h-8 text-xs bg-white"
+                    className="h-8 px-2.5 text-xs bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-600 text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700"
                   >
-                    <ChevronLeft className="w-3.5 h-3.5 mr-1" /> Previous
+                    <ChevronLeft className="w-3.5 h-3.5" />
                   </Button>
-                  <div className="flex items-center justify-center min-w-[30px] text-sm font-medium text-gray-700">
+                  <span className="text-xs font-medium text-gray-600 dark:text-slate-400 min-w-[50px] text-center">
                     {currentPage} / {totalPages}
-                  </div>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                     disabled={currentPage === totalPages}
-                    className="h-8 text-xs bg-white"
+                    className="h-8 px-2.5 text-xs bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-600 text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700"
                   >
-                    Next <ChevronRight className="w-3.5 h-3.5 ml-1" />
+                    <ChevronRight className="w-3.5 h-3.5" />
                   </Button>
                 </div>
               </div>
@@ -582,39 +589,41 @@ export function TaxonomyDataTable({ type, title }: Props) {
 
       {/* Edit Modal */}
       <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[425px] bg-white dark:bg-slate-900 border-gray-200 dark:border-slate-700">
           <DialogHeader>
-            <DialogTitle>Edit {title.slice(0, -1)}</DialogTitle>
+            <DialogTitle className="text-slate-900 dark:text-slate-100">Edit {title.slice(0, -1)}</DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label>Title</Label>
-              <Input 
-                value={editForm.title} 
+              <Label className="text-slate-700 dark:text-slate-300">Title</Label>
+              <Input
+                value={editForm.title}
                 onChange={(e) => {
                   const newTitle = e.target.value;
-                  setEditForm(prev => ({ 
-                    ...prev, 
+                  setEditForm(prev => ({
+                    ...prev,
                     title: newTitle,
                     slug: editingNode?.slug ? prev.slug : generateSlug(newTitle)
                   }));
-                }} 
-                placeholder="Title" 
+                }}
+                placeholder="Title"
+                className="bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-600 text-slate-900 dark:text-slate-100"
               />
             </div>
             <div className="grid gap-2">
-              <Label>Slug</Label>
-              <Input 
-                value={editForm.slug} 
-                onChange={(e) => setEditForm({ ...editForm, slug: e.target.value })} 
-                placeholder="url-friendly-slug" 
+              <Label className="text-slate-700 dark:text-slate-300">Slug</Label>
+              <Input
+                value={editForm.slug}
+                onChange={(e) => setEditForm({ ...editForm, slug: e.target.value })}
+                placeholder="url-friendly-slug"
+                className="bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 font-mono text-sm"
               />
-              <p className="text-xs text-gray-500">Updating the slug might break existing links. Use carefully.</p>
+              <p className="text-xs text-gray-500 dark:text-slate-400">Updating the slug might break existing links. Use carefully.</p>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancel</Button>
-            <Button onClick={handleSaveEdit} disabled={!editForm.title || isSaving} className="bg-indigo-600 hover:bg-indigo-700 text-white">
+            <Button variant="outline" onClick={() => setIsEditModalOpen(false)} className="border-gray-200 dark:border-slate-600 dark:text-slate-300">Cancel</Button>
+            <Button onClick={handleSaveEdit} disabled={!editForm.title || isSaving} className="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 text-white">
               {isSaving ? 'Saving...' : 'Save Changes'}
             </Button>
           </DialogFooter>
@@ -623,38 +632,40 @@ export function TaxonomyDataTable({ type, title }: Props) {
 
       {/* Add Modal */}
       <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[425px] bg-white dark:bg-slate-900 border-gray-200 dark:border-slate-700">
           <DialogHeader>
-            <DialogTitle>Add New {title.slice(0, -1)}</DialogTitle>
+            <DialogTitle className="text-slate-900 dark:text-slate-100">Add New {title.slice(0, -1)}</DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label>Title</Label>
-              <Input 
-                value={addForm.title} 
+              <Label className="text-slate-700 dark:text-slate-300">Title</Label>
+              <Input
+                value={addForm.title}
                 onChange={(e) => {
                   const newTitle = e.target.value;
-                  setAddForm(prev => ({ 
-                    ...prev, 
+                  setAddForm(prev => ({
+                    ...prev,
                     title: newTitle,
                     slug: generateSlug(newTitle)
                   }));
-                }} 
-                placeholder={`Enter ${type} title`} 
+                }}
+                placeholder={`Enter ${type} title`}
+                className="bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-600 text-slate-900 dark:text-slate-100"
               />
             </div>
             <div className="grid gap-2">
-              <Label>Slug</Label>
-              <Input 
-                value={addForm.slug} 
-                onChange={(e) => setAddForm({ ...addForm, slug: e.target.value })} 
-                placeholder="url-friendly-slug" 
+              <Label className="text-slate-700 dark:text-slate-300">Slug</Label>
+              <Input
+                value={addForm.slug}
+                onChange={(e) => setAddForm({ ...addForm, slug: e.target.value })}
+                placeholder="url-friendly-slug"
+                className="bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 font-mono text-sm"
               />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsAddModalOpen(false)}>Cancel</Button>
-            <Button onClick={handleSaveAdd} disabled={!addForm.title || isSaving} className="bg-indigo-600 hover:bg-indigo-700 text-white">
+            <Button variant="outline" onClick={() => setIsAddModalOpen(false)} className="border-gray-200 dark:border-slate-600 dark:text-slate-300">Cancel</Button>
+            <Button onClick={handleSaveAdd} disabled={!addForm.title || isSaving} className="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 text-white">
               {isSaving ? 'Adding...' : 'Add Item'}
             </Button>
           </DialogFooter>

@@ -5,7 +5,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { getUserProfile } from '@/lib/firebase/firestore';
-import { Loader2, Bell } from 'lucide-react';
+import { Loader2, Bell, LogOut, UserIcon, Moon, Sun, Monitor } from "lucide-react";
 import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset, useSidebar } from '@/components/ui/sidebar';
 import { AdminSidebar } from '@/components/layout/header';
 import { ThemeToggle } from '@/components/layout/theme-toggle';
@@ -19,7 +19,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LogOut, UserIcon, Moon, Sun, Monitor } from "lucide-react";
+
 import Link from "next/link";
 import { useTheme } from "next-themes";
 import { AdminMobileBottomNav } from '@/components/layout/admin-mobile-bottom-nav';
