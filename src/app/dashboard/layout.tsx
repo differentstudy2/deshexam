@@ -61,7 +61,7 @@ export default function DashboardLayout({
   return (
     <SidebarProvider>
         <div className="flex min-h-screen w-full bg-[#f8f9fa] dark:bg-slate-950 transition-colors duration-300">
-            <Sidebar>
+            <Sidebar collapsible="icon">
                 <DashboardSidebar user={user} logOut={logOut} />
             </Sidebar>
             <div className="flex flex-col flex-1 w-full relative">
