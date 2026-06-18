@@ -37,7 +37,7 @@ export function InstitutionReviewModal({ institutionId }: Props) {
 
   const handleOpenChange = (newOpen: boolean) => {
     if (newOpen && !user) {
-      openAuthDialog();
+      openAuthDialog('sign-in');
       return;
     }
     setOpen(newOpen);
@@ -50,7 +50,7 @@ export function InstitutionReviewModal({ institutionId }: Props) {
 
   const handleSubmit = async () => {
     if (!user) {
-      openAuthDialog();
+      openAuthDialog('sign-in');
       return;
     }
     if (rating === 0) {

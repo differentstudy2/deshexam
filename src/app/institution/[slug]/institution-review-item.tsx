@@ -26,16 +26,7 @@ export function InstitutionReviewItem({ review, institutionId }: ReviewItemProps
 
   const handleAction = async (actionType: 'like' | 'dislike') => {
     if (!user) {
-      openAuthDialog();
-      return;
-    }
-    
-    if (!localReview.id) {
-      toast({
-        title: "Action unavailable",
-        description: "This review cannot be liked or disliked as it lacks an ID.",
-        variant: "destructive"
-      });
+      openAuthDialog('sign-in');
       return;
     }
 
@@ -49,11 +40,20 @@ export function InstitutionReviewItem({ review, institutionId }: ReviewItemProps
       if (!data) throw new Error("Institution not found");
       
       const reviews = data.reviews || [];
-      const reviewIndex = reviews.findIndex((r: any) => r.id === localReview.id);
+      // If review has no ID, fallback to matching authorName and text
+      const reviewIndex = reviews.findIndex((r: any) => 
+        (localReview.id && r.id === localReview.id) || 
+        (!localReview.id && r.authorName === localReview.authorName && r.text === localReview.text)
+      );
       
       if (reviewIndex === -1) throw new Error("Review not found");
 
       const currentReview = reviews[reviewIndex];
+      // Generate ID for legacy reviews if missing
+      if (!currentReview.id) {
+        currentReview.id = crypto.randomUUID();
+      }
+
       const likedBy = currentReview.likedBy || [];
       const dislikedBy = currentReview.dislikedBy || [];
       
@@ -120,8 +120,8 @@ export function InstitutionReviewItem({ review, institutionId }: ReviewItemProps
         <div>
           <div className="font-bold text-slate-900 text-sm flex items-center gap-1.5">
             {localReview.authorName || localReview.name}
-            {localReview.isVerified && (
-              <BadgeCheck className="w-4 h-4 text-emerald-500" title="Verified Review" />
+            {localReview.isVerified !== false && (
+              <span title="Verified Review"><BadgeCheck className="w-4 h-4 text-emerald-500" /></span>
             )}
           </div>
           <div className="text-xs text-slate-500 mt-0.5 flex items-center gap-1">
