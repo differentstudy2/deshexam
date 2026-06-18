@@ -1,4 +1,5 @@
 import React from 'react';
+import { Metadata } from 'next';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -10,9 +11,99 @@ import {
   ChevronDown, BookMarked, Clock, Brain, Settings
 } from 'lucide-react';
 
+export const metadata: Metadata = {
+  title: 'DeshExam Features — Mock Tests, AI Learning, Question Bank & Institution Directory',
+  description: 'Explore DeshExam features including mock tests, quizzes, AI learning assistant, question bank, institution directory, analytics and study materials.',
+  alternates: {
+    canonical: 'https://deshexam.com/features'
+  },
+  openGraph: {
+    title: 'Explore DeshExam Features',
+    description: 'Mock tests, AI learning, quizzes, question bank and institution directory all in one platform.',
+    url: 'https://deshexam.com/features',
+    images: [
+      {
+        url: 'https://deshexam.com/og/features.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'DeshExam Features',
+      }
+    ]
+  }
+};
+
 export default function FeaturesPage() {
+  const jsonLdSoftware = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "DeshExam",
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "Any",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "INR"
+    }
+  };
+
+  const jsonLdProduct = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": "DeshExam Learning Platform",
+    "description": "Comprehensive learning platform with mock tests, AI assistant, and question bank.",
+    "brand": {
+      "@type": "Brand",
+      "name": "DeshExam"
+    }
+  };
+
+  const jsonLdBreadcrumb = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://deshexam.com" },
+      { "@type": "ListItem", "position": 2, "name": "Features", "item": "https://deshexam.com/features" }
+    ]
+  };
+
+  const jsonLdFAQ = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Is DeshExam free to use?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes, basic features like the institution directory and a selection of practice sets are completely free. We also offer premium plans for advanced AI features and unlimited mock tests." }
+      },
+      {
+        "@type": "Question",
+        "name": "Which exams are supported?",
+        "acceptedAnswer": { "@type": "Answer", "text": "We currently support major engineering (JEE), medical (NEET), and government exams (UPSC, SSC, Bank PO), with more added regularly." }
+      },
+      {
+        "@type": "Question",
+        "name": "Does DeshExam provide AI learning?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes, the AI study assistant is available to explain concepts, solve doubts, and analyze your performance." }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I attempt mock tests?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Absolutely. You can simulate actual exams with timer-based mock tests, negative marking, and detailed analytics." }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I search institutions?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes, our comprehensive institution directory allows you to find verified schools, colleges, and coaching centers." }
+      }
+    ]
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#020817] font-sans overflow-hidden">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdSoftware) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdProduct) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdBreadcrumb) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdFAQ) }} />
       
       {/* 1. HERO SECTION */}
       <section className="relative pt-20 pb-20 lg:pt-32 lg:pb-32 px-4 overflow-hidden">
@@ -156,6 +247,19 @@ export default function FeaturesPage() {
         </div>
       </section>
 
+      {/* 1.5 INTRO SEO TEXT */}
+      <section className="py-16 px-4 bg-white dark:bg-[#020817] border-t border-slate-100 dark:border-slate-800">
+        <div className="max-w-4xl mx-auto text-center space-y-6">
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">What is DeshExam?</h2>
+          <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
+            DeshExam is India's most comprehensive online learning platform designed to help students prepare for competitive exams. Whether you are studying for JEE, NEET, UPSC, SSC, or Bank PO, our platform offers a unified ecosystem. From our AI-powered learning assistant and massive question bank to realistic mock tests and a verified institution directory, DeshExam equips you with everything you need to succeed.
+          </p>
+          <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
+            We understand that competitive exam preparation can be overwhelming. That's why we've built an intuitive, high-performance platform that adapts to your learning pace. Our detailed performance analytics identify your weak areas, while our interactive practice sets ensure continuous improvement. Join the thousands of students who trust DeshExam as their ultimate study companion.
+          </p>
+        </div>
+      </section>
+
       {/* 2. EXPLORE CORE FEATURES GRID */}
       <section className="py-20 px-4 bg-white dark:bg-[#020817] relative z-20 border-t border-slate-100 dark:border-slate-800/50">
         <div className="max-w-7xl mx-auto">
@@ -281,9 +385,11 @@ export default function FeaturesPage() {
               </div>
             </div>
             <div className="pt-4">
-              <Button className="bg-slate-900 dark:bg-white hover:bg-slate-800 dark:hover:bg-slate-200 text-white dark:text-slate-900 rounded-sm">
-                Explore Institutions
-              </Button>
+              <Link href="/institutions">
+                <Button className="bg-slate-900 dark:bg-white hover:bg-slate-800 dark:hover:bg-slate-200 text-white dark:text-slate-900 rounded-sm">
+                  Explore Institutions →
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
@@ -320,6 +426,13 @@ export default function FeaturesPage() {
                 <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
                 <span className="text-slate-700 dark:text-slate-300 font-medium">Detailed solutions</span>
               </div>
+            </div>
+            <div className="pt-6">
+              <Link href="/mock-tests">
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-sm">
+                  Try Mock Tests →
+                </Button>
+              </Link>
             </div>
           </div>
           {/* Mockup Right */}
@@ -404,6 +517,13 @@ export default function FeaturesPage() {
             <p className="text-lg text-slate-600 dark:text-slate-400">
               Target specific areas of improvement with intelligent, adaptive practice sets designed to turn weaknesses into strengths.
             </p>
+            <div className="pt-4">
+              <Link href="/practice">
+                <Button className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-sm">
+                  Start Practicing →
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -429,6 +549,13 @@ export default function FeaturesPage() {
               <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300 font-medium"><Trophy className="w-4 h-4 text-amber-500" /> Streak rewards</div>
               <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300 font-medium"><Trophy className="w-4 h-4 text-amber-500" /> Badges</div>
               <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300 font-medium"><Trophy className="w-4 h-4 text-amber-500" /> Quiz battles</div>
+            </div>
+            <div className="pt-6">
+              <Link href="/quiz">
+                <Button className="bg-amber-500 hover:bg-amber-600 text-white rounded-sm">
+                  Enter Quiz Arena →
+                </Button>
+              </Link>
             </div>
           </div>
           {/* Mockup Right */}
@@ -515,6 +642,13 @@ export default function FeaturesPage() {
               <Badge variant="outline" className="text-slate-600 dark:text-slate-300">True/False</Badge>
               <Badge variant="outline" className="text-slate-600 dark:text-slate-300">Matching</Badge>
               <Badge variant="outline" className="text-slate-600 dark:text-slate-300">Creative Questions</Badge>
+            </div>
+            <div className="pt-4">
+              <Link href="/question-bank">
+                <Button className="bg-rose-600 hover:bg-rose-700 text-white rounded-sm">
+                  Browse Question Bank →
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
@@ -755,6 +889,64 @@ export default function FeaturesPage() {
                 </CardContent>
               </Card>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 5.5 USE CASES & EEAT */}
+      <section className="py-24 px-4 bg-slate-50 dark:bg-slate-900/50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-4">Who Can Benefit from DeshExam?</h2>
+            <div className="w-16 h-1.5 bg-emerald-500 mx-auto rounded-full"></div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+            <div className="bg-white dark:bg-slate-900 p-6 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm">
+              <h3 className="text-xl font-bold text-emerald-600 dark:text-emerald-400 mb-3">Students</h3>
+              <p className="text-slate-600 dark:text-slate-400">Access thousands of mock tests, study materials, and AI-driven insights to crack your dream exams. Track your progress daily and stay ahead of the competition.</p>
+            </div>
+            <div className="bg-white dark:bg-slate-900 p-6 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm">
+              <h3 className="text-xl font-bold text-blue-600 dark:text-blue-400 mb-3">Parents</h3>
+              <p className="text-slate-600 dark:text-slate-400">Find the best verified coaching institutions and schools for your children using our comprehensive directory, complete with genuine reviews and ratings.</p>
+            </div>
+            <div className="bg-white dark:bg-slate-900 p-6 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm">
+              <h3 className="text-xl font-bold text-purple-600 dark:text-purple-400 mb-3">Educators</h3>
+              <p className="text-slate-600 dark:text-slate-400">Utilize our massive question bank and rich content libraries to assign quizzes and practice sets, saving hours of preparation time.</p>
+            </div>
+            <div className="bg-white dark:bg-slate-900 p-6 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm">
+              <h3 className="text-xl font-bold text-orange-600 dark:text-orange-400 mb-3">Institutions</h3>
+              <p className="text-slate-600 dark:text-slate-400">Claim your profile in our directory, showcase your facilities, and connect with thousands of motivated students actively looking for the best coaching.</p>
+            </div>
+          </div>
+          
+          <div className="bg-slate-900 dark:bg-slate-950 text-slate-300 rounded-2xl p-8 lg:p-12 shadow-xl border border-slate-800">
+            <h3 className="text-2xl font-bold text-white mb-6">Why Trust DeshExam?</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <ul className="space-y-4">
+                <li className="flex items-start gap-3">
+                  <CheckCircle2 className="w-6 h-6 text-emerald-500 shrink-0" />
+                  <span><strong>Expert Verified Content:</strong> Every question, mock test, and study material is reviewed by subject matter experts before being published.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle2 className="w-6 h-6 text-emerald-500 shrink-0" />
+                  <span><strong>AI Powered Accuracy:</strong> Our advanced algorithms ensure adaptive learning, minimizing human error and maximizing efficiency.</span>
+                </li>
+              </ul>
+              <ul className="space-y-4">
+                <li className="flex items-start gap-3">
+                  <CheckCircle2 className="w-6 h-6 text-emerald-500 shrink-0" />
+                  <span><strong>Thousands of Questions:</strong> With over 100K+ questions updated regularly, you will never run out of practice material.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle2 className="w-6 h-6 text-emerald-500 shrink-0" />
+                  <span><strong>Trusted by Students:</strong> Join a thriving community of over 50,000+ students who have significantly improved their test scores.</span>
+                </li>
+              </ul>
+            </div>
+            <div className="mt-8 pt-6 border-t border-slate-800 text-sm flex flex-col sm:flex-row justify-between items-center gap-4 text-slate-500">
+              <p>Last Updated: October 2023</p>
+              <p>Questions? Contact our academic team at <a href="mailto:support@deshexam.com" className="text-emerald-400 hover:underline">support@deshexam.com</a></p>
+            </div>
           </div>
         </div>
       </section>
