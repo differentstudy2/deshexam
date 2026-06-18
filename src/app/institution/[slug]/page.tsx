@@ -317,7 +317,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
                 <div className="flex overflow-x-auto sm:overflow-visible pb-2 sm:pb-0 -mx-0 px-2 sm:mx-0 sm:px-0 sm:flex-wrap items-center gap-1 no-scrollbar w-[100vw] sm:w-auto">
                   <Badge variant="outline" className="text-blue-200 border-blue-500/30 bg-blue-500/10 backdrop-blur-md whitespace-nowrap">Est: {institution.establishedYear || '2013'}</Badge>
                   <Badge variant="outline" className="text-purple-200 border-purple-500/30 bg-purple-500/10 backdrop-blur-md whitespace-nowrap">Medium: {institution.mediumOfInstruction ? (Array.isArray(institution.mediumOfInstruction) ? institution.mediumOfInstruction.join(', ') : institution.mediumOfInstruction) : 'English'}</Badge>
-                  <Badge variant="outline" className="text-emerald-200 border-emerald-500/30 bg-emerald-500/10 backdrop-blur-md whitespace-nowrap">Institution Type: College</Badge>
+                  <Badge variant="outline" className="text-emerald-200 border-emerald-500/30 bg-emerald-500/10 backdrop-blur-md whitespace-nowrap">Type: College</Badge>
                 </div>
 
                 <div className="flex flex-col sm:flex-row flex-wrap gap-3 w-full">
@@ -865,13 +865,74 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
                     </div>
                   </a>
                 )}
-                <div className="flex items-center gap-3 text-slate-600 group cursor-default">
-                  <div className="bg-orange-50 p-2.5 rounded-full text-orange-600 group-hover:bg-orange-600 group-hover:text-white transition-colors"><Clock className="w-4 h-4" /></div>
-                  <div>
-                    <div className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">Opening Hours</div>
-                    <div className="text-sm font-semibold line-clamp-1">{(institution as any).openingHours || '9:00 AM - 5:00 PM (Mon-Fri)'}</div>
-                  </div>
-                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Opening Hours Card */}
+          <Card className="border-none shadow-sm rounded-sm bg-white">
+            <CardContent className="p-6">
+              <h3 className="font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100 flex items-center gap-2">
+                <Clock className="w-4 h-4 text-orange-500" /> Opening Hours
+              </h3>
+              <div className="overflow-hidden rounded-sm border border-slate-100">
+                <table className="w-full text-sm text-left">
+                  <tbody className="divide-y divide-slate-100">
+                    {(() => {
+                      let rawHours = (institution as any).openingHours;
+                      let scheduleArray = [];
+                      if (Array.isArray(rawHours) && rawHours.length > 0) {
+                        scheduleArray = rawHours.map(item => {
+                          if (typeof item === 'string') {
+                            const parts = item.split(':');
+                            if (parts.length > 1) {
+                              return { day: parts[0].trim(), hours: parts.slice(1).join(':').trim() };
+                            }
+                            return { day: '', hours: item.trim() };
+                          }
+                          if (typeof item === 'object' && item !== null) {
+                            return {
+                              day: item.day || item.dayOfWeek || item.name || '',
+                              hours: item.hours || item.time || item.value || ''
+                            };
+                          }
+                          return { day: '', hours: '' };
+                        });
+                      } else if (typeof rawHours === 'object' && rawHours !== null) {
+                        scheduleArray = Object.entries(rawHours).map(([key, val]) => ({
+                          day: key,
+                          hours: typeof val === 'string' ? val : ''
+                        }));
+                      }
+
+                      // Fallback if we still have nothing or just empty rows
+                      if (scheduleArray.length === 0 || scheduleArray.every(s => !s.day && !s.hours)) {
+                        scheduleArray = [
+                          { day: 'Monday', hours: '9:00 AM - 5:00 PM' },
+                          { day: 'Tuesday', hours: '9:00 AM - 5:00 PM' },
+                          { day: 'Wednesday', hours: '9:00 AM - 5:00 PM' },
+                          { day: 'Thursday', hours: '9:00 AM - 5:00 PM' },
+                          { day: 'Friday', hours: '9:00 AM - 5:00 PM' },
+                          { day: 'Saturday', hours: 'Closed' },
+                          { day: 'Sunday', hours: 'Closed' }
+                        ];
+                      }
+
+                      return scheduleArray.map((schedule: any, idx: number) => {
+                        const hours = schedule.hours || '';
+                        if (!schedule.day && !hours) return null; // Skip completely empty rows
+                        return (
+                          <tr key={idx} className={hours.toLowerCase() === 'closed' ? 'bg-slate-50/50' : ''}>
+                            <td className="py-2.5 px-3 font-medium text-slate-700">{schedule.day}</td>
+                            <td className={`py-2.5 px-3 text-right ${hours.toLowerCase() === 'closed' ? 'text-rose-500 font-medium' : 'text-slate-600'}`}>
+                              {hours}
+                            </td>
+                          </tr>
+                        );
+                      });
+                    })()}
+                  </tbody>
+                </table>
               </div>
             </CardContent>
           </Card>
