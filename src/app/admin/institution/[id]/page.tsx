@@ -35,6 +35,7 @@ export default function InstitutionEditPage() {
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [isSummarizing, setIsSummarizing] = useState(false);
   const [isGeneratingReviews, setIsGeneratingReviews] = useState(false);
+  const [reviewLanguage, setReviewLanguage] = useState('English');
   const [newGalleryUrl, setNewGalleryUrl] = useState('');
   const [draggedGalleryIdx, setDraggedGalleryIdx] = useState<number | null>(null);
   const [initialLoadDone, setInitialLoadDone] = useState(false);
@@ -340,7 +341,7 @@ export default function InstitutionEditPage() {
       const response = await fetch('/api/ai/generate-reviews', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ institutionName: formData.title || formData.acronym, count }),
+        body: JSON.stringify({ institutionName: formData.title || formData.acronym, count, language: reviewLanguage }),
       });
       if (!response.ok) throw new Error('Failed to generate reviews');
       const data = await response.json();
@@ -720,12 +721,42 @@ export default function InstitutionEditPage() {
 
               <div className="grid gap-2">
                 <Label htmlFor="mediumOfInstruction">Medium(s) of Instruction (comma separated)</Label>
-                <Input 
-                  id="mediumOfInstruction" 
-                  value={formData.mediumOfInstruction?.join(', ') || ''} 
-                  onChange={handleMediumChange} 
-                  placeholder="e.g. English, Bengali, Hindi" 
-                />
+                <div className="flex gap-2 items-center">
+                  <Input 
+                    id="mediumOfInstruction" 
+                    value={formData.mediumOfInstruction?.join(', ') || ''} 
+                    onChange={handleMediumChange} 
+                    placeholder="e.g. English, Bengali, Hindi" 
+                    className="flex-1"
+                  />
+                  <select 
+                    className="h-10 text-sm border border-slate-200 rounded-md px-3 bg-white"
+                    onChange={(e) => {
+                      if (e.target.value) {
+                        const current = formData.mediumOfInstruction || [];
+                        if (!current.includes(e.target.value)) {
+                           setFormData(prev => ({ ...prev, mediumOfInstruction: [...current, e.target.value] }));
+                        }
+                        e.target.value = "";
+                      }
+                    }}
+                  >
+                    <option value="">+ Add Language</option>
+                    <option value="English">English</option>
+                    <option value="Hindi">Hindi</option>
+                    <option value="Bengali">Bengali</option>
+                    <option value="Telugu">Telugu</option>
+                    <option value="Marathi">Marathi</option>
+                    <option value="Tamil">Tamil</option>
+                    <option value="Urdu">Urdu</option>
+                    <option value="Gujarati">Gujarati</option>
+                    <option value="Kannada">Kannada</option>
+                    <option value="Odia">Odia</option>
+                    <option value="Malayalam">Malayalam</option>
+                    <option value="Punjabi">Punjabi</option>
+                    <option value="Assamese">Assamese</option>
+                  </select>
+                </div>
               </div>
 
               {/* Social Profiles */}
@@ -1501,6 +1532,58 @@ export default function InstitutionEditPage() {
                 <div className="flex items-center justify-between">
                   <Label>Imported Student Reviews</Label>
                   <div className="flex gap-2">
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => {
+                        const jsonString = prompt("Paste a JSON array of reviews:\n[{ \"authorName\": \"John\", \"rating\": 5, \"text\": \"Great!\" }]");
+                        if (jsonString) {
+                          try {
+                            const parsed = JSON.parse(jsonString);
+                            if (Array.isArray(parsed)) {
+                              const newReviews = parsed.map(r => ({
+                                id: crypto.randomUUID(),
+                                authorName: r.authorName || 'Anonymous',
+                                rating: r.rating || 5,
+                                text: r.text || '',
+                                time: r.time || new Date().toLocaleDateString('en-GB').replace(/\//g, '.'),
+                                authorPhotoUrl: r.authorPhotoUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(r.authorName || 'User')}&background=random`,
+                                isVerified: true,
+                                likedBy: [],
+                                dislikedBy: []
+                              }));
+                              setFormData(prev => ({ ...prev, reviews: [...(prev.reviews || []), ...newReviews] }));
+                              toast({ title: `Imported ${newReviews.length} reviews successfully.` });
+                            }
+                          } catch(e) {
+                            toast({ variant: 'destructive', title: 'Invalid JSON format' });
+                          }
+                        }
+                      }} 
+                      className="h-8"
+                    >
+                      <Upload className="w-3 h-3 mr-2" /> Bulk Import
+                    </Button>
+                    <select
+                      className="h-8 text-xs border border-slate-200 rounded px-2 bg-white"
+                      value={reviewLanguage}
+                      onChange={(e) => setReviewLanguage(e.target.value)}
+                      disabled={isGeneratingReviews}
+                    >
+                      <option value="English">English</option>
+                      <option value="Hindi">Hindi</option>
+                      <option value="Bengali">Bengali</option>
+                      <option value="Telugu">Telugu</option>
+                      <option value="Marathi">Marathi</option>
+                      <option value="Tamil">Tamil</option>
+                      <option value="Gujarati">Gujarati</option>
+                      <option value="Kannada">Kannada</option>
+                      <option value="Malayalam">Malayalam</option>
+                      <option value="Odia">Odia</option>
+                      <option value="Punjabi">Punjabi</option>
+                      <option value="Assamese">Assamese</option>
+                    </select>
                     <select
                       className="h-8 text-xs border border-slate-200 rounded px-2"
                       onChange={(e) => {
@@ -1544,9 +1627,25 @@ export default function InstitutionEditPage() {
                 {formData.reviews && formData.reviews.length > 0 ? (
                   <div className="space-y-2">
                     {formData.reviews.map((r, idx) => (
-                      <div key={idx} className="text-sm bg-slate-50 p-2 rounded border border-slate-100">
-                        <div className="font-semibold text-slate-800">{r.authorName} <span className="text-amber-500">({r.rating}★)</span></div>
-                        <p className="text-slate-600 italic line-clamp-2">"{r.text}"</p>
+                      <div key={idx} className="text-sm bg-slate-50 p-3 rounded border border-slate-100 group relative">
+                        <div className="flex justify-between items-start mb-1">
+                          <div className="font-semibold text-slate-800">{r.authorName} <span className="text-amber-500">({r.rating}★)</span></div>
+                          <button 
+                            type="button"
+                            onClick={() => {
+                              const newReviews = [...(formData.reviews || [])];
+                              const updatedText = prompt(`Edit review text for ${r.authorName}:`, r.text);
+                              if (updatedText !== null) {
+                                newReviews[idx].text = updatedText;
+                                setFormData(prev => ({ ...prev, reviews: newReviews }));
+                              }
+                            }}
+                            className="opacity-0 group-hover:opacity-100 transition-opacity text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1"
+                          >
+                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg> Edit
+                          </button>
+                        </div>
+                        <p className="text-slate-600 italic">"{r.text}"</p>
                       </div>
                     ))}
                   </div>

@@ -5,7 +5,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
 export async function POST(req: NextRequest) {
   try {
-    const { institutionName, count } = await req.json();
+    const { institutionName, count, language = 'English' } = await req.json();
 
     if (!institutionName || !count) {
       return NextResponse.json({ error: 'Institution name and count are required' }, { status: 400 });
@@ -15,6 +15,8 @@ export async function POST(req: NextRequest) {
 
     const prompt = `
     You are an AI assistant tasked with generating realistic, helpful student or parent reviews for an educational institution named "${institutionName}".
+    
+    IMPORTANT: Write the review 'text' field completely in ${language}. If the language is not English, ensure the text is naturally written in the native script of ${language} (e.g., Hindi in Devanagari, Bengali in Bengali script, etc.).
     
     Generate exactly ${count} simulated reviews. 
     Make the reviews varied in sentiment (mostly positive, but include minor criticisms to look authentic), tone, and perspective (e.g., current student, alumni, parent).
