@@ -135,14 +135,26 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
   const currentYear = new Date().getFullYear();
   const stateStr = institution.stateRegion || "West Bengal";
   let cityStr = "City";
+  let postalCodeStr = undefined;
+  let streetAddressStr = undefined;
   if (institution.address) {
     const parts = institution.address.split(',');
     if (parts.length >= 3) {
+      streetAddressStr = parts.slice(0, parts.length - 3).join(', ').trim();
       cityStr = parts[parts.length - 3].trim();
+      const stateZipPart = parts[parts.length - 2]?.trim() || "";
+      const zipMatch = stateZipPart.match(/\d{5,6}/);
+      if (zipMatch) {
+        postalCodeStr = zipMatch[0];
+      }
     } else if (parts.length > 0) {
       cityStr = parts[0].trim();
+      streetAddressStr = institution.address;
     }
   }
+
+  // Cover Image (Mocked if not present)
+  const coverImage = 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=2000';
 
   // Generate JSON-LD Schemas
   const schemaInstitution = {
@@ -151,10 +163,13 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
     "name": institution.title,
     "url": `https://deshexam.com/institution/${params.slug}`,
     "telephone": institution.phoneNumber || "",
+    "image": institution.logoUrl || institution.featureImage || coverImage,
     "address":{
       "@type":"PostalAddress",
+      "streetAddress": streetAddressStr,
       "addressLocality": cityStr,
       "addressRegion": stateStr,
+      "postalCode": postalCodeStr,
       "addressCountry": "IN"
     }
   };
@@ -198,9 +213,6 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
   const schemas: any[] = [schemaInstitution, schemaFAQ, schemaBreadcrumb];
   if (schemaRating) schemas.push(schemaRating);
 
-  // Cover Image (Mocked if not present)
-  const coverImage = 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=2000';
-
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#020817] pb-20 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemas) }} />
@@ -231,7 +243,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
             <div className="w-full lg:w-2/3 flex flex-col">
               
               <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-center sm:items-start w-full text-center sm:text-left">
-              <div className="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-2xl bg-white shadow-2xl flex items-center justify-center overflow-hidden shrink-0 z-10 relative mx-auto sm:mx-0">
+              <div className="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-sm bg-white shadow-2xl flex items-center justify-center overflow-hidden shrink-0 z-10 relative mx-auto sm:mx-0">
                 {institution.logoUrl || institution.featureImage ? (
                   <Image src={institution.logoUrl || institution.featureImage || ''} alt={`${institution.title} official logo`} fill className="object-contain p-2 sm:p-3" unoptimized />
                 ) : (
@@ -274,11 +286,11 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
               </div>
 
               <div className="flex flex-col sm:flex-row flex-wrap gap-3 w-full">
-                <Button className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-medium shadow-lg hover:shadow-emerald-500/25 px-6 h-12 sm:h-10 rounded-xl sm:rounded-lg transition-all border border-emerald-500/50 text-base sm:text-sm">Get Admission Info</Button>
+                <Button className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-medium shadow-lg hover:shadow-emerald-500/25 px-6 h-12 sm:h-10 rounded-sm sm:rounded-sm transition-all border border-emerald-500/50 text-base sm:text-sm">Get Admission Info</Button>
                 <div className="grid grid-cols-2 gap-3 w-full sm:w-auto sm:flex sm:flex-wrap">
-                  <Button className="w-full sm:w-auto bg-indigo-500/20 border border-indigo-400/30 text-indigo-50 hover:bg-indigo-500/30 hover:border-indigo-400/50 backdrop-blur-md font-medium px-2 sm:px-5 h-12 sm:h-10 rounded-xl sm:rounded-lg shadow-lg shadow-indigo-500/10 transition-all text-[13px] sm:text-sm">Brochure</Button>
+                  <Button className="w-full sm:w-auto bg-indigo-500/20 border border-indigo-400/30 text-indigo-50 hover:bg-indigo-500/30 hover:border-indigo-400/50 backdrop-blur-md font-medium px-2 sm:px-5 h-12 sm:h-10 rounded-sm sm:rounded-sm shadow-lg shadow-indigo-500/10 transition-all text-[13px] sm:text-sm">Brochure</Button>
                   {institution.websiteUrl && (
-                    <Button asChild className="w-full sm:w-auto bg-amber-500/20 border border-amber-400/30 text-amber-50 hover:bg-amber-500/30 hover:border-amber-400/50 backdrop-blur-md font-medium px-2 sm:px-5 h-12 sm:h-10 rounded-xl sm:rounded-lg shadow-lg shadow-amber-500/10 transition-all text-[13px] sm:text-sm">
+                    <Button asChild className="w-full sm:w-auto bg-amber-500/20 border border-amber-400/30 text-amber-50 hover:bg-amber-500/30 hover:border-amber-400/50 backdrop-blur-md font-medium px-2 sm:px-5 h-12 sm:h-10 rounded-sm sm:rounded-sm shadow-lg shadow-amber-500/10 transition-all text-[13px] sm:text-sm">
                       <a href={institution.websiteUrl} target="_blank" rel="noopener noreferrer"><Globe className="w-4 h-4 sm:mr-2 shrink-0" /> <span className="hidden sm:inline">Visit Website</span><span className="sm:hidden ml-1">Website</span></a>
                     </Button>
                   )}
@@ -289,19 +301,19 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
 
             {/* Right side: Stats Cards */}
             <div className="lg:w-1/3 w-full grid grid-cols-2 gap-3 sm:gap-4 pt-4 lg:pt-0">
-              <div className="bg-blue-900/20 backdrop-blur-md border border-blue-500/20 rounded-2xl p-4 sm:p-5 text-blue-50 flex flex-col items-center justify-center shadow-inner hover:bg-blue-800/30 hover:border-blue-400/40 transition-all group">
+              <div className="bg-blue-900/20 backdrop-blur-md border border-blue-500/20 rounded-sm p-4 sm:p-5 text-blue-50 flex flex-col items-center justify-center shadow-inner hover:bg-blue-800/30 hover:border-blue-400/40 transition-all group">
                 <div className="text-2xl sm:text-3xl font-bold mb-1 group-hover:scale-105 transition-transform">{institution.totalEnrollment || '3,25K'}</div>
                 <div className="text-xs sm:text-sm text-blue-200/80 font-medium">Students</div>
               </div>
-              <div className="bg-amber-900/20 backdrop-blur-md border border-amber-500/20 rounded-2xl p-4 sm:p-5 text-amber-50 flex flex-col items-center justify-center shadow-inner hover:bg-amber-800/30 hover:border-amber-400/40 transition-all group">
+              <div className="bg-amber-900/20 backdrop-blur-md border border-amber-500/20 rounded-sm p-4 sm:p-5 text-amber-50 flex flex-col items-center justify-center shadow-inner hover:bg-amber-800/30 hover:border-amber-400/40 transition-all group">
                 <div className="flex items-center gap-1 sm:gap-2 text-2xl sm:text-3xl font-bold mb-1 group-hover:scale-105 transition-transform">{institution.rating || '4.7'}<Star className="w-5 h-5 sm:w-6 sm:h-6 fill-amber-400 text-amber-400" /></div>
                 <div className="text-xs sm:text-sm text-amber-200/80 font-medium">Rating</div>
               </div>
-              <div className="bg-emerald-900/20 backdrop-blur-md border border-emerald-500/20 rounded-2xl p-4 sm:p-5 text-emerald-50 flex flex-col items-center justify-center shadow-inner hover:bg-emerald-800/30 hover:border-emerald-400/40 transition-all group">
+              <div className="bg-emerald-900/20 backdrop-blur-md border border-emerald-500/20 rounded-sm p-4 sm:p-5 text-emerald-50 flex flex-col items-center justify-center shadow-inner hover:bg-emerald-800/30 hover:border-emerald-400/40 transition-all group">
                 <div className="text-2xl sm:text-3xl font-bold mb-1 group-hover:scale-105 transition-transform">{MOCK_COURSES.length}</div>
                 <div className="text-xs sm:text-sm text-emerald-200/80 font-medium">Courses</div>
               </div>
-              <div className="bg-purple-900/20 backdrop-blur-md border border-purple-500/20 rounded-2xl p-4 sm:p-5 text-purple-50 flex flex-col items-center justify-center shadow-inner hover:bg-purple-800/30 hover:border-purple-400/40 transition-all group">
+              <div className="bg-purple-900/20 backdrop-blur-md border border-purple-500/20 rounded-sm p-4 sm:p-5 text-purple-50 flex flex-col items-center justify-center shadow-inner hover:bg-purple-800/30 hover:border-purple-400/40 transition-all group">
                 <div className="text-2xl sm:text-3xl font-bold mb-1 group-hover:scale-105 transition-transform">{institution.userRatingsTotal || 232}</div>
                 <div className="text-xs sm:text-sm text-purple-200/80 font-medium">Reviews</div>
               </div>
@@ -318,7 +330,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
         <div className="lg:col-span-8 space-y-8">
           
           {/* 2. QUICK INFO BAR */}
-          <Card className="border-none shadow-sm rounded-2xl overflow-hidden bg-white">
+          <Card className="border-none shadow-sm rounded-sm overflow-hidden bg-white">
             <CardContent className="p-0">
               <div className="grid grid-cols-3 md:grid-cols-7 divide-x divide-y md:divide-y-0 divide-slate-100 text-sm">
                 <div className="flex flex-col items-center justify-center text-center p-4">
@@ -361,7 +373,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
           </Card>
 
           {/* 3. OVERVIEW */}
-          <Card className="border-none shadow-sm rounded-2xl bg-white">
+          <Card className="border-none shadow-sm rounded-sm bg-white">
             <CardContent className="p-8">
               <div className="w-12 h-1.5 bg-emerald-500 rounded-full mb-3"></div>
               <h2 className="text-2xl font-bold text-slate-900 mb-4">About Institution</h2>
@@ -404,7 +416,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
           </Card>
 
           {/* 4. COURSES / PROGRAMS */}
-          <Card className="border-none shadow-sm rounded-2xl bg-white">
+          <Card className="border-none shadow-sm rounded-sm bg-white">
             <CardContent className="p-6 md:p-8">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <h2 className="text-xl font-bold text-slate-900">Courses & Programs</h2>
@@ -418,7 +430,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {MOCK_COURSES.map(course => (
-                  <div key={course.id} className="border border-slate-100 rounded-xl p-4 hover:border-emerald-200 hover:shadow-sm transition-all bg-white relative">
+                  <div key={course.id} className="border border-slate-100 rounded-sm p-4 hover:border-emerald-200 hover:shadow-sm transition-all bg-white relative">
                     <div className="absolute top-4 right-4 bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">New</div>
                     <h3 className="font-bold text-base text-slate-900 mb-4 pr-10">{course.title}</h3>
                     <div className="grid grid-cols-2 gap-y-2 gap-x-4 text-xs text-slate-600 mb-4">
@@ -438,7 +450,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
           </Card>
 
           {/* FACILITIES */}
-          <Card className="border-none shadow-sm rounded-2xl bg-white">
+          <Card className="border-none shadow-sm rounded-sm bg-white">
             <CardContent className="p-6 md:p-8">
               <h2 className="text-xl font-bold text-slate-900 mb-6">Facilities</h2>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -459,7 +471,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
                       'Smart Board': <Monitor className="w-6 h-6" />
                     };
                     return (
-                      <div key={idx} className={`flex flex-col items-center justify-center p-4 rounded-xl border transition-colors cursor-default ${available ? 'border-emerald-100 bg-emerald-50/50 hover:bg-emerald-50 text-slate-800' : 'border-slate-100 bg-slate-50 text-slate-400'}`}>
+                      <div key={idx} className={`flex flex-col items-center justify-center p-4 rounded-sm border transition-colors cursor-default ${available ? 'border-emerald-100 bg-emerald-50/50 hover:bg-emerald-50 text-slate-800' : 'border-slate-100 bg-slate-50 text-slate-400'}`}>
                         <div className={`mb-2 ${available ? 'text-emerald-600' : 'text-slate-400'}`}>{iconMap[facilityStr] || <Building className="w-6 h-6" />}</div>
                         <span className="text-sm font-bold text-center mb-1">{facilityStr}</span>
                         <span className={`text-[10px] font-semibold tracking-wide uppercase ${available ? 'text-emerald-600' : 'text-slate-400'}`}>{available ? 'Available' : 'Not Available'}</span>
@@ -468,7 +480,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
                   })
                 ) : (
                   MOCK_FACILITIES.slice(0, 6).map((facility, idx) => (
-                    <div key={idx} className="flex flex-col items-center justify-center p-4 rounded-xl border border-emerald-100 bg-emerald-50/50 hover:bg-emerald-50 transition-colors text-slate-800 cursor-default">
+                    <div key={idx} className="flex flex-col items-center justify-center p-4 rounded-sm border border-emerald-100 bg-emerald-50/50 hover:bg-emerald-50 transition-colors text-slate-800 cursor-default">
                       <div className="mb-2 text-emerald-600">{facility.icon}</div>
                       <span className="text-sm font-bold text-center mb-1">{facility.label}</span>
                       <span className="text-[10px] font-semibold text-emerald-600 tracking-wide uppercase">Available</span>
@@ -480,7 +492,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
           </Card>
 
           {/* PLACEMENTS & SCHOLARSHIPS */}
-          <Card className="border-none shadow-sm rounded-2xl bg-white">
+          <Card className="border-none shadow-sm rounded-sm bg-white">
             <CardContent className="p-6 md:p-8">
               <h2 className="text-xl font-bold text-slate-900 mb-6">Placements & Scholarships</h2>
               
@@ -489,7 +501,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
                 {/* Left side: Scholarships */}
                 <div className="space-y-4">
                   {[1, 2].map((i) => (
-                    <div key={i} className="border border-slate-100 rounded-xl p-4 bg-white relative">
+                    <div key={i} className="border border-slate-100 rounded-sm p-4 bg-white relative">
                       <h3 className="font-bold text-slate-900 mb-3">Scholarship Name</h3>
                       <div className="flex flex-col gap-1 text-xs text-slate-600 mb-4">
                         <div className="flex"><span className="text-slate-400 w-20">Amount</span> <span className="font-bold text-slate-800">₹50,000</span></div>
@@ -504,15 +516,15 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
                 {institution.placement && institution.placement.placementAvailable ? (
                   <div className="space-y-6">
                     <div className="grid grid-cols-3 gap-2">
-                      <div className="bg-emerald-50 rounded-lg p-3 text-center">
+                      <div className="bg-emerald-50 rounded-sm p-3 text-center">
                         <div className="text-xl font-bold text-emerald-600">{institution.placement.placementRate || '95%'}</div>
                         <div className="text-[10px] sm:text-xs font-medium text-emerald-800 mt-1">Placement Rate</div>
                       </div>
-                      <div className="bg-slate-50 rounded-lg p-3 text-center border border-slate-100">
+                      <div className="bg-slate-50 rounded-sm p-3 text-center border border-slate-100">
                         <div className="text-xl font-bold text-slate-800">{institution.placement.highestPackage || '12 LPA'}</div>
                         <div className="text-[10px] sm:text-xs font-medium text-slate-500 mt-1">Highest Package</div>
                       </div>
-                      <div className="bg-slate-50 rounded-lg p-3 text-center border border-slate-100">
+                      <div className="bg-slate-50 rounded-sm p-3 text-center border border-slate-100">
                         <div className="text-xl font-bold text-emerald-600">{institution.placement.averagePackage || '6.5 LPA'}<span className="text-xs text-emerald-500 ml-0.5">★</span></div>
                         <div className="text-[10px] sm:text-xs font-medium text-slate-500 mt-1">Average Package</div>
                       </div>
@@ -560,7 +572,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
           </Card>
 
           {/* 5. ADMISSION INFO */}
-          <Card className="border-none shadow-sm rounded-2xl bg-white">
+          <Card className="border-none shadow-sm rounded-sm bg-white">
             <CardContent className="p-6 md:p-8">
               <h2 className="text-xl font-bold text-slate-900 mb-6">Admission</h2>
               
@@ -623,12 +635,12 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
           </Card>
 
           {/* GALLERY */}
-          <Card className="border-none shadow-sm rounded-2xl bg-white overflow-hidden">
+          <Card className="border-none shadow-sm rounded-sm bg-white overflow-hidden">
             <CardContent className="p-6 md:p-8">
               <h2 className="text-xl font-bold text-slate-900 mb-6">Gallery</h2>
               <div className="grid grid-cols-3 gap-2">
                 {(institution.galleryImages && institution.galleryImages.length > 0 ? institution.galleryImages : [...MOCK_GALLERY, ...MOCK_GALLERY, MOCK_GALLERY[0]]).slice(0, 9).map((img, idx) => (
-                  <div key={idx} className={`relative rounded-lg overflow-hidden group aspect-square`}>
+                  <div key={idx} className={`relative rounded-sm overflow-hidden group aspect-square`}>
                     <Image src={img} alt="Gallery image" fill className="object-cover group-hover:scale-110 transition-transform duration-500" unoptimized />
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
                   </div>
@@ -638,7 +650,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
           </Card>
 
           {/* REVIEWS */}
-          <Card className="border-none shadow-sm rounded-2xl bg-white">
+          <Card className="border-none shadow-sm rounded-sm bg-white">
             <CardContent className="p-6 md:p-8">
               <h2 className="text-xl font-bold text-slate-900 mb-6">Reviews</h2>
               <div className="flex flex-col sm:flex-row gap-8 mb-8 border-b border-slate-100 pb-8">
@@ -662,7 +674,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
               </div>
 
               {institution.aiReviewSummary && (
-                <div className="mb-8 bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-100 rounded-xl p-6 shadow-sm relative overflow-hidden">
+                <div className="mb-8 bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-100 rounded-sm p-6 shadow-sm relative overflow-hidden">
                   <div className="absolute top-0 right-0 p-4 opacity-10">
                     <Sparkles className="w-24 h-24 text-indigo-500" />
                   </div>
@@ -730,7 +742,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
 
               <div className="space-y-4">
                 {(institution.reviews && institution.reviews.length > 0 ? institution.reviews : MOCK_REVIEWS).map((review: any, idx) => (
-                  <div key={idx} className="p-5 rounded-xl border border-slate-100 bg-white shadow-sm">
+                  <div key={idx} className="p-5 rounded-sm border border-slate-100 bg-white shadow-sm">
                     <div className="flex items-start gap-3 mb-3">
                       <Image src={review.authorPhotoUrl || review.avatar} alt={review.authorName || review.name} width={40} height={40} className="rounded-full bg-slate-200" unoptimized />
                       <div>
@@ -754,12 +766,12 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
           </Card>
 
           {/* FAQs */}
-          <Card className="border-none shadow-sm rounded-2xl bg-white">
+          <Card className="border-none shadow-sm rounded-sm bg-white">
             <CardContent className="p-6 md:p-8">
               <h2 className="text-xl font-bold text-slate-900 mb-6">FAQs</h2>
               <div className="space-y-3">
                 {MOCK_FAQS.map((faq, idx) => (
-                  <details key={idx} className="group border border-slate-100 rounded-xl bg-slate-50 overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+                  <details key={idx} className="group border border-slate-100 rounded-sm bg-slate-50 overflow-hidden [&_summary::-webkit-details-marker]:hidden">
                     <summary className="flex items-center justify-between cursor-pointer p-4 font-semibold text-slate-800 text-sm hover:bg-slate-100 transition-colors">
                       <div className="flex items-center gap-2">
                         <ChevronRight className="w-4 h-4 text-slate-400 group-open:rotate-90 transition-transform" />
@@ -781,11 +793,11 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
         <div className="lg:col-span-4 space-y-6">
           
           {/* Mini Gallery */}
-          <Card className="border-none shadow-sm rounded-2xl bg-white overflow-hidden">
+          <Card className="border-none shadow-sm rounded-sm bg-white overflow-hidden">
             <CardContent className="p-4">
               <div className="grid grid-cols-2 gap-2">
                 {(institution.galleryImages && institution.galleryImages.length > 0 ? institution.galleryImages : MOCK_GALLERY).slice(0, 4).map((img, idx) => (
-                  <div key={idx} className="relative aspect-square rounded-lg overflow-hidden group">
+                  <div key={idx} className="relative aspect-square rounded-sm overflow-hidden group">
                     <Image src={img} alt={`${institution.title} campus gallery image ${idx + 1}`} fill className="object-cover group-hover:scale-110 transition-transform duration-500" unoptimized />
                   </div>
                 ))}
@@ -795,7 +807,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
           </Card>
 
           {/* Contact Card */}
-          <Card className="border-none shadow-sm rounded-2xl bg-white">
+          <Card className="border-none shadow-sm rounded-sm bg-white">
             <CardContent className="p-6">
               <h3 className="font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">Contact Us</h3>
               <div className="space-y-4">
@@ -837,7 +849,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
           </Card>
 
           {/* Quick Stats Card */}
-          <Card className="border-none shadow-sm rounded-2xl bg-white">
+          <Card className="border-none shadow-sm rounded-sm bg-white">
             <CardContent className="p-6">
               <h3 className="font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">Quick Stats</h3>
               <div className="grid grid-cols-2 gap-y-4 gap-x-2 text-sm">
@@ -862,7 +874,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
           </Card>
 
           {/* Location Map View */}
-          <Card className="border-none shadow-sm rounded-2xl bg-white">
+          <Card className="border-none shadow-sm rounded-sm bg-white">
             <CardContent className="p-6">
               <h3 className="font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">Location</h3>
               <div className="text-sm text-slate-600 mb-4 flex items-start gap-2">
@@ -870,7 +882,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
                 <span>{institution.address || 'Institution Address, City, State, Country - ZIP'}</span>
               </div>
               {institution.latitude && institution.longitude ? (
-                <div className="rounded-xl overflow-hidden border border-slate-200">
+                <div className="rounded-sm overflow-hidden border border-slate-200">
                   <iframe 
                     width="100%" 
                     height="200" 
@@ -882,7 +894,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
                   ></iframe>
                 </div>
               ) : (
-                <div className="rounded-xl overflow-hidden border border-slate-200 bg-slate-100 h-[200px] flex items-center justify-center text-slate-400">
+                <div className="rounded-sm overflow-hidden border border-slate-200 bg-slate-100 h-[200px] flex items-center justify-center text-slate-400">
                   Map View Not Available
                 </div>
               )}
@@ -891,7 +903,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
 
           {/* Social Links */}
           {institution.socialProfiles && Object.values(institution.socialProfiles).some(val => val) && (
-            <Card className="border-none shadow-sm rounded-2xl bg-white">
+            <Card className="border-none shadow-sm rounded-sm bg-white">
               <CardContent className="p-6">
                 <h3 className="font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">Follow Us</h3>
                 <div className="flex gap-3">
@@ -925,7 +937,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
             </Card>
           )}
           {/* Brochure Download Card */}
-          <Card className="border-none shadow-sm rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-700 text-white">
+          <Card className="border-none shadow-sm rounded-sm bg-gradient-to-br from-indigo-500 to-indigo-700 text-white">
             <CardContent className="p-6 text-center">
               <BookOpen className="w-12 h-12 mx-auto mb-4 text-indigo-200" />
               <h3 className="font-bold text-lg mb-2">Download Brochure</h3>
@@ -935,7 +947,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
           </Card>
 
           {/* Nearby Institutions */}
-          <Card className="border-none shadow-sm rounded-2xl bg-white">
+          <Card className="border-none shadow-sm rounded-sm bg-white">
             <CardContent className="p-6">
               <div className="flex justify-between items-center mb-4 border-b pb-3">
                 <h3 className="font-bold text-lg text-slate-900">Nearby</h3>
@@ -944,7 +956,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
               <div className="space-y-4">
                 {MOCK_NEARBY.map(nearby => (
                   <Link href={`/institution`} key={nearby.id} className="flex items-center gap-3 group">
-                    <Image src={nearby.img} alt={nearby.name} width={50} height={50} className="rounded-lg object-cover" unoptimized />
+                    <Image src={nearby.img} alt={nearby.name} width={50} height={50} className="rounded-sm object-cover" unoptimized />
                     <div>
                       <div className="font-semibold text-sm text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-1">{nearby.name}</div>
                       <div className="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
