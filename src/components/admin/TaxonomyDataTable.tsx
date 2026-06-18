@@ -8,7 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { 
   Plus, Edit2, Trash2, Hash, FileText, CheckSquare, EyeOff, LayoutGrid, 
-  ChevronRight, Filter, Database, BookOpen, Layers, Target, Eye, ChevronLeft, Calendar, Activity, PlusCircle, Search, Tag 
+  ChevronRight, Filter, Database, BookOpen, Layers, Target, Eye, ChevronLeft, Calendar, Activity, PlusCircle, Search, Tag,
+  ArrowUpDown, Download, SortAsc, SortDesc, ImageIcon, Globe, RefreshCw, X as XIcon
 } from 'lucide-react';
 import Link from 'next/link';
 import { format } from 'date-fns';
@@ -17,6 +18,23 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { updateTaxonomyNode, generateSlug, deleteTaxonomyNode } from '@/lib/firebase/taxonomy';
+
+const INSTITUTION_TYPES = [
+  'Public School', 'Private School', 'Government School', 'Govt. Aided School',
+  'Primary School', 'Secondary School', 'Higher Secondary', 'Madrasah',
+  'College', 'University', 'Deemed University', 'Engineering College',
+  'Medical College', 'Law College', 'Arts College', 'Science College', 'Commerce College',
+  'Polytechnic', 'ITI', 'Coaching Institute', 'Tuition Centre', 'Vocational Training',
+];
+
+const INDIAN_STATES = [
+  'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa',
+  'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala',
+  'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland',
+  'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura',
+  'Uttar Pradesh', 'Uttarakhand', 'West Bengal',
+  'Delhi', 'Jammu & Kashmir', 'Ladakh', 'Chandigarh', 'Puducherry'
+];
 
 interface Props {
   type: NodeType;
@@ -34,11 +52,21 @@ export function TaxonomyDataTable({ type, title }: Props) {
   const [filterSubjectId, setFilterSubjectId] = useState('all');
   const [filterTextbookId, setFilterTextbookId] = useState('all');
   const [filterChapterId, setFilterChapterId] = useState('all');
+  // New filters
+  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'title-asc' | 'title-desc'>('newest');
+  const [filterHasImage, setFilterHasImage] = useState<'all' | 'yes' | 'no'>('all');
+  const [filterInstitutionType, setFilterInstitutionType] = useState('all');
+  const [filterState, setFilterState] = useState('all');
+  const [filterDateRange, setFilterDateRange] = useState<'all' | 'today' | 'week' | 'month'>('all');
+  const [filterHasWebsite, setFilterHasWebsite] = useState<'all' | 'yes' | 'no'>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
 
   // Bulk Selection State
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [selectAllPages, setSelectAllPages] = useState(false);
+  const [bulkBoardType, setBulkBoardType] = useState('');
+  const [bulkState, setBulkState] = useState('');
 
   // Add Modal State
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -72,14 +100,35 @@ export function TaxonomyDataTable({ type, title }: Props) {
   useEffect(() => {
     setCurrentPage(1);
     setSelectedIds([]);
-  }, [searchQuery, statusFilter, filterBoardId, filterClassId, filterSubjectId, filterTextbookId, filterChapterId]);
+    setSelectAllPages(false);
+  }, [searchQuery, statusFilter, filterBoardId, filterClassId, filterSubjectId, filterTextbookId, filterChapterId, sortBy, filterHasImage, filterInstitutionType, filterState, filterDateRange, filterHasWebsite]);
 
   const filteredNodes = nodes.filter(node => {
-    const matchesSearch = node.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          (node.slug && node.slug.toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchesSearch = node.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          (node.slug && node.slug.toLowerCase().includes(searchQuery.toLowerCase())) ||
+                          ((node as any).address && (node as any).address.toLowerCase().includes(searchQuery.toLowerCase()));
     const matchesStatus = statusFilter === 'all' || node.status === statusFilter;
+    const matchesHasImage = filterHasImage === 'all'
+      ? true : filterHasImage === 'yes'
+      ? !!(node as any).featureImage
+      : !(node as any).featureImage;
+    const matchesHasWebsite = filterHasWebsite === 'all'
+      ? true : filterHasWebsite === 'yes'
+      ? !!(node as any).websiteUrl
+      : !(node as any).websiteUrl;
+    const matchesInstType = filterInstitutionType === 'all' || (node as any).boardType === filterInstitutionType;
+    const matchesState = filterState === 'all' || (node as any).stateRegion === filterState;
+    // Date filter
+    let matchesDate = true;
+    if (filterDateRange !== 'all' && (node as any).createdAt) {
+      const created = (node as any).createdAt?.toDate ? (node as any).createdAt.toDate() : new Date((node as any).createdAt);
+      const now = new Date();
+      if (filterDateRange === 'today') matchesDate = created.toDateString() === now.toDateString();
+      else if (filterDateRange === 'week') matchesDate = (now.getTime() - created.getTime()) < 7 * 86400000;
+      else if (filterDateRange === 'month') matchesDate = (now.getTime() - created.getTime()) < 30 * 86400000;
+    }
 
-    // Check hierarchy matches
+    // Hierarchy matches
     let current = node;
     const pathIds: string[] = [node.id];
     while (current.parentId) {
@@ -88,14 +137,24 @@ export function TaxonomyDataTable({ type, title }: Props) {
       pathIds.push(parent.id);
       current = parent;
     }
-
     const matchesBoard = filterBoardId === 'all' || pathIds.includes(filterBoardId);
     const matchesClass = filterClassId === 'all' || pathIds.includes(filterClassId);
     const matchesSubject = filterSubjectId === 'all' || pathIds.includes(filterSubjectId);
     const matchesTextbook = filterTextbookId === 'all' || pathIds.includes(filterTextbookId);
     const matchesChapter = filterChapterId === 'all' || pathIds.includes(filterChapterId);
 
-    return matchesSearch && matchesStatus && matchesBoard && matchesClass && matchesSubject && matchesTextbook && matchesChapter;
+    return matchesSearch && matchesStatus && matchesBoard && matchesClass && matchesSubject
+      && matchesTextbook && matchesChapter && matchesHasImage && matchesHasWebsite
+      && matchesInstType && matchesState && matchesDate;
+  });
+
+  // Sorting
+  const sortedNodes = [...filteredNodes].sort((a, b) => {
+    if (sortBy === 'title-asc') return a.title.localeCompare(b.title);
+    if (sortBy === 'title-desc') return b.title.localeCompare(a.title);
+    const aTime = (a as any).createdAt?.toDate ? (a as any).createdAt.toDate().getTime() : 0;
+    const bTime = (b as any).createdAt?.toDate ? (b as any).createdAt.toDate().getTime() : 0;
+    return sortBy === 'oldest' ? aTime - bTime : bTime - aTime;
   });
 
   // Dynamically calculate dropdown options based on selections
@@ -105,8 +164,21 @@ export function TaxonomyDataTable({ type, title }: Props) {
   const availableTextbooks = allNodes.filter(n => n.type === 'textbook' && (filterSubjectId === 'all' || n.parentId === filterSubjectId));
   const availableChapters = allNodes.filter(n => n.type === 'chapter' && (filterTextbookId === 'all' || n.parentId === filterTextbookId));
 
-  const totalPages = Math.max(1, Math.ceil(filteredNodes.length / itemsPerPage));
-  const paginatedNodes = filteredNodes.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const totalPages = Math.max(1, Math.ceil(sortedNodes.length / itemsPerPage));
+  const paginatedNodes = sortedNodes.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const effectiveSelectedIds = selectAllPages ? sortedNodes.map(n => n.id) : selectedIds;
+
+  // Active filter count
+  const activeFilterCount = [statusFilter !== 'all', filterHasImage !== 'all', filterHasWebsite !== 'all',
+    filterInstitutionType !== 'all', filterState !== 'all', filterDateRange !== 'all'].filter(Boolean).length;
+
+  const resetAllFilters = () => {
+    setSearchQuery(''); setStatusFilter('all'); setSortBy('newest');
+    setFilterHasImage('all'); setFilterHasWebsite('all');
+    setFilterInstitutionType('all'); setFilterState('all'); setFilterDateRange('all');
+    setFilterBoardId('all'); setFilterClassId('all'); setFilterSubjectId('all');
+    setFilterTextbookId('all'); setFilterChapterId('all');
+  };
 
   const handleEditClick = (node: TaxonomyNode) => {
     setEditingNode(node);
@@ -149,6 +221,7 @@ export function TaxonomyDataTable({ type, title }: Props) {
   };
 
   const handleToggleSelectAll = (checked: boolean) => {
+    setSelectAllPages(false);
     if (checked) {
       setSelectedIds(paginatedNodes.map(n => n.id));
     } else {
@@ -165,36 +238,59 @@ export function TaxonomyDataTable({ type, title }: Props) {
   };
 
   const handleBulkStatusUpdate = async (newStatus: string) => {
-    if (selectedIds.length === 0) return;
+    if (effectiveSelectedIds.length === 0) return;
     setIsSaving(true);
     try {
-      const promises = selectedIds.map(id => updateTaxonomyNode(id, { status: newStatus as any }));
-      await Promise.all(promises);
-      setSelectedIds([]);
+      await Promise.all(effectiveSelectedIds.map(id => updateTaxonomyNode(id, { status: newStatus as any })));
+      setSelectedIds([]); setSelectAllPages(false);
       fetchData();
-    } catch (e) {
-      console.error(e);
-      alert("Failed to update items.");
-    } finally {
-      setIsSaving(false);
-    }
+    } catch (e) { console.error(e); alert('Failed to update items.'); }
+    finally { setIsSaving(false); }
+  };
+
+  const handleBulkFieldUpdate = async (field: string, value: any) => {
+    if (effectiveSelectedIds.length === 0 || !value) return;
+    setIsSaving(true);
+    try {
+      await Promise.all(effectiveSelectedIds.map(id => updateTaxonomyNode(id, { [field]: value } as any)));
+      setSelectedIds([]); setSelectAllPages(false);
+      fetchData();
+    } catch (e) { console.error(e); alert('Failed to update items.'); }
+    finally { setIsSaving(false); }
+  };
+
+  const handleExportCSV = () => {
+    const rows = effectiveSelectedIds.length > 0
+      ? sortedNodes.filter(n => effectiveSelectedIds.includes(n.id))
+      : sortedNodes;
+    const headers = ['ID', 'Title', 'Slug', 'Status', 'Type', 'Board Type', 'State', 'Address', 'Website', 'Phone', 'Rating', 'Established Year', 'Order Index'];
+    const csvRows = [
+      headers.join(','),
+      ...rows.map(n => [
+        n.id, `"${n.title.replace(/"/g, '""')}"`, n.slug || '', n.status, n.type,
+        (n as any).boardType || '', (n as any).stateRegion || '',
+        `"${((n as any).address || '').replace(/"/g, '""')}"`,
+        (n as any).websiteUrl || '', (n as any).phoneNumber || '',
+        (n as any).rating || '', (n as any).establishedYear || '', n.orderIndex || 0
+      ].join(','))
+    ];
+    const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url;
+    a.download = `${type}-export-${new Date().toISOString().slice(0,10)}.csv`;
+    a.click(); URL.revokeObjectURL(url);
   };
 
   const handleBulkDelete = async () => {
-    if (selectedIds.length === 0) return;
-    if (!window.confirm(`Are you sure you want to delete ${selectedIds.length} items AND all their sub-items?`)) return;
+    if (effectiveSelectedIds.length === 0) return;
+    if (!window.confirm(`Are you sure you want to delete ${effectiveSelectedIds.length} items AND all their sub-items?`)) return;
     setIsSaving(true);
     try {
-      const promises = selectedIds.map(id => deleteTaxonomyNode(id));
-      await Promise.all(promises);
-      setSelectedIds([]);
+      await Promise.all(effectiveSelectedIds.map(id => deleteTaxonomyNode(id)));
+      setSelectedIds([]); setSelectAllPages(false);
       fetchData();
-    } catch (e) {
-      console.error(e);
-      alert("Failed to delete items.");
-    } finally {
-      setIsSaving(false);
-    }
+    } catch (e) { console.error(e); alert('Failed to delete items.'); }
+    finally { setIsSaving(false); }
   };
 
   const handleToggleStatus = async (node: TaxonomyNode) => {
@@ -271,66 +367,265 @@ export function TaxonomyDataTable({ type, title }: Props) {
       </div>
 
       <Card className="border-gray-100 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-900">
-        <CardHeader className="pb-4 border-b border-gray-100 dark:border-slate-700/60 bg-white dark:bg-slate-800/50">
+        <CardHeader className="pb-3 border-b border-gray-100 dark:border-slate-700/60 bg-white dark:bg-slate-800/50">
           <div className="flex flex-col gap-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-base font-semibold text-gray-800 dark:text-slate-200 flex items-center gap-2">
-                <DatabaseZap className="w-5 h-5 text-emerald-500 dark:text-emerald-400" />
-                Data Table
-                <Badge variant="secondary" className="ml-1 bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 font-mono text-xs">{filteredNodes.length}</Badge>
-              </CardTitle>
-              <Button onClick={() => setIsAddModalOpen(true)} className="h-9 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white text-sm">
-                <PlusCircle className="w-4 h-4 mr-1.5" /> Add New
-              </Button>
+            {/* Row 1: Title + count + Add + Reset */}
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 min-w-0">
+                <DatabaseZap className="w-5 h-5 text-emerald-500 dark:text-emerald-400 shrink-0" />
+                <CardTitle className="text-base font-semibold text-gray-800 dark:text-slate-200">
+                  Data Table
+                </CardTitle>
+                <Badge variant="secondary" className="ml-1 bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 font-mono text-xs">
+                  {sortedNodes.length}
+                </Badge>
+                {activeFilterCount > 0 && (
+                  <Badge className="bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 text-xs border-0">
+                    {activeFilterCount} filter{activeFilterCount > 1 ? 's' : ''} active
+                  </Badge>
+                )}
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                {activeFilterCount > 0 && (
+                  <Button variant="ghost" size="sm" onClick={resetAllFilters}
+                    className="h-8 text-xs text-gray-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 gap-1">
+                    <XIcon className="w-3 h-3" /> Reset
+                  </Button>
+                )}
+                <Button onClick={() => setIsAddModalOpen(true)}
+                  className="h-9 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white text-sm">
+                  <PlusCircle className="w-4 h-4 mr-1.5" /> Add New
+                </Button>
+              </div>
             </div>
+
+            {/* Row 2: Search + Sort + Status */}
             <div className="flex items-center gap-2">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500 w-4 h-4" />
                 <Input
-                  placeholder="Search by title or slug..."
+                  placeholder="Search title, slug, address..."
                   className="pl-9 h-9 bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-600 text-sm w-full text-slate-900 dark:text-slate-100 placeholder:text-gray-400 dark:placeholder:text-slate-500"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
+              {/* Sort */}
               <div className="relative shrink-0">
                 <select
-                  className="h-9 pl-3 pr-8 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-md text-sm text-gray-700 dark:text-slate-300 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none cursor-pointer"
+                  className="h-9 pl-3 pr-7 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-md text-xs text-gray-700 dark:text-slate-300 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none cursor-pointer"
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as any)}
+                >
+                  <option value="newest">Newest</option>
+                  <option value="oldest">Oldest</option>
+                  <option value="title-asc">A → Z</option>
+                  <option value="title-desc">Z → A</option>
+                </select>
+                <ArrowUpDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 dark:text-slate-500 pointer-events-none" />
+              </div>
+              {/* Status */}
+              <div className="relative shrink-0">
+                <select
+                  className="h-9 pl-3 pr-7 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-md text-xs text-gray-700 dark:text-slate-300 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none cursor-pointer"
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
                 >
-                  <option value="all">All</option>
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
+                  <option value="all">All Status</option>
                   <option value="published">Published</option>
+                  <option value="active">Active</option>
                   <option value="draft">Draft</option>
+                  <option value="inactive">Inactive</option>
                 </select>
-                <Filter className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 dark:text-slate-500 pointer-events-none" />
+                <Filter className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 dark:text-slate-500 pointer-events-none" />
               </div>
             </div>
+
+            {/* Row 3: Advanced filters — shown only for institution type */}
+            {type === 'institution' && (
+              <div className="flex flex-wrap gap-2">
+                {/* Institution Type */}
+                <div className="relative">
+                  <select
+                    className="h-8 pl-2.5 pr-7 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-md text-xs text-gray-700 dark:text-slate-300 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none cursor-pointer max-w-[160px]"
+                    value={filterInstitutionType}
+                    onChange={(e) => setFilterInstitutionType(e.target.value)}
+                  >
+                    <option value="all">All Types</option>
+                    {INSTITUTION_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                  </select>
+                  <Filter className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 dark:text-slate-500 pointer-events-none" />
+                </div>
+                {/* State */}
+                <div className="relative">
+                  <select
+                    className="h-8 pl-2.5 pr-7 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-md text-xs text-gray-700 dark:text-slate-300 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none cursor-pointer max-w-[140px]"
+                    value={filterState}
+                    onChange={(e) => setFilterState(e.target.value)}
+                  >
+                    <option value="all">All States</option>
+                    {INDIAN_STATES.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                  <Filter className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 dark:text-slate-500 pointer-events-none" />
+                </div>
+                {/* Has Image */}
+                <div className="relative">
+                  <select
+                    className="h-8 pl-2.5 pr-7 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-md text-xs text-gray-700 dark:text-slate-300 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none cursor-pointer"
+                    value={filterHasImage}
+                    onChange={(e) => setFilterHasImage(e.target.value as any)}
+                  >
+                    <option value="all">All Images</option>
+                    <option value="yes">Has Image</option>
+                    <option value="no">No Image</option>
+                  </select>
+                  <ImageIcon className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 dark:text-slate-500 pointer-events-none" />
+                </div>
+                {/* Has Website */}
+                <div className="relative">
+                  <select
+                    className="h-8 pl-2.5 pr-7 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-md text-xs text-gray-700 dark:text-slate-300 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none cursor-pointer"
+                    value={filterHasWebsite}
+                    onChange={(e) => setFilterHasWebsite(e.target.value as any)}
+                  >
+                    <option value="all">Any Website</option>
+                    <option value="yes">Has Website</option>
+                    <option value="no">No Website</option>
+                  </select>
+                  <Globe className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 dark:text-slate-500 pointer-events-none" />
+                </div>
+                {/* Date Range */}
+                <div className="relative">
+                  <select
+                    className="h-8 pl-2.5 pr-7 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-md text-xs text-gray-700 dark:text-slate-300 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none cursor-pointer"
+                    value={filterDateRange}
+                    onChange={(e) => setFilterDateRange(e.target.value as any)}
+                  >
+                    <option value="all">All Time</option>
+                    <option value="today">Today</option>
+                    <option value="week">This Week</option>
+                    <option value="month">This Month</option>
+                  </select>
+                  <Calendar className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 dark:text-slate-500 pointer-events-none" />
+                </div>
+              </div>
+            )}
           </div>
         </CardHeader>
 
-        {/* Bulk Actions Toolbar */}
-        {selectedIds.length > 0 && (
-          <div className="px-4 py-2.5 bg-indigo-50/80 dark:bg-indigo-900/20 border-b border-indigo-100 dark:border-indigo-800/50 flex flex-wrap items-center justify-between gap-2">
-            <span className="text-sm font-medium text-indigo-800 dark:text-indigo-300">{selectedIds.length} selected</span>
-            <div className="flex items-center gap-2">
-              <select
-                className="h-8 px-2 bg-white dark:bg-slate-800 border border-indigo-200 dark:border-indigo-700 rounded-md text-xs text-indigo-700 dark:text-indigo-300 outline-none"
-                onChange={(e) => handleBulkStatusUpdate(e.target.value)}
-                value=""
-              >
-                <option value="" disabled>Set Status...</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-                <option value="published">Published</option>
-                <option value="draft">Draft</option>
-              </select>
-              <Button variant="destructive" size="sm" className="h-8 text-xs" onClick={handleBulkDelete}>
-                <Trash2 className="w-3.5 h-3.5 mr-1" /> Delete
+        {/* ── Bulk Actions Toolbar ── */}
+        {effectiveSelectedIds.length > 0 && (
+          <div className="border-b border-indigo-100 dark:border-indigo-800/50 bg-indigo-50/80 dark:bg-indigo-900/20">
+            {/* Top: count + select all pages + deselect */}
+            <div className="px-4 py-2 flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-semibold text-indigo-800 dark:text-indigo-300">
+                  {effectiveSelectedIds.length} selected
+                </span>
+                {!selectAllPages && selectedIds.length === paginatedNodes.length && sortedNodes.length > itemsPerPage && (
+                  <button
+                    className="text-xs text-indigo-600 dark:text-indigo-400 underline hover:no-underline"
+                    onClick={() => setSelectAllPages(true)}
+                  >
+                    Select all {sortedNodes.length} records
+                  </button>
+                )}
+                {selectAllPages && (
+                  <button
+                    className="text-xs text-indigo-600 dark:text-indigo-400 underline hover:no-underline"
+                    onClick={() => { setSelectAllPages(false); setSelectedIds([]); }}
+                  >
+                    Clear selection
+                  </button>
+                )}
+              </div>
+              <Button variant="ghost" size="sm" className="h-7 text-xs text-indigo-500 dark:text-indigo-400"
+                onClick={() => { setSelectedIds([]); setSelectAllPages(false); }}>
+                <XIcon className="w-3 h-3 mr-1" /> Deselect
               </Button>
             </div>
+            {/* Bottom: bulk action buttons */}
+            <div className="px-4 pb-2.5 flex flex-wrap items-center gap-2">
+              {/* Set Status */}
+              <select
+                className="h-8 pl-2.5 pr-7 bg-white dark:bg-slate-800 border border-indigo-200 dark:border-indigo-700 rounded-md text-xs text-indigo-700 dark:text-indigo-300 outline-none appearance-none cursor-pointer"
+                onChange={(e) => { if (e.target.value) handleBulkStatusUpdate(e.target.value); e.target.value = ''; }}
+                defaultValue=""
+              >
+                <option value="" disabled>Set Status…</option>
+                <option value="published">→ Published</option>
+                <option value="active">→ Active</option>
+                <option value="draft">→ Draft</option>
+                <option value="inactive">→ Inactive</option>
+              </select>
+
+              {/* Institution-only: Set Type */}
+              {type === 'institution' && (
+                <>
+                  <select
+                    className="h-8 pl-2.5 pr-7 bg-white dark:bg-slate-800 border border-indigo-200 dark:border-indigo-700 rounded-md text-xs text-indigo-700 dark:text-indigo-300 outline-none appearance-none cursor-pointer max-w-[160px]"
+                    value={bulkBoardType}
+                    onChange={(e) => setBulkBoardType(e.target.value)}
+                  >
+                    <option value="">Set Inst. Type…</option>
+                    {INSTITUTION_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                  </select>
+                  {bulkBoardType && (
+                    <Button size="sm"
+                      className="h-8 text-xs bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 text-white"
+                      onClick={() => { handleBulkFieldUpdate('boardType', bulkBoardType); setBulkBoardType(''); }}
+                      disabled={isSaving}
+                    >
+                      Apply Type
+                    </Button>
+                  )}
+                  <select
+                    className="h-8 pl-2.5 pr-7 bg-white dark:bg-slate-800 border border-indigo-200 dark:border-indigo-700 rounded-md text-xs text-indigo-700 dark:text-indigo-300 outline-none appearance-none cursor-pointer max-w-[140px]"
+                    value={bulkState}
+                    onChange={(e) => setBulkState(e.target.value)}
+                  >
+                    <option value="">Set State…</option>
+                    {INDIAN_STATES.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                  {bulkState && (
+                    <Button size="sm"
+                      className="h-8 text-xs bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 text-white"
+                      onClick={() => { handleBulkFieldUpdate('stateRegion', bulkState); setBulkState(''); }}
+                      disabled={isSaving}
+                    >
+                      Apply State
+                    </Button>
+                  )}
+                </>
+              )}
+
+              {/* Export CSV */}
+              <Button
+                size="sm" variant="outline"
+                className="h-8 text-xs border-indigo-200 dark:border-indigo-700 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 gap-1"
+                onClick={handleExportCSV}
+              >
+                <Download className="w-3.5 h-3.5" /> Export CSV
+              </Button>
+
+              {/* Delete */}
+              <Button variant="destructive" size="sm" className="h-8 text-xs gap-1 ml-auto" onClick={handleBulkDelete} disabled={isSaving}>
+                <Trash2 className="w-3.5 h-3.5" /> Delete {effectiveSelectedIds.length}
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Export All (no selection) */}
+        {effectiveSelectedIds.length === 0 && type === 'institution' && (
+          <div className="px-4 py-2 border-b border-gray-100 dark:border-slate-700/40 flex items-center justify-end gap-2">
+            <Button
+              size="sm" variant="ghost"
+              className="h-7 text-xs text-gray-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 gap-1"
+              onClick={handleExportCSV}
+            >
+              <Download className="w-3.5 h-3.5" /> Export all {sortedNodes.length} as CSV
+            </Button>
           </div>
         )}
 
