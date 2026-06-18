@@ -865,6 +865,13 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
                     </div>
                   </a>
                 )}
+                <div className="flex items-center gap-3 text-slate-600 group cursor-default">
+                  <div className="bg-orange-50 p-2.5 rounded-full text-orange-600 group-hover:bg-orange-600 group-hover:text-white transition-colors"><Clock className="w-4 h-4" /></div>
+                  <div>
+                    <div className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">Opening Hours</div>
+                    <div className="text-sm font-semibold line-clamp-1">{(institution as any).openingHours || '9:00 AM - 5:00 PM (Mon-Fri)'}</div>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
