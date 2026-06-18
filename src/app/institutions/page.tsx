@@ -1,4 +1,7 @@
 import { Metadata } from 'next';
+import { collection, query, where, getDocs, limit, orderBy } from 'firebase/firestore';
+import { db } from '@/lib/firebase/client';
+import { TaxonomyNode } from '@/lib/firebase/taxonomy';
 import InstitutionsClient from './institutions-client';
 
 export const metadata: Metadata = {
@@ -9,7 +12,22 @@ export const metadata: Metadata = {
   },
 };
 
-export default function InstitutionsDirectoryPage() {
+export default async function InstitutionsDirectoryPage() {
+  // Fetch a few top institutions server-side for accurate ItemList schema
+  let featuredInstitutions: TaxonomyNode[] = [];
+  try {
+    const q = query(
+      collection(db, 'taxonomy_nodes'),
+      where('type', '==', 'institution'),
+      where('status', '==', 'published'),
+      limit(6)
+    );
+    const snap = await getDocs(q);
+    featuredInstitutions = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as TaxonomyNode));
+  } catch {
+    // Non-fatal: schema will still render without ItemList items
+  }
+
   const schemaOrg = {
     "@context": "https://schema.org",
     "@graph": [
@@ -39,19 +57,20 @@ export default function InstitutionsDirectoryPage() {
           }
         ]
       },
-      {
+      // Only include ItemList if we have real institutions
+      ...(featuredInstitutions.length > 0 ? [{
         "@type": "ItemList",
         "url": "https://deshexam.com/institutions",
-        "name": "Featured Institutions",
+        "name": "Featured Institutions in India",
         "description": "Top Schools, Colleges & Universities in India",
-        "numberOfItems": 4,
-        "itemListElement": [
-          { "@type": "ListItem", "position": 1, "url": "https://deshexam.com/institutions" },
-          { "@type": "ListItem", "position": 2, "url": "https://deshexam.com/institutions" },
-          { "@type": "ListItem", "position": 3, "url": "https://deshexam.com/institutions" },
-          { "@type": "ListItem", "position": 4, "url": "https://deshexam.com/institutions" }
-        ]
-      },
+        "numberOfItems": featuredInstitutions.length,
+        "itemListElement": featuredInstitutions.map((inst, i) => ({
+          "@type": "ListItem",
+          "position": i + 1,
+          "name": inst.title,
+          "url": `https://deshexam.com/institutions/${inst.slug || inst.id}`
+        }))
+      }] : []),
       {
         "@type": "FAQPage",
         "mainEntity": [

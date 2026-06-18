@@ -1,9 +1,10 @@
 import React from 'react';
-import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { collection, query, where, getDocs, limit } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
-import { TaxonomyNode } from '@/lib/firebase/taxonomy';
+import type { TaxonomyNode } from '@/lib/firebase/taxonomy';
+import InstitutionsClient from '../institutions-client';
+
 import {
   MapPin, Globe, Star, Building, Navigation, ArrowLeft, Bookmark, CheckCircle2,
   Users, BookOpen, Clock, Phone, Mail, FileText, Monitor, Bed, Bus, TestTube,
@@ -161,8 +162,14 @@ const MOCK_NEARBY = [
 export default async function InstitutionDetailsPage({ params }: { params: { slug: string } }) {
   const institution = await getInstitutionBySlug(params.slug);
 
+  // ── Fallback: treat slug as a location filter ──────────────────────────────
+  // e.g. /institutions/west-bengal — no institution found, show filtered list
   if (!institution) {
-    notFound();
+    const locationName = params.slug
+      .split('-')
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(' ');
+    return <InstitutionsClient initialLocationFilter={locationName} />;
   }
 
   const relatedInstitutions = await getRelatedInstitutions(institution.boardType || '', institution.id || '');
@@ -220,18 +227,22 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
     "reviewCount": institution.userRatingsTotal || 1
   } : null;
 
-  const schemaFAQ = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": MOCK_FAQS.map((faq) => ({
-      "@type": "Question",
-      "name": faq.q,
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": faq.a
+  // Only emit FAQPage schema when the institution has real FAQ data stored
+  const realFaqs = (institution as any).faqs as { q: string; a: string }[] | undefined;
+  const schemaFAQ = realFaqs && realFaqs.length > 0
+    ? {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": realFaqs.map((faq) => ({
+          "@type": "Question",
+          "name": faq.q,
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": faq.a
+          }
+        }))
       }
-    }))
-  };
+    : null;
 
   const schemaBreadcrumb = {
     "@context": "https://schema.org",
@@ -245,7 +256,8 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
     ]
   };
 
-  const schemas: any[] = [schemaInstitution, schemaFAQ, schemaBreadcrumb];
+  const schemas: any[] = [schemaInstitution, schemaBreadcrumb];
+  if (schemaFAQ) schemas.push(schemaFAQ);
   if (schemaRating) schemas.push(schemaRating);
 
   return (
@@ -378,11 +390,13 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
                   <span className="font-semibold text-slate-800 text-xs">Phone</span>
                   <span className="text-slate-500 text-[10px] sm:text-xs mt-1">{institution.phoneNumber || '+91 98765 43210'}</span>
                 </div>
+                {(institution as any).email && (
                 <div className="flex flex-col items-center justify-center text-center p-4">
                   <Mail className="w-5 h-5 text-amber-500 mb-2" />
                   <span className="font-semibold text-slate-800 text-xs">Email</span>
-                  <span className="text-slate-500 text-[10px] sm:text-xs mt-1 line-clamp-1">info@institution.edu</span>
+                  <span className="text-slate-500 text-[10px] sm:text-xs mt-1 line-clamp-1">{(institution as any).email}</span>
                 </div>
+                )}
                 <div className="flex flex-col items-center justify-center text-center p-4">
                   <BookOpen className="w-5 h-5 text-purple-500 mb-2" />
                   <span className="font-semibold text-slate-800 text-xs">Courses</span>
@@ -849,13 +863,15 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
                     <div className="text-sm font-semibold">{institution.phoneNumber || '+91 98765 43210'}</div>
                   </div>
                 </a>
-                <a href="mailto:contact@institution.edu" className="flex items-center gap-3 text-slate-600 hover:text-amber-600 transition-colors group">
+                {(institution as any).email && (
+                <a href={`mailto:${(institution as any).email}`} className="flex items-center gap-3 text-slate-600 hover:text-amber-600 transition-colors group">
                   <div className="bg-amber-50 p-2.5 rounded-full text-amber-600 group-hover:bg-amber-600 group-hover:text-white transition-colors"><Mail className="w-4 h-4" /></div>
                   <div>
                     <div className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">Email</div>
-                    <div className="text-sm font-semibold line-clamp-1">contact@institution.edu</div>
+                    <div className="text-sm font-semibold line-clamp-1">{(institution as any).email}</div>
                   </div>
                 </a>
+                )}
                 {institution.websiteUrl && (
                   <a href={institution.websiteUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-slate-600 hover:text-indigo-600 transition-colors group">
                     <div className="bg-indigo-50 p-2.5 rounded-full text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors"><Globe className="w-4 h-4" /></div>
