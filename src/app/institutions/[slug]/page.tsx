@@ -292,11 +292,11 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
             <div className="w-full lg:w-2/3 flex flex-col">
 
               <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-center sm:items-start w-full text-center sm:text-left">
-                <div className="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-sm bg-white shadow-2xl flex items-center justify-center overflow-hidden shrink-0 z-10 relative mx-auto sm:mx-0">
+                <div className="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-sm bg-white dark:bg-slate-900 shadow-2xl flex items-center justify-center overflow-hidden shrink-0 z-10 relative mx-auto sm:mx-0 ring-1 ring-black/5 dark:ring-white/10">
                   {institution.logoUrl || institution.featureImage ? (
                     <Image src={institution.logoUrl || institution.featureImage || ''} alt={`${institution.title} official logo`} fill className="object-contain p-2 sm:p-3" unoptimized />
                   ) : (
-                    <Building className="w-12 h-12 sm:w-16 sm:h-16 text-slate-300" />
+                    <Building className="w-12 h-12 sm:w-16 sm:h-16 text-slate-300 dark:text-slate-600" />
                   )}
                 </div>
 
@@ -376,63 +376,63 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
       <div className="max-w-7xl mx-auto px-2 md:px-8 pt-2 pb-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
 
         {/* LEFT COLUMN (MAIN CONTENT) - 70% */}
-        <div className="lg:col-span-8 space-y-8">
+        <div className="lg:col-span-8 space-y-4 sm:space-y-8">
 
           {/* 2. QUICK INFO BAR */}
-          <Card className="border-none shadow-sm rounded-sm overflow-hidden bg-white">
+          <Card className="border-slate-100 dark:border-slate-800 shadow-sm rounded-sm overflow-hidden bg-white dark:bg-slate-900">
             <CardContent className="p-0">
-              <div className="grid grid-cols-3 md:grid-cols-7 divide-x divide-y md:divide-y-0 divide-slate-100 text-sm">
+              <div className="grid grid-cols-3 md:grid-cols-7 divide-x divide-y md:divide-y-0 divide-slate-100 dark:divide-slate-800/60 text-sm">
                 <div className="flex flex-col items-center justify-center text-center p-4">
-                  <MapPin className="w-5 h-5 text-indigo-500 mb-2" />
-                  <span className="font-semibold text-slate-800 text-xs">Address</span>
-                  <span className="text-slate-500 text-[10px] sm:text-xs line-clamp-1 mt-1">{institution.address ? institution.address.split(',')[0] : 'Location Details'}</span>
+                  <MapPin className="w-5 h-5 text-indigo-500 dark:text-indigo-400 mb-2" />
+                  <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">Address</span>
+                  <span className="text-slate-500 dark:text-slate-400 text-[10px] sm:text-xs line-clamp-1 mt-1">{institution.address ? institution.address.split(',')[0] : 'Location Details'}</span>
                 </div>
                 <div className="flex flex-col items-center justify-center text-center p-4">
-                  <Phone className="w-5 h-5 text-emerald-500 mb-2" />
-                  <span className="font-semibold text-slate-800 text-xs">Phone</span>
-                  <span className="text-slate-500 text-[10px] sm:text-xs mt-1">{institution.phoneNumber || '+91 98765 43210'}</span>
+                  <Phone className="w-5 h-5 text-emerald-500 dark:text-emerald-400 mb-2" />
+                  <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">Phone</span>
+                  <span className="text-slate-500 dark:text-slate-400 text-[10px] sm:text-xs mt-1">{institution.phoneNumber || '+91 98765 43210'}</span>
                 </div>
                 {(institution as any).email && (
                 <div className="flex flex-col items-center justify-center text-center p-4">
-                  <Mail className="w-5 h-5 text-amber-500 mb-2" />
-                  <span className="font-semibold text-slate-800 text-xs">Email</span>
-                  <span className="text-slate-500 text-[10px] sm:text-xs mt-1 line-clamp-1">{(institution as any).email}</span>
+                  <Mail className="w-5 h-5 text-amber-500 dark:text-amber-400 mb-2" />
+                  <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">Email</span>
+                  <span className="text-slate-500 dark:text-slate-400 text-[10px] sm:text-xs mt-1 line-clamp-1">{(institution as any).email}</span>
                 </div>
                 )}
                 <div className="flex flex-col items-center justify-center text-center p-4">
-                  <BookOpen className="w-5 h-5 text-purple-500 mb-2" />
-                  <span className="font-semibold text-slate-800 text-xs">Courses</span>
-                  <span className="text-slate-500 text-[10px] sm:text-xs mt-1 line-clamp-1">{MOCK_COURSES.length} Available</span>
+                  <BookOpen className="w-5 h-5 text-purple-500 dark:text-purple-400 mb-2" />
+                  <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">Courses</span>
+                  <span className="text-slate-500 dark:text-slate-400 text-[10px] sm:text-xs mt-1 line-clamp-1">{MOCK_COURSES.length} Available</span>
                 </div>
                 <div className="flex flex-col items-center justify-center text-center p-4">
-                  <Globe className="w-5 h-5 text-cyan-500 mb-2" />
-                  <span className="font-semibold text-slate-800 text-xs">Website</span>
-                  <span className="text-slate-500 text-[10px] sm:text-xs mt-1 line-clamp-1">{institution.websiteUrl ? 'Available' : 'N/A'}</span>
+                  <Globe className="w-5 h-5 text-cyan-500 dark:text-cyan-400 mb-2" />
+                  <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">Website</span>
+                  <span className="text-slate-500 dark:text-slate-400 text-[10px] sm:text-xs mt-1 line-clamp-1">{institution.websiteUrl ? 'Available' : 'N/A'}</span>
                 </div>
-                <div className="flex flex-col items-center justify-center text-center p-4 bg-emerald-50/30">
-                  <CheckCircle2 className="w-5 h-5 text-emerald-500 mb-2" />
-                  <span className="font-semibold text-slate-800 text-xs">Admission Status</span>
-                  <span className="text-emerald-600 font-medium text-[10px] sm:text-xs mt-1 line-clamp-1">{institution.admission?.admissionOpen ? 'Open Now' : 'Closed'}</span>
+                <div className="flex flex-col items-center justify-center text-center p-4 bg-emerald-50/30 dark:bg-emerald-900/10">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-500 dark:text-emerald-400 mb-2" />
+                  <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">Admission</span>
+                  <span className="text-emerald-600 dark:text-emerald-400 font-medium text-[10px] sm:text-xs mt-1 line-clamp-1">{institution.admission?.admissionOpen ? 'Open Now' : 'Closed'}</span>
                 </div>
                 <div className="flex flex-col items-center justify-center text-center p-4 col-span-3 md:col-span-1">
-                  <Building className="w-5 h-5 text-slate-500 mb-2" />
-                  <span className="font-semibold text-slate-800 text-xs">Board</span>
-                  <span className="text-slate-500 text-[10px] sm:text-xs mt-1 line-clamp-1">{institution.boardType || 'University'}</span>
+                  <Building className="w-5 h-5 text-slate-500 dark:text-slate-400 mb-2" />
+                  <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">Board</span>
+                  <span className="text-slate-500 dark:text-slate-400 text-[10px] sm:text-xs mt-1 line-clamp-1">{institution.boardType || 'University'}</span>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           {/* 3. OVERVIEW */}
-          <Card className="border-none shadow-sm rounded-sm bg-white">
-            <CardContent className="p-2">
+          <Card className="border-slate-100 dark:border-slate-800 shadow-sm rounded-sm bg-white dark:bg-slate-900">
+            <CardContent className="p-4 sm:p-6">
               <div className="w-12 h-1.5 bg-emerald-500 rounded-full mb-3"></div>
-              <h2 className="text-2xl font-bold text-slate-900 mb-4">About Institution</h2>
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">About Institution</h2>
 
               <input type="checkbox" id="about-toggle" className="peer hidden" />
 
               <div className="overflow-hidden max-h-[140px] peer-checked:max-h-[5000px] transition-all duration-700 ease-in-out relative">
-                <div className="prose prose-slate max-w-none text-slate-600 leading-relaxed pb-2">
+                <div className="prose prose-slate dark:prose-invert max-w-none text-slate-600 dark:text-slate-300 leading-relaxed pb-2 text-sm sm:text-base">
                   {institution.description ? (
                     <div className="tiptap-content" dangerouslySetInnerHTML={{ __html: institution.description }} />
                   ) : (
@@ -444,22 +444,22 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
 
                 {/* Vision & Mission included in the expandable area */}
                 <div className="mt-6 pb-2">
-                  <h3 className="text-xl font-bold text-slate-900 mb-2">Vision & Mission</h3>
-                  <p className="text-slate-600 leading-relaxed">
+                  <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 mb-2">Vision & Mission</h3>
+                  <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-sm sm:text-base">
                     Our institution is dedicated to providing excellence in education. We strive to nurture talent, foster innovation, and build a community of lifelong learners who will contribute positively to society.
                   </p>
                 </div>
               </div>
 
               {/* Fade Overlay */}
-              <div className="h-24 -mt-24 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none peer-checked:opacity-0 transition-opacity duration-300 relative z-10" />
+              <div className="h-24 -mt-24 bg-gradient-to-t from-white dark:from-slate-900 via-white/80 dark:via-slate-900/80 to-transparent pointer-events-none peer-checked:opacity-0 transition-opacity duration-300 relative z-10" />
 
               {/* Toggle Labels */}
-              <div className="mt-2">
-                <label htmlFor="about-toggle" className="inline-flex items-center gap-1 cursor-pointer text-emerald-600 hover:text-emerald-700 font-semibold peer-checked:hidden transition-colors relative z-20">
+              <div className="mt-2 relative z-20">
+                <label htmlFor="about-toggle" className="inline-flex items-center gap-1 cursor-pointer text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-semibold peer-checked:hidden transition-colors text-sm">
                   Read More <ChevronDown className="w-4 h-4" />
                 </label>
-                <label htmlFor="about-toggle" className="hidden items-center gap-1 cursor-pointer text-emerald-600 hover:text-emerald-700 font-semibold peer-checked:inline-flex transition-colors relative z-20">
+                <label htmlFor="about-toggle" className="hidden items-center gap-1 cursor-pointer text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-semibold peer-checked:inline-flex transition-colors text-sm">
                   Show Less <ChevronDown className="w-4 h-4 rotate-180" />
                 </label>
               </div>
@@ -467,12 +467,12 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
           </Card>
 
           {/* 4. COURSES / PROGRAMS */}
-          <Card className="border-none shadow-sm rounded-sm bg-white">
-            <CardContent className="p-2">
+          <Card className="border-slate-100 dark:border-slate-800 shadow-sm rounded-sm bg-white dark:bg-slate-900">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                <h2 className="text-xl font-bold text-slate-900">Courses & Programs</h2>
+                <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">Courses & Programs</h2>
                 <div className="flex gap-2 w-full sm:w-auto relative">
-                  <Input placeholder="Search" className="pl-8 bg-slate-50 border-slate-200" />
+                  <Input placeholder="Search courses..." className="pl-8 bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 placeholder:text-slate-400" />
                   <div className="absolute left-2.5 top-2.5">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                   </div>
@@ -481,18 +481,18 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {MOCK_COURSES.map(course => (
-                  <div key={course.id} className="border border-slate-100 rounded-sm p-4 hover:border-emerald-200 hover:shadow-sm transition-all bg-white relative">
-                    <div className="absolute top-4 right-4 bg-emerald-500 text-white text-[10px] font-bold px-2 py-0 rounded shadow-sm">New</div>
-                    <h3 className="font-bold text-base text-slate-900 mb-4 pr-10">{course.title}</h3>
-                    <div className="grid grid-cols-2 gap-y-2 gap-x-4 text-xs text-slate-600 mb-4">
-                      <div className="flex flex-col"><span className="text-slate-400 font-medium">Degree Type</span> <span className="font-bold text-slate-800">English</span></div>
-                      <div className="flex flex-col"><span className="text-slate-400 font-medium">Duration</span> <span className="font-bold text-slate-800">{course.duration}</span></div>
-                      <div className="flex flex-col"><span className="text-slate-400 font-medium">Annual Fees</span> <span className="font-bold text-slate-800">{course.fees}</span></div>
-                      <div className="flex flex-col"><span className="text-slate-400 font-medium">Seats</span> <span className="font-bold text-slate-800">{course.seats}</span></div>
-                      <div className="flex flex-col"><span className="text-slate-400 font-medium">Eligibility</span> <span className="font-bold text-slate-800">{course.eligibility}</span></div>
+                  <div key={course.id} className="border border-slate-100 dark:border-slate-800/60 rounded-sm p-4 hover:border-emerald-200 dark:hover:border-emerald-500/30 hover:shadow-sm transition-all bg-white dark:bg-slate-800/30 relative">
+                    <div className="absolute top-4 right-4 bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">New</div>
+                    <h3 className="font-bold text-base text-slate-900 dark:text-slate-100 mb-4 pr-10">{course.title}</h3>
+                    <div className="grid grid-cols-2 gap-y-3 gap-x-4 text-xs text-slate-600 dark:text-slate-300 mb-4">
+                      <div className="flex flex-col"><span className="text-slate-400 dark:text-slate-500 font-medium">Degree Type</span> <span className="font-bold text-slate-800 dark:text-slate-200">English</span></div>
+                      <div className="flex flex-col"><span className="text-slate-400 dark:text-slate-500 font-medium">Duration</span> <span className="font-bold text-slate-800 dark:text-slate-200">{course.duration}</span></div>
+                      <div className="flex flex-col"><span className="text-slate-400 dark:text-slate-500 font-medium">Annual Fees</span> <span className="font-bold text-slate-800 dark:text-slate-200">{course.fees}</span></div>
+                      <div className="flex flex-col"><span className="text-slate-400 dark:text-slate-500 font-medium">Seats</span> <span className="font-bold text-slate-800 dark:text-slate-200">{course.seats}</span></div>
+                      <div className="flex flex-col col-span-2"><span className="text-slate-400 dark:text-slate-500 font-medium">Eligibility</span> <span className="font-bold text-slate-800 dark:text-slate-200">{course.eligibility}</span></div>
                     </div>
                     <div className="flex justify-end mt-2">
-                      <Button className="bg-emerald-600 hover:bg-emerald-700 text-white rounded shadow-sm h-8 px-6 text-xs">Apply</Button>
+                      <Button className="bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 text-white rounded shadow-sm h-8 px-6 text-xs">Apply</Button>
                     </div>
                   </div>
                 ))}
@@ -501,10 +501,10 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
           </Card>
 
           {/* FACILITIES */}
-          <Card className="border-none shadow-sm rounded-sm bg-white">
-            <CardContent className="p-2">
-              <h2 className="text-xl font-bold text-slate-900 mb-6">Facilities</h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <Card className="border-slate-100 dark:border-slate-800 shadow-sm rounded-sm bg-white dark:bg-slate-900">
+            <CardContent className="p-4 sm:p-6">
+              <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-6">Facilities</h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                 {institution.facilities && institution.facilities.length > 0 ? (
                   institution.facilities.map((facilityObj: any, idx) => {
                     const facilityStr = typeof facilityObj === 'string' ? facilityObj : facilityObj.title;
@@ -522,19 +522,19 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
                       'Smart Board': <Monitor className="w-6 h-6" />
                     };
                     return (
-                      <div key={idx} className={`flex flex-col items-center justify-center p-4 rounded-sm border transition-colors cursor-default ${available ? 'border-emerald-100 bg-emerald-50/50 hover:bg-emerald-50 text-slate-800' : 'border-slate-100 bg-slate-50 text-slate-400'}`}>
-                        <div className={`mb-2 ${available ? 'text-emerald-600' : 'text-slate-400'}`}>{iconMap[facilityStr] || <Building className="w-6 h-6" />}</div>
+                      <div key={idx} className={`flex flex-col items-center justify-center p-4 rounded-sm border transition-colors cursor-default ${available ? 'border-emerald-100 dark:border-emerald-500/20 bg-emerald-50/50 dark:bg-emerald-500/10 hover:bg-emerald-50 dark:hover:bg-emerald-500/20 text-slate-800 dark:text-slate-200' : 'border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/30 text-slate-400 dark:text-slate-500'}`}>
+                        <div className={`mb-2 ${available ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-500'}`}>{iconMap[facilityStr] || <Building className="w-6 h-6" />}</div>
                         <span className="text-sm font-bold text-center mb-1">{facilityStr}</span>
-                        <span className={`text-[10px] font-semibold tracking-wide uppercase ${available ? 'text-emerald-600' : 'text-slate-400'}`}>{available ? 'Available' : 'Not Available'}</span>
+                        <span className={`text-[10px] font-semibold tracking-wide uppercase ${available ? 'text-emerald-600 dark:text-emerald-500' : 'text-slate-400 dark:text-slate-600'}`}>{available ? 'Available' : 'Not Available'}</span>
                       </div>
                     );
                   })
                 ) : (
-                  MOCK_FACILITIES.slice(0, 6).map((facility, idx) => (
-                    <div key={idx} className="flex flex-col items-center justify-center p-4 rounded-sm border border-emerald-100 bg-emerald-50/50 hover:bg-emerald-50 transition-colors text-slate-800 cursor-default">
-                      <div className="mb-2 text-emerald-600">{facility.icon}</div>
+                  MOCK_FACILITIES.slice(0, 8).map((facility, idx) => (
+                    <div key={idx} className="flex flex-col items-center justify-center p-4 rounded-sm border border-emerald-100 dark:border-emerald-500/20 bg-emerald-50/50 dark:bg-emerald-500/10 hover:bg-emerald-50 dark:hover:bg-emerald-500/20 transition-colors text-slate-800 dark:text-slate-200 cursor-default">
+                      <div className="mb-2 text-emerald-600 dark:text-emerald-400">{facility.icon}</div>
                       <span className="text-sm font-bold text-center mb-1">{facility.label}</span>
-                      <span className="text-[10px] font-semibold text-emerald-600 tracking-wide uppercase">Available</span>
+                      <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-500 tracking-wide uppercase">Available</span>
                     </div>
                   ))
                 )}
@@ -543,22 +543,22 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
           </Card>
 
           {/* PLACEMENTS & SCHOLARSHIPS */}
-          <Card className="border-none shadow-sm rounded-sm bg-white">
-            <CardContent className="p-2">
-              <h2 className="text-xl font-bold text-slate-900 mb-6">Placements & Scholarships</h2>
+          <Card className="border-slate-100 dark:border-slate-800 shadow-sm rounded-sm bg-white dark:bg-slate-900">
+            <CardContent className="p-4 sm:p-6">
+              <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-6">Placements & Scholarships</h2>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
                 {/* Left side: Scholarships */}
                 <div className="space-y-4">
                   {[1, 2].map((i) => (
-                    <div key={i} className="border border-slate-100 rounded-sm p-4 bg-white relative">
-                      <h3 className="font-bold text-slate-900 mb-3">Scholarship Name</h3>
-                      <div className="flex flex-col gap-1 text-xs text-slate-600 mb-4">
-                        <div className="flex"><span className="text-slate-400 w-20">Amount</span> <span className="font-bold text-slate-800">₹50,000</span></div>
-                        <div className="flex"><span className="text-slate-400 w-20">Eligibility</span> <span className="font-bold text-slate-800">Merit Based</span></div>
+                    <div key={i} className="border border-slate-100 dark:border-slate-800 rounded-sm p-4 bg-white dark:bg-slate-800/30 relative">
+                      <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-3">Scholarship Name</h3>
+                      <div className="flex flex-col gap-1 text-xs text-slate-600 dark:text-slate-300 mb-4">
+                        <div className="flex"><span className="text-slate-400 dark:text-slate-500 w-20">Amount</span> <span className="font-bold text-slate-800 dark:text-slate-200">₹50,000</span></div>
+                        <div className="flex"><span className="text-slate-400 dark:text-slate-500 w-20">Eligibility</span> <span className="font-bold text-slate-800 dark:text-slate-200">Merit Based</span></div>
                       </div>
-                      <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded shadow-sm h-8 text-xs">Apply Scholarship</Button>
+                      <Button className="w-full bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 text-white rounded shadow-sm h-8 text-xs">Apply Scholarship</Button>
                     </div>
                   ))}
                 </div>
@@ -566,18 +566,18 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
                 {/* Right side: Placements */}
                 {institution.placement && institution.placement.placementAvailable ? (
                   <div className="space-y-6">
-                    <div className="grid grid-cols-3 gap-2">
-                      <div className="bg-emerald-50 rounded-sm p-3 text-center">
-                        <div className="text-xl font-bold text-emerald-600">{institution.placement.placementRate || '95%'}</div>
-                        <div className="text-[10px] sm:text-xs font-medium text-emerald-800 mt-1">Placement Rate</div>
+                    <div className="grid grid-cols-3 gap-2 sm:gap-4">
+                      <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-sm p-3 text-center border border-emerald-100 dark:border-emerald-500/20">
+                        <div className="text-xl sm:text-2xl font-bold text-emerald-600 dark:text-emerald-400">{institution.placement.placementRate || '95%'}</div>
+                        <div className="text-[10px] sm:text-xs font-medium text-emerald-800 dark:text-emerald-500 mt-1">Placement Rate</div>
                       </div>
-                      <div className="bg-slate-50 rounded-sm p-3 text-center border border-slate-100">
-                        <div className="text-xl font-bold text-slate-800">{institution.placement.highestPackage || '12 LPA'}</div>
-                        <div className="text-[10px] sm:text-xs font-medium text-slate-500 mt-1">Highest Package</div>
+                      <div className="bg-slate-50 dark:bg-slate-800/50 rounded-sm p-3 text-center border border-slate-100 dark:border-slate-700">
+                        <div className="text-xl sm:text-2xl font-bold text-slate-800 dark:text-slate-200">{institution.placement.highestPackage || '12 LPA'}</div>
+                        <div className="text-[10px] sm:text-xs font-medium text-slate-500 dark:text-slate-400 mt-1">Highest Package</div>
                       </div>
-                      <div className="bg-slate-50 rounded-sm p-3 text-center border border-slate-100">
-                        <div className="text-xl font-bold text-emerald-600">{institution.placement.averagePackage || '6.5 LPA'}<span className="text-xs text-emerald-500 ml-0.5">★</span></div>
-                        <div className="text-[10px] sm:text-xs font-medium text-slate-500 mt-1">Average Package</div>
+                      <div className="bg-slate-50 dark:bg-slate-800/50 rounded-sm p-3 text-center border border-slate-100 dark:border-slate-700">
+                        <div className="text-xl sm:text-2xl font-bold text-emerald-600 dark:text-emerald-400">{institution.placement.averagePackage || '6.5 LPA'}<span className="text-xs text-emerald-500 ml-0.5">★</span></div>
+                        <div className="text-[10px] sm:text-xs font-medium text-slate-500 dark:text-slate-400 mt-1">Average Package</div>
                       </div>
                     </div>
 
@@ -585,35 +585,35 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
                       <div className="flex flex-wrap gap-2">
                         {institution.placement.recruiters && institution.placement.recruiters.length > 0 ? (
                           institution.placement.recruiters.slice(0, 6).map((recruiter: string, idx: number) => (
-                            <Badge key={idx} variant="outline" className="bg-white border-slate-200 text-slate-600 py-1 font-normal text-xs">{recruiter}</Badge>
+                            <Badge key={idx} variant="outline" className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 py-1 font-normal text-xs">{recruiter}</Badge>
                           ))
                         ) : (
                           ['TCS', 'Infosys', 'Wipro', 'Cognizant', 'Accenture', 'IBM'].map((recruiter, idx) => (
-                            <Badge key={idx} variant="outline" className="bg-white border-slate-200 text-slate-600 py-1 font-normal text-xs">{recruiter}</Badge>
+                            <Badge key={idx} variant="outline" className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 py-1 font-normal text-xs">{recruiter}</Badge>
                           ))
                         )}
-                        <span className="text-xs text-slate-400 py-1 px-2 border border-slate-100 rounded-full">more...</span>
+                        <span className="text-xs text-slate-400 dark:text-slate-500 py-1 px-2 border border-slate-100 dark:border-slate-800 rounded-full">more...</span>
                       </div>
                     </div>
 
-                    <div className="text-xs text-slate-500 leading-relaxed">
+                    <div className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
                       {institution.placement.placementDescription ? (
-                        <div className="prose prose-sm max-w-none text-slate-500 tiptap-content line-clamp-3" dangerouslySetInnerHTML={{ __html: institution.placement.placementDescription }} />
+                        <div className="prose prose-sm dark:prose-invert max-w-none text-slate-500 dark:text-slate-400 tiptap-content line-clamp-3" dangerouslySetInnerHTML={{ __html: institution.placement.placementDescription }} />
                       ) : (
                         "Our dedicated placement cell ensures top-tier recruitment opportunities for students across various disciplines, partnering with industry leaders to provide excellent career starts."
                       )}
                     </div>
 
                     {/* Mock Mini Chart Line */}
-                    <div className="w-full h-10 mt-4 relative overflow-hidden">
-                      <svg className="w-full h-full text-emerald-500" viewBox="0 0 200 40" preserveAspectRatio="none">
+                    <div className="w-full h-10 mt-4 relative overflow-hidden opacity-80">
+                      <svg className="w-full h-full text-emerald-500 dark:text-emerald-600" viewBox="0 0 200 40" preserveAspectRatio="none">
                         <path d="M0,40 L0,20 C20,10 40,30 60,20 C80,10 100,25 120,15 C140,5 160,20 180,10 L200,10 L200,40 Z" fill="currentColor" fillOpacity="0.1" />
                         <path d="M0,20 C20,10 40,30 60,20 C80,10 100,25 120,15 C140,5 160,20 180,10 L200,10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                       </svg>
                     </div>
                   </div>
                 ) : (
-                  <div className="flex items-center justify-center h-full text-slate-400 text-sm">
+                  <div className="flex items-center justify-center h-full text-slate-400 dark:text-slate-600 text-sm py-10">
                     Placement data not available
                   </div>
                 )}
@@ -623,9 +623,9 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
           </Card>
 
           {/* 5. ADMISSION INFO */}
-          <Card className="border-none shadow-sm rounded-sm bg-white">
-            <CardContent className="p-2">
-              <h2 className="text-xl font-bold text-slate-900 mb-6">Admission</h2>
+          <Card className="border-slate-100 dark:border-slate-800 shadow-sm rounded-sm bg-white dark:bg-slate-900">
+            <CardContent className="p-4 sm:p-6">
+              <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-6">Admission</h2>
 
               <div className="flex flex-wrap gap-4 mb-6">
                 <Badge className={institution.admission?.admissionOpen ? "bg-emerald-500 hover:bg-emerald-600 text-white rounded text-sm py-1.5 px-4" : "bg-emerald-500 hover:bg-emerald-600 text-white rounded text-sm py-1.5 px-4 opacity-50"}>Admission Open</Badge>
@@ -633,48 +633,48 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10 text-sm">
-                <div className="flex flex-col"><span className="text-slate-500 font-medium mb-1">Start Date</span> <span className="font-bold text-slate-800">{institution.admission?.applicationStartDate ? new Date(institution.admission.applicationStartDate).toLocaleDateString('en-GB') : 'TBA'}</span></div>
-                <div className="flex flex-col"><span className="text-slate-500 font-medium mb-1">End Date</span> <span className="font-bold text-slate-800">{institution.admission?.applicationEndDate ? new Date(institution.admission.applicationEndDate).toLocaleDateString('en-GB') : 'TBA'}</span></div>
-                <div className="flex flex-col"><span className="text-slate-500 font-medium mb-1">Mode</span> <span className="font-bold text-slate-800">{institution.admission?.admissionMode || '-'}</span></div>
-                <div className="flex flex-col"><span className="text-slate-500 font-medium mb-1">Application Fee</span> <span className="font-bold text-slate-800">{institution.admission?.applicationFee ? `₹${institution.admission.applicationFee}` : '-'}</span></div>
+                <div className="flex flex-col"><span className="text-slate-500 dark:text-slate-400 font-medium mb-1">Start Date</span> <span className="font-bold text-slate-800 dark:text-slate-200">{institution.admission?.applicationStartDate ? new Date(institution.admission.applicationStartDate).toLocaleDateString('en-GB') : 'TBA'}</span></div>
+                <div className="flex flex-col"><span className="text-slate-500 dark:text-slate-400 font-medium mb-1">End Date</span> <span className="font-bold text-slate-800 dark:text-slate-200">{institution.admission?.applicationEndDate ? new Date(institution.admission.applicationEndDate).toLocaleDateString('en-GB') : 'TBA'}</span></div>
+                <div className="flex flex-col"><span className="text-slate-500 dark:text-slate-400 font-medium mb-1">Mode</span> <span className="font-bold text-slate-800 dark:text-slate-200">{institution.admission?.admissionMode || '-'}</span></div>
+                <div className="flex flex-col"><span className="text-slate-500 dark:text-slate-400 font-medium mb-1">Application Fee</span> <span className="font-bold text-slate-800 dark:text-slate-200">{institution.admission?.applicationFee ? `₹${institution.admission.applicationFee}` : '-'}</span></div>
               </div>
 
               {/* Timeline */}
               <div className="relative flex justify-between items-start w-full mb-10 px-2">
-                <div className="absolute top-2.5 left-0 w-full h-0.5 bg-slate-200 -z-10"></div>
+                <div className="absolute top-2.5 left-0 w-full h-0.5 bg-slate-200 dark:bg-slate-700 -z-10"></div>
 
                 <div className="flex flex-col items-center w-1/4">
-                  <div className="w-5 h-5 rounded-full bg-emerald-500 border-4 border-white mb-2 shadow-sm"></div>
-                  <span className="text-[10px] sm:text-xs text-slate-500 font-medium">Step 1</span>
-                  <span className="text-[10px] sm:text-xs font-bold text-slate-800 text-center">Registration</span>
+                  <div className="w-5 h-5 rounded-full bg-emerald-500 border-4 border-white dark:border-slate-900 mb-2 shadow-sm"></div>
+                  <span className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium">Step 1</span>
+                  <span className="text-[10px] sm:text-xs font-bold text-slate-800 dark:text-slate-200 text-center">Registration</span>
                 </div>
                 <div className="flex flex-col items-center w-1/4">
-                  <div className="w-5 h-5 rounded-full bg-emerald-500 border-4 border-white mb-2 shadow-sm"></div>
-                  <span className="text-[10px] sm:text-xs text-slate-500 font-medium">Step 2</span>
-                  <span className="text-[10px] sm:text-xs font-bold text-slate-800 text-center">Document<br />Upload</span>
+                  <div className="w-5 h-5 rounded-full bg-emerald-500 border-4 border-white dark:border-slate-900 mb-2 shadow-sm"></div>
+                  <span className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium">Step 2</span>
+                  <span className="text-[10px] sm:text-xs font-bold text-slate-800 dark:text-slate-200 text-center">Document<br />Upload</span>
                 </div>
                 <div className="flex flex-col items-center w-1/4">
-                  <div className="w-5 h-5 rounded-full bg-slate-200 border-4 border-white mb-2 shadow-sm"></div>
-                  <span className="text-[10px] sm:text-xs text-slate-500 font-medium">Step 3</span>
-                  <span className="text-[10px] sm:text-xs font-bold text-slate-800 text-center">Verification</span>
+                  <div className="w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-700 border-4 border-white dark:border-slate-900 mb-2 shadow-sm"></div>
+                  <span className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium">Step 3</span>
+                  <span className="text-[10px] sm:text-xs font-bold text-slate-800 dark:text-slate-200 text-center">Verification</span>
                 </div>
                 <div className="flex flex-col items-center w-1/4">
-                  <div className="w-5 h-5 rounded-full bg-slate-200 border-4 border-white mb-2 shadow-sm"></div>
-                  <span className="text-[10px] sm:text-xs text-slate-500 font-medium">Step 4</span>
-                  <span className="text-[10px] sm:text-xs font-bold text-slate-800 text-center">Confirmation</span>
+                  <div className="w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-700 border-4 border-white dark:border-slate-900 mb-2 shadow-sm"></div>
+                  <span className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium">Step 4</span>
+                  <span className="text-[10px] sm:text-xs font-bold text-slate-800 dark:text-slate-200 text-center">Confirmation</span>
                 </div>
               </div>
 
               {institution.admission?.admissionProcess && (
                 <div className="mb-8">
-                  <h3 className="font-bold text-slate-900 mb-2">Admission Details</h3>
-                  <div className="prose prose-sm prose-slate max-w-none text-slate-600 tiptap-content" dangerouslySetInnerHTML={{ __html: institution.admission.admissionProcess }} />
+                  <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-2">Admission Details</h3>
+                  <div className="prose prose-sm dark:prose-invert prose-slate max-w-none text-slate-600 dark:text-slate-400 tiptap-content" dangerouslySetInnerHTML={{ __html: institution.admission.admissionProcess }} />
                 </div>
               )}
 
               <div className="flex flex-col items-center">
-                {institution.admission?.admissionOpen && <div className="text-xs text-slate-500 mb-3">Admissions are currently active</div>}
-                <Button asChild className="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded shadow-sm h-10">
+                {institution.admission?.admissionOpen && <div className="text-xs text-slate-500 dark:text-slate-400 mb-3">Admissions are currently active</div>}
+                <Button asChild className="w-full bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 text-white rounded shadow-sm h-10">
                   {institution.admission?.admissionUrl ? (
                     <a href={institution.admission.admissionUrl} target="_blank" rel="noopener noreferrer">Apply Now</a>
                   ) : (
@@ -686,10 +686,10 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
           </Card>
 
           {/* GALLERY */}
-          <Card className="border-none shadow-sm rounded-sm bg-white overflow-hidden">
-            <CardContent className="p-2">
-              <h2 className="text-xl font-bold text-slate-900 mb-6">Gallery</h2>
-              <div className="grid grid-cols-3 gap-2">
+          <Card className="border-slate-100 dark:border-slate-800 shadow-sm rounded-sm bg-white dark:bg-slate-900 overflow-hidden">
+            <CardContent className="p-4 sm:p-6">
+              <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-6">Gallery</h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {(institution.galleryImages && institution.galleryImages.length > 0 ? institution.galleryImages : [...MOCK_GALLERY, ...MOCK_GALLERY, MOCK_GALLERY[0]]).slice(0, 9).map((img, idx) => (
                   <div key={idx} className={`relative rounded-sm overflow-hidden group aspect-square`}>
                     <Image src={img} alt="Gallery image" fill className="object-cover group-hover:scale-110 transition-transform duration-500" unoptimized />
@@ -701,25 +701,25 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
           </Card>
 
           {/* REVIEWS */}
-          <Card className="border-none shadow-sm rounded-sm bg-white">
-            <CardContent className="p-2">
+          <Card className="border-slate-100 dark:border-slate-800 shadow-sm rounded-sm bg-white dark:bg-slate-900">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-slate-900">Reviews</h2>
+                <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">Reviews</h2>
                 <InstitutionReviewModal institutionId={institution.id} />
               </div>
-              <div className="flex flex-col sm:flex-row gap-8 mb-8 border-b border-slate-100 pb-8">
+              <div className="flex flex-col sm:flex-row gap-8 mb-8 border-b border-slate-100 dark:border-slate-800 pb-8">
                 <div className="flex flex-col items-center sm:items-start justify-center">
-                  <div className="text-5xl font-bold text-slate-900 mb-2">{institution.rating || '4.5'}</div>
+                  <div className="text-5xl font-bold text-slate-900 dark:text-slate-100 mb-2">{institution.rating || '4.5'}</div>
                   <div className="flex text-amber-400 mb-1">
-                    {[1, 2, 3, 4, 5].map(i => <Star key={i} className={`w-5 h-5 ${i === 5 ? 'text-slate-300' : 'fill-amber-400 text-amber-400'}`} />)}
+                    {[1, 2, 3, 4, 5].map(i => <Star key={i} className={`w-5 h-5 ${i === 5 ? 'text-slate-300 dark:text-slate-600' : 'fill-amber-400 text-amber-400'}`} />)}
                   </div>
-                  <div className="text-xs text-slate-500 font-medium mt-1">Total Reviews: {institution.userRatingsTotal || 14}</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">Total Reviews: {institution.userRatingsTotal || 14}</div>
                 </div>
                 <div className="flex-1 space-y-2 max-w-xs">
                   {[5, 4, 3, 2, 1].map(stars => (
-                    <div key={stars} className="flex items-center gap-3 text-xs text-slate-600 font-medium">
+                    <div key={stars} className="flex items-center gap-3 text-xs text-slate-600 dark:text-slate-400 font-medium">
                       <div className="flex items-center gap-1 w-6">{stars} <Star className="w-3 h-3 fill-amber-400 text-amber-400" /></div>
-                      <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                      <div className="flex-1 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                         <div className="h-full bg-amber-400 rounded-full" style={{ width: `${stars === 5 ? 70 : stars === 4 ? 20 : stars === 3 ? 5 : 0}%` }}></div>
                       </div>
                     </div>
@@ -728,15 +728,15 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
               </div>
 
               {institution.aiReviewSummary && (
-                <div className="mb-8 bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-100 rounded-sm p-6 shadow-sm relative overflow-hidden">
+                <div className="mb-8 bg-gradient-to-br from-indigo-50 dark:from-indigo-900/20 to-purple-50 dark:to-purple-900/20 border border-indigo-100 dark:border-indigo-800/50 rounded-sm p-6 shadow-sm relative overflow-hidden">
                   <div className="absolute top-0 right-0 p-4 opacity-10">
                     <Sparkles className="w-24 h-24 text-indigo-500" />
                   </div>
                   <div className="relative z-10">
-                    <div className="flex items-center gap-2 text-indigo-700 font-bold mb-3">
+                    <div className="flex items-center gap-2 text-indigo-700 dark:text-indigo-400 font-bold mb-3">
                       <Sparkles className="w-5 h-5" /> AI Review Summary
                     </div>
-                    <div className="prose prose-sm prose-slate max-w-none prose-p:leading-relaxed">
+                    <div className="prose prose-sm dark:prose-invert prose-slate max-w-none prose-p:leading-relaxed">
                       <ReactMarkdown
                         remarkPlugins={[remarkGfm]}
                         components={{
@@ -769,9 +769,9 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
 
                             return (
                               <li className="flex items-start gap-2.5 m-0" {...props}>
-                                {isPro && <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-1 shrink-0" />}
-                                {isCon && <XCircle className="w-4 h-4 text-rose-500 mt-1 shrink-0" />}
-                                {!isPro && !isCon && <span className="w-1.5 h-1.5 bg-indigo-300 rounded-full mt-2.5 shrink-0" />}
+                                {isPro && <CheckCircle2 className="w-4 h-4 text-emerald-500 dark:text-emerald-400 mt-1 shrink-0" />}
+                                {isCon && <XCircle className="w-4 h-4 text-rose-500 dark:text-rose-400 mt-1 shrink-0" />}
+                                {!isPro && !isCon && <span className="w-1.5 h-1.5 bg-indigo-300 dark:bg-indigo-600 rounded-full mt-2.5 shrink-0" />}
                                 <div className="flex-1">{newChildren}</div>
                               </li>
                             );
@@ -803,19 +803,19 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
           </Card>
 
           {/* FAQs */}
-          <Card className="border-none shadow-sm rounded-sm bg-white">
-            <CardContent className="p-2">
-              <h2 className="text-xl font-bold text-slate-900 mb-6">FAQs</h2>
+          <Card className="border-slate-100 dark:border-slate-800 shadow-sm rounded-sm bg-white dark:bg-slate-900">
+            <CardContent className="p-4 sm:p-6">
+              <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-6">FAQs</h2>
               <div className="space-y-3">
                 {MOCK_FAQS.map((faq, idx) => (
-                  <details key={idx} className="group border border-slate-100 rounded-sm bg-slate-50 overflow-hidden [&_summary::-webkit-details-marker]:hidden">
-                    <summary className="flex items-center justify-between cursor-pointer p-4 font-semibold text-slate-800 text-sm hover:bg-slate-100 transition-colors">
+                  <details key={idx} className="group border border-slate-100 dark:border-slate-800 rounded-sm bg-slate-50 dark:bg-slate-800/50 overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+                    <summary className="flex items-center justify-between cursor-pointer p-4 font-semibold text-slate-800 dark:text-slate-200 text-sm hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                       <div className="flex items-center gap-2">
-                        <ChevronRight className="w-4 h-4 text-slate-400 group-open:rotate-90 transition-transform" />
+                        <ChevronRight className="w-4 h-4 text-slate-400 dark:text-slate-500 group-open:rotate-90 transition-transform" />
                         {faq.q}
                       </div>
                     </summary>
-                    <div className="p-4 pt-0 pl-10 text-slate-600 text-xs leading-relaxed">
+                    <div className="p-4 pt-0 pl-10 text-slate-600 dark:text-slate-400 text-xs sm:text-sm leading-relaxed">
                       {faq.a}
                     </div>
                   </details>
@@ -887,15 +887,69 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
             </CardContent>
           </Card>
 
-          {/* Opening Hours Card */}
-          <Card className="border-none shadow-sm rounded-sm bg-white">
+          {/* Quick Contact Card */}
+          <Card className="border-slate-100 dark:border-slate-800 shadow-sm rounded-sm bg-white dark:bg-slate-900 sticky top-24 z-10">
             <CardContent className="p-6">
-              <h3 className="font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100 flex items-center gap-2">
-                <Clock className="w-4 h-4 text-orange-500" /> Opening Hours
-              </h3>
-              <div className="overflow-hidden rounded-sm border border-slate-100">
-                <table className="w-full text-sm text-left">
-                  <tbody className="divide-y divide-slate-100">
+              <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-4 text-lg">Interested?</h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Get free counselling and admission assistance from our experts.</p>
+              <div className="space-y-3 mb-6">
+                <Button className="w-full bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 text-white font-bold h-11 shadow-sm"><Phone className="w-4 h-4 mr-2" /> Request Callback</Button>
+                <Button variant="outline" className="w-full border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 font-semibold h-11 text-slate-700 dark:text-slate-200"><Mail className="w-4 h-4 mr-2" /> Send Enquiry</Button>
+              </div>
+              <div className="text-xs text-center text-slate-400 dark:text-slate-500">
+                100% Free & Secure. We don't spam.
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Map/Contact Details Card */}
+          <Card className="border-slate-100 dark:border-slate-800 shadow-sm rounded-sm bg-white dark:bg-slate-900">
+            <CardContent className="p-0">
+              <div className="p-4 sm:p-6 border-b border-slate-100 dark:border-slate-800">
+                <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-4 pb-2 border-b border-slate-100 dark:border-slate-800">Contact Details</h3>
+                <div className="space-y-4">
+                  <div className="flex gap-3 text-sm">
+                    <MapPin className="w-5 h-5 text-indigo-500 dark:text-indigo-400 shrink-0 mt-0.5" />
+                    <div>
+                      <div className="font-semibold text-slate-800 dark:text-slate-200">Address</div>
+                      <div className="text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">{institution.address || 'Address not available'}</div>
+                    </div>
+                  </div>
+                  {(institution as any).email && (
+                    <div className="flex gap-3 text-sm">
+                      <Mail className="w-5 h-5 text-amber-500 dark:text-amber-400 shrink-0 mt-0.5" />
+                      <div>
+                        <div className="font-semibold text-slate-800 dark:text-slate-200">Email</div>
+                        <a href={`mailto:${(institution as any).email}`} className="text-indigo-600 dark:text-indigo-400 hover:underline mt-1 block">{(institution as any).email}</a>
+                      </div>
+                    </div>
+                  )}
+                  {institution.phoneNumber && (
+                    <div className="flex gap-3 text-sm">
+                      <Phone className="w-5 h-5 text-emerald-500 dark:text-emerald-400 shrink-0 mt-0.5" />
+                      <div>
+                        <div className="font-semibold text-slate-800 dark:text-slate-200">Phone</div>
+                        <a href={`tel:${institution.phoneNumber}`} className="text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors mt-1 block">{institution.phoneNumber}</a>
+                      </div>
+                    </div>
+                  )}
+                  {institution.websiteUrl && (
+                    <div className="flex gap-3 text-sm">
+                      <Globe className="w-5 h-5 text-cyan-500 dark:text-cyan-400 shrink-0 mt-0.5" />
+                      <div>
+                        <div className="font-semibold text-slate-800 dark:text-slate-200">Website</div>
+                        <a href={institution.websiteUrl} target="_blank" rel="noopener noreferrer" className="text-indigo-600 dark:text-indigo-400 hover:underline mt-1 block truncate max-w-[200px]">{institution.websiteUrl.replace(/^https?:\/\//, '')}</a>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Operating Hours inside Contact Card */}
+              <div className="p-4 sm:p-6 bg-slate-50/50 dark:bg-slate-800/30">
+                <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2 text-sm"><Clock className="w-4 h-4 text-slate-400 dark:text-slate-500" /> Operating Hours</h3>
+                <table className="w-full text-xs">
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
                     {(() => {
                       let rawHours = (institution as any).openingHours;
                       let scheduleArray: { day: string; hours: string }[] = [];
@@ -940,9 +994,9 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
                         const hours = schedule.hours || '';
                         if (!schedule.day && !hours) return null; // Skip completely empty rows
                         return (
-                          <tr key={idx} className={hours.toLowerCase() === 'closed' ? 'bg-slate-50/50' : ''}>
-                            <td className="py-2.5 px-3 font-medium text-slate-700">{schedule.day}</td>
-                            <td className={`py-2.5 px-3 text-right ${hours.toLowerCase() === 'closed' ? 'text-rose-500 font-medium' : 'text-slate-600'}`}>
+                          <tr key={idx} className={hours.toLowerCase() === 'closed' ? 'bg-slate-50/50 dark:bg-slate-800/50' : ''}>
+                            <td className="py-2.5 px-3 font-medium text-slate-700 dark:text-slate-300">{schedule.day}</td>
+                            <td className={`py-2.5 px-3 text-right ${hours.toLowerCase() === 'closed' ? 'text-rose-500 font-medium' : 'text-slate-600 dark:text-slate-400'}`}>
                               {hours}
                             </td>
                           </tr>
@@ -956,40 +1010,40 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
           </Card>
 
           {/* Quick Stats Card */}
-          <Card className="border-none shadow-sm rounded-sm bg-white">
-            <CardContent className="p-6">
-              <h3 className="font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">Quick Stats</h3>
+          <Card className="border-slate-100 dark:border-slate-800 shadow-sm rounded-sm bg-white dark:bg-slate-900">
+            <CardContent className="p-4 sm:p-6">
+              <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-4 pb-2 border-b border-slate-100 dark:border-slate-800">Quick Stats</h3>
               <div className="grid grid-cols-2 gap-y-4 gap-x-2 text-sm">
                 <div className="flex flex-col">
-                  <span className="text-[10px] text-slate-400 font-medium uppercase tracking-wider mb-1 flex items-center gap-1"><Building className="w-3 h-3" /> Ownership</span>
-                  <span className="font-semibold text-slate-800">{(institution as any).ownershipType || 'Private'}</span>
+                  <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wider mb-1 flex items-center gap-1"><Building className="w-3 h-3" /> Ownership</span>
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">{(institution as any).ownershipType || 'Private'}</span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[10px] text-slate-400 font-medium uppercase tracking-wider mb-1 flex items-center gap-1"><MapPin className="w-3 h-3" /> Area</span>
-                  <span className="font-semibold text-slate-800">{(institution as any).campusArea || '50 Acres'}</span>
+                  <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wider mb-1 flex items-center gap-1"><MapPin className="w-3 h-3" /> Area</span>
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">{(institution as any).campusArea || '50 Acres'}</span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[10px] text-slate-400 font-medium uppercase tracking-wider mb-1 flex items-center gap-1"><Users className="w-3 h-3" /> Faculty</span>
-                  <span className="font-semibold text-slate-800">{(institution as any).facultyCount || '200+'}</span>
+                  <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wider mb-1 flex items-center gap-1"><Users className="w-3 h-3" /> Faculty</span>
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">{(institution as any).facultyCount || '200+'}</span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[10px] text-slate-400 font-medium uppercase tracking-wider mb-1 flex items-center gap-1"><Calendar className="w-3 h-3" /> Est. Year</span>
-                  <span className="font-semibold text-slate-800">{institution.establishedYear || '1995'}</span>
+                  <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wider mb-1 flex items-center gap-1"><Calendar className="w-3 h-3" /> Est. Year</span>
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">{institution.establishedYear || '1995'}</span>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           {/* Location Map View */}
-          <Card className="border-none shadow-sm rounded-sm bg-white">
-            <CardContent className="p-6">
-              <h3 className="font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">Location</h3>
-              <div className="text-sm text-slate-600 mb-4 flex items-start gap-2">
-                <MapPin className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
+          <Card className="border-slate-100 dark:border-slate-800 shadow-sm rounded-sm bg-white dark:bg-slate-900">
+            <CardContent className="p-4 sm:p-6">
+              <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-4 pb-2 border-b border-slate-100 dark:border-slate-800">Location</h3>
+              <div className="text-sm text-slate-600 dark:text-slate-400 mb-4 flex items-start gap-2">
+                <MapPin className="w-4 h-4 text-emerald-500 dark:text-emerald-400 mt-0.5 shrink-0" />
                 <span>{institution.address || 'Institution Address, City, State, Country - ZIP'}</span>
               </div>
               {institution.latitude && institution.longitude ? (
-                <div className="rounded-sm overflow-hidden border border-slate-200">
+                <div className="rounded-sm overflow-hidden border border-slate-200 dark:border-slate-700">
                   <iframe
                     width="100%"
                     height="200"
@@ -1001,7 +1055,7 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
                   ></iframe>
                 </div>
               ) : (
-                <div className="rounded-sm overflow-hidden border border-slate-200 bg-slate-100 h-[200px] flex items-center justify-center text-slate-400">
+                <div className="rounded-sm overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 h-[200px] flex items-center justify-center text-slate-400 dark:text-slate-500">
                   Map View Not Available
                 </div>
               )}
@@ -1010,32 +1064,32 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
 
           {/* Social Links */}
           {institution.socialProfiles && Object.values(institution.socialProfiles).some(val => val) && (
-            <Card className="border-none shadow-sm rounded-sm bg-white">
-              <CardContent className="p-6">
-                <h3 className="font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">Follow Us</h3>
+            <Card className="border-slate-100 dark:border-slate-800 shadow-sm rounded-sm bg-white dark:bg-slate-900">
+              <CardContent className="p-4 sm:p-6">
+                <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-4 pb-2 border-b border-slate-100 dark:border-slate-800">Follow Us</h3>
                 <div className="flex gap-3">
                   {institution.socialProfiles.facebook && (
-                    <a href={institution.socialProfiles.facebook} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-slate-100 text-slate-500 hover:bg-blue-600 hover:text-white flex items-center justify-center transition-colors">
+                    <a href={institution.socialProfiles.facebook} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-blue-600 hover:text-white flex items-center justify-center transition-colors">
                       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" /></svg>
                     </a>
                   )}
                   {institution.socialProfiles.twitter && (
-                    <a href={institution.socialProfiles.twitter} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-slate-100 text-slate-500 hover:bg-sky-500 hover:text-white flex items-center justify-center transition-colors">
+                    <a href={institution.socialProfiles.twitter} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-sky-500 hover:text-white flex items-center justify-center transition-colors">
                       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" /></svg>
                     </a>
                   )}
                   {institution.socialProfiles.instagram && (
-                    <a href={institution.socialProfiles.instagram} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-slate-100 text-slate-500 hover:bg-rose-600 hover:text-white flex items-center justify-center transition-colors">
+                    <a href={institution.socialProfiles.instagram} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-rose-600 hover:text-white flex items-center justify-center transition-colors">
                       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" /></svg>
                     </a>
                   )}
                   {institution.socialProfiles.linkedin && (
-                    <a href={institution.socialProfiles.linkedin} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-slate-100 text-slate-500 hover:bg-blue-800 hover:text-white flex items-center justify-center transition-colors">
+                    <a href={institution.socialProfiles.linkedin} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-blue-800 hover:text-white flex items-center justify-center transition-colors">
                       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" /></svg>
                     </a>
                   )}
                   {institution.socialProfiles.youtube && (
-                    <a href={institution.socialProfiles.youtube} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-slate-100 text-slate-500 hover:bg-red-600 hover:text-white flex items-center justify-center transition-colors">
+                    <a href={institution.socialProfiles.youtube} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-red-600 hover:text-white flex items-center justify-center transition-colors">
                       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z" /></svg>
                     </a>
                   )}
@@ -1044,35 +1098,35 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
             </Card>
           )}
           {/* Brochure Download Card */}
-          <Card className="border-none shadow-sm rounded-sm bg-gradient-to-br from-indigo-500 to-indigo-700 text-white">
+          <Card className="border-none shadow-sm rounded-sm bg-gradient-to-br from-indigo-500 to-indigo-700 dark:from-indigo-900 dark:to-indigo-950 text-white">
             <CardContent className="p-6 text-center">
-              <BookOpen className="w-12 h-12 mx-auto mb-4 text-indigo-200" />
+              <BookOpen className="w-12 h-12 mx-auto mb-4 text-indigo-200 dark:text-indigo-400" />
               <h3 className="font-bold text-lg mb-2">Download Brochure</h3>
-              <p className="text-sm text-indigo-100 mb-6">Get detailed information about courses, fees, and facilities.</p>
+              <p className="text-sm text-indigo-100 dark:text-indigo-300 mb-6">Get detailed information about courses, fees, and facilities.</p>
               <Button className="w-full bg-white text-indigo-700 hover:bg-indigo-50 font-bold shadow-sm">Download PDF</Button>
             </CardContent>
           </Card>
 
           {/* Nearby Institutions */}
-          <Card className="border-none shadow-sm rounded-sm bg-white">
-            <CardContent className="p-6">
-              <div className="flex justify-between items-center mb-4 border-b pb-3">
-                <h3 className="font-bold text-lg text-slate-900">Nearby</h3>
-                <Link href="/institutions" className="text-xs text-indigo-600 font-semibold hover:underline">View All</Link>
+          <Card className="border-slate-100 dark:border-slate-800 shadow-sm rounded-sm bg-white dark:bg-slate-900">
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex justify-between items-center mb-4 border-b border-slate-100 dark:border-slate-800 pb-3">
+                <h3 className="font-bold text-lg text-slate-900 dark:text-slate-100">Nearby</h3>
+                <Link href="/institutions" className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold hover:underline">View All</Link>
               </div>
               <div className="space-y-4">
                 {relatedInstitutions.length > 0 ? relatedInstitutions.map(related => (
                   <Link href={`/institutions/${related.slug}`} key={related.id} className="flex items-center gap-3 group">
-                    <div className="w-12 h-12 flex-shrink-0 bg-slate-100 rounded-sm overflow-hidden flex items-center justify-center border border-slate-200">
+                    <div className="w-12 h-12 flex-shrink-0 bg-slate-100 dark:bg-slate-800 rounded-sm overflow-hidden flex items-center justify-center border border-slate-200 dark:border-slate-700">
                       {related.logoUrl || related.featureImage ? (
                         <Image src={related.logoUrl || related.featureImage || ''} alt={related.title || ''} width={50} height={50} className="object-cover w-full h-full" unoptimized />
                       ) : (
-                        <Building className="w-5 h-5 text-slate-400" />
+                        <Building className="w-5 h-5 text-slate-400 dark:text-slate-500" />
                       )}
                     </div>
                     <div>
-                      <div className="font-semibold text-sm text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-1">{related.title}</div>
-                      <div className="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
+                      <div className="font-semibold text-sm text-slate-900 dark:text-slate-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-1">{related.title}</div>
+                      <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                         <span className="flex items-center gap-0.5"><Building className="w-3 h-3" /> {related.boardType || 'Institution'}</span>
                         {related.rating && (
                           <>
@@ -1084,7 +1138,7 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
                     </div>
                   </Link>
                 )) : (
-                  <div className="text-sm text-slate-500">No related institutions found.</div>
+                  <div className="text-sm text-slate-500 dark:text-slate-400">No related institutions found.</div>
                 )}
               </div>
             </CardContent>
@@ -1094,9 +1148,9 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
       </div>
 
       {/* Sticky Mobile Footer CTA */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 p-4 flex gap-3 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] z-50">
-        <Button variant="outline" className="flex-1 border-slate-200 font-semibold h-11"><Phone className="w-4 h-4 mr-2" /> Call</Button>
-        <Button className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-sm h-11">Apply Now</Button>
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 p-4 flex gap-3 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] dark:shadow-none z-50">
+        <Button variant="outline" className="flex-1 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-semibold h-11"><Phone className="w-4 h-4 mr-2" /> Call</Button>
+        <Button className="flex-1 bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 text-white font-bold shadow-sm h-11">Apply Now</Button>
       </div>
     </div>
   );

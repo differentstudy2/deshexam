@@ -150,20 +150,20 @@ export function InstitutionReviewItem({ review, institutionId }: ReviewItemProps
   const photoUrl = localReview.authorPhotoUrl || localReview.avatar;
 
   return (
-    <div className="p-5 rounded-sm border border-slate-100 bg-white shadow-sm flex flex-col">
+    <div className="p-5 rounded-sm border border-slate-100 dark:border-slate-800/60 bg-white dark:bg-slate-800/30 shadow-sm flex flex-col">
       <div className="flex items-start gap-3 mb-3">
         <ReviewAvatar photoUrl={photoUrl} name={authorName} />
         <div>
-          <div className="font-bold text-slate-900 text-sm flex items-center gap-1.5">
+          <div className="font-bold text-slate-900 dark:text-slate-100 text-sm flex items-center gap-1.5">
             {authorName}
             {localReview.isVerified !== false && (
-              <span title="Verified Review"><BadgeCheck className="w-4 h-4 text-emerald-500" /></span>
+              <span title="Verified Review"><BadgeCheck className="w-4 h-4 text-emerald-500 dark:text-emerald-400" /></span>
             )}
           </div>
-          <div className="text-xs text-slate-500 mt-0.5 flex items-center gap-2">
+          <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 flex items-center gap-2">
             <div className="flex">
               {[1, 2, 3, 4, 5].map(star => (
-                <Star key={star} className={`w-3 h-3 ${star <= localReview.rating ? 'fill-amber-400 text-amber-400' : 'text-slate-300'}`} />
+                <Star key={star} className={`w-3 h-3 ${star <= localReview.rating ? 'fill-amber-400 text-amber-400' : 'text-slate-300 dark:text-slate-600'}`} />
               ))}
             </div>
             <span>{localReview.rating} • {localReview.time || 'Recent'}</span>
@@ -171,12 +171,12 @@ export function InstitutionReviewItem({ review, institutionId }: ReviewItemProps
         </div>
       </div>
       
-      <div className="text-sm text-slate-600 mb-3 whitespace-pre-wrap">
+      <div className="text-sm text-slate-600 dark:text-slate-300 mb-3 whitespace-pre-wrap">
         {displayText}
         {isLongText && (
           <button 
             onClick={() => setIsExpanded(!isExpanded)}
-            className="ml-2 font-medium text-indigo-600 hover:text-indigo-700 hover:underline flex items-center inline-flex"
+            className="ml-2 font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 hover:underline flex items-center inline-flex"
           >
             {isExpanded ? (
               <>Show less <ChevronUp className="w-3 h-3 ml-0.5" /></>
@@ -187,14 +187,14 @@ export function InstitutionReviewItem({ review, institutionId }: ReviewItemProps
         )}
       </div>
 
-      <div className="flex items-center justify-between mt-auto pt-3 border-t border-slate-50">
+      <div className="flex items-center justify-between mt-auto pt-3 border-t border-slate-50 dark:border-slate-800/60">
         <div className="flex gap-2">
           {localReview.rating >= 4 ? (
-            <Badge className="bg-emerald-50 text-emerald-600 border-emerald-100 hover:bg-emerald-100 font-normal text-[10px]">Positive</Badge>
+            <Badge className="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-500/20 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 font-normal text-[10px]">Positive</Badge>
           ) : localReview.rating === 3 ? (
-            <Badge className="bg-amber-50 text-amber-600 border-amber-100 hover:bg-amber-100 font-normal text-[10px]">Neutral</Badge>
+            <Badge className="bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-100 dark:border-amber-500/20 hover:bg-amber-100 dark:hover:bg-amber-900/40 font-normal text-[10px]">Neutral</Badge>
           ) : (
-            <Badge className="bg-rose-50 text-rose-600 border-rose-100 hover:bg-rose-100 font-normal text-[10px]">Critical</Badge>
+            <Badge className="bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 border-rose-100 dark:border-rose-500/20 hover:bg-rose-100 dark:hover:bg-rose-900/40 font-normal text-[10px]">Critical</Badge>
           )}
         </div>
         
@@ -202,18 +202,18 @@ export function InstitutionReviewItem({ review, institutionId }: ReviewItemProps
           <button 
             onClick={() => handleAction('like')}
             disabled={isLiking}
-            className={`flex items-center gap-1.5 text-xs font-medium transition-colors ${hasUserLiked ? 'text-indigo-600' : 'text-slate-400 hover:text-indigo-500'}`}
+            className={`flex items-center gap-1.5 text-xs font-medium transition-colors ${hasUserLiked ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500 hover:text-indigo-500 dark:hover:text-indigo-400'}`}
           >
-            <ThumbsUp className={`w-4 h-4 ${hasUserLiked ? 'fill-indigo-600' : ''}`} />
+            <ThumbsUp className={`w-4 h-4 ${hasUserLiked ? 'fill-indigo-600 dark:fill-indigo-400' : ''}`} />
             {likedCount > 0 && <span>{likedCount}</span>}
           </button>
           
           <button 
             onClick={() => handleAction('dislike')}
             disabled={isLiking}
-            className={`flex items-center gap-1.5 text-xs font-medium transition-colors ${hasUserDisliked ? 'text-rose-600' : 'text-slate-400 hover:text-rose-500'}`}
+            className={`flex items-center gap-1.5 text-xs font-medium transition-colors ${hasUserDisliked ? 'text-rose-600 dark:text-rose-400' : 'text-slate-400 dark:text-slate-500 hover:text-rose-500 dark:hover:text-rose-400'}`}
           >
-            <ThumbsDown className={`w-4 h-4 ${hasUserDisliked ? 'fill-rose-600' : ''}`} />
+            <ThumbsDown className={`w-4 h-4 ${hasUserDisliked ? 'fill-rose-600 dark:fill-rose-400' : ''}`} />
             {dislikedCount > 0 && <span>{dislikedCount}</span>}
           </button>
         </div>
