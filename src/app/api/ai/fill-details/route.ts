@@ -1,6 +1,24 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
+/** Extracts the first valid JSON object from a string that may contain
+ *  extra prose, markdown fences, or search-grounding citations. */
+function extractJSON(text: string): string | null {
+  // 1. Strip markdown code fences
+  let cleaned = text.replace(/```json[\s\S]*?```/gi, (m) =>
+    m.replace(/```json/gi, '').replace(/```/gi, '')
+  ).replace(/```[\s\S]*?```/gi, (m) => m.replace(/```/gi, '')).trim();
+
+  // 2. Find the first '{' and last '}' — grab everything in between
+  const start = cleaned.indexOf('{');
+  const end = cleaned.lastIndexOf('}');
+  if (start !== -1 && end !== -1 && end > start) {
+    return cleaned.slice(start, end + 1);
+  }
+
+  return null;
+}
+
 export async function POST(request: Request) {
   try {
     const { name, address } = await request.json();
@@ -15,13 +33,11 @@ export async function POST(request: Request) {
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    
-    // We use gemini-2.5-flash as it supports search grounding
+
+    // gemini-2.5-flash supports search grounding
     const model = genAI.getGenerativeModel({
       model: 'gemini-2.5-flash',
-      tools: [{
-        googleSearch: {}
-      } as any]
+      tools: [{ googleSearch: {} } as any],
     });
 
     const prompt = `
@@ -36,7 +52,7 @@ export async function POST(request: Request) {
     6. High Quality SEO Title: Write an optimized, catchy page title (max 60 characters) including the institution name and primary location.
     7. High Quality SEO Description: Write a compelling, concise meta description (max 160 characters) summarizing the institution for search engines.
     
-    Respond STRICTLY in JSON format with exactly these keys:
+    You MUST respond with ONLY a raw JSON object. No markdown, no code fences, no explanation text before or after. Just the JSON object:
     {
       "establishedYear": "string or null",
       "totalEnrollment": number or null,
@@ -59,18 +75,34 @@ export async function POST(request: Request) {
     });
 
     const responseText = result.response.text();
-    let cleanText = responseText.replace(/```json/gi, '').replace(/```/gi, '').trim();
-    
+
+    // Robustly extract JSON even when Gemini wraps with prose/citations
+    const jsonStr = extractJSON(responseText);
+
+    if (!jsonStr) {
+      console.error('No JSON object found in AI response:', responseText);
+      return NextResponse.json(
+        { error: 'AI returned invalid JSON format', details: responseText },
+        { status: 500 }
+      );
+    }
+
     try {
-      const data = JSON.parse(cleanText);
+      const data = JSON.parse(jsonStr);
       return NextResponse.json(data);
     } catch (parseError) {
-      console.error('Failed to parse AI JSON:', cleanText);
-      return NextResponse.json({ error: 'AI returned invalid JSON format', details: cleanText }, { status: 500 });
+      console.error('Failed to parse extracted JSON:', jsonStr);
+      return NextResponse.json(
+        { error: 'AI returned invalid JSON format', details: jsonStr },
+        { status: 500 }
+      );
     }
 
   } catch (error) {
     console.error('AI fill-details error:', error);
-    return NextResponse.json({ error: 'Failed to process AI request', details: String(error) }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to process AI request', details: String(error) },
+      { status: 500 }
+    );
   }
 }
