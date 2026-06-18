@@ -315,18 +315,18 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
           </div>
         </div>
       </div>
-
-      {/* QUICK ACTION BAR â€” sticky native Android horizontal scroll */}
-      <div className="bg-white border-b border-slate-100 shadow-sm sticky top-0 z-40">
-        <div className="flex overflow-x-auto no-scrollbar">
+     
+      {/* QUICK INFO BAR */}
+      <div className="bg-white border-b border-slate-200 shadow-sm">
+        <div className="max-w-7xl mx-auto flex overflow-x-auto no-scrollbar">
           {[
             { icon: <MapPin className="w-5 h-5 text-indigo-500" />, label: 'Address', value: institution.address ? institution.address.split(',')[0] : 'View' },
             { icon: <Phone className="w-5 h-5 text-emerald-500" />, label: 'Phone', value: institution.phoneNumber || 'Call' },
             { icon: <Mail className="w-5 h-5 text-amber-500" />, label: 'Email', value: 'Email Us' },
             { icon: <BookOpen className="w-5 h-5 text-purple-500" />, label: 'Courses', value: `${MOCK_COURSES.length} Available` },
             { icon: <Globe className="w-5 h-5 text-cyan-500" />, label: 'Website', value: institution.websiteUrl ? 'Open' : 'N/A' },
-            { icon: <CheckCircle2 className="w-5 h-5 text-emerald-500" />, label: 'Admission', value: institution.admission?.admissionOpen ? 'Open âœ“' : 'Closed' },
-            { icon: <Building className="w-5 h-5 text-slate-500" />, label: 'Board', value: institution.boardType || 'University' },
+            { icon: <CheckCircle2 className="w-5 h-5 text-emerald-500" />, label: 'Admission', value: institution.admission?.admissionOpen ? 'Open ✓' : 'Closed' },
+            { icon: <Building className="w-5 h-5 text-slate-500" />, label: 'Board', value: institution.boardType || 'College' },
           ].map((item, idx) => (
             <div key={idx} className="flex flex-col items-center justify-center text-center px-5 py-3 shrink-0 border-r border-slate-100 last:border-r-0 min-w-[90px] active:bg-slate-50 transition-colors cursor-pointer">
               {item.icon}
