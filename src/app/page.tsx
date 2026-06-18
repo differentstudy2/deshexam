@@ -468,6 +468,13 @@ export default function Home() {
           ))}
         </div>
       </section>
+
+      {/* Explicit Legal Links for Google Cloud Verification */}
+      <div className="container mx-auto px-4 max-w-6xl py-6 text-center text-xs text-gray-500 dark:text-gray-400 border-t border-gray-100 dark:border-slate-800">
+        <a href="https://deshexam.com/privacy" className="hover:underline mx-2">Privacy Policy</a>
+        <span>|</span>
+        <a href="https://deshexam.com/terms" className="hover:underline mx-2">Terms of Service</a>
+      </div>
     </div>
   );
 }
