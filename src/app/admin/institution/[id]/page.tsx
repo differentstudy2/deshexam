@@ -16,6 +16,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
+import ReactMarkdown from 'react-markdown';
 
 const TiptapEditor = dynamic(() => import('@/components/admin/TiptapEditor').then(mod => mod.TiptapEditor), {
   ssr: false,
@@ -36,6 +37,7 @@ export default function InstitutionEditPage() {
   const [isSummarizing, setIsSummarizing] = useState(false);
   const [isGeneratingReviews, setIsGeneratingReviews] = useState(false);
   const [reviewLanguage, setReviewLanguage] = useState('English');
+  const [editingReviewIdx, setEditingReviewIdx] = useState<number | null>(null);
   const [newGalleryUrl, setNewGalleryUrl] = useState('');
   const [draggedGalleryIdx, setDraggedGalleryIdx] = useState<number | null>(null);
   const [initialLoadDone, setInitialLoadDone] = useState(false);
@@ -1537,7 +1539,8 @@ export default function InstitutionEditPage() {
                       variant="outline" 
                       size="sm" 
                       onClick={() => {
-                        const jsonString = prompt("Paste a JSON array of reviews:\n[{ \"authorName\": \"John\", \"rating\": 5, \"text\": \"Great!\" }]");
+                        const demoJson = `[\n  {\n    "authorName": "Ramesh Kumar",\n    "rating": 5,\n    "text": "The teachers are extremely supportive and the infrastructure is top-notch."\n  },\n  {\n    "authorName": "Priya Sharma",\n    "rating": 4,\n    "text": "Good environment for studies, but sports facilities could be improved."\n  }\n]`;
+                        const jsonString = prompt("Paste a JSON array of reviews:\n\n" + demoJson, demoJson);
                         if (jsonString) {
                           try {
                             const parsed = JSON.parse(jsonString);
@@ -1620,32 +1623,94 @@ export default function InstitutionEditPage() {
                     <h4 className="text-sm font-semibold text-indigo-900 mb-2 flex items-center gap-2">
                       <Sparkles className="w-4 h-4 text-indigo-500" /> AI Review Summary
                     </h4>
-                    <div className="text-sm text-indigo-800 prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: formData.aiReviewSummary.replace(/\n/g, '<br/>') }} />
+                    <div className="text-sm text-indigo-800 prose prose-sm max-w-none prose-p:my-2 prose-ul:my-2 prose-li:my-0">
+                      <ReactMarkdown>{formData.aiReviewSummary}</ReactMarkdown>
+                    </div>
                   </div>
                 )}
 
                 {formData.reviews && formData.reviews.length > 0 ? (
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {formData.reviews.map((r, idx) => (
                       <div key={idx} className="text-sm bg-slate-50 p-3 rounded border border-slate-100 group relative">
-                        <div className="flex justify-between items-start mb-1">
-                          <div className="font-semibold text-slate-800">{r.authorName} <span className="text-amber-500">({r.rating}★)</span></div>
-                          <button 
-                            type="button"
-                            onClick={() => {
-                              const newReviews = [...(formData.reviews || [])];
-                              const updatedText = prompt(`Edit review text for ${r.authorName}:`, r.text);
-                              if (updatedText !== null) {
-                                newReviews[idx].text = updatedText;
+                        {editingReviewIdx === idx ? (
+                          <div className="space-y-2">
+                            <div className="flex gap-2">
+                              <Input 
+                                value={r.authorName} 
+                                onChange={(e) => {
+                                  const newReviews = [...(formData.reviews || [])];
+                                  newReviews[idx].authorName = e.target.value;
+                                  setFormData(prev => ({ ...prev, reviews: newReviews }));
+                                }} 
+                                placeholder="Author Name"
+                                className="h-8 text-xs bg-white flex-1"
+                              />
+                              <select 
+                                value={r.rating} 
+                                onChange={(e) => {
+                                  const newReviews = [...(formData.reviews || [])];
+                                  newReviews[idx].rating = Number(e.target.value);
+                                  setFormData(prev => ({ ...prev, reviews: newReviews }));
+                                }}
+                                className="h-8 text-xs border border-slate-200 rounded px-2 bg-white"
+                              >
+                                {[1,2,3,4,5].map(n => <option key={n} value={n}>{n} Stars</option>)}
+                              </select>
+                            </div>
+                            <textarea 
+                              value={r.text}
+                              onChange={(e) => {
+                                const newReviews = [...(formData.reviews || [])];
+                                newReviews[idx].text = e.target.value;
                                 setFormData(prev => ({ ...prev, reviews: newReviews }));
-                              }
-                            }}
-                            className="opacity-0 group-hover:opacity-100 transition-opacity text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1"
-                          >
-                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg> Edit
-                          </button>
-                        </div>
-                        <p className="text-slate-600 italic">"{r.text}"</p>
+                              }}
+                              className="w-full text-xs border border-slate-200 rounded p-2 min-h-[60px]"
+                              placeholder="Review Text"
+                            />
+                            <div className="flex justify-end gap-2">
+                              <Button size="sm" variant="outline" className="h-7 text-xs bg-white" onClick={() => setEditingReviewIdx(null)}>Done</Button>
+                            </div>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="flex justify-between items-start mb-2">
+                              <div className="flex items-center gap-2">
+                                {r.authorPhotoUrl ? (
+                                  <img src={r.authorPhotoUrl} alt={r.authorName} className="w-6 h-6 rounded-full object-cover shadow-sm" />
+                                ) : (
+                                  <div className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-500">
+                                    {r.authorName?.charAt(0)}
+                                  </div>
+                                )}
+                                <div className="font-semibold text-slate-800">{r.authorName} <span className="text-amber-500 font-medium">({r.rating}★)</span></div>
+                              </div>
+                              <div className="flex gap-1">
+                                <button 
+                                  type="button"
+                                  onClick={() => setEditingReviewIdx(idx)}
+                                  className="opacity-0 group-hover:opacity-100 transition-opacity text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1 bg-indigo-50 px-2 py-1 rounded"
+                                >
+                                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg> Edit
+                                </button>
+                                <button 
+                                  type="button"
+                                  onClick={() => {
+                                    if(confirm('Delete review?')) {
+                                      const newReviews = [...(formData.reviews || [])];
+                                      newReviews.splice(idx, 1);
+                                      setFormData(prev => ({ ...prev, reviews: newReviews }));
+                                    }
+                                  }}
+                                  className="opacity-0 group-hover:opacity-100 transition-opacity text-xs text-red-600 hover:text-red-800 bg-red-50 px-2 py-1 rounded"
+                                >
+                                  <X className="w-3 h-3" />
+                                </button>
+                              </div>
+                            </div>
+                            <p className="text-slate-600 italic">"{r.text}"</p>
+                          </>
+                        )}
                       </div>
                     ))}
                   </div>
