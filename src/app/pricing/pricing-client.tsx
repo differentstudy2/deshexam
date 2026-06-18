@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Input } from '@/components/ui/input';
-import { Check, X, BookCopy, FileClock, CircleUser, Video, Repeat, Loader2, Tag, ChevronRight } from 'lucide-react';
+import { Check, X, BookCopy, FileClock, CircleUser, Video, Repeat, Loader2, Tag, ChevronRight, Flame, Star, BrainCircuit, Search, BarChart3, Rocket, FileText, Users } from 'lucide-react';
 import { pricingData, faqData } from "@/lib/mock-data";
 import { cn } from '@/lib/utils';
 import { createRazorpayOrder } from '@/ai/flows/create-razorpay-order';
@@ -35,6 +35,20 @@ export default function PricingClientPage() {
     const [couponCode, setCouponCode] = useState('');
     const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
     const [couponDiscount, setCouponDiscount] = useState(0);
+    
+    // Countdown Timer State (12h 45m 32s = 45932 seconds)
+    const [timeLeft, setTimeLeft] = useState(45932);
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
+        }, 1000);
+        return () => clearInterval(timer);
+    }, []);
+
+    const hours = Math.floor(timeLeft / 3600);
+    const minutes = Math.floor((timeLeft % 3600) / 60);
+    const seconds = timeLeft % 60;
 
     useEffect(() => {
         document.title = "Pricing Plans | DeshExam";
@@ -148,8 +162,70 @@ export default function PricingClientPage() {
         
         <div className="w-full max-w-[1000px] mx-auto px-4 sm:px-6 pt-6">
             
+            {/* NEW HEADER SECTION */}
+            <div className="relative w-full rounded-2xl overflow-hidden bg-gradient-to-br from-violet-600 via-indigo-600 to-blue-700 text-white shadow-xl mb-12 border border-indigo-500/30">
+                {/* Background Glows */}
+                <div className="absolute top-0 left-0 w-64 h-64 bg-fuchsia-500/20 rounded-full blur-[80px] -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+                <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-cyan-500/20 rounded-full blur-[80px] translate-y-1/2 pointer-events-none"></div>
+                <div className="absolute top-1/2 right-0 w-96 h-96 bg-indigo-500/30 rounded-full blur-[100px] translate-x-1/3 -translate-y-1/2 pointer-events-none"></div>
+
+                <div className="relative z-10 px-6 py-10 sm:px-10 sm:py-12 flex flex-col md:flex-row items-center justify-between gap-10">
+                    {/* Left Content */}
+                    <div className="flex-1 flex flex-col items-center text-center md:items-start md:text-left">
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-sm font-medium mb-6 backdrop-blur-md">
+                            <Flame className="w-4 h-4 text-orange-400" />
+                            <span>Limited Time Offer</span>
+                        </div>
+                        
+                        <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 leading-tight tracking-tight">
+                            Unlock Premium Learning <br className="hidden md:block" /> with DeshExam Pass Pro
+                        </h1>
+                        
+                        <p className="text-indigo-100 text-base sm:text-lg mb-8 max-w-xl leading-relaxed">
+                            Get unlimited mock tests, AI analytics, previous year papers, premium practice sets, and advanced performance tracking.
+                        </p>
+
+                        <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 sm:gap-4 mb-8">
+                            {['50K+ Students', '70K+ Mock Tests', 'Secure Payments', 'Instant Access'].map((feat, i) => (
+                                <div key={i} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs sm:text-sm text-indigo-50 backdrop-blur-sm">
+                                    <Check className="w-3.5 h-3.5" />
+                                    <span>{feat}</span>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                            <Button className="bg-white text-indigo-900 hover:bg-slate-50 font-bold h-12 px-8 rounded-lg shadow-lg">
+                                Buy Pass Pro
+                            </Button>
+                            <Button variant="outline" className="bg-white/5 border-white/20 hover:bg-white/10 text-white font-bold h-12 px-8 rounded-lg backdrop-blur-sm">
+                                Compare Plans
+                            </Button>
+                        </div>
+                    </div>
+
+                    {/* Right Glass Card */}
+                    <div className="shrink-0 w-full sm:w-auto">
+                        <div className="relative p-[1.5px] rounded-2xl bg-gradient-to-b from-white/40 to-white/5 shadow-2xl backdrop-blur-md">
+                            <div className="absolute inset-0 bg-cyan-400/20 blur-[50px] -z-10 rounded-2xl"></div>
+                            <div className="bg-white/10 border border-white/10 rounded-xl p-6 flex flex-col items-center justify-center text-center min-w-[240px] backdrop-blur-xl">
+                                <span className="text-indigo-100 text-sm font-medium mb-1">Starting from</span>
+                                <div className="text-5xl font-extrabold text-white mb-3">₹599</div>
+                                <div className="bg-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-full mb-5 shadow-sm">
+                                    Save 64%
+                                </div>
+                                <button className="w-full py-2.5 bg-amber-100 hover:bg-amber-200 text-amber-900 text-sm font-bold rounded-lg shadow-sm flex items-center justify-center gap-1.5 transition-colors">
+                                    <Star className="w-4 h-4 fill-amber-500 text-amber-500" />
+                                    Bestseller
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div className="mb-6">
-                <h1 className="text-2xl font-bold">Choose a Plan</h1>
+                <h2 className="text-2xl font-bold">Choose a Plan</h2>
                 <p className="text-sm text-slate-500 mt-1">Unlock premium mock tests and analytics.</p>
             </div>
 
@@ -354,16 +430,121 @@ export default function PricingClientPage() {
                     <Button 
                         onClick={handlePayment} 
                         disabled={isProcessingPayment} 
-                        className="w-full h-12 rounded-xl text-[15px] font-bold bg-[#6366f1] hover:bg-[#4f46e5] text-white shadow-none"
+                        className="w-full h-12 rounded-[4px] text-[15px] font-bold bg-[#6064f4] hover:bg-[#4f53ec] text-white shadow-none transition-all"
                     >
                         {isProcessingPayment ? <><Loader2 className="mr-2 h-4 w-4 animate-spin"/> Processing...</> : 'Proceed to Pay'}
                     </Button>
+                    <div className="flex items-center justify-center gap-1.5 mt-3 opacity-70">
+                        <span className="text-xs font-semibold text-slate-500">Secured by</span>
+                        <span className="text-xs font-extrabold text-[#02042B] dark:text-white tracking-tight">Razorpay</span>
+                    </div>
                 </div>
 
             </div>
 
+            {/* Why Upgrade to Premium */}
+            <div className="mt-16 mb-8">
+                <h2 className="text-2xl font-bold text-center text-slate-900 dark:text-white mb-8">Why Upgrade to Premium?</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {[
+                        { title: 'Unlimited Mock Tests', desc: 'Unlimited Mock tests, in-depth analytics and advanced performance tracking.', icon: <FileText className="w-5 h-5 text-[#6366f1]" /> },
+                        { title: 'AI Insights', desc: 'AI Insights generate topic by topic analytics and previous year paper costs.', icon: <BrainCircuit className="w-5 h-5 text-[#6366f1]" /> },
+                        { title: 'Weak Topic Detection', desc: 'Weak topic detectors in context, recognize weak topic elimination.', icon: <Search className="w-5 h-5 text-[#6366f1]" /> },
+                        { title: 'Rank Prediction', desc: 'Rank Prediction compares with peers to focus on speed analytics.', icon: <BarChart3 className="w-5 h-5 text-[#6366f1]" /> },
+                        { title: 'Previous Year Papers', desc: 'Previous Year Papers combining including daily live Tests.', icon: <FileClock className="w-5 h-5 text-[#6366f1]" /> },
+                        { title: 'Smart Recommendations', desc: 'Smart recommendations on what to enhance and communications.', icon: <Rocket className="w-5 h-5 text-[#6366f1]" /> },
+                    ].map((feature, idx) => (
+                        <div key={idx} className="bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-[0_4px_20px_rgb(0,0,0,0.04)] border border-indigo-50 dark:border-slate-800">
+                            <div className="mb-3 w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center">
+                                {feature.icon}
+                            </div>
+                            <h3 className="font-bold text-[15px] text-slate-900 dark:text-white mb-2">{feature.title}</h3>
+                            <p className="text-[13px] text-slate-500 leading-relaxed">{feature.desc}</p>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* LIMITED OFFER BANNER */}
+            <div className="mt-12 mb-8">
+                <div className="text-center mb-3">
+                    <span className="text-sm font-bold tracking-widest text-slate-900 dark:text-white uppercase">Limited Offer</span>
+                </div>
+                <div className="bg-gradient-to-r from-red-700 via-red-600 to-orange-500 rounded-2xl p-8 text-center shadow-lg shadow-red-500/20 text-white relative overflow-hidden">
+                    {/* Glossy overlay effect */}
+                    <div className="absolute top-0 left-0 w-full h-1/2 bg-white/10 rounded-t-2xl pointer-events-none"></div>
+                    
+                    <h3 className="text-xl sm:text-2xl font-bold mb-2 relative z-10">Offer Ending Soon</h3>
+                    <div className="text-4xl sm:text-5xl font-extrabold tracking-wider mb-3 drop-shadow-md font-mono relative z-10">
+                        {hours}h {minutes.toString().padStart(2, '0')}m {seconds.toString().padStart(2, '0')}s
+                    </div>
+                    <p className="text-red-50 text-sm sm:text-base font-medium relative z-10">Lock in your discount before prices increase.</p>
+                </div>
+            </div>
+
+            {/* STUDENT SUCCESS */}
+            <div className="mt-16 mb-12">
+                <div className="text-center mb-10">
+                    <span className="text-sm font-bold tracking-widest text-slate-500 uppercase">Student Success</span>
+                    <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mt-2">Trusted by Thousands of Students</h2>
+                </div>
+                
+                {/* Stat Cards */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+                    <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 text-center shadow-sm hover:shadow-md transition-shadow">
+                        <Users className="w-8 h-8 text-emerald-500 mx-auto mb-3" />
+                        <div className="text-3xl font-bold text-slate-900 dark:text-white mb-1">50K+</div>
+                        <div className="text-sm text-slate-500 font-medium">Students</div>
+                    </div>
+                    <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 text-center shadow-sm hover:shadow-md transition-shadow">
+                        <div className="text-3xl font-bold text-slate-900 dark:text-white mb-1 mt-2">70K+</div>
+                        <div className="text-sm text-slate-500 font-medium">Tests Attempted Daily</div>
+                    </div>
+                    <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 text-center shadow-sm hover:shadow-md transition-shadow">
+                        <div className="text-3xl font-bold text-slate-900 dark:text-white mb-1 mt-2">4.8/5</div>
+                        <div className="text-sm text-slate-500 font-medium">Average Rating</div>
+                    </div>
+                    <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 text-center shadow-sm hover:shadow-md transition-shadow">
+                        <div className="text-3xl font-bold text-amber-500 mb-1 mt-2">92%</div>
+                        <div className="text-sm text-slate-500 font-medium">Improved Scores</div>
+                    </div>
+                </div>
+
+                {/* Testimonials */}
+                <div className="relative">
+                    <div className="flex gap-4 overflow-hidden">
+                        {[
+                            { name: 'Rahul Sharma', role: 'Premium Review', img: 'https://i.pravatar.cc/150?u=1' },
+                            { name: 'Priya Patel', role: 'Premium Rating', img: 'https://i.pravatar.cc/150?u=2' },
+                            { name: 'Amit Kumar', role: 'Premium Review', img: 'https://i.pravatar.cc/150?u=3' },
+                            { name: 'Sneha Singh', role: 'Premium Review', img: 'https://i.pravatar.cc/150?u=4' },
+                        ].map((user, idx) => (
+                            <div key={idx} className="flex-1 min-w-[200px] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 text-center shadow-sm hover:shadow-md transition-shadow">
+                                <img src={user.img} alt={user.name} className="w-16 h-16 rounded-full mx-auto mb-4 border-2 border-indigo-50 dark:border-slate-800" />
+                                <h4 className="font-bold text-slate-900 dark:text-white mb-1">{user.name}</h4>
+                                <p className="text-xs text-slate-500 mb-3">{user.role}</p>
+                                <div className="flex justify-center gap-1">
+                                    {[1, 2, 3, 4, 5].map(s => <Star key={s} className="w-4 h-4 fill-amber-400 text-amber-400" />)}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    {/* Carousel Arrow */}
+                    <button className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/3 w-10 h-10 bg-white border border-slate-200 rounded-full shadow-lg flex items-center justify-center text-slate-400 hover:text-slate-600 hidden md:flex">
+                        <ChevronRight className="w-5 h-5" />
+                    </button>
+                    {/* Pagination dots */}
+                    <div className="flex justify-center gap-2 mt-6">
+                        <div className="w-4 h-1.5 rounded-full bg-slate-800 dark:bg-slate-200"></div>
+                        <div className="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-700"></div>
+                        <div className="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-700"></div>
+                        <div className="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-700"></div>
+                    </div>
+                </div>
+            </div>
+
             {/* Native Accordion FAQ - Single Panel */}
-            <div className="mt-8">
+            <div className="mt-12">
                 <h3 className="font-bold text-[15px] mb-3 uppercase tracking-wide text-slate-500">FAQ</h3>
                 <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden px-4">
                     <Accordion type="single" collapsible className="w-full">
@@ -380,6 +561,34 @@ export default function PricingClientPage() {
                     </Accordion>
                 </div>
             </div>
+
+            {/* FINAL CTA */}
+            <div className="mt-16 mb-8 text-center">
+                <div className="text-xs font-bold tracking-widest text-slate-500 uppercase mb-4">FINAL CTA</div>
+                <div className="relative w-full rounded-3xl overflow-hidden bg-gradient-to-r from-emerald-500 via-indigo-500 to-purple-600 text-white shadow-xl">
+                    {/* Glowing orbs */}
+                    <div className="absolute top-0 left-0 w-64 h-64 bg-emerald-400/40 rounded-full blur-[60px] -translate-x-1/4 -translate-y-1/4 pointer-events-none"></div>
+                    <div className="absolute bottom-0 right-0 w-64 h-64 bg-purple-400/40 rounded-full blur-[60px] translate-x-1/4 translate-y-1/4 pointer-events-none"></div>
+                    
+                    <div className="relative z-10 px-6 py-16 sm:py-20 flex flex-col items-center text-center">
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 leading-tight">
+                            Start Your Premium Learning <br className="hidden md:block"/> Journey Today
+                        </h2>
+                        <p className="text-indigo-50 text-base sm:text-lg mb-8 max-w-xl">
+                            Join thousands of students preparing smarter with DeshExam
+                        </p>
+                        <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                            <Button className="bg-white text-indigo-900 hover:bg-slate-50 font-bold h-12 px-8 rounded-lg shadow-lg">
+                                Buy Now
+                            </Button>
+                            <Button variant="outline" className="bg-white/10 border-white/30 hover:bg-white/20 text-white font-bold h-12 px-8 rounded-lg backdrop-blur-sm">
+                                Contact Support
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
   );
