@@ -74,11 +74,11 @@ export interface TaxonomyNode {
   };
 
   // Module 4: Facilities
-  facilities?: {
+  facilities?: (string | {
     title: string;
     icon: string;
     available: boolean;
-  }[];
+  })[];
 
   // Module 7: Placement
   placement?: {

@@ -34,6 +34,7 @@ export default function InstitutionEditPage() {
   const [uploading, setUploading] = useState(false);
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [isSummarizing, setIsSummarizing] = useState(false);
+  const [isGeneratingReviews, setIsGeneratingReviews] = useState(false);
   const [newGalleryUrl, setNewGalleryUrl] = useState('');
   const [draggedGalleryIdx, setDraggedGalleryIdx] = useState<number | null>(null);
   const [initialLoadDone, setInitialLoadDone] = useState(false);
@@ -330,6 +331,31 @@ export default function InstitutionEditPage() {
       toast({ variant: 'destructive', title: 'AI failed to summarize' });
     } finally {
       setIsSummarizing(false);
+    }
+  };
+
+  const handleGenerateReviews = async (count: number) => {
+    setIsGeneratingReviews(true);
+    try {
+      const response = await fetch('/api/ai/generate-reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ institutionName: formData.title || formData.acronym, count }),
+      });
+      if (!response.ok) throw new Error('Failed to generate reviews');
+      const data = await response.json();
+      
+      setFormData(prev => ({
+        ...prev,
+        reviews: [...(prev.reviews || []), ...data.reviews]
+      }));
+      
+      toast({ title: `Generated ${count} AI reviews!`, description: 'Remember to save your changes.' });
+    } catch (error) {
+      console.error(error);
+      toast({ variant: 'destructive', title: 'AI failed to generate reviews' });
+    } finally {
+      setIsGeneratingReviews(false);
     }
   };
 
@@ -916,13 +942,13 @@ export default function InstitutionEditPage() {
                       <input
                         type="checkbox"
                         id={`facility-${facility}`}
-                        checked={(formData.facilities || []).includes(facility)}
+                        checked={((formData.facilities as any[]) || []).includes(facility)}
                         onChange={(e) => {
-                          const current = formData.facilities || [];
+                          const current = (formData.facilities as any[]) || [];
                           if (e.target.checked) {
-                            setFormData(prev => ({ ...prev, facilities: [...current, facility] }));
+                            setFormData(prev => ({ ...prev, facilities: [...current, facility] as any }));
                           } else {
-                            setFormData(prev => ({ ...prev, facilities: current.filter(f => f !== facility) }));
+                            setFormData(prev => ({ ...prev, facilities: current.filter(f => f !== facility) as any }));
                           }
                         }}
                         className="w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500"
@@ -937,19 +963,19 @@ export default function InstitutionEditPage() {
                   <Input 
                     id="customFacilities"
                     placeholder="e.g. Robotics Lab, Incubation Center"
-                    value={(formData.facilities || []).filter(f => ![
+                    value={((formData.facilities as any[]) || []).filter(f => ![
                       'Library', 'Hostel', 'Wi-Fi', 'Cafeteria', 'Transport', 
                       'Sports Complex', 'Gym', 'Medical Facility', 'Auditorium', 
                       'Labs', 'AC Classrooms', 'Swimming Pool', 'Smart Board'
                     ].includes(f)).join(', ')}
                     onChange={(e) => {
-                      const standard = (formData.facilities || []).filter(f => [
+                      const standard = ((formData.facilities as any[]) || []).filter(f => [
                         'Library', 'Hostel', 'Wi-Fi', 'Cafeteria', 'Transport', 
                         'Sports Complex', 'Gym', 'Medical Facility', 'Auditorium', 
                         'Labs', 'AC Classrooms', 'Swimming Pool', 'Smart Board'
                       ].includes(f));
                       const custom = e.target.value.split(',').map(s => s.trim()).filter(Boolean);
-                      setFormData(prev => ({ ...prev, facilities: [...standard, ...custom] }));
+                      setFormData(prev => ({ ...prev, facilities: [...standard, ...custom] as any }));
                     }}
                   />
                   <p className="text-xs text-slate-500">Any standard facilities you uncheck will disappear from the list, while custom ones will appear here.</p>
@@ -1467,19 +1493,36 @@ export default function InstitutionEditPage() {
               <div className="grid gap-2 pt-4 border-t border-slate-100">
                 <div className="flex items-center justify-between">
                   <Label>Imported Student Reviews</Label>
-                  {formData.reviews && formData.reviews.length > 0 && (
-                    <Button 
-                      type="button" 
-                      variant="secondary" 
-                      size="sm" 
-                      onClick={handleSummarizeReviews} 
-                      disabled={isSummarizing}
-                      className="h-8 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200"
+                  <div className="flex gap-2">
+                    <select
+                      className="h-8 text-xs border border-slate-200 rounded px-2"
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          handleGenerateReviews(Number(e.target.value));
+                          e.target.value = ""; // reset
+                        }
+                      }}
+                      disabled={isGeneratingReviews}
                     >
-                      <Sparkles className={`w-3 h-3 mr-2 ${isSummarizing ? 'animate-pulse text-indigo-400' : 'text-indigo-500'}`} />
-                      {isSummarizing ? 'Summarizing...' : 'AI Summarize'}
-                    </Button>
-                  )}
+                      <option value="">{isGeneratingReviews ? 'Generating...' : 'Generate AI Reviews'}</option>
+                      <option value="3">Generate 3 Reviews</option>
+                      <option value="5">Generate 5 Reviews</option>
+                      <option value="10">Generate 10 Reviews</option>
+                    </select>
+                    {formData.reviews && formData.reviews.length > 0 && (
+                      <Button 
+                        type="button" 
+                        variant="secondary" 
+                        size="sm" 
+                        onClick={handleSummarizeReviews} 
+                        disabled={isSummarizing}
+                        className="h-8 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200"
+                      >
+                        <Sparkles className={`w-3 h-3 mr-2 ${isSummarizing ? 'animate-pulse text-indigo-400' : 'text-indigo-500'}`} />
+                        {isSummarizing ? 'Summarizing...' : 'AI Summarize'}
+                      </Button>
+                    )}
+                  </div>
                 </div>
 
                 {formData.aiReviewSummary && (
