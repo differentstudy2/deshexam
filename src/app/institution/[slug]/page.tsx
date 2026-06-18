@@ -354,10 +354,14 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
 
           {/* 3. OVERVIEW */}
           <Card className="border-none shadow-sm rounded-2xl bg-white">
-            <CardContent className="p-8 space-y-6">
-              <div>
-                <h2 className="text-2xl font-bold text-slate-900 mb-3">About Institution</h2>
-                <div className="prose prose-slate max-w-none text-slate-600 leading-relaxed">
+            <CardContent className="p-8">
+              <div className="w-12 h-1.5 bg-emerald-500 rounded-full mb-3"></div>
+              <h2 className="text-2xl font-bold text-slate-900 mb-4">About Institution</h2>
+              
+              <input type="checkbox" id="about-toggle" className="peer hidden" />
+              
+              <div className="overflow-hidden max-h-[140px] peer-checked:max-h-[5000px] transition-all duration-700 ease-in-out relative">
+                <div className="prose prose-slate max-w-none text-slate-600 leading-relaxed pb-2">
                   {institution.description ? (
                     <div className="tiptap-content" dangerouslySetInnerHTML={{ __html: institution.description }} />
                   ) : (
@@ -366,14 +370,28 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
                     </p>
                   )}
                 </div>
+                
+                {/* Vision & Mission included in the expandable area */}
+                <div className="mt-6 pb-2">
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">Vision & Mission</h3>
+                  <p className="text-slate-600 leading-relaxed">
+                    Our institution is dedicated to providing excellence in education. We strive to nurture talent, foster innovation, and build a community of lifelong learners who will contribute positively to society.
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-xl font-bold text-slate-900 mb-2">Vision & Mission</h3>
-                <p className="text-slate-600 leading-relaxed">
-                  Our institution is dedicated to providing excellence in education. We strive to nurture talent, foster innovation, and build a community of lifelong learners who will contribute positively to society.
-                </p>
+              
+              {/* Fade Overlay */}
+              <div className="h-24 -mt-24 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none peer-checked:opacity-0 transition-opacity duration-300 relative z-10" />
+              
+              {/* Toggle Labels */}
+              <div className="mt-2">
+                <label htmlFor="about-toggle" className="inline-flex items-center gap-1 cursor-pointer text-emerald-600 hover:text-emerald-700 font-semibold peer-checked:hidden transition-colors relative z-20">
+                  Read More <ChevronDown className="w-4 h-4" />
+                </label>
+                <label htmlFor="about-toggle" className="hidden items-center gap-1 cursor-pointer text-emerald-600 hover:text-emerald-700 font-semibold peer-checked:inline-flex transition-colors relative z-20">
+                  Show Less <ChevronDown className="w-4 h-4 rotate-180" />
+                </label>
               </div>
-              <Button variant="outline" className="text-indigo-600 border-indigo-200 hover:bg-indigo-50">Read More</Button>
             </CardContent>
           </Card>
 
