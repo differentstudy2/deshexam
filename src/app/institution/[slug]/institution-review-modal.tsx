@@ -94,7 +94,8 @@ export function InstitutionReviewModal({ institutionId }: Props) {
 
       await updateDoc(institutionRef, {
         reviews: updatedReviews,
-        rating: parseFloat(newAvgRating.toFixed(1))
+        rating: parseFloat(newAvgRating.toFixed(1)),
+        userRatingsTotal: updatedReviews.length
       });
 
       toast({

@@ -124,8 +124,13 @@ export function InstitutionReviewItem({ review, institutionId }: ReviewItemProps
               <span title="Verified Review"><BadgeCheck className="w-4 h-4 text-emerald-500" /></span>
             )}
           </div>
-          <div className="text-xs text-slate-500 mt-0.5 flex items-center gap-1">
-            Rating: <span className="flex text-amber-400"><Star className="w-3 h-3 fill-amber-400 text-amber-400 mr-0.5" /></span> {localReview.rating} • {localReview.time || 'Recent'}
+          <div className="text-xs text-slate-500 mt-0.5 flex items-center gap-2">
+            <div className="flex">
+              {[1, 2, 3, 4, 5].map(star => (
+                <Star key={star} className={`w-3 h-3 ${star <= localReview.rating ? 'fill-amber-400 text-amber-400' : 'text-slate-300'}`} />
+              ))}
+            </div>
+            <span>{localReview.rating} • {localReview.time || 'Recent'}</span>
           </div>
         </div>
       </div>

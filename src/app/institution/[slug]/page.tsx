@@ -5,8 +5,8 @@ import { collection, query, where, getDocs, limit } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import { TaxonomyNode } from '@/lib/firebase/taxonomy';
 import {
-  MapPin, Globe, Star, Building, Navigation, ArrowLeft, Bookmark, CheckCircle2, 
-  Users, BookOpen, Clock, Phone, Mail, FileText, Monitor, Bed, Bus, TestTube, 
+  MapPin, Globe, Star, Building, Navigation, ArrowLeft, Bookmark, CheckCircle2,
+  Users, BookOpen, Clock, Phone, Mail, FileText, Monitor, Bed, Bus, TestTube,
   Trophy, Wifi, Coffee, Tent, PlusSquare, ChevronDown, ChevronRight, Filter, Sparkles, Calendar, XCircle
 } from 'lucide-react';
 import Image from 'next/image';
@@ -35,17 +35,48 @@ async function getInstitutionBySlug(slug: string): Promise<TaxonomyNode | null> 
   return { id: snap.docs[0].id, ...snap.docs[0].data() } as TaxonomyNode;
 }
 
+async function getRelatedInstitutions(boardType: string, currentId: string): Promise<TaxonomyNode[]> {
+  try {
+    let q = query(
+      collection(db, 'taxonomy_nodes'),
+      where('type', '==', 'institution'),
+      where('boardType', '==', boardType || ''),
+      limit(5)
+    );
+    const snap = await getDocs(q);
+    let related = snap.docs
+      .map(doc => ({ id: doc.id, ...doc.data() } as TaxonomyNode))
+      .filter(inst => inst.id !== currentId);
+
+    if (related.length < 3) {
+      const fallbackQ = query(
+        collection(db, 'taxonomy_nodes'),
+        where('type', '==', 'institution'),
+        limit(5)
+      );
+      const fallbackSnap = await getDocs(fallbackQ);
+      const fallbackRelated = fallbackSnap.docs
+        .map(doc => ({ id: doc.id, ...doc.data() } as TaxonomyNode))
+        .filter(inst => inst.id !== currentId && !related.some(r => r.id === inst.id));
+      related.push(...fallbackRelated);
+    }
+    return related.slice(0, 4);
+  } catch (error) {
+    console.error('Failed to fetch related institutions', error);
+    return [];
+  }
+}
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const institution = await getInstitutionBySlug(params.slug);
   if (!institution) return { title: 'Not Found' };
 
   const currentYear = new Date().getFullYear();
   const seoInfo = (institution as any).seo || {};
-  
+
   const title = seoInfo.seoTitle || `${institution.title} Admission ${currentYear}, Fees, Courses, Reviews | DeshExam`;
   const description = seoInfo.seoDescription || `Explore ${institution.title} admission ${currentYear}, fees, courses, placement, scholarship, facilities, ranking, contact details and student reviews on DeshExam.`;
   const keywords = seoInfo.seoKeywords || [seoInfo.focusKeyword || institution.title, `${institution.title} admission`, `${institution.title} fees`];
-  
+
   const ogImage = seoInfo.ogImage || (institution as any).featureImage || (institution.galleryImages && institution.galleryImages[0]) || '';
   const canonicalUrl = seoInfo.canonicalUrl || `https://deshexam.com/institution/${params.slug}`;
 
@@ -134,6 +165,8 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
     notFound();
   }
 
+  const relatedInstitutions = await getRelatedInstitutions(institution.boardType || '', institution.id || '');
+
   const currentYear = new Date().getFullYear();
   const stateStr = institution.stateRegion || "West Bengal";
   let cityStr = "City";
@@ -160,14 +193,14 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
 
   // Generate JSON-LD Schemas
   const schemaInstitution = {
-    "@context":"https://schema.org",
-    "@type":"CollegeOrUniversity",
+    "@context": "https://schema.org",
+    "@type": "CollegeOrUniversity",
     "name": institution.title,
     "url": `https://deshexam.com/institution/${params.slug}`,
     "telephone": institution.phoneNumber || "",
     "image": institution.logoUrl || institution.featureImage || coverImage,
-    "address":{
-      "@type":"PostalAddress",
+    "address": {
+      "@type": "PostalAddress",
       "streetAddress": streetAddressStr,
       "addressLocality": cityStr,
       "addressRegion": stateStr,
@@ -177,8 +210,8 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
   };
 
   const schemaRating = institution.rating ? {
-    "@context":"https://schema.org",
-    "@type":"AggregateRating",
+    "@context": "https://schema.org",
+    "@type": "AggregateRating",
     "itemReviewed": {
       "@type": "CollegeOrUniversity",
       "name": institution.title
@@ -188,8 +221,8 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
   } : null;
 
   const schemaFAQ = {
-    "@context":"https://schema.org",
-    "@type":"FAQPage",
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
     "mainEntity": MOCK_FAQS.map((faq) => ({
       "@type": "Question",
       "name": faq.q,
@@ -201,9 +234,9 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
   };
 
   const schemaBreadcrumb = {
-    "@context":"https://schema.org",
-    "@type":"BreadcrumbList",
-    "itemListElement":[
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
       { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://deshexam.com/" },
       { "@type": "ListItem", "position": 2, "name": "Institutions", "item": "https://deshexam.com/institutions" },
       { "@type": "ListItem", "position": 3, "name": stateStr, "item": `https://deshexam.com/institutions/${stateStr.toLowerCase().replace(/\s+/g, '-')}` },
@@ -218,12 +251,12 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#020817] pb-20 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemas) }} />
-      
+
       {/* 1. HERO BANNER */}
       <div className="relative w-full overflow-hidden">
         <Image src={coverImage} alt={`${institution.title} campus building and facilities in ${cityStr}, ${stateStr}`} fill className="object-cover brightness-[0.4]" unoptimized />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/80 to-slate-900/40" />
-        
+
         <div className="relative pt-8 px-4 md:px-8 max-w-7xl mx-auto flex flex-col pb-8 z-10">
           <div className="flex justify-between items-start w-full">
             <div className="flex items-center gap-2 text-xs font-medium text-white/70 mb-8 flex-wrap">
@@ -240,64 +273,64 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
           </div>
 
           <div className="flex flex-col lg:flex-row gap-10 items-start justify-between w-full">
-            
+
             {/* Left Column: Logo, Title, Badges, Buttons */}
             <div className="w-full lg:w-2/3 flex flex-col">
-              
+
               <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-center sm:items-start w-full text-center sm:text-left">
-              <div className="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-sm bg-white shadow-2xl flex items-center justify-center overflow-hidden shrink-0 z-10 relative mx-auto sm:mx-0">
-                {institution.logoUrl || institution.featureImage ? (
-                  <Image src={institution.logoUrl || institution.featureImage || ''} alt={`${institution.title} official logo`} fill className="object-contain p-2 sm:p-3" unoptimized />
-                ) : (
-                  <Building className="w-12 h-12 sm:w-16 sm:h-16 text-slate-300" />
-                )}
-              </div>
-              
-              <div className="text-white space-y-3 sm:space-y-4 pt-2 flex flex-col items-center sm:items-start w-full">
-                <div className="flex flex-wrap justify-center sm:justify-start items-center gap-2">
-                  <Badge className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/50 backdrop-blur-md px-2 py-0.5 shadow-sm"><CheckCircle2 className="w-3.5 h-3.5 mr-1" /> Verified by DeshExam</Badge>
-                  <span className="text-[10px] sm:text-xs text-white/70 font-medium ml-1">Updated on {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tight text-white">{institution.title}</h1>
-                </div>
-                
-                <div className="flex flex-wrap justify-center sm:justify-start items-center gap-2 sm:gap-4 text-xs sm:text-sm text-slate-300">
-                  {institution.boardType && (
-                    <span className="flex items-center gap-1.5 bg-white/10 px-3 py-1 rounded-full border border-white/10 backdrop-blur-sm"><Building className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> {institution.boardType}</span>
-                  )}
-                  {institution.rating && (
-                    <span className="flex items-center gap-1.5 bg-amber-500/20 text-amber-300 border border-amber-500/30 px-3 py-1 rounded-full backdrop-blur-sm font-semibold">
-                      <Star className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-amber-400" /> {institution.rating} ({institution.userRatingsTotal || 0} reviews)
-                    </span>
+                <div className="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-sm bg-white shadow-2xl flex items-center justify-center overflow-hidden shrink-0 z-10 relative mx-auto sm:mx-0">
+                  {institution.logoUrl || institution.featureImage ? (
+                    <Image src={institution.logoUrl || institution.featureImage || ''} alt={`${institution.title} official logo`} fill className="object-contain p-2 sm:p-3" unoptimized />
+                  ) : (
+                    <Building className="w-12 h-12 sm:w-16 sm:h-16 text-slate-300" />
                   )}
                 </div>
 
-                <div className="flex flex-wrap justify-center sm:justify-start items-center gap-4 text-xs sm:text-sm text-slate-300">
-                  <span className="flex items-center gap-1.5 text-center sm:text-left"><MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 shrink-0" /> {institution.address ? institution.address.split(',').slice(-2).join(',') : 'Location'}</span>
+                <div className="text-white space-y-3 sm:space-y-4 pt-2 flex flex-col items-center sm:items-start w-full">
+                  <div className="flex flex-wrap justify-center sm:justify-start items-center gap-2">
+                    <Badge className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/50 backdrop-blur-md px-2 py-0.5 shadow-sm"><CheckCircle2 className="w-3.5 h-3.5 mr-1" /> Verified by DeshExam</Badge>
+                    <span className="text-[10px] sm:text-xs text-white/70 font-medium ml-1">Updated on {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tight text-white">{institution.title}</h1>
+                  </div>
+
+                  <div className="flex flex-wrap justify-center sm:justify-start items-center gap-2 sm:gap-4 text-xs sm:text-sm text-slate-300">
+                    {institution.boardType && (
+                      <span className="flex items-center gap-1.5 bg-white/10 px-3 py-1 rounded-full border border-white/10 backdrop-blur-sm"><Building className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> {institution.boardType}</span>
+                    )}
+                    {institution.rating && (
+                      <span className="flex items-center gap-1.5 bg-amber-500/20 text-amber-300 border border-amber-500/30 px-3 py-1 rounded-full backdrop-blur-sm font-semibold">
+                        <Star className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-amber-400" /> {institution.rating} ({institution.reviews?.length || institution.userRatingsTotal || 0} reviews)
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex flex-wrap justify-center sm:justify-start items-center gap-4 text-xs sm:text-sm text-slate-300">
+                    <span className="flex items-center gap-1.5 text-center sm:text-left"><MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 shrink-0" /> {institution.address ? institution.address.split(',').slice(-2).join(',') : 'Location'}</span>
+                  </div>
                 </div>
-              </div>
               </div>
 
               {/* Badges and Buttons moved below to align with the left edge of the logo */}
               <div className="flex flex-col space-y-6 mt-6 sm:mt-8 w-full">
-              <div className="flex overflow-x-auto sm:overflow-visible pb-2 sm:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap items-center gap-2 no-scrollbar w-[100vw] sm:w-auto">
-                <Badge variant="outline" className="text-blue-200 border-blue-500/30 bg-blue-500/10 backdrop-blur-md whitespace-nowrap">Est: {institution.establishedYear || '2013'}</Badge>
-                <Badge variant="outline" className="text-purple-200 border-purple-500/30 bg-purple-500/10 backdrop-blur-md whitespace-nowrap">Medium: {institution.mediumOfInstruction ? (Array.isArray(institution.mediumOfInstruction) ? institution.mediumOfInstruction.join(', ') : institution.mediumOfInstruction) : 'English'}</Badge>
-                <Badge variant="outline" className="text-emerald-200 border-emerald-500/30 bg-emerald-500/10 backdrop-blur-md whitespace-nowrap">Institution Type: College</Badge>
-              </div>
-
-              <div className="flex flex-col sm:flex-row flex-wrap gap-3 w-full">
-                <Button className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-medium shadow-lg hover:shadow-emerald-500/25 px-6 h-12 sm:h-10 rounded-sm sm:rounded-sm transition-all border border-emerald-500/50 text-base sm:text-sm">Get Admission Info</Button>
-                <div className="grid grid-cols-2 gap-3 w-full sm:w-auto sm:flex sm:flex-wrap">
-                  <Button className="w-full sm:w-auto bg-indigo-500/20 border border-indigo-400/30 text-indigo-50 hover:bg-indigo-500/30 hover:border-indigo-400/50 backdrop-blur-md font-medium px-2 sm:px-5 h-12 sm:h-10 rounded-sm sm:rounded-sm shadow-lg shadow-indigo-500/10 transition-all text-[13px] sm:text-sm">Brochure</Button>
-                  {institution.websiteUrl && (
-                    <Button asChild className="w-full sm:w-auto bg-amber-500/20 border border-amber-400/30 text-amber-50 hover:bg-amber-500/30 hover:border-amber-400/50 backdrop-blur-md font-medium px-2 sm:px-5 h-12 sm:h-10 rounded-sm sm:rounded-sm shadow-lg shadow-amber-500/10 transition-all text-[13px] sm:text-sm">
-                      <a href={institution.websiteUrl} target="_blank" rel="noopener noreferrer"><Globe className="w-4 h-4 sm:mr-2 shrink-0" /> <span className="hidden sm:inline">Visit Website</span><span className="sm:hidden ml-1">Website</span></a>
-                    </Button>
-                  )}
+                <div className="flex overflow-x-auto sm:overflow-visible pb-2 sm:pb-0 -mx-0 px-2 sm:mx-0 sm:px-0 sm:flex-wrap items-center gap-1 no-scrollbar w-[100vw] sm:w-auto">
+                  <Badge variant="outline" className="text-blue-200 border-blue-500/30 bg-blue-500/10 backdrop-blur-md whitespace-nowrap">Est: {institution.establishedYear || '2013'}</Badge>
+                  <Badge variant="outline" className="text-purple-200 border-purple-500/30 bg-purple-500/10 backdrop-blur-md whitespace-nowrap">Medium: {institution.mediumOfInstruction ? (Array.isArray(institution.mediumOfInstruction) ? institution.mediumOfInstruction.join(', ') : institution.mediumOfInstruction) : 'English'}</Badge>
+                  <Badge variant="outline" className="text-emerald-200 border-emerald-500/30 bg-emerald-500/10 backdrop-blur-md whitespace-nowrap">Institution Type: College</Badge>
                 </div>
-              </div>
+
+                <div className="flex flex-col sm:flex-row flex-wrap gap-3 w-full">
+                  <Button className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-medium shadow-lg hover:shadow-emerald-500/25 px-6 h-12 sm:h-10 rounded-sm sm:rounded-sm transition-all border border-emerald-500/50 text-base sm:text-sm">Get Admission Info</Button>
+                  <div className="grid grid-cols-2 gap-3 w-full sm:w-auto sm:flex sm:flex-wrap">
+                    <Button className="w-full sm:w-auto bg-indigo-500/20 border border-indigo-400/30 text-indigo-50 hover:bg-indigo-500/30 hover:border-indigo-400/50 backdrop-blur-md font-medium px-2 sm:px-5 h-12 sm:h-10 rounded-sm sm:rounded-sm shadow-lg shadow-indigo-500/10 transition-all text-[13px] sm:text-sm">Brochure</Button>
+                    {institution.websiteUrl && (
+                      <Button asChild className="w-full sm:w-auto bg-amber-500/20 border border-amber-400/30 text-amber-50 hover:bg-amber-500/30 hover:border-amber-400/50 backdrop-blur-md font-medium px-2 sm:px-5 h-12 sm:h-10 rounded-sm sm:rounded-sm shadow-lg shadow-amber-500/10 transition-all text-[13px] sm:text-sm">
+                        <a href={institution.websiteUrl} target="_blank" rel="noopener noreferrer"><Globe className="w-4 h-4 sm:mr-2 shrink-0" /> <span className="hidden sm:inline">Visit Website</span><span className="sm:hidden ml-1">Website</span></a>
+                      </Button>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -326,11 +359,11 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
       </div>
 
       {/* PAGE LAYOUT */}
-      <div className="max-w-7xl mx-auto px-4 md:px-8 pt-2 pb-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
-        
+      <div className="max-w-7xl mx-auto px-2 md:px-8 pt-2 pb-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+
         {/* LEFT COLUMN (MAIN CONTENT) - 70% */}
         <div className="lg:col-span-8 space-y-8">
-          
+
           {/* 2. QUICK INFO BAR */}
           <Card className="border-none shadow-sm rounded-sm overflow-hidden bg-white">
             <CardContent className="p-0">
@@ -379,9 +412,9 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
             <CardContent className="p-2">
               <div className="w-12 h-1.5 bg-emerald-500 rounded-full mb-3"></div>
               <h2 className="text-2xl font-bold text-slate-900 mb-4">About Institution</h2>
-              
+
               <input type="checkbox" id="about-toggle" className="peer hidden" />
-              
+
               <div className="overflow-hidden max-h-[140px] peer-checked:max-h-[5000px] transition-all duration-700 ease-in-out relative">
                 <div className="prose prose-slate max-w-none text-slate-600 leading-relaxed pb-2">
                   {institution.description ? (
@@ -392,7 +425,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
                     </p>
                   )}
                 </div>
-                
+
                 {/* Vision & Mission included in the expandable area */}
                 <div className="mt-6 pb-2">
                   <h3 className="text-xl font-bold text-slate-900 mb-2">Vision & Mission</h3>
@@ -401,10 +434,10 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
                   </p>
                 </div>
               </div>
-              
+
               {/* Fade Overlay */}
               <div className="h-24 -mt-24 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none peer-checked:opacity-0 transition-opacity duration-300 relative z-10" />
-              
+
               {/* Toggle Labels */}
               <div className="mt-2">
                 <label htmlFor="about-toggle" className="inline-flex items-center gap-1 cursor-pointer text-emerald-600 hover:text-emerald-700 font-semibold peer-checked:hidden transition-colors relative z-20">
@@ -497,9 +530,9 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
           <Card className="border-none shadow-sm rounded-sm bg-white">
             <CardContent className="p-2">
               <h2 className="text-xl font-bold text-slate-900 mb-6">Placements & Scholarships</h2>
-              
+
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                
+
                 {/* Left side: Scholarships */}
                 <div className="space-y-4">
                   {[1, 2].map((i) => (
@@ -554,7 +587,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
                         "Our dedicated placement cell ensures top-tier recruitment opportunities for students across various disciplines, partnering with industry leaders to provide excellent career starts."
                       )}
                     </div>
-                    
+
                     {/* Mock Mini Chart Line */}
                     <div className="w-full h-10 mt-4 relative overflow-hidden">
                       <svg className="w-full h-full text-emerald-500" viewBox="0 0 200 40" preserveAspectRatio="none">
@@ -568,7 +601,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
                     Placement data not available
                   </div>
                 )}
-                
+
               </div>
             </CardContent>
           </Card>
@@ -577,7 +610,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
           <Card className="border-none shadow-sm rounded-sm bg-white">
             <CardContent className="p-2">
               <h2 className="text-xl font-bold text-slate-900 mb-6">Admission</h2>
-              
+
               <div className="flex flex-wrap gap-4 mb-6">
                 <Badge className={institution.admission?.admissionOpen ? "bg-emerald-500 hover:bg-emerald-600 text-white rounded text-sm py-1.5 px-4" : "bg-emerald-500 hover:bg-emerald-600 text-white rounded text-sm py-1.5 px-4 opacity-50"}>Admission Open</Badge>
                 <Badge className={!institution.admission?.admissionOpen ? "bg-rose-500 hover:bg-rose-600 text-white rounded text-sm py-1.5 px-4" : "bg-rose-500 hover:bg-rose-600 text-white rounded text-sm py-1.5 px-4 opacity-50"}>Admission Closed</Badge>
@@ -593,7 +626,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
               {/* Timeline */}
               <div className="relative flex justify-between items-start w-full mb-10 px-2">
                 <div className="absolute top-2.5 left-0 w-full h-0.5 bg-slate-200 -z-10"></div>
-                
+
                 <div className="flex flex-col items-center w-1/4">
                   <div className="w-5 h-5 rounded-full bg-emerald-500 border-4 border-white mb-2 shadow-sm"></div>
                   <span className="text-[10px] sm:text-xs text-slate-500 font-medium">Step 1</span>
@@ -602,7 +635,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
                 <div className="flex flex-col items-center w-1/4">
                   <div className="w-5 h-5 rounded-full bg-emerald-500 border-4 border-white mb-2 shadow-sm"></div>
                   <span className="text-[10px] sm:text-xs text-slate-500 font-medium">Step 2</span>
-                  <span className="text-[10px] sm:text-xs font-bold text-slate-800 text-center">Document<br/>Upload</span>
+                  <span className="text-[10px] sm:text-xs font-bold text-slate-800 text-center">Document<br />Upload</span>
                 </div>
                 <div className="flex flex-col items-center w-1/4">
                   <div className="w-5 h-5 rounded-full bg-slate-200 border-4 border-white mb-2 shadow-sm"></div>
@@ -662,12 +695,12 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
                 <div className="flex flex-col items-center sm:items-start justify-center">
                   <div className="text-5xl font-bold text-slate-900 mb-2">{institution.rating || '4.5'}</div>
                   <div className="flex text-amber-400 mb-1">
-                    {[1,2,3,4,5].map(i => <Star key={i} className={`w-5 h-5 ${i===5 ? 'text-slate-300' : 'fill-amber-400 text-amber-400'}`} />)}
+                    {[1, 2, 3, 4, 5].map(i => <Star key={i} className={`w-5 h-5 ${i === 5 ? 'text-slate-300' : 'fill-amber-400 text-amber-400'}`} />)}
                   </div>
                   <div className="text-xs text-slate-500 font-medium mt-1">Total Reviews: {institution.userRatingsTotal || 14}</div>
                 </div>
                 <div className="flex-1 space-y-2 max-w-xs">
-                  {[5,4,3,2,1].map(stars => (
+                  {[5, 4, 3, 2, 1].map(stars => (
                     <div key={stars} className="flex items-center gap-3 text-xs text-slate-600 font-medium">
                       <div className="flex items-center gap-1 w-6">{stars} <Star className="w-3 h-3 fill-amber-400 text-amber-400" /></div>
                       <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
@@ -688,14 +721,14 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
                       <Sparkles className="w-5 h-5" /> AI Review Summary
                     </div>
                     <div className="prose prose-sm prose-slate max-w-none prose-p:leading-relaxed">
-                      <ReactMarkdown 
+                      <ReactMarkdown
                         remarkPlugins={[remarkGfm]}
                         components={{
-                          ul: ({node, ...props}) => <ul className="list-none pl-0 space-y-3 my-4" {...props} />,
-                          li: ({node, children, ...props}) => {
+                          ul: ({ node, ...props }) => <ul className="list-none pl-0 space-y-3 my-4" {...props} />,
+                          li: ({ node, children, ...props }) => {
                             let isPro = false;
                             let isCon = false;
-                            
+
                             const processChildren = (childArray: any): any => {
                               return React.Children.map(childArray, child => {
                                 if (typeof child === 'string') {
@@ -709,8 +742,8 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
                                   }
                                 }
                                 if (React.isValidElement(child) && child.props && 'children' in (child.props as any)) {
-                                    const newChildren = processChildren((child.props as any).children);
-                                    return React.cloneElement(child, { children: newChildren } as any);
+                                  const newChildren = processChildren((child.props as any).children);
+                                  return React.cloneElement(child, { children: newChildren } as any);
                                 }
                                 return child;
                               });
@@ -779,7 +812,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
 
         {/* RIGHT COLUMN (SIDEBAR) - 30% */}
         <div className="lg:col-span-4 space-y-6">
-          
+
           {/* Mini Gallery */}
           <Card className="border-none shadow-sm rounded-sm bg-white overflow-hidden">
             <CardContent className="p-4">
@@ -809,7 +842,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
                 <a href={`https://wa.me/${institution.internationalPhoneNumber || institution.phoneNumber || '+919876543210'}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-slate-600 hover:text-green-600 transition-colors group">
                   <div className="bg-green-50 p-2.5 rounded-full text-green-600 group-hover:bg-green-600 group-hover:text-white transition-colors">
                     {/* SVG WhatsApp Icon */}
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" /></svg>
                   </div>
                   <div>
                     <div className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">WhatsApp</div>
@@ -842,19 +875,19 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
               <h3 className="font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">Quick Stats</h3>
               <div className="grid grid-cols-2 gap-y-4 gap-x-2 text-sm">
                 <div className="flex flex-col">
-                  <span className="text-[10px] text-slate-400 font-medium uppercase tracking-wider mb-1 flex items-center gap-1"><Building className="w-3 h-3"/> Ownership</span>
+                  <span className="text-[10px] text-slate-400 font-medium uppercase tracking-wider mb-1 flex items-center gap-1"><Building className="w-3 h-3" /> Ownership</span>
                   <span className="font-semibold text-slate-800">{(institution as any).ownershipType || 'Private'}</span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[10px] text-slate-400 font-medium uppercase tracking-wider mb-1 flex items-center gap-1"><MapPin className="w-3 h-3"/> Area</span>
+                  <span className="text-[10px] text-slate-400 font-medium uppercase tracking-wider mb-1 flex items-center gap-1"><MapPin className="w-3 h-3" /> Area</span>
                   <span className="font-semibold text-slate-800">{(institution as any).campusArea || '50 Acres'}</span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[10px] text-slate-400 font-medium uppercase tracking-wider mb-1 flex items-center gap-1"><Users className="w-3 h-3"/> Faculty</span>
+                  <span className="text-[10px] text-slate-400 font-medium uppercase tracking-wider mb-1 flex items-center gap-1"><Users className="w-3 h-3" /> Faculty</span>
                   <span className="font-semibold text-slate-800">{(institution as any).facultyCount || '200+'}</span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[10px] text-slate-400 font-medium uppercase tracking-wider mb-1 flex items-center gap-1"><Calendar className="w-3 h-3"/> Est. Year</span>
+                  <span className="text-[10px] text-slate-400 font-medium uppercase tracking-wider mb-1 flex items-center gap-1"><Calendar className="w-3 h-3" /> Est. Year</span>
                   <span className="font-semibold text-slate-800">{institution.establishedYear || '1995'}</span>
                 </div>
               </div>
@@ -871,13 +904,13 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
               </div>
               {institution.latitude && institution.longitude ? (
                 <div className="rounded-sm overflow-hidden border border-slate-200">
-                  <iframe 
-                    width="100%" 
-                    height="200" 
-                    frameBorder="0" 
-                    scrolling="no" 
-                    marginHeight={0} 
-                    marginWidth={0} 
+                  <iframe
+                    width="100%"
+                    height="200"
+                    frameBorder="0"
+                    scrolling="no"
+                    marginHeight={0}
+                    marginWidth={0}
                     src={`https://maps.google.com/maps?q=${institution.latitude},${institution.longitude}&hl=en&z=14&output=embed`}
                   ></iframe>
                 </div>
@@ -897,27 +930,27 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
                 <div className="flex gap-3">
                   {institution.socialProfiles.facebook && (
                     <a href={institution.socialProfiles.facebook} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-slate-100 text-slate-500 hover:bg-blue-600 hover:text-white flex items-center justify-center transition-colors">
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" /></svg>
                     </a>
                   )}
                   {institution.socialProfiles.twitter && (
                     <a href={institution.socialProfiles.twitter} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-slate-100 text-slate-500 hover:bg-sky-500 hover:text-white flex items-center justify-center transition-colors">
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg>
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" /></svg>
                     </a>
                   )}
                   {institution.socialProfiles.instagram && (
                     <a href={institution.socialProfiles.instagram} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-slate-100 text-slate-500 hover:bg-rose-600 hover:text-white flex items-center justify-center transition-colors">
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" /></svg>
                     </a>
                   )}
                   {institution.socialProfiles.linkedin && (
                     <a href={institution.socialProfiles.linkedin} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-slate-100 text-slate-500 hover:bg-blue-800 hover:text-white flex items-center justify-center transition-colors">
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" /></svg>
                     </a>
                   )}
                   {institution.socialProfiles.youtube && (
                     <a href={institution.socialProfiles.youtube} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-slate-100 text-slate-500 hover:bg-red-600 hover:text-white flex items-center justify-center transition-colors">
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z" /></svg>
                     </a>
                   )}
                 </div>
@@ -942,23 +975,35 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
                 <Link href="/institution" className="text-xs text-indigo-600 font-semibold hover:underline">View All</Link>
               </div>
               <div className="space-y-4">
-                {MOCK_NEARBY.map(nearby => (
-                  <Link href={`/institution`} key={nearby.id} className="flex items-center gap-3 group">
-                    <Image src={nearby.img} alt={nearby.name} width={50} height={50} className="rounded-sm object-cover" unoptimized />
+                {relatedInstitutions.length > 0 ? relatedInstitutions.map(related => (
+                  <Link href={`/institution/${related.slug}`} key={related.id} className="flex items-center gap-3 group">
+                    <div className="w-12 h-12 flex-shrink-0 bg-slate-100 rounded-sm overflow-hidden flex items-center justify-center border border-slate-200">
+                      {related.logoUrl || related.featureImage ? (
+                        <Image src={related.logoUrl || related.featureImage || ''} alt={related.title || ''} width={50} height={50} className="object-cover w-full h-full" unoptimized />
+                      ) : (
+                        <Building className="w-5 h-5 text-slate-400" />
+                      )}
+                    </div>
                     <div>
-                      <div className="font-semibold text-sm text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-1">{nearby.name}</div>
+                      <div className="font-semibold text-sm text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-1">{related.title}</div>
                       <div className="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
-                        <span className="flex items-center gap-0.5"><Building className="w-3 h-3" /> {nearby.type}</span>
-                        <span>•</span>
-                        <span>{nearby.location}</span>
+                        <span className="flex items-center gap-0.5"><Building className="w-3 h-3" /> {related.boardType || 'Institution'}</span>
+                        {related.rating && (
+                          <>
+                            <span>•</span>
+                            <span className="flex items-center gap-0.5 text-amber-500"><Star className="w-3 h-3 fill-amber-500" /> {related.rating}</span>
+                          </>
+                        )}
                       </div>
                     </div>
                   </Link>
-                ))}
+                )) : (
+                  <div className="text-sm text-slate-500">No related institutions found.</div>
+                )}
               </div>
             </CardContent>
           </Card>
-          
+
         </div>
       </div>
 

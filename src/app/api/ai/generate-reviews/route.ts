@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
     const generatedReviews = JSON.parse(cleanJson).map((review: any) => ({
       ...review,
       id: crypto.randomUUID(),
-      isVerified: false,
+      isVerified: true,
       likedBy: [],
       dislikedBy: []
     }));

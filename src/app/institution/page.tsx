@@ -167,7 +167,7 @@ export default function PublicInstitutionDirectory() {
                           {inst.rating ? (
                             <div className="flex items-center gap-1 font-medium text-slate-700 bg-amber-50 px-2 py-1 rounded-md border border-amber-100">
                               <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
-                              {inst.rating} <span className="text-slate-500 font-normal">({inst.userRatingsTotal || 0})</span>
+                              {inst.rating} <span className="text-slate-500 font-normal">({inst.reviews?.length || inst.userRatingsTotal || 0})</span>
                             </div>
                           ) : (
                             <div></div>

@@ -445,6 +445,7 @@ export default function InstitutionEditPage() {
         if (payload.reviews && payload.reviews.length > 0) {
           const avg = payload.reviews.reduce((sum: number, r: any) => sum + r.rating, 0) / payload.reviews.length;
           payload.rating = parseFloat(avg.toFixed(1));
+          payload.userRatingsTotal = payload.reviews.length;
         }
         
         Object.keys(payload).forEach(key => {
