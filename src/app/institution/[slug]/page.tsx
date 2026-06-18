@@ -288,7 +288,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
 
                 <div className="text-white space-y-3 sm:space-y-4 pt-2 flex flex-col items-center sm:items-start w-full">
                   <div className="flex flex-wrap justify-center sm:justify-start items-center gap-2">
-                    <Badge className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/50 backdrop-blur-md px-2 py-0.5 shadow-sm"><CheckCircle2 className="w-3.5 h-3.5 mr-1" /> Verified by DeshExam</Badge>
+                    <Badge className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/50 backdrop-blur-md px-2 py-0.0 shadow-sm"><CheckCircle2 className="w-3.5 h-3.5 mr-1" /> Verified by DeshExam</Badge>
                     <span className="text-[10px] sm:text-xs text-white/70 font-medium ml-1">Updated on {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                   </div>
                   <div className="flex items-center gap-3">
@@ -466,7 +466,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {MOCK_COURSES.map(course => (
                   <div key={course.id} className="border border-slate-100 rounded-sm p-4 hover:border-emerald-200 hover:shadow-sm transition-all bg-white relative">
-                    <div className="absolute top-4 right-4 bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">New</div>
+                    <div className="absolute top-4 right-4 bg-emerald-500 text-white text-[10px] font-bold px-2 py-0 rounded shadow-sm">New</div>
                     <h3 className="font-bold text-base text-slate-900 mb-4 pr-10">{course.title}</h3>
                     <div className="grid grid-cols-2 gap-y-2 gap-x-4 text-xs text-slate-600 mb-4">
                       <div className="flex flex-col"><span className="text-slate-400 font-medium">Degree Type</span> <span className="font-bold text-slate-800">English</span></div>
@@ -880,7 +880,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
                   <tbody className="divide-y divide-slate-100">
                     {(() => {
                       let rawHours = (institution as any).openingHours;
-                      let scheduleArray = [];
+                      let scheduleArray: { day: string; hours: string }[] = [];
                       if (Array.isArray(rawHours) && rawHours.length > 0) {
                         scheduleArray = rawHours.map(item => {
                           if (typeof item === 'string') {
