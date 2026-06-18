@@ -326,7 +326,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
       </div>
 
       {/* PAGE LAYOUT */}
-      <div className="max-w-7xl mx-auto px-4 md:px-8 pt-4 pb-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 pt-2 pb-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
         
         {/* LEFT COLUMN (MAIN CONTENT) - 70% */}
         <div className="lg:col-span-8 space-y-8">
@@ -376,7 +376,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
 
           {/* 3. OVERVIEW */}
           <Card className="border-none shadow-sm rounded-sm bg-white">
-            <CardContent className="p-8">
+            <CardContent className="p-2">
               <div className="w-12 h-1.5 bg-emerald-500 rounded-full mb-3"></div>
               <h2 className="text-2xl font-bold text-slate-900 mb-4">About Institution</h2>
               
@@ -419,7 +419,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
 
           {/* 4. COURSES / PROGRAMS */}
           <Card className="border-none shadow-sm rounded-sm bg-white">
-            <CardContent className="p-6 md:p-8">
+            <CardContent className="p-2">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <h2 className="text-xl font-bold text-slate-900">Courses & Programs</h2>
                 <div className="flex gap-2 w-full sm:w-auto relative">
@@ -453,7 +453,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
 
           {/* FACILITIES */}
           <Card className="border-none shadow-sm rounded-sm bg-white">
-            <CardContent className="p-6 md:p-8">
+            <CardContent className="p-2">
               <h2 className="text-xl font-bold text-slate-900 mb-6">Facilities</h2>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {institution.facilities && institution.facilities.length > 0 ? (
@@ -495,7 +495,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
 
           {/* PLACEMENTS & SCHOLARSHIPS */}
           <Card className="border-none shadow-sm rounded-sm bg-white">
-            <CardContent className="p-6 md:p-8">
+            <CardContent className="p-2">
               <h2 className="text-xl font-bold text-slate-900 mb-6">Placements & Scholarships</h2>
               
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -575,7 +575,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
 
           {/* 5. ADMISSION INFO */}
           <Card className="border-none shadow-sm rounded-sm bg-white">
-            <CardContent className="p-6 md:p-8">
+            <CardContent className="p-2">
               <h2 className="text-xl font-bold text-slate-900 mb-6">Admission</h2>
               
               <div className="flex flex-wrap gap-4 mb-6">
@@ -638,7 +638,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
 
           {/* GALLERY */}
           <Card className="border-none shadow-sm rounded-sm bg-white overflow-hidden">
-            <CardContent className="p-6 md:p-8">
+            <CardContent className="p-2">
               <h2 className="text-xl font-bold text-slate-900 mb-6">Gallery</h2>
               <div className="grid grid-cols-3 gap-2">
                 {(institution.galleryImages && institution.galleryImages.length > 0 ? institution.galleryImages : [...MOCK_GALLERY, ...MOCK_GALLERY, MOCK_GALLERY[0]]).slice(0, 9).map((img, idx) => (
@@ -653,7 +653,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
 
           {/* REVIEWS */}
           <Card className="border-none shadow-sm rounded-sm bg-white">
-            <CardContent className="p-6 md:p-8">
+            <CardContent className="p-2">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-slate-900">Reviews</h2>
                 <InstitutionReviewModal institutionId={institution.id} />
@@ -755,7 +755,7 @@ export default async function InstitutionDetailsPage({ params }: { params: { slu
 
           {/* FAQs */}
           <Card className="border-none shadow-sm rounded-sm bg-white">
-            <CardContent className="p-6 md:p-8">
+            <CardContent className="p-2">
               <h2 className="text-xl font-bold text-slate-900 mb-6">FAQs</h2>
               <div className="space-y-3">
                 {MOCK_FAQS.map((faq, idx) => (
