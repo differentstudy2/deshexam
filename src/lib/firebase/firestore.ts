@@ -2381,3 +2381,61 @@ export const deleteQuestionFromContent = async (contentId: string, questionId: s
         throw new Error("Failed to delete question.");
     }
 };
+
+export const addFaq = async (faqData: any) => {
+    try {
+        const docRef = await addDoc(collection(db, "faqs"), {
+            ...faqData,
+            createdAt: serverTimestamp(),
+        });
+        return docRef.id;
+    } catch (e) {
+        console.error("Error adding FAQ: ", e);
+        throw new Error("Failed to add FAQ.");
+    }
+};
+
+export const getFaqs = async () => {
+    try {
+        const q = query(collection(db, "faqs"), orderBy("createdAt", "desc"));
+        const querySnapshot = await getDocs(q);
+        return querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            let createdAt = 'N/A';
+            if (data.createdAt && typeof data.createdAt.toDate === 'function') {
+                createdAt = format(data.createdAt.toDate(), 'PPP');
+            }
+            return {
+                id: doc.id,
+                ...data,
+                createdAt
+            };
+        });
+    } catch (e) {
+        console.error("Error getting FAQs: ", e);
+        throw new Error("Failed to fetch FAQs.");
+    }
+};
+
+export const updateFaq = async (faqId: string, faqData: any) => {
+    if (!faqId) throw new Error("FAQ ID is required.");
+    try {
+        await updateDoc(doc(db, "faqs", faqId), {
+            ...faqData,
+            updatedAt: serverTimestamp()
+        });
+    } catch (e) {
+        console.error("Error updating FAQ: ", e);
+        throw new Error("Failed to update FAQ.");
+    }
+};
+
+export const deleteFaq = async (faqId: string) => {
+    if (!faqId) throw new Error("FAQ ID is required.");
+    try {
+        await deleteDoc(doc(db, "faqs", faqId));
+    } catch (e) {
+        console.error("Error deleting FAQ: ", e);
+        throw new Error("Failed to delete FAQ.");
+    }
+};

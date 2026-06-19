@@ -177,6 +177,7 @@ const adminNavGroups = [
   {
     title: "Communication",
     items: [
+      { href: '/admin/faqs', label: 'Manage FAQs', icon: <HelpCircle className="h-4 w-4" /> },
       { href: '/admin/push-notification', label: 'Push Notifications', icon: <Send className="h-4 w-4" /> },
       { href: '/admin/broadcast-messages', label: 'Broadcast Messages', icon: <MessageSquare className="h-4 w-4" /> },
       { href: '/admin/templates', label: 'Templates', icon: <FileText className="h-4 w-4" /> },
