@@ -1,7 +1,7 @@
 import { FAQ, FAQFilters, CreateFAQDTO, UpdateFAQDTO, FAQCategory, FAQTag } from '../types/faq.types';
 
 import { db } from "@/lib/firebase/client";
-import { collection, doc, getDocs, setDoc, addDoc, updateDoc, deleteDoc, writeBatch, query, orderBy, increment } from "firebase/firestore";
+import { collection, doc, getDocs, getDoc, setDoc, addDoc, updateDoc, deleteDoc, writeBatch, query, orderBy, increment, where, limit } from "firebase/firestore";
 const FAQS_COLLECTION = "faqs";
 const CATEGORIES_COLLECTION = "faq_categories";
 const TAGS_COLLECTION = "faq_tags";
@@ -57,25 +57,33 @@ export const getFaqs = async (filters?: FAQFilters): Promise<FAQ[]> => {
 };
 
 export const getFaqById = async (id: string): Promise<FAQ | null> => {
-  const snapshot = await getDocs(collection(db, FAQS_COLLECTION));
-  const doc = snapshot.docs.find(d => d.id === id);
-  return doc ? ({ id: doc.id, ...doc.data() } as FAQ) : null;
+  const docRef = doc(db, FAQS_COLLECTION, id);
+  const docSnap = await getDoc(docRef);
+  return docSnap.exists() ? ({ id: docSnap.id, ...docSnap.data() } as FAQ) : null;
 };
 
 export const getFaqBySlugOrId = async (identifier: string): Promise<FAQ | null> => {
-  const snapshot = await getDocs(collection(db, FAQS_COLLECTION));
-  // Find by slug first
-  let doc = snapshot.docs.find(d => {
-    const data = d.data();
-    return data.seo?.slug === identifier;
-  });
+  // Find by slug first using an indexed query (1 read)
+  const slugQuery = query(collection(db, FAQS_COLLECTION), where("seo.slug", "==", identifier), limit(1));
+  const slugSnap = await getDocs(slugQuery);
   
-  // Fallback to id
-  if (!doc) {
-    doc = snapshot.docs.find(d => d.id === identifier);
+  if (!slugSnap.empty) {
+    const d = slugSnap.docs[0];
+    return { id: d.id, ...d.data() } as FAQ;
   }
   
-  return doc ? ({ id: doc.id, ...doc.data() } as FAQ) : null;
+  // Fallback to searching by exact document ID (1 read)
+  try {
+    const docRef = doc(db, FAQS_COLLECTION, identifier);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return { id: docSnap.id, ...docSnap.data() } as FAQ;
+    }
+  } catch (err) {
+    // Identifier was not a valid path
+  }
+  
+  return null;
 };
 
 export const createFaq = async (data: CreateFAQDTO): Promise<FAQ> => {
