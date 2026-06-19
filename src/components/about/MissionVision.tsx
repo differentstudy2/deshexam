@@ -36,19 +36,18 @@ export function MissionVision() {
 
         {/* Bottom: Stats & Cards Layout */}
         <div>
-            <h2 className="text-sm font-bold text-[#64748B] uppercase tracking-widest mb-4">Section 2</h2>
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+            <div className="flex flex-col lg:flex-row gap-12 items-center mb-12">
                 
                 {/* Left Text */}
-                <div className="lg:col-span-4">
+                <div className="lg:w-1/3">
+                    <h2 className="text-sm font-bold text-[#64748B] uppercase tracking-widest mb-4">Section 2</h2>
                     <h2 className="text-4xl lg:text-5xl font-extrabold text-[#0F172A] leading-tight">
                         Make quality accessible to every student
                     </h2>
                 </div>
 
-                {/* Right Stats & Cards */}
-                <div className="lg:col-span-8 space-y-12">
-                    {/* Stats Grid */}
+                {/* Right Stats Grid */}
+                <div className="lg:w-2/3 w-full">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6 p-8 bg-[#F8FAFC] rounded-2xl border border-[#E2E8F0]">
                         <div>
                             <p className="text-sm font-bold text-[#64748B] mb-1">Students</p>
@@ -67,31 +66,30 @@ export function MissionVision() {
                             <h3 className="text-3xl font-extrabold text-[#0F172A]">92%</h3>
                         </div>
                     </div>
-
-                    {/* Colored Cards */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <Card className="bg-gradient-to-br from-[#16A34A] to-[#15803d] p-8 text-white border-0 shadow-lg relative overflow-hidden group">
-                            <div className="absolute right-0 top-0 w-32 h-32 bg-white/10 rounded-full blur-2xl transform translate-x-1/2 -translate-y-1/2 group-hover:scale-150 transition-transform duration-500"></div>
-                            <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mb-6 backdrop-blur-sm">
-                                <Users className="w-6 h-6 text-white" />
-                            </div>
-                            <h4 className="text-sm font-bold text-white/80 uppercase tracking-widest mb-1">Students</h4>
-                            <h3 className="text-3xl font-extrabold mb-2">50,000+</h3>
-                            <p className="text-white/80 text-sm">Active learners daily</p>
-                        </Card>
-
-                        <Card className="bg-gradient-to-br from-[#7C3AED] to-[#5b21b6] p-8 text-white border-0 shadow-lg relative overflow-hidden group">
-                            <div className="absolute right-0 top-0 w-32 h-32 bg-white/10 rounded-full blur-2xl transform translate-x-1/2 -translate-y-1/2 group-hover:scale-150 transition-transform duration-500"></div>
-                            <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mb-6 backdrop-blur-sm">
-                                <FileText className="w-6 h-6 text-white" />
-                            </div>
-                            <h4 className="text-sm font-bold text-white/80 uppercase tracking-widest mb-1">Mock Tests</h4>
-                            <h3 className="text-3xl font-extrabold mb-2">2M+</h3>
-                            <p className="text-white/80 text-sm">Tests taken to date</p>
-                        </Card>
-                    </div>
                 </div>
+            </div>
 
+            {/* Colored Cards - Full Width Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <Card className="bg-gradient-to-br from-[#16A34A] to-[#15803d] p-10 text-white border-0 shadow-lg relative overflow-hidden group">
+                    <div className="absolute right-0 top-0 w-48 h-48 bg-white/10 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2 group-hover:scale-150 transition-transform duration-500"></div>
+                    <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-8 backdrop-blur-sm">
+                        <Users className="w-8 h-8 text-white" />
+                    </div>
+                    <h4 className="text-sm font-bold text-white/80 uppercase tracking-widest mb-2">Students</h4>
+                    <h3 className="text-4xl md:text-5xl font-extrabold mb-3">50,000+</h3>
+                    <p className="text-white/80 text-base md:text-lg">Active learners daily</p>
+                </Card>
+
+                <Card className="bg-gradient-to-br from-[#7C3AED] to-[#5b21b6] p-10 text-white border-0 shadow-lg relative overflow-hidden group">
+                    <div className="absolute right-0 top-0 w-48 h-48 bg-white/10 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2 group-hover:scale-150 transition-transform duration-500"></div>
+                    <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-8 backdrop-blur-sm">
+                        <FileText className="w-8 h-8 text-white" />
+                    </div>
+                    <h4 className="text-sm font-bold text-white/80 uppercase tracking-widest mb-2">Mock Tests</h4>
+                    <h3 className="text-4xl md:text-5xl font-extrabold mb-3">2M+</h3>
+                    <p className="text-white/80 text-base md:text-lg">Tests taken to date</p>
+                </Card>
             </div>
         </div>
 
