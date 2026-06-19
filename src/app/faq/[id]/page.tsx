@@ -177,19 +177,23 @@ export default function SingleFAQPage() {
                             
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {relatedFaqsList.map((faq, idx) => (
-                                    <div key={idx} className="bg-white border border-slate-200 rounded-lg p-5 hover:border-slate-300 transition-colors cursor-pointer flex flex-col h-full">
+                                    <Link href={`/faq/${faq.seo?.slug || faq.id}`} key={faq.id} className="bg-white border border-slate-200 rounded-lg p-5 hover:border-slate-300 hover:shadow-sm transition-all cursor-pointer flex flex-col h-full">
                                         <h3 className="font-bold text-slate-800 text-[14px] leading-snug mb-2">
                                             {faq.question}
                                         </h3>
-                                        <p className="text-[12px] text-slate-500 leading-relaxed mb-4 flex-1">
+                                        <p className="text-[12px] text-slate-500 leading-relaxed mb-4 flex-1 line-clamp-2">
                                             {faq.answer}
                                         </p>
-                                        <div className="mt-auto">
+                                        <div className="mt-auto flex items-center justify-between">
                                             <span className="inline-block border border-slate-200 bg-white text-slate-600 px-3 py-1 rounded text-[11px] font-bold">
                                                 {(categoriesData.find(c => c.id === faq.categoryId)?.name || 'General')}
                                             </span>
+                                            <div className="flex items-center gap-1.5 text-slate-400 text-[12px] font-medium">
+                                                <Eye className="w-3.5 h-3.5" />
+                                                <span>{faq.views || 0}</span>
+                                            </div>
                                         </div>
-                                    </div>
+                                    </Link>
                                 ))}
                             </div>
                         </div>
