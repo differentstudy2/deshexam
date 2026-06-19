@@ -2,7 +2,7 @@
 'use client';
 
 import { useAuth } from '@/hooks/use-auth';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { getUserProfile } from '@/lib/firebase/firestore';
 import { Loader2, Bell, LogOut, UserIcon, Moon, Sun, Monitor } from "lucide-react";
@@ -72,6 +72,18 @@ export default function AdminLayout({
   }, [user, authLoading, router]);
 
 
+  const pathname = usePathname();
+
+  const getPageName = () => {
+    if (pathname.includes('/admin/faqs/settings')) return "Taxonomy Settings";
+    if (pathname.includes('/admin/faqs/create')) return "Create FAQ";
+    if (pathname.includes('/admin/faqs/edit')) return "Edit FAQ";
+    if (pathname.includes('/admin/faqs')) return "FAQ Management";
+    if (pathname.includes('/admin/push-notification')) return "Push Notifications";
+    if (pathname.includes('/admin/broadcast-messages')) return "Broadcast Messages";
+    return "Admin Dashboard";
+  };
+
   if (verifying) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -91,7 +103,7 @@ export default function AdminLayout({
           <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-4 border-b border-slate-200 dark:border-slate-800 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:bg-slate-950/95 dark:supports-[backdrop-filter]:bg-slate-950/60 px-4 md:px-6 shadow-sm">
                     <SidebarTrigger className="-ml-1 text-slate-500 dark:text-slate-400" />
                     <div className="flex-1 font-semibold text-slate-800 dark:text-slate-100 tracking-tight text-lg md:text-xl truncate">
-                        Admin
+                        {getPageName()}
                     </div>
                     <div className="ml-auto flex items-center space-x-2 md:space-x-4">
                         <ThemeToggle />
