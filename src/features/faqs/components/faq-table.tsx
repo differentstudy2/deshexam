@@ -104,9 +104,11 @@ export const FAQTable = ({ data, loading, onDelete, selectedIds, onSelect, onSel
               </TableCell>
               <TableCell className="text-right">
                 <div className="flex items-center justify-end gap-1 opacity-100 transition-opacity">
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/50 dark:hover:text-blue-400" title="Preview">
-                    <Eye className="w-4 h-4" />
-                  </Button>
+                  <Link href={`/faq/${faq.seo?.slug || faq.id}`} target="_blank">
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/50 dark:hover:text-blue-400" title="Preview">
+                      <Eye className="w-4 h-4" />
+                    </Button>
+                  </Link>
                   <Link href={`/admin/faqs/edit/${faq.id}`}>
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/50 dark:hover:text-indigo-400" title="Edit">
                       <Edit className="w-4 h-4" />

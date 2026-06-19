@@ -1,111 +1,24 @@
 import { FAQ, FAQFilters, CreateFAQDTO, UpdateFAQDTO, FAQCategory, FAQTag } from '../types/faq.types';
 
-// In-memory mock database
-let faqsDB: FAQ[] = [
-  {
-    id: "faq_1",
-    question: "কিভাবে মক টেস্ট শুরু করব?",
-    answer: "মক টেস্ট শুরু করতে প্রথমে ড্যাশবোর্ডে যান, তারপর 'Mock Tests' মেনুতে ক্লিক করুন। আপনার কাঙ্ক্ষিত পরীক্ষাটি নির্বাচন করে 'Start Test' বাটনে ক্লিক করুন।",
-    categoryId: "mock_tests",
-    tags: ["mock_test", "start"],
-    status: "published",
-    order: 1,
-    seo: {
-      slug: "how-to-start-mock-test",
-      metaTitle: "কিভাবে মক টেস্ট শুরু করবেন? | DeshExam",
-      metaDescription: "DeshExam এ কিভাবে সহজেই মক টেস্ট শুরু করবেন তার বিস্তারিত গাইড।",
-      schemaEnabled: true
-    },
-    featured: true,
-    views: 1250,
-    createdAt: new Date("2025-01-10T10:00:00Z").toISOString(),
-    updatedAt: new Date("2025-01-15T10:00:00Z").toISOString()
-  },
-  {
-    id: "faq_2",
-    question: "Pass Pro সাবস্ক্রিপশন এর সুবিধা কি?",
-    answer: "Pass Pro সাবস্ক্রিপশন নিলে আপনি সকল প্রিমিয়াম মক টেস্ট, বিস্তারিত ব্যাখ্যামূলক উত্তরপত্র এবং লিডারবোর্ডে আপনার পারফরম্যান্স এনালাইটিক্স আনলক করতে পারবেন।",
-    categoryId: "subscription",
-    tags: ["pricing", "pro"],
-    status: "published",
-    order: 2,
-    seo: {
-      slug: "benefits-of-pass-pro",
-      schemaEnabled: true
-    },
-    featured: true,
-    views: 890,
-    createdAt: new Date("2025-02-01T10:00:00Z").toISOString(),
-    updatedAt: new Date("2025-02-01T10:00:00Z").toISOString()
-  },
-  {
-    id: "faq_3",
-    question: "How to reset my password?",
-    answer: "Go to the login page and click on 'Forgot Password'. Enter your registered email address and we will send you a reset link.",
-    categoryId: "account",
-    tags: ["password", "login"],
-    status: "published",
-    order: 3,
-    seo: {
-      slug: "how-to-reset-password",
-      schemaEnabled: false
-    },
-    featured: false,
-    views: 450,
-    createdAt: new Date("2025-02-15T10:00:00Z").toISOString(),
-    updatedAt: new Date("2025-02-15T10:00:00Z").toISOString()
-  },
-  {
-    id: "faq_4",
-    question: "Payment failed but money was deducted?",
-    answer: "If your payment failed but the amount was deducted, it will automatically be refunded to your account within 3-5 business days. Contact support if you need immediate assistance.",
-    categoryId: "payments",
-    tags: ["payment", "refund"],
-    status: "published",
-    order: 4,
-    seo: {
-      slug: "payment-failed-money-deducted",
-      schemaEnabled: true
-    },
-    featured: false,
-    views: 1020,
-    createdAt: new Date("2025-03-01T10:00:00Z").toISOString(),
-    updatedAt: new Date("2025-03-01T10:00:00Z").toISOString()
-  },
-  {
-    id: "faq_5",
-    question: "Upcoming features in DeshExam (Draft)",
-    answer: "We are building an AI video generator and smart SEO assistant for academy owners.",
-    categoryId: "general",
-    tags: ["features", "roadmap"],
-    status: "draft",
-    order: 5,
-    seo: {
-      slug: "upcoming-features",
-      schemaEnabled: false
-    },
-    featured: false,
-    views: 0,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  }
-];
-
-// Helper to simulate network delay
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+import { db } from "@/lib/firebase/client";
+import { collection, doc, getDocs, setDoc, addDoc, updateDoc, deleteDoc, writeBatch, query, orderBy } from "firebase/firestore";
+const FAQS_COLLECTION = "faqs";
+const CATEGORIES_COLLECTION = "faq_categories";
+const TAGS_COLLECTION = "faq_tags";
 
 export const getFaqs = async (filters?: FAQFilters): Promise<FAQ[]> => {
-  await delay(600); // Simulate network
+  const q = query(collection(db, FAQS_COLLECTION));
+  const snapshot = await getDocs(q);
   
-  let result = [...faqsDB];
+  let result = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as FAQ));
 
   if (filters) {
     if (filters.search) {
       const s = filters.search.toLowerCase();
       result = result.filter(f => 
-        f.question.toLowerCase().includes(s) || 
-        f.answer.toLowerCase().includes(s) ||
-        f.tags.some(t => t.toLowerCase().includes(s))
+        f.question?.toLowerCase().includes(s) || 
+        f.answer?.toLowerCase().includes(s) ||
+        (f.tags && f.tags.some(t => t.toLowerCase().includes(s)))
       );
     }
     if (filters.categoryId && filters.categoryId !== "all") {
@@ -115,7 +28,7 @@ export const getFaqs = async (filters?: FAQFilters): Promise<FAQ[]> => {
       result = result.filter(f => f.status === filters.status);
     }
     if (filters.tag && filters.tag !== "all") {
-      result = result.filter(f => f.tags.includes(filters.tag!));
+      result = result.filter(f => f.tags && f.tags.includes(filters.tag!));
     }
 
     if (filters.sortBy) {
@@ -127,142 +40,118 @@ export const getFaqs = async (filters?: FAQFilters): Promise<FAQ[]> => {
           result.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
           break;
         case "most_viewed":
-          result.sort((a, b) => b.views - a.views);
+          result.sort((a, b) => (b.views || 0) - (a.views || 0));
           break;
         case "alphabetical":
-          result.sort((a, b) => a.question.localeCompare(b.question));
+          result.sort((a, b) => (a.question || "").localeCompare(b.question || ""));
           break;
       }
     } else {
-        // default sort by order
-        result.sort((a, b) => a.order - b.order);
+        result.sort((a, b) => (a.order || 0) - (b.order || 0));
     }
   } else {
-      result.sort((a, b) => a.order - b.order);
+      result.sort((a, b) => (a.order || 0) - (b.order || 0));
   }
 
   return result;
 };
 
 export const getFaqById = async (id: string): Promise<FAQ | null> => {
-  await delay(400);
-  return faqsDB.find(f => f.id === id) || null;
+  const snapshot = await getDocs(collection(db, FAQS_COLLECTION));
+  const doc = snapshot.docs.find(d => d.id === id);
+  return doc ? ({ id: doc.id, ...doc.data() } as FAQ) : null;
 };
 
 export const createFaq = async (data: CreateFAQDTO): Promise<FAQ> => {
-  await delay(800);
-  const newFaq: FAQ = {
+  const newFaqData = {
     ...data,
-    id: `faq_${Date.now()}`,
     views: 0,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
-  faqsDB.push(newFaq);
-  return newFaq;
+  const docRef = await addDoc(collection(db, FAQS_COLLECTION), newFaqData);
+  return { id: docRef.id, ...newFaqData } as FAQ;
 };
 
 export const bulkCreateFaqs = async (faqs: CreateFAQDTO[]): Promise<FAQ[]> => {
-  await delay(800);
-  const newFaqs: FAQ[] = faqs.map((faq, idx) => ({
-    ...faq,
-    id: `faq_bulk_${Date.now()}_${idx}`,
-    views: 0,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  }));
-  faqsDB.push(...newFaqs);
+  const batch = writeBatch(db);
+  const newFaqs: FAQ[] = [];
+
+  faqs.forEach((faq) => {
+    const docRef = doc(collection(db, FAQS_COLLECTION));
+    const faqData = {
+      ...faq,
+      views: 0,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    batch.set(docRef, faqData);
+    newFaqs.push({ id: docRef.id, ...faqData } as FAQ);
+  });
+
+  await batch.commit();
   return newFaqs;
 };
 
 export const updateFaq = async (id: string, data: UpdateFAQDTO): Promise<FAQ> => {
-  await delay(800);
-  const index = faqsDB.findIndex(f => f.id === id);
-  if (index === -1) throw new Error("FAQ not found");
-
-  faqsDB[index] = {
-    ...faqsDB[index],
+  const faqRef = doc(db, FAQS_COLLECTION, id);
+  const updateData = {
     ...data,
     updatedAt: new Date().toISOString()
   };
-  return faqsDB[index];
+  await updateDoc(faqRef, updateData);
+  return { id, ...updateData } as FAQ;
 };
 
 export const deleteFaq = async (id: string): Promise<boolean> => {
-  await delay(600);
-  faqsDB = faqsDB.filter(f => f.id !== id);
+  await deleteDoc(doc(db, FAQS_COLLECTION, id));
   return true;
 };
 
 export const bulkDeleteFaqs = async (ids: string[]): Promise<boolean> => {
-    await delay(1000);
-    faqsDB = faqsDB.filter(f => !ids.includes(f.id));
-    return true;
+  const batch = writeBatch(db);
+  ids.forEach(id => {
+    batch.delete(doc(db, FAQS_COLLECTION, id));
+  });
+  await batch.commit();
+  return true;
 };
 
 export const reorderFaqs = async (updates: { id: string, order: number }[]): Promise<boolean> => {
-    await delay(500);
-    updates.forEach(update => {
-        const faq = faqsDB.find(f => f.id === update.id);
-        if (faq) {
-            faq.order = update.order;
-        }
-    });
-    return true;
+  const batch = writeBatch(db);
+  updates.forEach(update => {
+    batch.update(doc(db, FAQS_COLLECTION, update.id), { order: update.order });
+  });
+  await batch.commit();
+  return true;
 };
 
-let categoriesDB: FAQCategory[] = [
-  { id: "general", name: "General", slug: "general" },
-  { id: "account", name: "Account & Profile", slug: "account" },
-  { id: "mock_tests", name: "Mock Tests & Quizzes", slug: "mock-tests" },
-  { id: "subscription", name: "Subscriptions & Pass Pro", slug: "subscription" },
-  { id: "payments", name: "Payments & Refunds", slug: "payments" },
-  { id: "materials", name: "Study Materials & Notes", slug: "materials" },
-  { id: "live_classes", name: "Live Classes", slug: "live-classes" },
-  { id: "results", name: "Results & Leaderboards", slug: "results" },
-  { id: "support", name: "Technical Support", slug: "support" }
-];
-
-let tagsDB: FAQTag[] = [
-  { id: "tag_1", name: "login" },
-  { id: "tag_2", name: "password" },
-  { id: "tag_3", name: "refund" },
-  { id: "tag_4", name: "mock_test" },
-  { id: "tag_5", name: "pricing" },
-];
-
 export const getCategories = async (): Promise<FAQCategory[]> => {
-  await delay(300);
-  return [...categoriesDB];
+  const snapshot = await getDocs(collection(db, CATEGORIES_COLLECTION));
+  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as FAQCategory));
 };
 
 export const createCategory = async (data: Omit<FAQCategory, "id">): Promise<FAQCategory> => {
-  await delay(500);
-  const newCat = { ...data, id: `cat_${Date.now()}` };
-  categoriesDB.push(newCat);
-  return newCat;
+  const docRef = await addDoc(collection(db, CATEGORIES_COLLECTION), data);
+  return { id: docRef.id, ...data };
 };
 
 export const deleteCategory = async (id: string): Promise<boolean> => {
-  await delay(400);
-  categoriesDB = categoriesDB.filter(c => c.id !== id);
+  await deleteDoc(doc(db, CATEGORIES_COLLECTION, id));
   return true;
 };
 
 export const getTags = async (): Promise<FAQTag[]> => {
-  await delay(300);
-  return [...tagsDB];
+  const snapshot = await getDocs(collection(db, TAGS_COLLECTION));
+  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as FAQTag));
 };
 
 export const createTag = async (name: string): Promise<FAQTag> => {
-  await delay(500);
-  const newTag = { name, id: `tag_${Date.now()}` };
-  tagsDB.push(newTag);
-  return newTag;
+  const docRef = await addDoc(collection(db, TAGS_COLLECTION), { name });
+  return { id: docRef.id, name };
 };
 
 export const deleteTag = async (id: string): Promise<boolean> => {
-  await delay(400);
-  tagsDB = tagsDB.filter(t => t.id !== id);
+  await deleteDoc(doc(db, TAGS_COLLECTION, id));
   return true;
 };
