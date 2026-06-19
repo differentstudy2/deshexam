@@ -162,6 +162,19 @@ export const createFaq = async (data: CreateFAQDTO): Promise<FAQ> => {
   return newFaq;
 };
 
+export const bulkCreateFaqs = async (faqs: CreateFAQDTO[]): Promise<FAQ[]> => {
+  await delay(800);
+  const newFaqs: FAQ[] = faqs.map((faq, idx) => ({
+    ...faq,
+    id: `faq_bulk_${Date.now()}_${idx}`,
+    views: 0,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  }));
+  faqsDB.push(...newFaqs);
+  return newFaqs;
+};
+
 export const updateFaq = async (id: string, data: UpdateFAQDTO): Promise<FAQ> => {
   await delay(800);
   const index = faqsDB.findIndex(f => f.id === id);

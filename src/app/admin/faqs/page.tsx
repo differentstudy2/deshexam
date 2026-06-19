@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { FAQ, FAQFilters } from "@/features/faqs/types/faq.types";
-import { getFaqs, deleteFaq, bulkDeleteFaqs } from "@/features/faqs/services/faq.api";
+import { FAQ, FAQFilters, FAQCategory } from "@/features/faqs/types/faq.types";
+import { getFaqs, deleteFaq, bulkDeleteFaqs, getCategories } from "@/features/faqs/services/faq.api";
 import { FAQFiltersBar } from "@/features/faqs/components/filters";
 import { FAQTable } from "@/features/faqs/components/faq-table";
+import { BulkImportDialog } from "@/features/faqs/components/bulk-import-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash2 } from "lucide-react";
@@ -13,6 +14,7 @@ import Link from "next/link";
 export default function FAQManagePage() {
   const { toast } = useToast();
   const [faqs, setFaqs] = useState<FAQ[]>([]);
+  const [categories, setCategories] = useState<FAQCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [filters, setFilters] = useState<FAQFilters>({ sortBy: "latest" });
@@ -40,6 +42,7 @@ export default function FAQManagePage() {
 
   useEffect(() => {
     fetchFaqs();
+    getCategories().then(setCategories).catch(console.error);
   }, [fetchFaqs]);
 
   const handleDelete = async (id: string) => {
@@ -89,6 +92,7 @@ export default function FAQManagePage() {
               <Trash2 className="w-4 h-4 mr-2" /> Delete Selected ({selectedIds.length})
             </Button>
           )}
+          <BulkImportDialog categories={categories} onImportComplete={fetchFaqs} />
           <Link href="/admin/faqs/settings">
             <Button variant="outline">
               Settings
