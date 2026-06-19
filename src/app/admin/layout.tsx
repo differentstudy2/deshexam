@@ -84,6 +84,10 @@ export default function AdminLayout({
     return "Admin Dashboard";
   };
 
+  useEffect(() => {
+    document.title = `${getPageName()} | DeshExam Admin`;
+  }, [pathname]);
+
   if (verifying) {
     return (
       <div className="flex h-screen items-center justify-center">
