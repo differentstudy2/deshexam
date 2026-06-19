@@ -17,13 +17,11 @@ import { Loader2 } from 'lucide-react';
 
 
 
+
 export default function SingleFAQPage() {
     const params = useParams();
-    
     const router = useRouter();
-    // Unwrap params using React.use() to fix Next.js 15 warning
-    const unwrappedParams = use(params as any) as { id: string };
-    const id = unwrappedParams.id;
+    const id = params?.id as string;
 
     const [faq, setFaq] = useState<FAQ | null>(null);
     const [categoriesData, setCategoriesData] = useState<FAQCategory[]>([]);
