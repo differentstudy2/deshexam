@@ -14,6 +14,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const resolvedParams = await params;
   const decodedSlug = decodeURIComponent(resolvedParams.slug);
   const item = decodedSlug === 'test' 
     ? { title: 'Advanced Audio Engineering Techniques & Masterclass', description: 'A comprehensive masterclass on modern audio production.', seoTitle: 'Audio Masterclass | DeshExam', seoDescription: 'Learn from industry veterans about compression and EQ.' }
@@ -98,8 +99,41 @@ export default async function AudioSinglePage({ params }: { params: Promise<{ sl
   // For Accordion default value, find which category the current audio is in
   const currentCategory = item.audioType || 'General Audio';
 
+  // Construct JSON-LD Schema
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'AudioObject',
+    name: item.title,
+    description: item.seoDescription || item.shortDescription || item.description,
+    contentUrl: item.audioUrl || item.url,
+    duration: item.duration ? `PT${item.duration.replace(':', 'M')}S` : undefined, // basic conversion assuming MM:SS
+    encodingFormat: 'audio/mpeg',
+    thumbnailUrl: item.featureImage || item.thumbnail,
+    uploadDate: item.createdAt instanceof Date ? item.createdAt.toISOString() : (item.createdAt?.toMillis ? new Date(item.createdAt.toMillis()).toISOString() : new Date().toISOString()),
+    author: {
+      '@type': 'Person',
+      name: authorName,
+      image: authorAvatar,
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'DeshExam',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://deshexam.com/logo.png' // Replace with actual logo URL
+      }
+    }
+  };
+
   return (
     <div className="bg-slate-50 dark:bg-slate-950 min-h-screen pb-12">
+      {/* Inject Structured Data */}
+      {item.schemaEnabled !== false && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      )}
       <div className="max-w-[1400px] mx-auto px-4 py-6">
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
