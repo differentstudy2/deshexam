@@ -208,3 +208,28 @@ export const deleteTag = async (id: string): Promise<boolean> => {
   await deleteDoc(doc(db, TAGS_COLLECTION, id));
   return true;
 };
+
+export const fixLegacyCategoryIds = async (): Promise<boolean> => {
+  const catsSnap = await getDocs(collection(db, CATEGORIES_COLLECTION));
+  const faqsSnap = await getDocs(collection(db, FAQS_COLLECTION));
+  
+  for (const catDoc of catsSnap.docs) {
+    const data = catDoc.data();
+    const oldId = catDoc.id;
+    const slug = data.slug;
+    
+    if (slug && oldId !== slug) {
+      await setDoc(doc(db, CATEGORIES_COLLECTION, slug), data);
+      
+      const batch = writeBatch(db);
+      faqsSnap.docs.forEach(faqDoc => {
+        if (faqDoc.data().categoryId === oldId) {
+          batch.update(doc(db, FAQS_COLLECTION, faqDoc.id), { categoryId: slug });
+        }
+      });
+      await batch.commit();
+      await deleteDoc(doc(db, CATEGORIES_COLLECTION, oldId));
+    }
+  }
+  return true;
+};

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { FAQCategory, FAQTag } from "@/features/faqs/types/faq.types";
-import { getCategories, createCategory, deleteCategory, getTags, createTag, deleteTag } from "@/features/faqs/services/faq.api";
+import { getCategories, createCategory, deleteCategory, getTags, createTag, deleteTag, fixLegacyCategoryIds } from "@/features/faqs/services/faq.api";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -130,6 +130,20 @@ export default function FAQSettingsPage() {
       fetchData(); // Revert on fail
     }
   };
+  const handleFixCategoryIds = async () => {
+    if (!confirm("This will migrate all ugly random category IDs to clean slugs. Proceed?")) return;
+    try {
+      setIsAddingCat(true);
+      await fixLegacyCategoryIds();
+      await fetchData(); // Reload everything since IDs changed
+      toast({ title: "Success", description: "All category IDs have been updated to clean slugs!" });
+    } catch (err) {
+      toast({ variant: "destructive", title: "Error", description: "Failed to fix category IDs." });
+    } finally {
+      setIsAddingCat(false);
+    }
+  };
+
 
   return (
     <div className="space-y-6 max-w-[1200px]">
@@ -146,9 +160,14 @@ export default function FAQSettingsPage() {
               <CardTitle>Categories</CardTitle>
               <CardDescription>Manage the main categories for your FAQs.</CardDescription>
             </div>
-            <Button variant="outline" size="sm" onClick={handleSeedCategories} disabled={isAddingCat} className="text-indigo-600 border-indigo-200 hover:bg-indigo-50">
-              Auto-Seed Default
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={handleFixCategoryIds} disabled={isAddingCat} className="text-amber-600 border-amber-200 hover:bg-amber-50">
+                Fix Legacy IDs
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleSeedCategories} disabled={isAddingCat} className="text-indigo-600 border-indigo-200 hover:bg-indigo-50">
+                Auto-Seed Default
+              </Button>
+            </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <form onSubmit={handleAddCategory} className="flex gap-2">
