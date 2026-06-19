@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { Brain, MonitorCheck, LineChart, BookOpen, Languages, Zap } from "lucide-react";
+import { Brain, MonitorCheck, LineChart, BookOpen, Languages, Zap, Trophy, FileSearch } from "lucide-react";
 
 export function WhyChooseUs() {
   const features = [
@@ -44,6 +44,20 @@ export function WhyChooseUs() {
       icon: Zap,
       color: "text-[#0ea5e9]",
       bg: "bg-[#0ea5e9]/10"
+    },
+    {
+      title: "All-India Ranking",
+      description: "Compete with thousands of students nationwide and see where you stand with dynamic leaderboards.",
+      icon: Trophy,
+      color: "text-[#f43f5e]",
+      bg: "bg-[#f43f5e]/10"
+    },
+    {
+      title: "Detailed Solutions",
+      description: "Review comprehensive, step-by-step explanations for every single question after you finish a mock test.",
+      icon: FileSearch,
+      color: "text-[#10b981]",
+      bg: "bg-[#10b981]/10"
     }
   ];
 
@@ -59,7 +73,7 @@ export function WhyChooseUs() {
             </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((feature, idx) => (
                 <Card key={idx} className="bg-white p-8 border-[#E2E8F0] shadow-sm hover:shadow-lg transition-all duration-300">
                     <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-6 ${feature.bg} ${feature.color}`}>
