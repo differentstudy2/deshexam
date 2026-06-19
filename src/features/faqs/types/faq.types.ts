@@ -22,6 +22,8 @@ export interface FAQ {
 
   featured: boolean;
   views: number;
+  helpfulVotes?: number;
+  unhelpfulVotes?: number;
 
   createdAt: string | Date;
   updatedAt: string | Date;

@@ -2,13 +2,13 @@
 
 import Link from 'next/link';
 import { 
-    Search, Folder, Globe, Copy, Printer, Calendar, Clock, Eye, User, 
+    Search, Check, Folder, Globe, Copy, Printer, Calendar, Clock, Eye, User, 
     ThumbsUp, ThumbsDown, Mail, HelpCircle, List 
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState, use } from 'react';
-import { getFaqBySlugOrId, getFaqs, getCategories } from '@/features/faqs/services/faq.api';
+import { getFaqBySlugOrId, getFaqs, getCategories, getTags, updateFaq } from '@/features/faqs/services/faq.api';
 import { FAQ, FAQCategory } from '@/features/faqs/types/faq.types';
 import { Loader2 } from 'lucide-react';
 
@@ -27,6 +27,8 @@ export default function SingleFAQPage() {
     const [categoriesData, setCategoriesData] = useState<FAQCategory[]>([]);
     const [relatedFaqsList, setRelatedFaqsList] = useState<FAQ[]>([]);
     const [loading, setLoading] = useState(true);
+    const [copied, setCopied] = useState(false);
+    const [hasVoted, setHasVoted] = useState(false);
 
     useEffect(() => {
         if (!id) return;
@@ -57,6 +59,35 @@ export default function SingleFAQPage() {
         return <div className="min-h-screen flex items-center justify-center bg-[#f8f9fa]"><Loader2 className="w-8 h-8 animate-spin text-[#0ea5e9]" /></div>;
     }
 
+    const handleCopyLink = () => {
+        navigator.clipboard.writeText(window.location.href);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+
+    const handlePrint = () => {
+        window.print();
+    };
+
+    const handleVote = async (type: 'yes' | 'no') => {
+        if (!faq || hasVoted) return;
+        setHasVoted(true);
+        
+        try {
+            const currentHelpful = faq.helpfulVotes || 0;
+            const currentUnhelpful = faq.unhelpfulVotes || 0;
+            
+            const updates = {
+                helpfulVotes: type === 'yes' ? currentHelpful + 1 : currentHelpful,
+                unhelpfulVotes: type === 'no' ? currentUnhelpful + 1 : currentUnhelpful
+            };
+            
+            setFaq({ ...faq, ...updates });
+            await updateFaq(faq.id, updates);
+        } catch (error) {
+            console.error("Failed to vote:", error);
+        }
+    };
 
     return (
         <div className="min-h-screen bg-[#f8f9fa] font-sans">
@@ -65,17 +96,17 @@ export default function SingleFAQPage() {
             <div className="bg-white border-b border-slate-200">
                 <div className="container mx-auto px-4 h-14 flex items-center justify-between text-sm">
                     <div className="flex items-center gap-3 sm:gap-4">
-                        <div className="font-bold text-slate-800 text-[15px]">প্রশ্ন করুন</div>
+                        <div className="font-bold text-slate-800 text-[15px]">FAQ</div>
                         <div className="w-[1px] h-4 bg-slate-200 hidden sm:block"></div>
                         <div className="text-slate-500 font-medium text-[13px] hidden sm:block">
-                            <Link href="/" className="hover:text-slate-800">হোম</Link> <span className="mx-1.5 text-slate-300">›</span> 
-                            <Link href="/faq" className="hover:text-slate-800">প্রশ্ন করুন</Link> <span className="mx-1.5 text-slate-300">›</span> 
+                            <Link href="/" className="hover:text-slate-800">Home</Link> <span className="mx-1.5 text-slate-300">›</span> 
+                            <Link href="/faq" className="hover:text-slate-800">FAQ</Link> <span className="mx-1.5 text-slate-300">›</span> 
                             <span className="text-slate-800 font-semibold truncate max-w-[200px] sm:max-w-[300px] inline-block align-bottom">{faq.question.substring(0, 20)}...</span>
                         </div>
                     </div>
                     <div>
                         <Link href="/faq" className="inline-flex items-center justify-center px-5 py-1.5 bg-green-100 hover:bg-green-200 text-green-800 text-[13px] font-bold rounded transition-colors">
-                            পিছনে
+                            Back
                         </Link>
                     </div>
                 </div>
@@ -98,19 +129,19 @@ export default function SingleFAQPage() {
                             <div className="flex flex-wrap items-center gap-y-3 gap-x-6 text-[#737373] text-[14px] font-medium mb-8 pb-6 border-b border-slate-100">
                                 <div className="flex items-center gap-2.5">
                                     <img src="https://picsum.photos/seed/raju/32/32" alt="Author" className="w-6 h-6 rounded-full mb-0" />
-                                    <span>লেখক: Najjar Hossain Raju</span>
+                                    <span>Author: Najjar Hossain Raju</span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <Calendar className="w-[18px] h-[18px]" />
-                                    <span>প্রকাশিত: {faq.createdAt ? (typeof (faq.createdAt as any).toDate === 'function' ? (faq.createdAt as any).toDate().toLocaleDateString() : new Date(faq.createdAt as any).toLocaleDateString()) : 'Recent'}</span>
+                                    <span>Published: {faq.createdAt ? (typeof (faq.createdAt as any).toDate === 'function' ? (faq.createdAt as any).toDate().toLocaleDateString() : new Date(faq.createdAt as any).toLocaleDateString()) : 'Recent'}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <Clock className="w-[18px] h-[18px]" />
-                                    <span>আপডেট: {faq.updatedAt ? (typeof (faq.updatedAt as any).toDate === 'function' ? (faq.updatedAt as any).toDate().toLocaleDateString() : new Date(faq.updatedAt as any).toLocaleDateString()) : 'Recent'}</span>
+                                    <span>Updated: {faq.updatedAt ? (typeof (faq.updatedAt as any).toDate === 'function' ? (faq.updatedAt as any).toDate().toLocaleDateString() : new Date(faq.updatedAt as any).toLocaleDateString()) : 'Recent'}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <Eye className="w-[18px] h-[18px]" />
-                                    <span>দেখা হয়েছে: {faq.views || 0} বার</span>
+                                    <span>Views: {faq.views || 0}</span>
                                 </div>
                             </div>
 
@@ -118,7 +149,7 @@ export default function SingleFAQPage() {
                             <div className="mt-4">
                                 {/* Tab */}
                                 <div className="inline-flex items-center gap-1.5 border border-slate-200 border-b-transparent bg-white px-5 py-2.5 rounded-t-md relative top-[1px] z-10 text-sm font-semibold text-slate-600">
-                                    <Globe className="w-4 h-4 text-slate-500" /> ওয়েব প্ল্যাটফর্ম
+                                    <Globe className="w-4 h-4 text-slate-500" /> Information
                                 </div>
                                 {/* Content Box */}
                                 <div className="bg-[#f8f9fa] border border-slate-200 rounded-b-md rounded-tr-md p-5 sm:p-6 mb-6">
@@ -128,11 +159,11 @@ export default function SingleFAQPage() {
                                 </div>
                                 {/* Action Buttons */}
                                 <div className="flex justify-end gap-3">
-                                    <button className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-green-500 hover:bg-green-600 text-white text-sm font-bold rounded transition-colors">
-                                        <Copy className="w-4 h-4" /> লিংক কপি
+                                    <button onClick={handleCopyLink} className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-green-500 hover:bg-green-600 text-white text-sm font-bold rounded transition-colors">
+                                        {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />} {copied ? 'Copied!' : 'Copy Link'}
                                     </button>
-                                    <button className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm font-bold rounded transition-colors">
-                                        <Printer className="w-4 h-4" /> প্রিন্ট করুন
+                                    <button onClick={handlePrint} className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm font-bold rounded transition-colors">
+                                        <Printer className="w-4 h-4" /> Print
                                     </button>
                                 </div>
                             </div>
@@ -141,7 +172,7 @@ export default function SingleFAQPage() {
                         {/* Related FAQs Section */}
                         <div>
                             <div className="flex items-center gap-2 mb-4 text-slate-800 font-bold text-[17px]">
-                                <HelpCircle className="w-5 h-5 text-slate-400" /> সংশ্লিষ্ট FAQ
+                                <HelpCircle className="w-5 h-5 text-slate-400" /> Related FAQs
                             </div>
                             
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -171,10 +202,10 @@ export default function SingleFAQPage() {
                         {/* Categories Widget */}
                         <div className="bg-white rounded-md border border-slate-200 overflow-hidden">
                             <div className="bg-slate-900 px-4 py-3 text-white font-bold text-sm flex items-center gap-2">
-                                <List className="w-4 h-4" /> ক্যাটাগরি
+                                <List className="w-4 h-4" /> Categories
                             </div>
                             <div className="flex flex-col text-[13px] font-medium p-2">
-                                {[{id: 'all', name: 'সকল FAQ'}, ...categoriesData].map((cat, index, arr) => {
+                                {[{id: 'all', name: 'All FAQs'}, ...categoriesData].map((cat, index, arr) => {
                                     const linkHref = "/faq?category=" + cat.id;
                                     return (
                                         <Link 
@@ -197,16 +228,16 @@ export default function SingleFAQPage() {
                         <div className="bg-white rounded-md border border-slate-200 overflow-hidden">
                             <div className="bg-slate-900 px-4 py-3 text-white font-bold text-sm flex items-center gap-2">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
-                                পরিসংখ্যান
+                                Statistics
                             </div>
                             <div className="p-6 flex items-center justify-between text-center divide-x divide-slate-100">
                                 <div className="flex-1">
                                     <div className="text-2xl font-bold text-blue-500 mb-1">{faq.views || 0}</div>
-                                    <div className="text-[12px] font-bold text-slate-400 uppercase tracking-wide">ভিউ</div>
+                                    <div className="text-[12px] font-bold text-slate-400 uppercase tracking-wide">Views</div>
                                 </div>
                                 <div className="flex-1">
-                                    <div className="text-2xl font-bold text-emerald-500 mb-1">0</div>
-                                    <div className="text-[12px] font-bold text-slate-400 uppercase tracking-wide">সহায়ক ভোট</div>
+                                    <div className="text-2xl font-bold text-emerald-500 mb-1">{faq.helpfulVotes || 0}</div>
+                                    <div className="text-[12px] font-bold text-slate-400 uppercase tracking-wide">Helpful Votes</div>
                                 </div>
                             </div>
                         </div>
@@ -214,19 +245,19 @@ export default function SingleFAQPage() {
                         {/* Helpful Widget */}
                         <div className="bg-white rounded-md border border-slate-200 overflow-hidden">
                             <div className="bg-slate-900 px-4 py-3 text-white font-bold text-sm flex items-center gap-2">
-                                <ThumbsUp className="w-4 h-4" /> এই FAQ টি কি সহায়ক?
+                                <ThumbsUp className="w-4 h-4" /> Was this FAQ helpful?
                             </div>
                             <div className="p-6 text-center">
                                 <div className="flex items-center justify-center gap-4 mb-4">
-                                    <button className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-2 rounded text-sm font-bold transition-colors">
-                                        <ThumbsUp className="w-4 h-4" /> হ্যাঁ
+                                    <button onClick={() => handleVote('yes')} disabled={hasVoted} className={cn("flex items-center gap-2 px-6 py-2 rounded text-sm font-bold transition-colors", hasVoted ? "bg-slate-200 text-slate-400 cursor-not-allowed" : "bg-emerald-500 hover:bg-emerald-600 text-white")}>
+                                        <ThumbsUp className="w-4 h-4" /> Yes
                                     </button>
-                                    <button className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded text-sm font-bold transition-colors">
-                                        <ThumbsDown className="w-4 h-4" /> না
+                                    <button onClick={() => handleVote('no')} disabled={hasVoted} className={cn("flex items-center gap-2 px-6 py-2 rounded text-sm font-bold transition-colors", hasVoted ? "bg-slate-200 text-slate-400 cursor-not-allowed" : "bg-red-500 hover:bg-red-600 text-white")}>
+                                        <ThumbsDown className="w-4 h-4" /> No
                                     </button>
                                 </div>
                                 <p className="text-[12px] font-medium text-slate-400 leading-snug">
-                                    আপনার মতামত আমাদের উন্নতিতে সাহায্য করবে
+                                    {hasVoted ? "Thank you for your feedback!" : "Your feedback helps us improve"}
                                 </p>
                             </div>
                         </div>
@@ -234,18 +265,18 @@ export default function SingleFAQPage() {
                         {/* Need More Help Widget */}
                         <div className="bg-white rounded-md border border-slate-200 overflow-hidden">
                             <div className="bg-slate-900 px-4 py-3 text-white font-bold text-sm flex items-center gap-2">
-                                <HelpCircle className="w-4 h-4" /> আরও সাহায্য প্রয়োজন?
+                                <HelpCircle className="w-4 h-4" /> Need More Help?
                             </div>
                             <div className="p-6 text-center">
                                 <p className="text-[13px] font-medium text-slate-500 leading-relaxed mb-6">
-                                    এই FAQ আপনার সমস্যার সমাধান করতে পারেনি? আমাদের সাপোর্ট টিমের সাথে যোগাযোগ করুন।
+                                    Did this FAQ not solve your issue? Contact our support team.
                                 </p>
                                 <div className="space-y-3">
                                     <button className="w-full flex items-center justify-center gap-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-4 py-2.5 rounded text-[13px] font-bold transition-colors">
-                                        <Mail className="w-4 h-4" /> সাপোর্ট যোগাযোগ
+                                        <Mail className="w-4 h-4" /> Contact Support
                                     </button>
                                     <button className="w-full flex items-center justify-center gap-2 text-slate-500 hover:text-slate-800 px-4 py-2 rounded text-[13px] font-bold transition-colors">
-                                        <HelpCircle className="w-4 h-4" /> নতুন প্রশ্ন জিজ্ঞাসা
+                                        <HelpCircle className="w-4 h-4" /> Ask a New Question
                                     </button>
                                 </div>
                             </div>

@@ -51,9 +51,12 @@ export default function FAQPage() {
     });
 
     const recentFaqsList = [...faqs].sort((a, b) => {
-        const aTime = a.createdAt?.toMillis ? a.createdAt.toMillis() : Date.now();
-        const bTime = b.createdAt?.toMillis ? b.createdAt.toMillis() : Date.now();
-        return bTime - aTime;
+        const getMillis = (date: any) => {
+            if (!date) return Date.now();
+            if (typeof date.toMillis === 'function') return date.toMillis();
+            return new Date(date).getTime() || Date.now();
+        };
+        return getMillis(b.createdAt) - getMillis(a.createdAt);
     }).slice(0, 5);
 
     if (loading) {
@@ -122,7 +125,7 @@ export default function FAQPage() {
                                 <List className="w-4 h-4" /> ক্যাটাগরি
                             </div>
                             <div className="flex flex-col text-sm font-medium">
-                                {[{id: 'all', name: 'সকল FAQ'}, ...categoriesData].map((cat, index) => {
+                                {[{id: 'all', name: 'সকল FAQ'}, ...categoriesData].map((cat, index, arr) => {
                                     const isActive = activeCategory === cat.id;
                                     return (
                                         <button 
@@ -133,7 +136,7 @@ export default function FAQPage() {
                                                 isActive 
                                                     ? "bg-slate-100 text-slate-900 border-slate-300" 
                                                     : "bg-white text-slate-600 border-transparent hover:bg-slate-50",
-                                                index !== categories.length - 1 && "border-b border-b-slate-100"
+                                                index !== arr.length - 1 && "border-b border-b-slate-100"
                                             )}
                                         >
                                             <span className="text-slate-400"><Folder className="w-4 h-4" /></span>
@@ -150,10 +153,10 @@ export default function FAQPage() {
                                 <Clock className="w-4 h-4" /> সাম্প্রতিক FAQ
                             </div>
                             <div className="flex flex-col">
-                                {recentFaqsList.map((faq, index) => (
+                                {recentFaqsList.map((faq, index, arr) => (
                                     <div key={index} className={cn(
                                         "p-4 hover:bg-slate-50 cursor-pointer transition-colors",
-                                        index !== recentFaqs.length - 1 && "border-b border-slate-100"
+                                        index !== arr.length - 1 && "border-b border-slate-100"
                                     )}>
                                         <h4 className="text-[13px] font-bold text-slate-800 leading-tight mb-1.5">{faq.question}</h4>
                                         <p className="text-[12px] text-slate-400 leading-snug line-clamp-2">{faq.answer}</p>
