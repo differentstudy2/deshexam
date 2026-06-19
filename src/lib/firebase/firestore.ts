@@ -1689,7 +1689,7 @@ export const updateSettings = async (data: any) => {
     }
 }
 
-export const addContactMessage = async (data: { name: string; email: string; subject: string; message: string; }) => {
+export const addContactMessage = async (data: { name: string; email: string; phone?: string; category?: string; subject: string; message: string; }) => {
     try {
         await addDoc(collection(db, "contactMessages"), {
             ...data,
