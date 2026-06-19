@@ -122,6 +122,7 @@ export default function FAQManagePage() {
 
       <FAQTable 
         data={faqs} 
+        categories={categories}
         loading={loading} 
         onDelete={handleDelete}
         selectedIds={selectedIds}

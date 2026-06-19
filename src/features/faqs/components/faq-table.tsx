@@ -11,6 +11,7 @@ import { format } from "date-fns";
 
 interface FAQTableProps {
   data: FAQ[];
+  categories: import("../types/faq.types").FAQCategory[];
   loading: boolean;
   onDelete: (id: string) => void;
   selectedIds: string[];
@@ -18,7 +19,7 @@ interface FAQTableProps {
   onSelectAll: (checked: boolean) => void;
 }
 
-export const FAQTable = ({ data, loading, onDelete, selectedIds, onSelect, onSelectAll }: FAQTableProps) => {
+export const FAQTable = ({ data, categories, loading, onDelete, selectedIds, onSelect, onSelectAll }: FAQTableProps) => {
   const allSelected = data.length > 0 && selectedIds.length === data.length;
 
   if (loading) {
@@ -89,7 +90,7 @@ export const FAQTable = ({ data, loading, onDelete, selectedIds, onSelect, onSel
               </TableCell>
               <TableCell>
                 <Badge variant="outline" className="capitalize bg-muted font-medium">
-                  {faq.categoryId.replace('_', ' ')}
+                  {categories.find(c => c.id === faq.categoryId)?.name || faq.categoryId.replace('_', ' ')}
                 </Badge>
               </TableCell>
               <TableCell>
