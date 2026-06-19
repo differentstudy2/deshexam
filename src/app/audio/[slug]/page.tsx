@@ -48,6 +48,7 @@ export default async function AudioSinglePage({ params }: { params: Promise<{ sl
       shortDescription: 'A comprehensive masterclass on modern audio production.',
       audioType: 'Masterclass',
       isPremium: true,
+      previewDuration: 10,
       boardId: 'CBSE',
       classId: 'Class 12',
       subjectId: 'Physics',
@@ -195,6 +196,7 @@ export default async function AudioSinglePage({ params }: { params: Promise<{ sl
                 audioUrl={item.audioUrl || item.url}
                 allowDownload={item.allowDownload}
                 isPremium={item.isPremium}
+                previewDuration={item.previewDuration}
               />
             </div>
 
