@@ -1,7 +1,7 @@
 import { FAQ, FAQFilters, CreateFAQDTO, UpdateFAQDTO, FAQCategory, FAQTag } from '../types/faq.types';
 
 import { db } from "@/lib/firebase/client";
-import { collection, doc, getDocs, setDoc, addDoc, updateDoc, deleteDoc, writeBatch, query, orderBy } from "firebase/firestore";
+import { collection, doc, getDocs, setDoc, addDoc, updateDoc, deleteDoc, writeBatch, query, orderBy, increment } from "firebase/firestore";
 const FAQS_COLLECTION = "faqs";
 const CATEGORIES_COLLECTION = "faq_categories";
 const TAGS_COLLECTION = "faq_tags";
@@ -129,6 +129,33 @@ export const bulkDeleteFaqs = async (ids: string[]): Promise<boolean> => {
   ids.forEach(id => {
     batch.delete(doc(db, FAQS_COLLECTION, id));
   });
+  await batch.commit();
+  return true;
+};
+
+export const bulkUpdateFaqs = async (ids: string[], data: UpdateFAQDTO): Promise<boolean> => {
+  if (ids.length === 0) return false;
+  
+  const batch = writeBatch(db);
+  const updateData: Record<string, any> = {
+    ...data,
+    updatedAt: new Date().toISOString()
+  };
+
+  if (typeof data.views === "number") {
+    updateData.views = increment(data.views);
+  }
+  if (typeof data.helpfulVotes === "number") {
+    updateData.helpfulVotes = increment(data.helpfulVotes);
+  }
+  if (typeof data.unhelpfulVotes === "number") {
+    updateData.unhelpfulVotes = increment(data.unhelpfulVotes);
+  }
+
+  ids.forEach(id => {
+    batch.update(doc(db, FAQS_COLLECTION, id), updateData);
+  });
+  
   await batch.commit();
   return true;
 };

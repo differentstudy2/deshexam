@@ -6,6 +6,7 @@ import { getFaqs, deleteFaq, bulkDeleteFaqs, getCategories } from "@/features/fa
 import { FAQFiltersBar } from "@/features/faqs/components/filters";
 import { FAQTable } from "@/features/faqs/components/faq-table";
 import { BulkImportDialog } from "@/features/faqs/components/bulk-import-dialog";
+import { BulkUpdateDialog } from "@/features/faqs/components/bulk-update-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash2, Upload, Settings } from "lucide-react";
@@ -89,9 +90,16 @@ export default function FAQManagePage() {
         {/* Desktop Actions */}
         <div className="hidden md:flex items-center gap-3">
           {selectedIds.length > 0 && (
-            <Button variant="destructive" onClick={handleBulkDelete}>
-              <Trash2 className="w-4 h-4 mr-2" /> Delete Selected ({selectedIds.length})
-            </Button>
+            <>
+              <Button variant="destructive" onClick={handleBulkDelete}>
+                <Trash2 className="w-4 h-4 mr-2" /> Delete Selected ({selectedIds.length})
+              </Button>
+              <BulkUpdateDialog 
+                selectedIds={selectedIds} 
+                categories={categories} 
+                onUpdateComplete={fetchFaqs} 
+              />
+            </>
           )}
           <BulkImportDialog categories={categories} onImportComplete={fetchFaqs} />
           <Link href="/admin/faqs/settings">
