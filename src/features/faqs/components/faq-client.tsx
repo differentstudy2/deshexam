@@ -62,8 +62,9 @@ export function FAQClient({ initialFaqs, categoriesData }: FAQClientProps) {
         return getMillis(b.createdAt) - getMillis(a.createdAt);
     }).slice(0, 5);
 
-    const handleCopyLink = () => {
-        navigator.clipboard.writeText(window.location.href);
+    const handleCopyLink = (faqLink: string) => {
+        const fullUrl = `${window.location.origin}/faqs/${faqLink}`;
+        navigator.clipboard.writeText(fullUrl);
         toast({
             description: (
                 <div className="flex items-center gap-2">
@@ -98,7 +99,7 @@ export function FAQClient({ initialFaqs, categoriesData }: FAQClientProps) {
                         
                         {/* Search Panel */}
                         <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden transition-colors">
-                            <div className="bg-[#0ea5e9] px-4 py-3 text-white font-bold text-sm flex items-center gap-2">
+                            <div className="bg-[#0ea5e9] dark:bg-[#0284c7] px-4 py-3 text-white dark:text-slate-100 font-bold text-sm flex items-center gap-2 border-b-0 dark:border-b dark:border-[#0284c7]/50">
                                 <Search className="w-4 h-4" /> Search FAQs
                             </div>
                             <div className="p-4">
@@ -119,7 +120,7 @@ export function FAQClient({ initialFaqs, categoriesData }: FAQClientProps) {
 
                         {/* Categories Panel */}
                         <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden transition-colors">
-                            <div className="bg-[#0ea5e9] px-4 py-3 text-white font-bold text-sm flex items-center gap-2">
+                            <div className="bg-[#0ea5e9] dark:bg-[#0284c7] px-4 py-3 text-white dark:text-slate-100 font-bold text-sm flex items-center gap-2 border-b-0 dark:border-b dark:border-[#0284c7]/50">
                                 <List className="w-4 h-4" /> Categories
                             </div>
                             <div className="flex flex-col text-sm font-medium">
@@ -147,7 +148,7 @@ export function FAQClient({ initialFaqs, categoriesData }: FAQClientProps) {
 
                         {/* Recent FAQs Panel */}
                         <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden transition-colors">
-                            <div className="bg-[#0ea5e9] px-4 py-3 text-white font-bold text-sm flex items-center gap-2">
+                            <div className="bg-[#0ea5e9] dark:bg-[#0284c7] px-4 py-3 text-white dark:text-slate-100 font-bold text-sm flex items-center gap-2 border-b-0 dark:border-b dark:border-[#0284c7]/50">
                                 <Clock className="w-4 h-4" /> Recent FAQs
                             </div>
                             <div className="flex flex-col">
@@ -168,14 +169,14 @@ export function FAQClient({ initialFaqs, categoriesData }: FAQClientProps) {
                     <div className="flex-1 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-6 transition-colors">
                         
                         {/* Header */}
-                        <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800 mb-6">
-                            <h2 className="text-[17px] font-bold text-slate-800 dark:text-slate-200">All FAQs ({filteredFaqs.length})</h2>
+                        <div className="flex items-center justify-between bg-[#0ea5e9] dark:bg-[#0284c7] px-5 py-3.5 rounded-md mb-6 shadow-sm">
+                            <h2 className="text-[16px] font-bold text-white dark:text-slate-100">All FAQs ({filteredFaqs.length})</h2>
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <button className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-800 dark:text-slate-200 px-3 py-1.5 rounded text-[14px] font-semibold border border-slate-200 dark:border-slate-700 outline-none">
-                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>
+                                    <button className="flex items-center gap-2 bg-white/20 hover:bg-white/30 dark:bg-slate-900/40 dark:hover:bg-slate-900/60 transition-colors text-white px-3 py-1.5 rounded text-[13px] font-semibold border border-white/10 outline-none">
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-white/80"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>
                                         Sort by
-                                        <ChevronDown className="w-4 h-4 ml-1 text-black" />
+                                        <ChevronDown className="w-4 h-4 ml-1 text-white" />
                                     </button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end" className="w-40 font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-1">
@@ -202,7 +203,7 @@ export function FAQClient({ initialFaqs, categoriesData }: FAQClientProps) {
                                             expandedFaq === faq.id ? "bg-blue-50 dark:bg-blue-900/20" : "hover:bg-slate-100 dark:hover:bg-slate-800"
                                         )}
                                     >
-                                        <div className="w-8 h-8 rounded-md bg-[#0ea5e9] text-white flex items-center justify-center font-bold text-[13px] shrink-0">
+                                        <div className="w-8 h-8 rounded-md bg-[#0ea5e9] dark:bg-[#0284c7] text-white flex items-center justify-center font-bold text-[13px] shrink-0">
                                             {displayIndex < 10 ? `0${displayIndex}` : displayIndex}
                                         </div>
                                         <h3 className="flex-1 text-[14px] font-semibold text-slate-800 dark:text-slate-200">
@@ -226,7 +227,7 @@ export function FAQClient({ initialFaqs, categoriesData }: FAQClientProps) {
                                     {expandedFaq === faq.id && (
                                         <div className="p-4 bg-slate-50 dark:bg-transparent">
                                             {/* Tab */}
-                                            <div className="inline-flex items-center gap-1.5 border border-slate-200 border-b-transparent bg-slate-50 px-4 py-2 rounded-t-md relative top-[1px] z-10 text-sm font-medium text-slate-600 dark:text-slate-400">
+                                            <div className="inline-flex items-center gap-1.5 border border-slate-200 dark:border-slate-700 border-b-transparent dark:border-b-transparent bg-slate-50 dark:bg-slate-800 px-4 py-2 rounded-t-md relative top-[1px] z-10 text-sm font-medium text-slate-600 dark:text-slate-400">
                                                 <Globe className="w-4 h-4" /> Information
                                             </div>
                                             {/* Content Box */}
@@ -240,7 +241,7 @@ export function FAQClient({ initialFaqs, categoriesData }: FAQClientProps) {
                                                 <Link href={`/faqs/${faq.seo?.slug || faq.id}`} className="inline-flex items-center gap-1.5 px-4 py-2 bg-green-100 dark:bg-green-900/30 hover:bg-green-200 dark:hover:bg-green-900/50 text-green-800 dark:text-green-400 text-[13px] font-bold rounded-md transition-colors">
                                                     <Eye className="w-4 h-4" /> View Details
                                                 </Link>
-                                                <button onClick={handleCopyLink} className="inline-flex items-center gap-1.5 px-4 py-2 bg-violet-600 dark:bg-violet-600/80 hover:bg-violet-700 dark:hover:bg-violet-600 text-white text-[13px] font-bold rounded-md transition-colors">
+                                                <button onClick={() => handleCopyLink(faq.seo?.slug || faq.id)} className="inline-flex items-center gap-1.5 px-4 py-2 bg-violet-600 dark:bg-violet-600/80 hover:bg-violet-700 dark:hover:bg-violet-600 text-white text-[13px] font-bold rounded-md transition-colors">
                                                     <Copy className="w-4 h-4" /> Copy Link
                                                 </button>
                                             </div>
