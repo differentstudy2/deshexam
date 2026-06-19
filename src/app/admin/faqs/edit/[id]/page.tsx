@@ -5,10 +5,12 @@ import { FAQForm } from "@/features/faqs/components/faq-form";
 import { getFaqById, updateFaq } from "@/features/faqs/services/faq.api";
 import { CreateFAQDTO, FAQ } from "@/features/faqs/types/faq.types";
 import { useToast } from "@/hooks/use-toast";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
-export default function EditFAQPage({ params }: { params: { id: string } }) {
+export default function EditFAQPage() {
+  const params = useParams();
+  const id = params.id as string;
   const { toast } = useToast();
   const router = useRouter();
   const [initialData, setInitialData] = useState<FAQ | null>(null);
@@ -16,9 +18,10 @@ export default function EditFAQPage({ params }: { params: { id: string } }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
+    if (!id) return;
     const fetchFaq = async () => {
       try {
-        const data = await getFaqById(params.id);
+        const data = await getFaqById(id);
         if (!data) {
           toast({ variant: "destructive", title: "Not Found", description: "FAQ could not be found." });
           router.push("/admin/faqs");
@@ -33,12 +36,12 @@ export default function EditFAQPage({ params }: { params: { id: string } }) {
       }
     };
     fetchFaq();
-  }, [params.id, router, toast]);
+  }, [id, router, toast]);
 
   const handleSubmit = async (data: CreateFAQDTO) => {
     try {
       setIsSubmitting(true);
-      await updateFaq(params.id, data);
+      await updateFaq(id, data);
       toast({ title: "FAQ Updated", description: "The FAQ has been successfully updated." });
       router.push("/admin/faqs");
     } catch (error) {

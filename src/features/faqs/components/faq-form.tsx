@@ -48,7 +48,7 @@ export const FAQForm = ({ initialData, onSubmit, isSubmitting, title }: FAQFormP
   const router = useRouter();
   const { toast } = useToast();
   const [categories, setCategories] = useState<FAQCategory[]>([]);
-  
+
   // AI State
   const [isAiDialogOpen, setIsAiDialogOpen] = useState(false);
   const [aiTopic, setAiTopic] = useState("");
@@ -119,14 +119,14 @@ export const FAQForm = ({ initialData, onSubmit, isSubmitting, title }: FAQFormP
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to generate");
-      
+
       form.setValue("question", data.question || "", { shouldValidate: true });
       form.setValue("answer", data.answer || "", { shouldValidate: true });
       form.setValue("tags", data.tags?.join(", ") || "", { shouldValidate: true });
       form.setValue("seo.slug", data.seo?.slug || "", { shouldValidate: true });
       form.setValue("seo.metaTitle", data.seo?.metaTitle || "", { shouldValidate: true });
       form.setValue("seo.metaDescription", data.seo?.metaDescription || "", { shouldValidate: true });
-      
+
       toast({ title: "AI Generation Complete", description: "Please review the generated content." });
       setIsAiDialogOpen(false);
       setAiTopic("");
@@ -148,7 +148,7 @@ export const FAQForm = ({ initialData, onSubmit, isSubmitting, title }: FAQFormP
           </Link>
           <h1 className="text-3xl font-bold tracking-tight text-foreground">{title}</h1>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="hidden md:flex items-center gap-3">
           <Dialog open={isAiDialogOpen} onOpenChange={setIsAiDialogOpen}>
             <DialogTrigger asChild>
               <Button variant="outline" className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 text-purple-700 hover:bg-purple-100 dark:text-purple-400 dark:hover:bg-purple-900/50 border-purple-200 dark:border-purple-800">
@@ -163,7 +163,7 @@ export const FAQForm = ({ initialData, onSubmit, isSubmitting, title }: FAQFormP
                 </DialogDescription>
               </DialogHeader>
               <div className="py-4">
-                <Input 
+                <Input
                   placeholder="e.g. 'Refund Policy' or 'How to reset password'"
                   value={aiTopic}
                   onChange={(e) => setAiTopic(e.target.value)}
@@ -181,9 +181,9 @@ export const FAQForm = ({ initialData, onSubmit, isSubmitting, title }: FAQFormP
             </DialogContent>
           </Dialog>
 
-          <Button 
-            type="button" 
-            variant="outline" 
+          <Button
+            type="button"
+            variant="outline"
             onClick={() => {
               form.setValue("status", "draft");
               form.handleSubmit(handleSubmit)();
@@ -192,8 +192,8 @@ export const FAQForm = ({ initialData, onSubmit, isSubmitting, title }: FAQFormP
           >
             Save as Draft
           </Button>
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             onClick={form.handleSubmit(handleSubmit)}
             disabled={isSubmitting}
             className="bg-indigo-600 hover:bg-indigo-700"
@@ -207,7 +207,7 @@ export const FAQForm = ({ initialData, onSubmit, isSubmitting, title }: FAQFormP
       <Form {...form}>
         <form className="space-y-8" onSubmit={(e) => e.preventDefault()}>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            
+
             <div className="lg:col-span-2 space-y-8">
               {/* Core Content */}
               <Card>
@@ -222,9 +222,9 @@ export const FAQForm = ({ initialData, onSubmit, isSubmitting, title }: FAQFormP
                       <FormItem>
                         <FormLabel>Question</FormLabel>
                         <FormControl>
-                          <Input 
-                            placeholder="e.g., How do I start a mock test?" 
-                            {...field} 
+                          <Input
+                            placeholder="e.g., How do I start a mock test?"
+                            {...field}
                             onChange={(e) => {
                               field.onChange(e);
                               handleSlugAutoGenerate(e.target.value);
@@ -242,10 +242,10 @@ export const FAQForm = ({ initialData, onSubmit, isSubmitting, title }: FAQFormP
                       <FormItem>
                         <FormLabel>Answer</FormLabel>
                         <FormControl>
-                          <Textarea 
-                            placeholder="Provide a detailed, helpful answer..." 
+                          <Textarea
+                            placeholder="Provide a detailed, helpful answer..."
                             className="min-h-[200px] resize-y"
-                            {...field} 
+                            {...field}
                           />
                         </FormControl>
                         <FormMessage />
@@ -432,6 +432,45 @@ export const FAQForm = ({ initialData, onSubmit, isSubmitting, title }: FAQFormP
           </div>
         </form>
       </Form>
+
+      {/* Mobile Floating Action Bar */}
+      <div className="md:hidden fixed bottom-2 left-1/2 -translate-x-1/2 w-[90%] max-w-[340px] bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border border-slate-200 dark:border-slate-800 rounded-full shadow-xl flex items-center justify-between px-6 py-3 z-50">
+        <Button
+          variant="ghost"
+          onClick={() => setIsAiDialogOpen(true)}
+          className="text-purple-600 dark:text-purple-400 hover:text-purple-700 hover:bg-purple-50 p-2 flex flex-col items-center justify-center gap-1 h-auto"
+        >
+          <Sparkles className="w-5 h-5" />
+          <span className="text-[10px] font-semibold tracking-wide">AI Draft</span>
+        </Button>
+
+        <Button
+          onClick={form.handleSubmit(handleSubmit)}
+          disabled={isSubmitting}
+          className="relative group bg-transparent hover:bg-transparent border-0 h-auto p-0"
+        >
+          <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-indigo-600 text-white p-3.5 rounded-full shadow-lg shadow-indigo-500/30 group-hover:bg-indigo-700 transition-colors">
+            {isSubmitting ? <Loader2 className="w-6 h-6 animate-spin" /> : <Save className="w-6 h-6" />}
+          </div>
+          <div className="flex flex-col items-center justify-center gap-1 mt-6 text-indigo-600 dark:text-indigo-400">
+            <span className="text-[10px] font-bold tracking-wide">{initialData ? "Update" : "Publish"}</span>
+          </div>
+        </Button>
+
+        <Button
+          variant="ghost"
+          onClick={() => {
+            form.setValue("status", "draft");
+            form.handleSubmit(handleSubmit)();
+          }}
+          disabled={isSubmitting}
+          className="text-slate-500 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-slate-100 p-2 flex flex-col items-center justify-center gap-1 h-auto"
+        >
+          <Save className="w-5 h-5" />
+          <span className="text-[10px] font-semibold tracking-wide">Draft</span>
+        </Button>
+      </div>
+
     </div>
   );
 };
