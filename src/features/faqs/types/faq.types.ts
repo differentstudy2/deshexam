@@ -37,8 +37,8 @@ export interface FAQFilters {
   sortBy?: "latest" | "oldest" | "most_viewed" | "alphabetical";
 }
 
-export type CreateFAQDTO = Omit<FAQ, "id" | "views" | "createdAt" | "updatedAt">;
-export type UpdateFAQDTO = Partial<CreateFAQDTO>;
+export type CreateFAQDTO = Omit<FAQ, "id" | "views" | "helpfulVotes" | "unhelpfulVotes" | "createdAt" | "updatedAt">;
+export type UpdateFAQDTO = Partial<Omit<FAQ, "id" | "createdAt" | "updatedAt">>;
 
 export interface FAQCategory {
   id: string;

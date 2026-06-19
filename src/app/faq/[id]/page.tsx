@@ -39,7 +39,17 @@ export default function SingleFAQPage() {
                     router.push('/faq');
                     return;
                 }
-                setFaq(fetchedFaq);
+                
+                // Increment views (once per session)
+                const viewedKey = `faq_viewed_${fetchedFaq.id}`;
+                if (!sessionStorage.getItem(viewedKey)) {
+                    sessionStorage.setItem(viewedKey, 'true');
+                    const newViews = (fetchedFaq.views || 0) + 1;
+                    setFaq({ ...fetchedFaq, views: newViews });
+                    updateFaq(fetchedFaq.id, { views: newViews }).catch(console.error);
+                } else {
+                    setFaq(fetchedFaq);
+                }
                 
                 const fetchedCategories = await getCategories();
                 setCategoriesData(fetchedCategories);
