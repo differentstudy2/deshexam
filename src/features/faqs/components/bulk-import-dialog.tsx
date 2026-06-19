@@ -71,7 +71,7 @@ export function BulkImportDialog({ categories, onImportComplete, trigger }: Bulk
       }
 
       // Transform and validate
-      const validFaqs: CreateFAQDTO[] = parsedFaqs.map(row => {
+      const validFaqs: CreateFAQDTO[] = parsedFaqs.map((row, index) => {
         if (!row.question || !row.answer) {
           throw new Error("Missing required fields (Question, Answer) in one or more rows.");
         }
