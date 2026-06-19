@@ -1,0 +1,32 @@
+[
+  {
+    "question": "What is Pass Pro?",
+    "answer": "Pass Pro is our premium subscription that gives you unlimited access to all mock tests, live classes, and premium study materials for a full year.",
+    "categoryId": "subscription",
+    "tags": "pricing, premium, pass pro"
+  },
+  {
+    "question": "How do I reset my password?",
+    "answer": "If you have forgotten your password, go to the login screen and click 'Forgot Password'. A reset link will be sent to your registered email address.",
+    "categoryId": "account",
+    "tags": "password, login, account"
+  },
+  {
+    "question": "Are the live classes recorded?",
+    "answer": "Yes! All our live classes are recorded and automatically uploaded to your student dashboard within 24 hours so you can review them at any time.",
+    "categoryId": "live-classes",
+    "tags": "live class, recordings, video"
+  },
+  {
+    "question": "What is the refund policy?",
+    "answer": "We offer a 7-day money-back guarantee. If you are not satisfied with your purchase, contact support within 7 days of payment for a full refund.",
+    "categoryId": "payments",
+    "tags": "refund, money, payment"
+  },
+  {
+    "question": "How are the Leaderboard scores calculated?",
+    "answer": "Leaderboard scores are based on your performance in the weekly Mega Mock Tests. Speed and accuracy both contribute to your final ranking.",
+    "categoryId": "results",
+    "tags": "leaderboard, ranking, score"
+  }
+]

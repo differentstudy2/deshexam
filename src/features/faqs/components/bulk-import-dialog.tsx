@@ -24,29 +24,18 @@ export function BulkImportDialog({ categories, onImportComplete }: BulkImportDia
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDownloadCsvTemplate = () => {
-    const csvContent = "data:text/csv;charset=utf-8,Question,Answer,Category Slug,Tags\n\"What is Pass Pro?\",\"Pass Pro is our premium subscription.\",\"subscription\",\"pricing, subscription\"\n\"How to login?\",\"Go to the login page.\",\"account\",\"login\"";
-    const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "faq_import_template.csv");
+    link.setAttribute("href", "/demo_faqs.csv");
+    link.setAttribute("download", "demo_faqs.csv");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
   const handleDownloadJsonTemplate = () => {
-    const jsonContent = [
-      {
-        question: "What is Pass Pro?",
-        answer: "Pass Pro is our premium subscription.",
-        categoryId: "subscription",
-        tags: "pricing, subscription"
-      }
-    ];
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(jsonContent, null, 2));
     const link = document.createElement("a");
-    link.setAttribute("href", dataStr);
-    link.setAttribute("download", "faq_import_template.json");
+    link.setAttribute("href", "/demo_faqs.json");
+    link.setAttribute("download", "demo_faqs.json");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
