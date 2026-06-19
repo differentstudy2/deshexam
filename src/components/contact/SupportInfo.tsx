@@ -5,7 +5,7 @@ import { Youtube, Twitter, Linkedin, Facebook } from 'lucide-react';
 
 export function SupportInfo() {
   return (
-    <Card className="p-8 border-[#E2E8F0] shadow-sm bg-white h-full flex flex-col rounded-xl">
+    <Card className="p-6 border-[#E2E8F0] shadow-sm bg-white h-full flex flex-col rounded-xl">
         <h3 className="text-lg font-bold text-[#0F172A] mb-6">Support Info</h3>
         
         <div className="space-y-6 flex-grow">

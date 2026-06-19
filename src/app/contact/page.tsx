@@ -164,11 +164,11 @@ export default function ContactPage() {
             {/* Right side: Illustration & Stats Card */}
             <div className="lg:col-span-5 xl:col-span-6 relative flex justify-center lg:justify-end">
               <div className="relative w-full max-w-md">
-                <div className="absolute -top-12 -right-4 w-72 h-72 z-20 drop-shadow-2xl animate-float">
+                <div className="absolute -top-20 -right-8 w-80 h-80 z-20 drop-shadow-2xl animate-float pointer-events-none">
                   <img src="/support-illustration.png" alt="DeshExam student support team helping learners" className="w-full h-full object-contain" />
                 </div>
                 
-                <div className="relative z-10 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-[0_20px_50px_rgba(0,0,0,0.5)] mt-32">
+                <div className="relative z-10 bg-[#0F172A]/40 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-[0_20px_50px_rgba(0,0,0,0.5)] mt-48">
                     <div className="space-y-6">
                         <div className="flex justify-between items-center border-b border-white/10 pb-4">
                             <span className="text-slate-300 font-medium text-sm">Tickets Resolved:</span>
@@ -232,7 +232,7 @@ export default function ContactPage() {
         {/* CONTACT FORM & SUPPORT INFO */}
         <section>
           <div className="mb-6">
-            <h2 className="text-xs font-bold text-[#0F172A] uppercase tracking-wider mb-2">Send Us a Message</h2>
+            <h2 className="text-xs font-bold text-[#0F172A] uppercase tracking-wider mb-2">Contact Form</h2>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             <div className="lg:col-span-8 xl:col-span-9">
@@ -248,15 +248,15 @@ export default function ContactPage() {
 
         {/* FREQUENTLY ASKED QUESTIONS */}
         <section>
-          <div className="mb-6 text-center">
-            <span className="inline-block px-3 py-1 bg-[#F8FAFC] border border-[#E2E8F0] rounded-full text-[10px] font-bold text-[#64748B] uppercase tracking-widest mb-4">Premium FAQ</span>
+          <div className="mb-6">
+            <h2 className="text-xs font-bold text-[#0F172A] uppercase tracking-wider mb-2">FAQ</h2>
           </div>
           <SupportFAQ />
         </section>
 
         {/* HELP CENTER CTA */}
         <section>
-          <div className="mb-6 hidden">
+          <div className="mb-6">
             <h2 className="text-xs font-bold text-[#0F172A] uppercase tracking-wider mb-2">Help Center CTA</h2>
           </div>
           <div className="bg-gradient-to-r from-[#16A34A] to-[#7C3AED] rounded-2xl p-12 relative overflow-hidden shadow-xl text-white">
@@ -281,7 +281,7 @@ export default function ContactPage() {
         {/* MAP / LOCATION */}
         <section className="pb-16">
           <div className="mb-6">
-            <h2 className="text-xs font-bold text-[#0F172A] uppercase tracking-wider mb-2">Visit Our Office</h2>
+            <h2 className="text-xs font-bold text-[#0F172A] uppercase tracking-wider mb-2">Map / Location</h2>
           </div>
           <div className="bg-white rounded-xl shadow-sm border border-[#E2E8F0] overflow-hidden">
             <div className="p-8 border-b border-[#E2E8F0]">
