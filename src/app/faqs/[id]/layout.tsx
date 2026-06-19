@@ -1,9 +1,10 @@
 import { Metadata } from 'next';
 import { getFaqBySlugOrIdServer as getFaqBySlugOrId } from '@/features/faqs/services/faq-server.api';
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
     try {
-        const faq = await getFaqBySlugOrId(params.id);
+        const resolvedParams = await params;
+        const faq = await getFaqBySlugOrId(resolvedParams.id);
 
         if (!faq) {
             return {
@@ -44,11 +45,12 @@ export default async function FAQLayout({
     params,
 }: {
     children: React.ReactNode;
-    params: { id: string };
+    params: Promise<{ id: string }>;
 }) {
     let faq = null;
     try {
-        faq = await getFaqBySlugOrId(params.id);
+        const resolvedParams = await params;
+        faq = await getFaqBySlugOrId(resolvedParams.id);
     } catch (error) {
         console.error("Failed to fetch FAQ for layout:", error);
     }
