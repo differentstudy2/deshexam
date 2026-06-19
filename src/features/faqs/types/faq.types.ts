@@ -37,3 +37,14 @@ export interface FAQFilters {
 
 export type CreateFAQDTO = Omit<FAQ, "id" | "views" | "createdAt" | "updatedAt">;
 export type UpdateFAQDTO = Partial<CreateFAQDTO>;
+
+export interface FAQCategory {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+export interface FAQTag {
+  id: string;
+  name: string;
+}

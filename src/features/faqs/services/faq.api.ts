@@ -1,4 +1,4 @@
-import { FAQ, FAQFilters, CreateFAQDTO, UpdateFAQDTO } from '../types/faq.types';
+import { FAQ, FAQFilters, CreateFAQDTO, UpdateFAQDTO, FAQCategory, FAQTag } from '../types/faq.types';
 
 // In-memory mock database
 let faqsDB: FAQ[] = [
@@ -196,4 +196,60 @@ export const reorderFaqs = async (updates: { id: string, order: number }[]): Pro
         }
     });
     return true;
+};
+
+let categoriesDB: FAQCategory[] = [
+  { id: "general", name: "General", slug: "general" },
+  { id: "account", name: "Account & Profile", slug: "account" },
+  { id: "mock_tests", name: "Mock Tests & Quizzes", slug: "mock-tests" },
+  { id: "subscription", name: "Subscriptions & Pass Pro", slug: "subscription" },
+  { id: "payments", name: "Payments & Refunds", slug: "payments" },
+  { id: "materials", name: "Study Materials & Notes", slug: "materials" },
+  { id: "live_classes", name: "Live Classes", slug: "live-classes" },
+  { id: "results", name: "Results & Leaderboards", slug: "results" },
+  { id: "support", name: "Technical Support", slug: "support" }
+];
+
+let tagsDB: FAQTag[] = [
+  { id: "tag_1", name: "login" },
+  { id: "tag_2", name: "password" },
+  { id: "tag_3", name: "refund" },
+  { id: "tag_4", name: "mock_test" },
+  { id: "tag_5", name: "pricing" },
+];
+
+export const getCategories = async (): Promise<FAQCategory[]> => {
+  await delay(300);
+  return [...categoriesDB];
+};
+
+export const createCategory = async (data: Omit<FAQCategory, "id">): Promise<FAQCategory> => {
+  await delay(500);
+  const newCat = { ...data, id: `cat_${Date.now()}` };
+  categoriesDB.push(newCat);
+  return newCat;
+};
+
+export const deleteCategory = async (id: string): Promise<boolean> => {
+  await delay(400);
+  categoriesDB = categoriesDB.filter(c => c.id !== id);
+  return true;
+};
+
+export const getTags = async (): Promise<FAQTag[]> => {
+  await delay(300);
+  return [...tagsDB];
+};
+
+export const createTag = async (name: string): Promise<FAQTag> => {
+  await delay(500);
+  const newTag = { name, id: `tag_${Date.now()}` };
+  tagsDB.push(newTag);
+  return newTag;
+};
+
+export const deleteTag = async (id: string): Promise<boolean> => {
+  await delay(400);
+  tagsDB = tagsDB.filter(t => t.id !== id);
+  return true;
 };
