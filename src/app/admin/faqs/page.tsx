@@ -8,7 +8,7 @@ import { FAQTable } from "@/features/faqs/components/faq-table";
 import { BulkImportDialog } from "@/features/faqs/components/bulk-import-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Upload, Settings } from "lucide-react";
 import Link from "next/link";
 
 export default function FAQManagePage() {
@@ -86,7 +86,8 @@ export default function FAQManagePage() {
           <h1 className="text-3xl font-bold tracking-tight text-foreground">FAQ Management</h1>
           <p className="text-muted-foreground mt-1">Admin / FAQs</p>
         </div>
-        <div className="flex items-center gap-3">
+        {/* Desktop Actions */}
+        <div className="hidden md:flex items-center gap-3">
           {selectedIds.length > 0 && (
             <Button variant="destructive" onClick={handleBulkDelete}>
               <Trash2 className="w-4 h-4 mr-2" /> Delete Selected ({selectedIds.length})
@@ -119,6 +120,34 @@ export default function FAQManagePage() {
         onSelect={handleSelect}
         onSelectAll={handleSelectAll}
       />
+
+      {/* Mobile Floating Action Bar */}
+      <div className="md:hidden fixed bottom-[80px] left-1/2 -translate-x-1/2 w-[90%] max-w-[340px] bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border border-slate-200 dark:border-slate-800 rounded-full shadow-xl flex items-center justify-between px-6 py-3 z-40">
+        <BulkImportDialog 
+          categories={categories} 
+          onImportComplete={fetchFaqs}
+          trigger={
+            <button className="flex flex-col items-center justify-center gap-1 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 transition-colors">
+              <Upload className="w-5 h-5" />
+              <span className="text-[10px] font-semibold tracking-wide">Import</span>
+            </button>
+          }
+        />
+        
+        <Link href="/admin/faqs/create" className="relative group">
+          <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-indigo-600 text-white p-3.5 rounded-full shadow-lg shadow-indigo-500/30 group-hover:bg-indigo-700 transition-colors">
+            <Plus className="w-6 h-6" />
+          </div>
+          <div className="flex flex-col items-center justify-center gap-1 mt-6 text-indigo-600 dark:text-indigo-400">
+            <span className="text-[10px] font-bold tracking-wide">Create</span>
+          </div>
+        </Link>
+
+        <Link href="/admin/faqs/settings" className="flex flex-col items-center justify-center gap-1 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 transition-colors">
+          <Settings className="w-5 h-5" />
+          <span className="text-[10px] font-semibold tracking-wide">Settings</span>
+        </Link>
+      </div>
     </div>
   );
 }

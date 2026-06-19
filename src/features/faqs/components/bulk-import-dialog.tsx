@@ -14,9 +14,10 @@ import { CreateFAQDTO, FAQCategory } from "../types/faq.types";
 interface BulkImportDialogProps {
   categories: FAQCategory[];
   onImportComplete: () => void;
+  trigger?: React.ReactNode;
 }
 
-export function BulkImportDialog({ categories, onImportComplete }: BulkImportDialogProps) {
+export function BulkImportDialog({ categories, onImportComplete, trigger }: BulkImportDialogProps) {
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [file, setFile] = useState<File | null>(null);
@@ -118,10 +119,14 @@ export function BulkImportDialog({ categories, onImportComplete }: BulkImportDia
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="gap-2">
-          <Upload className="w-4 h-4" />
-          Bulk Import
-        </Button>
+        {trigger ? (
+          trigger
+        ) : (
+          <Button variant="outline" className="gap-2">
+            <Upload className="w-4 h-4" />
+            Bulk Import
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
