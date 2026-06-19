@@ -62,6 +62,22 @@ export const getFaqById = async (id: string): Promise<FAQ | null> => {
   return doc ? ({ id: doc.id, ...doc.data() } as FAQ) : null;
 };
 
+export const getFaqBySlugOrId = async (identifier: string): Promise<FAQ | null> => {
+  const snapshot = await getDocs(collection(db, FAQS_COLLECTION));
+  // Find by slug first
+  let doc = snapshot.docs.find(d => {
+    const data = d.data();
+    return data.seo?.slug === identifier;
+  });
+  
+  // Fallback to id
+  if (!doc) {
+    doc = snapshot.docs.find(d => d.id === identifier);
+  }
+  
+  return doc ? ({ id: doc.id, ...doc.data() } as FAQ) : null;
+};
+
 export const createFaq = async (data: CreateFAQDTO): Promise<FAQ> => {
   const newFaqData = {
     ...data,

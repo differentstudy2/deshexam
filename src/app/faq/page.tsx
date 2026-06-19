@@ -1,6 +1,10 @@
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { getFaqs, getCategories } from '@/features/faqs/services/faq.api';
+import { FAQ, FAQCategory } from '@/features/faqs/types/faq.types';
+import { Loader2 } from 'lucide-react';
+
 import Link from 'next/link';
 import { Search, List, Folder, Plus, Minus, ChevronDown, Clock, Globe, Eye, Copy, CheckCircle2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -14,60 +18,48 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-const categories = [
-    { id: 'all', name: 'সকল FAQ', icon: <List className="w-4 h-4" /> },
-    { id: 'general', name: 'General', icon: <Folder className="w-4 h-4" /> },
-    { id: 'account', name: 'Account', icon: <Folder className="w-4 h-4" /> },
-    { id: 'package', name: 'Package', icon: <Folder className="w-4 h-4" /> },
-    { id: 'course', name: 'Course', icon: <Folder className="w-4 h-4" /> },
-    { id: 'books', name: 'Books', icon: <Folder className="w-4 h-4" /> },
-    { id: 'academy', name: 'Academy', icon: <Folder className="w-4 h-4" /> },
-    { id: 'admission', name: 'Admission', icon: <Folder className="w-4 h-4" /> },
-];
-
-const recentFaqs = [
-    {
-        title: "ফন্ট ও লেআউট কাস্টমাইজ করা যাবে?",
-        subtitle: "অবশ্যই, E-Question Builder-এ রয়েছে Font Size, Font Style, Layout..."
-    },
-    {
-        title: "আমি কি কলাম ডিজাইন নিজের মতো করতে পারি?",
-        subtitle: "হ্যাঁ, আপনি Custom Column Divider ব্যবহার করে প্রশ্নপত্রের কলাম ব..."
-    },
-    {
-        title: "আমি কি একাধিক সেট (Set-A, Set-B) তৈরি কর...",
-        subtitle: "E-Question Builder এর লিংকঃ https://deshexam.com/e-question-bu..."
-    },
-    {
-        title: "প্রশ্নপত্র কিভাবে শেয়ার বা প্রকাশ করবো?",
-        subtitle: "প্রশ্নপত্র তৈরি করার পর আপনি তা লিংক আকারে শেয়ার করতে পারবেন কিংবা..."
-    },
-    {
-        title: "আমি কি নিজের প্রতিষ্ঠানের Watermark যুক্ত...",
-        subtitle: "হ্যাঁ, আপনি প্রশ্নপত্রে নিজের প্রতিষ্ঠান বা কোচিংয়ের Watermark যু..."
-    }
-];
-
-const faqsList = [
-    { id: 1, text: "ফন্ট ও লেআউট কাস্টমাইজ করা যাবে?", category: "E-Question Builder", answer: "অবশ্যই, E-Question Builder-এ রয়েছে Font Size, Font Style, Layout Control - যার মাধ্যমে আপনি প্রিন্ট বা PDF এর চেহারা একদম নিজের মতো করে ডিজাইন করতে পারবেন।" },
-    { id: 2, text: "আমি কি কলাম ডিজাইন নিজের মতো করতে পারি?", category: "E-Question Builder", answer: "হ্যাঁ, আপনি Custom Column Divider ব্যবহার করে প্রশ্নপত্রের কলাম ডিজাইন করতে পারবেন।" },
-    { id: 3, text: "আমি কি একাধিক সেট (Set-A, Set-B) তৈরি করতে পারি?", category: "E-Question Builder", answer: "E-Question Builder এর মাধ্যমে আপনি একাধিক সেট (Set-A, Set-B) তৈরি করতে পারবেন।" },
-    { id: 4, text: "প্রশ্নপত্র কিভাবে শেয়ার বা প্রকাশ করবো?", category: "E-Question Builder", answer: "প্রশ্নপত্র তৈরি করার পর আপনি তা লিংক আকারে শেয়ার করতে পারবেন।" },
-    { id: 5, text: "আমি কি নিজের প্রতিষ্ঠানের Watermark যুক্ত করতে পারি?", category: "E-Question Builder", answer: "হ্যাঁ, আপনি প্রশ্নপত্রে নিজের প্রতিষ্ঠান বা কোচিংয়ের Watermark যুক্ত করতে পারবেন।" },
-    { id: 6, text: "প্রশ্নের সাথে উত্তরপত্র কি প্রিন্ট করা যায়?", category: "E-Question Builder", answer: "হ্যাঁ, প্রশ্নের সাথে উত্তরপত্র প্রিন্ট করার অপশন রয়েছে।" },
-    { id: 7, text: "আমি কি প্রশ্ন সম্পাদনা করতে পারি?", category: "E-Question Builder", answer: "হ্যাঁ, আপনি যেকোনো সময় প্রশ্ন সম্পাদনা করতে পারবেন।" },
-    { id: 8, text: "কোন কোন প্রশ্ন ধরন সাপোর্ট করে?", category: "E-Question Builder", answer: "MCQ, Written, True/False সহ অনেক ধরনের প্রশ্ন সাপোর্ট করে।" },
-    { id: 9, text: "একাধিক বিষয়ের প্রশ্ন একসাথে কি তৈরি করা সম্ভব?", category: "E-Question Builder", answer: "হ্যাঁ, আপনি একাধিক বিষয় নির্বাচন করে একত্রে প্রশ্ন সেট তৈরি করতে পারবেন।" },
-    { id: 10, text: "E-Question Builder-এ কোন স্তরের প্রশ্ন তৈরি করা যায়?", category: "E-Question Builder", answer: "এখানে ৪র্থ শ্রেণি থেকে দ্বাদশ শ্রেণি, বিশ্ববিদ্যালয় ভর্তি প্রস্তুতি ও চাকরি প্রস্তুতির প্রশ্ন তৈরি করা যায়।" },
-    { id: 11, text: "E-Question Builder কী?", category: "E-Question Builder", answer: "E-Question Builder হলো একটি স্মার্ট টুল যা শিক্ষকদের জন্য লক্ষ লক্ষ প্রশ্নের ভাণ্ডার থেকে প্রশ্নপত্র তৈরি করতে সাহায্য করে।" },
-    { id: 12, text: "আমি কি পাসওয়ার্ড পরিবর্তন করতে পারি?", category: "Account", answer: "হ্যাঁ, আপনি আপনার অ্যাকাউন্ট সেটিংসে গিয়ে পাসওয়ার্ড পরিবর্তন করতে পারবেন।" },
-];
-
 export default function FAQPage() {
     const [activeCategory, setActiveCategory] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
-    const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
+    const [expandedFaq, setExpandedFaq] = useState<string | null>(null);
     const { toast } = useToast();
+    const [faqs, setFaqs] = useState<FAQ[]>([]);
+    const [categoriesData, setCategoriesData] = useState<FAQCategory[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const loadData = async () => {
+            try {
+                const fetchedFaqs = await getFaqs();
+                const fetchedCategories = await getCategories();
+                setFaqs(fetchedFaqs);
+                setCategoriesData(fetchedCategories);
+            } catch (e) {
+                console.error("Failed to load", e);
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadData();
+    }, []);
+
+    const filteredFaqs = faqs.filter(faq => {
+        const matchesCategory = activeCategory === 'all' || faq.categoryId === activeCategory;
+        const matchesSearch = faq.question.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                              faq.answer.toLowerCase().includes(searchQuery.toLowerCase());
+        return matchesCategory && matchesSearch;
+    });
+
+    const recentFaqsList = [...faqs].sort((a, b) => {
+        const aTime = a.createdAt?.toMillis ? a.createdAt.toMillis() : Date.now();
+        const bTime = b.createdAt?.toMillis ? b.createdAt.toMillis() : Date.now();
+        return bTime - aTime;
+    }).slice(0, 5);
+
+    if (loading) {
+        return <div className="min-h-screen flex items-center justify-center bg-[#f8f9fa]"><Loader2 className="w-8 h-8 animate-spin text-[#0ea5e9]" /></div>;
+    }
+
 
     const handleCopyLink = () => {
         navigator.clipboard.writeText(window.location.href);
@@ -130,7 +122,7 @@ export default function FAQPage() {
                                 <List className="w-4 h-4" /> ক্যাটাগরি
                             </div>
                             <div className="flex flex-col text-sm font-medium">
-                                {categories.map((cat, index) => {
+                                {[{id: 'all', name: 'সকল FAQ'}, ...categoriesData].map((cat, index) => {
                                     const isActive = activeCategory === cat.id;
                                     return (
                                         <button 
@@ -144,7 +136,7 @@ export default function FAQPage() {
                                                 index !== categories.length - 1 && "border-b border-b-slate-100"
                                             )}
                                         >
-                                            <span className="text-slate-400">{cat.icon}</span>
+                                            <span className="text-slate-400"><Folder className="w-4 h-4" /></span>
                                             {cat.name}
                                         </button>
                                     );
@@ -158,13 +150,13 @@ export default function FAQPage() {
                                 <Clock className="w-4 h-4" /> সাম্প্রতিক FAQ
                             </div>
                             <div className="flex flex-col">
-                                {recentFaqs.map((faq, index) => (
+                                {recentFaqsList.map((faq, index) => (
                                     <div key={index} className={cn(
                                         "p-4 hover:bg-slate-50 cursor-pointer transition-colors",
                                         index !== recentFaqs.length - 1 && "border-b border-slate-100"
                                     )}>
-                                        <h4 className="text-[13px] font-bold text-slate-800 leading-tight mb-1.5">{faq.title}</h4>
-                                        <p className="text-[12px] text-slate-400 leading-snug line-clamp-2">{faq.subtitle}</p>
+                                        <h4 className="text-[13px] font-bold text-slate-800 leading-tight mb-1.5">{faq.question}</h4>
+                                        <p className="text-[12px] text-slate-400 leading-snug line-clamp-2">{faq.answer}</p>
                                     </div>
                                 ))}
                             </div>
@@ -195,7 +187,7 @@ export default function FAQPage() {
 
                         {/* FAQ List */}
                         <div className="space-y-3">
-                            {faqsList.map((faq) => (
+                            {filteredFaqs.map((faq) => (
                                 <div key={faq.id} className={cn(
                                     "bg-white border rounded-lg overflow-hidden transition-colors",
                                     expandedFaq === faq.id ? "border-[#bfdbfe]" : "border-slate-200 hover:border-slate-300"
@@ -211,14 +203,14 @@ export default function FAQPage() {
                                             {faq.id}
                                         </div>
                                         <h3 className="flex-1 text-[14px] font-semibold text-slate-800">
-                                            {faq.text}
+                                            {faq.question}
                                         </h3>
                                         <div className="hidden sm:flex items-center gap-3 shrink-0">
                                             <span className={cn(
                                                 "px-3 py-1 rounded text-[11px] font-bold whitespace-nowrap",
                                                 expandedFaq === faq.id ? "bg-white/50 text-slate-700" : "bg-slate-100 text-slate-600"
                                             )}>
-                                                {faq.category}
+                                                {(categoriesData.find(c => c.id === faq.categoryId)?.name || 'General')}
                                             </span>
                                             {expandedFaq === faq.id ? (
                                                 <Minus className="w-4 h-4 text-slate-600" />
@@ -242,7 +234,7 @@ export default function FAQPage() {
                                             </div>
                                             {/* Action Buttons */}
                                             <div className="flex justify-end gap-3">
-                                                <Link href={`/faq/${faq.id}`} className="inline-flex items-center gap-1.5 px-4 py-2 bg-green-100 hover:bg-green-200 text-green-800 text-[13px] font-bold rounded-md transition-colors">
+                                                <Link href={`/faq/${faq.seo?.slug || faq.id}`} className="inline-flex items-center gap-1.5 px-4 py-2 bg-green-100 hover:bg-green-200 text-green-800 text-[13px] font-bold rounded-md transition-colors">
                                                     <Eye className="w-4 h-4" /> বিস্তারিত দেখুন
                                                 </Link>
                                                 <button onClick={handleCopyLink} className="inline-flex items-center gap-1.5 px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white text-[13px] font-bold rounded-md transition-colors">

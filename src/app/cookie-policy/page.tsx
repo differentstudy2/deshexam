@@ -1,12 +1,25 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
+import { ManageCookiesButton } from "@/components/layout/manage-cookies-button";
 
 export const metadata: Metadata = {
-  title: 'Cookie Policy | DeshExam',
-  description: 'Understand how DeshExam uses cookies and similar tracking technologies to improve your experience, authenticate your account, and serve personalized content.',
-  keywords: ['cookie policy', 'tracking technologies', 'DeshExam cookies', 'web cookies'],
+  title: 'Cookie Policy | How We Use Cookies – DeshExam',
+  description: 'Learn how DeshExam uses cookies to improve performance, personalize experience, and ensure secure access to learning features and mock tests.',
+  keywords: [
+    'cookie policy', 
+    'cookies policy', 
+    'what are cookies in website', 
+    'website cookie usage policy', 
+    'cookie consent policy',
+    'cookie policy for educational website',
+    'how websites use cookies for login tracking',
+    'GDPR cookie policy explanation',
+    'cookie usage in online learning platforms',
+    'exam preparation website privacy cookies'
+  ],
   openGraph: {
-    title: 'Cookie Policy | DeshExam',
-    description: 'Understand how DeshExam uses cookies and similar tracking technologies to improve your experience, authenticate your account, and serve personalized content.',
+    title: 'Cookie Policy | How We Use Cookies – DeshExam',
+    description: 'Learn how DeshExam uses cookies to improve performance, personalize experience, and ensure secure access to learning features and mock tests.',
     url: 'https://deshexam.com/cookie-policy',
     siteName: 'DeshExam',
     locale: 'en_US',
@@ -14,8 +27,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Cookie Policy | DeshExam',
-    description: 'Understand how DeshExam uses cookies and similar tracking technologies to improve your experience, authenticate your account, and serve personalized content.',
+    title: 'Cookie Policy | How We Use Cookies – DeshExam',
+    description: 'Learn how DeshExam uses cookies to improve performance, personalize experience, and ensure secure access to learning features and mock tests.',
   },
   alternates: {
     canonical: 'https://deshexam.com/cookie-policy',
@@ -23,73 +36,133 @@ export const metadata: Metadata = {
 };
 
 export default function CookiePolicyPage() {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Cookie Policy",
+    "description": "Cookie usage policy for DeshExam",
+    "publisher": {
+      "@type": "Organization",
+      "name": "DeshExam"
+    }
+  };
+
   return (
-    <div className="bg-slate-50 dark:bg-slate-950 min-h-screen">
-      <div className="container py-12 md:py-20">
-        <header className="text-center mb-12">
-          <h1 className="font-headline text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-            Cookie Policy
-          </h1>
-          <p className="text-lg text-slate-600 dark:text-slate-400 mt-4 max-w-2xl mx-auto">
-            Last Updated: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-          </p>
-        </header>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <div className="bg-slate-50 dark:bg-slate-950 min-h-screen">
+        <div className="container py-12 md:py-20">
+          <header className="text-center mb-12">
+            <h1 className="font-headline text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+              Cookie Policy
+            </h1>
+            <p className="text-lg text-slate-600 dark:text-slate-400 mt-4 max-w-2xl mx-auto">
+              Last Updated: v1.0 (June 19, 2026)
+            </p>
+          </header>
 
-        <div className="max-w-4xl mx-auto bg-white dark:bg-slate-900 p-8 md:p-12 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 prose prose-slate dark:prose-invert lg:prose-lg">
-          <h2>1. What Are Cookies?</h2>
-          <p>
-            Cookies are small pieces of text sent to your web browser by a website you visit. A cookie file is stored in your web browser and allows the Service or a third-party to recognize you and make your next visit easier and the Service more useful to you.
-          </p>
-          <p>
-            Cookies can be "persistent" or "session" cookies. Persistent cookies remain on your personal computer or mobile device when you go offline, while session cookies are deleted as soon as you close your web browser.
-          </p>
+          <div className="max-w-4xl mx-auto bg-white dark:bg-slate-900 p-8 md:p-12 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 prose prose-slate dark:prose-invert lg:prose-lg">
+            
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-8 pb-8 border-b border-slate-200 dark:border-slate-800">
+              This Cookie Policy is part of our broader privacy practices. For more information on how we protect your data, please review our <Link href="/privacy-policy" className="text-blue-600 dark:text-blue-400 hover:underline font-medium">Privacy Policy</Link> and <Link href="/terms" className="text-blue-600 dark:text-blue-400 hover:underline font-medium">Terms and Conditions</Link>. You can also <Link href="/about" className="text-blue-600 dark:text-blue-400 hover:underline font-medium">learn more about DeshExam features</Link> or visit our <Link href="/faq" className="text-blue-600 dark:text-blue-400 hover:underline font-medium">FAQ page</Link>.
+            </p>
 
-          <h2>2. How DeshExam Uses Cookies</h2>
-          <p>
-            When you use and access the Service, we may place a number of cookie files in your web browser. We use cookies for the following purposes:
-          </p>
-          <ul>
-            <li><strong>Authentication & Security (Essential Cookies):</strong> We use cookies to authenticate users and prevent fraudulent use of user accounts. For example, Firebase Authentication uses tokens stored in your browser to keep you logged in.</li>
-            <li><strong>Preferences (Functionality Cookies):</strong> We use cookies to remember information that changes the way the Service behaves or looks, such as your "remember me" functionality, selected language preference, or dark/light theme choice.</li>
-            <li><strong>Analytics (Performance Cookies):</strong> We use cookies to track information on how the Service is used so that we can make improvements. We may also use cookies to test new pages, features, or new functionality of the Service to see how our users react to them.</li>
-            <li><strong>Advertising (Targeting Cookies):</strong> We and our third-party advertising partners (like Google AdSense) may use cookies to report on the performance of advertisements and to deliver ads that are relevant to your interests.</li>
-          </ul>
+            <h2>What Are Cookies</h2>
+            <p>
+              Cookies are small pieces of text sent to your web browser by a website you visit. They are safely stored on your device and allow educational platforms like DeshExam or a third-party to recognize you, making your next visit easier and the learning experience more personalized.
+            </p>
 
-          <h2>3. Third-Party Cookies</h2>
-          <p>
-            In addition to our own cookies, we may also use various third-party cookies to report usage statistics of the Service and deliver advertisements on and through the Service.
-          </p>
-          <ul>
-            <li><strong>Google Analytics:</strong> We use Google Analytics to analyze the use of our website. Google Analytics gathers information about website use by means of cookies.</li>
-            <li><strong>Google AdSense:</strong> Google uses cookies to help serve the ads it displays on the websites of its partners. When users visit a Google partner's website, a cookie may be dropped on that end user's browser.</li>
-          </ul>
+            <h2>How We Use Cookies</h2>
+            <p>
+              DeshExam uses cookies to ensure our online learning platform functions seamlessly. We use them for:
+            </p>
+            <ul>
+              <li><strong>Login sessions:</strong> Keeping your account authenticated while you take mock tests.</li>
+              <li><strong>User preferences:</strong> Remembering your theme choices (dark/light mode) or selected language.</li>
+              <li><strong>Analytics:</strong> Using tools like Google Analytics to understand which educational pages are most helpful to our students.</li>
+              <li><strong>Performance tracking:</strong> Ensuring our servers deliver fast mock tests and smooth navigation.</li>
+            </ul>
 
-          <h2>4. Your Choices Regarding Cookies</h2>
-          <p>
-            If you'd like to delete cookies or instruct your web browser to delete or refuse cookies, please visit the help pages of your web browser. Please note, however, that if you delete cookies or refuse to accept them, you might not be able to use all of the features we offer, you may not be able to store your preferences, and some of our pages might not display properly.
-          </p>
-          <ul>
-            <li>For the <strong>Chrome</strong> web browser, please visit this page from Google: <a href="https://support.google.com/accounts/answer/32050" target="_blank" rel="noopener noreferrer">Clear cache & cookies</a></li>
-            <li>For the <strong>Firefox</strong> web browser, please visit this page from Mozilla: <a href="https://support.mozilla.org/en-US/kb/clear-cookies-and-site-data-firefox" target="_blank" rel="noopener noreferrer">Clear cookies and site data in Firefox</a></li>
-            <li>For the <strong>Safari</strong> web browser, please visit this page from Apple: <a href="https://support.apple.com/guide/safari/manage-cookies-sfri11471/mac" target="_blank" rel="noopener noreferrer">Manage cookies and website data in Safari on Mac</a></li>
-          </ul>
-          <p>For any other web browser, please visit your web browser's official web pages.</p>
+            <h2>Types of Cookies We Use</h2>
+            <ul>
+              <li><strong>Essential cookies:</strong> Required for the website to function (e.g., logging in).</li>
+              <li><strong>Functional cookies:</strong> Used to recognize you when you return and remember your settings.</li>
+              <li><strong>Analytics cookies:</strong> Used to collect anonymous data on how visitors interact with the site.</li>
+              <li><strong>Performance cookies:</strong> Used to monitor website speed and technical performance.</li>
+            </ul>
 
-          <h2>5. More Information about Cookies</h2>
-          <p>
-            You can learn more about cookies and the following third-party websites:
-          </p>
-          <ul>
-            <li><a href="http://www.allaboutcookies.org/" target="_blank" rel="noopener noreferrer">AllAboutCookies</a></li>
-            <li><a href="http://www.networkadvertising.org/" target="_blank" rel="noopener noreferrer">Network Advertising Initiative</a></li>
-          </ul>
+            <h2>Why We Use Cookies in DeshExam</h2>
+            <p>
+              As an exam preparation website, maintaining a reliable user session is critical. We use cookies to:
+            </p>
+            <ul>
+              <li>Keep users logged in securely.</li>
+              <li>Save test progress during long mock exams.</li>
+              <li>Improve the mock test experience by reducing load times.</li>
+              <li>Provide personalization, such as recommending relevant tests based on past activity.</li>
+            </ul>
 
-          <h2>6. Contact Us</h2>
-          <p>
-            If you have any questions about our Cookie Policy, please contact us by email at <strong>privacy@deshexam.com</strong>.
-          </p>
+            <h2>Managing Cookies</h2>
+            <p>
+              You have full control over your cookie choices. If you wish to withdraw your consent for non-essential cookies (such as analytics and targeting cookies), you can easily do so right here:
+            </p>
+            <p className="my-6 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+              <ManageCookiesButton />
+            </p>
+            <p>
+              Alternatively, you can instruct your web browser to delete or refuse cookies entirely via its settings. Please note that disabling essential cookies may prevent you from logging into your account or taking mock tests.
+            </p>
+            <ul>
+              <li><a href="https://support.google.com/accounts/answer/32050" target="_blank" rel="noopener noreferrer">Clear cache & cookies in Chrome</a></li>
+              <li><a href="https://support.mozilla.org/en-US/kb/clear-cookies-and-site-data-firefox" target="_blank" rel="noopener noreferrer">Clear cookies and site data in Firefox</a></li>
+              <li><a href="https://support.apple.com/guide/safari/manage-cookies-sfri11471/mac" target="_blank" rel="noopener noreferrer">Manage cookies in Safari</a></li>
+            </ul>
+
+            <h2>Third-party Cookies</h2>
+            <p>
+              We partner with trusted third-party services to enhance our platform:
+            </p>
+            <ul>
+              <li><strong>Analytics tools:</strong> We use Google Analytics to measure site traffic and improve our educational content.</li>
+              <li><strong>Payment gateways:</strong> We use secure payment processors (like Razorpay/Stripe) that use essential cookies for fraud prevention during subscription checkouts.</li>
+            </ul>
+
+            <h2>Updates to This Policy</h2>
+            <p>
+              We may update this Cookie Policy from time to time to reflect changes in legal or operational requirements. We encourage you to review this page periodically. (Current Version: v1.0)
+            </p>
+
+            <hr className="my-10 border-slate-200 dark:border-slate-800" />
+
+            {/* People Also Ask FAQ Section for SEO */}
+            <h2>Frequently Asked Questions</h2>
+            <div className="space-y-6 mt-6">
+              <div>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white mt-0 mb-2">Do cookies store my personal data?</h3>
+                <p className="m-0 text-slate-600 dark:text-slate-400">
+                  Most of our cookies do not collect personally identifiable information. Essential cookies only use secure, encrypted tokens to verify your login session, while analytics cookies collect anonymous, aggregated traffic data.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white mt-0 mb-2">Can I disable cookies on DeshExam?</h3>
+                <p className="m-0 text-slate-600 dark:text-slate-400">
+                  Yes. You can manage your preferences using our Cookie Consent tool to disable non-essential cookies. You can also block all cookies via your browser settings, though this will restrict your ability to log in.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white mt-0 mb-2">Why do I need to accept cookies to use mock tests?</h3>
+                <p className="m-0 text-slate-600 dark:text-slate-400">
+                  Essential cookies are required to link your mock test answers to your specific user account. Without them, our system cannot securely verify your identity or save your test progress.
+                </p>
+              </div>
+            </div>
+
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

@@ -9,6 +9,7 @@ import { Inter, Lexend, Hind_Siliguri } from 'next/font/google';
 import { FirebaseProvider } from "@/hooks/use-firebase";
 import Script from 'next/script';
 import { ConditionalHeader, ConditionalFooter } from "@/components/layout/ConditionalLayout";
+import { CookieConsent } from "@/components/layout/cookie-consent";
 
 const inter = Inter({
   subsets: ['latin'],
@@ -66,6 +67,7 @@ export default function RootLayout({
                 <AuthDialog />
               </AuthDialogProvider>
             </AuthProvider>
+            <CookieConsent />
             <Toaster />
             <Script src="https://checkout.razorpay.com/v1/checkout.js" />
             <Script src="https://accounts.google.com/gsi/client" strategy="beforeInteractive" />

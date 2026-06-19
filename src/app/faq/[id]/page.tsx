@@ -6,43 +6,59 @@ import {
     ThumbsUp, ThumbsDown, Mail, HelpCircle, List 
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useState, use } from 'react';
+import { getFaqBySlugOrId, getFaqs, getCategories } from '@/features/faqs/services/faq.api';
+import { FAQ, FAQCategory } from '@/features/faqs/types/faq.types';
+import { Loader2 } from 'lucide-react';
 
-const categories = [
-    { id: 'study', name: 'Study Plan', icon: <Folder className="w-4 h-4 text-slate-400" /> },
-    { id: 'roles', name: 'Business Roles', icon: <Folder className="w-4 h-4 text-slate-400" /> },
-    { id: 'assignments', name: 'Business Course Assignments', icon: <Folder className="w-4 h-4 text-slate-400" /> },
-    { id: 'settings', name: 'Business Settings', icon: <Folder className="w-4 h-4 text-slate-400" /> },
-    { id: 'package', name: 'Business Exam Package', icon: <Folder className="w-4 h-4 text-slate-400" /> },
-    { id: 'builder', name: 'E-Question Builder', icon: <Folder className="w-4 h-4 text-slate-400" /> },
-];
 
-const relatedFaqs = [
-    {
-        title: "১ ক্লিকে প্রশ্ন তৈরীতে কি কি কাস্টমাইজ করা যাবে?",
-        subtitle: "প্রশ্ন এডিট করা যাবে। লোগো দেয়া যাবে। ঠিকানা যুক্ত করা যাবে। Logo, Motto যুক্ত করা যা...",
-        category: "E-Question Builder"
-    },
-    {
-        title: "E-Question Builder কী?",
-        subtitle: "E-Question Builder হল একটি স্মার্ট টুল যা শিক্ষকদের জন্য লক্ষ লক্ষ প্রশ্নের ভাণ্ডা...",
-        category: "E-Question Builder"
-    },
-    {
-        title: "E-Question Builder-এ কোন স্তরের প্রশ্ন তৈরি করা যায়?",
-        subtitle: "এখানে ৪র্থ শ্রেণি থেকে দ্বাদশ শ্রেণি, বিশ্ববিদ্যালয় ভর্তি প্রস্তুতি ও চাকরি প্রস্তু...",
-        category: "E-Question Builder"
-    },
-    {
-        title: "একাধিক বিষয়ের প্রশ্ন একসাথে কি তৈরি করা সম্ভব?",
-        subtitle: "হ্যাঁ, আপনি এক বা একাধিক বিষয় নির্বাচন করে একত্রে প্রশ্ন সেট তৈরি করতে পারবেন।",
-        category: "E-Question Builder"
-    }
-];
+
+
+
 
 export default function SingleFAQPage() {
     const params = useParams();
-    const id = params.id;
+    
+    const router = useRouter();
+    // Unwrap params using React.use() to fix Next.js 15 warning
+    const unwrappedParams = use(params as any) as { id: string };
+    const id = unwrappedParams.id;
+
+    const [faq, setFaq] = useState<FAQ | null>(null);
+    const [categoriesData, setCategoriesData] = useState<FAQCategory[]>([]);
+    const [relatedFaqsList, setRelatedFaqsList] = useState<FAQ[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (!id) return;
+        const loadData = async () => {
+            try {
+                const fetchedFaq = await getFaqBySlugOrId(id as string);
+                if (!fetchedFaq) {
+                    router.push('/faq');
+                    return;
+                }
+                setFaq(fetchedFaq);
+                
+                const fetchedCategories = await getCategories();
+                setCategoriesData(fetchedCategories);
+
+                const allFaqs = await getFaqs();
+                setRelatedFaqsList(allFaqs.filter(f => f.categoryId === fetchedFaq.categoryId && f.id !== fetchedFaq.id).slice(0, 4));
+            } catch (err) {
+                router.push('/faq');
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadData();
+    }, [id, router]);
+
+    if (loading || !faq) {
+        return <div className="min-h-screen flex items-center justify-center bg-[#f8f9fa]"><Loader2 className="w-8 h-8 animate-spin text-[#0ea5e9]" /></div>;
+    }
+
 
     return (
         <div className="min-h-screen bg-[#f8f9fa] font-sans">
@@ -56,7 +72,7 @@ export default function SingleFAQPage() {
                         <div className="text-slate-500 font-medium text-[13px] hidden sm:block">
                             <Link href="/" className="hover:text-slate-800">হোম</Link> <span className="mx-1.5 text-slate-300">›</span> 
                             <Link href="/faq" className="hover:text-slate-800">প্রশ্ন করুন</Link> <span className="mx-1.5 text-slate-300">›</span> 
-                            <span className="text-slate-800 font-semibold truncate max-w-[200px] sm:max-w-[300px] inline-block align-bottom">ফন্ট ও লেআউট কা...</span>
+                            <span className="text-slate-800 font-semibold truncate max-w-[200px] sm:max-w-[300px] inline-block align-bottom">{faq.question.substring(0, 20)}...</span>
                         </div>
                     </div>
                     <div>
@@ -78,7 +94,7 @@ export default function SingleFAQPage() {
                             
                             {/* Title & Meta */}
                             <h1 className="text-3xl sm:text-[34px] font-medium text-slate-800 mb-5 leading-tight break-words">
-                                ফন্ট ও লেআউট কাস্টমাইজ করা যাবে?
+                                {faq.question}
                             </h1>
                             
                             <div className="flex flex-wrap items-center gap-y-3 gap-x-6 text-[#737373] text-[14px] font-medium mb-8 pb-6 border-b border-slate-100">
@@ -88,15 +104,15 @@ export default function SingleFAQPage() {
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <Calendar className="w-[18px] h-[18px]" />
-                                    <span>প্রকাশিত: 04 Aug, 2025</span>
+                                    <span>প্রকাশিত: {faq.createdAt ? (typeof (faq.createdAt as any).toDate === 'function' ? (faq.createdAt as any).toDate().toLocaleDateString() : new Date(faq.createdAt as any).toLocaleDateString()) : 'Recent'}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <Clock className="w-[18px] h-[18px]" />
-                                    <span>আপডেট: 6 মাস আগে</span>
+                                    <span>আপডেট: {faq.updatedAt ? (typeof (faq.updatedAt as any).toDate === 'function' ? (faq.updatedAt as any).toDate().toLocaleDateString() : new Date(faq.updatedAt as any).toLocaleDateString()) : 'Recent'}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <Eye className="w-[18px] h-[18px]" />
-                                    <span>দেখা হয়েছে: 382 বার</span>
+                                    <span>দেখা হয়েছে: {faq.views || 0} বার</span>
                                 </div>
                             </div>
 
@@ -131,17 +147,17 @@ export default function SingleFAQPage() {
                             </div>
                             
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {relatedFaqs.map((faq, idx) => (
+                                {relatedFaqsList.map((faq, idx) => (
                                     <div key={idx} className="bg-white border border-slate-200 rounded-lg p-5 hover:border-slate-300 transition-colors cursor-pointer flex flex-col h-full">
                                         <h3 className="font-bold text-slate-800 text-[14px] leading-snug mb-2">
-                                            {faq.title}
+                                            {faq.question}
                                         </h3>
                                         <p className="text-[12px] text-slate-500 leading-relaxed mb-4 flex-1">
-                                            {faq.subtitle}
+                                            {faq.answer}
                                         </p>
                                         <div className="mt-auto">
                                             <span className="inline-block border border-slate-200 bg-white text-slate-600 px-3 py-1 rounded text-[11px] font-bold">
-                                                {faq.category}
+                                                {(categoriesData.find(c => c.id === faq.categoryId)?.name || 'General')}
                                             </span>
                                         </div>
                                     </div>
@@ -160,7 +176,7 @@ export default function SingleFAQPage() {
                                 <List className="w-4 h-4" /> ক্যাটাগরি
                             </div>
                             <div className="flex flex-col text-[13px] font-medium p-2">
-                                {categories.map((cat, index) => {
+                                {[{id: 'all', name: 'সকল FAQ'}, ...categoriesData].map((cat, index, arr) => {
                                     const linkHref = "/faq?category=" + cat.id;
                                     return (
                                         <Link 
@@ -168,10 +184,10 @@ export default function SingleFAQPage() {
                                             href={linkHref}
                                             className={cn(
                                                 "flex items-center gap-3 px-3 py-2.5 text-left transition-colors hover:bg-slate-50 text-slate-600 rounded",
-                                                index !== categories.length - 1 && "border-b border-slate-100"
+                                                index !== arr.length - 1 && "border-b border-slate-100"
                                             )}
                                         >
-                                            {cat.icon}
+                                            <Folder className="w-4 h-4" />
                                             {cat.name}
                                         </Link>
                                     );

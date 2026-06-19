@@ -1,177 +1,140 @@
 import re
 
-file_path = r"f:\developer\deshexam\src\app\e-question-builder\create-question\QuestionPaperBuilder.tsx"
+def patch_page():
+    with open('src/app/faq/page.tsx', 'r', encoding='utf-8') as f:
+        content = f.read()
 
-with open(file_path, "r", encoding="utf-8") as f:
-    content = f.read()
+    # remove static data
+    content = re.sub(r'const categories = \[.*?\];', '', content, flags=re.DOTALL)
+    content = re.sub(r'const recentFaqs = \[.*?\];', '', content, flags=re.DOTALL)
+    content = re.sub(r'const faqsList = \[.*?\];', '', content, flags=re.DOTALL)
 
-# 1. Imports
-content = content.replace(
-    "import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';",
-    "import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';\nimport { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';"
-)
+    # add imports
+    if 'getFaqs' not in content:
+        imports = "import { useEffect, useState } from 'react';\nimport { getFaqs, getCategories } from '@/features/faqs/services/faq.api';\nimport { FAQ, FAQCategory } from '@/features/faqs/types/faq.types';\nimport { Loader2 } from 'lucide-react';\n"
+        content = content.replace("import { useState } from 'react';", imports)
 
-content = content.replace(
-    "import { QuestionBankModal } from './QuestionBankModal';",
-    "import { QuestionBankModal } from './QuestionBankModal';\nimport { AiQuestionGeneratorModal } from './AiQuestionGeneratorModal';"
-)
+    new_state = """    const [faqs, setFaqs] = useState<FAQ[]>([]);
+    const [categories, setCategories] = useState<FAQCategory[]>([]);
+    const [loading, setLoading] = useState(true);
 
-content = content.replace(
-    "import { Download, Settings, FileText, Shuffle, Save, ArrowLeft, Edit, Book, Monitor, Lightbulb, User, Tag, Star, Grid3X3, Columns, Barcode, Hash, LayoutGrid, FileDigit, Heading, MapPin, Landmark, Layers, HelpCircle, RefreshCw, Printer, Languages, QrCode, ImageIcon, Waves, PlusCircle, Plus, CheckCircle, CircleDot, Zap, Loader2, GripVertical, Trash2, Database } from 'lucide-react';",
-    "import { Download, Settings, FileText, Shuffle, Save, ArrowLeft, Edit, Book, Monitor, Lightbulb, User, Tag, Star, Grid3X3, Columns, Barcode, Hash, LayoutGrid, FileDigit, Heading, MapPin, Landmark, Layers, HelpCircle, RefreshCw, Printer, Languages, QrCode, ImageIcon, Waves, PlusCircle, Plus, CheckCircle, CircleDot, Zap, Loader2, GripVertical, Trash2, Database, Sparkles } from 'lucide-react';"
-)
+    useEffect(() => {
+        const loadData = async () => {
+            const fetchedFaqs = await getFaqs();
+            const fetchedCategories = await getCategories();
+            setFaqs(fetchedFaqs);
+            setCategories(fetchedCategories);
+            setLoading(false);
+        };
+        loadData();
+    }, []);
 
-# 2. States
-content = content.replace(
-    "const [isQuestionBankOpen, setIsQuestionBankOpen] = useState(false);",
-    "const [isQuestionBankOpen, setIsQuestionBankOpen] = useState(false);\n  const [isAiGeneratorOpen, setIsAiGeneratorOpen] = useState(false);\n  const [isMobileSettingsOpen, setIsMobileSettingsOpen] = useState(false);"
-)
+    const filteredFaqs = faqs.filter(faq => {
+        const matchesCategory = activeCategory === 'all' || faq.categoryId === activeCategory;
+        const matchesSearch = faq.question.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                              faq.answer.toLowerCase().includes(searchQuery.toLowerCase());
+        return matchesCategory && matchesSearch;
+    });
 
-# 3. handleAddFromBank
-add_from_bank_fn = """  const handleAddFromBank = (newQs: QuestionBankEntry[]) => {
-    setQuestions([...questions, ...newQs]);
-  };"""
-if "const handleAddFromBank =" not in content:
-    content = content.replace(
-        "const [showExplanations, setShowExplanations] = useState(false);",
-        "const [showExplanations, setShowExplanations] = useState(false);\n\n" + add_from_bank_fn
-    )
+    const recentFaqsList = [...faqs].sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis()).slice(0, 5);
 
-# 4. Header & Layout Wrapper
-content = content.replace(
-    '<header className="bg-white border-b px-6 py-4 flex justify-between items-center print:hidden">',
-    '<header className="bg-white border-b px-4 sm:px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 print:hidden">'
-)
+    if (loading) {
+        return <div className="min-h-screen flex items-center justify-center bg-[#f8f9fa]"><Loader2 className="w-8 h-8 animate-spin text-[#0ea5e9]" /></div>;
+    }
+"""
+    if 'setFaqs' not in content:
+        content = re.sub(r'export default function FAQPage\(\) \{\n', 'export default function FAQPage() {\n' + new_state, content)
 
-content = content.replace(
-    '<Button variant="ghost" size="icon" onClick={() => router.back()} className="text-gray-500">',
-    '<Button variant="ghost" size="icon" onClick={() => router.back()} className="text-gray-500 shrink-0">'
-)
+    # UI replacements
+    content = content.replace("categories.map((cat, index)", "[{id: 'all', name: 'সকল FAQ'}, ...categories].map((cat, index)")
+    content = content.replace("{cat.icon}", '<Folder className="w-4 h-4" />')
+    
+    content = content.replace("recentFaqs.map", "recentFaqsList.map")
+    content = content.replace("{faq.title}", "{faq.question}")
+    content = content.replace("{faq.subtitle}", "{faq.answer}")
+    
+    content = content.replace("faqsList.map", "filteredFaqs.map")
+    content = content.replace("{faq.text}", "{faq.question}")
+    content = content.replace("{faq.category}", "{(categories.find(c => c.id === faq.categoryId)?.name || 'General')}")
+    content = content.replace("`/faq/${faq.id}`", "`/faq/${faq.seo?.slug || faq.id}`")
 
-content = content.replace(
-    '<div className="flex items-center gap-4">',
-    '<div className="flex items-center gap-3 w-full sm:w-auto">'
-)
+    with open('src/app/faq/page.tsx', 'w', encoding='utf-8') as f:
+        f.write(content)
 
-content = content.replace(
-    '          <div>\n            <h1 className="text-xl font-bold text-gray-800">{t(\'create_question_paper\', appLanguage)}</h1>\n            <div className="text-sm text-gray-500">Home &gt; E-Question Builder &gt; Create Question</div>\n          </div>',
-    '          <div className="min-w-0 flex-1">\n            <h1 className="text-lg sm:text-xl font-bold text-gray-800 truncate">{t(\'create_question_paper\', appLanguage)}</h1>\n            <div className="text-xs sm:text-sm text-gray-500 truncate">Home &gt; E-Question Builder &gt; Create Question</div>\n          </div>'
-)
 
-content = content.replace(
-    '<div className="flex gap-2">',
-    '<div className="flex gap-2 w-full sm:w-auto sm:justify-end">'
-)
+def patch_single_page():
+    with open('src/app/faq/[id]/page.tsx', 'r', encoding='utf-8') as f:
+        content = f.read()
 
-content = content.replace(
-    '<Button\n              className="bg-[#1e293b] hover:bg-[#0f172a] text-white shadow-sm flex items-center h-9 px-4 text-sm font-medium"\n              onClick={handlePrint}\n            >',
-    '<Button\n              className="bg-[#1e293b] hover:bg-[#0f172a] text-white shadow-sm flex items-center h-9 px-4 text-sm font-medium shrink-0"\n              onClick={handlePrint}\n            >'
-)
+    # remove static data
+    content = re.sub(r'const categories = \[.*?\];', '', content, flags=re.DOTALL)
+    content = re.sub(r'const relatedFaqs = \[.*?\];', '', content, flags=re.DOTALL)
 
-content = content.replace(
-    '<div className="flex flex-col min-h-screen bg-[#f0f2f5] print:bg-white">',
-    '<div className="flex flex-col min-h-screen bg-[#f0f2f5] print:bg-white pb-20 lg:pb-0">'
-)
+    # add imports
+    if 'getFaqBySlugOrId' not in content:
+        content = content.replace("import { useParams } from 'next/navigation';", 
+        "import { useParams, useRouter } from 'next/navigation';\nimport { useEffect, useState } from 'react';\nimport { getFaqBySlugOrId, getFaqs, getCategories } from '@/features/faqs/services/faq.api';\nimport { FAQ, FAQCategory } from '@/features/faqs/types/faq.types';\nimport { Loader2 } from 'lucide-react';\n")
 
-content = content.replace(
-    '<div className="flex flex-1 max-w-[1400px] mx-auto w-full p-4 gap-6 relative print:p-0 print:m-0 print:static">',
-    '<div className="flex flex-col lg:flex-row flex-1 max-w-[1400px] mx-auto w-full p-2 sm:p-4 gap-6 relative print:p-0 print:m-0 print:static">'
-)
+    new_state = """
+    const router = useRouter();
+    const [faq, setFaq] = useState<FAQ | null>(null);
+    const [categories, setCategories] = useState<FAQCategory[]>([]);
+    const [relatedFaqsList, setRelatedFaqsList] = useState<FAQ[]>([]);
+    const [loading, setLoading] = useState(true);
 
-# 5. Extract Sidebar to renderSidebarSettings()
-sidebar_match = re.search(r'(<aside className="w-72 bg-white rounded-lg shadow-sm border border-gray-200 h-fit max-h-\[calc\(100vh-120px\)\] overflow-y-auto sticky top-24 print:hidden shrink-0">.*?</aside>)', content, re.DOTALL)
-if sidebar_match:
-    sidebar_html = sidebar_match.group(1)
-    # Remove the wrapper
-    inner_sidebar = re.sub(r'^<aside.*?>', '<>', sidebar_html)
-    inner_sidebar = re.sub(r'</aside>$', '</>', inner_sidebar)
+    useEffect(() => {
+        if (!id) return;
+        const loadData = async () => {
+            try {
+                const fetchedFaq = await getFaqBySlugOrId(id as string);
+                if (!fetchedFaq) {
+                    router.push('/faq');
+                    return;
+                }
+                setFaq(fetchedFaq);
+                
+                const fetchedCategories = await getCategories();
+                setCategories(fetchedCategories);
 
-    # Replace aside with hidden lg:block wrapper
-    new_aside = f'<aside className="hidden lg:block w-full lg:w-72 bg-white rounded-lg shadow-sm border border-gray-200 h-fit max-h-[calc(100vh-120px)] overflow-y-auto lg:sticky lg:top-24 print:hidden shrink-0">\n          {{renderSidebarSettings()}}\n        </aside>'
+                const allFaqs = await getFaqs();
+                setRelatedFaqsList(allFaqs.filter(f => f.categoryId === fetchedFaq.categoryId && f.id !== fetchedFaq.id).slice(0, 4));
+            } catch (err) {
+                router.push('/faq');
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadData();
+    }, [id, router]);
 
-    content = content.replace(sidebar_html, new_aside)
+    if (loading || !faq) {
+        return <div className="min-h-screen flex items-center justify-center bg-[#f8f9fa]"><Loader2 className="w-8 h-8 animate-spin text-[#0ea5e9]" /></div>;
+    }
+"""
+    if 'setFaq' not in content:
+        content = re.sub(r'export default function SingleFAQPage\(\) \{\n.*?const id = params.id;\n', 
+        'export default function SingleFAQPage() {\n    const params = useParams();\n    const id = params.id;\n' + new_state, content, flags=re.DOTALL)
 
-    render_fn = f"  const renderSidebarSettings = () => (\n    {inner_sidebar}\n  );\n\n  return ("
-    content = content.replace("  return (", render_fn)
+    # UI Replacements
+    content = content.replace("ফন্ট ও লেআউট কা...", "{faq.question.substring(0, 20)}...")
+    content = content.replace("ফন্ট ও লেআউট কাস্টমাইজ করা যাবে?", "{faq.question}")
+    content = content.replace("E-Question Builder", "{(categories.find(c => c.id === faq.categoryId)?.name || 'General')}")
+    
+    # date replacements
+    content = content.replace("04 Aug, 2025", "{faq.createdAt.toDate().toLocaleDateString()}")
+    content = content.replace("6 মাস আগে", "{faq.updatedAt.toDate().toLocaleDateString()}")
+    content = content.replace("382 বার", "{faq.views} বার")
 
-# 6. Add Ai Generator button
-ai_btn = """                          <Button variant="outline" className="border-dashed border-2 bg-indigo-50/50 text-indigo-700 hover:bg-indigo-100/50 hover:text-indigo-800" onClick={() => setIsAiGeneratorOpen(true)}>
-                            <Sparkles className="w-4 h-4 mr-2" />
-                            {t('aiGenerate', appLanguage)}
-                          </Button>
-                          <Button variant="outline" className="border-dashed border-2 bg-gray-50 text-gray-700 hover:bg-gray-100" onClick={() => setIsQuestionBankOpen(true)}>
-                            <Database className="w-4 h-4 mr-2" />
-                            {t('addFromBank', appLanguage)}
-                          </Button>"""
+    content = content.replace("categories.map((cat, index)", "[{id: 'all', name: 'সকল FAQ'}, ...categories].map((cat, index)")
+    content = content.replace("{cat.icon}", '<Folder className="w-4 h-4" />')
+    
+    content = content.replace("relatedFaqs.map", "relatedFaqsList.map")
+    content = content.replace("{faq.title}", "{item.question}") # wait we need to see what var is used inside relatedFaqs.map
+    # we need to do regex replacement carefully
+    
+    with open('src/app/faq/[id]/page.tsx', 'w', encoding='utf-8') as f:
+        f.write(content)
 
-content = content.replace(
-    """<Button variant="outline" className="text-emerald-600 border-emerald-200 hover:bg-emerald-50" onClick={() => setIsQuestionBankOpen(true)}>
-                            <Database className="w-4 h-4 mr-2" /> {t('addFromBank', appLanguage)}
-                          </Button>""",
-    ai_btn
-)
-
-# 7. Add Modals and Mobile Bottom Bar
-bottom_content = """      <QuestionBankModal
-        isOpen={isQuestionBankOpen}
-        onClose={() => setIsQuestionBankOpen(false)}
-        onAdd={handleAddFromBank}
-        appLanguage={appLanguage}
-      />
-      
-      <AiQuestionGeneratorModal
-        isOpen={isAiGeneratorOpen}
-        onClose={() => setIsAiGeneratorOpen(false)}
-        onAdd={handleAddFromBank}
-        appLanguage={appLanguage}
-      />
-
-      {/* Mobile Bottom Navigation & Settings Sheet */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t px-2 py-3 flex items-center justify-around z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] pb-safe print:hidden">
-        <Button variant="ghost" className="flex flex-col items-center gap-1 h-auto py-1" onClick={() => setIsMobileSettingsOpen(true)}>
-          <Settings className="w-5 h-5 text-gray-600" />
-          <span className="text-[10px] text-gray-500 font-medium">Settings</span>
-        </Button>
-        <Button variant="ghost" className="flex flex-col items-center gap-1 h-auto py-1 text-indigo-600" onClick={() => { setIsAiGeneratorOpen(true); setEditingMode(true); }}>
-          <Sparkles className="w-5 h-5 text-indigo-600" />
-          <span className="text-[10px] font-medium">AI Gen</span>
-        </Button>
-        <Button variant="ghost" className="flex flex-col items-center gap-1 h-auto py-1 text-emerald-600" onClick={() => { setIsQuestionBankOpen(true); setEditingMode(true); }}>
-          <Database className="w-5 h-5 text-emerald-600" />
-          <span className="text-[10px] font-medium">Bank</span>
-        </Button>
-        <Button variant="ghost" className="flex flex-col items-center gap-1 h-auto py-1 text-blue-600" onClick={() => { setIsAddQuestionOpen(true); setEditingMode(true); }}>
-          <PlusCircle className="w-5 h-5 text-blue-600" />
-          <span className="text-[10px] font-medium">Custom</span>
-        </Button>
-      </div>
-
-      <Sheet open={isMobileSettingsOpen} onOpenChange={setIsMobileSettingsOpen}>
-        <SheetContent side="bottom" className="h-[85vh] p-0 flex flex-col bg-[#f0f2f5] rounded-t-2xl">
-          <SheetHeader className="px-4 py-3 bg-white border-b rounded-t-2xl shrink-0">
-            <SheetTitle className="text-left text-lg">Builder Settings</SheetTitle>
-          </SheetHeader>
-          <div className="flex-1 overflow-y-auto p-4">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-              {renderSidebarSettings()}
-            </div>
-          </div>
-        </SheetContent>
-      </Sheet>
-
-    </div>
-  );
-}"""
-
-# Remove old QuestionBankModal if it exists
-content = re.sub(r'<QuestionBankModal.*?/>', '', content, flags=re.DOTALL)
-
-content = content.replace(
-    '    </div>\n  );\n}',
-    bottom_content
-)
-
-with open(file_path, "w", encoding="utf-8") as f:
-    f.write(content)
-
-print("Patched successfully!")
+patch_page()
+patch_single_page()
+print("Done")
