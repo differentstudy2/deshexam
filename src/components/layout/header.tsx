@@ -15,7 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetHeader } from "@/components/ui/sheet";
-import { Menu, LogOut, LayoutDashboard, User as UserIcon, ShieldCheck, Gem, Trophy, Sparkles, BookOpen, ShoppingCart, PlusCircle, LogIn, UserPlus, LayoutGrid, Library, FileText, Settings, BookUser, ClipboardList, Send, Ticket, DollarSign, Users, Book, ToyBrick, Award, Activity, Zap, FilePlus, Printer, MessageSquare, Bell, Heart, Bookmark, Gift, Share2, Briefcase, Package, HelpCircle, ChevronRight, ChevronDown, BarChart2, Compass, Upload, Search, GraduationCap, School, Play } from "lucide-react";
+import { Menu, LogOut, LayoutDashboard, User as UserIcon, ShieldCheck, Gem, Trophy, Sparkles, BookOpen, ShoppingCart, PlusCircle, LogIn, UserPlus, LayoutGrid, Library, FileText, Settings, BookUser, ClipboardList, Send, Ticket, DollarSign, Users, Book, ToyBrick, Award, Activity, Zap, FilePlus, Printer, MessageSquare, Bell, Heart, Bookmark, Gift, Share2, Briefcase, Package, HelpCircle, ChevronRight, ChevronDown, BarChart2, Compass, Upload, Search, GraduationCap, School, Play, Headphones } from "lucide-react";
 import { DeshExamLogo } from "@/components/icons";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
@@ -117,6 +117,7 @@ const adminNavGroups = [
     title: "Academic Content",
     items: [
       { href: '/admin/video', label: 'Videos', icon: <Play className="h-4 w-4" /> },
+      { href: '/admin/audio', label: 'Audio', icon: <Headphones className="h-4 w-4" /> },
       { href: '/admin/documents', label: 'Documents', icon: <FileText className="h-4 w-4" /> },
       { href: '/admin/guide-content/explorer', label: 'Content Explorer', icon: <Compass className="h-4 w-4" /> },
       { href: '/admin/institution', label: 'Institutions', icon: <School className="h-4 w-4" /> },
