@@ -5,21 +5,21 @@ import { Linkedin, Twitter, Github } from "lucide-react";
 export function TeamSection() {
   const teamMembers = [
     {
-      name: "Aarav Sharma",
+      name: "MdjMiah",
       role: "Founder & CEO",
-      avatar: "https://picsum.photos/seed/AaravSharma/200/200",
+      avatar: "/mdjmiah.png",
       bio: "A passionate educator with a vision to make quality education accessible to every student in India.",
     },
     {
-      name: "Saanvi Gupta",
+      name: "MdjMiah",
       role: "Head of Content",
-      avatar: "https://picsum.photos/seed/SaanviGupta/200/200",
+      avatar: "/mdjmiah.png",
       bio: "An experienced teacher and curriculum designer, ensuring our content is top-notch and highly effective.",
     },
     {
-      name: "Vivaan Singh",
+      name: "MdjMiah",
       role: "Lead Developer",
-      avatar: "https://picsum.photos/seed/VivaanSingh/200/200",
+      avatar: "/mdjmiah.png",
       bio: "The tech wizard behind our platform, dedicated to creating a seamless and powerful learning experience.",
     },
   ];
