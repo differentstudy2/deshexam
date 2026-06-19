@@ -293,7 +293,7 @@ export default function ContactPage() {
             <div className="p-6 relative h-[400px]">
               <div className="w-full h-full rounded-xl overflow-hidden relative bg-slate-100 border border-[#E2E8F0]">
                 <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14736.255474320982!2d88.33400269999999!3d22.5766627!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a0277a06c2847c1%3A0xf69c0d9a6c9dfbd3!2sKolkata%2C%20West%20Bengal!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
+                  src="https://maps.google.com/maps?q=Dwarikamari,%20Petla,%20Dinhata,%20West%20Bengal%20736135&t=&z=14&ie=UTF8&iwloc=&output=embed"
                   width="100%"
                   height="100%"
                   style={{ border: 0 }}
