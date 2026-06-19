@@ -122,8 +122,8 @@ export default function SingleFAQPage() {
                                 </div>
                                 {/* Content Box */}
                                 <div className="bg-[#f8f9fa] border border-slate-200 rounded-b-md rounded-tr-md p-5 sm:p-6 mb-6">
-                                    <p className="text-[15px] text-slate-800 leading-relaxed font-medium">
-                                        অবশ্যই, E-Question Builder-এ রয়েছে Font Size, Font Style, Layout Control - যার মাধ্যমে আপনি প্রিন্ট বা PDF এর চেহারা একদম নিজের মতো করে ডিজাইন করতে পারবেন।
+                                    <p className="text-[15px] text-slate-800 leading-relaxed font-medium whitespace-pre-wrap">
+                                        {faq.answer}
                                     </p>
                                 </div>
                                 {/* Action Buttons */}
@@ -201,11 +201,11 @@ export default function SingleFAQPage() {
                             </div>
                             <div className="p-6 flex items-center justify-between text-center divide-x divide-slate-100">
                                 <div className="flex-1">
-                                    <div className="text-2xl font-bold text-blue-500 mb-1">381</div>
+                                    <div className="text-2xl font-bold text-blue-500 mb-1">{faq.views || 0}</div>
                                     <div className="text-[12px] font-bold text-slate-400 uppercase tracking-wide">ভিউ</div>
                                 </div>
                                 <div className="flex-1">
-                                    <div className="text-2xl font-bold text-emerald-500 mb-1">2</div>
+                                    <div className="text-2xl font-bold text-emerald-500 mb-1">0</div>
                                     <div className="text-[12px] font-bold text-slate-400 uppercase tracking-wide">সহায়ক ভোট</div>
                                 </div>
                             </div>
