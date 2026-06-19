@@ -63,6 +63,33 @@ export default function FAQSettingsPage() {
     }
   };
 
+  const handleSeedCategories = async () => {
+    if (!confirm("This will add standard categories like Mock Tests, Payments, etc. Proceed?")) return;
+    const defaultCats = [
+      { name: "General Queries", slug: "general" },
+      { name: "Mock Tests & Practice", slug: "mock-tests" },
+      { name: "Payments & Billing", slug: "payments" },
+      { name: "Account Management", slug: "account" },
+      { name: "Technical Support", slug: "technical" },
+      { name: "Syllabus & Course Info", slug: "syllabus" }
+    ];
+    try {
+      setIsAddingCat(true);
+      for (const cat of defaultCats) {
+        // Only add if it doesn't already exist
+        if (!categories.find(c => c.slug === cat.slug)) {
+          const added = await createCategory(cat);
+          setCategories(prev => [...prev, added]);
+        }
+      }
+      toast({ title: "Success", description: "Default categories added." });
+    } catch (err) {
+      toast({ variant: "destructive", title: "Error", description: "Failed to seed categories." });
+    } finally {
+      setIsAddingCat(false);
+    }
+  };
+
   const handleDeleteCategory = async (id: string) => {
     if (!confirm("Are you sure you want to delete this category? FAQs using it might lose their classification.")) return;
     try {
@@ -114,9 +141,14 @@ export default function FAQSettingsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Categories Card */}
         <Card>
-          <CardHeader>
-            <CardTitle>Categories</CardTitle>
-            <CardDescription>Manage the main categories for your FAQs.</CardDescription>
+          <CardHeader className="flex flex-row items-start justify-between space-y-0">
+            <div>
+              <CardTitle>Categories</CardTitle>
+              <CardDescription>Manage the main categories for your FAQs.</CardDescription>
+            </div>
+            <Button variant="outline" size="sm" onClick={handleSeedCategories} disabled={isAddingCat} className="text-indigo-600 border-indigo-200 hover:bg-indigo-50">
+              Auto-Seed Default
+            </Button>
           </CardHeader>
           <CardContent className="space-y-4">
             <form onSubmit={handleAddCategory} className="flex gap-2">
