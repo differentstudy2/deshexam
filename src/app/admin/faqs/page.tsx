@@ -89,6 +89,11 @@ export default function FAQManagePage() {
               <Trash2 className="w-4 h-4 mr-2" /> Delete Selected ({selectedIds.length})
             </Button>
           )}
+          <Link href="/admin/faqs/settings">
+            <Button variant="outline">
+              Settings
+            </Button>
+          </Link>
           <Link href="/admin/faqs/create">
             <Button className="bg-indigo-600 hover:bg-indigo-700">
               <Plus className="w-4 h-4 mr-2" /> Create FAQ

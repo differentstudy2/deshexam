@@ -1,9 +1,11 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FAQFilters, FAQStatus } from "../types/faq.types";
+import { FAQFilters, FAQStatus, FAQCategory } from "../types/faq.types";
 import { Search } from "lucide-react";
+import { getCategories } from "../services/faq.api";
 
 interface FAQFiltersBarProps {
   filters: FAQFilters;
@@ -11,6 +13,12 @@ interface FAQFiltersBarProps {
 }
 
 export const FAQFiltersBar = ({ filters, onFilterChange }: FAQFiltersBarProps) => {
+  const [categories, setCategories] = useState<FAQCategory[]>([]);
+
+  useEffect(() => {
+    getCategories().then(setCategories).catch(console.error);
+  }, []);
+
   return (
     <div className="flex flex-col md:flex-row gap-4 mb-6">
       <div className="relative flex-1">
@@ -28,16 +36,14 @@ export const FAQFiltersBar = ({ filters, onFilterChange }: FAQFiltersBarProps) =
           value={filters.categoryId || "all"} 
           onValueChange={(val) => onFilterChange({ categoryId: val })}
         >
-          <SelectTrigger className="w-[140px]">
+          <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Category" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Categories</SelectItem>
-            <SelectItem value="general">General</SelectItem>
-            <SelectItem value="account">Account</SelectItem>
-            <SelectItem value="mock_tests">Mock Tests</SelectItem>
-            <SelectItem value="subscription">Subscription</SelectItem>
-            <SelectItem value="payments">Payments</SelectItem>
+            {categories.map(cat => (
+              <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+            ))}
           </SelectContent>
         </Select>
 

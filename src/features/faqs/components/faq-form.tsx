@@ -266,11 +266,9 @@ export const FAQForm = ({ initialData, onSubmit, isSubmitting, title }: FAQFormP
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="general">General</SelectItem>
-                            <SelectItem value="account">Account</SelectItem>
-                            <SelectItem value="mock_tests">Mock Tests</SelectItem>
-                            <SelectItem value="subscription">Subscription</SelectItem>
-                            <SelectItem value="payments">Payments</SelectItem>
+                            {categories.map((cat) => (
+                              <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                         <FormMessage />
