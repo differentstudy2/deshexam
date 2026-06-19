@@ -12,6 +12,7 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { AudioPlayerPaywall } from '@/components/audio/AudioPlayerPaywall';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const resolvedParams = await params;
@@ -189,17 +190,12 @@ export default async function AudioSinglePage({ params }: { params: Promise<{ sl
                 </div>
               </div>
 
-              {/* Player Controls (Native HTML5 wrapper for now) */}
-              <div className="bg-slate-950 p-4 border-t border-slate-800">
-                <audio 
-                  controls 
-                  controlsList={item.allowDownload ? "" : "nodownload"}
-                  className="w-full h-12 [&::-webkit-media-controls-panel]:bg-slate-100" 
-                  src={item.audioUrl || item.url}
-                >
-                  Your browser does not support the audio element.
-                </audio>
-              </div>
+              {/* Player Controls (Paywall enabled wrapper) */}
+              <AudioPlayerPaywall 
+                audioUrl={item.audioUrl || item.url}
+                allowDownload={item.allowDownload}
+                isPremium={item.isPremium}
+              />
             </div>
 
             {/* Author and Action Buttons */}
