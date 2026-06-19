@@ -21,6 +21,7 @@ import {
 export default function FAQPage() {
     const [activeCategory, setActiveCategory] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
     const [expandedFaq, setExpandedFaq] = useState<string | null>(null);
     const { toast } = useToast();
     const [faqs, setFaqs] = useState<FAQ[]>([]);
@@ -49,6 +50,27 @@ export default function FAQPage() {
                               faq.answer.toLowerCase().includes(searchQuery.toLowerCase());
         return matchesCategory && matchesSearch;
     });
+
+    // Reset pagination when filters change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [activeCategory, searchQuery]);
+
+    const ITEMS_PER_PAGE = 10;
+    const totalPages = Math.ceil(filteredFaqs.length / ITEMS_PER_PAGE);
+    const paginatedFaqs = filteredFaqs.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
+    const getPaginationRange = () => {
+        const range = [];
+        for (let i = 1; i <= totalPages; i++) {
+            if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+                range.push(i);
+            } else if (i === currentPage - 3 || i === currentPage + 3) {
+                range.push("...");
+            }
+        }
+        return range.filter((p, idx, arr) => p !== "..." || arr[idx - 1] !== "...");
+    };
 
     const recentFaqsList = [...faqs].sort((a, b) => {
         const getMillis = (date: any) => {
@@ -171,7 +193,7 @@ export default function FAQPage() {
                         
                         {/* Header */}
                         <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
-                            <h2 className="text-[17px] font-bold text-slate-800">সকল FAQ (873)</h2>
+                            <h2 className="text-[17px] font-bold text-slate-800">সকল FAQ ({filteredFaqs.length})</h2>
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <button className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 transition-colors text-slate-800 px-3 py-1.5 rounded text-[14px] font-semibold border border-slate-200 outline-none">
@@ -190,7 +212,9 @@ export default function FAQPage() {
 
                         {/* FAQ List */}
                         <div className="space-y-3">
-                            {filteredFaqs.map((faq) => (
+                            {paginatedFaqs.map((faq, index) => {
+                                const displayIndex = (currentPage - 1) * ITEMS_PER_PAGE + index + 1;
+                                return (
                                 <div key={faq.id} className={cn(
                                     "bg-white border rounded-lg overflow-hidden transition-colors",
                                     expandedFaq === faq.id ? "border-[#bfdbfe]" : "border-slate-200 hover:border-slate-300"
@@ -202,8 +226,8 @@ export default function FAQPage() {
                                             expandedFaq === faq.id ? "bg-[#dbeafe]" : "hover:bg-slate-50"
                                         )}
                                     >
-                                        <div className="w-8 h-8 rounded-md bg-[#0ea5e9] text-white flex items-center justify-center font-bold text-sm shrink-0">
-                                            {faq.id}
+                                        <div className="w-8 h-8 rounded-md bg-[#0ea5e9] text-white flex items-center justify-center font-bold text-[13px] shrink-0">
+                                            {displayIndex < 10 ? `0${displayIndex}` : displayIndex}
                                         </div>
                                         <h3 className="flex-1 text-[14px] font-semibold text-slate-800">
                                             {faq.question}
@@ -247,27 +271,44 @@ export default function FAQPage() {
                                         </div>
                                     )}
                                 </div>
-                            ))}
+                            )})}
                         </div>
 
                         {/* Pagination */}
-                        <div className="mt-8 flex items-center justify-center gap-1.5">
-                            <button className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-600 text-sm">‹</button>
-                            <button className="w-8 h-8 flex items-center justify-center rounded bg-[#0ea5e9] text-white text-[13px] font-bold">1</button>
-                            <button className="w-8 h-8 flex items-center justify-center rounded hover:bg-slate-100 text-slate-600 text-[13px] font-semibold">2</button>
-                            <button className="w-8 h-8 flex items-center justify-center rounded hover:bg-slate-100 text-slate-600 text-[13px] font-semibold">3</button>
-                            <button className="w-8 h-8 flex items-center justify-center rounded hover:bg-slate-100 text-slate-600 text-[13px] font-semibold">4</button>
-                            <button className="w-8 h-8 flex items-center justify-center rounded hover:bg-slate-100 text-slate-600 text-[13px] font-semibold">5</button>
-                            <button className="w-8 h-8 flex items-center justify-center rounded hover:bg-slate-100 text-slate-600 text-[13px] font-semibold">6</button>
-                            <button className="w-8 h-8 flex items-center justify-center rounded hover:bg-slate-100 text-slate-600 text-[13px] font-semibold">7</button>
-                            <button className="w-8 h-8 flex items-center justify-center rounded hover:bg-slate-100 text-slate-600 text-[13px] font-semibold">8</button>
-                            <button className="w-8 h-8 flex items-center justify-center rounded hover:bg-slate-100 text-slate-600 text-[13px] font-semibold">9</button>
-                            <button className="w-8 h-8 flex items-center justify-center rounded hover:bg-slate-100 text-slate-600 text-[13px] font-semibold">10</button>
-                            <span className="text-slate-400 px-1">...</span>
-                            <button className="w-8 h-8 flex items-center justify-center rounded hover:bg-slate-100 text-slate-600 text-[13px] font-semibold">72</button>
-                            <button className="w-8 h-8 flex items-center justify-center rounded hover:bg-slate-100 text-slate-600 text-[13px] font-semibold">73</button>
-                            <button className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-600 text-sm">›</button>
-                        </div>
+                        {totalPages > 1 && (
+                            <div className="mt-8 flex items-center justify-center gap-1.5">
+                                <button 
+                                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                    disabled={currentPage === 1}
+                                    className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-600 text-sm disabled:opacity-50"
+                                >‹</button>
+                                
+                                {getPaginationRange().map((p, idx) => (
+                                    p === "..." ? (
+                                        <span key={`dots-${idx}`} className="text-slate-400 px-1">...</span>
+                                    ) : (
+                                        <button 
+                                            key={p}
+                                            onClick={() => setCurrentPage(p as number)}
+                                            className={cn(
+                                                "w-8 h-8 flex items-center justify-center rounded text-[13px] transition-colors",
+                                                currentPage === p 
+                                                    ? "bg-[#0ea5e9] text-white font-bold" 
+                                                    : "hover:bg-slate-100 text-slate-600 font-semibold"
+                                            )}
+                                        >
+                                            {p}
+                                        </button>
+                                    )
+                                ))}
+
+                                <button 
+                                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                                    disabled={currentPage === totalPages}
+                                    className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-600 text-sm disabled:opacity-50"
+                                >›</button>
+                            </div>
+                        )}
                         
                     </div>
 
