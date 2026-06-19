@@ -60,9 +60,10 @@ const jsonLdLocalBusiness = {
   "name": "DeshExam",
   "address": {
     "@type": "PostalAddress",
-    "streetAddress": "123",
-    "addressLocality": "Baharampur",
+    "streetAddress": "Dwarikamari, Petla",
+    "addressLocality": "Dinhata",
     "addressRegion": "West Bengal",
+    "postalCode": "736135",
     "addressCountry": "IN"
   },
   "telephone": "+916294006590"
@@ -307,7 +308,7 @@ export default function ContactPage() {
                     <div>
                       <h4 className="font-bold text-[#0F172A] mb-2">Office Location</h4>
                       <p className="text-sm text-[#64748B] mb-4 leading-relaxed">
-                        123, Baharampur, West Bengal, India
+                        Dwarikamari, Petla, Dinhata,<br/>West Bengal 736135, India
                       </p>
                       <a href="#" className="inline-flex items-center text-sm font-bold text-[#16A34A] hover:underline">
                         Get Directions &rarr;

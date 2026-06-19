@@ -21,7 +21,7 @@ export function SupportInfo() {
             
             <div>
                 <h4 className="text-xs font-bold text-[#0F172A] mb-1 uppercase tracking-wider">Address</h4>
-                <p className="text-sm text-[#64748B] leading-relaxed">Baharampur, West Bengal,<br/>India</p>
+                <p className="text-sm text-[#64748B] leading-relaxed">Dwarikamari, Petla, Dinhata,<br/>West Bengal 736135, India</p>
             </div>
             
             <div>
