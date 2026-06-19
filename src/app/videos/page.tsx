@@ -113,7 +113,7 @@ export default function VideosPage() {
             {filtered.map(video => (
               <Link
                 key={video.id}
-                href={`/learn/video/${video.slug || video.id}`}
+                href={`/video/${video.slug || video.id}`}
                 className="group rounded-xl bg-white dark:bg-slate-900 overflow-hidden shadow-sm border border-slate-100 dark:border-slate-800 hover:shadow-md hover:border-emerald-200 dark:hover:border-emerald-800 transition-all duration-200 flex flex-col"
               >
                 {/* Thumbnail */}

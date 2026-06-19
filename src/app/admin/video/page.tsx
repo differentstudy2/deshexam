@@ -98,7 +98,7 @@ export default function AdminVideoPage() {
                     </td>
                     <td className="p-4 text-right">
                       <div className="flex items-center justify-end gap-1">
-                        <Link href={`/learn/video/${video.slug || video.id}`}>
+                        <Link href={`/video/${video.slug || video.id}`}>
                           <Button variant="ghost" size="icon" title="Preview">
                             <Eye className="w-4 h-4 text-slate-500" />
                           </Button>

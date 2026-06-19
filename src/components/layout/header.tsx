@@ -29,6 +29,7 @@ const mainNavLinks = [
     { href: "/dashboard", label: "Dashboard", icon: <LayoutDashboard className="h-5 w-5" /> },
     { href: "/academy", label: "Academy", icon: <BookOpen className="h-5 w-5" /> },
     { href: "/videos", label: "Videos", icon: <Zap className="h-5 w-5" /> },
+    { href: "/audios", label: "Audios", icon: <Headphones className="h-5 w-5" /> },
     { href: "/documents", label: "Documents", icon: <FileText className="h-5 w-5" /> },
     { href: "/skill", label: "Skill", icon: <Zap className="h-5 w-5" /> },
     { href: "/course", label: "Course", icon: <Book className="h-5 w-5" /> },

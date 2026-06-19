@@ -198,7 +198,7 @@ export default async function VideoSinglePage({ params }: { params: Promise<{ sl
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Suggested Videos</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {suggestedVideos.map((vid: any) => (
-                    <Link href={`/learn/video/${vid.slug || vid.id}`} key={vid.id}>
+                    <Link href={`/video/${vid.slug || vid.id}`} key={vid.id}>
                       <Card className="border-0 shadow-none bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors cursor-pointer group">
                         <div className="aspect-video bg-slate-200 dark:bg-slate-800 rounded-lg mb-2 relative overflow-hidden">
                            {vid.thumbnail ? (
@@ -264,7 +264,7 @@ export default async function VideoSinglePage({ params }: { params: Promise<{ sl
                           {categoryVideos.map((vid: any, vIdx: number) => {
                             const isCurrent = vid.id === item.id;
                             return (
-                              <Link href={`/learn/video/${vid.slug || vid.id}`} key={vid.id}>
+                              <Link href={`/video/${vid.slug || vid.id}`} key={vid.id}>
                                 <div className={`flex items-start gap-3 p-3 px-4 transition-colors ${isCurrent ? 'bg-emerald-50 dark:bg-emerald-950/20 border-l-4 border-emerald-500' : 'hover:bg-slate-50 dark:hover:bg-slate-900/50'}`}>
                                   {/* Thumbnail */}
                                   <div className="w-24 shrink-0 aspect-video bg-slate-200 dark:bg-slate-800 rounded relative overflow-hidden">

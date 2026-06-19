@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,7 +15,9 @@ import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { getMediaItemById } from '@/lib/firebase/guide';
 
-export default function EditAudioPage({ params }: { params: { id: string } }) {
+export default function EditAudioPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = use(params);
+  const id = resolvedParams.id;
   const router = useRouter();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -43,11 +45,11 @@ export default function EditAudioPage({ params }: { params: { id: string } }) {
 
   useEffect(() => {
     loadAudio();
-  }, [params.id]);
+  }, [id]);
 
   const loadAudio = async () => {
     try {
-      const audio = await getMediaItemById('guide_audios', params.id);
+      const audio = await getMediaItemById('guide_audios', id);
       if (audio) {
         setFormData({
           title: audio.title || '',
@@ -102,7 +104,7 @@ export default function EditAudioPage({ params }: { params: { id: string } }) {
     
     setLoading(true);
     try {
-      const audioRef = doc(db, 'guide_audios', params.id);
+      const audioRef = doc(db, 'guide_audios', id);
       
       const payload = {
         ...formData,
