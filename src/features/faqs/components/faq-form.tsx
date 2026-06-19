@@ -3,7 +3,9 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { CreateFAQDTO, FAQ, FAQStatus } from "../types/faq.types";
+import { useEffect, useState } from "react";
+import { CreateFAQDTO, FAQ, FAQStatus, FAQCategory } from "../types/faq.types";
+import { getCategories } from "../services/faq.api";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -42,6 +44,11 @@ interface FAQFormProps {
 
 export const FAQForm = ({ initialData, onSubmit, isSubmitting, title }: FAQFormProps) => {
   const router = useRouter();
+  const [categories, setCategories] = useState<FAQCategory[]>([]);
+
+  useEffect(() => {
+    getCategories().then(setCategories).catch(console.error);
+  }, []);
 
   const defaultValues: FaqFormValues = initialData ? {
     question: initialData.question,
