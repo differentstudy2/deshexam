@@ -2,9 +2,9 @@ import { FAQ, FAQFilters, CreateFAQDTO, UpdateFAQDTO, FAQCategory, FAQTag } from
 
 import { db } from "@/lib/firebase/client";
 import { collection, doc, getDocs, getDoc, setDoc, addDoc, updateDoc, deleteDoc, writeBatch, query, orderBy, increment, where, limit } from "firebase/firestore";
-const FAQS_COLLECTION = "faqs";
-const CATEGORIES_COLLECTION = "faq_categories";
-const TAGS_COLLECTION = "faq_tags";
+export const FAQS_COLLECTION = "faqs";
+export const CATEGORIES_COLLECTION = "faq_categories";
+export const TAGS_COLLECTION = "faq_tags";
 
 export const getFaqs = async (filters?: FAQFilters): Promise<FAQ[]> => {
   const q = query(collection(db, FAQS_COLLECTION));
