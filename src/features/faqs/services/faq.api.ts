@@ -183,8 +183,10 @@ export const getCategories = async (): Promise<FAQCategory[]> => {
 };
 
 export const createCategory = async (data: Omit<FAQCategory, "id">): Promise<FAQCategory> => {
-  const docRef = await addDoc(collection(db, CATEGORIES_COLLECTION), data);
-  return { id: docRef.id, ...data };
+  // Use the clean slug as the actual Document ID in Firebase for beautiful URLs!
+  const docId = data.slug;
+  await setDoc(doc(db, CATEGORIES_COLLECTION, docId), data);
+  return { id: docId, ...data };
 };
 
 export const deleteCategory = async (id: string): Promise<boolean> => {

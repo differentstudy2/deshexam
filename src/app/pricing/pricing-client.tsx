@@ -596,7 +596,7 @@ export default function PricingClientPage() {
                         You might wonder, why specifically choose the Pass Pro over standard plans or competing platforms? The answer lies in the sheer volume and quality of content combined with cutting-edge technology. With a single subscription, you eliminate the need to buy dozens of expensive physical test series books. You get instant updates whenever an exam pattern changes. You get video solutions for complex problems.
                     </p>
                     <p className="mb-4 leading-relaxed">
-                        We are continuously adding new exams and updating our <a href="/exams" className="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline">exams library</a> to ensure you are never left behind. Don't leave your career to chance. If you still have questions about billing, access, or features, please <a href="/faq" className="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline">see detailed FAQ</a>. Make the smart choice today and join the ranks of toppers who trusted DeshExam.
+                        We are continuously adding new exams and updating our <a href="/exams" className="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline">exams library</a> to ensure you are never left behind. Don't leave your career to chance. If you still have questions about billing, access, or features, please <a href="/faqs" className="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline">see detailed FAQ</a>. Make the smart choice today and join the ranks of toppers who trusted DeshExam.
                     </p>
                 </div>
             </div>

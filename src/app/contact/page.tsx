@@ -157,7 +157,7 @@ export default function ContactPage() {
                   Contact Support
                 </Button>
                 <Button variant="outline" asChild className="border-white/20 hover:bg-white/10 text-white hover:text-white px-8 h-12 rounded-md font-bold text-sm backdrop-blur-sm transition-all bg-transparent">
-                  <Link href="/faq">Help Center</Link>
+                  <Link href="/faqs">Help Center</Link>
                 </Button>
               </div>
             </div>
@@ -218,7 +218,7 @@ export default function ContactPage() {
               <h3 className="text-xl font-bold mb-3 text-[#0F172A]">Subscription & Payment Assistance</h3>
               <p className="text-[#64748B] leading-relaxed text-sm">
                 If you need guidance choosing the right premium plan, or if a payment has failed, our customer care team is available 24/7.
-                Need help with premium upgrades? Visit our <Link href="/pricing" className="text-[#16A34A] hover:underline font-medium">Pricing Page</Link> for detailed tier breakdowns, or view the <Link href="/faq" className="text-[#16A34A] hover:underline font-medium">FAQ</Link> for our refund and cancellation policies.
+                Need help with premium upgrades? Visit our <Link href="/pricing" className="text-[#16A34A] hover:underline font-medium">Pricing Page</Link> for detailed tier breakdowns, or view the <Link href="/faqs" className="text-[#16A34A] hover:underline font-medium">FAQ</Link> for our refund and cancellation policies.
               </p>
             </div>
           </div>
@@ -271,10 +271,10 @@ export default function ContactPage() {
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button asChild className="bg-white text-[#16A34A] hover:bg-slate-50 px-8 h-12 rounded-md font-bold text-sm shadow-lg transition-all">
-                  <Link href="/faq">Visit Help Center</Link>
+                  <Link href="/faqs">Visit Help Center</Link>
                 </Button>
                 <Button asChild variant="outline" className="border-white/30 text-white hover:bg-white/10 hover:text-white px-8 h-12 rounded-md font-bold text-sm transition-all bg-transparent">
-                  <Link href="/faq">Browse FAQs</Link>
+                  <Link href="/faqs">Browse FAQs</Link>
                 </Button>
               </div>
             </div>

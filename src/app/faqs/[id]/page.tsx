@@ -36,7 +36,7 @@ export default function SingleFAQPage() {
             try {
                 const fetchedFaq = await getFaqBySlugOrId(id as string);
                 if (!fetchedFaq) {
-                    router.push('/faq');
+                    router.push('/faqs');
                     return;
                 }
                 
@@ -55,9 +55,9 @@ export default function SingleFAQPage() {
                 setCategoriesData(fetchedCategories);
 
                 const allFaqs = await getFaqs();
-                setRelatedFaqsList(allFaqs.filter(f => f.categoryId === fetchedFaq.categoryId && f.id !== fetchedFaq.id).slice(0, 4));
+                setRelatedFaqsList(allFaqs.filter((f: FAQ) => f.categoryId === fetchedFaq.categoryId && f.id !== fetchedFaq.id).slice(0, 4));
             } catch (err) {
-                router.push('/faq');
+                router.push('/faqs');
             } finally {
                 setLoading(false);
             }
@@ -110,12 +110,12 @@ export default function SingleFAQPage() {
                         <div className="w-[1px] h-4 bg-slate-200 hidden sm:block"></div>
                         <div className="text-slate-500 font-medium text-[13px] hidden sm:block">
                             <Link href="/" className="hover:text-slate-800">Home</Link> <span className="mx-1.5 text-slate-300">›</span> 
-                            <Link href="/faq" className="hover:text-slate-800">FAQ</Link> <span className="mx-1.5 text-slate-300">›</span> 
+                            <Link href="/faqs" className="hover:text-slate-800">FAQ</Link> <span className="mx-1.5 text-slate-300">›</span> 
                             <span className="text-slate-800 font-semibold truncate max-w-[200px] sm:max-w-[300px] inline-block align-bottom">{faq.question.substring(0, 20)}...</span>
                         </div>
                     </div>
                     <div>
-                        <Link href="/faq" className="inline-flex items-center justify-center px-5 py-1.5 bg-green-100 hover:bg-green-200 text-green-800 text-[13px] font-bold rounded transition-colors">
+                        <Link href="/faqs" className="inline-flex items-center justify-center px-5 py-1.5 bg-green-100 hover:bg-green-200 text-green-800 text-[13px] font-bold rounded transition-colors">
                             Back
                         </Link>
                     </div>
@@ -187,7 +187,7 @@ export default function SingleFAQPage() {
                             
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {relatedFaqsList.map((faq, idx) => (
-                                    <Link href={`/faq/${faq.seo?.slug || faq.id}`} key={faq.id} className="bg-white border border-slate-200 rounded-lg p-5 hover:border-slate-300 hover:shadow-sm transition-all cursor-pointer flex flex-col h-full">
+                                    <Link href={`/faqs/${faq.seo?.slug || faq.id}`} key={faq.id} className="bg-white border border-slate-200 rounded-lg p-5 hover:border-slate-300 hover:shadow-sm transition-all cursor-pointer flex flex-col h-full">
                                         <h3 className="font-bold text-slate-800 text-[14px] leading-snug mb-2">
                                             {faq.question}
                                         </h3>
@@ -220,7 +220,7 @@ export default function SingleFAQPage() {
                             </div>
                             <div className="flex flex-col text-[13px] font-medium p-2">
                                 {[{id: 'all', name: 'All FAQs'}, ...categoriesData].map((cat, index, arr) => {
-                                    const linkHref = "/faq?category=" + cat.id;
+                                    const linkHref = "/faqs?category=" + cat.id;
                                     return (
                                         <Link 
                                             key={cat.id}

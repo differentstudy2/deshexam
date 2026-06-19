@@ -280,7 +280,7 @@ export const FAQForm = ({ initialData, onSubmit, isSubmitting, title }: FAQFormP
                         <FormControl>
                           <Input placeholder="how-to-start-mock-test" {...field} />
                         </FormControl>
-                        <FormDescription>deshexam.com/faq/{"{slug}"}</FormDescription>
+                        <FormDescription>deshexam.com/faqs/{"{slug}"}</FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}

@@ -237,7 +237,7 @@ export default function FAQPage() {
                                             </div>
                                             {/* Action Buttons */}
                                             <div className="flex justify-end gap-3">
-                                                <Link href={`/faq/${faq.seo?.slug || faq.id}`} className="inline-flex items-center gap-1.5 px-4 py-2 bg-green-100 hover:bg-green-200 text-green-800 text-[13px] font-bold rounded-md transition-colors">
+                                                <Link href={`/faqs/${faq.seo?.slug || faq.id}`} className="inline-flex items-center gap-1.5 px-4 py-2 bg-green-100 hover:bg-green-200 text-green-800 text-[13px] font-bold rounded-md transition-colors">
                                                     <Eye className="w-4 h-4" /> বিস্তারিত দেখুন
                                                 </Link>
                                                 <button onClick={handleCopyLink} className="inline-flex items-center gap-1.5 px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white text-[13px] font-bold rounded-md transition-colors">

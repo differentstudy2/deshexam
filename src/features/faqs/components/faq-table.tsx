@@ -109,7 +109,7 @@ export const FAQTable = ({ data, categories, loading, onDelete, selectedIds, onS
               </TableCell>
               <TableCell className="text-right">
                 <div className="flex items-center justify-end gap-1 opacity-100 transition-opacity">
-                  <Link href={`/faq/${faq.seo?.slug || faq.id}`} target="_blank">
+                  <Link href={`/faqs/${faq.seo?.slug || faq.id}`} target="_blank">
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/50 dark:hover:text-blue-400" title="Preview">
                       <Eye className="w-4 h-4" />
                     </Button>

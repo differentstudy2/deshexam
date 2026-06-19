@@ -67,7 +67,7 @@ export default function CookiePolicyPage() {
           <div className="max-w-4xl mx-auto bg-white dark:bg-slate-900 p-8 md:p-12 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 prose prose-slate dark:prose-invert lg:prose-lg">
             
             <p className="text-sm text-slate-500 dark:text-slate-400 mb-8 pb-8 border-b border-slate-200 dark:border-slate-800">
-              This Cookie Policy is part of our broader privacy practices. For more information on how we protect your data, please review our <Link href="/privacy-policy" className="text-blue-600 dark:text-blue-400 hover:underline font-medium">Privacy Policy</Link> and <Link href="/terms" className="text-blue-600 dark:text-blue-400 hover:underline font-medium">Terms and Conditions</Link>. You can also <Link href="/about" className="text-blue-600 dark:text-blue-400 hover:underline font-medium">learn more about DeshExam features</Link> or visit our <Link href="/faq" className="text-blue-600 dark:text-blue-400 hover:underline font-medium">FAQ page</Link>.
+              This Cookie Policy is part of our broader privacy practices. For more information on how we protect your data, please review our <Link href="/privacy-policy" className="text-blue-600 dark:text-blue-400 hover:underline font-medium">Privacy Policy</Link> and <Link href="/terms" className="text-blue-600 dark:text-blue-400 hover:underline font-medium">Terms and Conditions</Link>. You can also <Link href="/about" className="text-blue-600 dark:text-blue-400 hover:underline font-medium">learn more about DeshExam features</Link> or visit our <Link href="/faqs" className="text-blue-600 dark:text-blue-400 hover:underline font-medium">FAQ page</Link>.
             </p>
 
             <h2>What Are Cookies</h2>

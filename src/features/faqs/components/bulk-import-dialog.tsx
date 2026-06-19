@@ -93,8 +93,11 @@ export function BulkImportDialog({ categories, onImportComplete, trigger }: Bulk
           categoryId: catId,
           tags: tagsArray,
           status: "published",
-          order: 0,
+          order: index,
           featured: false,
+          views: 0,
+          helpfulVotes: 0,
+          unhelpfulVotes: 0,
           seo: {
             slug: baseSlug,
             schemaEnabled: true
