@@ -62,6 +62,7 @@ export const FAQTable = ({ data, loading, onDelete, selectedIds, onSelect, onSel
             <TableHead className="font-semibold">Category</TableHead>
             <TableHead className="font-semibold">Status</TableHead>
             <TableHead className="font-semibold text-right">Views</TableHead>
+            <TableHead className="font-semibold text-right">Helpful</TableHead>
             <TableHead className="font-semibold text-right">Updated</TableHead>
             <TableHead className="text-right font-semibold">Actions</TableHead>
           </TableRow>
@@ -98,6 +99,9 @@ export const FAQTable = ({ data, loading, onDelete, selectedIds, onSelect, onSel
               </TableCell>
               <TableCell className="text-right text-muted-foreground">
                 {faq.views.toLocaleString()}
+              </TableCell>
+              <TableCell className="text-right font-medium">
+                <span className="text-emerald-600">+{faq.helpfulVotes || 0}</span> <span className="text-muted-foreground mx-1">/</span> <span className="text-red-500">-{faq.unhelpfulVotes || 0}</span>
               </TableCell>
               <TableCell className="text-right text-muted-foreground text-sm whitespace-nowrap">
                 {format(new Date(faq.updatedAt), "MMM d, yyyy")}

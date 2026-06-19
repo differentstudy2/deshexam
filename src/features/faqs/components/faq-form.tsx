@@ -27,6 +27,9 @@ const faqSchema = z.object({
   status: z.enum(["draft", "published", "hidden"]),
   order: z.coerce.number().min(0).default(0),
   featured: z.boolean().default(false),
+  views: z.coerce.number().min(0).default(0),
+  helpfulVotes: z.coerce.number().min(0).default(0),
+  unhelpfulVotes: z.coerce.number().min(0).default(0),
   seo: z.object({
     slug: z.string().min(2, "Slug is required."),
     metaTitle: z.string().optional(),
@@ -66,6 +69,9 @@ export const FAQForm = ({ initialData, onSubmit, isSubmitting, title }: FAQFormP
     status: initialData.status,
     order: initialData.order,
     featured: initialData.featured,
+    views: initialData.views || 0,
+    helpfulVotes: initialData.helpfulVotes || 0,
+    unhelpfulVotes: initialData.unhelpfulVotes || 0,
     seo: {
       slug: initialData.seo.slug,
       metaTitle: initialData.seo.metaTitle || "",
@@ -80,6 +86,9 @@ export const FAQForm = ({ initialData, onSubmit, isSubmitting, title }: FAQFormP
     status: "draft",
     order: 0,
     featured: false,
+    views: 0,
+    helpfulVotes: 0,
+    unhelpfulVotes: 0,
     seo: {
       slug: "",
       metaTitle: "",
@@ -101,10 +110,10 @@ export const FAQForm = ({ initialData, onSubmit, isSubmitting, title }: FAQFormP
   };
 
   const handleSubmit: SubmitHandler<FaqFormValues> = async (values) => {
-    const formattedData: CreateFAQDTO = {
+    const formattedData = {
       ...values,
       tags: values.tags.split(",").map(t => t.trim()).filter(Boolean),
-    };
+    } as CreateFAQDTO;
     await onSubmit(formattedData);
   };
 
@@ -425,6 +434,53 @@ export const FAQForm = ({ initialData, onSubmit, isSubmitting, title }: FAQFormP
                       </FormItem>
                     )}
                   />
+                </CardContent>
+              </Card>
+
+              {/* Statistics */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Statistics</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-3 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="views"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Views</FormLabel>
+                          <FormControl>
+                            <Input type="number" {...field} />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="helpfulVotes"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Helpful</FormLabel>
+                          <FormControl>
+                            <Input type="number" className="text-emerald-600 font-medium" {...field} />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="unhelpfulVotes"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Unhelpful</FormLabel>
+                          <FormControl>
+                            <Input type="number" className="text-red-500 font-medium" {...field} />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 </CardContent>
               </Card>
 
