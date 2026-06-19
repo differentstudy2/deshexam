@@ -13,7 +13,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowLeft, Save, Loader2 } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ArrowLeft, Save, Loader2, Sparkles } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -44,7 +46,13 @@ interface FAQFormProps {
 
 export const FAQForm = ({ initialData, onSubmit, isSubmitting, title }: FAQFormProps) => {
   const router = useRouter();
+  const { toast } = useToast();
   const [categories, setCategories] = useState<FAQCategory[]>([]);
+  
+  // AI State
+  const [isAiDialogOpen, setIsAiDialogOpen] = useState(false);
+  const [aiTopic, setAiTopic] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
     getCategories().then(setCategories).catch(console.error);
@@ -100,6 +108,35 @@ export const FAQForm = ({ initialData, onSubmit, isSubmitting, title }: FAQFormP
     await onSubmit(formattedData);
   };
 
+  const handleAIGenerate = async () => {
+    if (!aiTopic.trim()) return;
+    try {
+      setIsGenerating(true);
+      const res = await fetch("/api/ai/generate-faq", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ topic: aiTopic }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to generate");
+      
+      form.setValue("question", data.question || "", { shouldValidate: true });
+      form.setValue("answer", data.answer || "", { shouldValidate: true });
+      form.setValue("tags", data.tags?.join(", ") || "", { shouldValidate: true });
+      form.setValue("seo.slug", data.seo?.slug || "", { shouldValidate: true });
+      form.setValue("seo.metaTitle", data.seo?.metaTitle || "", { shouldValidate: true });
+      form.setValue("seo.metaDescription", data.seo?.metaDescription || "", { shouldValidate: true });
+      
+      toast({ title: "AI Generation Complete", description: "Please review the generated content." });
+      setIsAiDialogOpen(false);
+      setAiTopic("");
+    } catch (error: any) {
+      toast({ variant: "destructive", title: "AI Error", description: error.message });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   return (
     <div className="space-y-6 max-w-5xl pb-12">
       <div className="flex items-center justify-between">
@@ -112,6 +149,38 @@ export const FAQForm = ({ initialData, onSubmit, isSubmitting, title }: FAQFormP
           <h1 className="text-3xl font-bold tracking-tight text-foreground">{title}</h1>
         </div>
         <div className="flex items-center gap-3">
+          <Dialog open={isAiDialogOpen} onOpenChange={setIsAiDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 text-purple-700 hover:bg-purple-100 dark:text-purple-400 dark:hover:bg-purple-900/50 border-purple-200 dark:border-purple-800">
+                <Sparkles className="w-4 h-4 mr-2" /> Auto-Generate
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Generate FAQ with AI</DialogTitle>
+                <DialogDescription>
+                  Enter a topic or rough question, and our AI will draft the full FAQ content, tags, and SEO metadata.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="py-4">
+                <Input 
+                  placeholder="e.g. 'Refund Policy' or 'How to reset password'"
+                  value={aiTopic}
+                  onChange={(e) => setAiTopic(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') handleAIGenerate(); }}
+                  disabled={isGenerating}
+                />
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setIsAiDialogOpen(false)} disabled={isGenerating}>Cancel</Button>
+                <Button onClick={handleAIGenerate} disabled={isGenerating || !aiTopic.trim()}>
+                  {isGenerating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
+                  Generate
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
           <Button 
             type="button" 
             variant="outline" 
