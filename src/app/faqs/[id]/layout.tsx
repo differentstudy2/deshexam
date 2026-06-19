@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { getFaqBySlugOrId } from '@/features/faqs/services/faq.api';
+import { getFaqBySlugOrIdServer as getFaqBySlugOrId } from '@/features/faqs/services/faq-server.api';
 
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
     try {

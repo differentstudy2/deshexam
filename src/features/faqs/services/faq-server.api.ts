@@ -39,3 +39,35 @@ export async function getCategoriesServer(): Promise<FAQCategory[]> {
         return [];
     }
 }
+
+export async function getFaqBySlugOrIdServer(identifier: string): Promise<FAQ | null> {
+    if (!adminDb) return null;
+    try {
+        const slugQuery = await adminDb.collection(FAQS_COLLECTION).where('seo.slug', '==', identifier).limit(1).get();
+        if (!slugQuery.empty) {
+            const doc = slugQuery.docs[0];
+            const data = doc.data();
+            return {
+                ...data,
+                id: doc.id,
+                createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : data.createdAt,
+                updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate().toISOString() : data.updatedAt,
+            } as unknown as FAQ;
+        }
+        
+        const docRef = await adminDb.collection(FAQS_COLLECTION).doc(identifier).get();
+        if (docRef.exists) {
+            const data = docRef.data()!;
+            return {
+                ...data,
+                id: docRef.id,
+                createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : data.createdAt,
+                updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate().toISOString() : data.updatedAt,
+            } as unknown as FAQ;
+        }
+        return null;
+    } catch (error) {
+        console.error('Error fetching FAQ by slug/id on server:', error);
+        return null;
+    }
+}
