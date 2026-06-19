@@ -122,7 +122,7 @@ export default function FAQManagePage() {
       />
 
       {/* Mobile Floating Action Bar */}
-      <div className="md:hidden fixed bottom-[80px] left-1/2 -translate-x-1/2 w-[90%] max-w-[340px] bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border border-slate-200 dark:border-slate-800 rounded-full shadow-xl flex items-center justify-between px-6 py-3 z-40">
+      <div className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-[340px] bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border border-slate-200 dark:border-slate-800 rounded-full shadow-xl flex items-center justify-between px-6 py-3 z-40">
         <BulkImportDialog 
           categories={categories} 
           onImportComplete={fetchFaqs}
