@@ -92,7 +92,7 @@ export default function FAQPage() {
             description: (
                 <div className="flex items-center gap-2">
                     <CheckCircle2 className="w-5 h-5 text-white" />
-                    <span className="font-semibold text-[15px] text-white">লিংক কপি হয়েছে!</span>
+                    <span className="font-semibold text-[15px] text-white">Link copied!</span>
                 </div>
             ),
             className: "bg-[#5cb85c] border-none shadow-lg top-0 right-0 mt-4 mr-4 fixed w-auto min-w-[200px]",
@@ -108,8 +108,8 @@ export default function FAQPage() {
                 <div className="container mx-auto px-4">
                     <h1 className="text-4xl font-bold text-slate-800 mb-3">Frequently Asked Questions</h1>
                     <p className="text-slate-500 text-[15px] font-medium leading-relaxed">
-                        দেশ এক্সাম দেশের সর্ববৃহৎ শিক্ষাবিষয়ক ওপেন প্ল্যাটফর্ম।<br/>
-                        এখানে আপনি দেশ এক্সাম এবং এর সকল ফিচার সম্পর্কে বিস্তারিত তথ্য পাবেন।
+                        DeshExam is the country's largest open educational platform.<br/>
+                        Here you will find detailed information about DeshExam and all its features.
                     </p>
                 </div>
             </div>
@@ -123,13 +123,13 @@ export default function FAQPage() {
                         {/* Search Panel */}
                         <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
                             <div className="bg-[#0ea5e9] px-4 py-3 text-white font-bold text-sm flex items-center gap-2">
-                                <Search className="w-4 h-4" /> FAQ খুঁজুন
+                                <Search className="w-4 h-4" /> Search FAQs
                             </div>
                             <div className="p-4">
                                 <div className="flex bg-slate-50 border border-slate-200 rounded overflow-hidden">
                                     <input 
                                         type="text" 
-                                        placeholder="FAQ খুঁজুন..." 
+                                        placeholder="Search FAQs..." 
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                         className="w-full bg-transparent px-3 py-2 text-sm outline-none"
@@ -144,10 +144,10 @@ export default function FAQPage() {
                         {/* Categories Panel */}
                         <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
                             <div className="bg-[#0ea5e9] px-4 py-3 text-white font-bold text-sm flex items-center gap-2">
-                                <List className="w-4 h-4" /> ক্যাটাগরি
+                                <List className="w-4 h-4" /> Categories
                             </div>
                             <div className="flex flex-col text-sm font-medium">
-                                {[{id: 'all', name: 'সকল FAQ'}, ...categoriesData].map((cat, index, arr) => {
+                                {[{id: 'all', name: 'All FAQs'}, ...categoriesData].map((cat, index, arr) => {
                                     const isActive = activeCategory === cat.id;
                                     return (
                                         <button 
@@ -172,7 +172,7 @@ export default function FAQPage() {
                         {/* Recent FAQs Panel */}
                         <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
                             <div className="bg-[#0ea5e9] px-4 py-3 text-white font-bold text-sm flex items-center gap-2">
-                                <Clock className="w-4 h-4" /> সাম্প্রতিক FAQ
+                                <Clock className="w-4 h-4" /> Recent FAQs
                             </div>
                             <div className="flex flex-col">
                                 {recentFaqsList.map((faq, index, arr) => (
@@ -193,19 +193,19 @@ export default function FAQPage() {
                         
                         {/* Header */}
                         <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
-                            <h2 className="text-[17px] font-bold text-slate-800">সকল FAQ ({filteredFaqs.length})</h2>
+                            <h2 className="text-[17px] font-bold text-slate-800">All FAQs ({filteredFaqs.length})</h2>
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <button className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 transition-colors text-slate-800 px-3 py-1.5 rounded text-[14px] font-semibold border border-slate-200 outline-none">
                                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>
-                                        সর্ট করুন
+                                        Sort by
                                         <ChevronDown className="w-4 h-4 ml-1 text-black" />
                                     </button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end" className="w-40 font-medium text-slate-700 bg-white p-1">
-                                    <DropdownMenuItem className="py-2 px-3 text-[15px] cursor-pointer focus:bg-slate-50">নতুন প্রথম</DropdownMenuItem>
-                                    <DropdownMenuItem className="py-2 px-3 text-[15px] cursor-pointer focus:bg-slate-50">পুরাতন প্রথম</DropdownMenuItem>
-                                    <DropdownMenuItem className="py-2 px-3 text-[15px] cursor-pointer focus:bg-slate-50">জনপ্রিয়</DropdownMenuItem>
+                                    <DropdownMenuItem className="py-2 px-3 text-[15px] cursor-pointer focus:bg-slate-50">Newest First</DropdownMenuItem>
+                                    <DropdownMenuItem className="py-2 px-3 text-[15px] cursor-pointer focus:bg-slate-50">Oldest First</DropdownMenuItem>
+                                    <DropdownMenuItem className="py-2 px-3 text-[15px] cursor-pointer focus:bg-slate-50">Most Popular</DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         </div>
@@ -251,7 +251,7 @@ export default function FAQPage() {
                                         <div className="p-4 bg-white">
                                             {/* Tab */}
                                             <div className="inline-flex items-center gap-1.5 border border-slate-200 border-b-transparent bg-slate-50 px-4 py-2 rounded-t-md relative top-[1px] z-10 text-sm font-medium text-slate-600">
-                                                <Globe className="w-4 h-4" /> ওয়েব প্ল্যাটফর্ম
+                                                <Globe className="w-4 h-4" /> Information
                                             </div>
                                             {/* Content Box */}
                                             <div className="bg-slate-50 border border-slate-200 rounded-b-md rounded-tr-md p-4 mb-4">
@@ -262,10 +262,10 @@ export default function FAQPage() {
                                             {/* Action Buttons */}
                                             <div className="flex justify-end gap-3">
                                                 <Link href={`/faqs/${faq.seo?.slug || faq.id}`} className="inline-flex items-center gap-1.5 px-4 py-2 bg-green-100 hover:bg-green-200 text-green-800 text-[13px] font-bold rounded-md transition-colors">
-                                                    <Eye className="w-4 h-4" /> বিস্তারিত দেখুন
+                                                    <Eye className="w-4 h-4" /> View Details
                                                 </Link>
                                                 <button onClick={handleCopyLink} className="inline-flex items-center gap-1.5 px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white text-[13px] font-bold rounded-md transition-colors">
-                                                    <Copy className="w-4 h-4" /> লিংক কপি
+                                                    <Copy className="w-4 h-4" /> Copy Link
                                                 </button>
                                             </div>
                                         </div>
