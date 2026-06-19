@@ -80,8 +80,8 @@ export default function FAQManagePage() {
     <div className="space-y-6 max-w-[1400px]">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">FAQ Management</h1>
-          <p className="text-slate-500 mt-1">Admin / FAQs</p>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">FAQ Management</h1>
+          <p className="text-muted-foreground mt-1">Admin / FAQs</p>
         </div>
         <div className="flex items-center gap-3">
           {selectedIds.length > 0 && (
@@ -99,7 +99,7 @@ export default function FAQManagePage() {
 
       <FAQFiltersBar 
         filters={filters} 
-        onFilterChange={(newFilters) => setFilters(prev => ({ ...prev, ...newFilters }))} 
+        onFilterChange={(newFilters) => setFilters((prev: FAQFilters) => ({ ...prev, ...newFilters }))} 
       />
 
       <FAQTable 

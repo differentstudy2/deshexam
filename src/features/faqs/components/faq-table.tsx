@@ -23,15 +23,15 @@ export const FAQTable = ({ data, loading, onDelete, selectedIds, onSelect, onSel
 
   if (loading) {
     return (
-      <div className="border rounded-lg p-12 flex justify-center items-center bg-white">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-900"></div>
+      <div className="border rounded-lg p-12 flex justify-center items-center bg-background">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   if (data.length === 0) {
     return (
-      <div className="border rounded-lg p-12 text-center text-slate-500 bg-white">
+      <div className="border rounded-lg p-12 text-center text-muted-foreground bg-background">
         No FAQs found matching your criteria.
       </div>
     );
@@ -39,18 +39,18 @@ export const FAQTable = ({ data, loading, onDelete, selectedIds, onSelect, onSel
 
   const getStatusColor = (status: FAQ['status']) => {
     switch (status) {
-      case "published": return "bg-green-100 text-green-800 border-green-200";
-      case "draft": return "bg-amber-100 text-amber-800 border-amber-200";
-      case "hidden": return "bg-slate-100 text-slate-800 border-slate-200";
-      default: return "bg-slate-100 text-slate-800 border-slate-200";
+      case "published": return "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800";
+      case "draft": return "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800";
+      case "hidden": return "bg-slate-100 text-slate-800 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700";
+      default: return "bg-slate-100 text-slate-800 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700";
     }
   };
 
   return (
-    <div className="border rounded-lg bg-white overflow-hidden">
+    <div className="border rounded-lg bg-background overflow-hidden">
       <Table>
         <TableHeader>
-          <TableRow className="bg-slate-50/50">
+          <TableRow className="bg-muted/50 hover:bg-muted/50">
             <TableHead className="w-[40px] px-4">
               <Checkbox 
                 checked={allSelected} 
@@ -80,14 +80,14 @@ export const FAQTable = ({ data, loading, onDelete, selectedIds, onSelect, onSel
                   <GripVertical className="w-4 h-4" />
                 </button>
               </TableCell>
-              <TableCell className="font-medium text-slate-900">
+              <TableCell className="font-medium text-foreground">
                 <div className="flex flex-col">
                   <span className="line-clamp-1" title={faq.question}>{faq.question}</span>
-                  <span className="text-xs text-slate-400 font-normal mt-0.5 line-clamp-1" title={faq.answer}>{faq.answer}</span>
+                  <span className="text-xs text-muted-foreground font-normal mt-0.5 line-clamp-1" title={faq.answer}>{faq.answer}</span>
                 </div>
               </TableCell>
               <TableCell>
-                <Badge variant="outline" className="capitalize bg-slate-50 font-medium">
+                <Badge variant="outline" className="capitalize bg-muted font-medium">
                   {faq.categoryId.replace('_', ' ')}
                 </Badge>
               </TableCell>
@@ -96,19 +96,19 @@ export const FAQTable = ({ data, loading, onDelete, selectedIds, onSelect, onSel
                   {faq.status}
                 </Badge>
               </TableCell>
-              <TableCell className="text-right text-slate-600">
+              <TableCell className="text-right text-muted-foreground">
                 {faq.views.toLocaleString()}
               </TableCell>
-              <TableCell className="text-right text-slate-500 text-sm whitespace-nowrap">
+              <TableCell className="text-right text-muted-foreground text-sm whitespace-nowrap">
                 {format(new Date(faq.updatedAt), "MMM d, yyyy")}
               </TableCell>
               <TableCell className="text-right">
-                <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-blue-600 hover:bg-blue-50" title="Preview">
+                <div className="flex items-center justify-end gap-1 opacity-100 transition-opacity">
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/50 dark:hover:text-blue-400" title="Preview">
                     <Eye className="w-4 h-4" />
                   </Button>
                   <Link href={`/admin/faqs/edit/${faq.id}`}>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50" title="Edit">
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/50 dark:hover:text-indigo-400" title="Edit">
                       <Edit className="w-4 h-4" />
                     </Button>
                   </Link>
@@ -116,7 +116,7 @@ export const FAQTable = ({ data, loading, onDelete, selectedIds, onSelect, onSel
                     variant="ghost" 
                     size="icon" 
                     onClick={() => onDelete(faq.id)} 
-                    className="h-8 w-8 text-slate-500 hover:text-red-600 hover:bg-red-50" 
+                    className="h-8 w-8 text-muted-foreground hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/50 dark:hover:text-red-400" 
                     title="Delete"
                   >
                     <Trash2 className="w-4 h-4" />

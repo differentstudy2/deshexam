@@ -102,7 +102,7 @@ export const FAQForm = ({ initialData, onSubmit, isSubmitting, title }: FAQFormP
               <ArrowLeft className="h-4 w-4" />
             </Button>
           </Link>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">{title}</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">{title}</h1>
         </div>
         <div className="flex items-center gap-3">
           <Button 

@@ -14,10 +14,10 @@ export const FAQFiltersBar = ({ filters, onFilterChange }: FAQFiltersBarProps) =
   return (
     <div className="flex flex-col md:flex-row gap-4 mb-6">
       <div className="relative flex-1">
-        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-500" />
+        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
         <Input 
           placeholder="Search questions, answers, or tags... (Press '/' to focus)" 
-          className="pl-9 bg-white"
+          className="pl-9"
           value={filters.search || ""}
           onChange={(e) => onFilterChange({ search: e.target.value })}
         />
@@ -28,7 +28,7 @@ export const FAQFiltersBar = ({ filters, onFilterChange }: FAQFiltersBarProps) =
           value={filters.categoryId || "all"} 
           onValueChange={(val) => onFilterChange({ categoryId: val })}
         >
-          <SelectTrigger className="w-[140px] bg-white">
+          <SelectTrigger className="w-[140px]">
             <SelectValue placeholder="Category" />
           </SelectTrigger>
           <SelectContent>
@@ -43,9 +43,9 @@ export const FAQFiltersBar = ({ filters, onFilterChange }: FAQFiltersBarProps) =
 
         <Select 
           value={filters.status || "all"} 
-          onValueChange={(val) => onFilterChange({ status: val as FAQStatus | "all" })}
+          onValueChange={(val) => onFilterChange({ status: val === "all" ? undefined : val as FAQStatus })}
         >
-          <SelectTrigger className="w-[130px] bg-white">
+          <SelectTrigger className="w-[130px]">
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
@@ -60,7 +60,7 @@ export const FAQFiltersBar = ({ filters, onFilterChange }: FAQFiltersBarProps) =
           value={filters.sortBy || "latest"} 
           onValueChange={(val: any) => onFilterChange({ sortBy: val })}
         >
-          <SelectTrigger className="w-[140px] bg-white">
+          <SelectTrigger className="w-[140px]">
             <SelectValue placeholder="Sort By" />
           </SelectTrigger>
           <SelectContent>
