@@ -17,9 +17,8 @@ import { AudioPlayerPaywall } from '@/components/audio/AudioPlayerPaywall';
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const resolvedParams = await params;
   const decodedSlug = decodeURIComponent(resolvedParams.slug);
-  const item = decodedSlug === 'test' 
-    ? { title: 'Advanced Audio Engineering Techniques & Masterclass', description: 'A comprehensive masterclass on modern audio production.', seoTitle: 'Audio Masterclass | DeshExam', seoDescription: 'Learn from industry veterans about compression and EQ.' }
-    : await getMediaItemBySlug('guide_audios', decodedSlug);
+  const item = await getMediaItemBySlug('guide_audios', decodedSlug);
+  
   return {
     title: item?.seoTitle || (item?.title ? `${item.title} | DeshExam Audio` : 'Audio Not Found'),
     description: item?.seoDescription || item?.shortDescription || item?.description || 'Listen to educational audio tracks on DeshExam.',
@@ -38,40 +37,7 @@ export default async function AudioSinglePage({ params }: { params: Promise<{ sl
   const resolvedParams = await params;
   const decodedSlug = decodeURIComponent(resolvedParams.slug);
   
-  let item;
-  if (decodedSlug === 'test') {
-    item = {
-      id: 'test',
-      slug: 'test',
-      title: 'Advanced Audio Engineering Techniques & Masterclass',
-      description: 'In this masterclass, we dive deep into the intricacies of mixing, mastering, and modern sound design. Learn from industry veterans about compression, EQ balancing, and creating spatial depth. This track is designed for both beginners and experienced producers looking to refine their ear.',
-      shortDescription: 'A comprehensive masterclass on modern audio production.',
-      audioType: 'Masterclass',
-      isPremium: true,
-      previewDuration: 10,
-      boardId: 'CBSE',
-      classId: 'Class 12',
-      subjectId: 'Physics',
-      featureImage: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=2070&auto=format&fit=crop',
-      audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-      instructorName: 'Dr. Sarah Jenkins',
-      instructorAvatar: 'https://i.pravatar.cc/150?u=sarah',
-      instructorQualification: 'Lead Sound Engineer',
-      authorFollowers: '45K Followers',
-      views: 12400,
-      likesCount: '4.2K',
-      commentsCount: '342',
-      createdAt: new Date(),
-      transcript: 'Welcome to this advanced masterclass. Today we will cover...\n\n### 1. The Basics of Compression\nCompression is not just about volume control; it\'s about shaping the envelope of a sound. By adjusting the attack and release, we can completely alter the punchiness of a kick drum or the sustain of a bass guitar.\n\n### 2. Equalization Strategies\nWhen approaching EQ, always subtract before you add. If a mix sounds muddy, don\'t boost the highs; cut the low-mids around 250Hz. This creates headroom and clarity without harshness.',
-      resources: [
-        { title: 'Mixing & Mastering Cheat Sheet', type: 'PDF', url: '#' },
-        { title: 'Drum Sample Pack Vol 1', type: 'ZIP', url: '#' }
-      ],
-      tags: ['audio', 'engineering', 'masterclass', 'mixing']
-    };
-  } else {
-    item = await getMediaItemBySlug('guide_audios', decodedSlug);
-  }
+  const item = await getMediaItemBySlug('guide_audios', decodedSlug);
 
   if (!item) {
     notFound();
