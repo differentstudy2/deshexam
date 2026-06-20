@@ -12,6 +12,7 @@ import { MockTest } from '@/lib/assessment-types';
 import { QuestionBankEntry } from '@/lib/question-bank-types';
 import { useAuth } from '@/hooks/use-auth';
 import { getUserProfile } from '@/lib/firebase/firestore';
+import { saveExamAttempt, getUserExamAttemptsCount } from '@/lib/firebase/student-analytics';
 
 type QuestionState = 'unvisited' | 'answered' | 'skipped' | 'review' | 'current';
 
@@ -87,21 +88,32 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
   const { user, loading: authLoading } = useAuth();
   const [profileLoading, setProfileLoading] = useState(true);
   const [hasAccess, setHasAccess] = useState(false);
+  const [requiresLogin, setRequiresLogin] = useState(false);
+  const [attemptsExceeded, setAttemptsExceeded] = useState(false);
+  const [userAttemptCount, setUserAttemptCount] = useState(0);
 
   useEffect(() => {
     if (authLoading) return;
     
-    // For free tests, no login required
-    if (mockTest.accessType === 'free' || !mockTest.accessType) {
-        setHasAccess(true);
-        setProfileLoading(false);
-        return;
-    }
-
     if (!user) {
-      setHasAccess(false);
+      setRequiresLogin(true);
       setProfileLoading(false);
       return;
+    }
+
+    // For free tests, user is logged in
+    if (mockTest.accessType === 'free' || !mockTest.accessType) {
+        setHasAccess(true);
+        
+        if (mockTest.attemptsAllowed && mockTest.attemptsAllowed > 0) {
+            getUserExamAttemptsCount(user.uid, mockTest.id).then(count => {
+              setUserAttemptCount(count);
+              if (count >= mockTest.attemptsAllowed!) setAttemptsExceeded(true);
+            }).catch(console.error);
+        }
+
+        setProfileLoading(false);
+        return;
     }
 
     getUserProfile(user.uid).then(profile => {
@@ -120,10 +132,21 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
       }
       
       setHasAccess(accessGranted);
+
+      if (accessGranted && mockTest.attemptsAllowed && mockTest.attemptsAllowed > 0) {
+        // Enforce attempts for logged-in user
+        getUserExamAttemptsCount(user.uid, mockTest.id).then(count => {
+          setUserAttemptCount(count);
+          if (count >= mockTest.attemptsAllowed!) {
+            setAttemptsExceeded(true);
+          }
+        }).catch(console.error);
+      }
+      
     }).catch(console.error).finally(() => {
       setProfileLoading(false);
     });
-  }, [user, authLoading, mockTest.accessType, mockTest.allowedSubscriptionPlans, mockTest.slug]);
+  }, [user, authLoading, mockTest.accessType, mockTest.allowedSubscriptionPlans, mockTest.slug, mockTest.attemptsAllowed, mockTest.id]);
 
   useEffect(() => {
     const initialStates: Record<string, QuestionState> = {};
@@ -367,9 +390,15 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
       }
     });
 
-    setScoreData({ correct, wrong, skipped, score, total: mockTest.totalMarks || questions.length });
+    const finalScoreData = { correct, wrong, skipped, score, total: mockTest.totalMarks || questions.length };
+    setScoreData(finalScoreData);
     setShowSubmitConfirm(false);
     setIsSubmitted(true);
+
+    // Save attempt to Firebase
+    if (user) {
+      saveExamAttempt(user.uid, mockTest.id, finalScoreData).catch(console.error);
+    }
 
     if (document.fullscreenElement && document.exitFullscreen) {
       document.exitFullscreen().catch(e => console.error(e));
@@ -407,6 +436,25 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
     );
   }
 
+  if (requiresLogin) {
+    return (
+      <div className="fixed inset-0 z-[100] bg-[#F8FAFC] dark:bg-[#0f172a] flex flex-col items-center justify-center p-6 text-slate-900 font-inter transition-colors duration-300">
+        <div className="max-w-md w-full bg-white dark:bg-[#1e293b] rounded-3xl p-8 text-center shadow-xl border border-slate-200 dark:border-slate-700 transition-colors duration-300">
+          <div className="w-16 h-16 bg-blue-50 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-6 transition-colors">
+            <Lock className="w-8 h-8 text-blue-600 dark:text-blue-500" />
+          </div>
+          <h2 className="text-2xl font-bold mb-3 dark:text-slate-50 transition-colors">Authentication Required</h2>
+          <p className="text-slate-500 dark:text-slate-400 mb-8 leading-relaxed transition-colors">
+            You must be logged in to your account to take this mock test.
+          </p>
+          <Button onClick={() => router.replace(`/auth`)} className="w-full h-12 text-[15px] font-semibold rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-colors">
+            Log In or Sign Up
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   if (!hasAccess) {
     return (
       <div className="fixed inset-0 z-[100] bg-[#F8FAFC] dark:bg-[#0f172a] flex flex-col items-center justify-center p-6 text-slate-900 font-inter transition-colors duration-300">
@@ -420,6 +468,25 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
           </p>
           <Button onClick={() => router.replace(`/mock-tests/${mockTest.slug}`)} className="w-full h-12 text-[15px] font-semibold rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-colors">
             View Access Options
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (attemptsExceeded) {
+    return (
+      <div className="fixed inset-0 z-[100] bg-[#F8FAFC] dark:bg-[#0f172a] flex flex-col items-center justify-center p-6 text-slate-900 font-inter transition-colors duration-300">
+        <div className="max-w-md w-full bg-white dark:bg-[#1e293b] rounded-3xl p-8 text-center shadow-xl border border-slate-200 dark:border-slate-700 transition-colors duration-300">
+          <div className="w-16 h-16 bg-red-50 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-6 transition-colors">
+            <AlertCircle className="w-8 h-8 text-red-600 dark:text-red-500" />
+          </div>
+          <h2 className="text-2xl font-bold mb-3 dark:text-slate-50 transition-colors">Attempts Exceeded</h2>
+          <p className="text-slate-500 dark:text-slate-400 mb-8 leading-relaxed transition-colors">
+            You have already reached the maximum allowed attempts ({userAttemptCount}/{mockTest.attemptsAllowed}) for this mock test. You can no longer start a new session.
+          </p>
+          <Button onClick={() => router.replace(`/mock-tests`)} className="w-full h-12 text-[15px] font-semibold rounded-full bg-slate-800 hover:bg-slate-900 text-white shadow-sm transition-colors">
+            Back to Dashboard
           </Button>
         </div>
       </div>

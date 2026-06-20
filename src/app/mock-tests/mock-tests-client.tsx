@@ -1,197 +1,280 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
-import Image from "next/image";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Clock, HelpCircle, BarChart, Loader2, ChevronRight, BookOpen, Target } from "lucide-react";
-import { ContentBadge } from "@/components/content-badge";
-import { useToast } from '@/hooks/use-toast';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Badge } from '@/components/ui/badge';
-import { MockTestFilters } from "@/components/mock-test-filters";
+import React, { useState, useEffect } from 'react';
+import { MockTest } from '@/lib/assessment-types';
+import { getAssessments } from '@/lib/firebase/assessment';
+import { FeaturedMockTestCard } from '@/components/assessment/FeaturedMockTestCard';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Search, Loader2, ChevronRight, CheckCircle2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
-type Test = {
-  id: string;
-  title: string;
-  subtitle?: string;
-  subject: string;
-  questions: any[];
-  duration: number;
-  difficulty: string | string[];
-  questionSource?: string | string[];
-  access: "free" | "premium" | "pro";
-  testType: string | string[];
-  textbookId?: string;
-  textbookTitle?: string;
-  chapterId?: string;
-  topicId?: string;
-  board?: string;
-  classCategory?: string;
-  class?: string;
-  featureImage?: string;
-  description?: string;
-};
-
-const ITEMS_PER_PAGE = 12;
-
-function getUrlForTest(test: Test) {
-    if (test.textbookId && test.chapterId) {
-        const topicSegment = test.topicId || 'null';
-        return `/textbook-solutions/mock-test/${test.id}/textbook/${test.textbookId}/chapter/${test.chapterId}/topic/${topicSegment}`;
-    }
-    if (test.textbookId) {
-        return `/textbook-solutions/mock-test/${test.id}/textbook/${test.textbookId}`;
-    }
-    const primaryType = Array.isArray(test.testType) ? test.testType[0] : test.testType;
-    if (!primaryType) return `/content/${test.id}`; // Fallback
-    
-    const typeSlug = primaryType.toLowerCase().replace(/\s+/g, '-');
-    return `/${typeSlug}/${test.id}`;
-}
-
-export default function MockTestsClientPage({ initialTests }: { initialTests: Test[] }) {
-  const [tests, setTests] = useState<Test[]>(initialTests);
-  const [loading, setLoading] = useState(false);
-  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
-  const [subjects, setSubjects] = useState<string[]>([]);
-  const { toast } = useToast();
+export default function MockTestsClient() {
+  const [assessments, setAssessments] = useState<MockTest[]>([]);
+  const [loading, setLoading] = useState(true);
+  
+  // Filters
+  const [search, setSearch] = useState('');
+  const [category, setCategory] = useState('All');
+  const [board, setBoard] = useState('All');
+  const [classFilter, setClassFilter] = useState('All');
+  const [subject, setSubject] = useState('All');
+  const [difficulty, setDifficulty] = useState('All');
+  const [language, setLanguage] = useState('All');
+  const [sort, setSort] = useState('Popularity');
 
   useEffect(() => {
-    if (initialTests) {
-        const uniqueSubjects = Array.from(new Set(initialTests.map((exam) => exam.subject))).filter(Boolean) as string[];
-        setSubjects(uniqueSubjects);
+    async function loadData() {
+      setLoading(true);
+      try {
+        const data = await getAssessments('mockTests');
+        setAssessments((data as MockTest[]).filter(a => a.status === 'Published'));
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoading(false);
+      }
     }
-  }, [initialTests]);
-  
-  const visibleTests = useMemo(() => {
-    return tests.slice(0, visibleCount);
-  }, [tests, visibleCount]);
+    loadData();
+  }, []);
 
-  const handleLoadMore = () => {
-    setVisibleCount(prevCount => prevCount + ITEMS_PER_PAGE);
+  const categories = ['All', 'WBBSE', 'WBCHSE', 'ICSE', 'WBCS', 'NEET', 'JEE', 'GK', 'Math', 'Science'];
+
+  const handleReset = () => {
+    setSearch('');
+    setCategory('All');
+    setBoard('All');
+    setClassFilter('All');
+    setSubject('All');
+    setDifficulty('All');
+    setLanguage('All');
+    setSort('Popularity');
   };
 
-  return (
-    <div className="bg-slate-50 min-h-screen pb-20">
-      {/* ── Native Mobile Header & Desktop Hero ── */}
-      <section className="bg-gradient-to-br from-blue-700 to-indigo-800 text-white rounded-b-3xl md:rounded-none md:bg-hero-gradient relative overflow-hidden">
-        {/* Subtle background decoration */}
-        <div className="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 rounded-full bg-white/10 blur-2xl"></div>
-        <div className="absolute bottom-0 left-0 -ml-8 -mb-8 w-24 h-24 rounded-full bg-blue-400/20 blur-xl"></div>
-        
-        <div className="container mx-auto px-4 py-8 md:py-20 lg:py-28 relative z-10">
-          <div className="flex items-center gap-2 mb-3 md:hidden">
-            <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
-              <Target className="w-4 h-4 text-white" />
-            </div>
-            <span className="text-sm font-bold tracking-wide uppercase text-blue-100">Practice Zone</span>
-          </div>
+  const filtered = assessments.filter(a => {
+    const matchesSearch = a.title.toLowerCase().includes(search.toLowerCase()) || 
+                          (a.description || '').toLowerCase().includes(search.toLowerCase());
+    const matchesCategory = category === 'All' || (a.tags || []).includes(category);
+    const matchesDiff = difficulty === 'All' || a.difficulty === difficulty;
+    // Add other filters as needed when taxonomies exist
+    return matchesSearch && matchesCategory && matchesDiff;
+  });
 
-          <h1 className="text-2xl md:text-5xl lg:text-7xl font-extrabold tracking-tight md:text-center drop-shadow-md">
-            Mock Tests
-          </h1>
-          <p className="text-sm md:text-lg lg:text-xl mt-2 md:mt-4 max-w-3xl md:mx-auto md:text-center text-blue-100/90 leading-relaxed">
-            Simulate real exams and boost your confidence with our curated mock tests.
-          </p>
+  // Sort
+  const sorted = [...filtered].sort((a, b) => {
+    if (sort === 'Newest') {
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return dateB - dateA;
+    }
+    // Default: Popularity (views)
+    const viewsA = (a as any).viewsCount || 0;
+    const viewsB = (b as any).viewsCount || 0;
+    return viewsB - viewsA;
+  });
+
+  return (
+    <div className="bg-slate-50 min-h-screen pb-20 dark:bg-slate-950 font-inter">
+      
+      {/* --- HERO SECTION --- */}
+      <section className="relative w-full overflow-hidden bg-[#0a1128] pt-16 pb-32">
+        {/* Background Grid & Blobs */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff0a_1px,transparent_1px),linear-gradient(to_bottom,#ffffff0a_1px,transparent_1px)] bg-[size:40px_40px]"></div>
+        <div className="absolute top-[-10%] left-[-5%] w-96 h-96 bg-blue-600/30 rounded-full blur-[120px]"></div>
+        <div className="absolute bottom-[-10%] right-[10%] w-[500px] h-[500px] bg-indigo-600/20 rounded-full blur-[150px]"></div>
+        <div className="absolute top-[20%] right-[30%] w-64 h-64 bg-purple-600/30 rounded-full blur-[100px]"></div>
+
+        <div className="container max-w-7xl mx-auto px-4 relative z-10">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
+            
+            {/* Hero Text */}
+            <div className="flex-1 text-center lg:text-left mt-8">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-md text-white text-sm font-semibold mb-6 shadow-xl">
+                <span>🔥</span> 70,000+ Mock Tests Available
+              </div>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-[1.1] mb-6 tracking-tight">
+                Online Mock Tests for <br className="hidden lg:block" /> Smarter Exam Preparation
+              </h1>
+              <p className="text-lg md:text-xl text-blue-100/80 mb-10 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+                Practice exam-style mock tests, improve speed, accuracy, and boost rank with AI-powered analytics.
+              </p>
+              
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 mb-10">
+                <Button className="h-14 px-8 rounded-xl bg-[#16A34A] hover:bg-green-700 text-white font-bold text-lg shadow-lg shadow-green-600/20 transition-all hover:scale-105">
+                  Start Free Test
+                </Button>
+                <Button variant="outline" className="h-14 px-8 rounded-xl border-2 border-white/30 bg-white/5 hover:bg-white/10 text-white font-bold text-lg backdrop-blur-md transition-all">
+                  Explore Categories
+                </Button>
+              </div>
+
+              {/* Trust Checks */}
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-3 text-sm font-medium text-blue-100/90">
+                <div className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#16A34A]" /> 50K+ Students</div>
+                <div className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#16A34A]" /> Live Rankings</div>
+                <div className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#16A34A]" /> AI Analytics</div>
+                <div className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#16A34A]" /> Instant Results</div>
+              </div>
+            </div>
+
+            {/* Hero Stats Card */}
+            <div className="w-full lg:w-[400px] flex-shrink-0">
+              <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-[24px] p-8 shadow-2xl shadow-black/50">
+                <div className="space-y-6">
+                  <div className="flex justify-between items-center border-b border-white/10 pb-4">
+                    <span className="text-blue-100 text-lg font-medium">Mock Tests:</span>
+                    <span className="text-white text-2xl font-bold">70,000+</span>
+                  </div>
+                  <div className="flex justify-between items-center border-b border-white/10 pb-4">
+                    <span className="text-blue-100 text-lg font-medium">Daily Attempts:</span>
+                    <span className="text-white text-2xl font-bold">120K+</span>
+                  </div>
+                  <div className="flex justify-between items-center border-b border-white/10 pb-4">
+                    <span className="text-blue-100 text-lg font-medium">Avg Rating:</span>
+                    <span className="text-white text-2xl font-bold">4.8</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-blue-100 text-lg font-medium">Success Rate:</span>
+                    <span className="text-white text-2xl font-bold">92%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* ── Content ── */}
-      <div className="container mx-auto px-3 md:px-4 -mt-4 md:mt-0 relative z-20">
-        <div className="py-4 md:py-12">
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="bg-white rounded-2xl p-3 flex gap-3 shadow-sm border border-slate-100">
-                  <Skeleton className="w-24 h-24 rounded-xl flex-shrink-0" />
-                  <div className="flex-1 space-y-2 py-1">
-                    <Skeleton className="h-3 w-1/3" />
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-2/3" />
-                  </div>
-                </div>
-              ))}
+      {/* --- FLOATING FILTER BAR --- */}
+      <div className="container max-w-7xl mx-auto px-4 -mt-16 relative z-20">
+        <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white dark:border-slate-700 shadow-xl shadow-slate-200/50 dark:shadow-black/20 rounded-[24px] p-4 flex flex-col xl:flex-row items-center gap-4">
+          
+          <div className="relative flex-grow w-full xl:w-auto">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+            <Input 
+              value={search} 
+              onChange={e => setSearch(e.target.value)} 
+              placeholder="Search by exam, class, subject, topic..." 
+              className="w-full h-12 pl-12 pr-4 bg-slate-50/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 rounded-xl text-[15px] font-medium placeholder:text-slate-400 focus-visible:ring-[#16A34A]"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-3 w-full xl:w-auto">
+            <div className="flex flex-col gap-1">
+              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-1">Board</label>
+              <Select value={board} onValueChange={setBoard}>
+                <SelectTrigger className="h-10 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg font-semibold"><SelectValue placeholder="Select" /></SelectTrigger>
+                <SelectContent><SelectItem value="All">Select</SelectItem></SelectContent>
+              </Select>
             </div>
-          ) : tests.length > 0 ? (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
-                {visibleTests.map((test) => (
-                  <Link href={getUrlForTest(test)} key={test.id} className="block group">
-                    {/* Native Android Card Style */}
-                    <div className="bg-white rounded-2xl p-2.5 md:p-4 flex md:flex-col gap-3 md:gap-4 shadow-sm border border-slate-200/80 active:bg-slate-50 transition-colors md:hover:shadow-md h-full">
-                      
-                      {/* Image Thumbnail */}
-                      <div className="w-28 h-24 md:w-full md:h-40 rounded-xl overflow-hidden relative flex-shrink-0 bg-slate-100">
-                        <Image
-                          src={test.featureImage || `https://picsum.photos/seed/${test.id}/400/225`}
-                          alt={test.title}
-                          width={400}
-                          height={225}
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute top-1.5 left-1.5 md:top-2 md:left-2">
-                          <ContentBadge type={test.access} />
-                        </div>
-                      </div>
-
-                      {/* Content Details */}
-                      <div className="flex-1 min-w-0 flex flex-col py-0.5 md:py-0">
-                        {/* Tags */}
-                        <div className="flex flex-wrap gap-1.5 mb-1.5 md:mb-2">
-                          {test.subject && <span className="text-[10px] md:text-xs font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-100">{test.subject}</span>}
-                          {test.board && <span className="text-[10px] md:text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">{test.board}</span>}
-                        </div>
-
-                        {/* Title */}
-                        <h3 className="text-sm md:text-lg font-bold text-slate-900 leading-snug line-clamp-2 mb-1">
-                          {test.title}
-                        </h3>
-
-                        {/* Description / Subtitle */}
-                        <p className="text-[11px] md:text-sm text-slate-500 line-clamp-1 mb-2 md:mb-4">
-                          {test.subtitle || test.description || (test.textbookTitle && `From: ${test.textbookTitle}`)}
-                        </p>
-
-                        {/* Bottom Meta & Action */}
-                        <div className="mt-auto flex items-center justify-between">
-                          <div className="flex items-center gap-2.5 text-[10px] md:text-xs font-semibold text-slate-500">
-                            {test.duration > 0 && (
-                              <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {test.duration}m</span>
-                            )}
-                            <span className="flex items-center gap-1"><HelpCircle className="w-3 h-3" /> {(test.questions?.length || 0)} Qs</span>
-                          </div>
-                          
-                          <div className="w-7 h-7 md:w-auto md:h-auto md:px-4 md:py-2 md:bg-blue-600 md:hover:bg-blue-700 md:text-white rounded-full bg-blue-50 flex items-center justify-center text-blue-600 transition-colors">
-                            <ChevronRight className="w-4 h-4 md:hidden" />
-                            <span className="hidden md:inline text-sm font-semibold">Start</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-              
-              {visibleCount < tests.length && (
-                <div className="mt-8 md:mt-12 text-center">
-                  <Button onClick={handleLoadMore} className="rounded-full px-8 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold shadow-sm">
-                    Load More
-                  </Button>
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="text-center py-20 bg-white rounded-3xl border border-slate-200 border-dashed">
-              <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Target className="w-8 h-8 text-slate-400" />
-              </div>
-              <h3 className="text-lg font-bold text-slate-800 mb-1">No Tests Found</h3>
-              <p className="text-sm text-slate-500">There are no mock tests available matching your criteria.</p>
+            <div className="flex flex-col gap-1">
+              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-1">Class</label>
+              <Select value={classFilter} onValueChange={setClassFilter}>
+                <SelectTrigger className="h-10 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg font-semibold"><SelectValue placeholder="Select" /></SelectTrigger>
+                <SelectContent><SelectItem value="All">Select</SelectItem></SelectContent>
+              </Select>
             </div>
-          )}
+            <div className="flex flex-col gap-1">
+              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-1">Subject</label>
+              <Select value={subject} onValueChange={setSubject}>
+                <SelectTrigger className="h-10 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg font-semibold"><SelectValue placeholder="Select" /></SelectTrigger>
+                <SelectContent><SelectItem value="All">Select</SelectItem></SelectContent>
+              </Select>
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-1">Difficulty</label>
+              <Select value={difficulty} onValueChange={setDifficulty}>
+                <SelectTrigger className="h-10 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg font-semibold"><SelectValue placeholder="All" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="All">All</SelectItem>
+                  <SelectItem value="Easy">Easy</SelectItem>
+                  <SelectItem value="Medium">Medium</SelectItem>
+                  <SelectItem value="Hard">Hard</SelectItem>
+                  <SelectItem value="Expert">Expert</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-1">Language</label>
+              <Select value={language} onValueChange={setLanguage}>
+                <SelectTrigger className="h-10 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg font-semibold"><SelectValue placeholder="All" /></SelectTrigger>
+                <SelectContent><SelectItem value="All">All</SelectItem></SelectContent>
+              </Select>
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-1">Sort</label>
+              <Select value={sort} onValueChange={setSort}>
+                <SelectTrigger className="h-10 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg font-semibold"><SelectValue placeholder="All" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Popularity">Popularity</SelectItem>
+                  <SelectItem value="Newest">Newest</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="flex items-end gap-3 w-full xl:w-auto h-[62px] pb-0.5">
+            <Button className="h-10 flex-1 xl:w-24 bg-[#16A34A] hover:bg-green-700 text-white font-bold rounded-lg shadow-sm">
+              Filter
+            </Button>
+            <Button variant="outline" onClick={handleReset} className="h-10 flex-1 xl:w-24 font-bold border-slate-300 dark:border-slate-600 rounded-lg text-slate-700 dark:text-slate-300">
+              Reset
+            </Button>
+          </div>
+
         </div>
       </div>
+
+      {/* --- CATEGORY PILLS --- */}
+      <div className="container max-w-7xl mx-auto px-4 mt-8">
+        <div className="flex items-center gap-3 overflow-x-auto hide-scrollbar pb-4">
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setCategory(cat)}
+              className={cn(
+                "h-10 px-6 rounded-full font-bold text-sm whitespace-nowrap transition-all flex-shrink-0 shadow-sm border",
+                category === cat 
+                  ? "bg-[#16A34A] text-white border-[#16A34A] shadow-green-500/20" 
+                  : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:border-green-500/50 hover:text-[#16A34A]"
+              )}
+            >
+              {cat}
+            </button>
+          ))}
+          <button className="w-10 h-10 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-400 hover:text-slate-700 shadow-sm flex-shrink-0">
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+
+      {/* --- FEATURED MOCK TESTS GRID --- */}
+      <div className="container max-w-7xl mx-auto px-4 mt-10">
+        <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white mb-8">Featured Mock Tests</h2>
+
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-24 text-slate-400">
+            <Loader2 className="w-10 h-10 animate-spin mb-4 text-[#16A34A]" />
+            <p className="font-medium">Loading premium mock tests...</p>
+          </div>
+        ) : sorted.length === 0 ? (
+          <div className="text-center py-24 bg-white dark:bg-slate-900 rounded-3xl border border-dashed border-slate-300 dark:border-slate-700 shadow-sm">
+            <p className="text-lg text-slate-500 dark:text-slate-400 font-medium">No mock tests found matching your criteria.</p>
+            <Button onClick={handleReset} variant="outline" className="mt-4 border-slate-300">Clear Filters</Button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {sorted.map(assessment => (
+              <FeaturedMockTestCard 
+                key={assessment.id} 
+                mockTest={assessment} 
+                baseHref="/mock-tests" 
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
     </div>
   );
 }

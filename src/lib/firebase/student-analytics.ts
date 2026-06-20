@@ -96,3 +96,29 @@ export async function getUserRecentScores(userId: string, limitCount = 10) {
   results.sort((a: any, b: any) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
   return results.slice(0, limitCount);
 }
+
+// ----------------------------------------------------
+// Exam / Mock Test Attempts
+// ----------------------------------------------------
+export const EXAM_ATTEMPTS_COLLECTION = 'user_exam_attempts';
+
+export async function saveExamAttempt(userId: string, assessmentId: string, scoreData: any) {
+  const docRef = doc(collection(db, EXAM_ATTEMPTS_COLLECTION));
+  await setDoc(docRef, {
+    userId,
+    assessmentId,
+    scoreData,
+    createdAt: serverTimestamp()
+  });
+  return docRef.id;
+}
+
+export async function getUserExamAttemptsCount(userId: string, assessmentId: string) {
+  const q = query(
+    collection(db, EXAM_ATTEMPTS_COLLECTION),
+    where('userId', '==', userId),
+    where('assessmentId', '==', assessmentId)
+  );
+  const snap = await getDocs(q);
+  return snap.size;
+}

@@ -1,4 +1,4 @@
-import { AssessmentListing } from '@/components/assessment/AssessmentListing';
+import MockTestsClient from './mock-tests-client';
 import { Metadata } from 'next';
 import Link from 'next/link';
 
@@ -116,24 +116,7 @@ export default function MockTestsListingPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdFAQ) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdOrg) }} />
       
-      {/* Hero SEO Section */}
-      <div className="bg-slate-50 dark:bg-slate-900/50 py-12 md:py-20 border-b border-slate-200 dark:border-slate-800">
-        <div className="container max-w-7xl mx-auto px-4 text-center">
-            <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-white mb-6 tracking-tight">Free Online Mock Tests for All Major Exams</h1>
-            <p className="text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto mb-8 leading-relaxed">
-                Practice exam-style mock tests, improve accuracy, and track your performance with AI-powered analytics. 
-                Join 50,000+ students actively preparing for success.
-            </p>
-        </div>
-      </div>
-
-      <AssessmentListing 
-        collectionName="mockTests"
-        title="Browse by Category"
-        description="Select your target exam and start practicing immediately. Use the filters to find tests that match your difficulty level and subject."
-        type="Mock Test"
-        baseHref="/mock-tests"
-      />
+      <MockTestsClient />
 
       {/* SEO Contextual Content Block */}
       <div className="container max-w-5xl mx-auto px-4 py-16 text-slate-700 dark:text-slate-300">
