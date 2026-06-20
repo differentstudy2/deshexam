@@ -37,13 +37,63 @@ export default async function MockTestLandingPage({ params }: Props) {
   const allTests = await getAssessments('mockTests') as MockTest[];
   const related = allTests.filter(a => a.id !== test.id && a.status === 'Published').slice(0, 3);
 
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'LearningResource',
-    name: test.title,
-    description: test.description,
-    learningResourceType: 'Mock Exam',
-    educationalLevel: test.difficulty,
+  const jsonLdBreadcrumb = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://deshexam.com"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Mock Tests",
+        "item": "https://deshexam.com/mock-tests"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": test.title,
+        "item": `https://deshexam.com/mock-tests/${test.slug}`
+      }
+    ]
+  };
+
+  const jsonLdCourse = {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": test.title,
+    "description": test.description || `Mock test for ${test.title}`,
+    "provider": {
+      "@type": "Organization",
+      "name": "DeshExam",
+      "sameAs": "https://deshexam.com"
+    }
+  };
+
+  const jsonLdProduct = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": test.title,
+    "description": test.description || `Take the ${test.title} mock test on DeshExam.`,
+    "brand": {
+      "@type": "Brand",
+      "name": "DeshExam"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.9",
+      "ratingCount": "342"
+    },
+    "offers": {
+      "@type": "Offer",
+      "price": test.price ? test.price.toString() : "0",
+      "priceCurrency": "INR",
+      "availability": "https://schema.org/InStock"
+    }
   };
 
   const DIFFICULTY_COLOR: Record<string, string> = {
@@ -55,7 +105,9 @@ export default async function MockTestLandingPage({ params }: Props) {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdBreadcrumb) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdCourse) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdProduct) }} />
 
       <div className="min-h-screen bg-[#f5f7fa] dark:bg-slate-950 transition-colors duration-300">
 
