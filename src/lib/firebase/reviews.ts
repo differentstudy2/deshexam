@@ -25,7 +25,7 @@ export interface MockTestReview {
 }
 
 export const REVIEWS_COLLECTION = 'mockTestReviews';
-export const MOCK_TESTS_COLLECTION = 'mockTests';
+export const MOCK_TESTS_COLLECTION = 'mock_tests';
 
 /**
  * Fetch a specific user's review for a mock test
@@ -154,4 +154,26 @@ export async function submitReview(
     // 4. Update stats on test document
     transaction.update(testRef, { reviewStats: updatedStats });
   });
+}
+
+/**
+ * Bulk insert an array of fake reviews.
+ * This sequentially calls submitReview to safely update stats.
+ */
+export async function bulkSubmitReviews(
+  testId: string,
+  reviews: { name: string; rating: number; content: string }[]
+): Promise<void> {
+  for (const review of reviews) {
+    const fakeUserId = `ai_gen_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
+    const fakeAvatar = review.name.charAt(0).toUpperCase();
+    await submitReview(
+      testId,
+      fakeUserId,
+      review.name,
+      fakeAvatar,
+      review.rating,
+      review.content
+    );
+  }
 }
