@@ -315,7 +315,14 @@ const SignUpForm = () => {
                 </FormControl>
                 <div className="leading-none">
                   <FormLabel className="text-[13.5px] font-medium text-gray-700">
-                    I agree Terms & Privacy Policy
+                    I agree to the{" "}
+                    <Link href="/terms" onClick={closeAuthDialog} className="text-[#0066FF] hover:underline">
+                      Terms
+                    </Link>
+                    {" "}&{" "}
+                    <Link href="/privacy" onClick={closeAuthDialog} className="text-[#0066FF] hover:underline">
+                      Privacy Policy
+                    </Link>
                   </FormLabel>
                 </div>
               </FormItem>
@@ -350,22 +357,26 @@ export function AuthDialog() {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && closeAuthDialog()}>
       <DialogContent 
-        className="p-0 border border-white/60 shadow-[0_20px_60px_rgba(0,0,0,0.1)] overflow-hidden sm:max-w-[400px] w-[90vw] bg-gradient-to-br from-[#f8fafc]/90 to-[#e2e8f0]/90 backdrop-blur-xl rounded-2xl"
+        className="p-0 border border-white/60 shadow-[0_20px_60px_rgba(0,0,0,0.1)] overflow-visible sm:max-w-[400px] w-[90vw] bg-gradient-to-br from-[#f8fafc]/90 to-[#e2e8f0]/90 backdrop-blur-xl rounded-2xl"
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <DialogTitle className="sr-only">Authentication</DialogTitle>
-        {/* Decorative background blurs for glassmorphism effect */}
-        <div className="absolute top-[-100px] left-[-100px] w-[300px] h-[300px] bg-blue-300/30 rounded-full blur-[80px] pointer-events-none" />
-        <div className="absolute bottom-[-100px] right-[-100px] w-[300px] h-[300px] bg-indigo-300/30 rounded-full blur-[80px] pointer-events-none" />
-        <div className="absolute top-[30%] right-[10%] w-[150px] h-[150px] bg-amber-200/20 rounded-full blur-[60px] pointer-events-none" />
-        
-        <div className="relative z-0 pt-6 pb-2 px-4 text-center">
-             <div className="mb-2 inline-block">
-                <DeshExamLogo />
+
+        {/* Floating Logo Circle */}
+        <div className="absolute -top-10 left-1/2 -translate-x-1/2 z-50">
+            <div className="bg-white/95 backdrop-blur-md rounded-full w-20 h-20 p-2 shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-white/60 flex items-center justify-center pointer-events-auto">
+                 <img src="/icons/icon-192x192.png" alt="DeshExam Icon" className="w-full h-full object-contain" />
             </div>
         </div>
+
+        {/* Decorative background blurs inside an overflow-hidden wrapper */}
+        <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
+            <div className="absolute top-[-100px] left-[-100px] w-[300px] h-[300px] bg-blue-300/30 rounded-full blur-[80px]" />
+            <div className="absolute bottom-[-100px] right-[-100px] w-[300px] h-[300px] bg-indigo-300/30 rounded-full blur-[80px]" />
+            <div className="absolute top-[30%] right-[10%] w-[150px] h-[150px] bg-amber-200/20 rounded-full blur-[60px]" />
+        </div>
         
-        <div className="relative z-0">
+        <div className="relative z-10 pt-10">
           {variant === 'sign-in' ? <SignInForm /> : <SignUpForm />}
         </div>
       </DialogContent>
