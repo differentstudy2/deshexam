@@ -26,7 +26,6 @@ import { ScrollArea } from "../ui/scroll-area";
 import { useAuthDialog } from "@/hooks/use-auth-dialog";
 
 const mainNavLinks = [
-    { href: "/dashboard", label: "Dashboard", icon: <LayoutDashboard className="h-5 w-5" /> },
     { href: "/academy", label: "Academy", icon: <BookOpen className="h-5 w-5" /> },
     { href: "/videos", label: "Videos", icon: <Zap className="h-5 w-5" /> },
     { href: "/audios", label: "Audios", icon: <Headphones className="h-5 w-5" /> },
@@ -36,8 +35,6 @@ const mainNavLinks = [
     { href: "/book", label: "Book", icon: <Library className="h-5 w-5" /> },
     { href: "/exams", label: "Exams", icon: <Award className="h-5 w-5" /> },
     { href: "/pricing", label: "Pricing", icon: <ShoppingCart className="h-5 w-5" /> },
-    { href: "/about", label: "About", icon: <Users className="h-5 w-5" /> },
-    { href: "/contact", label: "Contact", icon: <HelpCircle className="h-5 w-5" /> },
     { href: "/others", label: "Others", icon: <PlusCircle className="h-5 w-5" /> },
 ];
 
