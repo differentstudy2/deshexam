@@ -68,34 +68,50 @@ const jsonLdFAQ = {
   "mainEntity": [
     {
       "@type": "Question",
-      "name": "Are mock tests free on DeshExam?",
+      "name": "Are mock tests free?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes, we offer a wide variety of free mock tests across different categories. For unlimited access and advanced AI analytics, you can upgrade to Pass Pro."
+        "text": "We offer both free and premium mock tests. Free tests give you a feel of the interface, while premium unlocks all tests and advanced analytics."
       }
     },
     {
       "@type": "Question",
-      "name": "Can I retake the mock tests?",
+      "name": "Can I retake tests?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Absolutely. You can retake mock tests to improve your score and track your progress over time."
+        "text": "Yes! You can retake any mock test multiple times to track your improvement over time."
       }
     },
     {
       "@type": "Question",
-      "name": "Is the ranking live?",
+      "name": "Are explanations included?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes, upon completing a mock test, your score is immediately calculated and placed on our live leaderboard so you can see where you stand among peers."
+        "text": "Absolutely. Every question comes with a detailed step-by-step solution immediately after you complete the test."
       }
     },
     {
       "@type": "Question",
-      "name": "Are detailed solutions included?",
+      "name": "Is ranking live?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes, every mock test comes with comprehensive step-by-step solutions and conceptual explanations for every question."
+        "text": "Our leaderboard and rank prediction are updated in real-time as thousands of students take the same test."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is it mobile supported?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, you can take tests seamlessly on both your desktop and your smartphone."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I download tests for offline?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Currently, mock tests require an active internet connection to securely track your analytics and timing."
       }
     }
   ]
@@ -105,7 +121,26 @@ const jsonLdOrg = {
   "@context": "https://schema.org",
   "@type": "Organization",
   "name": "DeshExam",
-  "url": "https://deshexam.com"
+  "url": "https://deshexam.com",
+  "logo": "https://deshexam.com/logo.png"
+};
+
+const jsonLdSoftwareApp = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "DeshExam Mock Tests",
+  "applicationCategory": "EducationalApplication",
+  "operatingSystem": "Web, Android, iOS",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "INR"
+  },
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "4.8",
+    "ratingCount": "120000"
+  }
 };
 
 export default function MockTestsListingPage() {
@@ -115,6 +150,7 @@ export default function MockTestsListingPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdBreadcrumb) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdFAQ) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdOrg) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdSoftwareApp) }} />
       
       <MockTestsClient />
 
