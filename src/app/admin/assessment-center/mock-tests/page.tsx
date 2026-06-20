@@ -4,11 +4,12 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { PlusCircle, Pencil, Trash2, Loader2, Copy } from 'lucide-react';
+import { PlusCircle, Pencil, Trash2, Loader2, Copy, Eye } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { MockTest } from '@/lib/assessment-types';
 import { getAssessments, saveAssessment, deleteAssessment } from '@/lib/firebase/assessment';
 import { AssessmentEditor } from '@/components/admin/AssessmentEditor';
+import Link from 'next/link';
 
 export default function MockTestsPage() {
     const { toast } = useToast();
@@ -144,6 +145,9 @@ export default function MockTestsPage() {
                                         <TableCell>{test.status}</TableCell>
                                         <TableCell>
                                             <div className="flex gap-2">
+                                                <Button variant="ghost" size="sm" asChild title="View on Site">
+                                                    <Link href={`/mock-tests/${test.slug}`} target="_blank"><Eye className="h-4 w-4" /></Link>
+                                                </Button>
                                                 <Button variant="ghost" size="sm" onClick={() => handleEdit(test)} title="Edit"><Pencil className="h-4 w-4" /></Button>
                                                 <Button variant="ghost" size="sm" onClick={() => handleClone(test)} title="Clone"><Copy className="h-4 w-4" /></Button>
                                                 <Button variant="ghost" size="sm" className="text-red-500" onClick={() => handleDelete(test.id)} title="Delete"><Trash2 className="h-4 w-4" /></Button>

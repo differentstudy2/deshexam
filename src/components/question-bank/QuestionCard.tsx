@@ -49,7 +49,7 @@ const formatDate = (dateValue: any) => {
 
 export default function QuestionCard({ question, index, testMode = false, isListView = false, isDetailView = false }: QuestionCardProps) {
     const isDescriptive = ['desc', 'descriptive', 'creative question'].includes(question.questionType?.toLowerCase() || '');
-    const [showAnswer, setShowAnswer] = useState(isDescriptive);
+    const [showAnswer, setShowAnswer] = useState(isDetailView || isDescriptive);
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
     const [fillBlankAnswer, setFillBlankAnswer] = useState<string>('');
     const { user } = useAuth();
@@ -114,12 +114,12 @@ export default function QuestionCard({ question, index, testMode = false, isList
     useEffect(() => {
         if (!testMode) {
             setSelectedOption(null);
-            setShowAnswer(isDescriptive);
+            setShowAnswer(isDetailView || isDescriptive);
         } else {
             setShowAnswer(false);
             setSelectedOption(null);
         }
-    }, [testMode, question.id, isDescriptive]);
+    }, [testMode, question.id, isDescriptive, isDetailView]);
 
     const handleInteract = async (type: 'like' | 'dislike' | 'bookmark') => {
         if (!user) {
@@ -432,6 +432,17 @@ export default function QuestionCard({ question, index, testMode = false, isList
         } catch(e) {}
     }
 
+    const getFormattedAnswer = () => {
+        if (!question.correctAnswer) return '';
+        if (isDescriptive) return question.correctAnswer;
+        if (question.options) {
+            const key = question.correctAnswer.toLowerCase();
+            const optionText = (question.options as any)[key];
+            if (optionText) return optionText;
+        }
+        return question.correctAnswer;
+    };
+
     return (
         <div id={`question-card-${question.id}`} className="w-full bg-white dark:bg-slate-900 p-5 md:p-6 rounded-xl border border-slate-200/60 dark:border-slate-800/60 shadow-sm mb-5 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 relative overflow-hidden">
             
@@ -447,6 +458,12 @@ export default function QuestionCard({ question, index, testMode = false, isList
                     {question.sourceYear ? (
                         <span className="bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium rounded-md px-2.5 py-0.5 text-[11px] uppercase tracking-wide">{question.sourceYear}</span>
                     ) : null}
+
+                    {question.questionType && (
+                        <span className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800/50 text-indigo-700 dark:text-indigo-300 font-bold rounded-md px-2.5 py-0.5 text-[11px] uppercase tracking-wide shadow-sm">
+                            {question.questionType}
+                        </span>
+                    )}
                     
                     {/* Real tags */}
                     {(question as any).taxonomyTags?.map((tag: string, idx: number) => (
@@ -723,18 +740,18 @@ export default function QuestionCard({ question, index, testMode = false, isList
             )}
 
             {/* Descriptive Answer Section */}
-            {isDescriptive && showAnswer && question.correctAnswer && (
+            {(isDetailView || isDescriptive) && showAnswer && question.correctAnswer && (
                 <div className="mt-4 mb-2 p-4 rounded-xl bg-green-50/50 dark:bg-green-900/10 !text-[0.8rem] text-slate-700 dark:text-slate-300 !leading-snug animate-in fade-in slide-in-from-top-2 duration-300 border border-green-100 dark:border-green-800/30">
                     <div className="font-bold text-green-900 dark:text-green-300 flex items-center gap-1.5 mb-2 border-b border-green-200/50 dark:border-green-800/50 pb-2">
                         <CheckCircle2 className="w-4 h-4 text-green-600" />
                         {isDetailView ? <h2 className="text-base m-0">Answer</h2> : "Answer"}
                     </div>
-                    <div className="prose dark:prose-invert max-w-none opacity-90 !text-[0.85rem] prose-p:!text-[0.85rem] prose-p:!my-1 prose-headings:!text-[0.95rem] prose-headings:!my-1.5 prose-li:!text-[0.85rem] prose-li:!my-0.5" dangerouslySetInnerHTML={{ __html: question.correctAnswer }} />
+                    <div className="prose dark:prose-invert max-w-none opacity-90 !text-[0.85rem] prose-p:!text-[0.85rem] prose-p:!my-1 prose-headings:!text-[0.95rem] prose-headings:!my-1.5 prose-li:!text-[0.85rem] prose-li:!my-0.5" dangerouslySetInnerHTML={{ __html: getFormattedAnswer() }} />
                 </div>
             )}
 
             {/* Explanation Section */}
-            {!isDescriptive && showAnswer && question.explanation && (
+            {showAnswer && question.explanation && (
                 <div className="mt-4 mb-2 p-4 rounded-xl bg-blue-50/50 dark:bg-blue-900/10 !text-[0.8rem] text-slate-700 dark:text-slate-300 !leading-snug animate-in fade-in slide-in-from-top-2 duration-300 border border-blue-100 dark:border-blue-800/30">
                     <div className="font-bold text-blue-900 dark:text-blue-300 flex items-center gap-1.5 mb-2 border-b border-blue-200/50 dark:border-blue-800/50 pb-2">
                         <Lightbulb className="w-4 h-4 text-amber-500" />

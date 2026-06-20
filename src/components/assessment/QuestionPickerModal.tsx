@@ -140,7 +140,7 @@ export function QuestionPickerModal({ open, onOpenChange, onSelectQuestions, pre
                 </div>
 
                 {/* List */}
-                <ScrollArea className="flex-1 -mx-6 px-6">
+                <div className="flex-1 overflow-y-auto min-h-0 -mx-6 px-6">
                     {loading ? (
                         <div className="flex justify-center items-center py-20">
                             <Loader2 className="w-8 h-8 animate-spin text-slate-400" />
@@ -202,7 +202,7 @@ export function QuestionPickerModal({ open, onOpenChange, onSelectQuestions, pre
                             })}
                         </div>
                     )}
-                </ScrollArea>
+                </div>
 
                 <DialogFooter className="pt-4 border-t mt-auto">
                     <div className="flex items-center justify-between w-full">
