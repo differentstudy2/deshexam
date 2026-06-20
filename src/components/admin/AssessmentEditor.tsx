@@ -16,6 +16,7 @@ import { MockTest } from '@/lib/assessment-types';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { storage } from '@/lib/firebase/client';
 import { QuestionPickerModal } from '@/components/assessment/QuestionPickerModal';
+import { QuestionImportModal } from '@/components/assessment/QuestionImportModal';
 import { QuestionBankEntry, TaxonomyNode } from '@/lib/question-bank-types';
 import { getQuestionsByIds } from '@/lib/firebase/question-bank';
 import { getTaxonomyNodesByTrack } from '@/lib/firebase/taxonomy';
@@ -75,6 +76,7 @@ export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock 
     
     // Question Picker State
     const [showPicker, setShowPicker] = useState(false);
+    const [showImport, setShowImport] = useState(false);
     
     // New Advanced States
     const [questionPreviews, setQuestionPreviews] = useState<Record<string, string>>({});
@@ -463,9 +465,14 @@ export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock 
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between pb-4">
                                 <CardTitle>Questions ({editData.questionIds?.length || 0})</CardTitle>
-                                <Button size="sm" onClick={() => setShowPicker(true)}>
-                                    <ListPlus className="h-4 w-4 mr-2" /> Add Questions
-                                </Button>
+                                <div className="flex gap-2">
+                                    <Button size="sm" variant="outline" onClick={() => setShowImport(true)}>
+                                        <Upload className="h-4 w-4 mr-2" /> Import Questions
+                                    </Button>
+                                    <Button size="sm" onClick={() => setShowPicker(true)}>
+                                        <ListPlus className="h-4 w-4 mr-2" /> Add Questions
+                                    </Button>
+                                </div>
                             </CardHeader>
                             <CardContent>
                                 {(!editData.questionIds || editData.questionIds.length === 0) ? (
@@ -657,6 +664,18 @@ export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock 
                     onOpenChange={setShowPicker} 
                     onSelectQuestions={handleQuestionsSelected}
                     preSelectedIds={editData.questionIds || []}
+                />
+
+                <QuestionImportModal
+                    open={showImport}
+                    onOpenChange={setShowImport}
+                    onImportComplete={(newIds) => {
+                        setEditData(prev => ({
+                            ...prev,
+                            questionIds: [...(prev.questionIds || []), ...newIds]
+                        }));
+                        setShowImport(false);
+                    }}
                 />
 
                 <Dialog open={showAIDialog} onOpenChange={setShowAIDialog}>
