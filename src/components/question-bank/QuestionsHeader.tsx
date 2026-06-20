@@ -17,6 +17,10 @@ export default function QuestionsHeader() {
     }
   };
 
+  const handleQuickFilter = (term: string) => {
+    router.push(`/questions/search?q=${encodeURIComponent(term)}`);
+  };
+
   return (
     <div className="w-full bg-gradient-to-b from-[#eaf7f0] via-[#f2fdf7] to-[#ffffff] dark:from-slate-950 dark:via-slate-900/50 dark:to-slate-950 py-16 px-4">
       <div className="max-w-4xl mx-auto text-center space-y-8">
@@ -51,7 +55,7 @@ export default function QuestionsHeader() {
               placeholder="Search by question, board, topic, exam..." 
               className="flex-1 outline-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-[15px] h-10 px-0"
             />
-            <Button type="button" variant="secondary" className="rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 px-5 h-10 flex items-center gap-2 font-medium">
+            <Button onClick={(e) => { e.preventDefault(); if(query.trim()) handleQuickFilter(query); }} type="button" variant="secondary" className="rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 px-5 h-10 flex items-center gap-2 font-medium">
               <SlidersHorizontal className="h-4 w-4" />
               Filter
             </Button>
@@ -59,15 +63,15 @@ export default function QuestionsHeader() {
         </form>
 
         <div className="flex flex-wrap justify-center items-center gap-2 mt-8 max-w-[850px] mx-auto">
-          <Button variant="default" className="rounded-full h-8 px-4 text-[13px] bg-[#3a9662] hover:bg-[#2d764d] text-white font-medium border-0">Academic</Button>
-          <Button variant="secondary" className="rounded-full h-8 px-4 text-[13px] bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-medium">Competitive</Button>
-          <Button variant="secondary" className="rounded-full h-8 px-4 text-[13px] bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-medium">MCQ</Button>
-          <Button variant="secondary" className="rounded-full h-8 px-4 text-[13px] bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-medium">Descriptive Questions</Button>
-          <Button variant="secondary" className="rounded-full h-8 px-4 text-[13px] bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-medium">Mock Test</Button>
-          <Button variant="secondary" className="rounded-full h-8 px-4 text-[13px] bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-medium">WBBSE</Button>
-          <Button variant="secondary" className="rounded-full h-8 px-4 text-[13px] bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-medium">CBSE</Button>
-          <Button variant="secondary" className="rounded-full h-8 px-4 text-[13px] bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-medium">SSC</Button>
-          <Button variant="secondary" className="rounded-full h-8 px-4 text-[13px] bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-medium">Railway</Button>
+          <Button onClick={() => handleQuickFilter('Academic')} variant="default" className="rounded-full h-8 px-4 text-[13px] bg-[#3a9662] hover:bg-[#2d764d] text-white font-medium border-0">Academic</Button>
+          <Button onClick={() => handleQuickFilter('Competitive')} variant="secondary" className="rounded-full h-8 px-4 text-[13px] bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-medium">Competitive</Button>
+          <Button onClick={() => handleQuickFilter('MCQ')} variant="secondary" className="rounded-full h-8 px-4 text-[13px] bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-medium">MCQ</Button>
+          <Button onClick={() => handleQuickFilter('Descriptive')} variant="secondary" className="rounded-full h-8 px-4 text-[13px] bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-medium">Descriptive Questions</Button>
+          <Button onClick={() => handleQuickFilter('Mock Test')} variant="secondary" className="rounded-full h-8 px-4 text-[13px] bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-medium">Mock Test</Button>
+          <Button onClick={() => handleQuickFilter('WBBSE')} variant="secondary" className="rounded-full h-8 px-4 text-[13px] bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-medium">WBBSE</Button>
+          <Button onClick={() => handleQuickFilter('CBSE')} variant="secondary" className="rounded-full h-8 px-4 text-[13px] bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-medium">CBSE</Button>
+          <Button onClick={() => handleQuickFilter('SSC')} variant="secondary" className="rounded-full h-8 px-4 text-[13px] bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-medium">SSC</Button>
+          <Button onClick={() => handleQuickFilter('Railway')} variant="secondary" className="rounded-full h-8 px-4 text-[13px] bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-medium">Railway</Button>
           
           <Button variant="outline" className="rounded-full h-8 px-4 text-[13px] bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 flex items-center gap-1.5 font-medium shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800">
             Subject <ChevronDown className="h-3.5 w-3.5 opacity-50" />
