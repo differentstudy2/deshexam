@@ -18,6 +18,7 @@ import {
   signInWithPopup,
   signInWithCredential,
   UserCredential,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 import { useFirebaseAuth } from "@/hooks/use-firebase";
 import { updateUserProfile } from "@/lib/firebase/firestore";
@@ -29,6 +30,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<any>;
   signInWithGoogle: () => Promise<any>;
   signInWithGoogleOneTap: (credentialResponse: any) => Promise<any>;
+  resetPassword: (email: string) => Promise<any>;
   logOut: () => Promise<any>;
 }
 
@@ -39,6 +41,7 @@ const AuthContext = createContext<AuthContextType>({
   signIn: async () => {},
   signInWithGoogle: async () => {},
   signInWithGoogleOneTap: async () => {},
+  resetPassword: async () => {},
   logOut: async () => {},
 });
 
@@ -92,6 +95,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return result;
   };
 
+  const resetPassword = (email: string) => {
+    if (!auth) throw new Error("Auth service is not available");
+    return sendPasswordResetEmail(auth, email);
+  };
+
   const logOut = () => {
     if (!auth) throw new Error("Auth service is not available");
     return signOut(auth);
@@ -141,7 +149,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [auth]);
 
   return (
-    <AuthContext.Provider value={{ user, loading, signUp, signIn, signInWithGoogle, signInWithGoogleOneTap, logOut }}>
+    <AuthContext.Provider value={{ user, loading, signUp, signIn, signInWithGoogle, signInWithGoogleOneTap, resetPassword, logOut }}>
       {children}
     </AuthContext.Provider>
   );
