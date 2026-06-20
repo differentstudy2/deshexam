@@ -71,3 +71,17 @@ export function getOrganizationSchema() {
     logo: "https://deshexam.com/logo.png"
   };
 }
+
+export function getQuestionSchema(questionText: string, answerText: string) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Question",
+    name: questionText,
+    text: questionText,
+    answerCount: 1,
+    acceptedAnswer: {
+      "@type": "Answer",
+      text: answerText
+    }
+  };
+}
