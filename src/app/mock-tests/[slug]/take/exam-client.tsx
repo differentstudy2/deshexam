@@ -736,11 +736,11 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
         )}
 
         {/* Bottom Bar */}
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-[#F1F5F9] dark:from-[#0f172a] via-[#F1F5F9] dark:via-[#0f172a] to-transparent flex items-center justify-between gap-3 z-20 pb-6 transition-colors">
+        <div className="fixed bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-[#F1F5F9] dark:from-[#0f172a] via-[#F1F5F9] dark:via-[#0f172a] to-transparent flex items-center justify-between gap-1.5 sm:gap-3 z-20 pb-5 sm:pb-6 transition-colors">
           <button
             onClick={handlePrevious}
             disabled={currentQuestionIndex === 0}
-            className="h-10 px-4 rounded-full border border-slate-400 dark:border-slate-600 bg-white dark:bg-[#1e293b] font-semibold text-sm text-slate-800 dark:text-slate-200 whitespace-nowrap disabled:opacity-50 transition-colors flex-shrink-0"
+            className="h-10 px-3 sm:px-4 rounded-full border border-slate-400 dark:border-slate-600 bg-white dark:bg-[#1e293b] font-semibold text-[13px] sm:text-sm text-slate-800 dark:text-slate-200 whitespace-nowrap disabled:opacity-50 transition-colors flex-shrink-0"
           >
             Previous
           </button>
@@ -749,23 +749,23 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
             <>
               <button
                 onClick={handleMarkReview}
-                className="h-10 px-4 rounded-full bg-[#FDE047] dark:bg-amber-500/90 font-semibold text-sm text-slate-800 dark:text-slate-900 whitespace-nowrap border border-transparent hover:border-amber-400 dark:hover:border-amber-400 transition-colors flex-shrink-0"
+                className="h-10 px-3 sm:px-4 rounded-full bg-[#FDE047] dark:bg-amber-500/90 font-semibold text-[13px] sm:text-sm text-slate-800 dark:text-slate-900 whitespace-nowrap border border-transparent hover:border-amber-400 dark:hover:border-amber-400 transition-colors flex-shrink-0"
               >
                 Preview
               </button>
               <button
                 onClick={handleSaveAndNext}
-                className="h-10 px-4 rounded-full bg-[#166534] dark:bg-emerald-600 text-white font-semibold text-sm flex-1 flex items-center justify-center gap-1.5 whitespace-nowrap transition-colors"
+                className="h-10 px-3 sm:px-4 rounded-full bg-[#166534] dark:bg-emerald-600 text-white font-semibold text-[13px] sm:text-sm flex-1 flex items-center justify-center gap-1 sm:gap-1.5 whitespace-nowrap transition-colors"
               >
                 Save & Next
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M7 17 17 7" /><path d="M7 7h10v10" /></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 sm:w-5 sm:h-5"><path d="M7 17 17 7" /><path d="M7 7h10v10" /></svg>
               </button>
             </>
           ) : (
             <button
               onClick={handleSaveAndNext}
               disabled={currentQuestionIndex === questions.length - 1}
-              className="h-10 flex-1 px-6 rounded-full font-bold text-sm bg-[#2563EB] dark:bg-blue-600 text-white shadow-sm transition-colors"
+              className="h-10 flex-1 px-4 sm:px-6 rounded-full font-bold text-[13px] sm:text-sm bg-[#2563EB] dark:bg-blue-600 text-white shadow-sm transition-colors"
             >
               Next Question
             </button>
