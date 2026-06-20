@@ -112,16 +112,16 @@ export default async function MockTestLandingPage({ params }: Props) {
                 )}
 
                 {/* Stats strip */}
-                <div className="flex flex-wrap gap-3">
+                <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-3">
                   {[
                     { icon: HelpCircle, label: `${test.questionIds?.length ?? 0} Questions`, color: 'text-blue-400', borderHover: 'hover:border-blue-500/30', bgHover: 'hover:bg-blue-500/10' },
                     { icon: Clock, label: `${test.durationMin ?? 0} Minutes`, color: 'text-violet-400', borderHover: 'hover:border-violet-500/30', bgHover: 'hover:bg-violet-500/10' },
                     { icon: FileText, label: `${test.totalMarks ?? 0} Marks`, color: 'text-amber-400', borderHover: 'hover:border-amber-500/30', bgHover: 'hover:bg-amber-500/10' },
                     { icon: AlertTriangle, label: `${test.negativeMarking ?? 0} Negative`, color: 'text-red-400', borderHover: 'hover:border-red-500/30', bgHover: 'hover:bg-red-500/10' },
                   ].map(({ icon: Icon, label, color, borderHover, bgHover }) => (
-                    <div key={label} className={`flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm font-semibold text-white backdrop-blur-md shadow-lg transition-all duration-300 ${borderHover} ${bgHover} cursor-default`}>
-                      <Icon className={`w-4 h-4 ${color}`} />
-                      {label}
+                    <div key={label} className={`flex items-center justify-center sm:justify-start gap-2 bg-white/5 border border-white/10 rounded-xl px-2 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold text-white backdrop-blur-md shadow-lg transition-all duration-300 ${borderHover} ${bgHover} cursor-default`}>
+                      <Icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 ${color}`} />
+                      <span className="truncate">{label}</span>
                     </div>
                   ))}
                 </div>
