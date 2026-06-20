@@ -10,6 +10,7 @@ import {
   getKidsZoneCategories,
   getClasses
 } from '@/lib/firebase/firestore';
+import { getTaxonomyNodesByType } from '@/lib/firebase/taxonomy';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://deshexam.com';
@@ -17,6 +18,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // 1. Static Routes
   const staticRoutes = [
     '', 
+    '/institutions',
     '/academy',
     '/videos',
     '/audios',
@@ -152,6 +154,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
+  // 7. Institutions
+  const institutions = await getTaxonomyNodesByType('academic', 'institution');
+  const institutionRoutes = institutions.map(inst => ({
+    url: `${baseUrl}/institutions/${inst.slug || inst.id}`,
+    lastModified: inst.updatedAt?.toDate?.() || inst.createdAt?.toDate?.() || new Date(),
+    priority: 0.8,
+  }));
+
   return [
     ...staticRoutes,
     ...classRoutes,
@@ -159,5 +169,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...contentRoutes,
     ...questionRoutes,
     ...textbookTreeRoutes,
+    ...institutionRoutes,
   ];
 }
