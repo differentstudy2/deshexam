@@ -1,5 +1,5 @@
 import { db } from './client';
-import { collection, doc, setDoc, getDoc, getDocs, query, where, orderBy, deleteDoc, serverTimestamp, increment, updateDoc } from 'firebase/firestore';
+import { collection, doc, setDoc, getDoc, getDocs, query, where, orderBy, deleteDoc, serverTimestamp, increment, updateDoc, limit } from 'firebase/firestore';
 
 // ----------------------------------------------------
 // Bookmarks
@@ -121,4 +121,32 @@ export async function getUserExamAttemptsCount(userId: string, assessmentId: str
   );
   const snap = await getDocs(q);
   return snap.size;
+}
+
+// ----------------------------------------------------
+// Leaderboard & Daily Challenges
+// ----------------------------------------------------
+export const LEADERBOARD_COLLECTION = 'platform_leaderboard';
+export const DAILY_CHALLENGES_COLLECTION = 'daily_challenges';
+
+export async function getTopLeaderboard(limitCount = 4) {
+  try {
+    const q = query(collection(db, LEADERBOARD_COLLECTION), orderBy('score', 'desc'), limit(limitCount));
+    const snap = await getDocs(q);
+    return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  } catch (e) {
+    console.error("Error fetching leaderboard", e);
+    return [];
+  }
+}
+
+export async function getDailyChallenges() {
+  try {
+    const q = query(collection(db, DAILY_CHALLENGES_COLLECTION), orderBy('order', 'asc'));
+    const snap = await getDocs(q);
+    return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  } catch (e) {
+    console.error("Error fetching daily challenges", e);
+    return [];
+  }
 }

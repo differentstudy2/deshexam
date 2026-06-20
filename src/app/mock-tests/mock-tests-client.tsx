@@ -3,16 +3,21 @@
 import React, { useState, useEffect } from 'react';
 import { MockTest } from '@/lib/assessment-types';
 import { getAssessments } from '@/lib/firebase/assessment';
+import { getTopLeaderboard, getDailyChallenges } from '@/lib/firebase/student-analytics';
 import { FeaturedMockTestCard } from '@/components/assessment/FeaturedMockTestCard';
+import { MockTestListCard } from '@/components/assessment/MockTestListCard';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, Loader2, ChevronRight, CheckCircle2 } from 'lucide-react';
+import { Search, Loader2, ChevronRight, CheckCircle2, LayoutGrid, List as ListIcon, CheckCircle, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 export default function MockTestsClient() {
   const [assessments, setAssessments] = useState<MockTest[]>([]);
+  const [leaderboard, setLeaderboard] = useState<any[]>([]);
+  const [challenges, setChallenges] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   
   // Filters
   const [search, setSearch] = useState('');
@@ -28,8 +33,14 @@ export default function MockTestsClient() {
     async function loadData() {
       setLoading(true);
       try {
-        const data = await getAssessments('mockTests');
+        const [data, lbData, chData] = await Promise.all([
+          getAssessments('mockTests'),
+          getTopLeaderboard(4),
+          getDailyChallenges()
+        ]);
         setAssessments((data as MockTest[]).filter(a => a.status === 'Published'));
+        setLeaderboard(lbData);
+        setChallenges(chData);
       } catch (e) {
         console.error(e);
       } finally {
@@ -248,23 +259,18 @@ export default function MockTestsClient() {
         </div>
       </div>
 
-      {/* --- FEATURED MOCK TESTS GRID --- */}
+      {/* --- FEATURED MOCK TESTS SECTION --- */}
       <div className="container max-w-7xl mx-auto px-4 mt-10">
-        <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white mb-8">Featured Mock Tests</h2>
-
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white">Featured Mock Tests</h2>
+          <Button variant="link" className="text-[#16A34A] font-bold">View All</Button>
+        </div>
+        
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-24 text-slate-400">
-            <Loader2 className="w-10 h-10 animate-spin mb-4 text-[#16A34A]" />
-            <p className="font-medium">Loading premium mock tests...</p>
-          </div>
-        ) : sorted.length === 0 ? (
-          <div className="text-center py-24 bg-white dark:bg-slate-900 rounded-3xl border border-dashed border-slate-300 dark:border-slate-700 shadow-sm">
-            <p className="text-lg text-slate-500 dark:text-slate-400 font-medium">No mock tests found matching your criteria.</p>
-            <Button onClick={handleReset} variant="outline" className="mt-4 border-slate-300">Clear Filters</Button>
-          </div>
+          <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-[#16A34A]" /></div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {sorted.map(assessment => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {sorted.slice(0, 4).map(assessment => (
               <FeaturedMockTestCard 
                 key={assessment.id} 
                 mockTest={assessment} 
@@ -273,6 +279,148 @@ export default function MockTestsClient() {
             ))}
           </div>
         )}
+      </div>
+
+      {/* --- BROWSE MOCK TESTS SECTION --- */}
+      <div className="container max-w-7xl mx-auto px-4 mt-16">
+        
+        {/* Section Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+          <div>
+            <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white">Browse All Mock Tests</h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{sorted.length.toLocaleString()} tests found</p>
+          </div>
+          
+          {/* View Toggle */}
+          <div className="flex items-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-1 shadow-sm">
+            <button 
+              onClick={() => setViewMode('grid')}
+              className={cn("flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-bold transition-all", viewMode === 'grid' ? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white" : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300")}
+            >
+              <LayoutGrid className="w-4 h-4" /> Grid
+            </button>
+            <button 
+              onClick={() => setViewMode('list')}
+              className={cn("flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-bold transition-all", viewMode === 'list' ? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white" : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300")}
+            >
+              <ListIcon className="w-4 h-4" /> List
+            </button>
+          </div>
+        </div>
+
+        <div className="flex flex-col xl:flex-row gap-8">
+          
+          {/* Main Content (Grid or List) */}
+          <div className="flex-grow">
+            {loading ? (
+              <div className="flex flex-col items-center justify-center py-24 text-slate-400">
+                <Loader2 className="w-10 h-10 animate-spin mb-4 text-[#16A34A]" />
+                <p className="font-medium">Loading premium mock tests...</p>
+              </div>
+            ) : sorted.length === 0 ? (
+              <div className="text-center py-24 bg-white dark:bg-slate-900 rounded-3xl border border-dashed border-slate-300 dark:border-slate-700 shadow-sm">
+                <p className="text-lg text-slate-500 dark:text-slate-400 font-medium">No mock tests found matching your criteria.</p>
+                <Button onClick={handleReset} variant="outline" className="mt-4 border-slate-300">Clear Filters</Button>
+              </div>
+            ) : viewMode === 'grid' ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {sorted.map(assessment => (
+                  <FeaturedMockTestCard 
+                    key={assessment.id} 
+                    mockTest={assessment} 
+                    baseHref="/mock-tests" 
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col gap-4">
+                {sorted.map(assessment => (
+                  <MockTestListCard 
+                    key={assessment.id} 
+                    mockTest={assessment} 
+                    baseHref="/mock-tests" 
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Right Sidebar */}
+          <div className="w-full xl:w-[320px] shrink-0 space-y-6">
+            
+            {/* Premium Upgrade Card */}
+            <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-[20px] p-6 text-white shadow-lg shadow-purple-500/20 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -mr-10 -mt-10"></div>
+              <span className="inline-block bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase mb-4">
+                Premium Upgrade
+              </span>
+              <h3 className="text-2xl font-extrabold leading-tight mb-4">Unlock Unlimited<br/>Mock Tests</h3>
+              <ul className="space-y-2 mb-6">
+                <li className="flex items-center gap-2 text-sm font-medium"><CheckCircle className="w-4 h-4 text-purple-200" /> Unlimited access</li>
+                <li className="flex items-center gap-2 text-sm font-medium"><CheckCircle className="w-4 h-4 text-purple-200" /> AI analytics</li>
+                <li className="flex items-center gap-2 text-sm font-medium"><CheckCircle className="w-4 h-4 text-purple-200" /> Rank prediction</li>
+              </ul>
+              <Button className="w-full bg-white text-purple-700 hover:bg-slate-100 font-bold h-11 rounded-xl shadow-sm">
+                Upgrade Now
+              </Button>
+            </div>
+
+            {/* Leaderboard Preview */}
+            <div className="bg-slate-100 dark:bg-slate-900 rounded-[20px] p-5 border border-slate-200 dark:border-slate-800">
+              <h3 className="text-lg font-extrabold text-slate-900 dark:text-white mb-4">Leaderboard Preview</h3>
+              
+              {/* Avatars row */}
+              <div className="flex items-center justify-center gap-2 mb-6">
+                {leaderboard.slice(0, 4).map((lb, i) => (
+                  <div key={i} className={`relative rounded-full overflow-hidden border-2 border-white dark:border-slate-800 shadow-sm ${i === 1 || i === 2 ? 'w-12 h-12 z-10 -mt-2' : 'w-10 h-10 opacity-80'}`}>
+                    <img src={lb.avatar || `https://i.pravatar.cc/150?u=${lb.id}`} alt={lb.name} className="w-full h-full object-cover" />
+                  </div>
+                ))}
+              </div>
+
+              {/* Leaderboard List */}
+              <div className="space-y-2">
+                {leaderboard.slice(0, 4).map((lb, i) => (
+                  <div key={i} className="flex items-center justify-between bg-white dark:bg-slate-800/50 rounded-xl p-3 shadow-sm border border-slate-200/50 dark:border-slate-700/50">
+                    <div className="flex items-center gap-3">
+                      <span className={cn("text-base font-bold w-4 text-center", i === 0 ? "text-amber-500" : i === 1 ? "text-slate-400" : i === 2 ? "text-amber-700" : "text-slate-400")}>
+                        {i + 1}
+                      </span>
+                      <div className="w-8 h-8 rounded-full overflow-hidden">
+                        <img src={lb.avatar || `https://i.pravatar.cc/150?u=${lb.id}`} alt={lb.name} className="w-full h-full object-cover" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-slate-900 dark:text-white leading-tight">{lb.name}</p>
+                        <p className="text-[10px] text-slate-500 font-medium">{lb.studentsCount} students</p>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-slate-400" />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Daily Challenge Card */}
+            <div className="bg-slate-100 dark:bg-slate-900 rounded-[20px] p-5 border border-slate-200 dark:border-slate-800">
+              <h3 className="text-lg font-extrabold text-slate-900 dark:text-white mb-4">Daily Challenge Card</h3>
+              <div className="space-y-3">
+                {challenges.map((ch, i) => (
+                  <div key={i} className="flex items-center gap-3 bg-white dark:bg-slate-800/50 rounded-xl p-3 shadow-sm border border-slate-200/50 dark:border-slate-700/50">
+                    <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center shrink-0", 
+                      ch.type === 'warning' ? "bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400" : "bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400"
+                    )}>
+                      {ch.type === 'warning' ? <Clock className="w-4 h-4" /> : <Loader2 className="w-4 h-4" />}
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-slate-900 dark:text-white leading-tight">{ch.title}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+          </div>
+        </div>
       </div>
 
     </div>

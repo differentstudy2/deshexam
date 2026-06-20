@@ -59,60 +59,46 @@ export function FeaturedMockTestCard({ mockTest, baseHref }: FeaturedMockTestCar
       <div className="p-5 flex flex-col flex-grow">
         {/* Badges Row */}
         <div className="flex items-center gap-2 mb-3 text-[11px] font-bold uppercase tracking-wider">
-          <span className="bg-[#16A34A] text-white px-2 py-0.5 rounded">Mock Test</span>
-          <span className="bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 px-2 py-0.5 rounded">{accessLabel}</span>
-          <span className={cn("px-2 py-0.5 rounded", diffColorClass)}>{mockTest.difficulty}</span>
+          <span className="bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 px-2 py-0.5 rounded">Exam</span>
+          <span className={cn("px-2 py-0.5 rounded", diffColorClass)}>{mockTest.difficulty || 'Mixed'}</span>
         </div>
 
-        {/* Title & Desc */}
-        <h3 className="text-[18px] font-extrabold text-slate-900 dark:text-white leading-snug mb-2 group-hover:text-[#16A34A] transition-colors line-clamp-2">
+        {/* Title */}
+        <h3 className="text-[18px] font-extrabold text-slate-900 dark:text-white leading-snug mb-5 group-hover:text-[#16A34A] transition-colors line-clamp-2">
           {mockTest.title}
         </h3>
-        <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed mb-5 flex-grow">
-          {mockTest.description || 'Practice exam-style mock tests, improve speed, accuracy, and boost rank with AI-powered analytics.'}
-        </p>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-4 gap-2 mb-5">
-          <div className="flex flex-col items-center justify-center text-center">
-            <span className="text-[17px] font-bold text-slate-900 dark:text-white">{mockTest.questionIds?.length || 0}</span>
-            <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">Questions</span>
+        {/* Stats 2x2 Grid */}
+        <div className="grid grid-cols-2 gap-y-3 gap-x-2 mb-6">
+          <div className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400 font-medium">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+            <span>{mockTest.questionIds?.length || 0} Questions</span>
           </div>
-          <div className="flex flex-col items-center justify-center text-center border-l border-slate-100 dark:border-slate-800">
-            <span className="text-[17px] font-bold text-slate-900 dark:text-white">{mockTest.durationMin || 0}</span>
-            <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">Min</span>
+          <div className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400 font-medium">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span>{mockTest.durationMin || 0} Min</span>
           </div>
-          <div className="flex flex-col items-center justify-center text-center border-l border-slate-100 dark:border-slate-800">
-            <span className="text-[17px] font-bold text-slate-900 dark:text-white">{mockTest.totalMarks || 0}</span>
-            <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">Marks</span>
+          <div className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400 font-medium">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            <span>{formattedAttempts} Attempts</span>
           </div>
-          <div className="flex flex-col items-center justify-center text-center border-l border-slate-100 dark:border-slate-800">
-            <span className="text-[17px] font-bold text-slate-900 dark:text-white">{formattedAttempts}</span>
-            <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">Attempts</span>
-          </div>
-        </div>
-
-        {/* Popularity Bar */}
-        <div className="mb-5">
-          <div className="flex justify-between text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-            <span>Popularity</span>
-            <span className="text-[#16A34A]">{popularity}%</span>
-          </div>
-          <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
-            <div 
-              className="bg-[#16A34A] h-1.5 rounded-full" 
-              style={{ width: `${popularity}%` }}
-            ></div>
+          <div className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400 font-medium">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <div className="flex items-center">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <svg key={star} xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill={star <= 4 ? "#eab308" : "none"} stroke={star <= 4 ? "#eab308" : "currentColor"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={star <= 4 ? "" : "text-slate-300 dark:text-slate-600"}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              ))}
+            </div>
           </div>
         </div>
 
         {/* Action Buttons */}
         <div className="grid grid-cols-2 gap-3 mt-auto pt-4 border-t border-slate-100 dark:border-slate-800">
           <Link href={`${baseHref}/${mockTest.slug}`} className="flex items-center justify-center h-10 rounded-lg border-2 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold text-sm hover:border-slate-300 hover:bg-slate-50 dark:hover:border-slate-600 dark:hover:bg-slate-800 transition-colors">
-            View
+            Details
           </Link>
           <Link href={`${baseHref}/${mockTest.slug}/take`} className="flex items-center justify-center h-10 rounded-lg bg-[#16A34A] text-white font-bold text-sm hover:bg-green-700 transition-colors shadow-sm shadow-green-600/20">
-            Start Test
+            Start
           </Link>
         </div>
       </div>
