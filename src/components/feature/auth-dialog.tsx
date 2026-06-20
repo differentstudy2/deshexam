@@ -85,53 +85,16 @@ const GlassInput = React.forwardRef<HTMLInputElement, any>(
 GlassInput.displayName = "GlassInput";
 
 
-// Google One Tap Button Component
-const GoogleOneTapButton = ({ isSignUp = false }: { isSignUp?: boolean }) => {
-  const { signInWithGoogleOneTap, signInWithGoogle } = useAuth();
+// Google Auth Button Component
+const GoogleAuthButton = ({ isSignUp = false }: { isSignUp?: boolean }) => {
+  const { signInWithGoogle } = useAuth();
   const { toast } = useToast();
   const { closeAuthDialog } = useAuthDialog();
-  const btnRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    let attempts = 0;
-    const initGoogle = () => {
-      if (typeof window === 'undefined') return;
-      if ((window as any).google && (window as any).google.accounts) {
-        (window as any).google.accounts.id.initialize({
-          client_id: '643911224795-3l0qt8drad3ucfm0tmf8g77cbb972rjq.apps.googleusercontent.com',
-          callback: async (response: any) => {
-            try {
-              await signInWithGoogleOneTap(response);
-              toast({ title: isSignUp ? "Account Created" : "Signed In", description: "Welcome!" });
-              closeAuthDialog();
-            } catch (error: any) {
-              toast({ variant: "destructive", title: "Authentication Failed", description: error.message });
-            }
-          },
-          auto_select: true, 
-          cancel_on_tap_outside: false,
-        });
-
-        if (btnRef.current) {
-          (window as any).google.accounts.id.renderButton(
-            btnRef.current,
-            { theme: 'outline', size: 'large', shape: 'pill', text: isSignUp ? 'signup_with' : 'continue_with', width: 340 }
-          );
-        }
-      } else {
-        attempts++;
-        if (attempts < 20) {
-          setTimeout(initGoogle, 100);
-        }
-      }
-    };
-    initGoogle();
-  }, [closeAuthDialog, isSignUp, signInWithGoogleOneTap, toast]);
-
-  const handleFallbackSignIn = async () => {
+  const handleSignIn = async () => {
     try {
       await signInWithGoogle();
-      toast({ title: "Signed In", description: "Welcome!" });
+      toast({ title: isSignUp ? "Account Created" : "Signed In", description: "Welcome!" });
       closeAuthDialog();
     } catch (error: any) {
       toast({ variant: "destructive", title: "Authentication Failed", description: error.message });
@@ -139,17 +102,14 @@ const GoogleOneTapButton = ({ isSignUp = false }: { isSignUp?: boolean }) => {
   };
 
   return (
-    <div className="w-full relative mb-5 flex justify-center min-h-[44px]">
-      <div ref={btnRef} className="absolute z-10 w-full flex justify-center overflow-hidden rounded-full" />
-      <button
-        type="button"
-        onClick={handleFallbackSignIn}
-        className="w-full flex items-center justify-center gap-3 bg-white hover:bg-gray-50 text-gray-800 font-semibold py-3 px-4 rounded-full border border-gray-100 shadow-[0_4px_14px_rgba(0,0,0,0.06)] transition-all"
-      >
-        <GoogleIcon className="h-5 w-5" />
-        Continue with Google
-      </button>
-    </div>
+    <button
+      type="button"
+      onClick={handleSignIn}
+      className="w-full flex items-center justify-center gap-3 bg-white hover:bg-gray-50 text-gray-800 font-semibold py-2.5 px-4 rounded-full border border-gray-200 shadow-[0_2px_10px_rgba(0,0,0,0.04)] transition-all mb-5"
+    >
+      <GoogleIcon className="h-5 w-5" />
+      Continue with Google
+    </button>
   );
 };
 
@@ -178,11 +138,11 @@ const SignInForm = () => {
   return (
     <div className="px-6 pb-6 pt-1">
       <div className="text-center mb-5">
-        <h2 className="text-[26px] font-extrabold text-[#111827] tracking-tight mb-1">Welcome Back</h2>
-        <p className="text-[#6B7280] text-[14px]">Sign in to continue your learning journey</p>
+        <h2 className="text-[24px] font-extrabold text-[#111827] tracking-tight mb-1">Welcome Back</h2>
+        <p className="text-[#6B7280] text-[13px]">Sign in to continue your learning journey</p>
       </div>
 
-      <GoogleOneTapButton isSignUp={false} />
+      <GoogleAuthButton isSignUp={false} />
 
       <div className="relative flex items-center justify-center mb-5">
         <div className="border-t border-gray-300 w-full absolute"></div>
@@ -278,11 +238,11 @@ const SignUpForm = () => {
   return (
     <div className="px-6 pb-6 pt-1">
       <div className="text-center mb-5">
-        <h2 className="text-[26px] font-extrabold text-[#111827] tracking-tight mb-1">Create Account</h2>
-        <p className="text-[#6B7280] text-[14px]">Join DeshExam and start learning</p>
+        <h2 className="text-[24px] font-extrabold text-[#111827] tracking-tight mb-1">Create Account</h2>
+        <p className="text-[#6B7280] text-[13px]">Join DeshExam and start learning</p>
       </div>
 
-      <GoogleOneTapButton isSignUp={true} />
+      <GoogleAuthButton isSignUp={true} />
 
       <div className="relative flex items-center justify-center mb-5">
         <div className="border-t border-gray-300 w-full absolute"></div>
@@ -390,7 +350,7 @@ export function AuthDialog() {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && closeAuthDialog()}>
       <DialogContent 
-        className="p-0 border border-white/60 shadow-[0_20px_60px_rgba(0,0,0,0.1)] overflow-hidden max-w-[480px] bg-gradient-to-br from-[#f8fafc]/90 to-[#e2e8f0]/90 backdrop-blur-xl rounded-2xl"
+        className="p-0 border border-white/60 shadow-[0_20px_60px_rgba(0,0,0,0.1)] overflow-hidden sm:max-w-[400px] w-[90vw] bg-gradient-to-br from-[#f8fafc]/90 to-[#e2e8f0]/90 backdrop-blur-xl rounded-2xl"
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <DialogTitle className="sr-only">Authentication</DialogTitle>

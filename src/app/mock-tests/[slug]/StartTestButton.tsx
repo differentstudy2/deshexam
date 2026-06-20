@@ -10,6 +10,7 @@ import { createRazorpayOrder } from '@/ai/flows/create-razorpay-order';
 import { doc, updateDoc, arrayUnion } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useAuthDialog } from '@/hooks/use-auth-dialog';
 
 declare global {
     interface Window {
@@ -35,6 +36,7 @@ export function StartTestButton({ slug, accessType = 'free', price = 0, allowedS
   
   const [isStarting, setIsStarting] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const { openAuthDialog } = useAuthDialog();
 
   useEffect(() => {
     if (authLoading) return;
@@ -67,7 +69,7 @@ export function StartTestButton({ slug, accessType = 'free', price = 0, allowedS
 
   const handleStart = async () => {
     if (!user) {
-        toast({ variant: 'destructive', title: 'Login Required', description: 'Please login to take this test.' });
+        openAuthDialog('sign-in');
         return;
     }
 
@@ -84,7 +86,7 @@ export function StartTestButton({ slug, accessType = 'free', price = 0, allowedS
 
   const handlePurchase = async () => {
       if (!user) {
-          toast({ variant: 'destructive', title: 'Login Required', description: 'Please login to purchase.' });
+          openAuthDialog('sign-in');
           return;
       }
 
@@ -124,75 +126,85 @@ export function StartTestButton({ slug, accessType = 'free', price = 0, allowedS
       }
   };
 
-  if (authLoading || profileLoading) {
-    return (
-      <Button disabled className="w-full h-14 text-lg rounded-xl">
-        <Loader2 className="w-5 h-5 mr-2 animate-spin" /> Checking Access...
-      </Button>
-    );
-  }
+  const renderButton = () => {
+      if (authLoading || profileLoading) {
+        return (
+          <Button disabled className="w-full h-14 text-lg rounded-xl">
+            <Loader2 className="w-5 h-5 mr-2 animate-spin" /> Checking Access...
+          </Button>
+        );
+      }
 
-  const canAccess = hasAccess();
+      const canAccess = hasAccess();
 
-  if (!canAccess) {
-    if (accessType === 'subscription') {
+      if (!canAccess) {
+        if (accessType === 'subscription') {
+          return (
+            <Button 
+              onClick={() => {
+                  if (!user) openAuthDialog('sign-in');
+                  else router.push('/pricing');
+              }} 
+              className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 h-14 text-lg rounded-xl transition-all shadow-md text-white font-bold"
+            >
+              <Crown className="w-5 h-5 mr-2" /> Upgrade to Pass
+            </Button>
+          );
+        }
+
+        if (accessType === 'one_time') {
+          return (
+            <Button 
+              onClick={handlePurchase} 
+              disabled={isProcessingPayment}
+              className="w-full bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-900 hover:to-black dark:from-slate-700 dark:to-slate-800 dark:hover:from-slate-600 dark:hover:to-slate-700 h-14 text-lg rounded-xl transition-all shadow-lg text-white font-bold border border-slate-700 dark:border-slate-600"
+            >
+              {isProcessingPayment ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : <ShoppingCart className="w-5 h-5 mr-2 text-slate-300" />}
+              {isProcessingPayment ? 'Processing...' : `Buy for ₹${price}`}
+            </Button>
+          );
+        }
+
+        if (accessType === 'both') {
+          return (
+            <div className="flex flex-col gap-2">
+                <Button 
+                onClick={() => {
+                    if (!user) openAuthDialog('sign-in');
+                    else router.push('/pricing');
+                }} 
+                className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 h-14 text-lg rounded-xl transition-all shadow-md text-white font-bold"
+                >
+                <Crown className="w-5 h-5 mr-2" /> Upgrade to Pass
+                </Button>
+                <Button 
+                variant="outline"
+                onClick={handlePurchase} 
+                disabled={isProcessingPayment}
+                className="w-full h-12 text-md rounded-xl transition-all border-2 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800"
+                >
+                {isProcessingPayment ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <ShoppingCart className="w-4 h-4 mr-2 text-slate-500 dark:text-slate-400" />}
+                {isProcessingPayment ? 'Processing...' : `Or buy for ₹${price}`}
+                </Button>
+            </div>
+          );
+        }
+      }
+
       return (
         <Button 
-          onClick={() => router.push('/pricing')} 
-          className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 h-14 text-lg rounded-xl transition-all shadow-md text-white font-bold"
+          onClick={handleStart} 
+          disabled={isStarting}
+          className="w-full bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-700 hover:to-violet-700 h-14 text-lg rounded-xl transition-all font-bold shadow-lg shadow-blue-600/25 text-white"
         >
-          <Crown className="w-5 h-5 mr-2" /> Upgrade to Pass
+          {isStarting ? (
+            <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Launching Exam...</>
+          ) : (
+            <><PlayCircle className="w-5 h-5 mr-2" /> Start Mock Test</>
+          )}
         </Button>
       );
-    }
+  };
 
-    if (accessType === 'one_time') {
-      return (
-        <Button 
-          onClick={handlePurchase} 
-          disabled={isProcessingPayment}
-          className="w-full bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-900 hover:to-black dark:from-slate-700 dark:to-slate-800 dark:hover:from-slate-600 dark:hover:to-slate-700 h-14 text-lg rounded-xl transition-all shadow-lg text-white font-bold border border-slate-700 dark:border-slate-600"
-        >
-          {isProcessingPayment ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : <ShoppingCart className="w-5 h-5 mr-2 text-slate-300" />}
-          {isProcessingPayment ? 'Processing...' : `Buy for ₹${price}`}
-        </Button>
-      );
-    }
-
-    if (accessType === 'both') {
-      return (
-        <div className="flex flex-col gap-2">
-            <Button 
-            onClick={() => router.push('/pricing')} 
-            className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 h-14 text-lg rounded-xl transition-all shadow-md text-white font-bold"
-            >
-            <Crown className="w-5 h-5 mr-2" /> Upgrade to Pass
-            </Button>
-            <Button 
-            variant="outline"
-            onClick={handlePurchase} 
-            disabled={isProcessingPayment}
-            className="w-full h-12 text-md rounded-xl transition-all border-2 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800"
-            >
-            {isProcessingPayment ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <ShoppingCart className="w-4 h-4 mr-2 text-slate-500 dark:text-slate-400" />}
-            {isProcessingPayment ? 'Processing...' : `Or buy for ₹${price}`}
-            </Button>
-        </div>
-      );
-    }
-  }
-
-  return (
-    <Button 
-      onClick={handleStart} 
-      disabled={isStarting}
-      className="w-full bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-700 hover:to-violet-700 h-14 text-lg rounded-xl transition-all font-bold shadow-lg shadow-blue-600/25 text-white"
-    >
-      {isStarting ? (
-        <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Launching Exam...</>
-      ) : (
-        <><PlayCircle className="w-5 h-5 mr-2" /> Start Mock Test</>
-      )}
-    </Button>
-  );
+  return renderButton();
 }
