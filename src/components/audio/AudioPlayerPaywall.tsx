@@ -19,9 +19,9 @@ export function AudioPlayerPaywall({ audioUrl, allowDownload, isPremium, preview
   const { user } = useAuth();
   const { openAuthDialog } = useAuthDialog();
 
-  // Mocking premium status check: For now, if the item is premium, 
-  // we require the user to be logged in. (Replace with actual premium flag later)
-  const isUserPremium = !!user; 
+  // Mocking premium status check: For now, we set this to false so you can see the paywall
+  // even while logged in as an Admin. (Replace with actual premium flag later, e.g. user?.plan === 'pro')
+  const isUserPremium = false; 
 
   const showPaywall = isPremium && !isUserPremium;
   
