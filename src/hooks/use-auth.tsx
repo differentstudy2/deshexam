@@ -20,6 +20,7 @@ import {
   UserCredential,
   sendPasswordResetEmail,
   confirmPasswordReset,
+  sendEmailVerification,
 } from "firebase/auth";
 import { useFirebaseAuth } from "@/hooks/use-firebase";
 import { updateUserProfile } from "@/lib/firebase/firestore";
@@ -74,6 +75,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (!auth) throw new Error("Auth service is not available");
     const credential = await createUserWithEmailAndPassword(auth, email, password);
     await handleNewUser(credential);
+    // Automatically send verification email upon sign up
+    await sendEmailVerification(credential.user);
     return credential;
   };
 
