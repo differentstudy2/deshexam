@@ -336,7 +336,7 @@ export default async function MockTestLandingPage({ params }: Props) {
               </div>
 
               {/* Reviews Section */}
-              <MockTestReviews testId={test.id} />
+              <MockTestReviews testId={test.id} slug={test.slug} stats={test.reviewStats} />
 
             </div>
 

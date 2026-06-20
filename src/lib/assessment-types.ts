@@ -54,6 +54,18 @@ export interface Quiz extends AssessmentBase {
   certificateOption: boolean;
 }
 
+export interface ReviewStats {
+  averageRating: number;
+  totalReviews: number;
+  ratingDistribution: {
+    1: number;
+    2: number;
+    3: number;
+    4: number;
+    5: number;
+  };
+}
+
 export interface MockTest extends AssessmentBase {
   durationMin: number;
   totalMarks: number;
@@ -68,6 +80,8 @@ export interface MockTest extends AssessmentBase {
   shuffleQuestions?: boolean; // If true, randomizes question order
   shuffleOptions?: boolean; // If true, randomizes options for each question
   
+  reviewStats?: ReviewStats;
+
   /** @deprecated use accessType instead */
   isPremium?: boolean;
 }
