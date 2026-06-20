@@ -10,9 +10,8 @@ import QuestionComments from '@/components/question-bank/QuestionComments';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Home, ChevronRight } from 'lucide-react';
+import { Home, ChevronRight, Share2 } from 'lucide-react';
 import { getFAQSchema, getBreadcrumbSchema, getQuestionSchema } from '@/lib/seo/json-ld';
-import QuestionDetailView from '@/components/question-bank/QuestionDetailView';
 
 type Props = {
     params: Promise<{ slug: string[] }>
@@ -206,7 +205,19 @@ export default async function DynamicQuestionPage({ params }: Props) {
             </span>
             </nav>
 
-            <QuestionDetailView question={safeQuestion} relatedQuestions={safeRelated} />
+            <QuestionCard question={safeQuestion} isDetailView={true} />
+
+            {safeRelated.length > 0 && (
+              <div className="mt-12 mb-8">
+                 <div className="flex justify-between items-center mb-6 bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
+                    <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">Related Questions</h2>
+                    <Link href={`/questions`} className="flex items-center gap-1.5 text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-[#107c41] transition-colors border bg-white dark:bg-slate-800 dark:border-slate-700 px-3 py-1.5 rounded-lg shadow-sm">
+                       <Share2 className="w-4 h-4" /> View All
+                    </Link>
+                 </div>
+                 <QuestionListViewer questions={safeRelated} />
+              </div>
+            )}
 
             <QuestionComments questionId={question.id} />
 

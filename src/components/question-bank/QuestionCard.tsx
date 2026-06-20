@@ -25,6 +25,7 @@ interface QuestionCardProps {
     index?: number;
     testMode?: boolean;
     isListView?: boolean;
+    isDetailView?: boolean;
 }
 
 const getOptionLabel = (key: string, language: string = 'Bangla') => {
@@ -46,7 +47,7 @@ const formatDate = (dateValue: any) => {
     return `${day}/${month}/${year}`;
 };
 
-export default function QuestionCard({ question, index, testMode = false, isListView = false }: QuestionCardProps) {
+export default function QuestionCard({ question, index, testMode = false, isListView = false, isDetailView = false }: QuestionCardProps) {
     const isDescriptive = ['desc', 'descriptive', 'creative question'].includes(question.questionType?.toLowerCase() || '');
     const [showAnswer, setShowAnswer] = useState(isDescriptive);
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -518,11 +519,17 @@ export default function QuestionCard({ question, index, testMode = false, isList
                             />
                         </div>
                     ) : (
-                        <div className="text-[1rem] font-bold text-slate-800 dark:text-slate-200 leading-snug whitespace-pre-wrap">
-                            <Link href={`/question/${question.slug || question.id}`} className="hover:text-blue-600 transition-colors">
+                        isDetailView ? (
+                            <h1 className="text-[1.3rem] md:text-[1.5rem] font-extrabold text-slate-800 dark:text-slate-200 leading-snug whitespace-pre-wrap mb-1 mt-0">
                                 {question.questionText}
-                            </Link>
-                        </div>
+                            </h1>
+                        ) : (
+                            <div className="text-[1rem] font-bold text-slate-800 dark:text-slate-200 leading-snug whitespace-pre-wrap">
+                                <Link href={`/question/${question.slug || question.id}`} className="hover:text-blue-600 transition-colors">
+                                    {question.questionText}
+                                </Link>
+                            </div>
+                        )
                     )}
                 </div>
             </div>
@@ -720,7 +727,7 @@ export default function QuestionCard({ question, index, testMode = false, isList
                 <div className="mt-4 mb-2 p-4 rounded-xl bg-green-50/50 dark:bg-green-900/10 !text-[0.8rem] text-slate-700 dark:text-slate-300 !leading-snug animate-in fade-in slide-in-from-top-2 duration-300 border border-green-100 dark:border-green-800/30">
                     <div className="font-bold text-green-900 dark:text-green-300 flex items-center gap-1.5 mb-2 border-b border-green-200/50 dark:border-green-800/50 pb-2">
                         <CheckCircle2 className="w-4 h-4 text-green-600" />
-                        Answer
+                        {isDetailView ? <h2 className="text-base m-0">Answer</h2> : "Answer"}
                     </div>
                     <div className="prose dark:prose-invert max-w-none opacity-90 !text-[0.85rem] prose-p:!text-[0.85rem] prose-p:!my-1 prose-headings:!text-[0.95rem] prose-headings:!my-1.5 prose-li:!text-[0.85rem] prose-li:!my-0.5" dangerouslySetInnerHTML={{ __html: question.correctAnswer }} />
                 </div>
@@ -731,7 +738,7 @@ export default function QuestionCard({ question, index, testMode = false, isList
                 <div className="mt-4 mb-2 p-4 rounded-xl bg-blue-50/50 dark:bg-blue-900/10 !text-[0.8rem] text-slate-700 dark:text-slate-300 !leading-snug animate-in fade-in slide-in-from-top-2 duration-300 border border-blue-100 dark:border-blue-800/30">
                     <div className="font-bold text-blue-900 dark:text-blue-300 flex items-center gap-1.5 mb-2 border-b border-blue-200/50 dark:border-blue-800/50 pb-2">
                         <Lightbulb className="w-4 h-4 text-amber-500" />
-                        Explanation
+                        {isDetailView ? <h2 className="text-base m-0">Explanation</h2> : "Explanation"}
                     </div>
                     <div className="prose dark:prose-invert max-w-none opacity-90 !text-[0.8rem] prose-p:!text-[0.8rem] prose-p:!my-0.5 prose-headings:!text-[0.85rem] prose-headings:!my-1 prose-li:!text-[0.8rem] prose-li:!my-0" dangerouslySetInnerHTML={{ __html: question.explanation }} />
                 </div>
