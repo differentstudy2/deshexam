@@ -34,16 +34,24 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
-      <div className="mb-8">
-        <DeshExamLogo />
-      </div>
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center p-4 overflow-hidden relative transition-colors duration-300">
+      {/* Decorative background blurs */}
+      <div className="absolute top-[-100px] left-[-100px] w-[300px] h-[300px] bg-blue-300/30 dark:bg-blue-600/20 rounded-full blur-[80px] pointer-events-none" />
+      <div className="absolute bottom-[-100px] right-[-100px] w-[300px] h-[300px] bg-indigo-300/30 dark:bg-indigo-600/20 rounded-full blur-[80px] pointer-events-none" />
+      <div className="absolute top-[30%] right-[10%] w-[150px] h-[150px] bg-amber-200/20 dark:bg-amber-600/10 rounded-full blur-[60px] pointer-events-none" />
+
+      <div className="w-full max-w-[400px] relative mt-12">
+        {/* Floating Logo Circle */}
+        <div className="absolute -top-10 left-1/2 -translate-x-1/2 z-50">
+            <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-full w-20 h-20 p-2 shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-white/60 dark:border-slate-700 flex items-center justify-center pointer-events-auto transition-colors duration-300">
+                 <img src="/icons/icon-192x192.png" alt="DeshExam Icon" className="w-full h-full object-contain" />
+            </div>
+        </div>
       
-      <div className="w-full max-w-[400px] bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 p-8 relative">
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-t-2xl"></div>
-        <div className="text-center mb-6 mt-2">
-          <h1 className="text-2xl font-extrabold text-slate-900 mb-2">Reset Password</h1>
-          <p className="text-sm text-slate-500">
+        <div className="relative z-10 bg-gradient-to-br from-[#f8fafc]/90 to-[#e2e8f0]/90 dark:from-slate-900/90 dark:to-slate-800/90 backdrop-blur-xl border border-white/60 dark:border-slate-700 shadow-[0_20px_60px_rgba(0,0,0,0.1)] rounded-2xl p-8 pt-12 transition-colors duration-300">
+        <div className="text-center mb-6">
+          <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white mb-2 transition-colors duration-300">Reset Password</h1>
+          <p className="text-[13px] text-slate-500 dark:text-slate-400 transition-colors duration-300">
             {isSent 
               ? "We've sent a password reset link to your email." 
               : "Enter your email and we'll send you a link to reset your password."}
@@ -51,15 +59,15 @@ export default function ForgotPasswordPage() {
         </div>
 
         {!isSent ? (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="relative">
-              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="relative flex items-center w-full border border-white/70 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 shadow-[0_4px_12px_rgba(0,0,0,0.04)] backdrop-blur-md px-4 rounded-full py-3 transition-all focus-within:border-blue-400 dark:focus-within:border-blue-500 focus-within:bg-white/70 dark:focus-within:bg-slate-800/80 focus-within:shadow-md">
+              <Mail className="h-[18px] w-[18px] mr-2.5 text-gray-500 dark:text-slate-400 shrink-0" />
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Email Address"
-                className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all font-medium"
+                className="w-full bg-transparent border-0 p-0 text-[15px] text-gray-800 dark:text-slate-100 placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-0"
                 required
               />
             </div>
@@ -67,7 +75,7 @@ export default function ForgotPasswordPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-gradient-to-r from-[#0066FF] to-[#0052CC] hover:from-[#0052CC] hover:to-[#0040A0] text-white font-bold py-3.5 rounded-xl shadow-[0_4px_14px_rgba(0,102,255,0.25)] transition-all disabled:opacity-70"
+              className="w-full bg-gradient-to-r from-[#0066FF] to-[#0052CC] hover:from-[#0052CC] hover:to-[#0040A0] text-white font-bold py-3.5 rounded-full shadow-[0_4px_14px_rgba(0,102,255,0.25)] transition-all disabled:opacity-70"
             >
               {isSubmitting ? "Sending..." : "Send Reset Link"}
             </button>
@@ -76,7 +84,7 @@ export default function ForgotPasswordPage() {
           <div className="space-y-4 mt-6">
             <button
               onClick={() => setIsSent(false)}
-              className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3.5 rounded-xl transition-all"
+              className="w-full bg-white/70 dark:bg-slate-800/70 hover:bg-white dark:hover:bg-slate-800 border border-white/60 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-bold py-3.5 rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.04)] backdrop-blur-md transition-all"
             >
               Try another email
             </button>
@@ -84,10 +92,11 @@ export default function ForgotPasswordPage() {
         )}
 
         <div className="mt-8 text-center">
-          <Link href="/" className="inline-flex items-center text-sm font-semibold text-[#0066FF] hover:underline">
+          <Link href="/" className="inline-flex items-center text-sm font-semibold text-[#0066FF] dark:text-blue-400 hover:underline transition-colors duration-300">
             <ArrowLeft className="w-4 h-4 mr-1.5" />
             Back to Home
           </Link>
+        </div>
         </div>
       </div>
     </div>
