@@ -38,7 +38,7 @@ export function FeaturedMockTestCard({ mockTest, baseHref }: FeaturedMockTestCar
   const accessLabel = isPremium ? 'Premium' : 'Free / Premium';
 
   return (
-    <div className="flex flex-col bg-white dark:bg-slate-900 rounded-[20px] overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all duration-300 group">
+    <div className="flex flex-col bg-white dark:bg-slate-900 rounded-[10px] overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all duration-300 group">
       {/* Thumbnail */}
       <div className="relative w-full h-44 overflow-hidden bg-slate-100 dark:bg-slate-800">
         <img 

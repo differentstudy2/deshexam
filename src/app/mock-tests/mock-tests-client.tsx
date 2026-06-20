@@ -6,6 +6,7 @@ import { getAssessments } from '@/lib/firebase/assessment';
 import { getTopLeaderboard, getDailyChallenges } from '@/lib/firebase/student-analytics';
 import { FeaturedMockTestCard } from '@/components/assessment/FeaturedMockTestCard';
 import { MockTestListCard } from '@/components/assessment/MockTestListCard';
+import { MockTestsFooter } from '@/components/assessment/MockTestsFooter';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, Loader2, ChevronRight, CheckCircle2, LayoutGrid, List as ListIcon, CheckCircle, Clock } from 'lucide-react';
@@ -101,27 +102,27 @@ export default function MockTestsClient() {
             
             {/* Hero Text */}
             <div className="flex-1 text-center lg:text-left mt-8">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-md text-white text-sm font-semibold mb-6 shadow-xl">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-md text-white text-[13px] sm:text-sm font-semibold mb-6 shadow-xl">
                 <span>🔥</span> 70,000+ Mock Tests Available
               </div>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-[1.1] mb-6 tracking-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-[1.2] lg:leading-[1.1] mb-4 sm:mb-6 tracking-tight px-2 sm:px-0">
                 Online Mock Tests for <br className="hidden lg:block" /> Smarter Exam Preparation
               </h1>
-              <p className="text-lg md:text-xl text-blue-100/80 mb-10 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+              <p className="text-base sm:text-lg md:text-xl text-blue-100/80 mb-8 sm:mb-10 max-w-2xl mx-auto lg:mx-0 leading-relaxed px-4 lg:px-0">
                 Practice exam-style mock tests, improve speed, accuracy, and boost rank with AI-powered analytics.
               </p>
               
-              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 mb-10">
-                <Button className="h-14 px-8 rounded-xl bg-[#16A34A] hover:bg-green-700 text-white font-bold text-lg shadow-lg shadow-green-600/20 transition-all hover:scale-105">
+              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 sm:gap-4 mb-8 sm:mb-10 w-full px-4 sm:px-0">
+                <Button className="w-full sm:w-auto h-12 sm:h-14 px-8 rounded-xl bg-[#16A34A] hover:bg-green-700 text-white font-bold text-base sm:text-lg shadow-lg shadow-green-600/20 transition-all hover:scale-105">
                   Start Free Test
                 </Button>
-                <Button variant="outline" className="h-14 px-8 rounded-xl border-2 border-white/30 bg-white/5 hover:bg-white/10 text-white font-bold text-lg backdrop-blur-md transition-all">
+                <Button variant="outline" className="w-full sm:w-auto h-12 sm:h-14 px-8 rounded-xl border-2 border-white/30 bg-white/5 hover:bg-white/10 text-white font-bold text-base sm:text-lg backdrop-blur-md transition-all">
                   Explore Categories
                 </Button>
               </div>
 
               {/* Trust Checks */}
-              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-3 text-sm font-medium text-blue-100/90">
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-4 sm:gap-x-6 gap-y-2 sm:gap-y-3 text-[13px] sm:text-sm font-medium text-blue-100/90 px-4 sm:px-0">
                 <div className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#16A34A]" /> 50K+ Students</div>
                 <div className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#16A34A]" /> Live Rankings</div>
                 <div className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#16A34A]" /> AI Analytics</div>
@@ -349,7 +350,7 @@ export default function MockTestsClient() {
           <div className="w-full xl:w-[320px] shrink-0 space-y-6">
             
             {/* Premium Upgrade Card */}
-            <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-[20px] p-6 text-white shadow-lg shadow-purple-500/20 relative overflow-hidden">
+            <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-[10px] p-6 text-white shadow-lg shadow-purple-500/20 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -mr-10 -mt-10"></div>
               <span className="inline-block bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase mb-4">
                 Premium Upgrade
@@ -366,7 +367,7 @@ export default function MockTestsClient() {
             </div>
 
             {/* Leaderboard Preview */}
-            <div className="bg-slate-100 dark:bg-slate-900 rounded-[20px] p-5 border border-slate-200 dark:border-slate-800">
+            <div className="bg-slate-100 dark:bg-slate-900 rounded-[10px] p-5 border border-slate-200 dark:border-slate-800">
               <h3 className="text-lg font-extrabold text-slate-900 dark:text-white mb-4">Leaderboard Preview</h3>
               
               {/* Avatars row */}
@@ -423,6 +424,7 @@ export default function MockTestsClient() {
         </div>
       </div>
 
+      <MockTestsFooter />
     </div>
   );
 }
