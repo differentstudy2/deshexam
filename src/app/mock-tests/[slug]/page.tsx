@@ -13,6 +13,7 @@ import {
 import Link from 'next/link';
 import { AssessmentCard } from '@/components/assessment/AssessmentCard';
 import { StartTestButton } from './StartTestButton';
+import { MockTestReviews } from '@/components/assessment/MockTestReviews';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -79,6 +80,7 @@ export default async function MockTestLandingPage({ params }: Props) {
     "@type": "Product",
     "name": test.title,
     "description": test.description || `Take the ${test.title} mock test on DeshExam.`,
+    "image": test.thumbnail || "https://deshexam.com/og/mock-tests.jpg",
     "brand": {
       "@type": "Brand",
       "name": "DeshExam"
@@ -332,6 +334,9 @@ export default async function MockTestLandingPage({ params }: Props) {
                   ))}
                 </div>
               </div>
+
+              {/* Reviews Section */}
+              <MockTestReviews testId={test.id} />
 
             </div>
 
