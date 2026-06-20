@@ -74,10 +74,12 @@ export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock 
         ...initialData
     });
     
-    // Question Picker State
     const [showPicker, setShowPicker] = useState(false);
     const [showImport, setShowImport] = useState(false);
     
+    // Auto-Calculate State
+    const [autoCalc, setAutoCalc] = useState(!initialData.id);
+
     // New Advanced States
     const [questionPreviews, setQuestionPreviews] = useState<Record<string, string>>({});
     const [draggedIdx, setDraggedIdx] = useState<number | null>(null);
@@ -142,6 +144,19 @@ export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock 
             }
         }
     }, [editData.questionIds]);
+
+    // Auto-calculate Configuration
+    useEffect(() => {
+        if (autoCalc && editData.questionIds) {
+            const count = editData.questionIds.length;
+            setEditData(prev => ({
+                ...prev,
+                totalMarks: count,
+                durationMin: count,
+                passingMarks: Math.ceil(count * 0.6) // 60% merit cutoff
+            }));
+        }
+    }, [autoCalc, editData.questionIds?.length]);
 
 
     // Drag and Drop handlers
@@ -519,6 +534,16 @@ export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock 
                         <Card>
                             <CardHeader><CardTitle>Exam Configuration</CardTitle></CardHeader>
                             <CardContent className="space-y-4">
+                                <div className="flex items-center justify-between bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg border border-blue-100 dark:border-blue-800/50 mb-4">
+                                    <div className="space-y-0.5">
+                                        <label className="text-sm font-medium text-blue-900 dark:text-blue-100 flex items-center gap-2">
+                                            <Wand2 className="h-4 w-4" /> Auto-Calculate
+                                        </label>
+                                        <p className="text-xs text-blue-700 dark:text-blue-300">Automatically sync marks and duration based on questions.</p>
+                                    </div>
+                                    <Switch checked={autoCalc} onCheckedChange={setAutoCalc} />
+                                </div>
+
                                 <div>
                                     <label className="text-sm font-medium">Status</label>
                                     <Select value={editData.status || 'Draft'} onValueChange={v => setEditData({...editData, status: v as any})}>
@@ -545,21 +570,21 @@ export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
                                         <label className="text-sm font-medium">Duration (Min)</label>
-                                        <Input type="number" value={editData.durationMin || ''} onChange={e => setEditData({...editData, durationMin: parseInt(e.target.value)})} />
+                                        <Input type="number" value={editData.durationMin || ''} onChange={e => setEditData({...editData, durationMin: parseInt(e.target.value)})} disabled={autoCalc} />
                                     </div>
                                     <div>
                                         <label className="text-sm font-medium">Total Marks</label>
-                                        <Input type="number" value={editData.totalMarks || ''} onChange={e => setEditData({...editData, totalMarks: parseInt(e.target.value)})} />
+                                        <Input type="number" value={editData.totalMarks || ''} onChange={e => setEditData({...editData, totalMarks: parseInt(e.target.value)})} disabled={autoCalc} />
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
                                         <label className="text-sm font-medium">Pass Marks</label>
-                                        <Input type="number" value={editData.passingMarks || ''} onChange={e => setEditData({...editData, passingMarks: parseInt(e.target.value)})} />
+                                        <Input type="number" value={editData.passingMarks || ''} onChange={e => setEditData({...editData, passingMarks: parseInt(e.target.value)})} disabled={autoCalc} />
                                     </div>
                                     <div>
                                         <label className="text-sm font-medium">Negative Mark</label>
-                                        <Input type="number" step="0.25" value={editData.negativeMarking ?? ''} onChange={e => setEditData({...editData, negativeMarking: parseFloat(e.target.value)})} />
+                                        <Input type="number" step="0.01" value={editData.negativeMarking ?? ''} onChange={e => setEditData({...editData, negativeMarking: parseFloat(e.target.value)})} />
                                     </div>
                                 </div>
                                 <div>
