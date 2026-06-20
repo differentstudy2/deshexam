@@ -1,14 +1,40 @@
-import React from 'react';
+'use client';
+
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowRight, PlayCircle, Calendar, ClipboardList, CheckCircle, Zap } from 'lucide-react';
+import { ArrowRight, PlayCircle, Calendar, ClipboardList, CheckCircle, Zap, ChevronDown, ChevronUp } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export default function QuestionsSidebar() {
+  const [isMobile, setIsMobile] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   return (
     <div className="space-y-6 w-full">
       
+      {/* Mobile Toggle Button */}
+      {isMobile && (
+        <Button 
+          variant="outline" 
+          className="w-full flex justify-between items-center bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm"
+          onClick={() => setIsCollapsed(!isCollapsed)}
+        >
+          <span className="font-semibold text-slate-800 dark:text-slate-200">More Tools & Filters</span>
+          {isCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+        </Button>
+      )}
+
+      <div className={cn("space-y-6 transition-all duration-300", isMobile && isCollapsed ? "hidden" : "block")}>
+        
       {/* Widget 1: Quick Practice */}
-      <div className="bg-white dark:bg-slate-950 rounded-2xl border border-slate-100 dark:border-slate-800 p-5 shadow-sm">
+      <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md rounded-2xl border border-slate-200/60 dark:border-slate-800/60 p-5 shadow-sm">
         <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
           <Zap className="w-4 h-4 text-amber-500" /> Quick Practice
         </h3>
@@ -39,7 +65,7 @@ export default function QuestionsSidebar() {
       </div>
 
       {/* Widget 3: Popular Topics */}
-      <div className="bg-white dark:bg-slate-950 rounded-2xl border border-slate-100 dark:border-slate-800 p-5 shadow-sm">
+      <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md rounded-2xl border border-slate-200/60 dark:border-slate-800/60 p-5 shadow-sm">
         <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-4">Popular Topics</h3>
         <div className="flex flex-wrap gap-2">
           {['Algebra', 'Arithmetic', 'Grammar', 'Biology', 'Geography', 'History'].map(topic => (
@@ -51,7 +77,7 @@ export default function QuestionsSidebar() {
       </div>
 
       {/* Widget 4: Trending Exams */}
-      <div className="bg-white dark:bg-slate-950 rounded-2xl border border-slate-100 dark:border-slate-800 p-5 shadow-sm">
+      <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md rounded-2xl border border-slate-200/60 dark:border-slate-800/60 p-5 shadow-sm">
         <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-3">Trending Exams</h3>
         <div className="space-y-0.5">
           {['SSC CGL', 'Railway Group D', 'WBBSE Madhyamik', 'JEE Main', 'NEET'].map(exam => (
@@ -87,6 +113,7 @@ export default function QuestionsSidebar() {
         </div>
       </div>
 
+      </div>
     </div>
   );
 }

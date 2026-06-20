@@ -13,75 +13,82 @@ export default function QuestionsHeader() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (query.trim()) {
-      router.push(`/questions/search?q=${encodeURIComponent(query)}`);
+      router.push(`/questions?q=${encodeURIComponent(query)}`);
     }
   };
 
   const handleQuickFilter = (term: string) => {
-    router.push(`/questions/search?q=${encodeURIComponent(term)}`);
+    router.push(`/questions?q=${encodeURIComponent(term)}`);
   };
 
   return (
-    <div className="w-full bg-gradient-to-b from-[#eaf7f0] via-[#f2fdf7] to-[#ffffff] dark:from-slate-950 dark:via-slate-900/50 dark:to-slate-950 py-16 px-4">
-      <div className="max-w-4xl mx-auto text-center space-y-8">
+    <section className="w-full relative overflow-hidden bg-white dark:bg-slate-950 py-16 px-4 sm:px-6 lg:px-8 border-b border-slate-200 dark:border-slate-800">
+      {/* Premium Soft Gradients */}
+      <div className="absolute top-0 inset-x-0 h-[500px] bg-gradient-to-b from-blue-50/50 via-indigo-50/20 to-transparent dark:from-blue-900/10 dark:via-indigo-900/5 dark:to-transparent pointer-events-none" />
+      <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-blue-100/40 dark:bg-blue-900/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-indigo-100/40 dark:bg-indigo-900/10 rounded-full blur-3xl pointer-events-none" />
+
+      <div className="max-w-4xl mx-auto text-center space-y-8 relative z-10">
         
-        <div className="space-y-3">
-          <h1 className="text-4xl md:text-[40px] font-bold tracking-tight text-slate-900 dark:text-slate-100 font-sans">
-            Practice Questions Smarter
+        <div className="space-y-4">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white font-sans drop-shadow-sm">
+            Practice Questions <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400">Smarter</span>
           </h1>
-          <p className="text-base md:text-lg text-slate-700 dark:text-slate-300 font-medium">
-            Explore board and competitive exam questions with instant answer checking
+          <p className="text-lg md:text-xl text-slate-600 dark:text-slate-300 font-medium max-w-2xl mx-auto">
+            Explore board and competitive exam questions with instant answer checking and detailed explanations.
           </p>
         </div>
 
-        <div className="flex flex-wrap justify-center gap-3">
-          <span className="px-3 py-1 bg-white dark:bg-slate-800 rounded-full text-sm font-medium text-slate-700 dark:text-slate-300 shadow-sm border border-slate-100 dark:border-slate-700">
-            <strong className="font-semibold text-slate-900 dark:text-slate-100">1M+</strong> Questions
-          </span>
-          <span className="px-3 py-1 bg-white dark:bg-slate-800 rounded-full text-sm font-medium text-slate-700 dark:text-slate-300 shadow-sm border border-slate-100 dark:border-slate-700">
-            <strong className="font-semibold text-slate-900 dark:text-slate-100">500+</strong> Exams
-          </span>
-          <span className="px-3 py-1 bg-white dark:bg-slate-800 rounded-full text-sm font-medium text-slate-700 dark:text-slate-300 shadow-sm border border-slate-100 dark:border-slate-700">
-            <strong className="font-semibold text-slate-900 dark:text-slate-100">100K+</strong> Learners
-          </span>
+        <div className="flex flex-wrap justify-center gap-4 py-2">
+          <div className="flex items-center gap-2 px-4 py-2 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-full text-sm font-medium text-slate-700 dark:text-slate-300 shadow-sm border border-white/40 dark:border-slate-700/50">
+            <span className="flex h-2 w-2 rounded-full bg-blue-500"></span>
+            <strong className="font-bold text-slate-900 dark:text-white">1M+</strong> Questions Solved
+          </div>
+          <div className="flex items-center gap-2 px-4 py-2 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-full text-sm font-medium text-slate-700 dark:text-slate-300 shadow-sm border border-white/40 dark:border-slate-700/50">
+            <span className="flex h-2 w-2 rounded-full bg-indigo-500"></span>
+            <strong className="font-bold text-slate-900 dark:text-white">500+</strong> Subjects
+          </div>
+          <div className="flex items-center gap-2 px-4 py-2 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-full text-sm font-medium text-slate-700 dark:text-slate-300 shadow-sm border border-white/40 dark:border-slate-700/50">
+            <span className="flex h-2 w-2 rounded-full bg-green-500"></span>
+            <strong className="font-bold text-slate-900 dark:text-white">100K+</strong> Learners
+          </div>
         </div>
 
-        <form onSubmit={handleSearch} className="relative max-w-[650px] mx-auto">
-          <div className="flex items-center bg-white dark:bg-slate-900 rounded-full shadow-sm border border-slate-200 dark:border-slate-800 p-1.5 pl-5 transition-all focus-within:ring-2 focus-within:ring-[#00a651] focus-within:ring-opacity-50">
-            <Search className="h-5 w-5 text-slate-500 dark:text-slate-400 mr-2 flex-shrink-0" />
+        <form onSubmit={handleSearch} className="relative max-w-2xl mx-auto pt-4">
+          <div className="flex items-center bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-full shadow-lg border border-slate-200/60 dark:border-slate-700/60 p-2 pl-6 transition-all hover:shadow-xl focus-within:shadow-xl focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
+            <Search className="h-5 w-5 text-slate-400 dark:text-slate-500 mr-3 flex-shrink-0" />
             <Input 
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search by question, board, topic, exam..." 
-              className="flex-1 outline-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-[15px] h-10 px-0"
+              placeholder="Search by keyword, topic, or exam..." 
+              className="flex-1 outline-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-base h-12 px-0"
             />
-            <Button onClick={(e) => { e.preventDefault(); if(query.trim()) handleQuickFilter(query); }} type="button" variant="secondary" className="rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 px-5 h-10 flex items-center gap-2 font-medium">
-              <SlidersHorizontal className="h-4 w-4" />
-              Filter
+            <Button 
+              type="submit" 
+              className="rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 h-12 flex items-center gap-2 font-semibold shadow-md transition-all hover:shadow-lg"
+            >
+              Search
             </Button>
           </div>
         </form>
 
-        <div className="flex flex-wrap justify-center items-center gap-2 mt-8 max-w-[850px] mx-auto">
-          <Button onClick={() => handleQuickFilter('Academic')} variant="default" className="rounded-full h-8 px-4 text-[13px] bg-[#3a9662] hover:bg-[#2d764d] text-white font-medium border-0">Academic</Button>
-          <Button onClick={() => handleQuickFilter('Competitive')} variant="secondary" className="rounded-full h-8 px-4 text-[13px] bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-medium">Competitive</Button>
-          <Button onClick={() => handleQuickFilter('MCQ')} variant="secondary" className="rounded-full h-8 px-4 text-[13px] bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-medium">MCQ</Button>
-          <Button onClick={() => handleQuickFilter('Descriptive')} variant="secondary" className="rounded-full h-8 px-4 text-[13px] bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-medium">Descriptive Questions</Button>
-          <Button onClick={() => handleQuickFilter('Mock Test')} variant="secondary" className="rounded-full h-8 px-4 text-[13px] bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-medium">Mock Test</Button>
-          <Button onClick={() => handleQuickFilter('WBBSE')} variant="secondary" className="rounded-full h-8 px-4 text-[13px] bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-medium">WBBSE</Button>
-          <Button onClick={() => handleQuickFilter('CBSE')} variant="secondary" className="rounded-full h-8 px-4 text-[13px] bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-medium">CBSE</Button>
-          <Button onClick={() => handleQuickFilter('SSC')} variant="secondary" className="rounded-full h-8 px-4 text-[13px] bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-medium">SSC</Button>
-          <Button onClick={() => handleQuickFilter('Railway')} variant="secondary" className="rounded-full h-8 px-4 text-[13px] bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-medium">Railway</Button>
-          
-          <Button variant="outline" className="rounded-full h-8 px-4 text-[13px] bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 flex items-center gap-1.5 font-medium shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800">
-            Subject <ChevronDown className="h-3.5 w-3.5 opacity-50" />
-          </Button>
-          <Button variant="outline" className="rounded-full h-8 px-4 text-[13px] bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 flex items-center gap-1.5 font-medium shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800">
-            Difficulty <ChevronDown className="h-3.5 w-3.5 opacity-50" />
-          </Button>
+        <div className="flex flex-wrap justify-center items-center gap-2 mt-8 max-w-3xl mx-auto">
+          {['Academic', 'Competitive', 'MCQ', 'WBBSE', 'CBSE', 'SSC', 'NEET', 'JEE'].map((filter) => (
+            <button 
+              key={filter}
+              onClick={() => handleQuickFilter(filter)} 
+              className="rounded-full h-9 px-5 text-sm bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium border border-slate-200 dark:border-slate-700 shadow-sm transition-colors"
+            >
+              {filter}
+            </button>
+          ))}
+          <button className="rounded-full h-9 px-5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 flex items-center gap-1.5 font-medium shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+            <SlidersHorizontal className="h-4 w-4 opacity-70" />
+            More Filters
+          </button>
         </div>
 
       </div>
-    </div>
+    </section>
   )
 }

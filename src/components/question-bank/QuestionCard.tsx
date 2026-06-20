@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
 import { recordQuestionAttempt } from '@/lib/firebase/student-analytics';
 import { toggleInteraction, getQuestionInteraction, incrementQuestionView } from '@/lib/firebase/question-bank';
+import { trackQuestionEvent } from '@/lib/analytics/question-events';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -99,8 +100,14 @@ export default function QuestionCard({ question, index, testMode = false, isList
             incrementQuestionView(question.id);
             setCounts(prev => ({ ...prev, views: prev.views + 1 }));
             sessionStorage.setItem(viewedKey, 'true');
+            
+            trackQuestionEvent('question_view', question.id, user?.uid, {
+                subject: question.subjectId,
+                board: question.boardId,
+                type: question.questionType
+            });
         }
-    }, [question.id]);
+    }, [question.id, user?.uid, question.subjectId, question.boardId, question.questionType]);
 
     // Reset state when mode changes
     useEffect(() => {
@@ -151,6 +158,13 @@ export default function QuestionCard({ question, index, testMode = false, isList
 
         try {
             await toggleInteraction(question.id, user.uid, type);
+            if (type === 'like' || type === 'bookmark') {
+                const eventType = type === 'bookmark' ? 'save' : 'like';
+                trackQuestionEvent(eventType, question.id, user.uid, {
+                    subject: question.subjectId,
+                    board: question.boardId
+                });
+            }
         } catch (e) {
             console.error(e);
             toast({ title: 'Error', variant: 'destructive' });
@@ -160,6 +174,21 @@ export default function QuestionCard({ question, index, testMode = false, isList
     const handleCopyLink = () => {
         navigator.clipboard.writeText(`${window.location.origin}/question/${question.slug || question.id}`);
         toast({ title: 'Link Copied!' });
+        trackQuestionEvent('share', question.id, user?.uid, {
+            subject: question.subjectId,
+            board: question.boardId
+        });
+    };
+
+    const handleRevealAnswer = () => {
+        const newState = !showAnswer;
+        setShowAnswer(newState);
+        if (newState) {
+            trackQuestionEvent('answer_reveal', question.id, user?.uid, {
+                subject: question.subjectId,
+                board: question.boardId
+            });
+        }
     };
 
     const handlePrint = () => {
@@ -403,7 +432,7 @@ export default function QuestionCard({ question, index, testMode = false, isList
     }
 
     return (
-        <div id={`question-card-${question.id}`} className="w-full bg-white dark:bg-slate-950 p-4 rounded-lg border border-slate-100 dark:border-slate-800 shadow-sm mb-4 transition-all hover:shadow-md relative overflow-hidden">
+        <div id={`question-card-${question.id}`} className="w-full bg-white dark:bg-slate-900 p-5 md:p-6 rounded-xl border border-slate-200/60 dark:border-slate-800/60 shadow-sm mb-5 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 relative overflow-hidden">
             
             {/* Top row: Taxonomy chips and Link */}
             <div className="flex items-start justify-between mb-4 gap-4">
@@ -642,7 +671,7 @@ export default function QuestionCard({ question, index, testMode = false, isList
                         <span className="text-sm">{counts.bookmarks > 0 ? counts.bookmarks : 'Save'}</span>
                     </button>
 
-                    <button onClick={() => setShowAnswer(!showAnswer)} className={cn("flex flex-1 justify-center items-center gap-1.5 hover:text-indigo-500 transition-colors py-1", showAnswer && "text-indigo-500")} title="Reveal Answer">
+                    <button onClick={handleRevealAnswer} className={cn("flex flex-1 justify-center items-center gap-1.5 hover:text-indigo-500 transition-colors py-1", showAnswer && "text-indigo-500")} title="Reveal Answer">
                         <Eye className={cn("h-4 w-4", showAnswer && "fill-current")} />
                         <span className="text-sm">Answer</span>
                     </button>
