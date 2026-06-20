@@ -114,7 +114,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // 5. Individual Questions (Community Q&A)
   const allQuestions = await getAllQuestions();
   const questionRoutes = allQuestions.map((q: any) => ({
-    url: `${baseUrl}/question/${q.id}`,
+    url: `${baseUrl}/question/${q.slug || q.id}`,
     lastModified: q.createdAt?.toDate?.() || new Date(),
     priority: 0.6,
   }));
