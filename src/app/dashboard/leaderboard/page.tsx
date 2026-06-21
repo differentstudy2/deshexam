@@ -2,9 +2,10 @@
 
 import React, { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Clock, Star, Info, Crown, Loader2 } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
-import { collection, query, where, orderBy, limit, getDocs } from 'firebase/firestore';
+import { collection, query, where, orderBy, limit, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 
 const getSuffix = (i: number) => {
@@ -20,6 +21,7 @@ export default function LeaderboardPage() {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [classTitle, setClassTitle] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchLeaderboard() {
@@ -34,6 +36,15 @@ export default function LeaderboardPage() {
         
         // If student and has class, filter by class. Otherwise, global leaderboard.
         if (userProfile.profileType === 'student' && userProfile.classId) {
+          try {
+            const classDoc = await getDoc(doc(db, 'taxonomy_nodes', userProfile.classId));
+            if (classDoc.exists() && classDoc.data().title) {
+              setClassTitle(classDoc.data().title);
+            }
+          } catch (e) {
+            console.error('Error fetching class title', e);
+          }
+
           q = query(
             collection(db, 'users'),
             where('classId', '==', userProfile.classId),
@@ -146,7 +157,7 @@ export default function LeaderboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between gap-4 mb-6 px-4 sm:px-0">
         <h1 className="text-xl font-bold text-slate-900 dark:text-white">
-          {userProfile?.profileType === 'student' ? 'Class Leaderboard' : 'Global Leaderboard'}
+          {userProfile?.profileType === 'student' ? `${classTitle || 'Class'} Leaderboard` : 'Global Leaderboard'}
         </h1>
       </div>
 
@@ -156,9 +167,79 @@ export default function LeaderboardPage() {
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-b from-[#f99d1c] to-[#e47900] shadow-md p-6 flex flex-col items-center justify-center text-white min-h-[220px]">
           
           <div className="absolute top-4 right-4">
-            <button className="flex items-center gap-1.5 px-3 py-1.5 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full text-xs font-semibold transition-colors">
-              <Star className="w-3.5 h-3.5 fill-current" /> Rules / Tiers
-            </button>
+            <Dialog>
+              <DialogTrigger asChild>
+                <button className="flex items-center gap-1.5 px-3 py-1.5 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full text-xs font-semibold transition-colors">
+                  <Star className="w-3.5 h-3.5 fill-current" /> Rules / Tiers
+                </button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[500px]">
+                <DialogHeader>
+                  <DialogTitle className="text-xl font-bold flex items-center gap-2 text-slate-800 dark:text-white">
+                    <Crown className="w-6 h-6 text-amber-500" /> Leagues & Rules
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="space-y-6 text-slate-600 dark:text-slate-300 py-4 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+                  <div className="space-y-2">
+                    <h3 className="font-semibold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                      <Star className="w-4 h-4 text-amber-500" /> How to earn XP
+                    </h3>
+                    <ul className="list-disc pl-5 space-y-1 text-sm">
+                      <li>Complete mock tests and daily challenges to earn XP.</li>
+                      <li>High accuracy and speed grant bonus XP multipliers.</li>
+                      <li>Reviewing your mistakes gives you small XP rewards.</li>
+                    </ul>
+                  </div>
+
+                  <div className="space-y-3">
+                    <h3 className="font-semibold text-slate-800 dark:text-slate-100">The League System</h3>
+                    <p className="text-sm">Compete with others in your class. At the end of the week, top players advance to the next league.</p>
+                    
+                    <div className="grid gap-3 mt-2">
+                      <div className="flex items-center gap-3 p-3 bg-amber-50 dark:bg-amber-950/20 rounded-lg border border-amber-200 dark:border-amber-900/30">
+                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#c98e6a] to-[#804f32] flex flex-shrink-0 items-center justify-center border-2 border-[#ffb142]">
+                           <Crown className="w-5 h-5 text-white" />
+                         </div>
+                         <div>
+                           <div className="font-bold text-amber-900 dark:text-amber-500">Bronze League</div>
+                           <div className="text-xs text-amber-700 dark:text-amber-600">Starting point. Top 20% advance to Silver.</div>
+                         </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#e2e8f0] to-[#94a3b8] flex flex-shrink-0 items-center justify-center border-2 border-slate-400">
+                           <Crown className="w-5 h-5 text-slate-700" />
+                         </div>
+                         <div>
+                           <div className="font-bold text-slate-700 dark:text-slate-300">Silver League</div>
+                           <div className="text-xs text-slate-500 dark:text-slate-400">Top 15% advance to Gold. Bottom 20% demoted.</div>
+                         </div>
+                      </div>
+
+                      <div className="flex items-center gap-3 p-3 bg-yellow-50 dark:bg-yellow-950/20 rounded-lg border border-yellow-200 dark:border-yellow-900/30">
+                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#fef08a] to-[#eab308] flex flex-shrink-0 items-center justify-center border-2 border-yellow-400">
+                           <Crown className="w-5 h-5 text-yellow-800" />
+                         </div>
+                         <div>
+                           <div className="font-bold text-yellow-800 dark:text-yellow-500">Gold League</div>
+                           <div className="text-xs text-yellow-700 dark:text-yellow-600">Top 10% advance to Diamond. Bottom 20% demoted.</div>
+                         </div>
+                      </div>
+
+                      <div className="flex items-center gap-3 p-3 bg-cyan-50 dark:bg-cyan-950/20 rounded-lg border border-cyan-200 dark:border-cyan-900/30">
+                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#67e8f9] to-[#06b6d4] flex flex-shrink-0 items-center justify-center border-2 border-cyan-300">
+                           <Crown className="w-5 h-5 text-white" />
+                         </div>
+                         <div>
+                           <div className="font-bold text-cyan-800 dark:text-cyan-500">Diamond League</div>
+                           <div className="text-xs text-cyan-700 dark:text-cyan-600">The Elite. Stay in the top 50% to avoid demotion.</div>
+                         </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
           
           <div className="flex items-center justify-center gap-2 mb-4 mt-6">
