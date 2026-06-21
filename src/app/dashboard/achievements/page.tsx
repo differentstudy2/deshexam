@@ -60,6 +60,13 @@ export default function AchievementsPage() {
           const current = unlocked ? ach.target : Math.min(rawCurrent, ach.target);
           const progressPct = (current / ach.target) * 100;
 
+          // Format the unit based on metric
+          let unitText = '';
+          if (ach.metric === 'xp') unitText = ' XP';
+          else if (ach.metric === 'streak_days') unitText = ' Days';
+          else if (ach.metric === 'exams_taken' || ach.metric === 'perfect_exams') unitText = ' Exams';
+          else if (ach.metric === 'study_hours') unitText = ' Mins';
+
           return (
             <Card key={i} className={`bg-white dark:bg-slate-900 shadow-sm border-slate-200 dark:border-slate-800 rounded-2xl transition-all ${unlocked ? 'border-amber-200 dark:border-amber-800 ring-1 ring-amber-100 dark:ring-amber-900/30' : 'hover:border-slate-300 dark:hover:border-slate-700 opacity-70 hover:opacity-100'}`}>
               <CardContent className="p-6">
@@ -86,7 +93,7 @@ export default function AchievementsPage() {
                         {ach.title}
                         {unlocked && <CheckCircle2 className="w-4 h-4 text-green-500" />}
                       </h4>
-                      <span className="text-[11px] font-bold text-slate-400 shrink-0 ml-2">{current}/{ach.target}</span>
+                      <span className="text-[11px] font-bold text-slate-400 shrink-0 ml-2">{current}/{ach.target}{unitText}</span>
                     </div>
                     
                     <Progress value={progressPct} className={`h-2 mb-2 ${unlocked ? 'bg-green-100 [&>div]:bg-green-500' : 'bg-slate-100 dark:bg-slate-800'}`} />
