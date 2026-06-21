@@ -85,9 +85,6 @@ export default function DashboardLayout({
                         <div className="hidden sm:flex">
                             <ThemeToggle />
                         </div>
-                        <Button variant="ghost" size="icon" className="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 rounded-full">
-                            <Search className="h-5 w-5" />
-                        </Button>
                         <NotificationBell />
                         
                         <DropdownMenu>

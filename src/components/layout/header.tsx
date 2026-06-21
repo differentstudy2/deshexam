@@ -538,6 +538,7 @@ export const DashboardSidebar = ({ onLinkClick, user, logOut }: { onLinkClick?: 
         <div className="p-4 flex items-center h-16 shrink-0 border-b border-slate-100 dark:border-slate-800">
             <Link href="/dashboard" onClick={onLinkClick} className="flex items-center gap-2 w-full group-data-[collapsible=icon]:justify-center">
                 <div className="font-extrabold text-2xl tracking-tighter flex items-center group-data-[collapsible=icon]:hidden">
+                    <img src="/icons/icon-192x192.png" alt="DeshExam" className="w-7 h-7 rounded-md mr-2 shadow-sm" />
                     <span className="text-green-600">DESH </span>
                     <span className="text-slate-800 dark:text-slate-100 ml-1">EXAM</span>
                 </div>
