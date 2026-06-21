@@ -56,7 +56,7 @@
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border transition-colors duration-500 ease-in-out;
     -webkit-tap-highlight-color: transparent;
   }
 

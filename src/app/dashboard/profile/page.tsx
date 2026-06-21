@@ -189,35 +189,41 @@ export default function ProfilePage() {
             <CardContent className="p-6">
               <div className="flex justify-between items-start">
                 <div className="flex items-center gap-5">
-                  <div className="w-20 h-20 rounded-full bg-[#00bcd4] text-white flex items-center justify-center text-3xl font-bold">
-                    JM
-                  </div>
+                  {user?.photoURL ? (
+                    <img src={user.photoURL} alt={user.displayName || 'User'} className="w-20 h-20 rounded-full object-cover border-4 border-white shadow-sm" />
+                  ) : (
+                    <div className="w-20 h-20 rounded-full bg-[#00bcd4] text-white flex items-center justify-center text-3xl font-bold shadow-sm">
+                      {user?.displayName ? user.displayName.split(' ').map((n: string) => n[0]).join('').substring(0,2).toUpperCase() : 'U'}
+                    </div>
+                  )}
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">Jahanur Miah</h2>
+                      <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">{user?.displayName || 'Student'}</h2>
                       <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center text-white text-[10px] font-bold">✓</div>
                       <User className="w-4 h-4 text-slate-400" />
                     </div>
-                    <p className="text-sm text-slate-500 font-medium mb-1">@jahanur-miah • Joined Jan 2026</p>
-                    <p className="text-sm text-slate-600 dark:text-slate-300 font-bold mb-3">অষ্টম শ্রেণি</p>
+                    <p className="text-sm text-slate-500 font-medium mb-1">@{user?.displayName?.toLowerCase().replace(/\s+/g, '-') || 'student'} • Joined {(user?.metadata as any)?.creationTime ? new Date((user?.metadata as any).creationTime).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'recently'}</p>
+                    {localProfile?.className && (
+                      <p className="text-sm text-slate-600 dark:text-slate-300 font-bold mb-3">{localProfile.className}</p>
+                    )}
                     
                     <div className="flex items-center gap-4 text-xs font-bold">
                       <div className="flex items-center gap-1.5 text-blue-600 bg-blue-50 px-2 py-0.5 rounded">
-                        <span className="w-3 h-3 bg-blue-600 text-white flex items-center justify-center text-[8px] rounded-sm">1</span> LVL 1
+                        <span className="w-3 h-3 bg-blue-600 text-white flex items-center justify-center text-[8px] rounded-sm">{localProfile?.level || 1}</span> LVL {localProfile?.level || 1}
                       </div>
-                      <span className="text-orange-500">Bronze League</span>
-                      <span className="text-blue-500">Followers: 0</span>
-                      <span className="text-blue-500">Followings: 0</span>
+                      <span className="text-orange-500">{localProfile?.league || 'Bronze League'}</span>
+                      <span className="text-blue-500">Followers: {localProfile?.followersCount || 0}</span>
+                      <span className="text-blue-500">Followings: {localProfile?.followingsCount || 0}</span>
                     </div>
                   </div>
                 </div>
                 
                 <div className="flex items-center gap-3">
                   <div className="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-bold flex items-center gap-1.5">
-                    <span className="text-yellow-300">●</span> 9
+                    <span className="text-yellow-300">●</span> {localProfile?.level || 1}
                   </div>
                   <div className="bg-slate-100 text-slate-700 px-3 py-1 rounded-md text-xs font-bold tracking-wider">
-                    FREE PLAN
+                    {localProfile?.plan === 'premium' ? 'PREMIUM' : 'FREE PLAN'}
                   </div>
                 </div>
               </div>
@@ -549,81 +555,28 @@ export default function ProfilePage() {
               <ArrowRight className="w-4 h-4 text-slate-300" />
             </CardHeader>
             <CardContent className="p-0">
-              <div className="h-[800px] overflow-y-auto pr-1 pl-2 py-2 custom-scrollbar space-y-2">
-                {subjects.map((sub, i) => {
-                  const isOpen = openSubjects[sub.name];
-                  
-                  if (isOpen) {
-                    return (
-                      <div key={i} className="border border-slate-200 dark:border-slate-700 rounded-xl p-4 bg-white dark:bg-slate-900 mx-2 shadow-sm">
-                        <div 
-                          className="flex justify-between items-center cursor-pointer mb-4"
-                          onClick={() => toggleSubject(sub.name)}
-                        >
-                          <h4 className="font-bold text-[15px] text-slate-800 dark:text-slate-100">{sub.name}</h4>
-                          <div className="flex items-center gap-3">
-                            <span className="text-sm font-bold text-green-600">{sub.progress.toFixed(2)}%</span>
-                            <div className="bg-slate-100 dark:bg-slate-800 rounded-full p-1 cursor-pointer hover:bg-slate-200 transition-colors">
-                              <ChevronUp className="w-4 h-4 text-slate-500" />
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="flex justify-between items-start mb-3">
-                          <div className="space-y-0.5">
-                            <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-700 dark:text-slate-300">
-                              <span className="w-2 h-2 rounded-full bg-green-500"></span> {sub.mcq.current}<span className="text-slate-400 font-medium">/{sub.mcq.total} {sub.mcq.pct && `(${sub.mcq.pct})`}</span>
-                            </div>
-                            <div className="text-[10px] font-semibold text-slate-400 ml-3.5">MCQ</div>
-                          </div>
-                          <div className="space-y-0.5">
-                            <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-700 dark:text-slate-300">
-                              <span className="w-2 h-2 rounded-full bg-blue-500"></span> {sub.cq.current}<span className="text-slate-400 font-medium">/{sub.cq.total} {sub.cq.pct && `(${sub.cq.pct})`}</span>
-                            </div>
-                            <div className="text-[10px] font-semibold text-slate-400 ml-3.5">CQ</div>
-                          </div>
-                          <div className="space-y-0.5">
-                            <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-700 dark:text-slate-300">
-                              <span className="w-2 h-2 rounded-full bg-purple-500"></span> {sub.content.current}<span className="text-slate-400 font-medium">/{sub.content.total} {sub.content.pct && `(${sub.content.pct})`}</span>
-                            </div>
-                            <div className="text-[10px] font-semibold text-slate-400 ml-3.5 uppercase">Content</div>
-                          </div>
-                        </div>
-                        
-                        <div className="w-full h-1 bg-slate-100 dark:bg-slate-800 rounded-full mb-4 overflow-hidden flex">
-                          <div className="h-full bg-green-500" style={{ width: `${(sub.mcq.current / sub.mcq.total) * 100}%` }}></div>
-                          <div className="h-full bg-blue-500" style={{ width: `${(sub.cq.current / sub.cq.total) * 100}%` }}></div>
-                          <div className="h-full bg-purple-500" style={{ width: `${(sub.content.current / sub.content.total) * 100}%` }}></div>
-                        </div>
-                        
-                        <div className="flex justify-between items-center mt-2">
-                          <div className="text-[11px] text-slate-500 font-medium">
-                            {sub.started ? `Started: ${sub.started}` : ''}
-                          </div>
-                          <div className="text-[11px] font-semibold text-blue-500 flex items-center gap-1 cursor-pointer hover:underline">
-                            View Report <ArrowRight className="w-3 h-3" />
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  }
-
-                  return (
+              <div className="max-h-[800px] min-h-[300px] overflow-y-auto pr-1 pl-2 py-2 custom-scrollbar space-y-2">
+                {localProfile?.subjectStats && Object.keys(localProfile.subjectStats).length > 0 ? (
+                  Object.entries(localProfile.subjectStats).map(([subjectName, stat]: [string, any], idx) => (
                     <div 
-                      key={i} 
+                      key={idx} 
                       className="px-6 py-3 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer group mx-2 rounded-xl"
-                      onClick={() => toggleSubject(sub.name)}
                     >
-                      <span className="text-[13px] font-bold text-slate-700 dark:text-slate-300">{sub.name}</span>
+                      <span className="text-[13px] font-bold text-slate-700 dark:text-slate-300">{subjectName}</span>
                       <div className="flex items-center gap-3">
-                        <span className="text-xs font-bold text-green-600">{sub.progress.toFixed(2)}%</span>
+                        <span className="text-xs font-bold text-green-600">{(stat.progress || 0).toFixed(2)}%</span>
                         <div className="bg-slate-100 dark:bg-slate-800 rounded-md p-1 group-hover:bg-slate-200 dark:group-hover:bg-slate-700 transition-colors">
                           <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
                         </div>
                       </div>
                     </div>
-                  );
-                })}
+                  ))
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-full text-center p-6">
+                    <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">No subject data available yet.</p>
+                    <p className="text-slate-400 dark:text-slate-500 text-xs mt-2">Take mock tests to see your progress here!</p>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
