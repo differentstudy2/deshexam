@@ -17,7 +17,8 @@ import {
   MinusCircle,
   ChevronLeft,
   ChevronRight as ChevronRightIcon,
-  Check
+  Check,
+  Star
 } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 
@@ -57,16 +58,42 @@ const subjects = [
   { name: 'সংস্কৃত', progress: 0.00, mcq: { current: 0, total: 100 }, cq: { current: 0, total: 50 }, content: { current: 0, total: 20 }, started: '' },
 ];
 
-const achievements = [
-  { title: 'Novice Explorer', desc: 'সর্বমোট ১০০ XP পয়েন্ট অর্জন করতে হবে।', current: 13, target: 100, icon: '🐣', type: 'COMMON' },
-  { title: 'Curious Learner', desc: 'সর্বমোট ৫০০ XP পয়েন্ট অর্জন করতে হবে।', current: 13, target: 500, icon: '🎒', type: 'COMMON' },
-  { title: 'Rising Star', desc: 'সর্বমোট ১,০০০ XP পয়েন্ট অর্জন করতে হবে।', current: 13, target: 1000, icon: '🌟', type: 'RARE' },
-];
+import { ACHIEVEMENTS } from '@/lib/constants/achievements';
+import { awardXP } from '@/lib/firebase/firestore';
+import { useToast } from '@/hooks/use-toast';
 
 export default function ProfilePage() {
-  const { user } = useAuth();
+  const { user, userProfile } = useAuth();
+  const { toast } = useToast();
   const [isUpgradeOpen, setIsUpgradeOpen] = useState(false);
   const [openSubjects, setOpenSubjects] = useState<Record<string, boolean>>({});
+  const [isAddingXp, setIsAddingXp] = useState(false);
+
+  const handleSimulateXP = async () => {
+    if (!user) return;
+    setIsAddingXp(true);
+    try {
+      const result = await awardXP(user.uid, 'CUSTOM', 50, { description: 'Simulated XP for testing' });
+      if (result.unlockedAchievements && result.unlockedAchievements.length > 0) {
+        result.unlockedAchievements.forEach(ach => {
+          toast({
+            title: `Achievement Unlocked: ${ach.title} ${ach.icon}`,
+            description: `You earned a bonus of ${ach.rewardXP} XP!`,
+            variant: "default",
+          });
+        });
+      } else if (result.xpAdded > 0) {
+        toast({
+          title: `+50 XP Earned!`,
+          description: `Keep up the good work!`,
+        });
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsAddingXp(false);
+    }
+  };
 
   const toggleSubject = (name: string) => {
     setOpenSubjects(prev => ({ ...prev, [name]: !prev[name] }));
@@ -180,6 +207,17 @@ export default function ProfilePage() {
             >
                {isUpgradeOpen ? <ChevronUp className="w-4 h-4 text-purple-400" /> : <ChevronDown className="w-4 h-4 text-purple-400" />}
             </button>
+          </div>
+
+          <div className="flex justify-end">
+            <Button 
+              onClick={handleSimulateXP} 
+              disabled={isAddingXp}
+              className="bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-full shadow-sm"
+            >
+              <Star className="w-4 h-4 mr-2" />
+              {isAddingXp ? 'Adding XP...' : 'Simulate +50 XP'}
+            </Button>
           </div>
 
           {/* Learning Statistics */}
@@ -366,24 +404,47 @@ export default function ProfilePage() {
             </CardHeader>
             <CardContent className="p-6">
               <div className="space-y-6">
-                {achievements.map((ach, i) => (
-                  <div key={i} className="flex gap-4 items-center">
-                    <div className="w-14 h-14 rounded-xl bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 flex flex-col items-center justify-center shrink-0 relative">
-                      <span className="text-2xl leading-none">{ach.icon}</span>
-                      <div className={`text-white text-[7px] font-bold px-1.5 py-0.5 rounded-sm absolute -bottom-2 shadow-sm uppercase tracking-wider ${ach.type === 'COMMON' ? 'bg-slate-900' : 'bg-slate-900'}`}>
-                        {ach.type}
+                {ACHIEVEMENTS.map((ach, i) => {
+                  const unlocked = userProfile?.achievements?.includes(ach.id);
+                  
+                  let rawCurrent = 0;
+                  if (ach.metric === 'xp') {
+                    rawCurrent = userProfile?.xp || 0;
+                  }
+                  // Future metrics can be handled here
+
+                  const current = unlocked ? ach.target : Math.min(rawCurrent, ach.target);
+                  const progressPct = (current / ach.target) * 100;
+
+                  // Format the unit based on metric
+                  let unitText = '';
+                  if (ach.metric === 'xp') unitText = ' XP';
+                  else if (ach.metric === 'streak_days') unitText = ' Days';
+                  else if (ach.metric === 'exams_taken' || ach.metric === 'perfect_exams') unitText = ' Exams';
+                  else if (ach.metric === 'study_hours') unitText = ' Mins';
+
+                  return (
+                    <div key={i} className={`flex gap-4 items-center ${unlocked ? '' : 'opacity-70'}`}>
+                      <div className={`w-14 h-14 rounded-xl flex flex-col items-center justify-center shrink-0 relative ${unlocked ? 'bg-amber-50 dark:bg-amber-900/20 border-2 border-amber-200 dark:border-amber-700' : 'bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700'}`}>
+                        <span className="text-2xl leading-none">{ach.icon}</span>
+                        <div className={`text-white text-[7px] font-bold px-1.5 py-0.5 rounded-sm absolute -bottom-2 shadow-sm uppercase tracking-wider ${ach.type === 'COMMON' ? 'bg-slate-900' : ach.type === 'RARE' ? 'bg-blue-600' : ach.type === 'EPIC' ? 'bg-purple-600' : 'bg-orange-500'}`}>
+                          {ach.type}
+                        </div>
+                      </div>
+                      <div className="flex-1 pt-1 ml-2">
+                        <div className="flex justify-between items-end mb-1.5">
+                          <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                            {ach.title} 
+                            {unlocked && <CheckCircle2 className="w-4 h-4 text-green-500" />}
+                          </h4>
+                          <span className="text-[11px] font-bold text-slate-400">{current}/{ach.target}{unitText}</span>
+                        </div>
+                        <Progress value={progressPct} className={`h-1.5 mb-1 ${unlocked ? 'bg-green-100 [&>div]:bg-green-500' : 'bg-slate-100 dark:bg-slate-800'}`} />
+                        <p className="text-[10px] text-slate-500 font-medium">{ach.desc}</p>
                       </div>
                     </div>
-                    <div className="flex-1 pt-1 ml-2">
-                      <div className="flex justify-between items-end mb-1.5">
-                        <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100">{ach.title}</h4>
-                        <span className="text-[11px] font-bold text-slate-400">{ach.current}/{ach.target}</span>
-                      </div>
-                      <Progress value={(ach.current / ach.target) * 100} className="h-1.5 bg-slate-100 dark:bg-slate-800 mb-1" />
-                      <p className="text-[10px] text-slate-500 font-medium">{ach.desc}</p>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </CardContent>
           </Card>

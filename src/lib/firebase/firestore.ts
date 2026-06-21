@@ -1,9 +1,9 @@
-
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment, limit, startAfter, DocumentSnapshot,getCountFromServer, onSnapshot } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { format } from 'date-fns';
+import { ACHIEVEMENTS, Achievement } from '@/lib/constants/achievements';
 
 
 export type Order = {
@@ -2456,8 +2456,8 @@ export const deleteFaq = async (faqId: string) => {
 
 export type XPActionType = 'MOCK_TEST_COMPLETE' | 'CHAPTER_PRACTICE_COMPLETE' | 'DAILY_LOGIN_STREAK' | 'WEEKLY_TARGET_COMPLETE' | 'MISTAKE_VAULT_SOLVE' | 'FORUM_HELP' | 'FORUM_UPVOTE' | 'CUSTOM';
 
-export const awardXP = async (userId: string, actionType: XPActionType, customAmount?: number, metadata?: any) => {
-    if (!userId) return 0;
+export const awardXP = async (userId: string, actionType: XPActionType, customAmount?: number, metadata?: any): Promise<{ xpAdded: number, unlockedAchievements: Achievement[] }> => {
+    if (!userId) return { xpAdded: 0, unlockedAchievements: [] };
     
     let xpAmount = 0;
     switch (actionType) {
@@ -2468,7 +2468,7 @@ export const awardXP = async (userId: string, actionType: XPActionType, customAm
             xpAmount = 30;
             break;
         case 'DAILY_LOGIN_STREAK':
-            xpAmount = customAmount || 5; // Depends on streak length
+            xpAmount = customAmount || 5;
             break;
         case 'WEEKLY_TARGET_COMPLETE':
             xpAmount = 100;
@@ -2489,25 +2489,58 @@ export const awardXP = async (userId: string, actionType: XPActionType, customAm
             xpAmount = 0;
     }
 
-    if (xpAmount <= 0) return 0;
+    if (xpAmount <= 0) return { xpAdded: 0, unlockedAchievements: [] };
 
     try {
         const userRef = doc(db, "users", userId);
-        await updateDoc(userRef, {
-            xp: increment(xpAmount)
-        });
         
+        // We need to fetch the current user profile to check achievements
+        const userDoc = await getDoc(userRef);
+        if (!userDoc.exists()) return { xpAdded: 0, unlockedAchievements: [] };
+        
+        const userData = userDoc.data();
+        const currentXP = userData.xp || 0;
+        const currentAchievements = userData.achievements || [];
+        
+        const newTotalXP = currentXP + xpAmount;
+        let totalXPAwarded = xpAmount;
+        const newUnlockedAchievements: Achievement[] = [];
+        const achievementIdsToUnlock: string[] = [];
+        
+        // Check for newly unlocked XP achievements
+        for (const achievement of ACHIEVEMENTS) {
+            if (achievement.metric === 'xp' && newTotalXP >= achievement.target && !currentAchievements.includes(achievement.id)) {
+                newUnlockedAchievements.push(achievement);
+                achievementIdsToUnlock.push(achievement.id);
+                totalXPAwarded += achievement.rewardXP; // Give bonus XP for unlocking
+            }
+        }
+        
+        // Update user document
+        const updates: any = {
+            xp: increment(totalXPAwarded)
+        };
+        
+        if (achievementIdsToUnlock.length > 0) {
+            updates.achievements = arrayUnion(...achievementIdsToUnlock);
+        }
+        
+        await updateDoc(userRef, updates);
+        
+        // Log transaction
         await addDoc(collection(db, "xp_transactions"), {
             userId,
             actionType,
             amount: xpAmount,
+            bonusFromAchievements: totalXPAwarded - xpAmount,
+            unlockedAchievements: achievementIdsToUnlock,
             metadata: metadata || null,
             createdAt: serverTimestamp()
         });
 
-        return xpAmount;
+        return { xpAdded: totalXPAwarded, unlockedAchievements: newUnlockedAchievements };
     } catch (e) {
         console.error("Failed to award XP:", e);
-        return 0;
+        return { xpAdded: 0, unlockedAchievements: [] };
     }
 };

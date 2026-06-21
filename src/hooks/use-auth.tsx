@@ -64,6 +64,7 @@ const handleNewUser = async (credential: UserCredential) => {
             followersCount: 0,
             followingCount: 0,
             xp: 0,
+            achievements: [],
             role: 'user',
             isOnboarded: false,
             profileType: null,
