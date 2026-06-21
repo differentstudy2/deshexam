@@ -62,6 +62,14 @@ const subjects = [
   { name: 'Sanskrit', progress: 0.00, mcq: { current: 0, total: 100 }, cq: { current: 0, total: 50 }, content: { current: 0, total: 20 }, started: '' },
 ];
 
+const radarData = [
+  { subject: 'Math', A: 85, fullMark: 100 },
+  { subject: 'Science', A: 65, fullMark: 100 },
+  { subject: 'English', A: 50, fullMark: 100 },
+  { subject: 'Bengali', A: 90, fullMark: 100 },
+  { subject: 'ICT', A: 75, fullMark: 100 },
+];
+
 import { 
   startOfMonth, 
   endOfMonth, 
@@ -78,9 +86,13 @@ import {
 
 import { ACHIEVEMENTS } from '@/lib/constants/achievements';
 import { awardXP, getUserProfile, checkDailyStreak, recordMockTest } from '@/lib/firebase/firestore';
-import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, getDocs, updateDoc } from 'firebase/firestore';
+import { getAuth, updateProfile } from 'firebase/auth';
 import { db } from '@/lib/firebase/client';
 import { useToast } from '@/hooks/use-toast';
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 
 export default function ProfilePage() {
   const { user, userProfile } = useAuth();
@@ -93,6 +105,36 @@ export default function ProfilePage() {
   const [localProfile, setLocalProfile] = useState<any>(userProfile);
   const [resolvedClassName, setResolvedClassName] = useState<string | null>(null);
   const [realSubjects, setRealSubjects] = useState<any[]>([]);
+
+  // Edit Profile State
+  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
+  const [newDisplayName, setNewDisplayName] = useState('');
+  const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
+
+  useEffect(() => {
+    if (user?.displayName && isEditProfileOpen) {
+      setNewDisplayName(user.displayName);
+    }
+  }, [user, isEditProfileOpen]);
+
+  const handleUpdateProfile = async () => {
+    if (!newDisplayName.trim() || !user) return;
+    setIsUpdatingProfile(true);
+    try {
+      const auth = getAuth();
+      if (auth.currentUser) {
+        await updateProfile(auth.currentUser, { displayName: newDisplayName });
+        await updateDoc(doc(db, "users", user.uid), { displayName: newDisplayName });
+        toast({ title: 'Success', description: 'Profile updated successfully!' });
+        setIsEditProfileOpen(false);
+        setTimeout(() => window.location.reload(), 1000); // Reload to reflect changes globally
+      }
+    } catch (e) {
+      toast({ title: 'Error', description: 'Failed to update profile.', variant: 'destructive' });
+    } finally {
+      setIsUpdatingProfile(false);
+    }
+  };
 
   useEffect(() => {
     setLocalProfile(userProfile);
@@ -251,6 +293,25 @@ export default function ProfilePage() {
     setOpenSubjects(prev => ({ ...prev, [name]: !prev[name] }));
   };
 
+  const currentXP = localProfile?.xp || 0;
+  let currentLeague: { name: string, color: string, next: string | null, max: number | null, min: number, bg: string } = { name: 'Bronze', color: 'text-amber-600', next: 'Silver', max: 500, min: 0, bg: 'bg-amber-600' };
+  if (currentXP >= 5000) currentLeague = { name: 'Diamond', color: 'text-blue-400', next: null, max: 5000, min: 5000, bg: 'bg-blue-400' };
+  else if (currentXP >= 2000) currentLeague = { name: 'Gold', color: 'text-yellow-500', next: 'Diamond', max: 5000, min: 2000, bg: 'bg-yellow-500' };
+  else if (currentXP >= 500) currentLeague = { name: 'Silver', color: 'text-slate-400', next: 'Gold', max: 2000, min: 500, bg: 'bg-slate-400' };
+  
+  const leagueProgress = currentLeague.max && currentLeague.max > currentLeague.min 
+    ? ((currentXP - currentLeague.min) / (currentLeague.max - currentLeague.min)) * 100 
+    : 100;
+
+  const notifications = localProfile?.notifications || [];
+  const recentActivities = [...notifications]
+    .sort((a: any, b: any) => {
+      const timeA = typeof a.createdAt?.toMillis === 'function' ? a.createdAt.toMillis() : new Date(a.createdAt || 0).getTime();
+      const timeB = typeof b.createdAt?.toMillis === 'function' ? b.createdAt.toMillis() : new Date(b.createdAt || 0).getTime();
+      return timeB - timeA;
+    })
+    .slice(0, 5);
+
   return (
     <div className="w-full max-w-[1400px] mx-auto pb-12 text-slate-800 dark:text-slate-100">
       <div className="mb-6">
@@ -278,7 +339,33 @@ export default function ProfilePage() {
                     <div className="flex items-center gap-2 mb-1">
                       <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">{user?.displayName || 'Student'}</h2>
                       <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center text-white text-[10px] font-bold">✓</div>
-                      <User className="w-4 h-4 text-slate-400" />
+                      
+                      <Dialog open={isEditProfileOpen} onOpenChange={setIsEditProfileOpen}>
+                        <DialogTrigger asChild>
+                          <button className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors ml-2" title="Edit Profile">
+                            <User className="w-4 h-4 text-slate-400" />
+                          </button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Edit Profile</DialogTitle>
+                          </DialogHeader>
+                          <div className="py-4">
+                            <label className="text-sm font-medium mb-2 block">Display Name</label>
+                            <Input 
+                              value={newDisplayName} 
+                              onChange={(e) => setNewDisplayName(e.target.value)} 
+                              placeholder="Enter your full name" 
+                            />
+                          </div>
+                          <div className="flex justify-end gap-2">
+                            <Button variant="outline" onClick={() => setIsEditProfileOpen(false)}>Cancel</Button>
+                            <Button onClick={handleUpdateProfile} disabled={isUpdatingProfile} className="bg-purple-600 hover:bg-purple-700 text-white">
+                              {isUpdatingProfile ? 'Saving...' : 'Save Changes'}
+                            </Button>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
                     </div>
                     <p className="text-sm text-slate-500 font-medium mb-1">@{user?.displayName?.toLowerCase().replace(/\s+/g, '-') || 'student'} • Joined {(user?.metadata as any)?.creationTime ? new Date((user?.metadata as any).creationTime).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'recently'}</p>
                     {(resolvedClassName || localProfile?.className) && (
@@ -410,10 +497,16 @@ export default function ProfilePage() {
                   <div className="text-2xl font-bold text-blue-500">{localProfile?.xp || 0}</div>
                 </CardContent>
               </Card>
-              <Card className="shadow-sm border-slate-200 dark:border-slate-800 rounded-xl">
+              <Card className="shadow-sm border-slate-200 dark:border-slate-800 rounded-xl relative overflow-hidden">
+                <div className={`absolute bottom-0 left-0 h-1 ${currentLeague.bg}`} style={{ width: `${leagueProgress}%` }}></div>
                 <CardContent className="p-4 flex flex-col items-center justify-center text-center gap-2">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600 dark:text-slate-400"><Medal className="w-4 h-4 text-orange-400"/> Rank (League)</div>
-                  <div className="text-2xl font-bold text-orange-500">Unranked</div>
+                  <div className={`text-2xl font-bold ${currentLeague.color}`}>{currentLeague.name}</div>
+                  {currentLeague.next && (
+                    <div className="text-[10px] text-slate-400 font-medium mt-[-4px]">
+                      {currentLeague.max! - currentXP} XP to {currentLeague.next}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
               <Card className="shadow-sm border-slate-200 dark:border-slate-800 rounded-xl">
@@ -589,6 +682,38 @@ export default function ProfilePage() {
             </CardContent>
           </Card>
 
+          {/* Recent Activity Timeline */}
+          <Card className="bg-white dark:bg-slate-900 shadow-sm border-slate-200 dark:border-slate-800 rounded-2xl mb-8">
+            <CardHeader className="p-6 pb-2 flex flex-row items-center justify-between">
+              <CardTitle className="text-sm font-bold">Recent Activity</CardTitle>
+            </CardHeader>
+            <CardContent className="p-6 pt-2">
+              <div className="space-y-4">
+                {recentActivities.length > 0 ? (
+                  recentActivities.map((act: any, i: number) => {
+                    const date = act.createdAt && typeof act.createdAt.toDate === 'function' ? act.createdAt.toDate() : new Date(act.createdAt || Date.now());
+                    return (
+                      <div key={i} className="flex gap-4 items-start relative">
+                        {i !== recentActivities.length - 1 && (
+                          <div className="absolute left-[11px] top-6 bottom-[-16px] w-0.5 bg-slate-100 dark:bg-slate-800"></div>
+                        )}
+                        <div className="w-6 h-6 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-500 border border-blue-200 dark:border-blue-800 flex items-center justify-center shrink-0 z-10 mt-1">
+                          <Star className="w-3 h-3" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-slate-800 dark:text-slate-200">{act.message || 'Activity completed'}</p>
+                          <p className="text-xs text-slate-400 font-medium mt-0.5">{date.toLocaleDateString()} at {date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div className="text-center py-4 text-sm text-slate-500">No recent activity yet. Take a mock test to get started!</div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Achievements */}
           <Card className="bg-white dark:bg-slate-900 shadow-sm border-slate-200 dark:border-slate-800 rounded-2xl mb-8">
             <CardHeader className="p-6 pb-2 flex flex-row items-center justify-between">
@@ -645,7 +770,34 @@ export default function ProfilePage() {
         </div>
 
         {/* RIGHT COLUMN: Subjects Report Sidebar */}
-        <div className="w-full lg:w-[380px] shrink-0">
+        <div className="w-full lg:w-[380px] shrink-0 space-y-6">
+          
+          {/* Radar Chart (Subject Proficiency) */}
+          <Card className="bg-white dark:bg-slate-900 shadow-sm border-slate-200 dark:border-slate-800 rounded-2xl">
+            <CardHeader className="p-5 pb-0 flex flex-row items-center justify-between">
+              <CardTitle className="text-sm font-bold">Subject Proficiency</CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 pt-0 flex justify-center">
+              <div className="w-[300px] h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
+                    <PolarGrid stroke="#e2e8f0" />
+                    <PolarAngleAxis dataKey="subject" tick={{ fill: '#64748b', fontSize: 12, fontWeight: 600 }} />
+                    <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
+                    <Radar
+                      name="Student"
+                      dataKey="A"
+                      stroke="#8b5cf6"
+                      strokeWidth={2}
+                      fill="#8b5cf6"
+                      fillOpacity={0.4}
+                    />
+                  </RadarChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+
           <Card className="bg-white dark:bg-slate-900 shadow-sm border-slate-200 dark:border-slate-800 rounded-2xl sticky top-24">
             <CardHeader className="p-5 pb-4 flex flex-row items-center justify-between border-b border-slate-100 dark:border-slate-800">
               <CardTitle className="text-sm font-bold">Subjects Report</CardTitle>
