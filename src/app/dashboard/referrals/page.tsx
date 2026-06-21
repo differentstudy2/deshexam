@@ -9,7 +9,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import { Copy, CheckCircle2, Users, Gift, Share2 } from 'lucide-react';
 import { ACHIEVEMENTS } from '@/lib/constants/achievements';
-import { processReferral } from '@/lib/firebase/firestore';
+import { processReferral, updateUserProfile } from '@/lib/firebase/firestore';
 
 export default function ReferralsPage() {
   const { user, userProfile } = useAuth();
@@ -19,12 +19,28 @@ export default function ReferralsPage() {
 
   // We need the base URL to generate the full link
   const [baseUrl, setBaseUrl] = useState('');
+  const [localReferralCode, setLocalReferralCode] = useState<string>('');
   
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setBaseUrl(window.location.origin);
     }
   }, []);
+
+  // Generate code for older users if missing
+  useEffect(() => {
+    if (!user || !userProfile) return;
+    
+    if (userProfile.referralCode) {
+        setLocalReferralCode(userProfile.referralCode);
+    } else {
+        // Generate and save
+        const newCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+        updateUserProfile(user.uid, { ...userProfile, referralCode: newCode, referralCount: 0 })
+          .then(() => setLocalReferralCode(newCode))
+          .catch(console.error);
+    }
+  }, [user, userProfile]);
 
   // Fetch the Social Butterfly achievement details
   const socialAchievement = ACHIEVEMENTS.find(a => a.id === 'SOCIAL_BUTTERFLY');
@@ -33,7 +49,7 @@ export default function ReferralsPage() {
   const currentProgress = isUnlocked ? (socialAchievement?.target || 10) : Math.min(referralCount, socialAchievement?.target || 10);
   const progressPct = socialAchievement ? (currentProgress / socialAchievement.target) * 100 : 0;
 
-  const referralCode = userProfile?.referralCode || 'YOUR_CODE';
+  const referralCode = localReferralCode || 'GENERATING...';
   const referralLink = `${baseUrl}/sign_up?ref=${referralCode}`;
 
   const copyToClipboard = () => {
@@ -49,7 +65,7 @@ export default function ReferralsPage() {
   };
 
   const handleSimulateReferral = async () => {
-    if (!user) return;
+    if (!user || referralCode === 'GENERATING...') return;
     setIsSimulating(true);
     try {
       // We pass the current user's code, but pretend a "dummy" user just registered
