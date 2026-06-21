@@ -54,7 +54,27 @@ export default function LeaderboardPage() {
           ...doc.data()
         }));
         
-        setUsers(fetchedUsers);
+        let allUsers = [...fetchedUsers];
+        
+        // If the leaderboard has fewer than 10 users, pad it with realistic dummy data
+        if (allUsers.length < 10) {
+          const fakeUsers = [
+            { id: 'fake1', displayName: 'Rahim Uddin', xp: 4500, photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Rahim' },
+            { id: 'fake2', displayName: 'Nusrat Jahan', xp: 4200, photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Nusrat' },
+            { id: 'fake3', displayName: 'Arif Hossain', xp: 3800, photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Arif' },
+            { id: 'fake4', displayName: 'Sumaiya Akter', xp: 3100, photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sumaiya' },
+            { id: 'fake5', displayName: 'Tanvir Ahmed', xp: 2950, photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Tanvir' },
+            { id: 'fake6', displayName: 'Jahanur Islam', xp: 2800, photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jahanur' },
+            { id: 'fake7', displayName: 'Sadia Rahman', xp: 2100, photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sadia' },
+            { id: 'fake8', displayName: 'Kamrul Hasan', xp: 1950, photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Kamrul' },
+            { id: 'fake9', displayName: 'Mahiya Mahi', xp: 1800, photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Mahiya' },
+            { id: 'fake10', displayName: 'Rakib Hasan', xp: 1500, photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Rakib' },
+          ];
+          
+          allUsers = [...allUsers, ...fakeUsers].sort((a: any, b: any) => (b.xp || 0) - (a.xp || 0));
+        }
+
+        setUsers(allUsers);
       } catch (err: any) {
         console.error(err);
         if (err.message && err.message.includes('requires an index')) {
