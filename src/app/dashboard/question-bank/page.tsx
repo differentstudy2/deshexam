@@ -10,6 +10,7 @@ import { getTaxonomyNodes, TaxonomyType, QUESTIONS_COLLECTION } from '@/lib/fire
 import { collection, query, where, getCountFromServer } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import { TaxonomyNode } from '@/lib/question-bank-types';
+import { useAuth } from '@/hooks/use-auth';
 
 type TabDef = {
   id: TaxonomyType;
@@ -34,6 +35,7 @@ export default function QuestionBankPage() {
   const [nodes, setNodes] = useState<NodeWithCount[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const { user, userProfile } = useAuth();
 
   useEffect(() => {
     async function loadData() {
@@ -54,9 +56,15 @@ export default function QuestionBankPage() {
           taxonomyNodes.push(...competitiveNodes);
         }
         
+        // Filter subjects by user's class if logged in
+        let finalNodes = taxonomyNodes;
+        if (nodeType === 'subject' && userProfile?.classId) {
+          finalNodes = taxonomyNodes.filter(n => n.parentId === userProfile.classId);
+        }
+        
         // Fetch question counts for each node
         const nodesWithCounts: NodeWithCount[] = await Promise.all(
-          taxonomyNodes.map(async (node) => {
+          finalNodes.map(async (node) => {
             const colRef = collection(db, QUESTIONS_COLLECTION);
             let countQuery;
             if (activeTab.isArray) {
@@ -84,7 +92,7 @@ export default function QuestionBankPage() {
     }
 
     loadData();
-  }, [activeTab]);
+  }, [activeTab, userProfile?.classId]);
 
   const filteredNodes = nodes.filter(node => 
     node.name.toLowerCase().includes(searchQuery.toLowerCase())
