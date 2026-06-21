@@ -2505,7 +2505,6 @@ export const awardXP = async (userId: string, actionType: XPActionType, customAm
         const newTotalXP = currentXP + xpAmount;
         let totalXPAwarded = xpAmount;
         const newUnlockedAchievements: Achievement[] = [];
-        const achievementIdsToUnlock: string[] = [];
         
         // Check for newly unlocked achievements
         for (const achievement of ACHIEVEMENTS) {
@@ -2549,20 +2548,38 @@ export const awardXP = async (userId: string, actionType: XPActionType, customAm
             
             if (isUnlocked) {
                 newUnlockedAchievements.push(achievement);
-                achievementIdsToUnlock.push(achievement.id);
-                totalXPAwarded += achievement.rewardXP; // Give bonus XP for unlocking
             }
-        }
-        
-        // Update user document
+        } // End of for loop
+
+        const newAchievementIdsToUnlock = [...currentAchievements, ...newUnlockedAchievements.map(a => a.id)];
+
+        // Prepare notifications for newly unlocked achievements
+        const newNotifications = newUnlockedAchievements.map(ach => ({
+            id: `notif_${ach.id}_${Date.now()}`,
+            type: 'achievement',
+            title: `Achievement Unlocked: ${ach.title}`,
+            desc: `You earned ${ach.rewardXP} bonus XP!`,
+            icon: ach.icon,
+            read: false,
+            createdAt: Date.now()
+        }));
+
+        // Calculate total XP (base + bonuses)
+        totalXPAwarded = xpAmount + newUnlockedAchievements.reduce((sum, ach) => sum + ach.rewardXP, 0);
+
+        // Build the updates object
         const updates: any = {
             xp: increment(totalXPAwarded)
         };
         
-        if (achievementIdsToUnlock.length > 0) {
-            updates.achievements = arrayUnion(...achievementIdsToUnlock);
+        if (newUnlockedAchievements.length > 0) {
+            updates.achievements = newAchievementIdsToUnlock;
+            if (newNotifications.length > 0) {
+                updates.notifications = arrayUnion(...newNotifications);
+            }
         }
-        
+
+        // Update the user document
         await updateDoc(userRef, updates);
         
         // Log transaction
@@ -2571,7 +2588,7 @@ export const awardXP = async (userId: string, actionType: XPActionType, customAm
             actionType,
             amount: xpAmount,
             bonusFromAchievements: totalXPAwarded - xpAmount,
-            unlockedAchievements: achievementIdsToUnlock,
+            unlockedAchievements: newAchievementIdsToUnlock,
             metadata: metadata || null,
             createdAt: serverTimestamp()
         });

@@ -207,6 +207,69 @@ const adminNavGroups = [
 
 type UserProfile = {
   role?: 'admin' | 'user';
+  notifications?: any[];
+};
+
+const NotificationBell = () => {
+  const { user } = useAuth();
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (user) {
+        const userProfile = await getUserProfile(user.uid);
+        if (userProfile?.notifications) {
+          const sorted = [...userProfile.notifications].sort((a, b) => b.createdAt - a.createdAt);
+          setNotifications(sorted);
+          setUnreadCount(sorted.filter(n => !n.read).length);
+        }
+      }
+    };
+    
+    // Poll for notifications every 10 seconds just to keep it somewhat updated, 
+    // or rely on a simple load. For now just fetch once on mount/user change.
+    fetchProfile();
+    const interval = setInterval(fetchProfile, 10000);
+    return () => clearInterval(interval);
+  }, [user]);
+
+  if (!user) return null;
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" className="relative text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100 rounded-full">
+          <Bell className="h-[1.2rem] w-[1.2rem]" />
+          {unreadCount > 0 && (
+            <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
+          )}
+          <span className="sr-only">Notifications</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-80" align="end">
+        <DropdownMenuLabel className="font-bold flex justify-between items-center">
+          <span>Notifications</span>
+          {unreadCount > 0 && <span className="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full">{unreadCount} new</span>}
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <ScrollArea className="h-80">
+          {notifications.length === 0 ? (
+            <div className="p-4 text-center text-sm text-slate-500">No notifications yet.</div>
+          ) : (
+            <div className="flex flex-col gap-1 p-1">
+              {notifications.map((notif, i) => (
+                <div key={notif.id || i} className={`p-3 text-sm rounded-md flex flex-col gap-1 ${!notif.read ? 'bg-amber-50 dark:bg-amber-900/10 border-l-2 border-amber-500' : 'hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
+                   <div className="font-semibold text-slate-800 dark:text-slate-200">{notif.title}</div>
+                   <div className="text-slate-600 dark:text-slate-400 text-xs">{notif.desc}</div>
+                </div>
+              ))}
+            </div>
+          )}
+        </ScrollArea>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 };
 
 const UserNav = () => {
@@ -617,6 +680,7 @@ export function Header() {
             </Link>
           </Button>
           <ThemeToggle />
+          <NotificationBell />
           <div className="hidden md:flex">
              <UserNav />
           </div>
