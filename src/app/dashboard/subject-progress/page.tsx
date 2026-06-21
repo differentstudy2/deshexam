@@ -7,12 +7,15 @@ import { useAuth } from '@/hooks/use-auth';
 import { getUserSubjectsProgress } from '@/lib/firebase/firestore';
 import { Skeleton } from '@/components/ui/skeleton';
 import Link from 'next/link';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase/client';
 
 export default function SubjectProgressPage() {
   const [openSubjects, setOpenSubjects] = useState<Record<string, boolean>>({});
   const [subjects, setSubjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState<'recent' | 'lowest' | 'highest'>('recent');
+  const [resolvedClassName, setResolvedClassName] = useState<string | null>(null);
   const { user, userProfile } = useAuth();
 
   useEffect(() => {
@@ -20,6 +23,12 @@ export default function SubjectProgressPage() {
       if (user && userProfile) {
         setLoading(true);
         try {
+          if (userProfile.classId) {
+            const classDoc = await getDoc(doc(db, 'taxonomy_nodes', userProfile.classId));
+            if (classDoc.exists()) {
+              setResolvedClassName(classDoc.data().title);
+            }
+          }
           const data = await getUserSubjectsProgress(user.uid, userProfile);
           setSubjects(data);
         } catch (error) {
@@ -52,7 +61,9 @@ export default function SubjectProgressPage() {
     <div className="w-full max-w-[1400px] mx-auto pb-12 text-slate-800 dark:text-slate-100">
       {/* Header */}
       <div className="mb-6 px-4 sm:px-0 flex items-center justify-between">
-        <h1 className="text-xl font-bold text-slate-900 dark:text-white">Subjects Report</h1>
+        <h1 className="text-xl font-bold text-slate-900 dark:text-white">
+            Subjects Report {resolvedClassName && <span className="text-slate-500 font-medium ml-2 text-[15px]">({resolvedClassName})</span>}
+        </h1>
         <select 
           value={sortBy} 
           onChange={(e) => setSortBy(e.target.value as any)}
