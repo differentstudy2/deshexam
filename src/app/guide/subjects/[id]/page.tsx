@@ -44,7 +44,18 @@ export default async function SubjectsOrSingleSubjectPage({ params }: { params: 
 
   // 2. If it's a subject, render the single subject view (SubjectDashboard)
   if (node.type === 'subject') {
-    const subjects = await getGuideSubjects();
+    let subjects: any[] = [];
+    if (node.parentId) {
+      const classNodes = await getTaxonomyNodesByParent(node.parentId);
+      const relevantNodes = classNodes.filter(n => n.type === 'subject' || n.type === 'textbook');
+      subjects = relevantNodes.map(n => ({
+        id: n.id,
+        title: n.title || (n as any).name,
+        countStr: ''
+      }));
+    } else {
+      subjects = await getGuideSubjects();
+    }
     const fullCurriculum = await getCurriculumBySubject(node.id);
     
     // Attempt to get class details if parentId exists

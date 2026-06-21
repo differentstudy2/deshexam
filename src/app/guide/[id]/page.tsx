@@ -48,8 +48,22 @@ export default async function GenericGuidePage({ params }: { params: Promise<{ i
   }
 
   const { node, level } = result;
-  const subjects = await getGuideSubjects();
   const hierarchy = await getTopicHierarchy(node.id);
+
+  const classId = hierarchy?.classId || (level === 'class' ? node.id : null);
+  let subjects: any[] = [];
+  if (classId) {
+    const { getTaxonomyNodesByParent } = await import('@/lib/firebase/taxonomy');
+    const classNodes = await getTaxonomyNodesByParent(classId);
+    const relevantNodes = classNodes.filter(n => n.type === 'subject' || n.type === 'textbook');
+    subjects = relevantNodes.map(n => ({
+      id: n.id,
+      title: n.title || (n as any).name,
+      countStr: ''
+    }));
+  } else {
+    subjects = await getGuideSubjects();
+  }
   
   // Try to find curriculum starting from the closest known subject
   // If hierarchy is missing (e.g. for taxonomy_nodes), fallback to node.id if it's a subject

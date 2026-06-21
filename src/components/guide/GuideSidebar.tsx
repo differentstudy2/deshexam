@@ -13,11 +13,12 @@ import { Loader2 } from 'lucide-react';
 interface GuideSidebarProps {
   subjects: SidebarSubject[];
   activeId?: string;
+  classTitle?: string;
 }
 
-export function GuideSidebar({ subjects: initialSubjects, activeId }: GuideSidebarProps) {
+export function GuideSidebar({ subjects: initialSubjects, activeId, classTitle: initialClassTitle = 'Subjects' }: GuideSidebarProps) {
   const { user, userProfile } = useAuth();
-  const [classTitle, setClassTitle] = useState<string>('All Subjects');
+  const [classTitle, setClassTitle] = useState<string>(initialClassTitle);
   const [subjects, setSubjects] = useState<SidebarSubject[]>(initialSubjects);
   const [loading, setLoading] = useState(true);
 
@@ -39,7 +40,6 @@ export function GuideSidebar({ subjects: initialSubjects, activeId }: GuideSideb
           if (relevantNodes.length > 0) {
             setSubjects(relevantNodes.map(n => ({
               id: n.id,
-              slug: n.slug,
               title: n.title || (n as any).name,
               countStr: '' // We could calculate this if needed
             })));
@@ -76,7 +76,7 @@ export function GuideSidebar({ subjects: initialSubjects, activeId }: GuideSideb
             
             return (
               <Link 
-                href={`/guide/${(subject as any).slug || subject.id}`} 
+                href={`/guide/${subject.id}`} 
                 key={subject.id}
               >
                 <div 
@@ -109,7 +109,7 @@ export function GuideSidebar({ subjects: initialSubjects, activeId }: GuideSideb
           })
         ) : (
           <div className="p-5 text-center text-sm text-slate-500">
-            No subjects found for your class.
+            No subjects found.
           </div>
         )}
       </div>
