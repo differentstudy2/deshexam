@@ -2453,3 +2453,61 @@ export const deleteFaq = async (faqId: string) => {
         throw new Error("Failed to delete FAQ.");
     }
 };
+
+export type XPActionType = 'MOCK_TEST_COMPLETE' | 'CHAPTER_PRACTICE_COMPLETE' | 'DAILY_LOGIN_STREAK' | 'WEEKLY_TARGET_COMPLETE' | 'MISTAKE_VAULT_SOLVE' | 'FORUM_HELP' | 'FORUM_UPVOTE' | 'CUSTOM';
+
+export const awardXP = async (userId: string, actionType: XPActionType, customAmount?: number, metadata?: any) => {
+    if (!userId) return 0;
+    
+    let xpAmount = 0;
+    switch (actionType) {
+        case 'MOCK_TEST_COMPLETE':
+            xpAmount = 20;
+            break;
+        case 'CHAPTER_PRACTICE_COMPLETE':
+            xpAmount = 30;
+            break;
+        case 'DAILY_LOGIN_STREAK':
+            xpAmount = customAmount || 5; // Depends on streak length
+            break;
+        case 'WEEKLY_TARGET_COMPLETE':
+            xpAmount = 100;
+            break;
+        case 'MISTAKE_VAULT_SOLVE':
+            xpAmount = 5;
+            break;
+        case 'FORUM_HELP':
+            xpAmount = 10;
+            break;
+        case 'FORUM_UPVOTE':
+            xpAmount = 2;
+            break;
+        case 'CUSTOM':
+            xpAmount = customAmount || 0;
+            break;
+        default:
+            xpAmount = 0;
+    }
+
+    if (xpAmount <= 0) return 0;
+
+    try {
+        const userRef = doc(db, "users", userId);
+        await updateDoc(userRef, {
+            xp: increment(xpAmount)
+        });
+        
+        await addDoc(collection(db, "xp_transactions"), {
+            userId,
+            actionType,
+            amount: xpAmount,
+            metadata: metadata || null,
+            createdAt: serverTimestamp()
+        });
+
+        return xpAmount;
+    } catch (e) {
+        console.error("Failed to award XP:", e);
+        return 0;
+    }
+};
