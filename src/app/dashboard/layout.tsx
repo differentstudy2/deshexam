@@ -32,6 +32,19 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const [verifying, setVerifying] = useState(true);
   
+  const formatPathname = (path: string) => {
+    if (path === '/dashboard') return 'Dashboard';
+    const parts = path.split('/');
+    const lastPart = parts[parts.length - 1];
+    return lastPart.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+  };
+
+  const pageTitle = formatPathname(pathname || '/dashboard');
+
+  useEffect(() => {
+    document.title = `${pageTitle} | Desh Exam`;
+  }, [pageTitle]);
+
   useEffect(() => {
     if (!loading) {
       if (!user) {
@@ -52,15 +65,6 @@ export default function DashboardLayout({
       </div>
     );
   }
-
-  const formatPathname = (path: string) => {
-    if (path === '/dashboard') return 'Dashboard';
-    const parts = path.split('/');
-    const lastPart = parts[parts.length - 1];
-    return lastPart.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-  };
-
-  const pageTitle = formatPathname(pathname || '/dashboard');
 
   return (
     <SidebarProvider>
