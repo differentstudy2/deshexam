@@ -30,6 +30,7 @@ export default function ChallengesHubPage() {
   const [opponentIdInput, setOpponentIdInput] = useState('');
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState('');
+  const [pageError, setPageError] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadData() {
@@ -41,14 +42,58 @@ export default function ChallengesHubPage() {
         ]);
         setChallenges(chData);
         setSubjects(subjData);
-      } catch (err) {
+      } catch (err: any) {
         console.error("Failed to load challenges", err);
+        if (err.message && err.message.includes('requires an index')) {
+          setPageError(err.message);
+        } else {
+          setPageError("Failed to load challenges.");
+        }
       } finally {
         setLoading(false);
       }
     }
     loadData();
   }, [user]);
+
+  // Handle Firebase Index Error Display
+  if (pageError) {
+    let errorMessage = pageError;
+    let indexLink = null;
+    if (pageError.includes('https://console.firebase.google.com/')) {
+      const urlMatch = pageError.match(/(https:\/\/console\.firebase\.google\.com\/[^\s]+)/);
+      if (urlMatch) {
+        indexLink = urlMatch[0];
+        errorMessage = pageError.replace(indexLink, '').replace('You can create it here: ', '');
+      }
+    }
+
+    return (
+      <div className="w-full max-w-3xl mx-auto p-6 bg-red-50 text-red-700 rounded-xl border border-red-200 mt-8 shadow-sm">
+        <div className="flex items-start gap-3">
+          <AlertCircle className="w-6 h-6 text-red-500 shrink-0 mt-0.5" />
+          <div>
+            <p className="font-bold text-lg mb-1">Database Index Required</p>
+            <p className="text-sm mb-4 leading-relaxed">{errorMessage}</p>
+            
+            {indexLink && (
+              <div className="bg-white p-4 rounded-lg border border-red-100 shadow-sm">
+                <p className="text-sm font-medium mb-3 text-slate-700">Click the button below to auto-generate the required index in your Firebase console. It will take 3-5 minutes to build.</p>
+                <a 
+                  href={indexLink} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md shadow-sm transition-colors"
+                >
+                  Create Index in Firebase Console
+                </a>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const handleCreateChallenge = async () => {
     if (!user || !userProfile) return;
