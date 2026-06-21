@@ -72,12 +72,12 @@ export default function DashboardLayout({
                 <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-2 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 md:px-6 shadow-sm transition-colors duration-300">
                     <SidebarTrigger className="-ml-1" />
                     
-                    <h1 className="text-xl font-bold text-slate-800 dark:text-slate-100 ml-2 tracking-tight">
+                    <h1 className="text-lg sm:text-xl font-bold text-slate-800 dark:text-slate-100 ml-1 sm:ml-2 tracking-tight truncate">
                         {pageTitle}
                     </h1>
                     
-                    <div className="ml-auto flex items-center space-x-2 md:space-x-4">
-                        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-50 border border-orange-100 text-orange-600 font-bold text-sm">
+                    <div className="ml-auto flex items-center space-x-1.5 sm:space-x-4 shrink-0">
+                        <div className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 rounded-full bg-orange-50 border border-orange-100 text-orange-600 font-bold text-xs sm:text-sm shrink-0 whitespace-nowrap">
                             <span className="text-orange-500">🔥</span> {userProfile?.xp || 0} XP
                         </div>
                         
