@@ -2525,6 +2525,26 @@ export const awardXP = async (userId: string, actionType: XPActionType, customAm
                 if (currentStreak >= achievement.target) {
                     isUnlocked = true;
                 }
+            } else if (achievement.metric === 'exams_taken') {
+                const examsTaken = userData.examsTaken || 0;
+                if (examsTaken >= achievement.target) {
+                    isUnlocked = true;
+                }
+            } else if (achievement.metric === 'perfect_exams') {
+                const perfectExams = userData.perfectExams || 0;
+                if (perfectExams >= achievement.target) {
+                    isUnlocked = true;
+                }
+            } else if (achievement.metric === 'night_owl') {
+                const nightOwlCount = userData.nightOwlCount || 0;
+                if (nightOwlCount >= achievement.target) {
+                    isUnlocked = true;
+                }
+            } else if (achievement.metric === 'early_bird') {
+                const earlyBirdCount = userData.earlyBirdCount || 0;
+                if (earlyBirdCount >= achievement.target) {
+                    isUnlocked = true;
+                }
             }
             
             if (isUnlocked) {
@@ -2684,5 +2704,52 @@ export const checkDailyStreak = async (userId: string, simulateNextDay: boolean 
     } catch (e) {
         console.error("Failed to check daily streak:", e);
         return null;
+    }
+};
+
+/**
+ * Records a mock test attempt, updates stats, and checks time-based achievements.
+ * @param userId The user ID
+ * @param scorePct The percentage score (0-100)
+ * @param simulatedHour Optional simulated hour (0-23) for testing night_owl/early_bird
+ */
+export const recordMockTest = async (userId: string, scorePct: number, simulatedHour?: number) => {
+    if (!userId) return null;
+    try {
+        const userRef = doc(db, "users", userId);
+        
+        let hour = new Date().getHours();
+        if (typeof simulatedHour === 'number') {
+            hour = simulatedHour;
+        }
+
+        const updates: any = {
+            examsTaken: increment(1)
+        };
+
+        if (scorePct === 100) {
+            updates.perfectExams = increment(1);
+        }
+
+        // Night Owl (12 AM to 3 AM)
+        if (hour >= 0 && hour < 4) {
+            updates.nightOwlCount = increment(1);
+        }
+        
+        // Early Bird (4 AM to 6 AM)
+        if (hour >= 4 && hour < 7) {
+            updates.earlyBirdCount = increment(1);
+        }
+
+        await updateDoc(userRef, updates);
+
+        // Award base XP for completing a test
+        // This will trigger the checks for exams_taken, perfect_exams, etc.
+        const xpResult = await awardXP(userId, 'MOCK_TEST_COMPLETE', 50, { description: `Completed Mock Test (Score: ${scorePct}%)` });
+
+        return { success: true, xpAwarded: xpResult.xpAdded };
+    } catch (e) {
+        console.error("Failed to record mock test:", e);
+        return { success: false, xpAwarded: 0 };
     }
 };

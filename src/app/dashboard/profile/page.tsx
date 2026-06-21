@@ -63,7 +63,7 @@ const subjects = [
 ];
 
 import { ACHIEVEMENTS } from '@/lib/constants/achievements';
-import { awardXP, getUserProfile, checkDailyStreak } from '@/lib/firebase/firestore';
+import { awardXP, getUserProfile, checkDailyStreak, recordMockTest } from '@/lib/firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 
 export default function ProfilePage() {
@@ -73,6 +73,7 @@ export default function ProfilePage() {
   const [openSubjects, setOpenSubjects] = useState<Record<string, boolean>>({});
   const [isAddingXp, setIsAddingXp] = useState(false);
   const [isSimulatingNextDay, setIsSimulatingNextDay] = useState(false);
+  const [isSimulatingMockTest, setIsSimulatingMockTest] = useState(false);
   const [localProfile, setLocalProfile] = useState<any>(userProfile);
 
   useEffect(() => {
@@ -138,6 +139,33 @@ export default function ProfilePage() {
       });
     } finally {
       setIsSimulatingNextDay(false);
+    }
+  };
+
+  const handleSimulateMockTest = async () => {
+    if (!user) return;
+    setIsSimulatingMockTest(true);
+    try {
+      // Simulate a mock test with 100% score to easily test Flawless Victory
+      const result = await recordMockTest(user.uid, 100);
+      if (result && result.success) {
+        toast({
+          title: "Mock Test Completed!",
+          description: `You scored 100% and earned ${result.xpAwarded} XP.`,
+          variant: "default",
+        });
+        const updatedProfile = await getUserProfile(user.uid);
+        setLocalProfile(updatedProfile);
+      }
+    } catch (e) {
+      console.error(e);
+      toast({
+        title: "Error",
+        description: "Failed to simulate mock test.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSimulatingMockTest(false);
     }
   };
 
@@ -255,7 +283,15 @@ export default function ProfilePage() {
             </button>
           </div>
 
-          <div className="flex justify-end gap-2">
+          <div className="flex flex-wrap justify-end gap-2">
+            <Button 
+              onClick={handleSimulateMockTest} 
+              disabled={isSimulatingMockTest}
+              className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-full shadow-sm"
+            >
+              <FileText className="w-4 h-4 mr-2" />
+              {isSimulatingMockTest ? 'Simulating...' : 'Simulate Mock Test'}
+            </Button>
             <Button 
               onClick={handleSimulateNextDay} 
               disabled={isSimulatingNextDay}
