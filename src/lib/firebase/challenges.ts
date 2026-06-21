@@ -2,7 +2,7 @@ import { db } from './client';
 import { collection, doc, getDoc, getDocs, setDoc, updateDoc, query, where, orderBy, serverTimestamp, limit, addDoc } from 'firebase/firestore';
 import { getQuestions } from './question-bank';
 
-export type ChallengeMode = "friend" | "random";
+export type ChallengeMode = "friend" | "random" | "public";
 export type ChallengeStatus = "pending" | "accepted" | "completed" | "declined" | "expired";
 
 export interface Challenge {
@@ -11,6 +11,7 @@ export interface Challenge {
   status: ChallengeStatus;
   subjectId: string;
   questionIds: string[];
+  classId?: string;
   
   challengerId: string;
   challengerName: string;
@@ -43,7 +44,8 @@ export async function createChallenge(
   opponentAvatar: string,
   subjectId: string,
   mode: ChallengeMode,
-  numberOfQuestions: number
+  numberOfQuestions: number,
+  classId?: string
 ) {
   // Fetch random questions for the subject
   const allSubjectQuestions = await getQuestions({ subjectId: subjectId }, 100);
@@ -79,7 +81,8 @@ export async function createChallenge(
     winnerId: null,
     rewardXp: numberOfQuestions * 10, // Base XP reward
     createdAt: serverTimestamp(),
-    expiresAt: expiresAt
+    expiresAt: expiresAt,
+    classId: classId || ''
   };
 
   const colRef = collection(db, CHALLENGES_COLLECTION);
@@ -186,4 +189,39 @@ export async function submitChallengeResult(
 
   await updateChallenge(challengeId, updates);
   return updates;
+}
+
+export async function getPublicChallenges(classId: string) {
+  if (!classId) return [];
+  const colRef = collection(db, CHALLENGES_COLLECTION);
+  const q = query(
+    colRef, 
+    where('mode', '==', 'public'), 
+    where('status', '==', 'pending'), 
+    where('classId', '==', classId),
+    orderBy('createdAt', 'desc'),
+    limit(30)
+  );
+
+  const snap = await getDocs(q);
+  return snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Challenge));
+}
+
+export async function acceptPublicChallenge(
+  challengeId: string,
+  opponentId: string,
+  opponentName: string,
+  opponentAvatar: string
+) {
+  const challenge = await getChallenge(challengeId);
+  if (!challenge) throw new Error("Challenge not found");
+  if (challenge.status !== 'pending') throw new Error("This challenge is no longer available");
+  
+  // Update to 'accepted' and assign the opponent
+  await updateChallenge(challengeId, {
+    status: 'accepted',
+    opponentId,
+    opponentName,
+    opponentAvatar
+  });
 }

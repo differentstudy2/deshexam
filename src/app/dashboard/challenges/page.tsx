@@ -7,9 +7,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/hooks/use-auth';
-import { Challenge, getUserChallenges, createChallenge } from '@/lib/firebase/challenges';
+import { Challenge, getUserChallenges, createChallenge, getPublicChallenges, acceptPublicChallenge } from '@/lib/firebase/challenges';
 import { getTaxonomyNodes } from '@/lib/firebase/question-bank';
-import { Swords, Trophy, Clock, CheckCircle, XCircle, Search, User as UserIcon, Loader2, Sparkles, Plus, AlertCircle, BookOpen } from 'lucide-react';
+import { Swords, Trophy, Clock, CheckCircle, XCircle, Search, User as UserIcon, Loader2, Sparkles, Plus, AlertCircle, BookOpen, Globe } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export default function ChallengesHubPage() {
@@ -17,14 +17,15 @@ export default function ChallengesHubPage() {
   const router = useRouter();
   
   const [challenges, setChallenges] = useState<Challenge[]>([]);
+  const [publicChallenges, setPublicChallenges] = useState<Challenge[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'incoming' | 'sent' | 'completed'>('incoming');
+  const [activeTab, setActiveTab] = useState<'incoming' | 'sent' | 'completed' | 'public'>('incoming');
   
   const [isNewModalOpen, setIsNewModalOpen] = useState(false);
   const [subjects, setSubjects] = useState<any[]>([]);
   
   // New Challenge Form State
-  const [mode, setMode] = useState<'friend' | 'random'>('random');
+  const [mode, setMode] = useState<'friend' | 'random' | 'public'>('random');
   const [subjectId, setSubjectId] = useState('');
   const [questionCount, setQuestionCount] = useState('5');
   const [opponentIdInput, setOpponentIdInput] = useState('');
@@ -36,12 +37,14 @@ export default function ChallengesHubPage() {
     async function loadData() {
       if (!user) return;
       try {
-        const [chData, subjData] = await Promise.all([
+        const [chData, subjData, pubData] = await Promise.all([
           getUserChallenges(user.uid),
-          getTaxonomyNodes('subject')
+          getTaxonomyNodes('subject'),
+          userProfile?.classId ? getPublicChallenges(userProfile.classId) : Promise.resolve([])
         ]);
         setChallenges(chData);
         setSubjects(subjData);
+        setPublicChallenges(pubData);
       } catch (err: any) {
         console.error("Failed to load challenges", err);
         if (err.message && err.message.includes('requires an index')) {
@@ -155,7 +158,24 @@ export default function ChallengesHubPage() {
   const sent = challenges.filter(c => c.challengerId === user?.uid && c.status === 'pending');
   const completed = challenges.filter(c => c.status === 'completed' || c.status === 'expired' || c.status === 'declined');
 
-  const displayList = activeTab === 'incoming' ? incoming : activeTab === 'sent' ? sent : completed;
+  // Also filter out public challenges created by the user themselves from the public tab so they don't join their own challenge.
+  const filteredPublic = publicChallenges.filter(c => c.challengerId !== user?.uid);
+
+  const displayList = activeTab === 'incoming' ? incoming : activeTab === 'sent' ? sent : activeTab === 'completed' ? completed : filteredPublic;
+
+  const handleJoinPublic = async (challengeId: string) => {
+    try {
+      await acceptPublicChallenge(
+        challengeId, 
+        user!.uid, 
+        user!.displayName || "Unknown", 
+        user!.photoURL || `https://picsum.photos/seed/${user!.uid}/40/40`
+      );
+      router.push(`/dashboard/challenges/${challengeId}`);
+    } catch (err: any) {
+      alert(err.message || "Failed to join public challenge.");
+    }
+  };
 
   return (
     <div className="w-full max-w-4xl mx-auto space-y-6 text-slate-800 dark:text-slate-100">
@@ -191,20 +211,27 @@ export default function ChallengesHubPage() {
               
               <div className="space-y-2">
                 <label className="text-sm font-semibold">Matchmaking Mode</label>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-3 gap-2">
                   <Button 
                     variant={mode === 'random' ? 'default' : 'outline'} 
                     onClick={() => setMode('random')}
                     className={mode === 'random' ? 'bg-green-600 hover:bg-green-700 text-white' : ''}
                   >
-                    <Search className="w-4 h-4 mr-2" /> Random
+                    <Search className="w-4 h-4 mr-2 hidden sm:block" /> Random
+                  </Button>
+                  <Button 
+                    variant={mode === 'public' ? 'default' : 'outline'} 
+                    onClick={() => setMode('public')}
+                    className={mode === 'public' ? 'bg-green-600 hover:bg-green-700 text-white' : ''}
+                  >
+                    <Globe className="w-4 h-4 mr-2 hidden sm:block" /> Public
                   </Button>
                   <Button 
                     variant={mode === 'friend' ? 'default' : 'outline'} 
                     onClick={() => setMode('friend')}
                     className={mode === 'friend' ? 'bg-green-600 hover:bg-green-700 text-white' : ''}
                   >
-                    <UserIcon className="w-4 h-4 mr-2" /> Friend
+                    <UserIcon className="w-4 h-4 mr-2 hidden sm:block" /> Friend
                   </Button>
                 </div>
               </div>
@@ -275,6 +302,12 @@ export default function ChallengesHubPage() {
           Sent {sent.length > 0 && <span className="bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[10px] px-1.5 py-0.5 rounded-full">{sent.length}</span>}
         </button>
         <button 
+          onClick={() => setActiveTab('public')}
+          className={`pb-3 px-4 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${activeTab === 'public' ? 'border-green-500 text-green-600 dark:text-green-400' : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+        >
+          Public {filteredPublic.length > 0 && <span className="bg-blue-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">{filteredPublic.length}</span>}
+        </button>
+        <button 
           onClick={() => setActiveTab('completed')}
           className={`pb-3 px-4 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${activeTab === 'completed' ? 'border-green-500 text-green-600 dark:text-green-400' : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
         >
@@ -323,6 +356,11 @@ export default function ChallengesHubPage() {
                   {activeTab === 'incoming' && (
                     <Button onClick={() => router.push(`/dashboard/challenges/${challenge.id}`)} className="bg-green-600 hover:bg-green-700 text-white shadow-sm w-full sm:w-auto">
                       Accept & Play
+                    </Button>
+                  )}
+                  {activeTab === 'public' && (
+                    <Button onClick={() => handleJoinPublic(challenge.id!)} className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm w-full sm:w-auto">
+                      <Globe className="w-4 h-4 mr-2" /> Join Challenge
                     </Button>
                   )}
                   {activeTab === 'sent' && (
