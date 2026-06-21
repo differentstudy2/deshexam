@@ -542,7 +542,7 @@ export const DashboardSidebar = ({ onLinkClick, user, logOut }: { onLinkClick?: 
                     <span className="text-slate-800 dark:text-slate-100 ml-1">EXAM</span>
                 </div>
                 <div className="hidden items-center justify-center group-data-[collapsible=icon]:flex">
-                    <img src="/favicon-96x96.png" alt="DeshExam" className="w-8 h-8 rounded-lg shadow-sm" />
+                    <img src="/icons/icon-192x192.png" alt="DeshExam" className="w-8 h-8 rounded-lg shadow-sm" />
                 </div>
             </Link>
         </div>
