@@ -2572,7 +2572,10 @@ export const awardXP = async (userId: string, actionType: XPActionType, customAm
         
         // Build the updates object
         const updates: any = {
-            xp: increment(totalXPAwarded)
+            xp: increment(totalXPAwarded),
+            xp_today: increment(totalXPAwarded),
+            xp_week: increment(totalXPAwarded),
+            xp_month: increment(totalXPAwarded)
         };
 
         // Update the user document

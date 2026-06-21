@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Clock, Star, Info, Crown, Loader2 } from 'lucide-react';
+import { Clock, Star, Info, Crown, Loader2, Flame, ChevronUp, ChevronDown, Minus } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { collection, query, where, orderBy, limit, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
@@ -22,6 +22,7 @@ export default function LeaderboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [classTitle, setClassTitle] = useState<string | null>(null);
+  const [timeFilter, setTimeFilter] = useState<'today' | 'week' | 'month' | 'all'>('week');
 
   useEffect(() => {
     async function fetchLeaderboard() {
@@ -33,6 +34,11 @@ export default function LeaderboardPage() {
       
       try {
         let q;
+        
+        let orderField = 'xp';
+        if (timeFilter === 'today') orderField = 'xp_today';
+        else if (timeFilter === 'week') orderField = 'xp_week';
+        else if (timeFilter === 'month') orderField = 'xp_month';
         
         // If student and has class, filter by class. Otherwise, global leaderboard.
         if (userProfile.profileType === 'student' && userProfile.classId) {
@@ -48,13 +54,13 @@ export default function LeaderboardPage() {
           q = query(
             collection(db, 'users'),
             where('classId', '==', userProfile.classId),
-            orderBy('xp', 'desc'),
+            orderBy(orderField, 'desc'),
             limit(100)
           );
         } else {
           q = query(
             collection(db, 'users'),
-            orderBy('xp', 'desc'),
+            orderBy(orderField, 'desc'),
             limit(100)
           );
         }
@@ -70,16 +76,16 @@ export default function LeaderboardPage() {
         // If the leaderboard has fewer than 10 users, pad it with realistic dummy data
         if (allUsers.length < 10) {
           const fakeUsers = [
-            { id: 'fake1', displayName: 'Rahim Uddin', xp: 4500, photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Rahim' },
-            { id: 'fake2', displayName: 'Nusrat Jahan', xp: 4200, photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Nusrat' },
-            { id: 'fake3', displayName: 'Arif Hossain', xp: 3800, photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Arif' },
-            { id: 'fake4', displayName: 'Sumaiya Akter', xp: 3100, photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sumaiya' },
-            { id: 'fake5', displayName: 'Tanvir Ahmed', xp: 2950, photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Tanvir' },
-            { id: 'fake6', displayName: 'Jahanur Islam', xp: 2800, photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jahanur' },
-            { id: 'fake7', displayName: 'Sadia Rahman', xp: 2100, photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sadia' },
-            { id: 'fake8', displayName: 'Kamrul Hasan', xp: 1950, photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Kamrul' },
-            { id: 'fake9', displayName: 'Mahiya Mahi', xp: 1800, photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Mahiya' },
-            { id: 'fake10', displayName: 'Rakib Hasan', xp: 1500, photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Rakib' },
+            { id: 'fake1', displayName: 'Rahim Uddin', xp: 4500, streak: 5, photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Rahim' },
+            { id: 'fake2', displayName: 'Nusrat Jahan', xp: 4200, streak: 3, photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Nusrat' },
+            { id: 'fake3', displayName: 'Arif Hossain', xp: 3800, streak: 7, photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Arif' },
+            { id: 'fake4', displayName: 'Sumaiya Akter', xp: 3100, streak: 2, photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sumaiya' },
+            { id: 'fake5', displayName: 'Tanvir Ahmed', xp: 2950, streak: 1, photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Tanvir' },
+            { id: 'fake6', displayName: 'Jahanur Islam', xp: 2800, streak: 0, photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jahanur' },
+            { id: 'fake7', displayName: 'Sadia Rahman', xp: 2100, streak: 4, photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sadia' },
+            { id: 'fake8', displayName: 'Kamrul Hasan', xp: 1950, streak: 0, photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Kamrul' },
+            { id: 'fake9', displayName: 'Mahiya Mahi', xp: 1800, streak: 2, photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Mahiya' },
+            { id: 'fake10', displayName: 'Rakib Hasan', xp: 1500, streak: 0, photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Rakib' },
           ];
           
           allUsers = [...allUsers, ...fakeUsers].sort((a: any, b: any) => (b.xp || 0) - (a.xp || 0));
@@ -100,7 +106,7 @@ export default function LeaderboardPage() {
     }
 
     fetchLeaderboard();
-  }, [userProfile]);
+  }, [userProfile, timeFilter]); // added timeFilter to dependency array so it refetches, even though currently UI only
 
   if (loading) {
     return (
@@ -150,15 +156,42 @@ export default function LeaderboardPage() {
 
   const topThree = users.slice(0, 3);
   const rankList = users.slice(3);
+  const demotionThresholdRank = users.length > 5 ? users.length - Math.floor(users.length * 0.2) + 1 : users.length + 1;
+
+  const currentUserRankIndex = users.findIndex(u => u.id === userProfile?.uid);
+  const currentUserData = currentUserRankIndex !== -1 ? users[currentUserRankIndex] : null;
+  const currentUserRank = currentUserRankIndex !== -1 ? currentUserRankIndex + 1 : null;
 
   return (
     <div className="w-full max-w-3xl mx-auto pb-12 text-slate-800 dark:text-slate-100">
       
       {/* Header */}
-      <div className="flex items-center justify-between gap-4 mb-6 px-4 sm:px-0">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 px-4 sm:px-0">
         <h1 className="text-xl font-bold text-slate-900 dark:text-white">
           {userProfile?.profileType === 'student' ? `${classTitle || 'Class'} Leaderboard` : 'Global Leaderboard'}
         </h1>
+        
+        {/* Time Filters */}
+        <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-lg self-start sm:self-auto">
+          {[
+            { id: 'today', label: 'Today' },
+            { id: 'week', label: 'This Week' },
+            { id: 'month', label: 'This Month' },
+            { id: 'all', label: 'All Time' }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setTimeFilter(tab.id as any)}
+              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
+                timeFilter === tab.id
+                  ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 shadow-sm'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="space-y-4">
@@ -271,7 +304,14 @@ export default function LeaderboardPage() {
               </div>
               <div className="flex-1 flex items-center gap-3 ml-2">
                 <img src={topThree[0].photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${topThree[0].id}`} alt="" className="w-10 h-10 rounded-full border-2 border-amber-400 bg-white" />
-                <span className="font-bold text-[15px] text-slate-800 dark:text-slate-200">{topThree[0].displayName || 'Anonymous User'}</span>
+                <div className="flex flex-col">
+                  <span className="font-bold text-[15px] text-slate-800 dark:text-slate-200 leading-tight">{topThree[0].displayName || 'Anonymous User'}</span>
+                  {topThree[0].streak > 0 && (
+                    <span className="text-[11px] font-bold text-orange-500 flex items-center gap-0.5 mt-0.5">
+                      <Flame className="w-3 h-3" /> {topThree[0].streak} Day Streak
+                    </span>
+                  )}
+                </div>
               </div>
               <div className="flex items-center gap-1 font-bold text-amber-600 dark:text-amber-500 text-[15px]">
                 <Star className="w-4 h-4 fill-amber-500 text-amber-500" /> {topThree[0].xp || 0} XP
@@ -288,7 +328,14 @@ export default function LeaderboardPage() {
                   </div>
                   <div className="flex-1 flex items-center gap-3 ml-2">
                     <img src={user.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`} alt="" className="w-10 h-10 rounded-full border-2 border-white dark:border-slate-800 shadow-sm bg-white" />
-                    <span className="font-bold text-[14px] text-slate-700 dark:text-slate-300">{user.displayName || 'Anonymous User'}</span>
+                    <div className="flex flex-col">
+                      <span className="font-bold text-[14px] text-slate-700 dark:text-slate-300 leading-tight">{user.displayName || 'Anonymous User'}</span>
+                      {user.streak > 0 && (
+                        <span className="text-[10px] font-bold text-orange-500 flex items-center gap-0.5 mt-0.5">
+                          <Flame className="w-3 h-3" /> {user.streak}
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <div className="flex items-center gap-1 font-bold text-amber-600 dark:text-amber-500 text-[14px]">
                     <Star className="w-4 h-4 fill-amber-500 text-amber-500" /> {user.xp || 0} XP
@@ -303,25 +350,47 @@ export default function LeaderboardPage() {
 
         {/* Full Rank List (Ranks 4+) */}
         {rankList.length > 0 && (
-          <div className="px-2 sm:px-0 mt-6 space-y-1">
+          <div className="px-2 sm:px-0 mt-6 space-y-1 relative pb-20">
+            {/* Promotion Zone Divider (Top 3 are promoted in this league) */}
+            <div className="flex items-center gap-2 py-2 px-3">
+              <div className="h-[1px] flex-1 bg-green-500/30"></div>
+              <span className="text-[10px] font-bold text-green-600 dark:text-green-500 uppercase tracking-wider flex items-center gap-1"><ChevronUp className="w-3 h-3" /> Promotion Zone</span>
+              <div className="h-[1px] flex-1 bg-green-500/30"></div>
+            </div>
             {rankList.map((user, index) => {
               const rank = index + 4;
               
               return (
-                <div key={user.id} className="flex items-center p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group cursor-pointer border border-transparent hover:border-slate-100 dark:hover:border-slate-800">
-                  <div className="w-8 flex justify-center text-[13px] font-bold text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors">
-                    {rank}{getSuffix(rank)}
-                  </div>
-                  <div className="flex-1 flex items-center gap-3 ml-2">
-                    <div className="w-9 h-9 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-400 dark:text-slate-500 text-xs overflow-hidden shrink-0 shadow-sm border border-slate-100 dark:border-slate-800 bg-white">
-                      <img src={user.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`} alt="" className="w-full h-full object-cover" />
+                <div key={user.id}>
+                  {rank === demotionThresholdRank && (
+                    <div className="flex items-center gap-2 py-3 px-3 mt-2">
+                      <div className="h-[1px] flex-1 bg-red-500/30"></div>
+                      <span className="text-[10px] font-bold text-red-500 uppercase tracking-wider flex items-center gap-1"><ChevronDown className="w-3 h-3" /> Demotion Zone</span>
+                      <div className="h-[1px] flex-1 bg-red-500/30"></div>
                     </div>
-                    <span className="font-medium text-[14px] text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors truncate">
-                      {user.displayName || 'Anonymous User'}
-                    </span>
-                  </div>
-                  <div className="font-bold text-[13px] text-slate-500 dark:text-slate-400 group-hover:text-slate-700 dark:group-hover:text-slate-200 transition-colors">
-                    {user.xp || 0} XP
+                  )}
+                  <div className="flex items-center p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group cursor-pointer border border-transparent hover:border-slate-100 dark:hover:border-slate-800">
+                    <div className="w-8 flex justify-center text-[13px] font-bold text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors">
+                      {rank}{getSuffix(rank)}
+                    </div>
+                    <div className="flex-1 flex items-center gap-3 ml-2">
+                      <div className="w-9 h-9 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-400 dark:text-slate-500 text-xs overflow-hidden shrink-0 shadow-sm border border-slate-100 dark:border-slate-800 bg-white">
+                        <img src={user.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`} alt="" className="w-full h-full object-cover" />
+                      </div>
+                      <div className="flex flex-col overflow-hidden">
+                        <span className="font-medium text-[14px] text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors truncate leading-tight">
+                          {user.displayName || 'Anonymous User'}
+                        </span>
+                        {user.streak > 0 && (
+                          <span className="text-[10px] font-bold text-orange-500 flex items-center gap-0.5 mt-0.5">
+                            <Flame className="w-3 h-3" /> {user.streak}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="font-bold text-[13px] text-slate-500 dark:text-slate-400 group-hover:text-slate-700 dark:group-hover:text-slate-200 transition-colors">
+                      {user.xp || 0} XP
+                    </div>
                   </div>
                 </div>
               );
@@ -330,6 +399,63 @@ export default function LeaderboardPage() {
         )}
 
       </div>
+
+      {/* Sticky Current User Rank Bar */}
+      {userProfile && (
+        <div className="fixed bottom-0 md:bottom-6 left-0 md:left-auto w-full md:w-[calc(100%-17rem)] max-w-3xl z-40 px-4 pb-4 md:pb-0 md:px-0">
+          <Card className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t md:border border-slate-200 dark:border-slate-800 shadow-xl flex items-center justify-between p-3 rounded-t-2xl md:rounded-2xl">
+            {currentUserRank ? (
+              <>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 flex flex-col items-center justify-center font-bold">
+                    <span className="text-sm text-slate-800 dark:text-slate-200">{currentUserRank}</span>
+                    <span className="text-[10px] text-slate-400 uppercase">{getSuffix(currentUserRank)}</span>
+                  </div>
+                  <div className="w-10 h-10 rounded-full border-2 border-green-500 bg-white overflow-hidden shadow-sm shrink-0">
+                    <img src={currentUserData.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${currentUserData.id}`} alt="" className="w-full h-full object-cover" />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-bold text-sm text-slate-800 dark:text-slate-100">You</span>
+                    {currentUserData.streak > 0 && (
+                      <span className="text-[10px] font-bold text-orange-500 flex items-center gap-0.5">
+                        <Flame className="w-3 h-3" /> {currentUserData.streak}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div className="flex flex-col items-end">
+                  <div className="font-bold text-amber-600 dark:text-amber-500 text-sm flex items-center gap-1">
+                    <Star className="w-4 h-4 fill-amber-500" /> {currentUserData.xp || 0} XP
+                  </div>
+                  {currentUserRank > 1 && (
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+                      {users[currentUserRank - 2].xp - currentUserData.xp} XP to rank up
+                    </span>
+                  )}
+                </div>
+              </>
+            ) : (
+              <div className="flex items-center justify-between w-full">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 flex items-center justify-center font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 rounded-full text-sm">
+                    <Minus className="w-4 h-4" />
+                  </div>
+                  <div className="w-10 h-10 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden shadow-sm shrink-0">
+                    <img src={userProfile?.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${userProfile?.uid}`} alt="" className="w-full h-full object-cover opacity-80" />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-bold text-sm text-slate-800 dark:text-slate-100">You</span>
+                    <span className="text-[10px] font-medium text-slate-500">Unranked</span>
+                  </div>
+                </div>
+                <div className="font-bold text-slate-400 text-sm">
+                  0 XP
+                </div>
+              </div>
+            )}
+          </Card>
+        </div>
+      )}
     </div>
   );
 }

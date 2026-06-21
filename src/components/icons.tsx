@@ -8,9 +8,9 @@ export const DeshExamLogo = () => (
     <Image 
       src={iconImage} 
       alt="DeshExam Icon" 
-      className="h-7 w-7 object-contain rounded-sm"
-      width={28}
-      height={28}
+      className="h-8 w-8 object-contain"
+      width={32}
+      height={32}
     />
     <div className="font-extrabold text-2xl tracking-tighter flex items-center">
         <span className="bg-gradient-to-r from-[#00a651] to-teal-400 bg-clip-text text-transparent drop-shadow-sm">DESH</span>
