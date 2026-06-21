@@ -6,7 +6,6 @@ import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { Search, ChevronDown, ChevronRight } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface ContentNavigationSidebarProps {
   curriculum: Chapter[];
@@ -27,8 +26,8 @@ export function ContentNavigationSidebar({ curriculum, activeId, subjectTitle }:
   };
 
   return (
-    <div className="w-[350px] shrink-0 bg-white dark:bg-[#020817] border-r border-slate-200 dark:border-slate-800 hidden lg:block pr-2">
-      <div className="flex flex-col h-[calc(100vh-3rem)] sticky top-6 pt-0">
+    <div className="w-full shrink-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden flex flex-col shadow-sm">
+      <div className="flex flex-col pt-0">
         {/* Search Header */}
         <div className="bg-slate-100 dark:bg-slate-800/50 border-l-4 border-[#107c41] dark:border-emerald-500 p-2 shrink-0">
           <div className="relative">
@@ -40,7 +39,7 @@ export function ContentNavigationSidebar({ curriculum, activeId, subjectTitle }:
           </div>
         </div>
 
-        <ScrollArea className="flex-1 w-full">
+        <div className="flex-1 w-full flex flex-col">
           {/* Subject Title */}
           <div className="px-4 py-3 border-b border-dotted border-slate-300 dark:border-slate-700">
             <h2 className="font-semibold text-[19px] text-slate-800 dark:text-slate-100">
@@ -110,7 +109,7 @@ export function ContentNavigationSidebar({ curriculum, activeId, subjectTitle }:
               );
             })}
           </div>
-        </ScrollArea>
+        </div>
       </div>
     </div>
   );

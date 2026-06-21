@@ -6,6 +6,7 @@ import { ContentNavigationSidebar } from '@/components/guide/ContentNavigationSi
 import { ReadingArticle } from '@/components/guide/ReadingArticle';
 import { AssessmentTabs } from '@/components/guide/AssessmentTabs';
 import { TopicSectionsSidebar } from '@/components/guide/TopicSectionsSidebar';
+import { GuideSidebar } from '@/components/guide/GuideSidebar';
 import { Chapter } from '@/app/guide/guide-data';
 
 export function ReadingLayout({
@@ -79,7 +80,9 @@ export function ReadingLayout({
       <div className="max-w-[1400px] mx-auto flex items-stretch mt-[10px]">
 
         {/* Left Navigation Sidebar */}
-        <ContentNavigationSidebar curriculum={curriculum} activeId={id} subjectTitle={textbookTitle} />
+        <div className="w-[280px] shrink-0 hidden lg:flex flex-col gap-5 sticky top-6 self-start max-h-[calc(100vh-3rem)] overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-slate-300 dark:[&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full pr-1">
+          <ContentNavigationSidebar curriculum={curriculum} activeId={id} subjectTitle={textbookTitle} />
+        </div>
 
         {/* Main Content Area */}
         <div className="flex-1 min-w-0">
@@ -100,8 +103,9 @@ export function ReadingLayout({
         </div>
 
         {/* Right Sections Sidebar */}
-        <div className="w-[300px] shrink-0 hidden lg:block sticky top-6 self-start max-h-[calc(100vh-3rem)] overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-slate-300 dark:[&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full pr-1">
+        <div className="w-[300px] shrink-0 hidden lg:flex flex-col gap-6 sticky top-6 self-start max-h-[calc(100vh-3rem)] overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-slate-300 dark:[&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full pr-1">
           <TopicSectionsSidebar sections={data.sections} />
+          <GuideSidebar subjects={subjects} activeId={id} classTitle={classTitle} />
         </div>
 
       </div>

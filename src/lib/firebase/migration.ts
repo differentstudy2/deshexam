@@ -31,11 +31,14 @@ export async function migrateTaxonomyNodesForSeo(onProgress?: (msg: string) => v
     for (const node of nodes) {
       const ancestors = getAncestors(node.parentId);
       
-      // Calculate local slug
-      const localSlug = node.slug || generateSlug(node.title || node.id);
+      // Check if existing slug is valid (only english lowercase, numbers, hyphens)
+      const isValidSlug = (s?: string) => s && /^[a-z0-9-]+$/.test(s);
+      
+      // Calculate local slug - force regenerate if existing slug contains invalid chars (like Bengali)
+      const localSlug = isValidSlug(node.slug) ? node.slug! : generateSlug(node.title || node.id);
       
       // Calculate full slug
-      const ancestorSlugs = ancestors.map(a => a.slug || generateSlug(a.title || a.id));
+      const ancestorSlugs = ancestors.map(a => isValidSlug(a.slug) ? a.slug! : generateSlug(a.title || a.id));
       const fullSlug = [...ancestorSlugs, localSlug].join('/');
 
       // Ancestor info array for rich breadcrumbs

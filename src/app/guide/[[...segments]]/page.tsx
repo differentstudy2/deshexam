@@ -83,7 +83,26 @@ export default async function GuidePage({ params }: { params: Promise<{ segments
     }
   }
 
-  if (!node) notFound();
+  if (!node) {
+    if (process.env.NODE_ENV === 'development') {
+      const { collection, getDocs, query } = await import('firebase/firestore');
+      const { db } = await import('@/lib/firebase/client');
+      const snap = await getDocs(query(collection(db, 'taxonomy_nodes')));
+      const allSlugs = snap.docs.map(d => d.data().fullSlug).filter(Boolean);
+      
+      return (
+        <div className="p-10 text-red-600 bg-red-50 min-h-screen">
+          <h1 className="text-2xl font-bold mb-4">404 - Node Not Found (Debug)</h1>
+          <p>Requested fullSlug: <strong>{requestedPath}</strong></p>
+          <h2 className="text-xl font-semibold mt-6 mb-2">Available fullSlugs in DB:</h2>
+          <ul className="list-disc pl-5 max-h-[60vh] overflow-y-auto text-sm bg-white p-4 rounded border break-all">
+            {allSlugs.map((s, idx) => <li key={`${s}-${idx}`}>{s}</li>)}
+          </ul>
+        </div>
+      );
+    }
+    notFound();
+  }
 
   // Helper to extract titles from ancestors array for Dashboard/ReadingLayout props
   const getAncestorTitle = (type: string) => node.ancestors?.find(a => a.type === type)?.title;
@@ -144,8 +163,8 @@ export default async function GuidePage({ params }: { params: Promise<{ segments
   }
 
   // If it's board, class, subject, textbook, show SubjectDashboard
-  const curriculum = node.type === 'textbook' && getAncestorTitle('textbook')
-    ? fullCurriculum.filter(c => c.title === getAncestorTitle('textbook'))
+  const curriculum = node.type === 'textbook'
+    ? fullCurriculum.filter(c => c.title === node.title)
     : fullCurriculum;
 
   return (
