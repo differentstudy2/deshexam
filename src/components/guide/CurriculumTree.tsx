@@ -47,17 +47,21 @@ export function CurriculumTree({ curriculum }: CurriculumTreeProps) {
                 "flex items-center justify-between py-3 px-2 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group border-b border-slate-100 dark:border-slate-800"
               )}
             >
-              <div 
-                onClick={() => toggleChapter(chapter.id)} 
-                className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
-              >
-                <ChevronsRight className={cn(
-                  "w-5 h-5 text-emerald-500 transition-transform duration-200",
-                  isChapterExpanded && "rotate-90"
-                )} />
-                <span className="font-semibold text-[17px] text-emerald-600 dark:text-emerald-400">
-                  {chapter.title}
-                </span>
+              <div className="flex items-center gap-2 flex-1">
+                <div 
+                  onClick={() => toggleChapter(chapter.id)} 
+                  className="cursor-pointer p-1 rounded-md hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-colors"
+                >
+                  <ChevronsRight className={cn(
+                    "w-5 h-5 text-emerald-500 transition-transform duration-200",
+                    isChapterExpanded && "rotate-90"
+                  )} />
+                </div>
+                <Link href={`/guide/${chapter.id}`} className="hover:opacity-80 transition-opacity">
+                  <span className="font-semibold text-[17px] text-emerald-600 dark:text-emerald-400 hover:underline">
+                    {chapter.title}
+                  </span>
+                </Link>
               </div>
               <div className="flex items-center gap-2">
                 <Button 

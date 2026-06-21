@@ -5,8 +5,7 @@ import { SidebarSubject } from '@/app/guide/guide-data';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/use-auth';
-import { getTaxonomyNodesByParent } from '@/lib/firebase/taxonomy';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, getDocs, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import { Loader2 } from 'lucide-react';
 
@@ -33,14 +32,21 @@ export function GuideSidebar({ subjects: initialSubjects, activeId, classTitle: 
           }
 
           // Fetch subjects/textbooks for this class
-          const classNodes = await getTaxonomyNodesByParent(userProfile.classId);
+          const q = query(
+            collection(db, "taxonomy_nodes"),
+            where("parentId", "==", userProfile.classId)
+          );
+          const snap = await getDocs(q);
+          const classNodes = snap.docs.map(d => ({ id: d.id, ...d.data() as any }));
+          
           // Get subjects or textbooks
           const relevantNodes = classNodes.filter(n => n.type === 'subject' || n.type === 'textbook');
+          relevantNodes.sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
           
           if (relevantNodes.length > 0) {
             setSubjects(relevantNodes.map(n => ({
               id: n.id,
-              title: n.title || (n as any).name,
+              title: n.title || n.name,
               countStr: '' // We could calculate this if needed
             })));
           }

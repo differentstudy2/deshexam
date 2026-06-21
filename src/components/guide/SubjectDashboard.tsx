@@ -17,6 +17,7 @@ export function SubjectDashboard({
   boardTitle,
   classTitle,
   subjectTitle,
+  textbookTitle,
   chapterTitle
 }: {
   id: string;
@@ -29,7 +30,7 @@ export function SubjectDashboard({
   textbookTitle?: string;
   chapterTitle?: string;
 }) {
-  const displayTitle = pageType === 'chapter' ? (chapterTitle || 'Chapter') : (subjectTitle || 'Subject');
+  const displayTitle = pageType === 'chapter' ? (chapterTitle || 'Chapter') : pageType === 'textbook' ? (textbookTitle || 'Textbook') : (subjectTitle || 'Subject');
 
   let treeData = curriculum;
   if (pageType === 'chapter') {
@@ -44,6 +45,15 @@ export function SubjectDashboard({
           type: 'topic',
           subtopics: []
         }))
+      })) as any;
+    }
+  } else if (pageType === 'textbook') {
+    const textbook = curriculum.find(c => c.id === id);
+    if (textbook) {
+      treeData = textbook.topics.map((ch: any) => ({
+        id: ch.id,
+        title: ch.title,
+        topics: ch.subtopics || []
       })) as any;
     }
   }
@@ -77,6 +87,16 @@ export function SubjectDashboard({
                 <>
                   <ChevronRight className="w-3.5 h-3.5 mx-2" />
                   <span className="hover:text-emerald-600 transition-colors cursor-pointer">{subjectTitle}</span>
+                </>
+              )}
+              {textbookTitle && (pageType === 'textbook' || pageType === 'chapter') && (
+                <>
+                  <ChevronRight className="w-3.5 h-3.5 mx-2" />
+                  {pageType === 'textbook' ? (
+                    <span className="text-slate-800 dark:text-slate-200">{textbookTitle}</span>
+                  ) : (
+                    <span className="hover:text-emerald-600 transition-colors cursor-pointer">{textbookTitle}</span>
+                  )}
                 </>
               )}
               {pageType === 'chapter' && chapterTitle && (
