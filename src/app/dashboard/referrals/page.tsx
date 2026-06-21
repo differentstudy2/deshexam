@@ -23,7 +23,12 @@ export default function ReferralsPage() {
   
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      setBaseUrl(window.location.origin);
+      // Use a public domain if on localhost, because Facebook blocks localhost sharing
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        setBaseUrl('https://deshexam.com');
+      } else {
+        setBaseUrl(window.location.origin);
+      }
     }
   }, []);
 
