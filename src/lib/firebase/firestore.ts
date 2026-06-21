@@ -2229,6 +2229,71 @@ export const updateTextbookProgress = async (userId: string, textbookId: string,
         throw new Error("Failed to update progress.");
     }
 }
+
+export const getUserSubjectsProgress = async (userId: string, userProfile?: any) => {
+    if (!userId || !userProfile?.classId) return [];
+    
+    try {
+        const subjQ = query(
+            collection(db, 'taxonomy_nodes'),
+            where('parentId', '==', userProfile.classId),
+            where('type', '==', 'subject')
+        );
+        const subjSnap = await getDocs(subjQ);
+        const subjectIds = subjSnap.docs.map(d => d.id);
+
+        let fetchedTextbooks: any[] = [];
+        if (subjectIds.length > 0) {
+            const chunks = [];
+            for (let i = 0; i < subjectIds.length; i += 10) {
+                chunks.push(subjectIds.slice(i, i + 10));
+            }
+            
+            for (const chunk of chunks) {
+                const tbQ = query(
+                    collection(db, 'taxonomy_nodes'),
+                    where('parentId', 'in', chunk),
+                    where('type', '==', 'textbook')
+                );
+                const tbSnap = await getDocs(tbQ);
+                fetchedTextbooks.push(...tbSnap.docs.map(doc => ({ id: doc.id, ...doc.data() as any })));
+            }
+        }
+        
+        fetchedTextbooks.sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
+
+        // Fetch textbook progress subcollection for extra data
+        const progressColRef = collection(db, 'users', userId, 'textbookProgress');
+        const progressSnap = await getDocs(progressColRef);
+        
+        const progressMap: Record<string, any> = {};
+        progressSnap.forEach(doc => {
+            progressMap[doc.id] = doc.data();
+        });
+
+        return fetchedTextbooks.map(fs => {
+            const stat = userProfile.subjectStats?.[fs.title] || {};
+            const progData = progressMap[fs.id];
+            
+            const totalAssumedChapters = 12;
+            const completedChapters = progData ? Object.keys(progData).length : 0;
+            const progressPct = stat.progress || (completedChapters > 0 ? Math.min((completedChapters / totalAssumedChapters) * 100, 100) : 0);
+
+            return {
+                id: fs.id,
+                name: fs.title || 'Unknown Subject',
+                progress: progressPct,
+                mcq: stat.mcq || { current: completedChapters * 5, total: totalAssumedChapters * 5 },
+                cq: stat.cq || { current: completedChapters * 2, total: totalAssumedChapters * 2 },
+                content: stat.content || { current: completedChapters, total: totalAssumedChapters },
+                started: stat.started || (progData ? 'In progress' : '')
+            };
+        });
+    } catch (error) {
+        console.error("Error fetching subject progress:", error);
+        return [];
+    }
+}
     
 export const deleteQuestionFromChapter = async (textbookId: string, chapterId: string, questionId: string) => {
     const chapterRef = doc(db, `textbooks/${textbookId}/chapters`, chapterId);

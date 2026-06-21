@@ -1,30 +1,38 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ChevronDown, ChevronUp, ArrowRight } from 'lucide-react';
-
-const subjects = [
-  { 
-    name: 'আমার বাংলা বই', 
-    progress: 0.28,
-    mcq: { current: 1, total: 356, pct: '0.28%' },
-    cq: { current: 0, total: 2774, pct: '' },
-    content: { current: 0, total: 29, pct: '' },
-    started: '5 days ago'
-  },
-  { name: 'English For Today', progress: 0.00, mcq: { current: 0, total: 100 }, cq: { current: 0, total: 50 }, content: { current: 0, total: 20 }, started: '' },
-  { name: 'প্রাথমিক গণিত', progress: 0.00, mcq: { current: 0, total: 100 }, cq: { current: 0, total: 50 }, content: { current: 0, total: 20 }, started: '' },
-  { name: 'প্রাথমিক বিজ্ঞান', progress: 0.00, mcq: { current: 0, total: 100 }, cq: { current: 0, total: 50 }, content: { current: 0, total: 20 }, started: '' },
-  { name: 'বাংলাদেশ ও বিশ্বপরিচয়', progress: 0.00, mcq: { current: 0, total: 100 }, cq: { current: 0, total: 50 }, content: { current: 0, total: 20 }, started: '' },
-  { name: 'ইসলাম শিক্ষা', progress: 0.00, mcq: { current: 0, total: 100 }, cq: { current: 0, total: 50 }, content: { current: 0, total: 20 }, started: '' },
-  { name: 'হিন্দুধর্ম শিক্ষা', progress: 0.00, mcq: { current: 0, total: 100 }, cq: { current: 0, total: 50 }, content: { current: 0, total: 20 }, started: '' },
-  { name: 'বৌদ্ধধর্ম শিক্ষা', progress: 0.00, mcq: { current: 0, total: 100 }, cq: { current: 0, total: 50 }, content: { current: 0, total: 20 }, started: '' },
-  { name: 'খ্রিষ্টধর্ম শিক্ষা', progress: 0.00, mcq: { current: 0, total: 100 }, cq: { current: 0, total: 50 }, content: { current: 0, total: 20 }, started: '' },
-];
+import { ChevronDown, ChevronUp, ArrowRight, Loader2 } from 'lucide-react';
+import { useAuth } from '@/hooks/use-auth';
+import { getUserSubjectsProgress } from '@/lib/firebase/firestore';
+import { Skeleton } from '@/components/ui/skeleton';
+import Link from 'next/link';
 
 export default function SubjectProgressPage() {
   const [openSubjects, setOpenSubjects] = useState<Record<string, boolean>>({});
+  const [subjects, setSubjects] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { user, userProfile } = useAuth();
+
+  useEffect(() => {
+    const fetchProgress = async () => {
+      if (user && userProfile) {
+        setLoading(true);
+        try {
+          const data = await getUserSubjectsProgress(user.uid, userProfile);
+          setSubjects(data);
+        } catch (error) {
+          console.error("Error fetching subject progress:", error);
+        } finally {
+          setLoading(false);
+        }
+      } else if (!user) {
+        setLoading(false);
+      }
+    };
+    
+    fetchProgress();
+  }, [user, userProfile]);
 
   const toggleSubject = (name: string) => {
     setOpenSubjects(prev => ({ ...prev, [name]: !prev[name] }));
@@ -39,7 +47,20 @@ export default function SubjectProgressPage() {
 
       {/* 3-Column Grid Layout */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-4 sm:px-0">
-        {subjects.map((sub, i) => {
+        {loading ? (
+            Array.from({ length: 6 }).map((_, idx) => (
+                <div key={idx} className="border border-slate-200 dark:border-slate-800 rounded-xl p-5 bg-white dark:bg-slate-900 shadow-sm h-20 flex items-center justify-between">
+                   <Skeleton className="h-5 w-1/2" />
+                   <Skeleton className="h-6 w-16" />
+                </div>
+            ))
+        ) : subjects.length === 0 ? (
+             <div className="col-span-full py-12 text-center text-slate-500 dark:text-slate-400">
+                <p>No subjects found for your class category.</p>
+                <Link href="/textbook-solutions" className="text-blue-600 hover:underline mt-2 inline-block">Explore Subjects</Link>
+             </div>
+        ) : (
+          subjects.map((sub, i) => {
           const isOpen = openSubjects[sub.name];
           
           if (isOpen) {
@@ -92,7 +113,9 @@ export default function SubjectProgressPage() {
                     {sub.started ? `Started: ${sub.started}` : 'Not started'}
                   </div>
                   <div className="text-[12px] font-bold text-blue-600 dark:text-blue-500 flex items-center gap-1 cursor-pointer hover:underline">
-                    View Report <ArrowRight className="w-3.5 h-3.5" />
+                    <Link href={`/textbook-solutions/${sub.id}`} className="flex items-center gap-1">
+                      View Report <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -114,7 +137,7 @@ export default function SubjectProgressPage() {
               </div>
             </div>
           );
-        })}
+        }))}
       </div>
     </div>
   );
