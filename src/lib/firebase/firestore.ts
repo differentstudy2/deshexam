@@ -2504,80 +2504,11 @@ export const awardXP = async (userId: string, actionType: XPActionType, customAm
         
         const newTotalXP = currentXP + xpAmount;
         let totalXPAwarded = xpAmount;
-        const newUnlockedAchievements: Achievement[] = [];
         
-        // Check for newly unlocked achievements
-        for (const achievement of ACHIEVEMENTS) {
-            if (currentAchievements.includes(achievement.id)) continue;
-            
-            let isUnlocked = false;
-            
-            if (achievement.metric === 'xp' && newTotalXP >= achievement.target) {
-                isUnlocked = true;
-            } else if (achievement.metric === 'referrals') {
-                const currentReferrals = userData.referralCount || 0;
-                if (currentReferrals >= achievement.target) {
-                    isUnlocked = true;
-                }
-            } else if (achievement.metric === 'streak_days') {
-                const currentStreak = userData.currentStreak || 0;
-                if (currentStreak >= achievement.target) {
-                    isUnlocked = true;
-                }
-            } else if (achievement.metric === 'exams_taken') {
-                const examsTaken = userData.examsTaken || 0;
-                if (examsTaken >= achievement.target) {
-                    isUnlocked = true;
-                }
-            } else if (achievement.metric === 'perfect_exams') {
-                const perfectExams = userData.perfectExams || 0;
-                if (perfectExams >= achievement.target) {
-                    isUnlocked = true;
-                }
-            } else if (achievement.metric === 'night_owl') {
-                const nightOwlCount = userData.nightOwlCount || 0;
-                if (nightOwlCount >= achievement.target) {
-                    isUnlocked = true;
-                }
-            } else if (achievement.metric === 'early_bird') {
-                const earlyBirdCount = userData.earlyBirdCount || 0;
-                if (earlyBirdCount >= achievement.target) {
-                    isUnlocked = true;
-                }
-            }
-            
-            if (isUnlocked) {
-                newUnlockedAchievements.push(achievement);
-            }
-        } // End of for loop
-
-        const newAchievementIdsToUnlock = [...currentAchievements, ...newUnlockedAchievements.map(a => a.id)];
-
-        // Prepare notifications for newly unlocked achievements
-        const newNotifications = newUnlockedAchievements.map(ach => ({
-            id: `notif_${ach.id}_${Date.now()}`,
-            type: 'achievement',
-            title: `Achievement Unlocked: ${ach.title}`,
-            desc: `You earned ${ach.rewardXP} bonus XP!`,
-            icon: ach.icon,
-            read: false,
-            createdAt: Date.now()
-        }));
-
-        // Calculate total XP (base + bonuses)
-        totalXPAwarded = xpAmount + newUnlockedAchievements.reduce((sum, ach) => sum + ach.rewardXP, 0);
-
         // Build the updates object
         const updates: any = {
             xp: increment(totalXPAwarded)
         };
-        
-        if (newUnlockedAchievements.length > 0) {
-            updates.achievements = newAchievementIdsToUnlock;
-            if (newNotifications.length > 0) {
-                updates.notifications = arrayUnion(...newNotifications);
-            }
-        }
 
         // Update the user document
         await updateDoc(userRef, updates);
@@ -2587,13 +2518,13 @@ export const awardXP = async (userId: string, actionType: XPActionType, customAm
             userId,
             actionType,
             amount: xpAmount,
-            bonusFromAchievements: totalXPAwarded - xpAmount,
-            unlockedAchievements: newAchievementIdsToUnlock,
+            bonusFromAchievements: 0,
+            unlockedAchievements: [],
             metadata: metadata || null,
             createdAt: serverTimestamp()
         });
 
-        return { xpAdded: totalXPAwarded, unlockedAchievements: newUnlockedAchievements };
+        return { xpAdded: totalXPAwarded, unlockedAchievements: [] };
     } catch (e) {
         console.error("Failed to award XP:", e);
         return { xpAdded: 0, unlockedAchievements: [] };

@@ -10,7 +10,7 @@ import { CheckCircle2, Lock, Trophy, Target, Star, Gift, Loader2 } from 'lucide-
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import Confetti from 'react-dom-confetti';
 import { db } from '@/lib/firebase/client';
-import { doc, updateDoc, arrayUnion, Timestamp } from 'firebase/firestore';
+import { doc, updateDoc, arrayUnion, Timestamp, increment } from 'firebase/firestore';
 
 export default function AchievementsPage() {
   const { user, userProfile } = useAuth();
@@ -68,9 +68,10 @@ export default function AchievementsPage() {
       
       const userRef = doc(db, 'users', user.uid);
       
-      // Update achievements and add notification
+      // Update achievements, award XP, and add notification
       await updateDoc(userRef, {
         achievements: arrayUnion(ach.id),
+        xp: increment(ach.rewardXP || 0),
         notifications: arrayUnion({
           id: Date.now().toString(),
           type: 'achievement',
@@ -167,11 +168,13 @@ export default function AchievementsPage() {
           
           // Determine current progress based on metric
           let rawCurrent = 0;
-          if (ach.metric === 'xp') {
-            rawCurrent = userProfile?.xp || 0;
-          } 
-          // Future metrics can be handled here:
-          // else if (ach.metric === 'exams_taken') { rawCurrent = userProfile?.stats?.examsTaken || 0; }
+          if (ach.metric === 'xp') rawCurrent = userProfile?.xp || 0;
+          else if (ach.metric === 'referrals') rawCurrent = userProfile?.referralCount || 0;
+          else if (ach.metric === 'streak_days') rawCurrent = userProfile?.currentStreak || 0;
+          else if (ach.metric === 'exams_taken') rawCurrent = userProfile?.examsTaken || 0;
+          else if (ach.metric === 'perfect_exams') rawCurrent = userProfile?.perfectExams || 0;
+          else if (ach.metric === 'night_owl') rawCurrent = userProfile?.nightOwlCount || 0;
+          else if (ach.metric === 'early_bird') rawCurrent = userProfile?.earlyBirdCount || 0;
           
           const current = unlocked ? ach.target : Math.min(rawCurrent, ach.target);
           const progressPct = (current / ach.target) * 100;
@@ -253,6 +256,12 @@ export default function AchievementsPage() {
             const isClaimable = !unlocked && (() => {
               let rawCurrent = 0;
               if (selectedAchievement.metric === 'xp') rawCurrent = userProfile?.xp || 0;
+              else if (selectedAchievement.metric === 'referrals') rawCurrent = userProfile?.referralCount || 0;
+              else if (selectedAchievement.metric === 'streak_days') rawCurrent = userProfile?.currentStreak || 0;
+              else if (selectedAchievement.metric === 'exams_taken') rawCurrent = userProfile?.examsTaken || 0;
+              else if (selectedAchievement.metric === 'perfect_exams') rawCurrent = userProfile?.perfectExams || 0;
+              else if (selectedAchievement.metric === 'night_owl') rawCurrent = userProfile?.nightOwlCount || 0;
+              else if (selectedAchievement.metric === 'early_bird') rawCurrent = userProfile?.earlyBirdCount || 0;
               return rawCurrent >= selectedAchievement.target;
             })();
             const ap = selectedAchievement.type === 'COMMON' ? 10 : selectedAchievement.type === 'RARE' ? 50 : selectedAchievement.type === 'EPIC' ? 100 : 500;
