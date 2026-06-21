@@ -62,6 +62,20 @@ const subjects = [
   { name: 'সংস্কৃত', progress: 0.00, mcq: { current: 0, total: 100 }, cq: { current: 0, total: 50 }, content: { current: 0, total: 20 }, started: '' },
 ];
 
+import { 
+  startOfMonth, 
+  endOfMonth, 
+  startOfWeek, 
+  endOfWeek, 
+  eachDayOfInterval, 
+  format, 
+  isSameMonth, 
+  isSameDay, 
+  subDays,
+  isAfter,
+  parseISO
+} from 'date-fns';
+
 import { ACHIEVEMENTS } from '@/lib/constants/achievements';
 import { awardXP, getUserProfile, checkDailyStreak, recordMockTest } from '@/lib/firebase/firestore';
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
@@ -85,27 +99,46 @@ export default function ProfilePage() {
     if (userProfile?.classId) {
       const fetchData = async () => {
         try {
-          const classDoc = await getDoc(doc(db, 'taxonomy', userProfile.classId));
+          const classDoc = await getDoc(doc(db, 'taxonomy_nodes', userProfile.classId));
           if (classDoc.exists()) {
-            setResolvedClassName(classDoc.data().name);
+            setResolvedClassName(classDoc.data().title);
           } else {
             setResolvedClassName(null);
           }
 
-          const q = query(
-            collection(db, 'taxonomy'),
+          const subjQ = query(
+            collection(db, 'taxonomy_nodes'),
             where('parentId', '==', userProfile.classId),
             where('type', '==', 'subject')
           );
-          const snap = await getDocs(q);
-          const fetchedSubjects = snap.docs.map(doc => ({ id: doc.id, ...doc.data() as any }));
-          fetchedSubjects.sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
+          const subjSnap = await getDocs(subjQ);
+          const subjectIds = subjSnap.docs.map(d => d.id);
+
+          let fetchedTextbooks: any[] = [];
+          if (subjectIds.length > 0) {
+            const chunks = [];
+            for (let i = 0; i < subjectIds.length; i += 10) {
+              chunks.push(subjectIds.slice(i, i + 10));
+            }
+            
+            for (const chunk of chunks) {
+              const tbQ = query(
+                collection(db, 'taxonomy_nodes'),
+                where('parentId', 'in', chunk),
+                where('type', '==', 'textbook')
+              );
+              const tbSnap = await getDocs(tbQ);
+              fetchedTextbooks.push(...tbSnap.docs.map(doc => ({ id: doc.id, ...doc.data() as any })));
+            }
+          }
           
-          const formattedSubjects = fetchedSubjects.map(fs => {
-            const stat = userProfile.subjectStats?.[fs.name] || {};
+          fetchedTextbooks.sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
+          
+          const formattedSubjects = fetchedTextbooks.map(fs => {
+            const stat = userProfile.subjectStats?.[fs.title] || {};
             return {
               id: fs.id,
-              name: fs.name,
+              name: fs.title,
               progress: stat.progress || 0,
               mcq: stat.mcq || { current: 0, total: 100 },
               cq: stat.cq || { current: 0, total: 50 },
@@ -424,17 +457,17 @@ export default function ProfilePage() {
             <CardContent>
               <div className="flex justify-between items-center mb-6">
                 <div className="flex items-center gap-2 text-xs font-bold text-teal-600">
-                  <span className="w-2 h-2 rounded-full bg-teal-500"></span> Jahanur Miah
+                  <span className="w-2 h-2 rounded-full bg-teal-500"></span> {user?.displayName || 'Student'}
                 </div>
-                <div className="text-xs font-bold text-slate-400">0 XP</div>
+                <div className="text-xs font-bold text-slate-400">{localProfile?.xp || 0} XP Total</div>
               </div>
               
               {/* Custom SVG Line Chart matching screenshot */}
               <div className="w-full h-[150px] relative mt-4">
                 {/* Y Axis labels */}
                 <div className="absolute left-0 top-0 bottom-6 flex flex-col justify-between text-[10px] text-slate-400 font-medium">
-                  <span>1.3</span>
-                  <span>1</span>
+                  <span>100</span>
+                  <span>50</span>
                   <span>0</span>
                 </div>
                 
@@ -442,10 +475,10 @@ export default function ProfilePage() {
                 <div className="absolute left-6 right-0 top-0 bottom-6">
                   {/* Grid lines */}
                   <div className="absolute w-full top-0 border-t border-slate-100 dark:border-slate-800"></div>
-                  <div className="absolute w-full top-[23%] border-t border-slate-100 dark:border-slate-800"></div>
+                  <div className="absolute w-full top-[50%] border-t border-slate-100 dark:border-slate-800"></div>
                   <div className="absolute w-full bottom-0 border-t-2 border-teal-500 z-10"></div>
                   
-                  {/* Data Points (all at Y=0 / bottom) */}
+                  {/* Data Points (all at Y=0 for now as history isn't tracked yet) */}
                   <div className="absolute bottom-0 w-full flex justify-between px-1 translate-y-1/2 z-20">
                     {[0,1,2,3,4,5,6].map(i => (
                       <div key={i} className="w-3 h-3 bg-teal-500 rounded-full border-2 border-white dark:border-slate-900"></div>
@@ -453,15 +486,13 @@ export default function ProfilePage() {
                   </div>
                 </div>
                 
-                {/* X Axis labels */}
+                {/* X Axis labels (Dynamic Last 7 Days) */}
                 <div className="absolute left-6 right-0 bottom-0 flex justify-between text-[10px] text-slate-400 font-medium px-0.5">
-                  <span>Sat</span>
-                  <span>Sun</span>
-                  <span>Mon</span>
-                  <span>Tue</span>
-                  <span>Wed</span>
-                  <span>Thu</span>
-                  <span>Fri</span>
+                  {[6,5,4,3,2,1,0].map(daysAgo => {
+                    const d = new Date();
+                    d.setDate(d.getDate() - daysAgo);
+                    return <span key={daysAgo}>{d.toLocaleDateString('en-US', { weekday: 'short' })}</span>;
+                  })}
                 </div>
               </div>
             </CardContent>
@@ -472,67 +503,88 @@ export default function ProfilePage() {
             <CardHeader className="py-4">
                <div className="flex justify-between items-center px-4">
                  <ChevronLeft className="w-4 h-4 text-slate-400 cursor-pointer" />
-                 <h3 className="font-bold text-sm text-slate-800 dark:text-slate-200">Streaks | June 2026</h3>
+                 <h3 className="font-bold text-sm text-slate-800 dark:text-slate-200">Streaks | {format(new Date(), 'MMMM yyyy')}</h3>
                  <ChevronRightIcon className="w-4 h-4 text-slate-400 cursor-pointer" />
                </div>
             </CardHeader>
             <CardContent className="px-8 pb-8">
                <div className="grid grid-cols-7 text-center gap-y-6">
                  {/* Weekday Headers */}
-                 <div className="text-xs font-bold text-slate-700 dark:text-slate-300">Sun</div>
-                 <div className="text-xs font-bold text-slate-700 dark:text-slate-300">Mon</div>
-                 <div className="text-xs font-bold text-slate-700 dark:text-slate-300">Tue</div>
-                 <div className="text-xs font-bold text-slate-700 dark:text-slate-300">Wed</div>
-                 <div className="text-xs font-bold text-slate-700 dark:text-slate-300">Thu</div>
-                 <div className="text-xs font-bold text-slate-700 dark:text-slate-300">Fri</div>
-                 <div className="text-xs font-bold text-slate-700 dark:text-slate-300">Sat</div>
+                 {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                   <div key={day} className="text-xs font-bold text-slate-700 dark:text-slate-300">{day}</div>
+                 ))}
                  
-                 {/* Dates Row 1 */}
-                 <div className="text-xs font-semibold text-slate-300 dark:text-slate-600">31</div>
-                 <div className="text-xs font-semibold text-slate-600 dark:text-slate-400">1</div>
-                 <div className="text-xs font-semibold text-slate-600 dark:text-slate-400">2</div>
-                 <div className="text-xs font-semibold text-slate-600 dark:text-slate-400">3</div>
-                 <div className="text-xs font-semibold text-slate-600 dark:text-slate-400">4</div>
-                 <div className="flex justify-center relative">
-                   <div className="w-7 h-7 bg-red-400 text-white rounded-full flex items-center justify-center text-xs font-bold -mt-1.5 shadow-sm shadow-red-400/50">5</div>
-                 </div>
-                 <div className="text-xs font-semibold text-slate-600 dark:text-slate-400">6</div>
-                 
-                 {/* Dates Row 2 */}
-                 <div className="text-xs font-semibold text-slate-600 dark:text-slate-400">7</div>
-                 <div className="text-xs font-semibold text-slate-600 dark:text-slate-400">8</div>
-                 <div className="text-xs font-semibold text-slate-600 dark:text-slate-400">9</div>
-                 <div className="text-xs font-semibold text-slate-600 dark:text-slate-400">10</div>
-                 <div className="text-xs font-semibold text-slate-600 dark:text-slate-400">11</div>
-                 <div className="text-xs font-semibold text-slate-600 dark:text-slate-400">12</div>
-                 <div className="text-xs font-semibold text-slate-600 dark:text-slate-400">13</div>
+                 {/* Calendar Grid */}
+                 {(() => {
+                   const today = new Date();
+                   const monthStart = startOfMonth(today);
+                   const monthEnd = endOfMonth(monthStart);
+                   const startDate = startOfWeek(monthStart);
+                   const endDate = endOfWeek(monthEnd);
+                   
+                   const dateFormat = "d";
+                   const days = eachDayOfInterval({
+                       start: startDate,
+                       end: endDate
+                   });
+                   
+                   // Determine active streak days to highlight
+                   const currentStreak = localProfile?.currentStreak || 0;
+                   let lastActiveDate = localProfile?.lastActiveDate;
+                   if (lastActiveDate && typeof lastActiveDate.toDate === 'function') {
+                     lastActiveDate = lastActiveDate.toDate();
+                   } else if (lastActiveDate) {
+                     lastActiveDate = new Date(lastActiveDate);
+                   }
+                   
+                   const activeStreakDates: Date[] = [];
+                   if (currentStreak > 0 && lastActiveDate) {
+                     for(let i=0; i<currentStreak; i++) {
+                       activeStreakDates.push(subDays(lastActiveDate, i));
+                     }
+                   }
 
-                 {/* Dates Row 3 */}
-                 <div className="text-xs font-semibold text-slate-600 dark:text-slate-400">14</div>
-                 <div className="text-xs font-semibold text-slate-600 dark:text-slate-400">15</div>
-                 <div className="text-xs font-semibold text-slate-600 dark:text-slate-400">16</div>
-                 <div className="text-xs font-semibold text-slate-600 dark:text-slate-400">17</div>
-                 <div className="text-xs font-semibold text-slate-600 dark:text-slate-400">18</div>
-                 <div className="text-xs font-semibold text-slate-600 dark:text-slate-400">19</div>
-                 <div className="text-xs font-semibold text-slate-600 dark:text-slate-400">20</div>
+                   return days.map((day, i) => {
+                     const isCurrentMonth = isSameMonth(day, monthStart);
+                     const isToday = isSameDay(day, today);
+                     const isStreakDay = activeStreakDates.some(streakDate => isSameDay(streakDate, day));
+                     
+                     let className = "text-xs font-semibold ";
+                     if (!isCurrentMonth) {
+                       className += "text-slate-300 dark:text-slate-600";
+                     } else if (isToday || isStreakDay) {
+                       className = ""; // We use a wrapper below
+                     } else {
+                       className += "text-slate-600 dark:text-slate-400";
+                     }
+                     
+                     if (isToday) {
+                       return (
+                         <div key={i} className="flex justify-center relative">
+                           <div className="w-7 h-7 bg-red-400 text-white rounded-full flex items-center justify-center text-xs font-bold -mt-1.5 shadow-sm shadow-red-400/50">
+                             {format(day, dateFormat)}
+                           </div>
+                         </div>
+                       );
+                     }
+                     
+                     if (isStreakDay) {
+                       return (
+                         <div key={i} className="flex justify-center relative">
+                           <div className="w-7 h-7 bg-orange-400 text-white rounded-full flex items-center justify-center text-xs font-bold -mt-1.5 shadow-sm shadow-orange-400/50">
+                             {format(day, dateFormat)}
+                           </div>
+                         </div>
+                       );
+                     }
 
-                 {/* Dates Row 4 */}
-                 <div className="text-xs font-semibold text-slate-600 dark:text-slate-400">21</div>
-                 <div className="text-xs font-semibold text-slate-600 dark:text-slate-400">22</div>
-                 <div className="text-xs font-semibold text-slate-600 dark:text-slate-400">23</div>
-                 <div className="text-xs font-semibold text-slate-600 dark:text-slate-400">24</div>
-                 <div className="text-xs font-semibold text-slate-600 dark:text-slate-400">25</div>
-                 <div className="text-xs font-semibold text-slate-600 dark:text-slate-400">26</div>
-                 <div className="text-xs font-semibold text-slate-600 dark:text-slate-400">27</div>
-
-                 {/* Dates Row 5 */}
-                 <div className="text-xs font-semibold text-slate-600 dark:text-slate-400">28</div>
-                 <div className="text-xs font-semibold text-slate-600 dark:text-slate-400">29</div>
-                 <div className="text-xs font-semibold text-slate-600 dark:text-slate-400">30</div>
-                 <div className="text-xs font-semibold text-slate-300 dark:text-slate-600">1</div>
-                 <div className="text-xs font-semibold text-slate-300 dark:text-slate-600">2</div>
-                 <div className="text-xs font-semibold text-slate-300 dark:text-slate-600">3</div>
-                 <div className="text-xs font-semibold text-slate-300 dark:text-slate-600">4</div>
+                     return (
+                       <div key={i} className={className}>
+                         {format(day, dateFormat)}
+                       </div>
+                     );
+                   });
+                 })()}
                </div>
             </CardContent>
           </Card>
