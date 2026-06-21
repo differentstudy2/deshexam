@@ -47,8 +47,8 @@ export async function createChallenge(
   numberOfQuestions: number,
   classId?: string
 ) {
-  // Fetch random questions for the subject
-  const allSubjectQuestions = await getQuestions({ subjectId: subjectId }, 100);
+  // Fetch random questions for the textbook
+  const allSubjectQuestions = await getQuestions({ textbookId: subjectId }, 100);
   // Shuffle and pick
   const shuffled = allSubjectQuestions.sort(() => 0.5 - Math.random());
   const selectedQuestions = shuffled.slice(0, numberOfQuestions).map(q => q.id);

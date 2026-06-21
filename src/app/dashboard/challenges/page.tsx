@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/hooks/use-auth';
 import { Challenge, getUserChallenges, createChallenge, getPublicChallenges, acceptPublicChallenge } from '@/lib/firebase/challenges';
-import { getTaxonomyNodes } from '@/lib/firebase/question-bank';
+import { getTaxonomyNodesByParent } from '@/lib/firebase/taxonomy';
 import { Swords, Trophy, Clock, CheckCircle, XCircle, Search, User as UserIcon, Loader2, Sparkles, Plus, AlertCircle, BookOpen, Globe } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -34,19 +34,13 @@ export default function ChallengesHubPage() {
   const [pageError, setPageError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function loadData() {
+    async function loadCoreData() {
       if (!user) return;
       try {
-        const [chData, subjData, pubData] = await Promise.all([
-          getUserChallenges(user.uid),
-          getTaxonomyNodes('subject'),
-          userProfile?.classId ? getPublicChallenges(userProfile.classId) : Promise.resolve([])
-        ]);
+        const chData = await getUserChallenges(user.uid);
         setChallenges(chData);
-        setSubjects(subjData);
-        setPublicChallenges(pubData);
       } catch (err: any) {
-        console.error("Failed to load challenges", err);
+        console.error("Failed to load core data", err);
         if (err.message && err.message.includes('requires an index')) {
           setPageError(err.message);
         } else {
@@ -56,8 +50,36 @@ export default function ChallengesHubPage() {
         setLoading(false);
       }
     }
-    loadData();
+    loadCoreData();
   }, [user]);
+
+  useEffect(() => {
+    async function loadClassData() {
+      if (!userProfile?.classId) return;
+      try {
+        // Fetch textbooks only for the user's class
+        const classSubjects = await getTaxonomyNodesByParent(userProfile.classId);
+        let classTextbooks: any[] = [];
+        for (const subj of classSubjects) {
+          if (subj.type === 'subject') {
+            const textbooks = await getTaxonomyNodesByParent(subj.id);
+            classTextbooks.push(...textbooks.filter(t => t.type === 'textbook'));
+          }
+        }
+        setSubjects(classTextbooks);
+
+        // Fetch public challenges for this class
+        const pubData = await getPublicChallenges(userProfile.classId);
+        setPublicChallenges(pubData);
+      } catch (err: any) {
+        console.error("Failed to load class data", err);
+        if (err.message && err.message.includes('requires an index')) {
+          setPageError(err.message);
+        }
+      }
+    }
+    loadClassData();
+  }, [userProfile?.classId]);
 
   // Handle Firebase Index Error Display
   if (pageError) {
@@ -132,15 +154,25 @@ export default function ChallengesHubPage() {
         oppAvatar,
         subjectId,
         mode,
-        parseInt(questionCount)
+        parseInt(questionCount),
+        userProfile.classId
       );
       
       setIsNewModalOpen(false);
-      // Navigate straight to the arena
-      router.push(`/dashboard/challenges/${challengeId}`);
+      
+      // Update local state temporarily for UX
+      if (mode === 'public') {
+        setActiveTab('public');
+      } else {
+        setActiveTab('sent');
+      }
     } catch (err: any) {
-      console.error(err);
-      setError(err.message || 'Failed to create challenge');
+      if (err.message && err.message.includes('requires an index')) {
+        setIsNewModalOpen(false);
+        setPageError(err.message);
+      } else {
+        setError(err.message || "Failed to create challenge");
+      }
     } finally {
       setCreating(false);
     }
