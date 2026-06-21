@@ -784,3 +784,23 @@ html {
   font-weight: 700;
   letter-spacing: -0.025em;
 }
+
+/* Custom scrollbar utility for specific areas that need visible scrolling */
+.show-scrollbar::-webkit-scrollbar {
+  display: block;
+  width: 6px;
+}
+.show-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.show-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 20px;
+}
+.dark .show-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #334155;
+}
+.show-scrollbar {
+  -ms-overflow-style: auto;
+  scrollbar-width: thin;
+}

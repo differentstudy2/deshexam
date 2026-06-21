@@ -31,6 +31,8 @@ export interface Challenge {
   rewardXp: number;
   createdAt: any;
   expiresAt: any;
+  classId?: string;
+  topicIds?: string[]; // Optional for backwards compatibility
 }
 
 export const CHALLENGES_COLLECTION = 'challenges';
@@ -45,16 +47,24 @@ export async function createChallenge(
   subjectId: string,
   mode: ChallengeMode,
   numberOfQuestions: number,
-  classId?: string
+  classId?: string,
+  topicIds?: string[]
 ) {
-  // Fetch random questions for the textbook
-  const allSubjectQuestions = await getQuestions({ textbookId: subjectId }, 100);
+  // Fetch up to 2000 questions for the textbook to avoid Firebase 'in' limits
+  const allSubjectQuestions = await getQuestions({ textbookId: subjectId }, 2000);
+  
+  // Filter questions by selected topics if provided
+  let filteredQuestions = allSubjectQuestions;
+  if (topicIds && topicIds.length > 0) {
+    filteredQuestions = allSubjectQuestions.filter(q => q.topicId && topicIds.includes(q.topicId));
+  }
+  
   // Shuffle and pick
-  const shuffled = allSubjectQuestions.sort(() => 0.5 - Math.random());
+  const shuffled = filteredQuestions.sort(() => 0.5 - Math.random());
   const selectedQuestions = shuffled.slice(0, numberOfQuestions).map(q => q.id);
 
   if (selectedQuestions.length === 0) {
-    throw new Error("No questions found for this subject.");
+    throw new Error("No questions found for the selected topics.");
   }
 
   // Expires in 24 hours
