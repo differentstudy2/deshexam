@@ -6,6 +6,9 @@ export type AcademicNodeType = 'board' | 'institution' | 'class' | 'subject' | '
 export type CompetitiveNodeType = 'category' | 'subcategory' | 'exam' | 'subject' | 'chapter' | 'topic';
 export type NodeType = AcademicNodeType | CompetitiveNodeType;
 
+export const VALID_CONTENT_TYPES = ['mcq', 'cq', 'notes', 'summary', 'practice', 'mock-test', 'video', 'pdf'] as const;
+export type ContentType = typeof VALID_CONTENT_TYPES[number];
+
 export interface TaxonomyNode {
   id: string;
   title: string;
@@ -17,6 +20,23 @@ export interface TaxonomyNode {
   grandParentId?: string | null; // Optional: helps to find items using grandparent ID
   orderIndex: number;
   status: 'active' | 'inactive' | 'published' | 'draft';
+  
+  // SEO & Routing Fields
+  fullSlug?: string;
+  boardSlug?: string | null;
+  classSlug?: string | null;
+  subjectSlug?: string | null;
+  bookSlug?: string | null;
+  chapterSlug?: string | null;
+  topicSlug?: string | null;
+  
+  // Rich Breadcrumbs support
+  ancestors?: { id: string, slug: string, title: string, type: string }[];
+  
+  // Indexing & Schema
+  isIndexable?: boolean;
+  schemaType?: string;
+
   
   // Optional fields used by specific node types
   icon?: string;
@@ -139,6 +159,21 @@ export const getTaxonomyNodesByTrack = async (track: TaxonomyTrack): Promise<Tax
   const snap = await getDocs(q);
   const nodes = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as TaxonomyNode));
   return nodes.sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
+};
+
+export const getTaxonomyNodeBySlug = async (fullSlug: string): Promise<TaxonomyNode | null> => {
+  try {
+    const q = query(collection(db, 'taxonomy_nodes'), where('fullSlug', '==', fullSlug));
+    const snap = await getDocs(q);
+    if (!snap.empty) {
+      const doc = snap.docs[0];
+      return { id: doc.id, ...doc.data() } as TaxonomyNode;
+    }
+    return null;
+  } catch (error) {
+    console.error("Error fetching taxonomy node by slug:", error);
+    return null;
+  }
 };
 
 export const getTaxonomyNodesByType = async (track: TaxonomyTrack, type: NodeType): Promise<TaxonomyNode[]> => {

@@ -45,7 +45,7 @@ export function GuideSidebar({ subjects: initialSubjects, activeId, classTitle: 
           
           if (relevantNodes.length > 0) {
             setSubjects(relevantNodes.map(n => ({
-              id: n.id,
+              id: n.fullSlug || n.id,
               title: n.title || n.name,
               countStr: '' // We could calculate this if needed
             })));
