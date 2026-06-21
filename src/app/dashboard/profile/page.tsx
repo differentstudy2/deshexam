@@ -29,7 +29,7 @@ import { useAuth } from '@/hooks/use-auth';
 // MOCK DATA
 const subjects = [
   { 
-    name: 'সাহিত্য কণিকা', 
+    name: 'Literature Kanika', 
     progress: 0.96,
     mcq: { current: 10, total: 2389, pct: '0.42%' },
     cq: { current: 0, total: 1845, pct: '' },
@@ -37,7 +37,7 @@ const subjects = [
     started: '4 months ago'
   },
   { 
-    name: 'আনন্দ পাঠ(বাংলা দ্রুত পঠন)', 
+    name: 'Joyful Reading (Bengali Rapid Reader)', 
     progress: 0.00,
     mcq: { current: 0, total: 255, pct: '' },
     cq: { current: 0, total: 118, pct: '' },
@@ -45,7 +45,7 @@ const subjects = [
     started: ''
   },
   { 
-    name: 'বাংলা ব্যাকরণ ও নির্মিতি', 
+    name: 'Bengali Grammar and Composition', 
     progress: 0.29,
     mcq: { current: 2, total: 700, pct: '0.29%' },
     cq: { current: 0, total: 385, pct: '' },
@@ -54,12 +54,12 @@ const subjects = [
   },
   { name: 'English for Today', progress: 0.00, mcq: { current: 0, total: 100 }, cq: { current: 0, total: 50 }, content: { current: 0, total: 20 }, started: '' },
   { name: 'English Grammar and C...', progress: 0.00, mcq: { current: 0, total: 100 }, cq: { current: 0, total: 50 }, content: { current: 0, total: 20 }, started: '' },
-  { name: 'গণিত', progress: 0.00, mcq: { current: 0, total: 100 }, cq: { current: 0, total: 50 }, content: { current: 0, total: 20 }, started: '' },
-  { name: 'তথ্য ও যোগাযোগ প্রযুক্তি', progress: 0.00, mcq: { current: 0, total: 100 }, cq: { current: 0, total: 50 }, content: { current: 0, total: 20 }, started: '' },
-  { name: 'বাংলাদেশ ও বিশ্বপরিচয়', progress: 0.00, mcq: { current: 0, total: 100 }, cq: { current: 0, total: 50 }, content: { current: 0, total: 20 }, started: '' },
-  { name: 'বিজ্ঞান', progress: 0.05, mcq: { current: 1, total: 100 }, cq: { current: 0, total: 50 }, content: { current: 0, total: 20 }, started: '' },
-  { name: 'আরবি', progress: 0.00, mcq: { current: 0, total: 100 }, cq: { current: 0, total: 50 }, content: { current: 0, total: 20 }, started: '' },
-  { name: 'সংস্কৃত', progress: 0.00, mcq: { current: 0, total: 100 }, cq: { current: 0, total: 50 }, content: { current: 0, total: 20 }, started: '' },
+  { name: 'Mathematics', progress: 0.00, mcq: { current: 0, total: 100 }, cq: { current: 0, total: 50 }, content: { current: 0, total: 20 }, started: '' },
+  { name: 'Information and Communication Technology', progress: 0.00, mcq: { current: 0, total: 100 }, cq: { current: 0, total: 50 }, content: { current: 0, total: 20 }, started: '' },
+  { name: 'Bangladesh and Global Studies', progress: 0.00, mcq: { current: 0, total: 100 }, cq: { current: 0, total: 50 }, content: { current: 0, total: 20 }, started: '' },
+  { name: 'Science', progress: 0.05, mcq: { current: 1, total: 100 }, cq: { current: 0, total: 50 }, content: { current: 0, total: 20 }, started: '' },
+  { name: 'Arabic', progress: 0.00, mcq: { current: 0, total: 100 }, cq: { current: 0, total: 50 }, content: { current: 0, total: 20 }, started: '' },
+  { name: 'Sanskrit', progress: 0.00, mcq: { current: 0, total: 100 }, cq: { current: 0, total: 50 }, content: { current: 0, total: 20 }, started: '' },
 ];
 
 import { 
@@ -312,11 +312,11 @@ export default function ProfilePage() {
           <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-2xl relative transition-all duration-300">
             <div className="p-5 flex justify-between items-start md:items-center flex-col md:flex-row gap-4">
               <div>
-                <h3 className="font-bold text-purple-800 dark:text-purple-300 text-lg">প্রিমিয়াম প্যাকেজে আপগ্রেড করুন</h3>
-                <p className="text-xs font-medium text-purple-600/70 dark:text-purple-400 mt-1">সকল ফিচারে এক্সেস পেতে যেকোনো একটি প্যাকেজ সাবস্ক্রাইব করুন।</p>
+                <h3 className="font-bold text-purple-800 dark:text-purple-300 text-lg">Upgrade to Premium Package</h3>
+                <p className="text-xs font-medium text-purple-600/70 dark:text-purple-400 mt-1">Subscribe to any package to get access to all features.</p>
               </div>
               <Button className="bg-[#a855f7] hover:bg-[#9333ea] text-white rounded-full font-bold px-6 shadow-md shadow-purple-500/20 shrink-0">
-                সাবস্ক্রাইব করুন
+                Subscribe Now
               </Button>
             </div>
             
@@ -326,33 +326,33 @@ export default function ProfilePage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8">
                   <div className="space-y-4">
                     <div className="flex items-center gap-3 text-sm font-bold text-slate-800 dark:text-slate-200">
-                      <Check className="w-4 h-4 text-green-500 shrink-0" strokeWidth={3} /> বিগত বছরের প্রশ্ন
+                      <Check className="w-4 h-4 text-green-500 shrink-0" strokeWidth={3} /> Previous Years' Questions
                     </div>
                     <div className="flex items-center gap-3 text-sm font-bold text-slate-800 dark:text-slate-200">
-                      <Check className="w-4 h-4 text-green-500 shrink-0" strokeWidth={3} /> আনলিমিটেড পরীক্ষা ও ব্যাখ্যা
+                      <Check className="w-4 h-4 text-green-500 shrink-0" strokeWidth={3} /> Unlimited Exams & Explanations
                     </div>
                     <div className="flex items-center gap-3 text-sm font-bold text-slate-800 dark:text-slate-200">
-                      <Check className="w-4 h-4 text-green-500 shrink-0" strokeWidth={3} /> ডাউট সলভিং চ্যাট AI
+                      <Check className="w-4 h-4 text-green-500 shrink-0" strokeWidth={3} /> Doubt Solving AI Chat
                     </div>
                     <div className="flex items-center gap-3 text-sm font-bold text-slate-800 dark:text-slate-200">
-                      <Check className="w-4 h-4 text-green-500 shrink-0" strokeWidth={3} /> ইচ্ছেমত কাস্টম মক টেস্ট
+                      <Check className="w-4 h-4 text-green-500 shrink-0" strokeWidth={3} /> Custom Mock Tests on Demand
                     </div>
                   </div>
                   <div className="space-y-4">
                     <div className="flex items-center gap-3 text-sm font-bold text-slate-800 dark:text-slate-200">
-                      <Check className="w-4 h-4 text-green-500 shrink-0" strokeWidth={3} /> অ্যাড ফ্রি কনটেন্ট ও ∞ পেজ ভিউ
+                      <Check className="w-4 h-4 text-green-500 shrink-0" strokeWidth={3} /> Ad-free Content & ∞ Page Views
                     </div>
                     <div className="flex items-center gap-3 text-sm font-bold text-slate-800 dark:text-slate-200">
-                      <Check className="w-4 h-4 text-green-500 shrink-0" strokeWidth={3} /> DeshExam (বুক ডাউনলোড)
+                      <Check className="w-4 h-4 text-green-500 shrink-0" strokeWidth={3} /> DeshExam (Book Downloads)
                     </div>
                     <div className="flex items-center gap-3 text-sm font-bold text-slate-800 dark:text-slate-200">
-                      <Check className="w-4 h-4 text-green-500 shrink-0" strokeWidth={3} /> প্রিমিয়াম ভিডিও কোর্স ও মডেল টেস্ট
+                      <Check className="w-4 h-4 text-green-500 shrink-0" strokeWidth={3} /> Premium Video Courses & Model Tests
                     </div>
                     <div className="flex items-center gap-3 text-sm font-bold text-slate-800 dark:text-slate-200">
-                      <Check className="w-4 h-4 text-green-500 shrink-0" strokeWidth={3} /> সারা দেশব্যাপী লিডারবোর্ড
+                      <Check className="w-4 h-4 text-green-500 shrink-0" strokeWidth={3} /> Nationwide Leaderboard
                     </div>
                     <div className="flex items-center gap-3 text-sm font-bold text-slate-800 dark:text-slate-200">
-                      <Check className="w-4 h-4 text-green-500 shrink-0" strokeWidth={3} /> ২৪/৭ লাইভ সাপোর্ট
+                      <Check className="w-4 h-4 text-green-500 shrink-0" strokeWidth={3} /> 24/7 Live Support
                     </div>
                   </div>
                 </div>
