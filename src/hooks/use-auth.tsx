@@ -23,10 +23,11 @@ import {
   sendEmailVerification,
 } from "firebase/auth";
 import { useFirebaseAuth } from "@/hooks/use-firebase";
-import { updateUserProfile } from "@/lib/firebase/firestore";
+import { updateUserProfile, getUserProfile } from "@/lib/firebase/firestore";
 
 interface AuthContextType {
   user: User | null;
+  userProfile: any | null;
   loading: boolean;
   signUp: (email: string, password: string) => Promise<any>;
   signIn: (email: string, password: string) => Promise<any>;
@@ -39,6 +40,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
+  userProfile: null,
   loading: true,
   signUp: async () => {},
   signIn: async () => {},
@@ -61,6 +63,12 @@ const handleNewUser = async (credential: UserCredential) => {
             following: [],
             followersCount: 0,
             followingCount: 0,
+            xp: 0,
+            role: 'user',
+            isOnboarded: false,
+            profileType: null,
+            boardId: null,
+            classId: null,
         };
         await updateUserProfile(user.uid, userProfile);
     }
@@ -69,6 +77,7 @@ const handleNewUser = async (credential: UserCredential) => {
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const auth = useFirebaseAuth();
   const [user, setUser] = useState<User | null>(null);
+  const [userProfile, setUserProfile] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
 
   const signUp = async (email: string, password: string) => {
@@ -121,8 +130,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         // Auth might not be initialized yet, so we wait.
         return;
     }
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
+      if (user) {
+        const profile = await getUserProfile(user.uid);
+        setUserProfile(profile);
+      } else {
+        setUserProfile(null);
+      }
       setLoading(false);
 
       if (!user) {
@@ -160,7 +175,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [auth]);
 
   return (
-    <AuthContext.Provider value={{ user, loading, signUp, signIn, signInWithGoogle, signInWithGoogleOneTap, resetPassword, confirmPasswordReset: confirmPasswordResetAction, logOut }}>
+    <AuthContext.Provider value={{ user, userProfile, loading, signUp, signIn, signInWithGoogle, signInWithGoogleOneTap, resetPassword, confirmPasswordReset: confirmPasswordResetAction, logOut }}>
       {children}
     </AuthContext.Provider>
   );

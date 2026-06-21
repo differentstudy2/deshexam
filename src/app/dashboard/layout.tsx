@@ -25,7 +25,7 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, loading, logOut } = useAuth();
+  const { user, userProfile, loading, logOut } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const [verifying, setVerifying] = useState(true);
@@ -34,11 +34,13 @@ export default function DashboardLayout({
     if (!loading) {
       if (!user) {
         router.push('/sign-in');
+      } else if (userProfile && !userProfile.isOnboarded) {
+        router.push('/onboarding');
       } else {
         setVerifying(false);
       }
     }
-  }, [user, loading, router]);
+  }, [user, userProfile, loading, router]);
   
   if (verifying) {
     return (
@@ -75,7 +77,7 @@ export default function DashboardLayout({
                     
                     <div className="ml-auto flex items-center space-x-2 md:space-x-4">
                         <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-50 border border-orange-100 text-orange-600 font-bold text-sm">
-                            <span className="text-orange-500">🔥</span> 30 XP
+                            <span className="text-orange-500">🔥</span> {userProfile?.xp || 0} XP
                         </div>
                         
                         <Button variant="ghost" size="icon" className="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 hidden sm:flex rounded-full">

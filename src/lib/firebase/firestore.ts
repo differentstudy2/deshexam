@@ -624,6 +624,13 @@ export const addTestSubmission = async (submissionData: any) => {
             userId: user.uid,
             submittedAt: serverTimestamp(),
         });
+        
+        // Add 10 XP to the user
+        const userRef = doc(db, "users", user.uid);
+        await updateDoc(userRef, {
+            xp: increment(10)
+        });
+
         return docRef.id;
     } catch (e) {
         console.error("Error adding document: ", e);
@@ -658,6 +665,13 @@ export const addPracticeSetSubmission = async (submissionData: any) => {
 
         const cleanedData = cleanDataForFirebase(dataToSave);
         const docRef = await addDoc(collection(db, "practiceSetSubmissions"), cleanedData);
+
+        // Add 5 XP to the user
+        const userRef = doc(db, "users", user.uid);
+        await updateDoc(userRef, {
+            xp: increment(5)
+        });
+
         return docRef.id;
     } catch (e) {
         console.error("Error adding practice set submission: ", e);
