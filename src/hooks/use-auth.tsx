@@ -23,15 +23,15 @@ import {
   sendEmailVerification,
 } from "firebase/auth";
 import { useFirebaseAuth } from "@/hooks/use-firebase";
-import { updateUserProfile, getUserProfile } from "@/lib/firebase/firestore";
+import { updateUserProfile, getUserProfile, processReferral } from "@/lib/firebase/firestore";
 
 interface AuthContextType {
   user: User | null;
   userProfile: any | null;
   loading: boolean;
-  signUp: (email: string, password: string) => Promise<any>;
+  signUp: (email: string, password: string, referralCode?: string) => Promise<any>;
   signIn: (email: string, password: string) => Promise<any>;
-  signInWithGoogle: () => Promise<any>;
+  signInWithGoogle: (referralCode?: string) => Promise<any>;
   signInWithGoogleOneTap: (credentialResponse: any) => Promise<any>;
   resetPassword: (email: string) => Promise<any>;
   confirmPasswordReset: (oobCode: string, newPassword: string) => Promise<any>;
@@ -54,6 +54,9 @@ const AuthContext = createContext<AuthContextType>({
 const handleNewUser = async (credential: UserCredential) => {
     const user = credential.user;
     if (user) {
+        // Generate a 6-character random referral code (alphanumeric)
+        const referralCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+        
         const userProfile = {
             displayName: user.displayName || user.email?.split('@')[0] || 'New User',
             email: user.email,
@@ -65,6 +68,8 @@ const handleNewUser = async (credential: UserCredential) => {
             followingCount: 0,
             xp: 0,
             achievements: [],
+            referralCode: referralCode,
+            referralCount: 0,
             role: 'user',
             isOnboarded: false,
             profileType: null,
@@ -81,10 +86,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [userProfile, setUserProfile] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const signUp = async (email: string, password: string) => {
+  const signUp = async (email: string, password: string, referralCode?: string) => {
     if (!auth) throw new Error("Auth service is not available");
     const credential = await createUserWithEmailAndPassword(auth, email, password);
     await handleNewUser(credential);
+    
+    // Process referral if provided
+    if (referralCode) {
+        await processReferral(credential.user.uid, referralCode);
+    }
+    
     // Automatically send verification email upon sign up
     await sendEmailVerification(credential.user);
     return credential;
@@ -95,11 +106,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return signInWithEmailAndPassword(auth, email, password);
   };
 
-  const signInWithGoogle = async () => {
+  const signInWithGoogle = async (referralCode?: string) => {
     if (!auth) throw new Error("Auth service is not available");
     const provider = new GoogleAuthProvider();
     const credential = await signInWithPopup(auth, provider);
     await handleNewUser(credential);
+    
+    // Process referral if provided
+    if (referralCode) {
+        await processReferral(credential.user.uid, referralCode);
+    }
+    
     return credential;
   };
 

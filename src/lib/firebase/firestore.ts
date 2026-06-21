@@ -2507,9 +2507,23 @@ export const awardXP = async (userId: string, actionType: XPActionType, customAm
         const newUnlockedAchievements: Achievement[] = [];
         const achievementIdsToUnlock: string[] = [];
         
-        // Check for newly unlocked XP achievements
+        // Check for newly unlocked achievements
         for (const achievement of ACHIEVEMENTS) {
-            if (achievement.metric === 'xp' && newTotalXP >= achievement.target && !currentAchievements.includes(achievement.id)) {
+            if (currentAchievements.includes(achievement.id)) continue;
+            
+            let isUnlocked = false;
+            
+            if (achievement.metric === 'xp' && newTotalXP >= achievement.target) {
+                isUnlocked = true;
+            } else if (achievement.metric === 'referrals') {
+                // For referral achievement checks
+                const currentReferrals = userData.referralCount || 0;
+                if (currentReferrals >= achievement.target) {
+                    isUnlocked = true;
+                }
+            }
+            
+            if (isUnlocked) {
                 newUnlockedAchievements.push(achievement);
                 achievementIdsToUnlock.push(achievement.id);
                 totalXPAwarded += achievement.rewardXP; // Give bonus XP for unlocking
@@ -2542,5 +2556,56 @@ export const awardXP = async (userId: string, actionType: XPActionType, customAm
     } catch (e) {
         console.error("Failed to award XP:", e);
         return { xpAdded: 0, unlockedAchievements: [] };
+    }
+};
+
+/**
+ * Processes a referral code used by a new user during signup.
+ * @param newUserId The UID of the newly registered user
+ * @param referrerCode The referral code provided
+ * @returns boolean indicating success
+ */
+export const processReferral = async (newUserId: string, referrerCode: string): Promise<boolean> => {
+    if (!newUserId || !referrerCode) return false;
+    
+    try {
+        // Find referrer by referralCode
+        const q = query(collection(db, "users"), where("referralCode", "==", referrerCode), limit(1));
+        const querySnapshot = await getDocs(q);
+        
+        if (querySnapshot.empty) return false;
+        
+        const referrerDoc = querySnapshot.docs[0];
+        const referrerId = referrerDoc.id;
+        
+        // Prevent self-referral
+        if (referrerId === newUserId) return false;
+        
+        // Add to referrals collection for audit
+        await addDoc(collection(db, "referrals"), {
+            referrerId,
+            referredUserId: newUserId,
+            createdAt: serverTimestamp()
+        });
+        
+        // Update referrer's referralCount
+        await updateDoc(doc(db, "users", referrerId), {
+            referralCount: increment(1)
+        });
+        
+        // Update the new user's profile to mark who referred them
+        // Using setDoc with merge: true so that simulated dummy users don't cause an error
+        await setDoc(doc(db, "users", newUserId), {
+            referredBy: referrerId
+        }, { merge: true });
+        
+        // Award 100 XP to the referrer
+        // This will also trigger the achievement check for 'referrals' since we updated referralCount
+        await awardXP(referrerId, 'CUSTOM', 100, { description: `Successful Referral Bonus` });
+        
+        return true;
+    } catch (e) {
+        console.error("Failed to process referral:", e);
+        return false;
     }
 };
