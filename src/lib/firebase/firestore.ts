@@ -2516,9 +2516,13 @@ export const awardXP = async (userId: string, actionType: XPActionType, customAm
             if (achievement.metric === 'xp' && newTotalXP >= achievement.target) {
                 isUnlocked = true;
             } else if (achievement.metric === 'referrals') {
-                // For referral achievement checks
                 const currentReferrals = userData.referralCount || 0;
                 if (currentReferrals >= achievement.target) {
+                    isUnlocked = true;
+                }
+            } else if (achievement.metric === 'streak_days') {
+                const currentStreak = userData.currentStreak || 0;
+                if (currentStreak >= achievement.target) {
                     isUnlocked = true;
                 }
             }
@@ -2607,5 +2611,78 @@ export const processReferral = async (newUserId: string, referrerCode: string): 
     } catch (e) {
         console.error("Failed to process referral:", e);
         return false;
+    }
+};
+
+/**
+ * Checks and updates the user's daily login streak.
+ * Called automatically when the app loads or user signs in.
+ * @param userId The user ID
+ * @param simulateNextDay If true, simulates logging in tomorrow
+ * @returns Object with the updated streak info and any XP awarded
+ */
+export const checkDailyStreak = async (userId: string, simulateNextDay: boolean = false) => {
+    if (!userId) return null;
+    try {
+        const userRef = doc(db, "users", userId);
+        const userDoc = await getDoc(userRef);
+        
+        if (!userDoc.exists()) return null;
+        
+        const userData = userDoc.data();
+        let lastActive = userData.lastActiveDate?.toDate() || null;
+        let currentStreak = userData.currentStreak || 0;
+        let longestStreak = userData.longestStreak || 0;
+        
+        const now = new Date();
+        if (simulateNextDay) {
+            // For testing: Pretend today is the day AFTER their last active date, or tomorrow if they have no last active date
+            if (lastActive) {
+                now.setTime(lastActive.getTime() + 24 * 60 * 60 * 1000);
+            } else {
+                now.setTime(now.getTime() + 24 * 60 * 60 * 1000);
+            }
+        }
+        
+        const todayStr = format(now, 'yyyy-MM-dd');
+        const lastActiveStr = lastActive ? format(lastActive, 'yyyy-MM-dd') : null;
+        
+        if (lastActiveStr === todayStr) {
+            // Already logged in today, do nothing
+            return { currentStreak, longestStreak, xpAwarded: 0 };
+        }
+        
+        // Check if yesterday
+        const yesterday = new Date(now);
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayStr = format(yesterday, 'yyyy-MM-dd');
+        
+        if (lastActiveStr === yesterdayStr) {
+            // Logged in yesterday, increment streak
+            currentStreak += 1;
+        } else {
+            // Missed a day (or first time logging in), reset streak to 1
+            currentStreak = 1;
+        }
+        
+        if (currentStreak > longestStreak) {
+            longestStreak = currentStreak;
+        }
+        
+        // Update user document
+        await updateDoc(userRef, {
+            lastActiveDate: simulateNextDay ? now : serverTimestamp(),
+            currentStreak,
+            longestStreak
+        });
+        
+        // Award 10 XP for daily login
+        // This will also trigger the achievement check for 'streak_days' since we just updated currentStreak!
+        const xpResult = await awardXP(userId, 'DAILY_LOGIN_STREAK', 10, { description: `Daily Login Streak: ${currentStreak} days` });
+        
+        return { currentStreak, longestStreak, xpAwarded: xpResult.xpAdded };
+    } catch (e) {
+        console.error("Failed to check daily streak:", e);
+        return null;
     }
 };

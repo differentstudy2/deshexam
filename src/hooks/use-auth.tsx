@@ -23,7 +23,12 @@ import {
   sendEmailVerification,
 } from "firebase/auth";
 import { useFirebaseAuth } from "@/hooks/use-firebase";
-import { updateUserProfile, getUserProfile, processReferral } from "@/lib/firebase/firestore";
+import {
+  getUserProfile,
+  updateUserProfile,
+  checkDailyStreak,
+  processReferral,
+} from "@/lib/firebase/firestore";
 
 interface AuthContextType {
   user: User | null;
@@ -70,6 +75,9 @@ const handleNewUser = async (credential: UserCredential) => {
             achievements: [],
             referralCode: referralCode,
             referralCount: 0,
+            currentStreak: 0,
+            longestStreak: 0,
+            lastActiveDate: null,
             role: 'user',
             isOnboarded: false,
             profileType: null,
@@ -151,6 +159,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
       if (user) {
+        // Run streak check in background
+        await checkDailyStreak(user.uid);
+        
         const profile = await getUserProfile(user.uid);
         setUserProfile(profile);
       } else {

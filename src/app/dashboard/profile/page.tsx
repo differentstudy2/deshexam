@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -17,6 +17,10 @@ import {
   MinusCircle,
   ChevronLeft,
   ChevronRight as ChevronRightIcon,
+  BookOpen,
+  Calendar,
+  Lock,
+  Clock,
   Check,
   Star
 } from 'lucide-react';
@@ -59,7 +63,7 @@ const subjects = [
 ];
 
 import { ACHIEVEMENTS } from '@/lib/constants/achievements';
-import { awardXP } from '@/lib/firebase/firestore';
+import { awardXP, getUserProfile, checkDailyStreak } from '@/lib/firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 
 export default function ProfilePage() {
@@ -68,6 +72,12 @@ export default function ProfilePage() {
   const [isUpgradeOpen, setIsUpgradeOpen] = useState(false);
   const [openSubjects, setOpenSubjects] = useState<Record<string, boolean>>({});
   const [isAddingXp, setIsAddingXp] = useState(false);
+  const [isSimulatingNextDay, setIsSimulatingNextDay] = useState(false);
+  const [localProfile, setLocalProfile] = useState<any>(userProfile);
+
+  useEffect(() => {
+    setLocalProfile(userProfile);
+  }, [userProfile]);
 
   const handleSimulateXP = async () => {
     if (!user) return;
@@ -88,10 +98,46 @@ export default function ProfilePage() {
           description: `Keep up the good work!`,
         });
       }
+      const updatedProfile = await getUserProfile(user.uid);
+      setLocalProfile(updatedProfile);
     } catch (e) {
       console.error(e);
     } finally {
       setIsAddingXp(false);
+    }
+  };
+
+  const handleSimulateNextDay = async () => {
+    if (!user) return;
+    setIsSimulatingNextDay(true);
+    try {
+      const result = await checkDailyStreak(user.uid, true);
+      if (result) {
+        if (result.xpAwarded > 0) {
+          toast({
+            title: "Next Day Logged!",
+            description: `You earned ${result.xpAwarded} XP for your login streak. Current Streak: ${result.currentStreak} days.`,
+            variant: "default",
+          });
+        } else {
+          toast({
+            title: "Simulated Next Day",
+            description: `Streak is now ${result.currentStreak} days.`,
+            variant: "default",
+          });
+        }
+        const updatedProfile = await getUserProfile(user.uid);
+        setLocalProfile(updatedProfile);
+      }
+    } catch (e) {
+      console.error(e);
+      toast({
+        title: "Error",
+        description: "Failed to simulate next day login.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSimulatingNextDay(false);
     }
   };
 
@@ -209,7 +255,15 @@ export default function ProfilePage() {
             </button>
           </div>
 
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-2">
+            <Button 
+              onClick={handleSimulateNextDay} 
+              disabled={isSimulatingNextDay}
+              className="bg-purple-500 hover:bg-purple-600 text-white font-bold rounded-full shadow-sm"
+            >
+              <Clock className="w-4 h-4 mr-2" />
+              {isSimulatingNextDay ? 'Simulating...' : 'Simulate Next Day'}
+            </Button>
             <Button 
               onClick={handleSimulateXP} 
               disabled={isAddingXp}
@@ -227,25 +281,25 @@ export default function ProfilePage() {
               <Card className="shadow-sm border-slate-200 dark:border-slate-800 rounded-xl">
                 <CardContent className="p-4 flex flex-col items-center justify-center text-center gap-2">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600 dark:text-slate-400">🔥 Day Streak</div>
-                  <div className="text-2xl font-bold text-slate-900 dark:text-white">0</div>
+                  <div className="text-2xl font-bold text-slate-900 dark:text-white">{localProfile?.currentStreak || 0}</div>
                 </CardContent>
               </Card>
               <Card className="shadow-sm border-slate-200 dark:border-slate-800 rounded-xl">
                 <CardContent className="p-4 flex flex-col items-center justify-center text-center gap-2">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600 dark:text-slate-400">⚡ XP Earned</div>
-                  <div className="text-2xl font-bold text-blue-500">33</div>
+                  <div className="text-2xl font-bold text-blue-500">{localProfile?.xp || 0}</div>
                 </CardContent>
               </Card>
               <Card className="shadow-sm border-slate-200 dark:border-slate-800 rounded-xl">
                 <CardContent className="p-4 flex flex-col items-center justify-center text-center gap-2">
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600 dark:text-slate-400"><Medal className="w-4 h-4 text-orange-400"/> Rank (Bronze)</div>
-                  <div className="text-2xl font-bold text-orange-500">288</div>
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600 dark:text-slate-400"><Medal className="w-4 h-4 text-orange-400"/> Rank (League)</div>
+                  <div className="text-2xl font-bold text-orange-500">Unranked</div>
                 </CardContent>
               </Card>
               <Card className="shadow-sm border-slate-200 dark:border-slate-800 rounded-xl">
                 <CardContent className="p-4 flex flex-col items-center justify-center text-center gap-2">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600 dark:text-slate-400"><FileText className="w-4 h-4"/> Exams Taken</div>
-                  <div className="text-2xl font-bold text-slate-900 dark:text-white">7</div>
+                  <div className="text-2xl font-bold text-slate-900 dark:text-white">{localProfile?.examsTaken || 0}</div>
                 </CardContent>
               </Card>
               <Card className="shadow-sm border-slate-200 dark:border-slate-800 rounded-xl">
