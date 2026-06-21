@@ -20,6 +20,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
+import { MobileBottomNav } from '@/components/layout/mobile-bottom-nav';
 
 export default function DashboardLayout({
   children,
@@ -142,10 +143,11 @@ export default function DashboardLayout({
                 </header>
                 
                 <SidebarInset className="bg-transparent">
-                    <main className="flex-grow p-4 md:p-6 mx-auto w-full max-w-7xl">
+                    <main className="flex-grow p-4 md:p-6 mx-auto w-full max-w-7xl pb-24 md:pb-6">
                         {children}
                     </main>
                 </SidebarInset>
+                <MobileBottomNav />
             </div>
         </div>
     </SidebarProvider>
