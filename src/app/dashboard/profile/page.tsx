@@ -64,6 +64,8 @@ const subjects = [
 
 import { ACHIEVEMENTS } from '@/lib/constants/achievements';
 import { awardXP, getUserProfile, checkDailyStreak, recordMockTest } from '@/lib/firebase/firestore';
+import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from '@/lib/firebase/client';
 import { useToast } from '@/hooks/use-toast';
 
 export default function ProfilePage() {
@@ -75,9 +77,52 @@ export default function ProfilePage() {
   const [isSimulatingNextDay, setIsSimulatingNextDay] = useState(false);
   const [isSimulatingMockTest, setIsSimulatingMockTest] = useState(false);
   const [localProfile, setLocalProfile] = useState<any>(userProfile);
+  const [resolvedClassName, setResolvedClassName] = useState<string | null>(null);
+  const [realSubjects, setRealSubjects] = useState<any[]>([]);
 
   useEffect(() => {
     setLocalProfile(userProfile);
+    if (userProfile?.classId) {
+      const fetchData = async () => {
+        try {
+          const classDoc = await getDoc(doc(db, 'taxonomy', userProfile.classId));
+          if (classDoc.exists()) {
+            setResolvedClassName(classDoc.data().name);
+          } else {
+            setResolvedClassName(null);
+          }
+
+          const q = query(
+            collection(db, 'taxonomy'),
+            where('parentId', '==', userProfile.classId),
+            where('type', '==', 'subject')
+          );
+          const snap = await getDocs(q);
+          const fetchedSubjects = snap.docs.map(doc => ({ id: doc.id, ...doc.data() as any }));
+          fetchedSubjects.sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
+          
+          const formattedSubjects = fetchedSubjects.map(fs => {
+            const stat = userProfile.subjectStats?.[fs.name] || {};
+            return {
+              id: fs.id,
+              name: fs.name,
+              progress: stat.progress || 0,
+              mcq: stat.mcq || { current: 0, total: 100 },
+              cq: stat.cq || { current: 0, total: 50 },
+              content: stat.content || { current: 0, total: 20 },
+              started: stat.started || ''
+            };
+          });
+          
+          setRealSubjects(formattedSubjects);
+        } catch (err) {
+          console.error('Error fetching data', err);
+        }
+      };
+      fetchData();
+    } else {
+      setResolvedClassName(null);
+    }
   }, [userProfile]);
 
   const handleSimulateXP = async () => {
@@ -203,8 +248,8 @@ export default function ProfilePage() {
                       <User className="w-4 h-4 text-slate-400" />
                     </div>
                     <p className="text-sm text-slate-500 font-medium mb-1">@{user?.displayName?.toLowerCase().replace(/\s+/g, '-') || 'student'} • Joined {(user?.metadata as any)?.creationTime ? new Date((user?.metadata as any).creationTime).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'recently'}</p>
-                    {localProfile?.className && (
-                      <p className="text-sm text-slate-600 dark:text-slate-300 font-bold mb-3">{localProfile.className}</p>
+                    {(resolvedClassName || localProfile?.className) && (
+                      <p className="text-sm text-slate-600 dark:text-slate-300 font-bold mb-3">{resolvedClassName || localProfile.className}</p>
                     )}
                     
                     <div className="flex items-center gap-4 text-xs font-bold">
@@ -556,27 +601,86 @@ export default function ProfilePage() {
             </CardHeader>
             <CardContent className="p-0">
               <div className="max-h-[800px] min-h-[300px] overflow-y-auto pr-1 pl-2 py-2 custom-scrollbar space-y-2">
-                {localProfile?.subjectStats && Object.keys(localProfile.subjectStats).length > 0 ? (
-                  Object.entries(localProfile.subjectStats).map(([subjectName, stat]: [string, any], idx) => (
+                {realSubjects.length > 0 ? (
+                  realSubjects.map((sub, i) => {
+                    const isOpen = openSubjects[sub.name];
+                    
+                    if (isOpen) {
+                    return (
+                      <div key={i} className="border border-slate-200 dark:border-slate-700 rounded-xl p-4 bg-white dark:bg-slate-900 mx-2 shadow-sm">
+                        <div 
+                          className="flex justify-between items-center cursor-pointer mb-4"
+                          onClick={() => toggleSubject(sub.name)}
+                        >
+                          <h4 className="font-bold text-[15px] text-slate-800 dark:text-slate-100">{sub.name}</h4>
+                          <div className="flex items-center gap-3">
+                            <span className="text-sm font-bold text-green-600">{sub.progress.toFixed(2)}%</span>
+                            <div className="bg-slate-100 dark:bg-slate-800 rounded-full p-1 cursor-pointer hover:bg-slate-200 transition-colors">
+                              <ChevronUp className="w-4 h-4 text-slate-500" />
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="flex justify-between items-start mb-3">
+                          <div className="space-y-0.5">
+                            <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                              <span className="w-2 h-2 rounded-full bg-green-500"></span> {sub.mcq.current}<span className="text-slate-400 font-medium">/{sub.mcq.total} {sub.mcq.pct && `(${sub.mcq.pct})`}</span>
+                            </div>
+                            <div className="text-[10px] font-semibold text-slate-400 ml-3.5">MCQ</div>
+                          </div>
+                          <div className="space-y-0.5">
+                            <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                              <span className="w-2 h-2 rounded-full bg-blue-500"></span> {sub.cq.current}<span className="text-slate-400 font-medium">/{sub.cq.total} {sub.cq.pct && `(${sub.cq.pct})`}</span>
+                            </div>
+                            <div className="text-[10px] font-semibold text-slate-400 ml-3.5">CQ</div>
+                          </div>
+                          <div className="space-y-0.5">
+                            <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                              <span className="w-2 h-2 rounded-full bg-purple-500"></span> {sub.content.current}<span className="text-slate-400 font-medium">/{sub.content.total} {sub.content.pct && `(${sub.content.pct})`}</span>
+                            </div>
+                            <div className="text-[10px] font-semibold text-slate-400 ml-3.5 uppercase">Content</div>
+                          </div>
+                        </div>
+                        
+                        <div className="w-full h-1 bg-slate-100 dark:bg-slate-800 rounded-full mb-4 overflow-hidden flex">
+                          <div className="h-full bg-green-500" style={{ width: `${(sub.mcq.current / sub.mcq.total) * 100}%` }}></div>
+                          <div className="h-full bg-blue-500" style={{ width: `${(sub.cq.current / sub.cq.total) * 100}%` }}></div>
+                          <div className="h-full bg-purple-500" style={{ width: `${(sub.content.current / sub.content.total) * 100}%` }}></div>
+                        </div>
+                        
+                        <div className="flex justify-between items-center mt-2">
+                          <div className="text-[11px] text-slate-500 font-medium">
+                            {sub.started ? `Started: ${sub.started}` : ''}
+                          </div>
+                          <div className="text-[11px] font-semibold text-blue-500 flex items-center gap-1 cursor-pointer hover:underline">
+                            View Report <ArrowRight className="w-3 h-3" />
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  return (
                     <div 
-                      key={idx} 
+                      key={i} 
                       className="px-6 py-3 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer group mx-2 rounded-xl"
+                      onClick={() => toggleSubject(sub.name)}
                     >
-                      <span className="text-[13px] font-bold text-slate-700 dark:text-slate-300">{subjectName}</span>
+                      <span className="text-[13px] font-bold text-slate-700 dark:text-slate-300">{sub.name}</span>
                       <div className="flex items-center gap-3">
-                        <span className="text-xs font-bold text-green-600">{(stat.progress || 0).toFixed(2)}%</span>
+                        <span className="text-xs font-bold text-green-600">{sub.progress.toFixed(2)}%</span>
                         <div className="bg-slate-100 dark:bg-slate-800 rounded-md p-1 group-hover:bg-slate-200 dark:group-hover:bg-slate-700 transition-colors">
                           <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
                         </div>
                       </div>
                     </div>
-                  ))
-                ) : (
-                  <div className="flex flex-col items-center justify-center h-full text-center p-6">
-                    <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">No subject data available yet.</p>
-                    <p className="text-slate-400 dark:text-slate-500 text-xs mt-2">Take mock tests to see your progress here!</p>
-                  </div>
-                )}
+                  );
+                })
+              ) : (
+                <div className="flex flex-col items-center justify-center h-full text-center p-6 mt-10">
+                  <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">No textbook data found for this class.</p>
+                </div>
+              )}
               </div>
             </CardContent>
           </Card>
