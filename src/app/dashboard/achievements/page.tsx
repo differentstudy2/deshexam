@@ -6,12 +6,17 @@ import { Progress } from '@/components/ui/progress';
 
 import { ACHIEVEMENTS } from '@/lib/constants/achievements';
 import { useAuth } from '@/hooks/use-auth';
-import { CheckCircle2, Lock, Trophy, Target, Star } from 'lucide-react';
+import { CheckCircle2, Lock, Trophy, Target, Star, Gift, Loader2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import Confetti from 'react-dom-confetti';
+import { db } from '@/lib/firebase/client';
+import { doc, updateDoc, arrayUnion, Timestamp } from 'firebase/firestore';
 
 export default function AchievementsPage() {
-  const { userProfile } = useAuth();
+  const { user, userProfile } = useAuth();
   const [activeTab, setActiveTab] = useState('All');
+  const [isConfettiActive, setIsConfettiActive] = useState(false);
+  const [isClaiming, setIsClaiming] = useState(false);
 
   const tabs = ['All', 'Common', 'Rare', 'Epic', 'Legendary'];
 
@@ -41,6 +46,51 @@ export default function AchievementsPage() {
   const strokeDashoffset = circumference - (completionPct / 100) * circumference;
 
   const [selectedAchievement, setSelectedAchievement] = useState<any | null>(null);
+
+  const confettiConfig = {
+    angle: 90,
+    spread: 360,
+    startVelocity: 40,
+    elementCount: 70,
+    dragFriction: 0.12,
+    duration: 3000,
+    stagger: 3,
+    width: "10px",
+    height: "10px",
+    perspective: "500px",
+    colors: ["#a864fd", "#29cdff", "#78ff44", "#ff718d", "#fdff6a"]
+  };
+
+  const handleClaim = async (ach: any) => {
+    if (!user || !userProfile) return;
+    try {
+      setIsClaiming(true);
+      
+      const userRef = doc(db, 'users', user.uid);
+      
+      // Update achievements and add notification
+      await updateDoc(userRef, {
+        achievements: arrayUnion(ach.id),
+        notifications: arrayUnion({
+          id: Date.now().toString(),
+          type: 'achievement',
+          title: `Unlocked: ${ach.title}`,
+          message: 'You have claimed a new achievement reward!',
+          createdAt: Timestamp.now(),
+          read: false
+        })
+      });
+
+      // Trigger Confetti
+      setIsConfettiActive(true);
+      setTimeout(() => setIsConfettiActive(false), 3000);
+
+    } catch (error) {
+      console.error('Error claiming achievement:', error);
+    } finally {
+      setIsClaiming(false);
+    }
+  };
 
   return (
     <div className="w-full max-w-[1400px] mx-auto pb-12 text-slate-800 dark:text-slate-100">
@@ -167,7 +217,13 @@ export default function AchievementsPage() {
                       <span className="text-[11px] font-bold text-slate-400 shrink-0 ml-2">{current}/{ach.target}{unitText}</span>
                     </div>
                     
-                    <Progress value={progressPct} className={`h-2 mb-2 ${unlocked ? 'bg-green-100 [&>div]:bg-green-500' : 'bg-slate-100 dark:bg-slate-800'}`} />
+                    {progressPct >= 100 && !unlocked ? (
+                      <div className="bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 font-bold text-[10px] uppercase tracking-wider py-1 px-2 rounded-md mb-2 flex items-center justify-center gap-1 border border-amber-200 dark:border-amber-800 animate-pulse">
+                        <Gift className="w-3 h-3" /> Ready to Claim!
+                      </div>
+                    ) : (
+                      <Progress value={progressPct} className={`h-2 mb-2 ${unlocked ? 'bg-green-100 [&>div]:bg-green-500' : 'bg-slate-100 dark:bg-slate-800'}`} />
+                    )}
                     
                     <p className="text-[11px] text-slate-500 font-medium leading-tight line-clamp-2">
                       {ach.desc}
@@ -194,9 +250,18 @@ export default function AchievementsPage() {
         <DialogContent className="sm:max-w-[425px] text-center flex flex-col items-center p-8">
           {selectedAchievement && (() => {
             const unlocked = userProfile?.achievements?.includes(selectedAchievement.id);
+            const isClaimable = !unlocked && (() => {
+              let rawCurrent = 0;
+              if (selectedAchievement.metric === 'xp') rawCurrent = userProfile?.xp || 0;
+              return rawCurrent >= selectedAchievement.target;
+            })();
             const ap = selectedAchievement.type === 'COMMON' ? 10 : selectedAchievement.type === 'RARE' ? 50 : selectedAchievement.type === 'EPIC' ? 100 : 500;
             return (
               <>
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none">
+                  <Confetti active={isConfettiActive} config={confettiConfig} />
+                </div>
+
                 <DialogHeader className="w-full">
                   <DialogTitle className="sr-only">Achievement Details</DialogTitle>
                 </DialogHeader>
@@ -229,8 +294,8 @@ export default function AchievementsPage() {
                 <div className="mt-6 w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 flex flex-col gap-2">
                   <div className="flex justify-between items-center text-sm">
                     <span className="font-bold text-slate-700 dark:text-slate-300">Status:</span>
-                    <span className={`font-bold ${unlocked ? 'text-green-500' : 'text-slate-500'}`}>
-                      {unlocked ? 'Unlocked!' : 'Locked'}
+                    <span className={`font-bold ${unlocked ? 'text-green-500' : isClaimable ? 'text-amber-500' : 'text-slate-500'}`}>
+                      {unlocked ? 'Unlocked!' : isClaimable ? 'Ready to Claim' : 'Locked'}
                     </span>
                   </div>
                   <div className="flex justify-between items-center text-sm">
@@ -244,6 +309,17 @@ export default function AchievementsPage() {
                     </div>
                   )}
                 </div>
+
+                {isClaimable && (
+                  <button 
+                    onClick={() => handleClaim(selectedAchievement)}
+                    disabled={isClaiming}
+                    className="w-full mt-4 bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 disabled:opacity-70 disabled:hover:scale-100"
+                  >
+                    {isClaiming ? <Loader2 className="w-5 h-5 animate-spin" /> : <Gift className="w-5 h-5" />}
+                    {isClaiming ? 'Claiming...' : 'Claim Reward!'}
+                  </button>
+                )}
               </>
             );
           })()}
