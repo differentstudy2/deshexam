@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import { getUserProfile } from '@/lib/firebase/firestore';
 import { Loader2, Bell, LogOut, UserIcon, Moon, Sun, Monitor } from "lucide-react";
 import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset, useSidebar } from '@/components/ui/sidebar';
-import { AdminSidebar } from '@/components/layout/header';
+import { AdminSidebar, NotificationBell } from '@/components/layout/header';
 import { ThemeToggle } from '@/components/layout/theme-toggle';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -111,10 +111,7 @@ export default function AdminLayout({
                     </div>
                     <div className="ml-auto flex items-center space-x-2 md:space-x-4">
                         <ThemeToggle />
-                        <Button variant="ghost" size="icon" className="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100 rounded-full relative">
-                            <Bell className="h-5 w-5" />
-                            <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-red-500 border-2 border-white dark:border-slate-950"></span>
-                        </Button>
+                        <NotificationBell />
                         
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>

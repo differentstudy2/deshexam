@@ -6,7 +6,8 @@ import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset } from '@/components/ui/sidebar';
-import { DashboardSidebar } from '@/components/layout/header';
+import { DashboardSidebar, NotificationBell } from '@/components/layout/header';
+import { ThemeToggle } from '@/components/layout/theme-toggle';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Bell, Search, Moon, LogOut, User as UserIcon, Settings as SettingsIcon, Briefcase } from 'lucide-react';
@@ -80,16 +81,13 @@ export default function DashboardLayout({
                             <span className="text-orange-500">🔥</span> {userProfile?.xp || 0} XP
                         </div>
                         
-                        <Button variant="ghost" size="icon" className="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 hidden sm:flex rounded-full">
-                            <Moon className="h-5 w-5" />
-                        </Button>
+                        <div className="hidden sm:flex">
+                            <ThemeToggle />
+                        </div>
                         <Button variant="ghost" size="icon" className="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 rounded-full">
                             <Search className="h-5 w-5" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 rounded-full relative">
-                            <Bell className="h-5 w-5" />
-                            <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-red-500 border-2 border-white"></span>
-                        </Button>
+                        <NotificationBell />
                         
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>

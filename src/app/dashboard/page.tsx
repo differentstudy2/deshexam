@@ -22,6 +22,9 @@ import {
   Users
 } from 'lucide-react';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { getUserProfile } from '@/lib/firebase/firestore';
+import { ACHIEVEMENTS } from '@/lib/constants/achievements';
 
 // --- MOCK DATA ---
 
@@ -64,6 +67,16 @@ const achievements = [
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const [userProfile, setUserProfile] = useState<any>(null);
+
+  useEffect(() => {
+    if (user) {
+      getUserProfile(user.uid).then(setUserProfile);
+    }
+  }, [user]);
+
+  // Take the first 4 achievements to display on the dashboard
+  const displayAchievements = ACHIEVEMENTS.slice(0, 4);
 
   return (
     <div className="space-y-6 pb-12 w-full max-w-[1400px] mx-auto text-slate-800 dark:text-slate-100">
@@ -333,24 +346,40 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent className="p-5">
             <div className="space-y-6">
-              {achievements.map((ach, i) => (
-                <div key={i} className="flex gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center shrink-0">
-                    <span className="text-xl leading-none">{ach.icon}</span>
-                    <div className="bg-slate-900 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-sm absolute mt-12 shadow-sm uppercase tracking-wider">
-                      Locked
+              {displayAchievements.map((ach, i) => {
+                const isUnlocked = userProfile?.achievements?.includes(ach.id);
+                // For simplicity on dashboard, use 'xp' for current progress, or other basic stats if possible.
+                // You can expand this logic based on `ach.metric`. Let's fallback to XP if metric is 'xp'.
+                let rawCurrent = 0;
+                if (ach.metric === 'xp') rawCurrent = userProfile?.xp || 0;
+                else if (ach.metric === 'streak_days') rawCurrent = userProfile?.currentStreak || 0;
+                else if (ach.metric === 'referrals') rawCurrent = userProfile?.referralCount || 0;
+                else if (ach.metric === 'exams_taken') rawCurrent = userProfile?.examsTaken || 0;
+                
+                const current = isUnlocked ? ach.target : Math.min(rawCurrent, ach.target);
+                const progressPct = (current / ach.target) * 100;
+                
+                return (
+                  <div key={i} className="flex gap-4">
+                    <div className={`w-12 h-12 rounded-xl border-2 flex flex-col items-center justify-center shrink-0 ${isUnlocked ? 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-700' : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700'}`}>
+                      <span className="text-xl leading-none">{ach.icon}</span>
+                      {!isUnlocked && (
+                        <div className="bg-slate-900 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-sm absolute mt-12 shadow-sm uppercase tracking-wider">
+                          Locked
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 pt-1">
+                      <div className="flex justify-between items-end mb-1">
+                        <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100">{ach.title}</h4>
+                        <span className="text-[11px] font-bold text-slate-400">{current}/{ach.target}</span>
+                      </div>
+                      <Progress value={progressPct} className={`h-1.5 mb-1 ${isUnlocked ? 'bg-green-100 [&>div]:bg-green-500' : 'bg-slate-100 dark:bg-slate-800'}`} />
+                      <p className="text-[10px] text-slate-500 font-medium">{ach.desc}</p>
                     </div>
                   </div>
-                  <div className="flex-1 pt-1">
-                    <div className="flex justify-between items-end mb-1">
-                      <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100">{ach.title}</h4>
-                      <span className="text-[11px] font-bold text-slate-400">{ach.current}/{ach.target}</span>
-                    </div>
-                    <Progress value={(ach.current / ach.target) * 100} className="h-1.5 bg-slate-100 dark:bg-slate-800 mb-1" />
-                    <p className="text-[10px] text-slate-500 font-medium">{ach.desc}</p>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </CardContent>
         </Card>

@@ -210,7 +210,7 @@ type UserProfile = {
   notifications?: any[];
 };
 
-const NotificationBell = () => {
+export const NotificationBell = () => {
   const { user } = useAuth();
   const [notifications, setNotifications] = useState<any[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
