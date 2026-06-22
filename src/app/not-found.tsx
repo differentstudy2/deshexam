@@ -23,18 +23,18 @@ export default function NotFound() {
         
         {/* Title */}
         <h2 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-slate-100 mt-4 mb-3">
-          পেজটি পাওয়া যায়নি
+          Page Not Found
         </h2>
         
         {/* Description */}
         <p className="text-slate-500 dark:text-slate-400 text-sm md:text-base leading-relaxed px-2">
-          দুঃখিত, আপনি যে লিংকটি খুঁজছেন তা হয়তো সরানো হয়েছে অথবা এটি অস্তিত্বহীন।
+          Sorry, the page you are looking for might have been removed or does not exist.
         </p>
 
         {/* Primary Action */}
         <Link href="/" className="block mt-10">
           <button className="w-full bg-[#10b981] hover:bg-[#059669] text-white font-medium text-base py-4 rounded-xl transition-all shadow-sm shadow-emerald-500/20 active:scale-[0.98]">
-            হোমপেজে ফিরে যান
+            Return to Homepage
           </button>
         </Link>
 
@@ -44,12 +44,12 @@ export default function NotFound() {
             onClick={() => router.back()} 
             className="flex-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium text-sm py-4 rounded-xl transition-all active:scale-[0.98]"
           >
-            ← পেছনে যান
+            ← Go Back
           </button>
           
           <Link href="/contact" className="flex-1">
             <button className="w-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium text-sm py-4 rounded-xl transition-all active:scale-[0.98]">
-              যোগাযোগ
+              Contact
             </button>
           </Link>
         </div>

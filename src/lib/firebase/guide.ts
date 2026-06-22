@@ -18,56 +18,79 @@ export const getGuideSubjects = async (): Promise<SidebarSubject[]> => {
   }
 };
 
+const sortNodes = (nodes: any[]) => {
+  const extractNumber = (title: string): number => {
+    const match = title.match(/[0-9০-৯]+/);
+    if (!match) return 0;
+    const bengaliToEnglish: Record<string, string> = {
+      '০': '0', '১': '1', '২': '2', '৩': '3', '৪': '4',
+      '৫': '5', '৬': '6', '৭': '7', '৮': '8', '৯': '9'
+    };
+    const numStr = match[0].replace(/[০-৯]/g, (c) => bengaliToEnglish[c]);
+    return parseInt(numStr, 10);
+  };
+
+  return nodes.sort((a, b) => {
+    const numA = extractNumber(a.title);
+    const numB = extractNumber(b.title);
+    
+    if (numA !== numB && (numA > 0 || numB > 0)) {
+      return numA - numB;
+    }
+
+    if (typeof a.orderIndex === 'number' && typeof b.orderIndex === 'number' && a.orderIndex !== b.orderIndex) {
+      return a.orderIndex - b.orderIndex;
+    }
+    
+    return a.title.localeCompare(b.title, undefined, { numeric: true, sensitivity: 'base' });
+  });
+};
+
+const buildCurriculumFromTextbooks = (textbooks: any[], allNodes: any[]): Chapter[] => {
+  const sortedTextbooks = sortNodes(textbooks);
+
+  return sortedTextbooks.map(tb => {
+    const tbChapters = sortNodes(allNodes.filter(n => n.parentId === tb.id && n.type === 'chapter'))
+      .map(ch => {
+        const chTopics = sortNodes(allNodes.filter(n => n.parentId === ch.id && n.type === 'topic'))
+          .map(t => ({ id: t.fullSlug || t.id, title: t.title, type: 'topic' as const, subtopics: [] }));
+
+        return {
+          id: ch.fullSlug || ch.id,
+          title: ch.title,
+          type: 'chapter' as const,
+          subtopics: chTopics
+        };
+      });
+
+    return {
+      id: tb.fullSlug || tb.id,
+      title: tb.title,
+      topics: tbChapters
+    };
+  }) as unknown as Chapter[];
+};
+
 export const getCurriculumBySubject = async (subjectId: string): Promise<Chapter[]> => {
   try {
     const allNodes = await getTaxonomyNodesByTrack('academic');
-    
     const textbooks = allNodes.filter(n => n.parentId === subjectId && n.type === 'textbook');
-
-    const sortNodes = (nodes: any[]) => {
-      return nodes.sort((a, b) => {
-        const numA = parseInt((a.title.match(/\d+/) || [0, '0'])[0], 10);
-        const numB = parseInt((b.title.match(/\d+/) || [0, '0'])[0], 10);
-        
-        if (numA !== numB && (numA > 0 || numB > 0)) {
-          // If one doesn't have a number, put it BEFORE numbered items (e.g. Intro)
-          return numA - numB;
-        }
-
-        if (typeof a.orderIndex === 'number' && typeof b.orderIndex === 'number' && a.orderIndex !== b.orderIndex) {
-          return a.orderIndex - b.orderIndex;
-        }
-        
-        return a.title.localeCompare(b.title, undefined, { numeric: true, sensitivity: 'base' });
-      });
-    };
-
-    const sortedTextbooks = sortNodes(textbooks);
-
-    const curriculum = sortedTextbooks.map(tb => {
-      const tbChapters = sortNodes(allNodes.filter(n => n.parentId === tb.id && n.type === 'chapter'))
-        .map(ch => {
-          const chTopics = sortNodes(allNodes.filter(n => n.parentId === ch.id && n.type === 'topic'))
-            .map(t => ({ id: t.fullSlug || t.id, title: t.title, type: 'topic' as const, subtopics: [] }));
-
-          return {
-            id: ch.fullSlug || ch.id,
-            title: ch.title,
-            type: 'chapter' as const,
-            subtopics: chTopics
-          };
-        });
-
-      return {
-        id: tb.fullSlug || tb.id,
-        title: tb.title,
-        topics: tbChapters
-      };
-    }) as unknown as Chapter[];
-
-    return curriculum;
+    return buildCurriculumFromTextbooks(textbooks, allNodes);
   } catch (error) {
-    console.error("Error fetching curriculum:", error);
+    console.error("Error fetching curriculum by subject:", error);
+    return [];
+  }
+};
+
+export const getCurriculumByClass = async (classId: string): Promise<Chapter[]> => {
+  try {
+    const allNodes = await getTaxonomyNodesByTrack('academic');
+    const subjects = allNodes.filter(n => n.parentId === classId && n.type === 'subject');
+    const subjectIds = subjects.map(s => s.id);
+    const textbooks = allNodes.filter(n => (subjectIds.includes(n.parentId as string) || n.parentId === classId) && n.type === 'textbook');
+    return buildCurriculumFromTextbooks(textbooks, allNodes);
+  } catch (error) {
+    console.error("Error fetching curriculum by class:", error);
     return [];
   }
 };

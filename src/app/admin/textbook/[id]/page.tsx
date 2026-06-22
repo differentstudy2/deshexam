@@ -39,16 +39,43 @@ export default function TextbookDetailsPage() {
         setTextbook(tbNode);
 
         if (tbNode) {
+          const sortNodes = (nodes: any[]) => {
+            const extractNumber = (title: string): number => {
+              const match = title.match(/[0-9০-৯]+/);
+              if (!match) return 0;
+              const bengaliToEnglish: Record<string, string> = {
+                '০': '0', '১': '1', '২': '2', '৩': '3', '৪': '4',
+                '৫': '5', '৬': '6', '৭': '7', '৮': '8', '৯': '9'
+              };
+              const numStr = match[0].replace(/[০-৯]/g, (c) => bengaliToEnglish[c]);
+              return parseInt(numStr, 10);
+            };
+
+            return nodes.sort((a, b) => {
+              const numA = extractNumber(a.title);
+              const numB = extractNumber(b.title);
+              if (numA !== numB && (numA > 0 || numB > 0)) {
+                return numA - numB;
+              }
+              if (typeof a.orderIndex === 'number' && typeof b.orderIndex === 'number' && a.orderIndex !== b.orderIndex) {
+                return a.orderIndex - b.orderIndex;
+              }
+              return a.title.localeCompare(b.title, undefined, { numeric: true, sensitivity: 'base' });
+            });
+          };
+
           // 2. Fetch all chapters for this textbook
           const chapterNodes = await getTaxonomyNodesByParent(textbookId);
+          const sortedChapters = sortNodes(chapterNodes);
           
           // 3. For each chapter, fetch topics and their content counts
           const fullChapters: ChapterData[] = await Promise.all(
-            chapterNodes.map(async (chap) => {
+            sortedChapters.map(async (chap) => {
               const topicNodes = await getTaxonomyNodesByParent(chap.id);
+              const sortedTopics = sortNodes(topicNodes);
               
               const fullTopics: TopicData[] = await Promise.all(
-                topicNodes.map(async (top) => {
+                sortedTopics.map(async (top) => {
                   // Fetch question count for this topic
                   const qQuery = query(collection(db, 'questions'), where('topicId', '==', top.id));
                   const qSnap = await getDocs(qQuery);
@@ -149,7 +176,7 @@ export default function TextbookDetailsPage() {
               </Button>
             </div>
           ) : (
-            <Accordion type="multiple" className="space-y-4" defaultValue={chapters.map(c => c.id)}>
+            <Accordion type="multiple" className="space-y-4" defaultValue={chapters.length > 0 ? [chapters[0].id] : []}>
               {chapters.map((chapter) => (
                 <AccordionItem 
                   key={chapter.id} 

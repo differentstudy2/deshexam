@@ -62,7 +62,7 @@ export async function generateMetadata({ params }: { params: Promise<{ segments?
 
 export default async function GuidePage({ params }: { params: Promise<{ segments?: string[] }> }) {
   const resolvedParams = await params;
-  const segments = resolvedParams.segments || [];
+  const segments = (resolvedParams.segments || []).map(decodeURIComponent);
   
   if (segments.length === 0) {
     // Redirect or show guide home
@@ -84,23 +84,6 @@ export default async function GuidePage({ params }: { params: Promise<{ segments
   }
 
   if (!node) {
-    if (process.env.NODE_ENV === 'development') {
-      const { collection, getDocs, query } = await import('firebase/firestore');
-      const { db } = await import('@/lib/firebase/client');
-      const snap = await getDocs(query(collection(db, 'taxonomy_nodes')));
-      const allSlugs = snap.docs.map(d => d.data().fullSlug).filter(Boolean);
-      
-      return (
-        <div className="p-10 text-red-600 bg-red-50 min-h-screen">
-          <h1 className="text-2xl font-bold mb-4">404 - Node Not Found (Debug)</h1>
-          <p>Requested fullSlug: <strong>{requestedPath}</strong></p>
-          <h2 className="text-xl font-semibold mt-6 mb-2">Available fullSlugs in DB:</h2>
-          <ul className="list-disc pl-5 max-h-[60vh] overflow-y-auto text-sm bg-white p-4 rounded border break-all">
-            {allSlugs.map((s, idx) => <li key={`${s}-${idx}`}>{s}</li>)}
-          </ul>
-        </div>
-      );
-    }
     notFound();
   }
 
@@ -120,7 +103,8 @@ export default async function GuidePage({ params }: { params: Promise<{ segments
     const classNodes = await getTaxonomyNodesByParent(classNode.id);
     const relevantNodes = classNodes.filter(n => n.type === 'subject' || n.type === 'textbook');
     subjects = relevantNodes.map(n => ({
-      id: n.fullSlug || n.id, // We might need to adjust sidebar to use fullSlug instead of ID for routing
+      id: n.fullSlug || n.id, // Used for routing in sidebar
+      dbId: n.id,             // Used for database queries
       title: n.title || (n as any).name,
       countStr: ''
     }));
@@ -130,11 +114,19 @@ export default async function GuidePage({ params }: { params: Promise<{ segments
 
   // Fetch curriculum for SubjectDashboard / ReadingLayout
   const subjectNode = node.ancestors?.find(a => a.type === 'subject') || (node.type === 'subject' ? node : null);
-  const subjectId: string = subjectNode?.id || subjects[0]?.id || 'sahitya-kanika'; // Fallback
   
-  // NOTE: getCurriculumBySubject currently takes subjectId and returns the curriculum. 
-  // It might need updates to return fullSlugs, but for now we keep it compatible.
-  const fullCurriculum = await getCurriculumBySubject(subjectId);
+  let fullCurriculum: any[] = [];
+  
+  if (subjectNode) {
+    fullCurriculum = await getCurriculumBySubject(subjectNode.id);
+  } else if (node.type === 'class') {
+    const { getCurriculumByClass } = await import('@/lib/firebase/guide');
+    fullCurriculum = await getCurriculumByClass(node.id);
+  } else {
+    // Fallback if somehow no subject or class is determined
+    const fallbackId = subjects[0]?.dbId || subjects[0]?.id || 'sahitya-kanika';
+    fullCurriculum = await getCurriculumBySubject(fallbackId);
+  }
 
   // If it's a content page (contentType exists) OR topic/chapter
   if (contentType || node.type === 'topic' || node.type === 'chapter') {
