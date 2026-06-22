@@ -391,18 +391,18 @@ export default function AcademyPage() {
   const selectedClassTitle = selectedClass ? selectedClass.title : 'Academy Subject';
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#020817] text-slate-800 dark:text-slate-200">
+    <main className="min-h-screen bg-slate-50 dark:bg-[#020817] text-slate-800 dark:text-slate-200">
       
       {/* Top Header Bar */}
-      <div className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 sticky top-16 z-40">
+      <header className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 sticky top-16 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
           <div className="flex items-center gap-6">
             <h1 className="font-bold text-lg text-slate-900 dark:text-white">Academy</h1>
-            <div className="hidden sm:flex items-center text-sm text-slate-500 dark:text-slate-400 font-medium">
+            <nav aria-label="breadcrumb" className="hidden sm:flex items-center text-sm text-slate-500 dark:text-slate-400 font-medium">
               <Link href="/" className="hover:text-slate-900 dark:hover:text-white transition-colors">Home</Link>
               <ChevronDown className="w-3 h-3 mx-2 -rotate-90 text-slate-400" />
-              <span className="text-slate-900 dark:text-slate-200">{selectedClassTitle}</span>
-            </div>
+              <span aria-current="page" className="text-slate-900 dark:text-slate-200">{selectedClassTitle}</span>
+            </nav>
           </div>
           <Button 
             variant="outline" 
@@ -411,9 +411,9 @@ export default function AcademyPage() {
             Back
           </Button>
         </div>
-      </div>
+      </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         
         {loading ? (
           <div className="flex justify-center py-20">
@@ -471,7 +471,7 @@ export default function AcademyPage() {
             </div>
           </>
         )}
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }
