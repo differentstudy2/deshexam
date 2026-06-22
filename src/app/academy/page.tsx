@@ -17,53 +17,104 @@ type SubjectTopic = {
   id: string;
   title: string;
   link: string;
-  subtopics?: SubjectTopic[];
 };
 
 type Subject = {
+  id: string;
   title: string;
-  link?: string;
+  link: string;
   badges: any[];
   progressText: string;
   progressValue: number;
   stats?: { mcq: string; cq: string; content: string };
-  topics?: SubjectTopic[];
 }
 
-function ChapterRow({ chapter }: { chapter: SubjectTopic }) {
+const sortTaxonomyNodes = (nodes: any[]) => {
+  const extractNumber = (title: string): number => {
+    const match = title?.match(/[0-9০-৯]+/);
+    if (!match) return 0;
+    const bengaliToEnglish: Record<string, string> = {
+      '০': '0', '১': '1', '২': '2', '৩': '3', '৪': '4',
+      '৫': '5', '৬': '6', '৭': '7', '৮': '8', '৯': '9'
+    };
+    const numStr = match[0].replace(/[০-৯]/g, (c) => bengaliToEnglish[c]);
+    return parseInt(numStr, 10);
+  };
+
+  return nodes.sort((a, b) => {
+    const numA = extractNumber(a.title);
+    const numB = extractNumber(b.title);
+    if (numA !== numB && (numA > 0 || numB > 0)) return numA - numB;
+    if (typeof a.orderIndex === 'number' && typeof b.orderIndex === 'number' && a.orderIndex !== b.orderIndex) return a.orderIndex - b.orderIndex;
+    return (a.title || '').localeCompare(b.title || '', undefined, { numeric: true, sensitivity: 'base' });
+  });
+};
+
+function ChapterRow({ chapterId, chapterTitle, chapterLink }: { chapterId: string, chapterTitle: string, chapterLink: string }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [topics, setTopics] = useState<SubjectTopic[]>([]);
+  const [hasFetched, setHasFetched] = useState(false);
+
+  const toggleOpen = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!isOpen && !hasFetched) {
+      setIsLoading(true);
+      try {
+        const tpQ = query(
+          collection(db, 'taxonomy_nodes'), 
+          where('type', '==', 'topic'), 
+          where('parentId', '==', chapterId)
+        );
+        const tpSnap = await getDocs(tpQ);
+        let fetchedTopics = tpSnap.docs.map((d: any) => ({id: d.id, ...d.data()}));
+        fetchedTopics = sortTaxonomyNodes(fetchedTopics);
+        
+        setTopics(fetchedTopics.map((t: any) => ({
+          id: t.id,
+          title: t.title,
+          link: `/guide/${t.fullSlug || t.id}`
+        })));
+        setHasFetched(true);
+      } catch (error) {
+        console.error("Error fetching topics:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    setIsOpen(!isOpen);
+  };
   
   return (
     <div className="flex flex-col border-b border-dashed border-slate-200 dark:border-slate-800 last:border-b-0">
       <div className="flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
-        <Link href={chapter.link} className="flex items-center gap-3 py-3.5 pl-4 pr-2 flex-1 cursor-pointer">
+        <Link href={chapterLink} className="flex items-center gap-3 py-3.5 pl-4 pr-2 flex-1 cursor-pointer">
           <CircleDot className="w-4 h-4 text-slate-400 dark:text-slate-500 group-hover:text-blue-500 transition-colors shrink-0" strokeWidth={2} />
           <span className="text-[14px] text-slate-800 dark:text-slate-200 font-bold group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-            {chapter.title}
+            {chapterTitle}
           </span>
         </Link>
-        {chapter.subtopics && chapter.subtopics.length > 0 && (
-          <div 
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setIsOpen(!isOpen);
-            }} 
-            className={cn(
-              "flex items-center justify-center w-7 h-7 mr-3 rounded-md transition-colors cursor-pointer shrink-0",
-              isOpen 
-                ? "bg-blue-50 dark:bg-blue-900/30 text-blue-500 hover:bg-blue-100 dark:hover:bg-blue-900/50" 
-                : "bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-400"
-            )}
-          >
-            {isOpen ? <ArrowUp className="w-3.5 h-3.5" /> : <ArrowDown className="w-3.5 h-3.5" />}
-          </div>
-        )}
+        <div 
+          onClick={toggleOpen} 
+          className={cn(
+            "flex items-center justify-center w-7 h-7 mr-3 rounded-md transition-colors cursor-pointer shrink-0",
+            isOpen 
+              ? "bg-blue-50 dark:bg-blue-900/30 text-blue-500 hover:bg-blue-100 dark:hover:bg-blue-900/50" 
+              : "bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-400"
+          )}
+        >
+          {isLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : (isOpen ? <ArrowUp className="w-3.5 h-3.5" /> : <ArrowDown className="w-3.5 h-3.5" />)}
+        </div>
       </div>
       
-      {isOpen && chapter.subtopics && chapter.subtopics.length > 0 && (
+      {isOpen && (
         <div className="flex flex-col pb-2">
-          {chapter.subtopics.map((topic, i) => (
+          {topics.length === 0 && !isLoading && (
+            <div className="pl-12 py-2 text-[13px] text-slate-400">No topics found.</div>
+          )}
+          {topics.map((topic, i) => (
             <Link 
               key={i} 
               href={topic.link} 
@@ -84,6 +135,37 @@ function ChapterRow({ chapter }: { chapter: SubjectTopic }) {
 function AcademyCard({ subject }: { subject: Subject }) {
   const [isTopExpanded, setIsTopExpanded] = useState(false);
   const [isBottomExpanded, setIsBottomExpanded] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [chapters, setChapters] = useState<SubjectTopic[]>([]);
+  const [hasFetched, setHasFetched] = useState(false);
+
+  const toggleTopExpanded = async () => {
+    if (!isTopExpanded && !hasFetched && subject.id) {
+      setIsLoading(true);
+      try {
+        const chQ = query(
+          collection(db, 'taxonomy_nodes'), 
+          where('type', '==', 'chapter'), 
+          where('parentId', '==', subject.id)
+        );
+        const chSnap = await getDocs(chQ);
+        let fetchedChapters = chSnap.docs.map((d: any) => ({id: d.id, ...d.data()}));
+        fetchedChapters = sortTaxonomyNodes(fetchedChapters);
+        
+        setChapters(fetchedChapters.map((c: any) => ({
+          id: c.id,
+          title: c.title,
+          link: `/guide/${c.fullSlug || c.id}`
+        })));
+        setHasFetched(true);
+      } catch (error) {
+        console.error("Error fetching chapters:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    setIsTopExpanded(!isTopExpanded);
+  };
 
   // Parse progress text to use || instead of |
   const progressTextFormatted = subject.progressText.replace(' | ', ' || ');
@@ -106,22 +188,25 @@ function AcademyCard({ subject }: { subject: Subject }) {
             </Link>
           </div>
           <button 
-            onClick={() => setIsTopExpanded(!isTopExpanded)}
+            onClick={toggleTopExpanded}
             className={cn(
             "flex items-center justify-center w-8 h-8 rounded-lg transition-colors shrink-0",
             isTopExpanded 
               ? "bg-blue-50 dark:bg-blue-900/30 text-blue-500 hover:bg-blue-100" 
               : "bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-400"
           )}>
-            {isTopExpanded ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />}
+            {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : (isTopExpanded ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />)}
           </button>
         </div>
 
         {/* Expanded Topics List */}
-        {isTopExpanded && subject.topics && subject.topics.length > 0 && (
+        {isTopExpanded && (
           <div className="flex flex-col mb-6 mt-4 border-t border-slate-100 dark:border-slate-800">
-            {subject.topics.map((chapter, i) => (
-              <ChapterRow key={i} chapter={chapter} />
+            {chapters.length === 0 && !isLoading && (
+              <div className="py-4 text-center text-sm text-slate-400">No chapters found.</div>
+            )}
+            {chapters.map((chapter, i) => (
+              <ChapterRow key={i} chapterId={chapter.id} chapterTitle={chapter.title} chapterLink={chapter.link} />
             ))}
           </div>
         )}
@@ -260,7 +345,7 @@ export default function AcademyPage() {
             where('parentId', 'in', chunk)
           );
           const tbSnap = await getDocs(tbQ);
-          allTextbooks = [...allTextbooks, ...tbSnap.docs.map(d => ({id: d.id, ...d.data()}))];
+          allTextbooks = [...allTextbooks, ...tbSnap.docs.map((d: any) => ({id: d.id, ...d.data()}))];
         }
 
         if (allTextbooks.length === 0) {
@@ -269,60 +354,10 @@ export default function AcademyPage() {
            return;
         }
 
-        // Fetch chapters for these textbooks
-        const textbookIds = allTextbooks.map(tb => tb.id);
-        let allChapters: any[] = [];
-        if (textbookIds.length > 0) {
-          for (let i = 0; i < textbookIds.length; i += chunkSize) {
-            const chunk = textbookIds.slice(i, i + chunkSize);
-            const chQ = query(
-              collection(db, 'taxonomy_nodes'), 
-              where('type', '==', 'chapter'), 
-              where('parentId', 'in', chunk)
-            );
-            const chSnap = await getDocs(chQ);
-            allChapters = [...allChapters, ...chSnap.docs.map(d => ({id: d.id, ...d.data()}))];
-          }
-        }
-
-        // Fetch topics for these chapters
-        const chapterIds = allChapters.map(ch => ch.id);
-        let allTopics: any[] = [];
-        if (chapterIds.length > 0) {
-          for (let i = 0; i < chapterIds.length; i += chunkSize) {
-            const chunk = chapterIds.slice(i, i + chunkSize);
-            const tpQ = query(
-              collection(db, 'taxonomy_nodes'), 
-              where('type', '==', 'topic'), 
-              where('parentId', 'in', chunk)
-            );
-            const tpSnap = await getDocs(tpQ);
-            allTopics = [...allTopics, ...tpSnap.docs.map(d => ({id: d.id, ...d.data()}))];
-          }
-        }
-
         // Map data to the UI structure
         const mappedData = allTextbooks.map(tb => {
-          const tbChapters = allChapters.filter(c => c.parentId === tb.id);
-          
-          let chapterItems: SubjectTopic[] = [];
-          tbChapters.forEach(ch => {
-             const chTopics = allTopics.filter(t => t.parentId === ch.id);
-             const subtopics = chTopics.map(tp => ({
-                id: tp.id,
-                title: tp.title,
-                link: `/guide/${tp.fullSlug || tp.id}`
-             }));
-
-             chapterItems.push({ 
-               id: ch.id,
-               title: ch.title, 
-               link: `/guide/${ch.fullSlug || ch.id}`,
-               subtopics
-             });
-          });
-
           return {
+            id: tb.id,
             title: tb.title,
             link: `/guide/${tb.fullSlug || tb.id}`,
             badges: [
@@ -331,12 +366,11 @@ export default function AcademyPage() {
             ],
             progressText: 'Progress: 0%',
             progressValue: 0,
-            stats: { mcq: '0%', cq: '0%', content: '0%' },
-            topics: chapterItems
+            stats: { mcq: '0%', cq: '0%', content: '0%' }
           };
         });
 
-        setSubjectsData(mappedData);
+        setSubjectsData(sortTaxonomyNodes(mappedData));
 
       } catch (error) {
         console.error("Error fetching class specific data:", error);
