@@ -419,69 +419,69 @@ export default function AcademyPage() {
               <div className="absolute -top-32 -right-32 w-[30rem] h-[30rem] bg-teal-400/20 rounded-full blur-3xl"></div>
               <div className="absolute -bottom-32 -left-32 w-[25rem] h-[25rem] bg-emerald-400/20 rounded-full blur-3xl"></div>
               
-              <div className="relative p-8 md:p-12 lg:p-16 flex flex-col md:flex-row items-center justify-between gap-10">
-                <div className="max-w-2xl space-y-6">
+              <div className="relative p-6 md:p-8 lg:p-10 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="max-w-2xl space-y-4">
                   {/* Greeting & Badge Row */}
-                  <div className="flex flex-wrap items-center gap-4">
+                  <div className="flex flex-wrap items-center gap-3">
                     {userProfile?.displayName ? (
-                      <div className="text-emerald-100 font-semibold text-lg border-r border-white/20 pr-4">
+                      <div className="text-emerald-100 font-semibold text-base border-r border-white/20 pr-3">
                         Welcome back, {userProfile.displayName}!
                       </div>
                     ) : null}
-                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-sm font-medium backdrop-blur-md shadow-inner">
-                      <span className="relative flex h-2.5 w-2.5">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-xs font-medium backdrop-blur-md shadow-inner">
+                      <span className="relative flex h-2 w-2">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-300 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
                       </span>
                       Interactive Learning Platform
                     </div>
                   </div>
                   
-                  <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
+                  <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight">
                     Master Your Subjects with <br/>
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-200 to-teal-100">DeshExam Academy</span>
                   </h2>
                   
-                  <p className="text-emerald-50/90 text-lg max-w-xl leading-relaxed font-medium">
+                  <p className="text-emerald-50/90 text-base max-w-xl leading-relaxed font-medium">
                     Access comprehensive textbooks, interactive chapters, and curated practice materials specifically tailored for {selectedClassTitle}.
                   </p>
                   
                   {/* Stats Row */}
-                  <div className="flex flex-wrap gap-4 pt-4">
-                    <div className="flex items-center gap-4 bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10 shadow-lg hover:bg-white/20 transition-colors">
-                      <div className="bg-emerald-400/20 p-3 rounded-xl border border-white/10">
-                        <BookOpen className="w-6 h-6 text-emerald-100" />
+                  <div className="flex flex-wrap gap-3 pt-2">
+                    <div className="flex items-center gap-3 bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/10 shadow-lg hover:bg-white/20 transition-colors">
+                      <div className="bg-emerald-400/20 p-2 rounded-lg border border-white/10">
+                        <BookOpen className="w-5 h-5 text-emerald-100" />
                       </div>
                       <div>
-                        <div className="text-3xl font-black">{filteredSubjectsData.length}</div>
-                        <div className="text-xs text-emerald-100/80 uppercase tracking-widest font-bold">Textbooks</div>
+                        <div className="text-2xl font-black">{filteredSubjectsData.length}</div>
+                        <div className="text-[10px] text-emerald-100/80 uppercase tracking-wider font-bold">Textbooks</div>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-4 bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10 shadow-lg hover:bg-white/20 transition-colors">
-                      <div className="bg-blue-400/20 p-3 rounded-xl border border-white/10">
-                        <Target className="w-6 h-6 text-blue-100" />
+                    <div className="flex items-center gap-3 bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/10 shadow-lg hover:bg-white/20 transition-colors">
+                      <div className="bg-blue-400/20 p-2 rounded-lg border border-white/10">
+                        <Target className="w-5 h-5 text-blue-100" />
                       </div>
                       <div>
-                        <div className="text-3xl font-black">1.5k+</div>
-                        <div className="text-xs text-blue-100/80 uppercase tracking-widest font-bold">Questions</div>
+                        <div className="text-2xl font-black">1.5k+</div>
+                        <div className="text-[10px] text-blue-100/80 uppercase tracking-wider font-bold">Questions</div>
                       </div>
                     </div>
                     
-                    <div className="flex items-center gap-4 bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10 shadow-lg hover:bg-white/20 transition-colors">
-                      <div className="bg-purple-400/20 p-3 rounded-xl border border-white/10">
-                        <Activity className="w-6 h-6 text-purple-100" />
+                    <div className="flex items-center gap-3 bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/10 shadow-lg hover:bg-white/20 transition-colors">
+                      <div className="bg-purple-400/20 p-2 rounded-lg border border-white/10">
+                        <Activity className="w-5 h-5 text-purple-100" />
                       </div>
                       <div>
-                        <div className="text-3xl font-black">50+</div>
-                        <div className="text-xs text-purple-100/80 uppercase tracking-widest font-bold">Mock Tests</div>
+                        <div className="text-2xl font-black">50+</div>
+                        <div className="text-[10px] text-purple-100/80 uppercase tracking-wider font-bold">Mock Tests</div>
                       </div>
                     </div>
                   </div>
 
                   {/* Actions & Progress */}
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 pt-2">
-                    <button className="flex items-center gap-2 bg-white text-emerald-900 px-6 py-3 rounded-xl font-bold hover:bg-emerald-50 transition-colors shadow-lg group">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 pt-1">
+                    <button className="flex items-center gap-2 bg-white text-emerald-900 px-5 py-2.5 rounded-lg text-sm font-bold hover:bg-emerald-50 transition-colors shadow-lg group">
                       Resume Learning
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </button>
@@ -499,26 +499,26 @@ export default function AcademyPage() {
                 </div>
                 
                 <div className="hidden lg:flex relative shrink-0 items-center justify-center">
-                  <div className="w-72 h-72 relative">
+                  <div className="w-56 h-56 relative">
                     <div className="absolute inset-0 bg-gradient-to-tr from-emerald-400/30 to-teal-300/30 rounded-full blur-2xl animate-pulse"></div>
                     <div className="relative w-full h-full bg-white/10 backdrop-blur-xl border border-white/20 rounded-full flex items-center justify-center shadow-2xl">
-                      <GraduationCap className="w-32 h-32 text-emerald-50 drop-shadow-xl" />
+                      <GraduationCap className="w-24 h-24 text-emerald-50 drop-shadow-xl" />
                     </div>
                     
                     {/* Floating elements */}
-                    <div className="absolute top-4 -left-4 bg-white/10 backdrop-blur-xl p-4 rounded-2xl border border-white/20 shadow-2xl animate-[bounce_3s_ease-in-out_infinite]">
-                      <BookMarked className="w-8 h-8 text-emerald-200" />
+                    <div className="absolute top-2 -left-2 bg-white/10 backdrop-blur-xl p-3 rounded-xl border border-white/20 shadow-2xl animate-[bounce_3s_ease-in-out_infinite]">
+                      <BookMarked className="w-6 h-6 text-emerald-200" />
                     </div>
-                    <div className="absolute bottom-8 -right-4 bg-white/10 backdrop-blur-xl p-4 rounded-2xl border border-white/20 shadow-2xl animate-[bounce_4s_ease-in-out_infinite]" style={{ animationDelay: '1s' }}>
-                      <Lightbulb className="w-8 h-8 text-yellow-200" />
+                    <div className="absolute bottom-6 -right-2 bg-white/10 backdrop-blur-xl p-3 rounded-xl border border-white/20 shadow-2xl animate-[bounce_4s_ease-in-out_infinite]" style={{ animationDelay: '1s' }}>
+                      <Lightbulb className="w-6 h-6 text-yellow-200" />
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Bottom Control Bar Inside Hero */}
-              <div className="relative border-t border-white/10 bg-black/10 backdrop-blur-md p-6 md:px-12 lg:px-16">
-                <div className="flex flex-col space-y-6">
+              <div className="relative border-t border-white/10 bg-black/10 backdrop-blur-md p-4 md:px-8 lg:px-10">
+                <div className="flex flex-col space-y-4">
                   {/* Filter Tags */}
                   <div className="flex flex-wrap gap-2">
                     {classesList.map((cls) => (
