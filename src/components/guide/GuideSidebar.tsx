@@ -22,6 +22,15 @@ export function GuideSidebar({ subjects: initialSubjects, activeId, classTitle: 
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // If subjects are passed as props (e.g. from the guide pages), use them directly
+    if (initialSubjects && initialSubjects.length > 0) {
+      setSubjects(initialSubjects);
+      setClassTitle(initialClassTitle);
+      setLoading(false);
+      return;
+    }
+
+    // Otherwise, fetch based on user profile (e.g. for dashboard)
     async function fetchStudentData() {
       if (user && userProfile?.classId) {
         try {
@@ -47,21 +56,20 @@ export function GuideSidebar({ subjects: initialSubjects, activeId, classTitle: 
             setSubjects(relevantNodes.map(n => ({
               id: n.fullSlug || n.id,
               title: n.title || n.name,
-              countStr: '' // We could calculate this if needed
+              countStr: '' 
             })));
           }
         } catch (error) {
           console.error("Error fetching class subjects for sidebar:", error);
         }
       } else if (!user) {
-        // Fallback title if not logged in
         setClassTitle('Subjects');
       }
       setLoading(false);
     }
     
     fetchStudentData();
-  }, [user, userProfile]);
+  }, [initialSubjects, initialClassTitle, user, userProfile]);
 
   return (
     <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col h-fit overflow-hidden">
