@@ -31,7 +31,7 @@ type Subject = {
 }
 
 function ChapterRow({ chapter }: { chapter: SubjectTopic }) {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   
   return (
     <div className="flex flex-col border-b border-dashed border-slate-200 dark:border-slate-800 last:border-b-0">
@@ -44,10 +44,19 @@ function ChapterRow({ chapter }: { chapter: SubjectTopic }) {
         </Link>
         {chapter.subtopics && chapter.subtopics.length > 0 && (
           <div 
-            onClick={() => setIsOpen(!isOpen)} 
-            className="p-3 mr-1 cursor-pointer text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsOpen(!isOpen);
+            }} 
+            className={cn(
+              "flex items-center justify-center w-7 h-7 mr-3 rounded-md transition-colors cursor-pointer shrink-0",
+              isOpen 
+                ? "bg-blue-50 dark:bg-blue-900/30 text-blue-500 hover:bg-blue-100 dark:hover:bg-blue-900/50" 
+                : "bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-400"
+            )}
           >
-            {isOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+            {isOpen ? <ArrowUp className="w-3.5 h-3.5" /> : <ArrowDown className="w-3.5 h-3.5" />}
           </div>
         )}
       </div>
