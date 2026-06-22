@@ -132,12 +132,22 @@ function ChapterRow({ chapterId, chapterTitle, chapterLink }: { chapterId: strin
   );
 }
 
-function AcademyCard({ subject }: { subject: Subject }) {
+function AcademyCard({ subject, index }: { subject: Subject, index: number }) {
   const [isTopExpanded, setIsTopExpanded] = useState(false);
   const [isBottomExpanded, setIsBottomExpanded] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [chapters, setChapters] = useState<SubjectTopic[]>([]);
   const [hasFetched, setHasFetched] = useState(false);
+
+  const colorThemes = [
+    { text: 'text-emerald-600 dark:text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400', hoverBg: 'hover:bg-emerald-100 dark:hover:bg-emerald-900/50' },
+    { text: 'text-blue-600 dark:text-blue-500', bg: 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400', hoverBg: 'hover:bg-blue-100 dark:hover:bg-blue-900/50' },
+    { text: 'text-purple-600 dark:text-purple-500', bg: 'bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400', hoverBg: 'hover:bg-purple-100 dark:hover:bg-purple-900/50' },
+    { text: 'text-amber-600 dark:text-amber-500', bg: 'bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400', hoverBg: 'hover:bg-amber-100 dark:hover:bg-amber-900/50' },
+    { text: 'text-rose-600 dark:text-rose-500', bg: 'bg-rose-50 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400', hoverBg: 'hover:bg-rose-100 dark:hover:bg-rose-900/50' },
+    { text: 'text-indigo-600 dark:text-indigo-500', bg: 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400', hoverBg: 'hover:bg-indigo-100 dark:hover:bg-indigo-900/50' },
+  ];
+  const theme = colorThemes[index % colorThemes.length];
 
   const toggleTopExpanded = async () => {
     if (!isTopExpanded && !hasFetched && subject.id) {
@@ -180,9 +190,9 @@ function AcademyCard({ subject }: { subject: Subject }) {
         {/* Card Header (Title & Right Icon) */}
         <div className="flex justify-between items-start gap-4 mb-2">
           <div className="flex items-center gap-2.5">
-            <ChevronsDown className="w-5 h-5 text-emerald-600 dark:text-emerald-500" />
+            <ChevronsDown className={cn("w-5 h-5", theme.text)} />
             <Link href={subject.link || '#'} className="hover:underline transition-colors">
-              <h3 className="font-bold text-emerald-600 dark:text-emerald-500 text-[18px] leading-tight">
+              <h3 className={cn("font-bold text-[18px] leading-tight", theme.text)}>
                 {subject.title}
               </h3>
             </Link>
@@ -192,7 +202,7 @@ function AcademyCard({ subject }: { subject: Subject }) {
             className={cn(
             "flex items-center justify-center w-8 h-8 rounded-lg transition-colors shrink-0",
             isTopExpanded 
-              ? "bg-blue-50 dark:bg-blue-900/30 text-blue-500 hover:bg-blue-100" 
+              ? cn(theme.bg, theme.hoverBg)
               : "bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-400"
           )}>
             {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : (isTopExpanded ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />)}
@@ -552,7 +562,7 @@ export default function AcademyPage() {
             {/* Grid of Subjects */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pb-12 items-start">
               {filteredSubjectsData.map((subject, idx) => (
-                <AcademyCard key={idx} subject={subject} />
+                <AcademyCard key={idx} subject={subject} index={idx} />
               ))}
               {filteredSubjectsData.length === 0 && (
                 <div className="col-span-full py-12 text-center text-slate-500">
