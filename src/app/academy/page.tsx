@@ -8,7 +8,10 @@ import { Input } from '@/components/ui/input';
 import { Search, ChevronDown, ChevronUp, ExternalLink, Play, ArrowUp, ArrowDown, Loader2 } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
-import { getTaxonomyNodesByTrack, TaxonomyNode } from '@/lib/firebase/taxonomy';
+import { getTaxonomyNodesByType, getTaxonomyNodeById, TaxonomyNode } from '@/lib/firebase/taxonomy';
+import { useAuth } from "@/hooks/use-auth";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { db } from "@/lib/firebase/client";
 
 type Subject = {
   title: string;
@@ -133,66 +136,132 @@ function AcademyCard({ subject }: { subject: Subject }) {
 }
 
 export default function AcademyPage() {
-  const [allNodes, setAllNodes] = useState<TaxonomyNode[]>([]);
+  const { userProfile, loading: authLoading } = useAuth();
+  const [classesList, setClassesList] = useState<TaxonomyNode[]>([]);
+  const [subjectsData, setSubjectsData] = useState<Subject[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedClassId, setSelectedClassId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
+  // 1. Fetch only necessary Classes (Optimized Read Counts)
   useEffect(() => {
-    const fetchNodes = async () => {
+    if (authLoading) return;
+    const fetchClasses = async () => {
+      setLoading(true);
       try {
-        const nodes = await getTaxonomyNodesByTrack('academic');
-        setAllNodes(nodes);
+        let fetchedClasses: TaxonomyNode[] = [];
+        if (userProfile?.classId) {
+          // Only fetch 1 document if user is onboarded!
+          const userClass = await getTaxonomyNodeById(userProfile.classId);
+          if (userClass) {
+            fetchedClasses = [userClass];
+          }
+        } else {
+          // Fetch only 'class' nodes, not the entire database
+          fetchedClasses = await getTaxonomyNodesByType('academic', 'class');
+        }
         
-        // Default to first class if available
-        const classes = nodes.filter(n => n.type === 'class');
-        if (classes.length > 0) {
-          setSelectedClassId(classes[0].id);
+        setClassesList(fetchedClasses);
+        if (fetchedClasses.length > 0 && !selectedClassId) {
+          setSelectedClassId(fetchedClasses[0].id);
         }
       } catch (error) {
-        console.error("Error fetching taxonomy nodes:", error);
+        console.error("Error fetching classes:", error);
       } finally {
         setLoading(false);
       }
     };
-    fetchNodes();
-  }, []);
+    fetchClasses();
+  }, [authLoading, userProfile]);
 
-  const classes = allNodes.filter(n => n.type === 'class');
+  // 2. Fetch Textbooks & Chapters dynamically ONLY for the selected Class
+  useEffect(() => {
+    if (!selectedClassId) return;
+    const fetchClassData = async () => {
+      setLoading(true);
+      try {
+        // Find subjects for this class
+        const subjectsQ = query(
+          collection(db, 'taxonomy_nodes'), 
+          where('parentId', '==', selectedClassId), 
+          where('type', '==', 'subject')
+        );
+        const subjectsSnap = await getDocs(subjectsQ);
+        const subjectIds = subjectsSnap.docs.map(d => d.id);
+        
+        let parentIdsToSearch = [selectedClassId];
+        if (subjectIds.length > 0) {
+           parentIdsToSearch = [...parentIdsToSearch, ...subjectIds];
+        }
 
-  let subjectsData: Subject[] = [];
-  if (selectedClassId) {
-    const subjects = allNodes.filter(n => n.parentId === selectedClassId && n.type === 'subject');
-    const subjectIds = subjects.map(s => s.id);
+        // Firestore 'in' query allows up to 30 items. Chunking for safety.
+        let allTextbooks: any[] = [];
+        const chunkSize = 30;
+        for (let i = 0; i < parentIdsToSearch.length; i += chunkSize) {
+          const chunk = parentIdsToSearch.slice(i, i + chunkSize);
+          const tbQ = query(
+            collection(db, 'taxonomy_nodes'), 
+            where('type', '==', 'textbook'), 
+            where('parentId', 'in', chunk)
+          );
+          const tbSnap = await getDocs(tbQ);
+          allTextbooks = [...allTextbooks, ...tbSnap.docs.map(d => ({id: d.id, ...d.data()}))];
+        }
+
+        if (allTextbooks.length === 0) {
+           setSubjectsData([]);
+           setLoading(false);
+           return;
+        }
+
+        // Fetch chapters for these textbooks
+        const textbookIds = allTextbooks.map(tb => tb.id);
+        let allChapters: any[] = [];
+        for (let i = 0; i < textbookIds.length; i += chunkSize) {
+          const chunk = textbookIds.slice(i, i + chunkSize);
+          const chQ = query(
+            collection(db, 'taxonomy_nodes'), 
+            where('type', '==', 'chapter'), 
+            where('parentId', 'in', chunk)
+          );
+          const chSnap = await getDocs(chQ);
+          allChapters = [...allChapters, ...chSnap.docs.map(d => ({id: d.id, ...d.data()}))];
+        }
+
+        // Map data to the UI structure
+        const mappedData = allTextbooks.map(tb => {
+          const tbChapters = allChapters.filter(c => c.parentId === tb.id);
+          return {
+            title: tb.title,
+            badges: [
+              { type: 'Practice', icon: true, color: 'slate' },
+              { type: 'প্রশ্ন তৈরি করুন', isAction: true, color: 'slate' }
+            ],
+            progressText: 'Progress: 0%',
+            progressValue: 0,
+            stats: { mcq: '0%', cq: '0%', content: '0%' },
+            topics: tbChapters.map(c => c.title)
+          };
+        });
+
+        setSubjectsData(mappedData);
+
+      } catch (error) {
+        console.error("Error fetching class specific data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
     
-    // Find textbooks that belong to the selected class (either direct child or grandchild via subject)
-    const textbooks = allNodes.filter(n => 
-      n.type === 'textbook' && 
-      (n.parentId === selectedClassId || (n.parentId && subjectIds.includes(n.parentId)))
-    );
+    fetchClassData();
+  }, [selectedClassId]);
 
-    subjectsData = textbooks.map(tb => {
-      const chapters = allNodes.filter(n => n.type === 'chapter' && n.parentId === tb.id);
-      
-      return {
-        title: tb.title,
-        badges: [
-          { type: 'Practice', icon: true, color: 'slate' },
-          { type: 'প্রশ্ন তৈরি করুন', isAction: true, color: 'slate' }
-        ],
-        progressText: 'Progress: 0%',
-        progressValue: 0,
-        stats: { mcq: '0%', cq: '0%', content: '0%' },
-        topics: chapters.map(c => c.title)
-      };
-    });
-  }
-
+  let filteredSubjectsData = subjectsData;
   if (searchQuery) {
-    subjectsData = subjectsData.filter(s => s.title.toLowerCase().includes(searchQuery.toLowerCase()));
+    filteredSubjectsData = filteredSubjectsData.filter(s => s.title.toLowerCase().includes(searchQuery.toLowerCase()));
   }
 
-  const selectedClass = classes.find(c => c.id === selectedClassId);
+  const selectedClass = classesList.find(c => c.id === selectedClassId);
   const selectedClassTitle = selectedClass ? selectedClass.title : 'Academy Subject';
 
   return (
@@ -228,7 +297,7 @@ export default function AcademyPage() {
           <>
             {/* Filter Tags */}
             <div className="flex flex-wrap gap-2">
-              {classes.map((cls) => (
+              {classesList.map((cls) => (
                 <button 
                   key={cls.id} 
                   onClick={() => setSelectedClassId(cls.id)}
@@ -248,7 +317,7 @@ export default function AcademyPage() {
             <div className="space-y-4">
               <div>
                 <h2 className="text-xl font-bold text-slate-900 dark:text-white">{selectedClassTitle} Dashboard</h2>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Showing 1 - {subjectsData.length} of {subjectsData.length} entries</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Showing 1 - {filteredSubjectsData.length} of {filteredSubjectsData.length} entries</p>
               </div>
               
               <div className="relative max-w-full bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
@@ -265,10 +334,10 @@ export default function AcademyPage() {
 
             {/* Grid of Subjects */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pb-12 items-start">
-              {subjectsData.map((subject, idx) => (
+              {filteredSubjectsData.map((subject, idx) => (
                 <AcademyCard key={idx} subject={subject} />
               ))}
-              {subjectsData.length === 0 && (
+              {filteredSubjectsData.length === 0 && (
                 <div className="col-span-full py-12 text-center text-slate-500">
                   No textbooks found for the selected class.
                 </div>
