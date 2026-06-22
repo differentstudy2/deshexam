@@ -26,6 +26,18 @@ export interface TaxonomyNode {
   metaTitle?: string;
   metaDescription?: string;
   keywords?: string[];
+  seo?: {
+    customTitle?: string;
+    customDescription?: string;
+    focusKeyword?: string;
+    keywords?: string[];
+    ogTitle?: string;
+    ogDescription?: string;
+    ogImage?: string;
+    canonicalUrl?: string;
+    robotsIndex?: boolean;
+    useCustomSeo?: boolean;
+  };
   
   createdAt: Date;
   updatedAt: Date;

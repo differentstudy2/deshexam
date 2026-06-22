@@ -24,10 +24,10 @@ export function ReadingLayout({
   data: any;
   subjects: any[];
   curriculum: Chapter[];
-  boardTitle: string;
-  classTitle: string;
-  subjectTitle: string;
-  textbookTitle: string;
+  boardTitle?: string;
+  classTitle?: string;
+  subjectTitle?: string;
+  textbookTitle?: string;
   chapterTitle?: string;
 }) {
 

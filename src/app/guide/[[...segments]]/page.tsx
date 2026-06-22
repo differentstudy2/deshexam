@@ -29,33 +29,18 @@ export async function generateMetadata({ params }: { params: Promise<{ segments?
 
   if (!node) return { title: 'Not Found' };
 
-  let title = node.seoTitle || node.title;
-  let description = node.seoDescription || node.description || `Read comprehensive guides for ${node.title}`;
-
-  if (contentType) {
-    title = `${node.title} ${contentType.toUpperCase()} - ${node.classSlug?.replace('-', ' ') || 'Guide'} | DeshExam`;
-    description = `Practice ${contentType.toUpperCase()} for ${node.title}. Comprehensive guide and questions.`;
-  } else if (node.type === 'board') {
-    title = `${node.title} Study Materials, Notes & Mock Tests | DeshExam`;
-  } else if (node.type === 'chapter') {
-    title = `${node.title} Guide & Notes - ${node.classSlug?.replace('-', ' ') || 'Class'} | DeshExam`;
+  const { generateHybridSeo } = await import('@/lib/seo');
+  const metadata = generateHybridSeo({ node, contentType });
+  
+  if (node.featureImage && metadata.openGraph) {
+    metadata.openGraph.images = [{ url: node.featureImage }];
   }
-
+  
   return {
-    title: `${title} - Academy Guide`,
-    description,
+    ...metadata,
     alternates: {
-      canonical: `https://deshexam.com/guide/${requestedPath}`
-    },
-    robots: {
-      index: node.isIndexable !== false,
-      follow: true
-    },
-    openGraph: {
-      title,
-      description,
-      type: contentType || node.type === 'chapter' ? 'article' : 'website',
-      ...(node.featureImage ? { images: [{ url: node.featureImage }] } : {})
+      ...metadata.alternates,
+      canonical: metadata.alternates?.canonical || `https://deshexam.com/guide/${requestedPath}`
     }
   };
 }
@@ -108,6 +93,17 @@ export default async function GuidePage({ params }: { params: Promise<{ segments
       title: n.title || (n as any).name,
       countStr: ''
     }));
+  } else if (node.type === 'board') {
+    const boardNodes = await getTaxonomyNodesByParent(node.id);
+    const classes = boardNodes.filter(n => n.type === 'class');
+    // Sort classes by orderIndex if available
+    classes.sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
+    subjects = classes.map(n => ({
+      id: n.fullSlug || n.id,
+      dbId: n.id,
+      title: n.title || (n as any).name,
+      countStr: ''
+    }));
   } else {
     subjects = await getGuideSubjects();
   }
@@ -122,8 +118,11 @@ export default async function GuidePage({ params }: { params: Promise<{ segments
   } else if (node.type === 'class') {
     const { getCurriculumByClass } = await import('@/lib/firebase/guide');
     fullCurriculum = await getCurriculumByClass(node.id);
+  } else if (node.type === 'board') {
+    const { getCurriculumByBoard } = await import('@/lib/firebase/guide');
+    fullCurriculum = await getCurriculumByBoard(node.id);
   } else {
-    // Fallback if somehow no subject or class is determined
+    // Fallback if somehow no subject or class or board is determined
     const fallbackId = subjects[0]?.dbId || subjects[0]?.id || 'sahitya-kanika';
     fullCurriculum = await getCurriculumBySubject(fallbackId);
   }
@@ -145,10 +144,10 @@ export default async function GuidePage({ params }: { params: Promise<{ segments
         data={readingData}
         subjects={subjects} 
         curriculum={curriculum} 
-        boardTitle={boardTitle || 'Board'}
-        classTitle={classTitle || 'Class'}
-        subjectTitle={subjectTitle || 'Subject'}
-        textbookTitle={textbookTitle || 'Textbook'}
+        boardTitle={boardTitle}
+        classTitle={classTitle}
+        subjectTitle={subjectTitle}
+        textbookTitle={textbookTitle}
         chapterTitle={chapterTitle}
       />
     );
@@ -162,13 +161,13 @@ export default async function GuidePage({ params }: { params: Promise<{ segments
   return (
     <SubjectDashboard 
       id={node.id} 
-      pageType={node.type as "chapter" | "textbook" | "subject"}
+      pageType={node.type as "board" | "class" | "subject" | "textbook" | "chapter"}
       subjects={subjects} 
       curriculum={curriculum} 
-      boardTitle={boardTitle || 'Board'}
-      classTitle={classTitle || 'Class'}
-      subjectTitle={subjectTitle || 'Subject'}
-      textbookTitle={textbookTitle || 'Textbook'}
+      boardTitle={boardTitle}
+      classTitle={classTitle}
+      subjectTitle={subjectTitle}
+      textbookTitle={textbookTitle}
       chapterTitle={chapterTitle}
     />
   );

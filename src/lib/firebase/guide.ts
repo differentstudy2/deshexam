@@ -95,6 +95,52 @@ export const getCurriculumByClass = async (classId: string): Promise<Chapter[]> 
   }
 };
 
+export const getCurriculumByBoard = async (boardId: string): Promise<Chapter[]> => {
+  try {
+    const allNodes = await getTaxonomyNodesByTrack('academic');
+    
+    const extractNumber = (title: string): number => {
+      const match = title.match(/[0-9০-৯]+/);
+      if (!match) return 0;
+      const bengaliToEnglish: Record<string, string> = {
+        '০': '0', '১': '1', '২': '2', '৩': '3', '৪': '4',
+        '৫': '5', '৬': '6', '৭': '7', '৮': '8', '৯': '9'
+      };
+      const englishNumStr = match[0].split('').map(char => bengaliToEnglish[char] || char).join('');
+      return parseInt(englishNumStr, 10);
+    };
+
+    const sortNodes = (nodes: any[]) => {
+      return nodes.sort((a, b) => {
+        const numA = extractNumber(a.title || '');
+        const numB = extractNumber(b.title || '');
+        if (numA !== numB) return numA - numB;
+        return (a.orderIndex || 0) - (b.orderIndex || 0);
+      });
+    };
+
+    const classes = sortNodes(allNodes.filter(n => n.parentId === boardId && n.type === 'class'));
+    
+    return classes.map(c => {
+      const subjects = sortNodes(allNodes.filter(n => n.parentId === c.id && n.type === 'subject'));
+      return {
+        id: c.fullSlug || c.id,
+        title: c.title,
+        type: 'chapter',
+        topics: subjects.map(s => ({
+          id: s.fullSlug || s.id,
+          title: s.title,
+          type: 'topic',
+          subtopics: []
+        }))
+      };
+    }) as unknown as Chapter[];
+  } catch (error) {
+    console.error("Error fetching curriculum by board:", error);
+    return [];
+  }
+};
+
 export const getReadingContent = async (contentId: string): Promise<ReadingContentData | null> => {
   try {
     const { getTaxonomyNodeById } = await import('./taxonomy');

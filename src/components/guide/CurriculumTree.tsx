@@ -40,7 +40,7 @@ export function CurriculumTree({ curriculum }: CurriculumTreeProps) {
         const isChapterExpanded = expandedChapters.has(chapter.id);
 
         return (
-          <div key={chapter.id} className="flex flex-col mb-4 last:mb-0">
+          <div key={`${chapter.id}-${cIdx}`} className="flex flex-col mb-4 last:mb-0">
             {/* Chapter Row */}
             <div 
               className={cn(
@@ -91,9 +91,9 @@ export function CurriculumTree({ curriculum }: CurriculumTreeProps) {
             {/* Topics & Subtopics */}
             {isChapterExpanded && (
               <div className="flex flex-col">
-                {chapter.topics.map((topic) => {
+                {chapter.topics.map((topic, tIdx) => {
                   return (
-                    <div key={topic.id} className="flex flex-col">
+                    <div key={`${topic.id}-${cIdx}-${tIdx}`} className="flex flex-col">
                       
                       {/* Topic Row */}
                       <div 
@@ -134,9 +134,9 @@ export function CurriculumTree({ curriculum }: CurriculumTreeProps) {
                       {/* Subtopics List */}
                       {topic.subtopics && topic.subtopics.length > 0 && (
                         <div className="flex flex-col">
-                          {topic.subtopics.map((subtopic) => (
+                          {topic.subtopics.map((subtopic, sIdx) => (
                             <div 
-                              key={subtopic.id} 
+                              key={`${subtopic.id}-${cIdx}-${tIdx}-${sIdx}`} 
                               className="flex items-center justify-between py-3 pl-16 pr-2 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border-b border-dashed border-slate-200 dark:border-slate-800 group"
                             >
                               <Link 

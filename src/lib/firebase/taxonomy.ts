@@ -36,8 +36,18 @@ export interface TaxonomyNode {
   // Indexing & Schema
   isIndexable?: boolean;
   schemaType?: string;
-
-  
+  seo?: {
+    customTitle?: string;
+    customDescription?: string;
+    focusKeyword?: string;
+    keywords?: string[];
+    ogTitle?: string;
+    ogDescription?: string;
+    ogImage?: string;
+    canonicalUrl?: string;
+    robotsIndex?: boolean;
+    useCustomSeo?: boolean;
+  };
   // Optional fields used by specific node types
   icon?: string;
   description?: string;

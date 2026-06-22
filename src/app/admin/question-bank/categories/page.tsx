@@ -117,22 +117,51 @@ export default function QuestionBankCategoriesPage() {
           </CardHeader>
           <CardContent>
             {isEditing && (
-              <div className="mb-6 grid grid-cols-3 gap-4 border p-4 rounded bg-slate-50 dark:bg-slate-900">
-                <Input placeholder="ID (slug-like)" value={editData.id || ''} onChange={(e) => setEditData({...editData, id: e.target.value})} disabled={!!nodes.find(n => n.id === editData.id)} />
-                <Input placeholder="Name" value={editData.name || ''} onChange={(e) => {
-                  const newName = e.target.value;
-                  const newSlug = slugify(newName);
-                  // Only auto-update id if we are creating a new node, not editing an existing one
-                  const isNew = !nodes.find(n => n.id === editData.id);
-                  setEditData({
-                    ...editData, 
-                    name: newName, 
-                    slug: newSlug,
-                    ...(isNew ? { id: newSlug } : {})
-                  });
-                }} />
-                <Input placeholder="Slug" value={editData.slug || ''} onChange={(e) => setEditData({...editData, slug: e.target.value})} />
-                <Button onClick={handleSave} className="col-span-3">Save</Button>
+              <div className="mb-6 space-y-4 border p-4 rounded bg-slate-50 dark:bg-slate-900">
+                <div className="grid grid-cols-3 gap-4">
+                  <Input placeholder="ID (slug-like)" value={editData.id || ''} onChange={(e) => setEditData({...editData, id: e.target.value})} disabled={!!nodes.find(n => n.id === editData.id)} />
+                  <Input placeholder="Name" value={editData.name || ''} onChange={(e) => {
+                    const newName = e.target.value;
+                    const newSlug = slugify(newName);
+                    const isNew = !nodes.find(n => n.id === editData.id);
+                    setEditData({
+                      ...editData, 
+                      name: newName, 
+                      slug: newSlug,
+                      ...(isNew ? { id: newSlug } : {})
+                    });
+                  }} />
+                  <Input placeholder="Slug" value={editData.slug || ''} onChange={(e) => setEditData({...editData, slug: e.target.value})} />
+                </div>
+                
+                <div className="border-t pt-4">
+                  <h3 className="font-semibold mb-3">SEO Configuration</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm text-slate-500">Custom Title</label>
+                      <Input placeholder="Custom Title Override" value={editData.seo?.customTitle || ''} onChange={(e) => setEditData({...editData, seo: {...editData.seo, customTitle: e.target.value}})} />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm text-slate-500">Focus Keyword</label>
+                      <Input placeholder="Focus Keyword" value={editData.seo?.focusKeyword || ''} onChange={(e) => setEditData({...editData, seo: {...editData.seo, focusKeyword: e.target.value}})} />
+                    </div>
+                    <div className="space-y-2 col-span-2">
+                      <label className="text-sm text-slate-500">Custom Description</label>
+                      <Input placeholder="Custom Meta Description" value={editData.seo?.customDescription || ''} onChange={(e) => setEditData({...editData, seo: {...editData.seo, customDescription: e.target.value}})} />
+                    </div>
+                    <div className="flex items-center gap-2 col-span-2">
+                      <input 
+                        type="checkbox" 
+                        id="useCustomSeo" 
+                        checked={editData.seo?.useCustomSeo || false} 
+                        onChange={(e) => setEditData({...editData, seo: {...editData.seo, useCustomSeo: e.target.checked}})} 
+                      />
+                      <label htmlFor="useCustomSeo" className="text-sm text-slate-700 dark:text-slate-300">Force Custom SEO (Disable Dynamic Fallback)</label>
+                    </div>
+                  </div>
+                </div>
+
+                <Button onClick={handleSave} className="w-full">Save</Button>
               </div>
             )}
           

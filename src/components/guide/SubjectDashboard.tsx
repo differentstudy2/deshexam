@@ -21,7 +21,7 @@ export function SubjectDashboard({
   chapterTitle
 }: {
   id: string;
-  pageType: 'class' | 'subject' | 'textbook' | 'chapter';
+  pageType: 'board' | 'class' | 'subject' | 'textbook' | 'chapter';
   subjects: any[];
   curriculum: Chapter[];
   boardTitle?: string;
@@ -34,6 +34,7 @@ export function SubjectDashboard({
     pageType === 'chapter' ? (chapterTitle || 'Chapter') : 
     pageType === 'textbook' ? (textbookTitle || 'Textbook') : 
     pageType === 'class' ? (classTitle || 'Class') : 
+    pageType === 'board' ? (boardTitle || 'Board') : 
     (subjectTitle || 'Subject');
 
   let treeData = curriculum;
@@ -146,7 +147,7 @@ export function SubjectDashboard({
               {displayTitle}
             </h2>
             <p className="text-[14px] text-[#5c7a6b] dark:text-emerald-200/70 mb-8">
-              {pageType === 'class' ? `${boardTitle} Curriculum Guide` : `${classTitle} ${subjectTitle || ''} Guide`}
+              {pageType === 'board' ? 'All Classes & Curriculum' : pageType === 'class' ? `${boardTitle} Curriculum Guide` : `${classTitle} ${subjectTitle || ''} Guide`}
             </p>
 
             <div className="mt-auto">
@@ -192,9 +193,11 @@ export function SubjectDashboard({
         </div>
 
         {/* Right Column (Sidebar) */}
-        <div className="w-full lg:w-[340px] shrink-0">
-          <GuideSidebar subjects={subjects} activeId={id} />
-        </div>
+        {pageType !== 'board' && (
+          <div className="w-full lg:w-[340px] shrink-0">
+            <GuideSidebar subjects={subjects} activeId={id} classTitle={classTitle} />
+          </div>
+        )}
       </div>
     </div>
   );
