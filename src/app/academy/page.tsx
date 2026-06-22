@@ -192,6 +192,9 @@ export default function AcademyPage() {
     subjectsData = subjectsData.filter(s => s.title.toLowerCase().includes(searchQuery.toLowerCase()));
   }
 
+  const selectedClass = classes.find(c => c.id === selectedClassId);
+  const selectedClassTitle = selectedClass ? selectedClass.title : 'Academy Subject';
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#020817] text-slate-800 dark:text-slate-200">
       
@@ -203,7 +206,7 @@ export default function AcademyPage() {
             <div className="hidden sm:flex items-center text-sm text-slate-500 dark:text-slate-400 font-medium">
               <Link href="/" className="hover:text-slate-900 dark:hover:text-white transition-colors">Home</Link>
               <ChevronDown className="w-3 h-3 mx-2 -rotate-90 text-slate-400" />
-              <span className="text-slate-900 dark:text-slate-200">Academy Subject</span>
+              <span className="text-slate-900 dark:text-slate-200">{selectedClassTitle}</span>
             </div>
           </div>
           <Button 
@@ -244,7 +247,7 @@ export default function AcademyPage() {
             {/* Section Header */}
             <div className="space-y-4">
               <div>
-                <h2 className="text-xl font-bold text-slate-900 dark:text-white">Subject Dashboard</h2>
+                <h2 className="text-xl font-bold text-slate-900 dark:text-white">{selectedClassTitle} Dashboard</h2>
                 <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Showing 1 - {subjectsData.length} of {subjectsData.length} entries</p>
               </div>
               
