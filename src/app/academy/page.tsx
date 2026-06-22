@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, ChevronDown, ChevronUp, ExternalLink, Play, ArrowUp, ArrowDown, Loader2 } from 'lucide-react';
+import { Search, ChevronDown, ChevronUp, ExternalLink, Play, ArrowUp, ArrowDown, Loader2, Circle, CircleDot, ChevronsDown } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 import { getTaxonomyNodesByType, getTaxonomyNodeById, TaxonomyNode } from '@/lib/firebase/taxonomy';
@@ -15,12 +15,12 @@ import { db } from "@/lib/firebase/client";
 
 type Subject = {
   title: string;
+  link?: string;
   badges: any[];
   progressText: string;
   progressValue: number;
   stats?: { mcq: string; cq: string; content: string };
-  topics?: string[];
-  link?: string;
+  topics?: { title: string; link: string; isTopic?: boolean }[];
 }
 
 function AcademyCard({ subject }: { subject: Subject }) {
@@ -38,14 +38,14 @@ function AcademyCard({ subject }: { subject: Subject }) {
       <CardContent className="p-5 flex flex-col">
         
         {/* Card Header (Title & Right Icon) */}
-        <div className="flex justify-between items-start gap-4 mb-4">
-          <div className="flex items-start gap-2.5">
-            <div className="mt-1">
-              <ExternalLink className="w-4 h-4 text-slate-600 dark:text-slate-400" />
-            </div>
-            <h3 className="font-bold text-slate-800 dark:text-slate-100 text-[17px] leading-tight">
-              {subject.title}
-            </h3>
+        <div className="flex justify-between items-start gap-4 mb-2">
+          <div className="flex items-center gap-2.5">
+            <ChevronsDown className="w-5 h-5 text-emerald-600 dark:text-emerald-500" />
+            <Link href={subject.link || '#'} className="hover:underline transition-colors">
+              <h3 className="font-bold text-emerald-600 dark:text-emerald-500 text-[18px] leading-tight">
+                {subject.title}
+              </h3>
+            </Link>
           </div>
           <button 
             onClick={() => setIsTopExpanded(!isTopExpanded)}
@@ -61,12 +61,28 @@ function AcademyCard({ subject }: { subject: Subject }) {
 
         {/* Expanded Topics List */}
         {isTopExpanded && subject.topics && subject.topics.length > 0 && (
-          <div className="flex flex-col gap-1 mb-4">
+          <div className="flex flex-col mb-6 mt-4 border-t border-slate-100 dark:border-slate-800">
             {subject.topics.map((topic, i) => (
-              <div key={i} className="flex items-center gap-2 px-3 py-2.5 bg-slate-100/80 dark:bg-slate-800/50 rounded-md hover:bg-slate-100 transition-colors cursor-pointer">
-                <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
-                <span className="text-[13px] font-bold text-slate-800 dark:text-slate-200">{topic}</span>
-              </div>
+              <Link 
+                key={i} 
+                href={topic.link} 
+                className={cn(
+                  "flex items-center gap-3 py-3.5 border-b border-dashed border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors",
+                  topic.isTopic ? "pl-12 pr-4" : "pl-4 pr-4"
+                )}
+              >
+                {topic.isTopic ? (
+                  <Circle className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400 shrink-0" strokeWidth={2.5} />
+                ) : (
+                  <CircleDot className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" strokeWidth={2} />
+                )}
+                <span className={cn(
+                  "text-[14px]",
+                  topic.isTopic ? "text-slate-600 dark:text-slate-400 font-medium" : "text-slate-800 dark:text-slate-200 font-bold"
+                )}>
+                  {topic.title}
+                </span>
+              </Link>
             ))}
           </div>
         )}
@@ -217,22 +233,52 @@ export default function AcademyPage() {
         // Fetch chapters for these textbooks
         const textbookIds = allTextbooks.map(tb => tb.id);
         let allChapters: any[] = [];
-        for (let i = 0; i < textbookIds.length; i += chunkSize) {
-          const chunk = textbookIds.slice(i, i + chunkSize);
-          const chQ = query(
-            collection(db, 'taxonomy_nodes'), 
-            where('type', '==', 'chapter'), 
-            where('parentId', 'in', chunk)
-          );
-          const chSnap = await getDocs(chQ);
-          allChapters = [...allChapters, ...chSnap.docs.map(d => ({id: d.id, ...d.data()}))];
+        if (textbookIds.length > 0) {
+          for (let i = 0; i < textbookIds.length; i += chunkSize) {
+            const chunk = textbookIds.slice(i, i + chunkSize);
+            const chQ = query(
+              collection(db, 'taxonomy_nodes'), 
+              where('type', '==', 'chapter'), 
+              where('parentId', 'in', chunk)
+            );
+            const chSnap = await getDocs(chQ);
+            allChapters = [...allChapters, ...chSnap.docs.map(d => ({id: d.id, ...d.data()}))];
+          }
+        }
+
+        // Fetch topics for these chapters
+        const chapterIds = allChapters.map(ch => ch.id);
+        let allTopics: any[] = [];
+        if (chapterIds.length > 0) {
+          for (let i = 0; i < chapterIds.length; i += chunkSize) {
+            const chunk = chapterIds.slice(i, i + chunkSize);
+            const tpQ = query(
+              collection(db, 'taxonomy_nodes'), 
+              where('type', '==', 'topic'), 
+              where('parentId', 'in', chunk)
+            );
+            const tpSnap = await getDocs(tpQ);
+            allTopics = [...allTopics, ...tpSnap.docs.map(d => ({id: d.id, ...d.data()}))];
+          }
         }
 
         // Map data to the UI structure
         const mappedData = allTextbooks.map(tb => {
           const tbChapters = allChapters.filter(c => c.parentId === tb.id);
+          
+          let combinedItems: { title: string; link: string; isTopic?: boolean }[] = [];
+          tbChapters.forEach(ch => {
+             // Do not prepend "Chapter: ", just use the title to match the screenshot
+             combinedItems.push({ title: ch.title, link: `/guide/${ch.id}` });
+             const chTopics = allTopics.filter(t => t.parentId === ch.id);
+             chTopics.forEach(tp => {
+                combinedItems.push({ title: tp.title, link: `/guide/${tp.id}`, isTopic: true });
+             });
+          });
+
           return {
             title: tb.title,
+            link: `/guide/${tb.id}`,
             badges: [
               { type: 'Practice', icon: true, color: 'slate' },
               { type: 'প্রশ্ন তৈরি করুন', isAction: true, color: 'slate' }
@@ -240,7 +286,7 @@ export default function AcademyPage() {
             progressText: 'Progress: 0%',
             progressValue: 0,
             stats: { mcq: '0%', cq: '0%', content: '0%' },
-            topics: tbChapters.map(c => c.title)
+            topics: combinedItems
           };
         });
 
