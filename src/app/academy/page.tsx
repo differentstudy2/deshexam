@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, ChevronDown, ChevronUp, ChevronRight, ExternalLink, Play, ArrowUp, ArrowDown, Loader2, Circle, CircleDot, ChevronsDown } from 'lucide-react';
+import { Search, ChevronDown, ChevronUp, ChevronRight, ExternalLink, Play, ArrowUp, ArrowDown, Loader2, Circle, CircleDot, ChevronsDown, BookOpen, GraduationCap, BookMarked, Lightbulb } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 import { getTaxonomyNodesByType, getTaxonomyNodeById, TaxonomyNode } from '@/lib/firebase/taxonomy';
@@ -421,40 +421,103 @@ export default function AcademyPage() {
           </div>
         ) : (
           <>
-            {/* Filter Tags */}
-            <div className="flex flex-wrap gap-2">
-              {classesList.map((cls) => (
-                <button 
-                  key={cls.id} 
-                  onClick={() => setSelectedClassId(cls.id)}
-                  className={cn(
-                    "px-3 py-1 text-xs font-semibold rounded-full shadow-sm transition-colors cursor-pointer",
-                    selectedClassId === cls.id 
-                      ? "bg-green-600 text-white" 
-                      : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700"
-                  )}
-                >
-                  {cls.title}
-                </button>
-              ))}
-            </div>
-
-            {/* Section Header */}
-            <div className="space-y-4">
-              <div>
-                <h2 className="text-xl font-bold text-slate-900 dark:text-white">{selectedClassTitle} Dashboard</h2>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Showing 1 - {filteredSubjectsData.length} of {filteredSubjectsData.length} entries</p>
-              </div>
+            {/* Hero Section */}
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-600 via-teal-600 to-emerald-900 text-white shadow-xl mb-10 border border-emerald-500/30">
+              {/* Background Decorative Elements */}
+              <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white/10 via-transparent to-transparent opacity-60"></div>
+              <div className="absolute -top-32 -right-32 w-[30rem] h-[30rem] bg-teal-400/20 rounded-full blur-3xl"></div>
+              <div className="absolute -bottom-32 -left-32 w-[25rem] h-[25rem] bg-emerald-400/20 rounded-full blur-3xl"></div>
               
-              <div className="relative max-w-full bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                <Input 
-                  type="text" 
-                  placeholder="Search here" 
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-12 h-12 bg-transparent border-none focus-visible:ring-0 w-full text-base placeholder:text-slate-400"
-                />
+              <div className="relative p-8 md:p-12 lg:p-16 flex flex-col md:flex-row items-center justify-between gap-10">
+                <div className="max-w-2xl space-y-6">
+                  <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-sm font-medium backdrop-blur-md shadow-inner">
+                    <span className="relative flex h-2.5 w-2.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-300 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400"></span>
+                    </span>
+                    Interactive Learning Platform
+                  </div>
+                  
+                  <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
+                    Master Your Subjects with <br/>
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-200 to-teal-100">DeshExam Academy</span>
+                  </h2>
+                  
+                  <p className="text-emerald-50/90 text-lg max-w-xl leading-relaxed font-medium">
+                    Access comprehensive textbooks, interactive chapters, and curated practice materials specifically tailored for {selectedClassTitle}.
+                  </p>
+                  
+                  <div className="flex flex-wrap gap-4 pt-4">
+                    <div className="flex items-center gap-4 bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10 shadow-lg hover:bg-white/20 transition-colors">
+                      <div className="bg-emerald-400/20 p-3 rounded-xl border border-white/10">
+                        <BookOpen className="w-6 h-6 text-emerald-100" />
+                      </div>
+                      <div>
+                        <div className="text-3xl font-black">{filteredSubjectsData.length}</div>
+                        <div className="text-xs text-emerald-100/80 uppercase tracking-widest font-bold">Textbooks</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="hidden lg:flex relative shrink-0 items-center justify-center">
+                  <div className="w-72 h-72 relative">
+                    <div className="absolute inset-0 bg-gradient-to-tr from-emerald-400/30 to-teal-300/30 rounded-full blur-2xl animate-pulse"></div>
+                    <div className="relative w-full h-full bg-white/10 backdrop-blur-xl border border-white/20 rounded-full flex items-center justify-center shadow-2xl">
+                      <GraduationCap className="w-32 h-32 text-emerald-50 drop-shadow-xl" />
+                    </div>
+                    
+                    {/* Floating elements */}
+                    <div className="absolute top-4 -left-4 bg-white/10 backdrop-blur-xl p-4 rounded-2xl border border-white/20 shadow-2xl animate-[bounce_3s_ease-in-out_infinite]">
+                      <BookMarked className="w-8 h-8 text-emerald-200" />
+                    </div>
+                    <div className="absolute bottom-8 -right-4 bg-white/10 backdrop-blur-xl p-4 rounded-2xl border border-white/20 shadow-2xl animate-[bounce_4s_ease-in-out_infinite]" style={{ animationDelay: '1s' }}>
+                      <Lightbulb className="w-8 h-8 text-yellow-200" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom Control Bar Inside Hero */}
+              <div className="relative border-t border-white/10 bg-black/10 backdrop-blur-md p-6 md:px-12 lg:px-16">
+                <div className="flex flex-col space-y-6">
+                  {/* Filter Tags */}
+                  <div className="flex flex-wrap gap-2">
+                    {classesList.map((cls) => (
+                      <button 
+                        key={cls.id} 
+                        onClick={() => setSelectedClassId(cls.id)}
+                        className={cn(
+                          "px-4 py-1.5 text-xs font-semibold rounded-full shadow-sm transition-colors cursor-pointer border",
+                          selectedClassId === cls.id 
+                            ? "bg-white text-emerald-800 border-white" 
+                            : "bg-white/10 text-emerald-50 hover:bg-white/20 border-white/20"
+                        )}
+                      >
+                        {cls.title}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Section Header & Search */}
+                  <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                    <div>
+                      <h2 className="text-2xl font-bold text-white">{selectedClassTitle} Dashboard</h2>
+                      <p className="text-sm text-emerald-100/80 mt-1">Showing 1 - {filteredSubjectsData.length} of {filteredSubjectsData.length} entries</p>
+                    </div>
+                    
+                    <div className="relative w-full md:max-w-md bg-white/10 backdrop-blur-md rounded-xl shadow-inner border border-white/20">
+                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-100/70" />
+                      <Input 
+                        type="text" 
+                        placeholder="Search here" 
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="pl-12 h-12 bg-transparent border-none focus-visible:ring-0 w-full text-base text-white placeholder:text-emerald-100/70"
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
