@@ -48,13 +48,13 @@ export function ContentNavigationSidebar({ curriculum, activeId, subjectTitle }:
           </div>
 
           <div className="flex flex-col pb-4">
-            {(curriculum[0]?.topics || []).map((topic) => {
+            {(curriculum[0]?.topics || []).map((topic, index) => {
               const isTopicActive = topic.id === activeId || topic.subtopics?.some((s: any) => s.id === activeId);
               const displayTitle = topic.title.split(' (')[0];
               const isClosed = closedTopics[topic.id];
               
               return (
-                <div key={topic.id} className="flex flex-col mb-1 border-b border-white dark:border-slate-900">
+                <div key={`${topic.id}-${index}`} className="flex flex-col mb-1 border-b border-white dark:border-slate-900">
                   
                   {/* Topic Row (Chapter in DB layer) */}
                   <Link href={`/guide/${topic.id}`} className="block">
@@ -85,11 +85,11 @@ export function ContentNavigationSidebar({ curriculum, activeId, subjectTitle }:
                   {/* Subtopics */}
                   {!isClosed && (
                     <div className="flex flex-col">
-                      {topic.subtopics?.map((subtopic: any) => {
+                      {topic.subtopics?.map((subtopic: any, subIndex: number) => {
                         const isSubActive = subtopic.id === activeId;
                         
                         return (
-                          <Link href={`/guide/${subtopic.id}`} key={subtopic.id}>
+                          <Link href={`/guide/${subtopic.id}`} key={`${subtopic.id}-${subIndex}`}>
                             <div 
                               className={cn(
                                 "px-4 py-2 text-[14.5px] border-b border-dotted border-slate-200 dark:border-slate-800 transition-colors",

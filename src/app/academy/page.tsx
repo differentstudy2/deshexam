@@ -5,13 +5,20 @@ import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, ChevronDown, ChevronUp, ExternalLink, Play, ArrowUp, ArrowDown, Loader2, Circle, CircleDot, ChevronsDown } from 'lucide-react';
+import { Search, ChevronDown, ChevronUp, ChevronRight, ExternalLink, Play, ArrowUp, ArrowDown, Loader2, Circle, CircleDot, ChevronsDown } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 import { getTaxonomyNodesByType, getTaxonomyNodeById, TaxonomyNode } from '@/lib/firebase/taxonomy';
 import { useAuth } from "@/hooks/use-auth";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
+
+type SubjectTopic = {
+  id: string;
+  title: string;
+  link: string;
+  subtopics?: SubjectTopic[];
+};
 
 type Subject = {
   title: string;
@@ -20,7 +27,49 @@ type Subject = {
   progressText: string;
   progressValue: number;
   stats?: { mcq: string; cq: string; content: string };
-  topics?: { title: string; link: string; isTopic?: boolean }[];
+  topics?: SubjectTopic[];
+}
+
+function ChapterRow({ chapter }: { chapter: SubjectTopic }) {
+  const [isOpen, setIsOpen] = useState(true);
+  
+  return (
+    <div className="flex flex-col border-b border-dashed border-slate-200 dark:border-slate-800 last:border-b-0">
+      <div className="flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
+        <Link href={chapter.link} className="flex items-center gap-3 py-3.5 pl-4 pr-2 flex-1 cursor-pointer">
+          <CircleDot className="w-4 h-4 text-slate-400 dark:text-slate-500 group-hover:text-blue-500 transition-colors shrink-0" strokeWidth={2} />
+          <span className="text-[14px] text-slate-800 dark:text-slate-200 font-bold group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+            {chapter.title}
+          </span>
+        </Link>
+        {chapter.subtopics && chapter.subtopics.length > 0 && (
+          <div 
+            onClick={() => setIsOpen(!isOpen)} 
+            className="p-3 mr-1 cursor-pointer text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+          >
+            {isOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+          </div>
+        )}
+      </div>
+      
+      {isOpen && chapter.subtopics && chapter.subtopics.length > 0 && (
+        <div className="flex flex-col pb-2">
+          {chapter.subtopics.map((topic, i) => (
+            <Link 
+              key={i} 
+              href={topic.link} 
+              className="flex items-center gap-3 py-2.5 pl-12 pr-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer group/topic"
+            >
+              <Circle className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 group-hover/topic:text-blue-400 transition-colors shrink-0" strokeWidth={2.5} />
+              <span className="text-[14px] text-slate-600 dark:text-slate-400 font-medium group-hover/topic:text-blue-600 dark:group-hover/topic:text-blue-400 transition-colors">
+                {topic.title}
+              </span>
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 function AcademyCard({ subject }: { subject: Subject }) {
@@ -62,27 +111,8 @@ function AcademyCard({ subject }: { subject: Subject }) {
         {/* Expanded Topics List */}
         {isTopExpanded && subject.topics && subject.topics.length > 0 && (
           <div className="flex flex-col mb-6 mt-4 border-t border-slate-100 dark:border-slate-800">
-            {subject.topics.map((topic, i) => (
-              <Link 
-                key={i} 
-                href={topic.link} 
-                className={cn(
-                  "flex items-center gap-3 py-3.5 border-b border-dashed border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors",
-                  topic.isTopic ? "pl-12 pr-4" : "pl-4 pr-4"
-                )}
-              >
-                {topic.isTopic ? (
-                  <Circle className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400 shrink-0" strokeWidth={2.5} />
-                ) : (
-                  <CircleDot className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" strokeWidth={2} />
-                )}
-                <span className={cn(
-                  "text-[14px]",
-                  topic.isTopic ? "text-slate-600 dark:text-slate-400 font-medium" : "text-slate-800 dark:text-slate-200 font-bold"
-                )}>
-                  {topic.title}
-                </span>
-              </Link>
+            {subject.topics.map((chapter, i) => (
+              <ChapterRow key={i} chapter={chapter} />
             ))}
           </div>
         )}
@@ -266,19 +296,26 @@ export default function AcademyPage() {
         const mappedData = allTextbooks.map(tb => {
           const tbChapters = allChapters.filter(c => c.parentId === tb.id);
           
-          let combinedItems: { title: string; link: string; isTopic?: boolean }[] = [];
+          let chapterItems: SubjectTopic[] = [];
           tbChapters.forEach(ch => {
-             // Do not prepend "Chapter: ", just use the title to match the screenshot
-             combinedItems.push({ title: ch.title, link: `/guide/${ch.id}` });
              const chTopics = allTopics.filter(t => t.parentId === ch.id);
-             chTopics.forEach(tp => {
-                combinedItems.push({ title: tp.title, link: `/guide/${tp.id}`, isTopic: true });
+             const subtopics = chTopics.map(tp => ({
+                id: tp.id,
+                title: tp.title,
+                link: `/guide/${tp.fullSlug || tp.id}`
+             }));
+
+             chapterItems.push({ 
+               id: ch.id,
+               title: ch.title, 
+               link: `/guide/${ch.fullSlug || ch.id}`,
+               subtopics
              });
           });
 
           return {
             title: tb.title,
-            link: `/guide/${tb.id}`,
+            link: `/guide/${tb.fullSlug || tb.id}`,
             badges: [
               { type: 'Practice', icon: true, color: 'slate' },
               { type: 'প্রশ্ন তৈরি করুন', isAction: true, color: 'slate' }
@@ -286,7 +323,7 @@ export default function AcademyPage() {
             progressText: 'Progress: 0%',
             progressValue: 0,
             stats: { mcq: '0%', cq: '0%', content: '0%' },
-            topics: combinedItems
+            topics: chapterItems
           };
         });
 
