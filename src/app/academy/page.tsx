@@ -421,30 +421,53 @@ export default function AcademyPage() {
               
               <div className="relative p-6 md:p-8 lg:p-10 flex flex-col md:flex-row items-center justify-between gap-6">
                 <div className="max-w-2xl space-y-4">
-                  {/* Greeting & Badge Row */}
-                  <div className="flex flex-wrap items-center gap-3">
+                  {/* Greeting & Filter Row */}
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                     {userProfile?.displayName ? (
-                      <div className="text-emerald-100 font-semibold text-base border-r border-white/20 pr-3">
+                      <div className="text-emerald-100 font-semibold text-base sm:border-r sm:border-white/20 sm:pr-4">
                         Welcome back, {userProfile.displayName}!
                       </div>
                     ) : null}
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-xs font-medium backdrop-blur-md shadow-inner">
-                      <span className="relative flex h-2 w-2">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-300 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
-                      </span>
-                      Interactive Learning Platform
+                    
+                    {/* Filter Tags */}
+                    <div className="flex flex-wrap gap-2">
+                      {classesList.map((cls) => (
+                        <button 
+                          key={cls.id} 
+                          onClick={() => setSelectedClassId(cls.id)}
+                          className={cn(
+                            "px-3 py-1 text-xs font-bold rounded-full shadow-sm transition-colors cursor-pointer border",
+                            selectedClassId === cls.id 
+                              ? "bg-white text-emerald-800 border-white" 
+                              : "bg-white/10 text-emerald-50 hover:bg-white/20 border-white/20"
+                          )}
+                        >
+                          {cls.title}
+                        </button>
+                      ))}
                     </div>
                   </div>
                   
+                  {/* Main Title */}
                   <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight">
-                    Master Your Subjects with <br/>
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-200 to-teal-100">DeshExam Academy</span>
+                    {selectedClassTitle} Dashboard
                   </h2>
                   
                   <p className="text-emerald-50/90 text-base max-w-xl leading-relaxed font-medium">
-                    Access comprehensive textbooks, interactive chapters, and curated practice materials specifically tailored for {selectedClassTitle}.
+                    Showing 1 - {filteredSubjectsData.length} of {filteredSubjectsData.length} entries. Access comprehensive textbooks, interactive chapters, and curated practice materials.
                   </p>
+                  
+                  {/* Search Bar */}
+                  <div className="relative w-full max-w-md bg-white/10 backdrop-blur-md rounded-xl shadow-inner border border-white/20">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-100/70" />
+                    <Input 
+                      type="text" 
+                      placeholder="Search here" 
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-12 h-11 bg-transparent border-none focus-visible:ring-0 w-full text-base text-white placeholder:text-emerald-100/70"
+                    />
+                  </div>
                   
                   {/* Stats Row */}
                   <div className="flex flex-wrap gap-3 pt-2">
@@ -516,47 +539,7 @@ export default function AcademyPage() {
                 </div>
               </div>
 
-              {/* Bottom Control Bar Inside Hero */}
-              <div className="relative border-t border-white/10 bg-black/10 backdrop-blur-md p-4 md:px-8 lg:px-10">
-                <div className="flex flex-col space-y-4">
-                  {/* Filter Tags */}
-                  <div className="flex flex-wrap gap-2">
-                    {classesList.map((cls) => (
-                      <button 
-                        key={cls.id} 
-                        onClick={() => setSelectedClassId(cls.id)}
-                        className={cn(
-                          "px-4 py-1.5 text-xs font-semibold rounded-full shadow-sm transition-colors cursor-pointer border",
-                          selectedClassId === cls.id 
-                            ? "bg-white text-emerald-800 border-white" 
-                            : "bg-white/10 text-emerald-50 hover:bg-white/20 border-white/20"
-                        )}
-                      >
-                        {cls.title}
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Section Header & Search */}
-                  <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                    <div>
-                      <h2 className="text-2xl font-bold text-white">{selectedClassTitle} Dashboard</h2>
-                      <p className="text-sm text-emerald-100/80 mt-1">Showing 1 - {filteredSubjectsData.length} of {filteredSubjectsData.length} entries</p>
-                    </div>
-                    
-                    <div className="relative w-full md:max-w-md bg-white/10 backdrop-blur-md rounded-xl shadow-inner border border-white/20">
-                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-100/70" />
-                      <Input 
-                        type="text" 
-                        placeholder="Search here" 
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-12 h-12 bg-transparent border-none focus-visible:ring-0 w-full text-base text-white placeholder:text-emerald-100/70"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
+              {/* Bottom Control Bar Removed - Elements merged into Hero */}
             </div>
 
             {/* Grid of Subjects */}
