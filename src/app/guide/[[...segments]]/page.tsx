@@ -90,9 +90,9 @@ export default async function GuidePage({ params }: { params: Promise<{ segments
   // Helper to extract titles from ancestors array for Dashboard/ReadingLayout props
   const getAncestorTitle = (type: string) => node.ancestors?.find(a => a.type === type)?.title;
   
-  const boardTitle = getAncestorTitle('board');
-  const classTitle = getAncestorTitle('class');
-  const subjectTitle = getAncestorTitle('subject');
+  const boardTitle = node.type === 'board' ? node.title : getAncestorTitle('board');
+  const classTitle = node.type === 'class' ? node.title : getAncestorTitle('class');
+  const subjectTitle = node.type === 'subject' ? node.title : getAncestorTitle('subject');
   const textbookTitle = node.type === 'textbook' ? node.title : getAncestorTitle('textbook');
   const chapterTitle = node.type === 'chapter' ? node.title : getAncestorTitle('chapter');
 
