@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, ChevronDown, ChevronUp, ChevronRight, ExternalLink, Play, ArrowUp, ArrowDown, Loader2, Circle, CircleDot, ChevronsDown, BookOpen, GraduationCap, BookMarked, Lightbulb } from 'lucide-react';
+import { Search, ChevronDown, ChevronUp, ChevronRight, ExternalLink, Play, ArrowUp, ArrowDown, Loader2, Circle, CircleDot, ChevronsDown, BookOpen, GraduationCap, BookMarked, Lightbulb, Target, Activity, ArrowRight } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 import { getTaxonomyNodesByType, getTaxonomyNodeById, TaxonomyNode } from '@/lib/firebase/taxonomy';
@@ -393,25 +393,6 @@ export default function AcademyPage() {
   return (
     <main className="min-h-screen bg-slate-50 dark:bg-[#020817] text-slate-800 dark:text-slate-200">
       
-      {/* Top Header Bar */}
-      <header className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 sticky top-16 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            <h1 className="font-bold text-lg text-slate-900 dark:text-white">Academy</h1>
-            <nav aria-label="breadcrumb" className="hidden sm:flex items-center text-sm text-slate-500 dark:text-slate-400 font-medium">
-              <Link href="/" className="hover:text-slate-900 dark:hover:text-white transition-colors">Home</Link>
-              <ChevronDown className="w-3 h-3 mx-2 -rotate-90 text-slate-400" />
-              <span aria-current="page" className="text-slate-900 dark:text-slate-200">{selectedClassTitle}</span>
-            </nav>
-          </div>
-          <Button 
-            variant="outline" 
-            className="h-8 px-4 bg-green-100 text-green-800 border-transparent hover:bg-green-200 hover:text-green-900 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-900/50"
-          >
-            Back
-          </Button>
-        </div>
-      </header>
 
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         
@@ -430,12 +411,20 @@ export default function AcademyPage() {
               
               <div className="relative p-8 md:p-12 lg:p-16 flex flex-col md:flex-row items-center justify-between gap-10">
                 <div className="max-w-2xl space-y-6">
-                  <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-sm font-medium backdrop-blur-md shadow-inner">
-                    <span className="relative flex h-2.5 w-2.5">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-300 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400"></span>
-                    </span>
-                    Interactive Learning Platform
+                  {/* Greeting & Badge Row */}
+                  <div className="flex flex-wrap items-center gap-4">
+                    {userProfile?.displayName ? (
+                      <div className="text-emerald-100 font-semibold text-lg border-r border-white/20 pr-4">
+                        Welcome back, {userProfile.displayName}!
+                      </div>
+                    ) : null}
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-sm font-medium backdrop-blur-md shadow-inner">
+                      <span className="relative flex h-2.5 w-2.5">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-300 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400"></span>
+                      </span>
+                      Interactive Learning Platform
+                    </div>
                   </div>
                   
                   <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
@@ -447,6 +436,7 @@ export default function AcademyPage() {
                     Access comprehensive textbooks, interactive chapters, and curated practice materials specifically tailored for {selectedClassTitle}.
                   </p>
                   
+                  {/* Stats Row */}
                   <div className="flex flex-wrap gap-4 pt-4">
                     <div className="flex items-center gap-4 bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10 shadow-lg hover:bg-white/20 transition-colors">
                       <div className="bg-emerald-400/20 p-3 rounded-xl border border-white/10">
@@ -455,6 +445,44 @@ export default function AcademyPage() {
                       <div>
                         <div className="text-3xl font-black">{filteredSubjectsData.length}</div>
                         <div className="text-xs text-emerald-100/80 uppercase tracking-widest font-bold">Textbooks</div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-4 bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10 shadow-lg hover:bg-white/20 transition-colors">
+                      <div className="bg-blue-400/20 p-3 rounded-xl border border-white/10">
+                        <Target className="w-6 h-6 text-blue-100" />
+                      </div>
+                      <div>
+                        <div className="text-3xl font-black">1.5k+</div>
+                        <div className="text-xs text-blue-100/80 uppercase tracking-widest font-bold">Questions</div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-4 bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10 shadow-lg hover:bg-white/20 transition-colors">
+                      <div className="bg-purple-400/20 p-3 rounded-xl border border-white/10">
+                        <Activity className="w-6 h-6 text-purple-100" />
+                      </div>
+                      <div>
+                        <div className="text-3xl font-black">50+</div>
+                        <div className="text-xs text-purple-100/80 uppercase tracking-widest font-bold">Mock Tests</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Actions & Progress */}
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 pt-2">
+                    <button className="flex items-center gap-2 bg-white text-emerald-900 px-6 py-3 rounded-xl font-bold hover:bg-emerald-50 transition-colors shadow-lg group">
+                      Resume Learning
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </button>
+                    
+                    <div className="flex flex-col w-full max-w-[200px] space-y-2">
+                      <div className="flex justify-between text-xs font-semibold text-emerald-100">
+                        <span>Overall Progress</span>
+                        <span>12%</span>
+                      </div>
+                      <div className="h-2 bg-white/20 rounded-full overflow-hidden">
+                        <div className="h-full bg-emerald-300 w-[12%] rounded-full shadow-[0_0_10px_rgba(110,231,183,0.5)]"></div>
                       </div>
                     </div>
                   </div>
