@@ -24,12 +24,30 @@ export const getCurriculumBySubject = async (subjectId: string): Promise<Chapter
     
     const textbooks = allNodes.filter(n => n.parentId === subjectId && n.type === 'textbook');
 
-    const curriculum = textbooks.map(tb => {
-      const tbChapters = allNodes
-        .filter(n => n.parentId === tb.id && n.type === 'chapter')
+    const sortNodes = (nodes: any[]) => {
+      return nodes.sort((a, b) => {
+        const numA = parseInt((a.title.match(/\d+/) || [0, '0'])[0], 10);
+        const numB = parseInt((b.title.match(/\d+/) || [0, '0'])[0], 10);
+        
+        if (numA !== numB && (numA > 0 || numB > 0)) {
+          // If one doesn't have a number, put it BEFORE numbered items (e.g. Intro)
+          return numA - numB;
+        }
+
+        if (typeof a.orderIndex === 'number' && typeof b.orderIndex === 'number' && a.orderIndex !== b.orderIndex) {
+          return a.orderIndex - b.orderIndex;
+        }
+        
+        return a.title.localeCompare(b.title, undefined, { numeric: true, sensitivity: 'base' });
+      });
+    };
+
+    const sortedTextbooks = sortNodes(textbooks);
+
+    const curriculum = sortedTextbooks.map(tb => {
+      const tbChapters = sortNodes(allNodes.filter(n => n.parentId === tb.id && n.type === 'chapter'))
         .map(ch => {
-          const chTopics = allNodes
-            .filter(n => n.parentId === ch.id && n.type === 'topic')
+          const chTopics = sortNodes(allNodes.filter(n => n.parentId === ch.id && n.type === 'topic'))
             .map(t => ({ id: t.fullSlug || t.id, title: t.title, type: 'topic' as const, subtopics: [] }));
 
           return {
