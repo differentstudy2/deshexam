@@ -125,7 +125,7 @@ export default function TextbookDetailsPage() {
         </div>
         <div className="ml-auto flex items-center gap-2">
           <Button asChild variant="outline" className="gap-2">
-            <Link href={`/textbook-solutions/${textbook.id}`} target="_blank">
+            <Link href={`/guide/${textbook.fullSlug || textbook.id}`} target="_blank">
               <Eye className="w-4 h-4" /> View Client Page
             </Link>
           </Button>
@@ -166,7 +166,7 @@ export default function TextbookDetailsPage() {
                       </div>
                       <div className="flex items-center gap-3">
                         <Button asChild variant="ghost" size="icon" className="h-8 w-8 hover:bg-gray-200" onClick={(e) => e.stopPropagation()}>
-                          <Link href={`/textbook-solutions/${textbook.id}/chapter/${chapter.id}`} target="_blank">
+                          <Link href={`/guide/${chapter.fullSlug || chapter.id}`} target="_blank">
                             <ExternalLink className="h-4 w-4 text-gray-500" />
                           </Link>
                         </Button>
@@ -191,7 +191,7 @@ export default function TextbookDetailsPage() {
                                 <Target className="h-4 w-4 text-gray-400 group-hover:text-indigo-500 transition-colors" />
                                 <span className="font-medium text-gray-800">{topic.title}</span>
                                 <Button asChild variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity">
-                                  <Link href={`/textbook-solutions/${textbook.id}/chapter/${chapter.id}/topic/${topic.id}`} target="_blank">
+                                  <Link href={`/guide/${topic.fullSlug || topic.id}`} target="_blank">
                                     <ExternalLink className="h-3 w-3 text-indigo-600" />
                                   </Link>
                                 </Button>

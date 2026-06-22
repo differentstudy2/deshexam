@@ -197,6 +197,13 @@ export function TaxonomyDataTable({ type, title }: Props) {
         title: editForm.title, 
         slug: editForm.slug 
       });
+      
+      // If the slug or title has changed, rebuild the SEO fullSlugs for this node and its descendants
+      if (editForm.title !== editingNode.title || editForm.slug !== editingNode.slug) {
+        const { rebuildSubtreeSeo } = await import('@/lib/firebase/migration');
+        await rebuildSubtreeSeo(editingNode.id);
+      }
+
       setIsEditModalOpen(false);
       fetchData(); // Refresh
     } catch (error) {

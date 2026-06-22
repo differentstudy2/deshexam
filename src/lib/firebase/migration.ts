@@ -95,3 +95,79 @@ export async function migrateTaxonomyNodesForSeo(onProgress?: (msg: string) => v
     onProgress?.("Migration failed! Check console.");
   }
 }
+
+export async function rebuildSubtreeSeo(rootNodeId: string) {
+  try {
+    const snap = await getDocs(collection(db, 'taxonomy_nodes'));
+    const nodes = snap.docs.map(d => ({ id: d.id, ...d.data() } as TaxonomyNode));
+    
+    const nodeMap = new Map<string, TaxonomyNode>();
+    nodes.forEach(n => nodeMap.set(n.id, n));
+    
+    // Find all descendants of rootNodeId
+    const descendantsToUpdate: TaxonomyNode[] = [];
+    const queue = [rootNodeId];
+    
+    // We also need to update the root node itself
+    const rootNode = nodeMap.get(rootNodeId);
+    if (rootNode) descendantsToUpdate.push(rootNode);
+
+    while (queue.length > 0) {
+      const currentId = queue.shift()!;
+      const children = nodes.filter(n => n.parentId === currentId);
+      children.forEach(child => {
+        descendantsToUpdate.push(child);
+        queue.push(child.id);
+      });
+    }
+
+    const getAncestors = (nodeId: string | null): TaxonomyNode[] => {
+      const ancestors: TaxonomyNode[] = [];
+      let currentId = nodeId;
+      while (currentId && nodeMap.has(currentId)) {
+        const parent = nodeMap.get(currentId)!;
+        ancestors.unshift(parent);
+        currentId = parent.parentId;
+      }
+      return ancestors;
+    };
+
+    const isValidSlug = (s?: string) => s && /^[a-z0-9-]+$/.test(s);
+
+    const promises = descendantsToUpdate.map(node => {
+      const ancestors = getAncestors(node.parentId);
+      const localSlug = isValidSlug(node.slug) ? node.slug! : generateSlug(node.title || node.id);
+      
+      const ancestorSlugs = ancestors.map(a => isValidSlug(a.slug) ? a.slug! : generateSlug(a.title || a.id));
+      const fullSlug = [...ancestorSlugs, localSlug].join('/');
+
+      const ancestorsArray = ancestors.map(a => ({
+        id: a.id,
+        slug: a.slug || generateSlug(a.title || a.id),
+        title: a.title,
+        type: a.type
+      }));
+
+      const updates: Partial<TaxonomyNode> = {
+        slug: localSlug,
+        fullSlug,
+        ancestors: ancestorsArray as any,
+      };
+
+      return updateDoc(doc(db, 'taxonomy_nodes', node.id), updates as any).then(() => {
+        // Create redirect mapping
+        return setDoc(doc(db, 'url_redirects', node.id), {
+          oldUrl: node.id,
+          newUrl: fullSlug,
+          createdAt: new Date()
+        }, { merge: true });
+      });
+    });
+
+    await Promise.all(promises);
+    return true;
+  } catch (error) {
+    console.error("Failed to rebuild subtree SEO:", error);
+    return false;
+  }
+}
