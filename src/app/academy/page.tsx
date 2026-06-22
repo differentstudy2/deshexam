@@ -1,20 +1,14 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, ChevronDown, ChevronUp, Download, ExternalLink, Play, ArrowUp, ArrowDown } from 'lucide-react';
+import { Search, ChevronDown, ChevronUp, ExternalLink, Play, ArrowUp, ArrowDown, Loader2 } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
-
-const tags = [
-  "class Five (2025) MCQ: 1.7k", "HSC MCQ: 161.2k", "SSC MCQ: 110.4k", "Class 8 MCQ: 15.6k",
-  "Class 7 MCQ: 10.3k", "Class 6 MCQ: 10.1k", "Class Five MCQ: 3.3k", "Class Four MCQ: 2.6k",
-  "Class Three MCQ: 1.7k", "Dakhil Class 9 & 10 MCQ: 518", "Class Eight MCQ: 20", 
-  "Class Six MCQ: 1", "SSC Vokesonal MCQ: 6"
-];
+import { getTaxonomyNodesByTrack, TaxonomyNode } from '@/lib/firebase/taxonomy';
 
 type Subject = {
   title: string;
@@ -23,187 +17,8 @@ type Subject = {
   progressValue: number;
   stats?: { mcq: string; cq: string; content: string };
   topics?: string[];
+  link?: string;
 }
-
-const subjectsData: Subject[] = [
-  {
-    title: 'সাহিত্য কণিকা',
-    badges: [
-      { type: 'MCQ', count: '2.4k', color: 'blue' },
-      { type: 'CQ', count: '1.8k', color: 'blue' },
-      { type: 'Board Ques', count: '1', color: 'slate' },
-      { type: 'Book', count: '1', color: 'slate' },
-      { type: 'Exam', count: '3', color: 'slate' },
-      { type: 'Practice', icon: true, color: 'slate' },
-      { type: 'প্রশ্ন তৈরি করুন', isAction: true, color: 'slate' }
-    ],
-    progressText: 'Started: 4 months ago | Progress: 0.98%',
-    progressValue: 0.98,
-    stats: { mcq: '0.42%', cq: '0%', content: '0.54%' },
-    topics: [
-      'গদ্য',
-      'কবিতা'
-    ]
-  },
-  {
-    title: 'আনন্দ পাঠ(বাংলা দ্রুত পঠন)',
-    badges: [
-      { type: 'MCQ', count: '255', color: 'blue' },
-      { type: 'CQ', count: '118', color: 'blue' },
-      { type: 'Practice', icon: true, color: 'slate' },
-      { type: 'প্রশ্ন তৈরি করুন', isAction: true, color: 'slate' }
-    ],
-    progressText: 'Started: 11 hours ago | Progress: 2.44%',
-    progressValue: 2.44,
-    stats: { mcq: '0%', cq: '0%', content: '2.44%' },
-    topics: [
-      'কাকতাড়ুয়া (সৈয়দ ওয়ালীউল্লাহ)',
-      'নয়া পত্তন (জহির রায়হান)',
-      'হেমায়েত, এ্যালাপাথারি (হাসান আজিজুল হক)',
-      'ডেভিড কপারফিল্ড (চার্লস ডিকেন্স, রূপান্তরঃ আখতারুজ্জামান ইলিয়াস)',
-      'মুক্তি (হাসানুল বারী, রূপান্তরঃ বাণীব্রত বন্দ্যোপাধ্যায়)',
-      'ফিলিস্তিনের চিঠি (হাসান কানাকানি, অনুবাদঃ মানবেন্দ্র বন্দ্যোপাধ্যায়)',
-      'তিরস্কার (জ্যোতির্ময় সরকার)',
-      'নাটক মানসিংহ ও ঈসা খাঁ (ইব্রাহীম সরকার)',
-      'ভ্রমণ-কাহিনি কাবুলের শেষ প্রহরে (সৈয়দ মুজতবা আলী)'
-    ]
-  },
-  {
-    title: 'বাংলা ব্যাকরণ ও নির্মিতি',
-    badges: [
-      { type: 'MCQ', count: '700', color: 'blue' },
-      { type: 'CQ', count: '385', color: 'blue' },
-      { type: 'Book', count: '1', color: 'slate' },
-      { type: 'Practice', icon: true, color: 'slate' },
-      { type: 'প্রশ্ন তৈরি করুন', isAction: true, color: 'slate' }
-    ],
-    progressText: 'Started: 4 months ago | Progress: 0.28%',
-    progressValue: 0.28,
-    stats: { mcq: '0%', cq: '0%', content: '0.28%' },
-    topics: [
-      'ভাষা (প্রথম পরিচ্ছেদ)',
-      'ধ্বনি ও বর্ণ (দ্বিতীয় পরিচ্ছেদ)',
-      'সন্ধি (তৃতীয় পরিচ্ছেদ)',
-      'শব্দ ও পদ (চতুর্থ পরিচ্ছেদ)',
-      'শব্দগঠন (পঞ্চম পরিচ্ছেদ)',
-      'বাক্য (ষষ্ঠ পরিচ্ছেদ)',
-      'বিরামচিহ্ন (সপ্তম পরিচ্ছেদ)',
-      'বানান (অষ্টম পরিচ্ছেদ)',
-      'অভিধান (নবম পরিচ্ছেদ)',
-      'শব্দার্থ (দশম পরিচ্ছেদ)',
-      'নির্মিতি',
-      'অনুধাবন দক্ষতা',
-      'সারাংশ ও সারমর্ম',
-      'অনুচ্ছেদ রচনা',
-      'ভাব-সম্প্রসারণ',
-      'পত্র রচনা',
-      'প্রবন্ধ রচনা'
-    ]
-  },
-  {
-    title: 'English for Today',
-    badges: [
-      { type: 'MCQ', count: '650', color: 'blue' },
-      { type: 'CQ', count: '2.6k', color: 'blue' },
-      { type: 'Practice', icon: true, color: 'slate' },
-      { type: 'প্রশ্ন তৈরি করুন', isAction: true, color: 'slate' }
-    ],
-    progressText: 'Progress: 0%',
-    progressValue: 0,
-    stats: { mcq: '0%', cq: '0%', content: '0%' },
-    topics: [
-      'A glimpse of our culture (Unit 1)',
-      'Food and nutrition (Unit 2)',
-      'Health and hygiene (Unit 3)',
-      'Check your reference (Unit 4)',
-      'Bangabandhu and Bangladesh (Unit 5)',
-      'Going on a trip (Unit 6)',
-      'Different people, different occupations (Unit 7)',
-      'News! News! News! (Unit 8)',
-      'Things that have changed our life (Unit 9)',
-      'Fables (Unit 10)',
-      'Sample question',
-      'paragraph',
-      'Humans and Environment (Unit 06)',
-      'People and Occupations (Unit 07)',
-      'Women\'s Role in Uprisings (Unit 11)',
-      'Unseen Comprehension',
-      'Matching Sentences',
-      'Re-arranging Sentences',
-      'Answering Questions form Poem',
-      'Dialogue Writing',
-      'Completing Stories',
-      'Occupations at Risk (Unit 7)'
-    ]
-  },
-  {
-    title: 'English Grammar and Composition',
-    badges: [
-      { type: 'CQ', count: '2.8k', color: 'blue' },
-      { type: 'Practice', icon: true, color: 'slate' },
-      { type: 'প্রশ্ন তৈরি করুন', isAction: true, color: 'slate' }
-    ],
-    progressText: 'Progress: 0%',
-    progressValue: 0,
-    stats: { mcq: '0%', cq: '0%', content: '0%' },
-    topics: []
-  },
-  {
-    title: 'গণিত',
-    badges: [
-      { type: 'MCQ', count: '2.4k', color: 'blue' },
-      { type: 'CQ', count: '2.3k', color: 'blue' },
-      { type: 'Book', count: '1', color: 'slate' },
-      { type: 'Courses', count: '1', color: 'slate' },
-      { type: 'Practice', icon: true, color: 'slate' },
-      { type: 'প্রশ্ন তৈরি করুন', isAction: true, color: 'slate' }
-    ],
-    progressText: 'Progress: 0%',
-    progressValue: 0,
-    stats: { mcq: '0%', cq: '0%', content: '0%' },
-    topics: []
-  },
-  {
-    title: 'তথ্য ও যোগাযোগ প্রযুক্তি',
-    badges: [
-      { type: 'MCQ', count: '948', color: 'blue' },
-      { type: 'CQ', count: '345', color: 'blue' },
-      { type: 'Book', count: '1', color: 'slate' },
-      { type: 'Practice', icon: true, color: 'slate' },
-      { type: 'প্রশ্ন তৈরি করুন', isAction: true, color: 'slate' }
-    ],
-    progressText: 'Progress: 0%',
-    progressValue: 0,
-    stats: { mcq: '0%', cq: '0%', content: '0%' },
-    topics: []
-  },
-  {
-    title: 'বাংলাদেশ ও বিশ্বপরিচয়',
-    badges: [
-      { type: 'MCQ', count: '1.8k', color: 'blue' },
-      { type: 'CQ', count: '2.2k', color: 'blue' },
-      { type: 'Practice', icon: true, color: 'slate' },
-      { type: 'প্রশ্ন তৈরি করুন', isAction: true, color: 'slate' }
-    ],
-    progressText: 'Progress: 0%',
-    progressValue: 0,
-    stats: { mcq: '0%', cq: '0%', content: '0%' },
-    topics: []
-  },
-  {
-    title: 'বিজ্ঞান',
-    badges: [
-      { type: 'MCQ', count: '2k', color: 'blue' },
-      { type: 'CQ', count: '2k', color: 'blue' },
-      { type: 'Practice', icon: true, color: 'slate' },
-      { type: 'প্রশ্ন তৈরি করুন', isAction: true, color: 'slate' }
-    ],
-    progressText: 'Started: 4 months ago | Progress: 0.05%',
-    progressValue: 0.05,
-    stats: { mcq: '0%', cq: '0%', content: '0%' },
-    topics: []
-  }
-];
 
 function AcademyCard({ subject }: { subject: Subject }) {
   const [isTopExpanded, setIsTopExpanded] = useState(false);
@@ -318,6 +133,65 @@ function AcademyCard({ subject }: { subject: Subject }) {
 }
 
 export default function AcademyPage() {
+  const [allNodes, setAllNodes] = useState<TaxonomyNode[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedClassId, setSelectedClassId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  useEffect(() => {
+    const fetchNodes = async () => {
+      try {
+        const nodes = await getTaxonomyNodesByTrack('academic');
+        setAllNodes(nodes);
+        
+        // Default to first class if available
+        const classes = nodes.filter(n => n.type === 'class');
+        if (classes.length > 0) {
+          setSelectedClassId(classes[0].id);
+        }
+      } catch (error) {
+        console.error("Error fetching taxonomy nodes:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchNodes();
+  }, []);
+
+  const classes = allNodes.filter(n => n.type === 'class');
+
+  let subjectsData: Subject[] = [];
+  if (selectedClassId) {
+    const subjects = allNodes.filter(n => n.parentId === selectedClassId && n.type === 'subject');
+    const subjectIds = subjects.map(s => s.id);
+    
+    // Find textbooks that belong to the selected class (either direct child or grandchild via subject)
+    const textbooks = allNodes.filter(n => 
+      n.type === 'textbook' && 
+      (n.parentId === selectedClassId || (n.parentId && subjectIds.includes(n.parentId)))
+    );
+
+    subjectsData = textbooks.map(tb => {
+      const chapters = allNodes.filter(n => n.type === 'chapter' && n.parentId === tb.id);
+      
+      return {
+        title: tb.title,
+        badges: [
+          { type: 'Practice', icon: true, color: 'slate' },
+          { type: 'প্রশ্ন তৈরি করুন', isAction: true, color: 'slate' }
+        ],
+        progressText: 'Progress: 0%',
+        progressValue: 0,
+        stats: { mcq: '0%', cq: '0%', content: '0%' },
+        topics: chapters.map(c => c.title)
+      };
+    });
+  }
+
+  if (searchQuery) {
+    subjectsData = subjectsData.filter(s => s.title.toLowerCase().includes(searchQuery.toLowerCase()));
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#020817] text-slate-800 dark:text-slate-200">
       
@@ -343,41 +217,62 @@ export default function AcademyPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         
-        {/* Filter Tags */}
-        <div className="flex flex-wrap gap-2">
-          {tags.map((tag, idx) => (
-            <span 
-              key={idx} 
-              className="px-3 py-1 bg-green-600 text-white text-xs font-semibold rounded-full shadow-sm"
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
-
-        {/* Section Header */}
-        <div className="space-y-4">
-          <div>
-            <h2 className="text-xl font-bold text-slate-900 dark:text-white">Subject Dashboard</h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Showing 1 - {subjectsData.length} of {subjectsData.length} entries</p>
+        {loading ? (
+          <div className="flex justify-center py-20">
+            <Loader2 className="w-8 h-8 animate-spin text-green-600" />
           </div>
-          
-          <div className="relative max-w-full bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-            <Input 
-              type="text" 
-              placeholder="Search here" 
-              className="pl-12 h-12 bg-transparent border-none focus-visible:ring-0 w-full text-base placeholder:text-slate-400"
-            />
-          </div>
-        </div>
+        ) : (
+          <>
+            {/* Filter Tags */}
+            <div className="flex flex-wrap gap-2">
+              {classes.map((cls) => (
+                <button 
+                  key={cls.id} 
+                  onClick={() => setSelectedClassId(cls.id)}
+                  className={cn(
+                    "px-3 py-1 text-xs font-semibold rounded-full shadow-sm transition-colors cursor-pointer",
+                    selectedClassId === cls.id 
+                      ? "bg-green-600 text-white" 
+                      : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700"
+                  )}
+                >
+                  {cls.title}
+                </button>
+              ))}
+            </div>
 
-        {/* Grid of Subjects */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pb-12 items-start">
-          {subjectsData.map((subject, idx) => (
-            <AcademyCard key={idx} subject={subject} />
-          ))}
-        </div>
+            {/* Section Header */}
+            <div className="space-y-4">
+              <div>
+                <h2 className="text-xl font-bold text-slate-900 dark:text-white">Subject Dashboard</h2>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Showing 1 - {subjectsData.length} of {subjectsData.length} entries</p>
+              </div>
+              
+              <div className="relative max-w-full bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <Input 
+                  type="text" 
+                  placeholder="Search here" 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-12 h-12 bg-transparent border-none focus-visible:ring-0 w-full text-base placeholder:text-slate-400"
+                />
+              </div>
+            </div>
+
+            {/* Grid of Subjects */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pb-12 items-start">
+              {subjectsData.map((subject, idx) => (
+                <AcademyCard key={idx} subject={subject} />
+              ))}
+              {subjectsData.length === 0 && (
+                <div className="col-span-full py-12 text-center text-slate-500">
+                  No textbooks found for the selected class.
+                </div>
+              )}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
