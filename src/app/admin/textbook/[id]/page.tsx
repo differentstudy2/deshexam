@@ -11,6 +11,10 @@ import { ArrowLeft, BookOpen, Layers, Target, FileText, Activity, Eye, ExternalL
 import Link from 'next/link';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Plus } from 'lucide-react';
 
 interface TopicData extends TaxonomyNode {
   contentsCount: number;
@@ -32,8 +36,13 @@ export default function TextbookDetailsPage() {
   const [loading, setLoading] = useState(true);
   const [clientUrl, setClientUrl] = useState<string>('');
 
-  useEffect(() => {
-    async function loadData() {
+  const [isAddChapterOpen, setIsAddChapterOpen] = useState(false);
+  const [isAddTopicOpen, setIsAddTopicOpen] = useState(false);
+  const [activeChapterId, setActiveChapterId] = useState<string | null>(null);
+  const [newItemTitle, setNewItemTitle] = useState('');
+  const [isAdding, setIsAdding] = useState(false);
+
+  const loadData = async () => {
       if (!textbookId) return;
 
       try {
@@ -125,14 +134,62 @@ export default function TextbookDetailsPage() {
           setChapters(fullChapters);
         }
       } catch (error) {
-        console.error('Error fetching textbook details:', error);
+        console.error("Error fetching textbook details:", error);
       } finally {
         setLoading(false);
       }
-    }
+    };
 
+  useEffect(() => {
     loadData();
   }, [textbookId]);
+
+  const handleAddChapter = async () => {
+    if (!newItemTitle.trim() || !textbook) return;
+    setIsAdding(true);
+    try {
+      const { createTaxonomyNode } = await import('@/lib/firebase/taxonomy');
+      await createTaxonomyNode({
+        title: newItemTitle.trim(),
+        type: 'chapter',
+        track: textbook.track,
+        parentId: textbook.id,
+        status: 'published'
+      });
+      setIsAddChapterOpen(false);
+      setNewItemTitle('');
+      await loadData();
+    } catch (e) {
+      console.error(e);
+      alert('Failed to add chapter');
+    } finally {
+      setIsAdding(false);
+    }
+  };
+
+  const handleAddTopic = async () => {
+    if (!newItemTitle.trim() || !textbook || !activeChapterId) return;
+    setIsAdding(true);
+    try {
+      const { createTaxonomyNode } = await import('@/lib/firebase/taxonomy');
+      await createTaxonomyNode({
+        title: newItemTitle.trim(),
+        type: 'topic',
+        track: textbook.track,
+        parentId: activeChapterId,
+        status: 'published'
+      });
+      setIsAddTopicOpen(false);
+      setNewItemTitle('');
+      setActiveChapterId(null);
+      await loadData();
+    } catch (e) {
+      console.error(e);
+      alert('Failed to add topic');
+    } finally {
+      setIsAdding(false);
+    }
+  };
 
   if (loading) {
     return <div className="p-12 text-center text-gray-500 animate-pulse">Loading textbook data...</div>;
@@ -185,17 +242,22 @@ export default function TextbookDetailsPage() {
       {/* Chapters & Topics Accordion */}
       <Card>
         <CardHeader className="bg-gray-50/50 border-b border-gray-100">
-          <CardTitle className="text-xl flex items-center gap-2">
-            <Layers className="h-5 w-5 text-indigo-500" />
-            Chapters & Topics Content Map
-          </CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-xl flex items-center gap-2">
+              <Layers className="h-5 w-5 text-indigo-500" />
+              Chapters & Topics Content Map
+            </CardTitle>
+            <Button onClick={() => setIsAddChapterOpen(true)} size="sm" className="gap-2">
+              <Plus className="w-4 h-4" /> Add Chapter
+            </Button>
+          </div>
         </CardHeader>
         <CardContent className="p-6">
           {chapters.length === 0 ? (
             <div className="text-center p-8 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50">
               <p className="text-gray-500 mb-4">No chapters have been added to this textbook yet.</p>
-              <Button asChild variant="outline">
-                <Link href="/admin/chapters">Manage Chapters</Link>
+              <Button onClick={() => setIsAddChapterOpen(true)} variant="outline">
+                Add First Chapter
               </Button>
             </div>
           ) : (
@@ -230,8 +292,11 @@ export default function TextbookDetailsPage() {
                   <AccordionContent className="pt-0 pb-0">
                     <div className="border-t border-gray-100">
                       {chapter.topics.length === 0 ? (
-                        <div className="p-6 text-center text-gray-500 bg-gray-50 text-sm">
-                          No topics found under this chapter.
+                        <div className="p-6 text-center text-gray-500 bg-gray-50 text-sm flex flex-col items-center justify-center gap-3">
+                          <p>No topics found under this chapter.</p>
+                          <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); setActiveChapterId(chapter.id); setIsAddTopicOpen(true); }} className="gap-2">
+                            <Plus className="w-3 h-3" /> Add First Topic
+                          </Button>
                         </div>
                       ) : (
                         <ul className="divide-y divide-gray-100">
@@ -267,6 +332,11 @@ export default function TextbookDetailsPage() {
                               </div>
                             </li>
                           ))}
+                          <li className="p-3 pl-12 bg-gray-50/50 flex items-center justify-center border-t border-gray-100">
+                             <Button variant="ghost" size="sm" className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 gap-2" onClick={() => { setActiveChapterId(chapter.id); setIsAddTopicOpen(true); }}>
+                               <Plus className="w-4 h-4" /> Add Another Topic
+                             </Button>
+                          </li>
                         </ul>
                       )}
                     </div>
@@ -277,6 +347,62 @@ export default function TextbookDetailsPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Add Chapter Dialog */}
+      <Dialog open={isAddChapterOpen} onOpenChange={(open) => { setIsAddChapterOpen(open); if (!open) setNewItemTitle(''); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add New Chapter</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="chapter-title">Chapter Title</Label>
+              <Input 
+                id="chapter-title" 
+                placeholder="e.g. 1. Introduction to Physics" 
+                value={newItemTitle} 
+                onChange={(e) => setNewItemTitle(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleAddChapter(); }}
+                autoFocus
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAddChapterOpen(false)} disabled={isAdding}>Cancel</Button>
+            <Button onClick={handleAddChapter} disabled={!newItemTitle.trim() || isAdding}>
+              {isAdding ? 'Adding...' : 'Add Chapter'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Topic Dialog */}
+      <Dialog open={isAddTopicOpen} onOpenChange={(open) => { setIsAddTopicOpen(open); if (!open) { setNewItemTitle(''); setActiveChapterId(null); } }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add New Topic</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="topic-title">Topic Title</Label>
+              <Input 
+                id="topic-title" 
+                placeholder="e.g. Newton's First Law" 
+                value={newItemTitle} 
+                onChange={(e) => setNewItemTitle(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleAddTopic(); }}
+                autoFocus
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAddTopicOpen(false)} disabled={isAdding}>Cancel</Button>
+            <Button onClick={handleAddTopic} disabled={!newItemTitle.trim() || isAdding}>
+              {isAdding ? 'Adding...' : 'Add Topic'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

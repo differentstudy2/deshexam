@@ -1114,9 +1114,9 @@ export const incrementGuideNodeViews = async (nodeId: string) => {
     const collectionName = nodeInfo.level === 'chapter' ? 'guide_chapters' : 'guide_topics';
     const docRef = doc(db, collectionName, nodeId);
     
-    await updateDoc(docRef, {
+    await setDoc(docRef, {
       views: increment(1)
-    });
+    }, { merge: true });
   } catch (error) {
     console.error("Error incrementing views:", error);
   }

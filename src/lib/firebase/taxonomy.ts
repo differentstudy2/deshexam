@@ -211,8 +211,59 @@ export const getTaxonomyNodeById = async (id: string): Promise<TaxonomyNode | nu
 // CREATE
 export const createTaxonomyNode = async (data: Omit<TaxonomyNode, 'id' | 'createdAt' | 'updatedAt' | 'orderIndex'>, idOverride?: string): Promise<string> => {
   const newRef = idOverride ? doc(db, 'taxonomy_nodes', idOverride) : doc(collection(db, 'taxonomy_nodes'));
+  
+  let finalData: any = { ...data };
+  
+  try {
+    const { generateSlug } = await import('@/lib/seo/slug');
+    const isValidSlug = (s?: string) => s && /^[a-z0-9-]+$/.test(s);
+    const localSlug = isValidSlug(data.slug) ? data.slug! : generateSlug(data.title || newRef.id);
+    finalData.slug = localSlug;
+
+    if (data.parentId) {
+      const parentDoc = await getDoc(doc(db, 'taxonomy_nodes', data.parentId));
+      if (parentDoc.exists()) {
+        const parent = parentDoc.data() as TaxonomyNode;
+        const parentAncestors = parent.ancestors || [];
+        const newAncestors = [...parentAncestors, {
+          id: parentDoc.id,
+          slug: parent.slug || generateSlug(parent.title || parentDoc.id),
+          title: parent.title,
+          type: parent.type
+        }];
+        finalData.ancestors = newAncestors;
+        finalData.fullSlug = parent.fullSlug ? `${parent.fullSlug}/${localSlug}` : localSlug;
+        
+        newAncestors.forEach(a => {
+          if (a.type === 'board') finalData.boardSlug = a.slug;
+          if (a.type === 'class') finalData.classSlug = a.slug;
+          if (a.type === 'subject') finalData.subjectSlug = a.slug;
+          if (a.type === 'textbook') finalData.bookSlug = a.slug;
+          if (a.type === 'chapter') finalData.chapterSlug = a.slug;
+          if (a.type === 'topic') finalData.topicSlug = a.slug;
+        });
+      } else {
+        finalData.fullSlug = localSlug;
+      }
+    } else {
+      finalData.fullSlug = localSlug;
+    }
+
+    let schemaType = 'LearningResource';
+    if (['board', 'class', 'subject'].includes(data.type)) schemaType = 'Course';
+    else if (data.type === 'textbook') schemaType = 'Book';
+    else if (data.type === 'chapter' || data.type === 'topic') schemaType = 'Article';
+    finalData.schemaType = schemaType;
+    
+    if (finalData.isIndexable === undefined) {
+      finalData.isIndexable = true;
+    }
+  } catch (e) {
+    console.error("Failed to auto-generate SEO metadata:", e);
+  }
+
   await setDoc(newRef, {
-    ...data,
+    ...finalData,
     orderIndex: Date.now(), // default simple ordering
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp()
@@ -227,17 +278,28 @@ export const updateTaxonomyNode = async (id: string, data: Partial<TaxonomyNode>
   
   await updateDoc(docRef, { ...data, updatedAt: serverTimestamp() });
 
-  // Automatically sync updates to the new guide_* collections to prevent split-brain issues
-  if (existingDoc.exists() && data.title) {
-    const type = existingDoc.data().type;
-    // Only sync if it's an academic node type that exists in guide_* collections
-    if (['board', 'class', 'subject', 'textbook', 'chapter', 'topic'].includes(type)) {
-      try {
-        // Dynamic import to avoid circular dependencies if any
-        const { updateGuideNodeTitle } = await import('./guide');
-        await updateGuideNodeTitle(id, type, data.title, data.author);
-      } catch (e) {
-        console.error('Failed to sync to guide collections:', e);
+  if (existingDoc.exists()) {
+    const existingData = existingDoc.data() as TaxonomyNode;
+    
+    // Auto-rebuild SEO if title or slug changed
+    if ((data.title && data.title !== existingData.title) || (data.slug && data.slug !== existingData.slug)) {
+      import('./migration').then(({ rebuildSubtreeSeo }) => {
+        rebuildSubtreeSeo(id).catch(e => console.error("Failed to rebuild subtree SEO in background:", e));
+      }).catch(e => console.error("Failed to import migration module:", e));
+    }
+
+    // Automatically sync updates to the new guide_* collections to prevent split-brain issues
+    if (data.title) {
+      const type = existingData.type;
+      // Only sync if it's an academic node type that exists in guide_* collections
+      if (['board', 'class', 'subject', 'textbook', 'chapter', 'topic'].includes(type)) {
+        try {
+          // Dynamic import to avoid circular dependencies if any
+          const { updateGuideNodeTitle } = await import('./guide');
+          await updateGuideNodeTitle(id, type, data.title, data.author);
+        } catch (e) {
+          console.error('Failed to sync to guide collections:', e);
+        }
       }
     }
   }
