@@ -13,8 +13,9 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Plus } from 'lucide-react';
+import { Plus, Edit2, Trash2 } from 'lucide-react';
 
 interface TopicData extends TaxonomyNode {
   contentsCount: number;
@@ -41,6 +42,14 @@ export default function TextbookDetailsPage() {
   const [activeChapterId, setActiveChapterId] = useState<string | null>(null);
   const [newItemTitle, setNewItemTitle] = useState('');
   const [isAdding, setIsAdding] = useState(false);
+
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editNodeData, setEditNodeData] = useState<{ id: string, title: string, type: 'chapter' | 'topic' } | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [deleteNodeData, setDeleteNodeData] = useState<{ id: string, title: string, type: 'chapter' | 'topic' } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const loadData = async () => {
       if (!textbookId) return;
@@ -149,13 +158,18 @@ export default function TextbookDetailsPage() {
     setIsAdding(true);
     try {
       const { createTaxonomyNode } = await import('@/lib/firebase/taxonomy');
-      await createTaxonomyNode({
-        title: newItemTitle.trim(),
-        type: 'chapter',
-        track: textbook.track,
-        parentId: textbook.id,
-        status: 'published'
-      });
+      const titles = newItemTitle.split('\n').map(t => t.trim()).filter(Boolean);
+      
+      for (const title of titles) {
+        await createTaxonomyNode({
+          title: title,
+          type: 'chapter',
+          track: textbook.track,
+          parentId: textbook.id,
+          status: 'published'
+        });
+      }
+      
       setIsAddChapterOpen(false);
       setNewItemTitle('');
       await loadData();
@@ -172,13 +186,18 @@ export default function TextbookDetailsPage() {
     setIsAdding(true);
     try {
       const { createTaxonomyNode } = await import('@/lib/firebase/taxonomy');
-      await createTaxonomyNode({
-        title: newItemTitle.trim(),
-        type: 'topic',
-        track: textbook.track,
-        parentId: activeChapterId,
-        status: 'published'
-      });
+      const titles = newItemTitle.split('\n').map(t => t.trim()).filter(Boolean);
+      
+      for (const title of titles) {
+        await createTaxonomyNode({
+          title: title,
+          type: 'topic',
+          track: textbook.track,
+          parentId: activeChapterId,
+          status: 'published'
+        });
+      }
+      
       setIsAddTopicOpen(false);
       setNewItemTitle('');
       setActiveChapterId(null);
@@ -188,6 +207,40 @@ export default function TextbookDetailsPage() {
       alert('Failed to add topic');
     } finally {
       setIsAdding(false);
+    }
+  };
+
+  const handleEditSubmit = async () => {
+    if (!editNodeData || !editNodeData.title.trim()) return;
+    setIsEditing(true);
+    try {
+      const { updateTaxonomyNode } = await import('@/lib/firebase/taxonomy');
+      await updateTaxonomyNode(editNodeData.id, { title: editNodeData.title.trim() });
+      setIsEditModalOpen(false);
+      setEditNodeData(null);
+      await loadData();
+    } catch (e) {
+      console.error(e);
+      alert('Failed to update');
+    } finally {
+      setIsEditing(false);
+    }
+  };
+
+  const handleDeleteSubmit = async () => {
+    if (!deleteNodeData) return;
+    setIsDeleting(true);
+    try {
+      const { deleteTaxonomyNode } = await import('@/lib/firebase/taxonomy');
+      await deleteTaxonomyNode(deleteNodeData.id);
+      setIsDeleteDialogOpen(false);
+      setDeleteNodeData(null);
+      await loadData();
+    } catch (e) {
+      console.error(e);
+      alert('Failed to delete');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -266,28 +319,34 @@ export default function TextbookDetailsPage() {
                 <AccordionItem 
                   key={chapter.id} 
                   value={chapter.id} 
-                  className="border border-gray-200 rounded-lg bg-white overflow-hidden shadow-sm"
+                  className="border border-gray-200 rounded-lg bg-white overflow-hidden shadow-sm relative"
                 >
-                  <AccordionTrigger className="px-5 py-4 hover:bg-gray-50 hover:no-underline transition-colors data-[state=open]:bg-indigo-50/30">
-                    <div className="flex items-center justify-between w-full pr-4">
-                      <div className="flex items-center gap-3">
-                        <div className="bg-indigo-100 p-2 rounded-md text-indigo-600">
-                          <BookOpen className="h-5 w-5" />
-                        </div>
-                        <span className="font-semibold text-lg text-gray-900 text-left">{chapter.title}</span>
+                  <AccordionTrigger className="px-5 py-4 hover:bg-gray-50 hover:no-underline transition-colors data-[state=open]:bg-indigo-50/30 pr-64">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-indigo-100 p-2 rounded-md text-indigo-600">
+                        <BookOpen className="h-5 w-5" />
                       </div>
-                      <div className="flex items-center gap-3">
-                        <Button asChild variant="ghost" size="icon" className="h-8 w-8 hover:bg-gray-200" onClick={(e) => e.stopPropagation()}>
-                          <Link href={chapter.clientUrl} target="_blank">
-                            <ExternalLink className="h-4 w-4 text-gray-500" />
-                          </Link>
-                        </Button>
-                        <Badge variant="secondary" className="bg-gray-100 text-gray-600">
-                          {chapter.topics.length} Topics
-                        </Badge>
-                      </div>
+                      <span className="font-semibold text-lg text-gray-900 text-left line-clamp-1">{chapter.title}</span>
                     </div>
                   </AccordionTrigger>
+                  
+                  {/* Action buttons extracted outside the button element to fix hydration error */}
+                  <div className="absolute right-12 top-0 flex items-center gap-3 h-[60px] pointer-events-auto">
+                    <Button asChild variant="ghost" size="icon" className="h-8 w-8 hover:bg-gray-200 z-10" onClick={(e) => e.stopPropagation()}>
+                      <Link href={chapter.clientUrl} target="_blank">
+                        <ExternalLink className="h-4 w-4 text-gray-500" />
+                      </Link>
+                    </Button>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-gray-200 z-10" onClick={(e) => { e.stopPropagation(); setEditNodeData({ id: chapter.id, title: chapter.title, type: 'chapter' }); setIsEditModalOpen(true); }}>
+                      <Edit2 className="h-4 w-4 text-gray-500" />
+                    </Button>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-red-100 hover:text-red-600 z-10" onClick={(e) => { e.stopPropagation(); setDeleteNodeData({ id: chapter.id, title: chapter.title, type: 'chapter' }); setIsDeleteDialogOpen(true); }}>
+                      <Trash2 className="h-4 w-4 text-gray-500 hover:text-red-600" />
+                    </Button>
+                    <Badge variant="secondary" className="bg-gray-100 text-gray-600 z-10">
+                      {chapter.topics.length} Topics
+                    </Badge>
+                  </div>
                   
                   <AccordionContent className="pt-0 pb-0">
                     <div className="border-t border-gray-100">
@@ -309,6 +368,12 @@ export default function TextbookDetailsPage() {
                                   <Link href={topic.clientUrl} target="_blank">
                                     <ExternalLink className="h-3 w-3 text-indigo-600" />
                                   </Link>
+                                </Button>
+                                <Button variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => { e.stopPropagation(); setEditNodeData({ id: topic.id, title: topic.title, type: 'topic' }); setIsEditModalOpen(true); }}>
+                                  <Edit2 className="h-3 w-3 text-gray-500 hover:text-indigo-600" />
+                                </Button>
+                                <Button variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-100" onClick={(e) => { e.stopPropagation(); setDeleteNodeData({ id: topic.id, title: topic.title, type: 'topic' }); setIsDeleteDialogOpen(true); }}>
+                                  <Trash2 className="h-3 w-3 text-gray-500 hover:text-red-600" />
                                 </Button>
                               </div>
                               
@@ -356,15 +421,16 @@ export default function TextbookDetailsPage() {
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="chapter-title">Chapter Title</Label>
-              <Input 
+              <Label htmlFor="chapter-title">Chapter Title(s)</Label>
+              <Textarea 
                 id="chapter-title" 
-                placeholder="e.g. 1. Introduction to Physics" 
+                placeholder="e.g. 1. Introduction to Physics&#10;2. Mechanics" 
                 value={newItemTitle} 
                 onChange={(e) => setNewItemTitle(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') handleAddChapter(); }}
+                rows={5}
                 autoFocus
               />
+              <p className="text-xs text-gray-500">Enter one chapter title per line to add multiple chapters at once.</p>
             </div>
           </div>
           <DialogFooter>
@@ -384,21 +450,72 @@ export default function TextbookDetailsPage() {
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="topic-title">Topic Title</Label>
-              <Input 
+              <Label htmlFor="topic-title">Topic Title(s)</Label>
+              <Textarea 
                 id="topic-title" 
-                placeholder="e.g. Newton's First Law" 
+                placeholder="e.g. Newton's First Law&#10;Newton's Second Law" 
                 value={newItemTitle} 
                 onChange={(e) => setNewItemTitle(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') handleAddTopic(); }}
+                rows={5}
                 autoFocus
               />
+              <p className="text-xs text-gray-500">Enter one topic title per line to add multiple topics at once.</p>
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsAddTopicOpen(false)} disabled={isAdding}>Cancel</Button>
             <Button onClick={handleAddTopic} disabled={!newItemTitle.trim() || isAdding}>
               {isAdding ? 'Adding...' : 'Add Topic'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Node Dialog */}
+      <Dialog open={isEditModalOpen} onOpenChange={(open) => { setIsEditModalOpen(open); if (!open) setEditNodeData(null); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit {editNodeData?.type === 'chapter' ? 'Chapter' : 'Topic'}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="edit-title">Title</Label>
+              <Input 
+                id="edit-title" 
+                value={editNodeData?.title || ''} 
+                onChange={(e) => setEditNodeData(prev => prev ? { ...prev, title: e.target.value } : null)}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleEditSubmit(); }}
+                autoFocus
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditModalOpen(false)} disabled={isEditing}>Cancel</Button>
+            <Button onClick={handleEditSubmit} disabled={!editNodeData?.title.trim() || isEditing}>
+              {isEditing ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={(open) => { setIsDeleteDialogOpen(open); if (!open) setDeleteNodeData(null); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="text-red-600">Delete {deleteNodeData?.type === 'chapter' ? 'Chapter' : 'Topic'}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <p className="text-gray-700">
+              Are you sure you want to delete <strong>{deleteNodeData?.title}</strong>?
+            </p>
+            <p className="text-sm text-red-600 font-medium bg-red-50 p-3 rounded-md border border-red-100">
+              Warning: This action cannot be undone. All contents and resources inside this {deleteNodeData?.type} will be permanently deleted.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)} disabled={isDeleting}>Cancel</Button>
+            <Button variant="destructive" onClick={handleDeleteSubmit} disabled={isDeleting}>
+              {isDeleting ? 'Deleting...' : 'Yes, Delete Permanently'}
             </Button>
           </DialogFooter>
         </DialogContent>
