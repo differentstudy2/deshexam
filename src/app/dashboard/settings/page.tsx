@@ -398,41 +398,208 @@ function AcademicInfoTab() {
 }
 
 function ProfessionalInfoTab() {
+  const { user, userProfile } = useAuth();
+  
+  // Existing fields
+  const [lastDegree, setLastDegree] = useState('');
+  const [instituteName, setInstituteName] = useState('');
+  const [profession, setProfession] = useState('');
+  const [organization, setOrganization] = useState('');
+  
+  // New fields
+  const [currentStatus, setCurrentStatus] = useState('');
+  const [major, setMajor] = useState('');
+  const [passingYear, setPassingYear] = useState('');
+  const [skills, setSkills] = useState('');
+  const [experience, setExperience] = useState('');
+  const [resumeLink, setResumeLink] = useState('');
+  
+  const [isSaving, setIsSaving] = useState(false);
+  const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    if (userProfile?.professionalInfo) {
+      setLastDegree(userProfile.professionalInfo.lastDegree || '');
+      setInstituteName(userProfile.professionalInfo.instituteName || '');
+      setProfession(userProfile.professionalInfo.profession || '');
+      setOrganization(userProfile.professionalInfo.organization || '');
+      
+      setCurrentStatus(userProfile.professionalInfo.currentStatus || '');
+      setMajor(userProfile.professionalInfo.major || '');
+      setPassingYear(userProfile.professionalInfo.passingYear || '');
+      setSkills(userProfile.professionalInfo.skills || '');
+      setExperience(userProfile.professionalInfo.experience || '');
+      setResumeLink(userProfile.professionalInfo.resumeLink || '');
+    }
+  }, [userProfile]);
+
+  const handleSave = async () => {
+    if (!user) return;
+    setIsSaving(true);
+    setMessage('');
+    try {
+      await updateUserProfile(user.uid, {
+        professionalInfo: {
+          lastDegree,
+          instituteName,
+          profession,
+          organization,
+          currentStatus,
+          major,
+          passingYear,
+          skills,
+          experience,
+          resumeLink,
+        }
+      });
+      setMessage('Professional info updated successfully!');
+      setTimeout(() => setMessage(''), 3000);
+    } catch (err) {
+      console.error(err);
+      setMessage('Failed to update professional info.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <div className="space-y-8 max-w-4xl">
       <div>
-        <h2 className="text-lg font-bold text-slate-900 dark:text-white">Professional Information</h2>
-        <p className="text-sm font-medium text-slate-500 mt-1">Update your professional information</p>
+        <h2 className="text-lg font-bold text-slate-900 dark:text-white">Professional & Academic Info</h2>
+        <p className="text-sm font-medium text-slate-500 mt-1">Update your education and career details</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
         <div className="space-y-2">
+          <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Current Status</label>
+          <Select value={currentStatus} onValueChange={setCurrentStatus}>
+            <SelectTrigger className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-11">
+              <SelectValue placeholder="Select your status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Student">Student</SelectItem>
+              <SelectItem value="Job Seeker">Job Seeker</SelectItem>
+              <SelectItem value="Employed">Employed</SelectItem>
+              <SelectItem value="Freelancer">Freelancer</SelectItem>
+              <SelectItem value="Entrepreneur">Entrepreneur</SelectItem>
+              <SelectItem value="Other">Other</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+          <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Skills / Expertise</label>
+          <Input 
+            className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-11" 
+            placeholder="e.g. React, Marketing, English (comma separated)"
+            value={skills}
+            onChange={(e) => setSkills(e.target.value)}
+          />
+        </div>
+
+        <div className="col-span-1 md:col-span-2 py-2">
+          <div className="h-px w-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+            <span className="bg-white dark:bg-slate-900 px-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Academic Background</span>
+          </div>
+        </div>
+
+        <div className="space-y-2">
           <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Last Academic Degree</label>
-          <Input className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-11" />
+          <Input 
+            className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-11" 
+            placeholder="e.g. B.Sc, 12th, BA"
+            value={lastDegree}
+            onChange={(e) => setLastDegree(e.target.value)}
+          />
+        </div>
+        <div className="space-y-2">
+          <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Major / Department</label>
+          <Input 
+            className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-11" 
+            placeholder="e.g. Computer Science, Science, English"
+            value={major}
+            onChange={(e) => setMajor(e.target.value)}
+          />
         </div>
         <div className="space-y-2">
           <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Institute Name</label>
-          <Input className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-11" />
+          <Input 
+            className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-11" 
+            placeholder="e.g. Delhi University"
+            value={instituteName}
+            onChange={(e) => setInstituteName(e.target.value)}
+          />
+        </div>
+        <div className="space-y-2">
+          <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Passing Year / Expected</label>
+          <Input 
+            className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-11" 
+            placeholder="e.g. 2024"
+            value={passingYear}
+            onChange={(e) => setPassingYear(e.target.value)}
+          />
         </div>
         
         <div className="col-span-1 md:col-span-2 py-2">
-          <div className="h-px w-full bg-slate-100 dark:bg-slate-800" />
+          <div className="h-px w-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+            <span className="bg-white dark:bg-slate-900 px-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Professional Background</span>
+          </div>
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Profession</label>
-          <Input className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-11" />
+          <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Profession / Designation</label>
+          <Input 
+            className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-11" 
+            placeholder="e.g. Software Engineer"
+            value={profession}
+            onChange={(e) => setProfession(e.target.value)}
+          />
         </div>
         <div className="space-y-2">
           <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Current Organization</label>
-          <Input className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-11" />
+          <Input 
+            className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-11" 
+            placeholder="e.g. Google"
+            value={organization}
+            onChange={(e) => setOrganization(e.target.value)}
+          />
+        </div>
+        <div className="space-y-2">
+          <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Years of Experience</label>
+          <Input 
+            className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-11" 
+            placeholder="e.g. 2"
+            type="number"
+            value={experience}
+            onChange={(e) => setExperience(e.target.value)}
+          />
+        </div>
+        <div className="space-y-2">
+          <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Resume / CV Link</label>
+          <Input 
+            className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-11" 
+            placeholder="Google Drive link..."
+            value={resumeLink}
+            onChange={(e) => setResumeLink(e.target.value)}
+          />
         </div>
       </div>
 
-      <div className="flex justify-end pt-6">
-        <Button className="bg-[#4f46e5] hover:bg-[#4338ca] text-white px-8 h-11 font-bold shadow-md shadow-indigo-500/20 rounded-xl">
-          <Lock className="w-4 h-4 mr-2" /> Save Changes
-        </Button>
+      <div className="flex flex-col gap-2 pt-6">
+        <div className="flex justify-end">
+          <Button 
+            onClick={handleSave}
+            disabled={isSaving}
+            className="bg-[#4f46e5] hover:bg-[#4338ca] text-white px-8 h-11 font-bold shadow-md shadow-indigo-500/20 rounded-xl"
+          >
+            {isSaving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Lock className="w-4 h-4 mr-2" />}
+            {isSaving ? 'Saving...' : 'Save Changes'}
+          </Button>
+        </div>
+        {message && (
+          <p className={`text-right text-sm font-semibold mt-2 ${message.includes('success') ? 'text-green-600' : 'text-red-600'}`}>
+            {message}
+          </p>
+        )}
       </div>
     </div>
   );
