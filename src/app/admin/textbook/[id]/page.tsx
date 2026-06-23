@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { getTaxonomyNodeById, getTaxonomyNodesByParent, TaxonomyNode } from '@/lib/firebase/taxonomy';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -15,10 +15,12 @@ import { Badge } from '@/components/ui/badge';
 interface TopicData extends TaxonomyNode {
   contentsCount: number;
   questionCount: number;
+  clientUrl: string;
 }
 
 interface ChapterData extends TaxonomyNode {
   topics: TopicData[];
+  clientUrl: string;
 }
 
 export default function TextbookDetailsPage() {
@@ -28,6 +30,7 @@ export default function TextbookDetailsPage() {
   const [textbook, setTextbook] = useState<TaxonomyNode | null>(null);
   const [chapters, setChapters] = useState<ChapterData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [clientUrl, setClientUrl] = useState<string>('');
 
   useEffect(() => {
     async function loadData() {
@@ -39,6 +42,24 @@ export default function TextbookDetailsPage() {
         setTextbook(tbNode);
 
         if (tbNode) {
+          // 2. Fetch Client URL base path for textbook by walking up the taxonomy tree
+          let baseTextbookSlugPath = tbNode.fullSlug || tbNode.id;
+          try {
+            let currentNode: TaxonomyNode | null = tbNode;
+            const slugs: string[] = [];
+            
+            while (currentNode) {
+              slugs.unshift(currentNode.slug || currentNode.id);
+              if (!currentNode.parentId) break;
+              currentNode = await getTaxonomyNodeById(currentNode.parentId);
+            }
+            baseTextbookSlugPath = slugs.join('/');
+            setClientUrl(`/guide/${baseTextbookSlugPath}`);
+          } catch (e) {
+            console.error("Error building client url:", e);
+            setClientUrl(`/guide/${baseTextbookSlugPath}`);
+          }
+
           const sortNodes = (nodes: any[]) => {
             const extractNumber = (title: string): number => {
               const match = title.match(/[0-9০-৯]+/);
@@ -87,14 +108,16 @@ export default function TextbookDetailsPage() {
                   return {
                     ...top,
                     questionCount: qSnap.size,
-                    contentsCount: cSnap.size
+                    contentsCount: cSnap.size,
+                    clientUrl: `/guide/${baseTextbookSlugPath}/${chap.slug || chap.id}/${top.slug || top.id}`
                   };
                 })
               );
 
               return {
                 ...chap,
-                topics: fullTopics
+                topics: fullTopics,
+                clientUrl: `/guide/${baseTextbookSlugPath}/${chap.slug || chap.id}`
               };
             })
           );
@@ -152,7 +175,7 @@ export default function TextbookDetailsPage() {
         </div>
         <div className="ml-auto flex items-center gap-2">
           <Button asChild variant="outline" className="gap-2">
-            <Link href={`/guide/${textbook.fullSlug || textbook.id}`} target="_blank">
+            <Link href={clientUrl || `/guide/${textbook.boardSlug}/${textbook.classSlug}/${textbook.subjectSlug}/${textbook.slug || textbook.id}`} target="_blank">
               <Eye className="w-4 h-4" /> View Client Page
             </Link>
           </Button>
@@ -193,7 +216,7 @@ export default function TextbookDetailsPage() {
                       </div>
                       <div className="flex items-center gap-3">
                         <Button asChild variant="ghost" size="icon" className="h-8 w-8 hover:bg-gray-200" onClick={(e) => e.stopPropagation()}>
-                          <Link href={`/guide/${chapter.fullSlug || chapter.id}`} target="_blank">
+                          <Link href={chapter.clientUrl} target="_blank">
                             <ExternalLink className="h-4 w-4 text-gray-500" />
                           </Link>
                         </Button>
@@ -218,7 +241,7 @@ export default function TextbookDetailsPage() {
                                 <Target className="h-4 w-4 text-gray-400 group-hover:text-indigo-500 transition-colors" />
                                 <span className="font-medium text-gray-800">{topic.title}</span>
                                 <Button asChild variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity">
-                                  <Link href={`/guide/${topic.fullSlug || topic.id}`} target="_blank">
+                                  <Link href={topic.clientUrl} target="_blank">
                                     <ExternalLink className="h-3 w-3 text-indigo-600" />
                                   </Link>
                                 </Button>
