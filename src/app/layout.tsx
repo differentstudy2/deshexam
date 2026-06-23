@@ -50,12 +50,13 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#ffffff" />
+        <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
+        <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f172a" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, viewport-fit=cover" />
         <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
         <meta name="trustpilot-one-time-domain-verification-id" content="7f080357-aa3e-4ce3-b4a6-40484af64723"/>
       </head>
-      <body className={cn("antialiased", inter.variable, lexend.variable, hindSiliguri.variable)}>
+      <body className={cn("antialiased overscroll-none touch-manipulation", inter.variable, lexend.variable, hindSiliguri.variable)}>
         <FirebaseProvider>
           <AppProviders>
             <AuthProvider>

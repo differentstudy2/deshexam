@@ -107,6 +107,7 @@ const adminNavGroups = [
     title: "Dashboard",
     items: [
       { href: '/admin', label: 'Overview', icon: <LayoutGrid className="h-4 w-4" /> },
+      { href: '/admin/todo', label: 'Todo List', icon: <ClipboardList className="h-4 w-4" /> },
       { href: '/admin/reports', label: 'Reports', icon: <BarChart2 className="h-4 w-4" /> },
       { href: '/admin/notifications', label: 'Notifications', icon: <Bell className="h-4 w-4" /> },
     ]

@@ -22,8 +22,9 @@ import {
   confirmPasswordReset,
   sendEmailVerification,
 } from "firebase/auth";
-import { doc, setDoc, onSnapshot, serverTimestamp } from "firebase/firestore";
+import { doc, setDoc, onSnapshot, serverTimestamp, getDoc } from "firebase/firestore";
 import { useFirebaseAuth, useFirestore } from "@/hooks/use-firebase";
+import { db } from "@/lib/firebase/client";
 import {
   getUserProfile,
   updateUserProfile,
@@ -60,36 +61,50 @@ const AuthContext = createContext<AuthContextType>({
 const handleNewUser = async (credential: UserCredential) => {
     const user = credential.user;
     if (user) {
-        // Generate a 6-character random referral code (alphanumeric)
-        const referralCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+        const userDocRef = doc(db, "users", user.uid);
+        const userDoc = await getDoc(userDocRef);
         
-        const userProfile = {
-            displayName: user.displayName || user.email?.split('@')[0] || 'New User',
-            email: user.email,
-            photoURL: user.photoURL,
-            createdAt: new Date(),
-            followers: [],
-            following: [],
-            followersCount: 0,
-            followingCount: 0,
-            xp: 0,
-            achievements: [],
-            referralCode: referralCode,
-            referralCount: 0,
-            currentStreak: 0,
-            longestStreak: 0,
-            lastActiveDate: null,
-            examsTaken: 0,
-            perfectExams: 0,
-            nightOwlCount: 0,
-            earlyBirdCount: 0,
-            role: 'user',
-            isOnboarded: false,
-            profileType: null,
-            boardId: null,
-            classId: null,
-        };
-        await updateUserProfile(user.uid, userProfile);
+        if (!userDoc.exists()) {
+            // Only set these default values for brand new users
+            const referralCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+            
+            const userProfile = {
+                displayName: user.displayName || user.email?.split('@')[0] || 'New User',
+                email: user.email,
+                photoURL: user.photoURL,
+                createdAt: new Date(),
+                followers: [],
+                following: [],
+                followersCount: 0,
+                followingCount: 0,
+                xp: 0,
+                achievements: [],
+                referralCode: referralCode,
+                referralCount: 0,
+                currentStreak: 0,
+                longestStreak: 0,
+                lastActiveDate: null,
+                examsTaken: 0,
+                perfectExams: 0,
+                nightOwlCount: 0,
+                earlyBirdCount: 0,
+                role: 'user',
+                isOnboarded: false,
+                profileType: null,
+                boardId: null,
+                classId: null,
+            };
+            await updateUserProfile(user.uid, userProfile);
+        } else {
+            // For existing users, only update their basic info if it changed
+            const currentProfile = userDoc.data();
+            if (!currentProfile.displayName && user.displayName) {
+                await updateUserProfile(user.uid, { displayName: user.displayName });
+            }
+            if (!currentProfile.photoURL && user.photoURL) {
+                await updateUserProfile(user.uid, { photoURL: user.photoURL });
+            }
+        }
     }
 };
 

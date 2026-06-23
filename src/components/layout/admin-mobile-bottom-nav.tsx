@@ -30,7 +30,7 @@ export function AdminMobileBottomNav() {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex flex-col items-center justify-center w-full h-full space-y-1 transition-all duration-200 ease-in-out",
+                "flex flex-col items-center justify-center w-full h-full space-y-1 transition-all duration-200 ease-in-out active:scale-95",
                 isActive 
                   ? "text-[#00a651] dark:text-[#00a651]" 
                   : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"

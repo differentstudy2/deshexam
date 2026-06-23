@@ -1318,20 +1318,26 @@ function SecurityTab() {
         
         <div className="flex items-center justify-between">
           <div>
-            <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300">Two-Factor Authentication (2FA)</h4>
+            <div className="flex items-center gap-2">
+              <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300">Two-Factor Authentication (2FA)</h4>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-400">Coming Soon</span>
+            </div>
             <p className="text-xs text-slate-500 mt-1">Add an extra layer of security to your account.</p>
           </div>
-          <Switch checked={twoFactorEnabled} onCheckedChange={setTwoFactorEnabled} />
+          <Switch checked={false} disabled onCheckedChange={() => {}} />
         </div>
 
         <div className="h-px w-full bg-slate-100 dark:bg-slate-800 my-4" />
 
         <div className="flex items-center justify-between">
           <div>
-            <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300">Login Alerts</h4>
+            <div className="flex items-center gap-2">
+              <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300">Login Alerts</h4>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-400">Coming Soon</span>
+            </div>
             <p className="text-xs text-slate-500 mt-1">Get notified of unrecognized logins.</p>
           </div>
-          <Switch checked={loginAlerts} onCheckedChange={setLoginAlerts} />
+          <Switch checked={false} disabled onCheckedChange={() => {}} />
         </div>
       </div>
 

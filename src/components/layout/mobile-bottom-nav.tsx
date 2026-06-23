@@ -47,7 +47,7 @@ export function MobileBottomNav() {
   const pathname = usePathname();
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around h-[68px] bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 md:hidden shadow-[0_-4px_15px_-4px_rgba(0,0,0,0.05)] pb-safe pt-1">
+    <div className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around h-[68px] bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-t border-slate-200/80 dark:border-slate-800/80 md:hidden shadow-[0_-4px_15px_-4px_rgba(0,0,0,0.05)] pb-safe pt-1 transition-all duration-300">
       {bottomNavItems.map((item) => {
         // Strict matching for home to avoid active state on all sub-routes,
         // and startsWith for others to keep active state when inside a sub-route.
@@ -60,7 +60,7 @@ export function MobileBottomNav() {
             key={item.href}
             href={item.href}
             className={cn(
-              "flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors",
+              "flex flex-col items-center justify-center w-full h-full space-y-1 transition-all active:scale-95",
               isActive 
                 ? item.activeColor
                 : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
