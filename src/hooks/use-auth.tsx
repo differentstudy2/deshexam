@@ -22,7 +22,8 @@ import {
   confirmPasswordReset,
   sendEmailVerification,
 } from "firebase/auth";
-import { useFirebaseAuth } from "@/hooks/use-firebase";
+import { doc, setDoc, onSnapshot, serverTimestamp } from "firebase/firestore";
+import { useFirebaseAuth, useFirestore } from "@/hooks/use-firebase";
 import {
   getUserProfile,
   updateUserProfile,
@@ -94,6 +95,7 @@ const handleNewUser = async (credential: UserCredential) => {
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const auth = useFirebaseAuth();
+  const db = useFirestore();
   const [user, setUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
@@ -156,10 +158,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
-    if (!auth) {
-        // Auth might not be initialized yet, so we wait.
+    if (!auth || !db) {
+        // Auth or DB might not be initialized yet, so we wait.
         return;
     }
+
+    let sessionUnsubscribe: () => void;
+
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
       if (user) {
@@ -168,8 +173,50 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         
         const profile = await getUserProfile(user.uid);
         setUserProfile(profile);
+
+        // --- Session Management ---
+        try {
+          let sessionId = localStorage.getItem("sessionId");
+          if (!sessionId) {
+            sessionId = Math.random().toString(36).substring(2, 15);
+            localStorage.setItem("sessionId", sessionId);
+          }
+          const userAgent = navigator.userAgent;
+          let location = "Unknown Location";
+          try {
+            const ipRes = await fetch("https://ipapi.co/json/");
+            if (ipRes.ok) {
+              const ipData = await ipRes.json();
+              if (ipData.city && ipData.country_name) {
+                location = `${ipData.city}, ${ipData.country_name}`;
+              }
+            }
+          } catch (e) {
+            console.warn("Could not fetch location", e);
+          }
+
+          const sessionRef = doc(db, `users/${user.uid}/sessions/${sessionId}`);
+          
+          await setDoc(sessionRef, {
+            userAgent,
+            location,
+            lastActive: serverTimestamp(),
+          }, { merge: true });
+
+          sessionUnsubscribe = onSnapshot(sessionRef, (snapshot) => {
+            // If the document is deleted (e.g. from another device), log out
+            if (!snapshot.exists()) {
+              signOut(auth);
+              localStorage.removeItem("sessionId");
+            }
+          });
+        } catch (error) {
+          console.error("Session registration failed", error);
+        }
+
       } else {
         setUserProfile(null);
+        if (sessionUnsubscribe) sessionUnsubscribe();
       }
       setLoading(false);
 
@@ -204,8 +251,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     });
 
-    return () => unsubscribe();
-  }, [auth]);
+    return () => {
+      unsubscribe();
+      if (sessionUnsubscribe) sessionUnsubscribe();
+    };
+  }, [auth, db]);
 
   return (
     <AuthContext.Provider value={{ user, userProfile, loading, signUp, signIn, signInWithGoogle, signInWithGoogleOneTap, resetPassword, confirmPasswordReset: confirmPasswordResetAction, logOut }}>

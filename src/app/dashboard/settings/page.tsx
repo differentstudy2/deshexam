@@ -15,14 +15,23 @@ import {
   Shield, 
   Settings as SettingsIcon, 
   ChevronRight,
-  Upload
+  Upload,
+  Smartphone,
+  Monitor,
+  LogOut,
+  AlertTriangle,
+  Trash2
 } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/hooks/use-auth';
 import { getTaxonomyNodesByType, TaxonomyNode } from '@/lib/firebase/taxonomy';
 import { updateUserProfile, uploadFile } from '@/lib/firebase/firestore';
 import { Loader2 } from 'lucide-react';
+import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from 'firebase/auth';
+import { doc, deleteDoc, collection, onSnapshot } from 'firebase/firestore';
+import { useFirestore } from '@/hooks/use-firebase';
 
 const TABS = [
   { id: 'personal-info', label: 'Personal Info', icon: User },
@@ -1104,6 +1113,148 @@ function SocialLinksTab() {
 }
 
 function SecurityTab() {
+  const { user } = useAuth();
+  const db = useFirestore();
+  
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  
+  const [isSaving, setIsSaving] = useState(false);
+  const [message, setMessage] = useState('');
+  
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+  const [loginAlerts, setLoginAlerts] = useState(true);
+
+  // Sessions state
+  const [sessions, setSessions] = useState<any[]>([]);
+  const [currentSessionId, setCurrentSessionId] = useState('');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setCurrentSessionId(localStorage.getItem('sessionId') || '');
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!user || !db) return;
+    
+    const sessionsRef = collection(db, `users/${user.uid}/sessions`);
+    const unsubscribe = onSnapshot(sessionsRef, (snapshot) => {
+      const fetchedSessions: any[] = [];
+      snapshot.forEach((doc) => {
+        fetchedSessions.push({ id: doc.id, ...doc.data() });
+      });
+      // Sort by last active descending
+      fetchedSessions.sort((a, b) => {
+        const timeA = a.lastActive ? a.lastActive.toMillis() : 0;
+        const timeB = b.lastActive ? b.lastActive.toMillis() : 0;
+        return timeB - timeA;
+      });
+      setSessions(fetchedSessions);
+    });
+
+    return () => unsubscribe();
+  }, [user, db]);
+
+  const handleLogOutDevice = async (sessionId: string) => {
+    if (!user || !db) return;
+    try {
+      await deleteDoc(doc(db, `users/${user.uid}/sessions/${sessionId}`));
+    } catch (error) {
+      console.error('Failed to log out device', error);
+    }
+  };
+
+  const handleLogOutAllOtherDevices = async () => {
+    if (!user || !db) return;
+    try {
+      const otherSessions = sessions.filter(s => s.id !== currentSessionId);
+      for (const s of otherSessions) {
+        await deleteDoc(doc(db, `users/${user.uid}/sessions/${s.id}`));
+      }
+    } catch (error) {
+      console.error('Failed to log out all other devices', error);
+    }
+  };
+
+  const parseUserAgent = (ua: string) => {
+    if (!ua) return "Unknown Device";
+    let device = "Unknown Device";
+    let browser = "Unknown Browser";
+    
+    if (ua.includes('Windows')) device = "Windows PC";
+    else if (ua.includes('Macintosh')) device = "Mac";
+    else if (ua.includes('iPhone')) device = "iPhone";
+    else if (ua.includes('iPad')) device = "iPad";
+    else if (ua.includes('Android')) device = "Android Device";
+    else if (ua.includes('Linux')) device = "Linux PC";
+    
+    if (ua.includes('Chrome') && !ua.includes('Edg') && !ua.includes('OPR')) browser = "Chrome";
+    else if (ua.includes('Safari') && !ua.includes('Chrome')) browser = "Safari";
+    else if (ua.includes('Firefox')) browser = "Firefox";
+    else if (ua.includes('Edg')) browser = "Edge";
+    else if (ua.includes('OPR') || ua.includes('Opera')) browser = "Opera";
+    
+    return `${device} - ${browser}`;
+  };
+
+  const formatLastActive = (timestamp: any) => {
+    if (!timestamp) return 'Active Now';
+    const date = timestamp.toDate();
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.round(diffMs / 60000);
+    const diffHours = Math.round(diffMins / 60);
+    const diffDays = Math.round(diffHours / 24);
+    
+    if (diffMins < 5) return 'Active Now';
+    if (diffMins < 60) return `Last active ${diffMins} minutes ago`;
+    if (diffHours < 24) return `Last active ${diffHours} hours ago`;
+    if (diffDays === 1) return 'Last active yesterday';
+    return `Last active ${date.toLocaleDateString()}`;
+  };
+
+  const handleUpdatePassword = async () => {
+    if (!user || !user.email) {
+      setMessage('error:User email not found. Please log in again.');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setMessage('error:New passwords do not match');
+      return;
+    }
+    if (newPassword.length < 6) {
+      setMessage('error:Password should be at least 6 characters');
+      return;
+    }
+    setIsSaving(true);
+    setMessage('');
+    
+    try {
+      const credential = EmailAuthProvider.credential(user.email, currentPassword);
+      await reauthenticateWithCredential(user, credential);
+      await updatePassword(user, newPassword);
+      
+      setMessage('success:Password updated successfully!');
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      setTimeout(() => setMessage(''), 3000);
+    } catch (error: any) {
+      console.error(error);
+      if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+        setMessage('error:Incorrect current password');
+      } else if (error.code === 'auth/requires-recent-login') {
+        setMessage('error:Please log out and log back in to change password.');
+      } else {
+        setMessage('error:Failed to update password.');
+      }
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <div className="space-y-8 max-w-2xl">
       <div>
@@ -1116,23 +1267,144 @@ function SecurityTab() {
         <div className="space-y-4">
           <div className="space-y-2">
             <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Current Password</label>
-            <Input type="password" className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-11" />
+            <Input 
+              type="password" 
+              className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-11" 
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+            />
           </div>
           <div className="space-y-2">
             <label className="text-sm font-bold text-slate-700 dark:text-slate-300">New Password</label>
-            <Input type="password" className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-11" />
+            <Input 
+              type="password" 
+              className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-11" 
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+            />
           </div>
           <div className="space-y-2">
             <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Confirm New Password</label>
-            <Input type="password" className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-11" />
+            <Input 
+              type="password" 
+              className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-11" 
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+            />
           </div>
+        </div>
+        
+        <div className="flex flex-col gap-2 pt-2">
+          <div className="flex justify-end">
+            <Button 
+              onClick={handleUpdatePassword}
+              disabled={isSaving || !currentPassword || !newPassword || !confirmPassword}
+              className="bg-[#4f46e5] hover:bg-[#4338ca] text-white px-8 h-11 font-bold shadow-md shadow-indigo-500/20 rounded-xl"
+            >
+              {isSaving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Shield className="w-4 h-4 mr-2" />}
+              {isSaving ? 'Updating...' : 'Update Password'}
+            </Button>
+          </div>
+          {message && (
+            <p className={`text-right text-sm font-semibold mt-2 ${message.startsWith('success') ? 'text-green-600' : 'text-red-600'}`}>
+              {message.replace('success:', '').replace('error:', '')}
+            </p>
+          )}
         </div>
       </div>
 
-      <div className="flex justify-end pt-2">
-        <Button className="bg-[#4f46e5] hover:bg-[#4338ca] text-white px-8 h-11 font-bold shadow-md shadow-indigo-500/20 rounded-xl">
-          <Shield className="w-4 h-4 mr-2" /> Update Password
-        </Button>
+      <div className="space-y-6 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl">
+        <h3 className="font-bold text-slate-800 dark:text-slate-200">Additional Security</h3>
+        
+        <div className="flex items-center justify-between">
+          <div>
+            <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300">Two-Factor Authentication (2FA)</h4>
+            <p className="text-xs text-slate-500 mt-1">Add an extra layer of security to your account.</p>
+          </div>
+          <Switch checked={twoFactorEnabled} onCheckedChange={setTwoFactorEnabled} />
+        </div>
+
+        <div className="h-px w-full bg-slate-100 dark:bg-slate-800 my-4" />
+
+        <div className="flex items-center justify-between">
+          <div>
+            <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300">Login Alerts</h4>
+            <p className="text-xs text-slate-500 mt-1">Get notified of unrecognized logins.</p>
+          </div>
+          <Switch checked={loginAlerts} onCheckedChange={setLoginAlerts} />
+        </div>
+      </div>
+
+      <div className="space-y-6 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl">
+        <h3 className="font-bold text-slate-800 dark:text-slate-200">Active Sessions</h3>
+        <p className="text-xs text-slate-500 mb-4">You are currently logged in on these devices.</p>
+        
+        <div className="space-y-4">
+          {sessions.map((session) => {
+            const isCurrent = session.id === currentSessionId;
+            const parsedUA = parseUserAgent(session.userAgent);
+            const isActiveNow = isCurrent || formatLastActive(session.lastActive) === 'Active Now';
+            
+            return (
+              <div key={session.id} className="flex items-start gap-4">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${isCurrent ? 'bg-[#4f46e5]/10' : 'bg-slate-100 dark:bg-slate-800'}`}>
+                  {parsedUA.includes('Phone') || parsedUA.includes('Android') ? (
+                    <Smartphone className={`w-5 h-5 ${isCurrent ? 'text-[#4f46e5]' : 'text-slate-400'}`} />
+                  ) : (
+                    <Monitor className={`w-5 h-5 ${isCurrent ? 'text-[#4f46e5]' : 'text-slate-400'}`} />
+                  )}
+                </div>
+                <div className="flex-1">
+                  <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300">{parsedUA}</h4>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    {session.location || 'Unknown Location'} • {isActiveNow ? 'Active Now' : formatLastActive(session.lastActive)}
+                  </p>
+                </div>
+                {isCurrent ? (
+                  <span className="text-xs font-bold text-green-600 bg-green-50 dark:bg-green-500/10 px-2 py-1 rounded-md border border-green-200 dark:border-green-500/20">This Device</span>
+                ) : (
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => handleLogOutDevice(session.id)}
+                    className="h-8 text-xs font-bold text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-500/10"
+                  >
+                    Log out
+                  </Button>
+                )}
+              </div>
+            );
+          })}
+          
+          {sessions.length === 0 && (
+            <div className="text-center text-sm text-slate-500 py-4">No active sessions found.</div>
+          )}
+        </div>
+
+        {sessions.length > 1 && (
+          <div className="flex justify-start pt-4 border-t border-slate-100 dark:border-slate-800">
+            <Button 
+              variant="outline" 
+              onClick={handleLogOutAllOtherDevices}
+              className="text-slate-700 dark:text-slate-300 font-bold h-10 rounded-xl"
+            >
+              <LogOut className="w-4 h-4 mr-2" /> Log out of all other devices
+            </Button>
+          </div>
+        )}
+      </div>
+
+      <div className="space-y-4 border border-red-200 dark:border-red-900/50 bg-red-50/50 dark:bg-red-900/10 p-6 rounded-2xl">
+        <div className="flex items-center gap-2">
+          <AlertTriangle className="w-5 h-5 text-red-600" />
+          <h3 className="font-bold text-red-600 dark:text-red-500">Danger Zone</h3>
+        </div>
+        <p className="text-sm text-red-600/80 dark:text-red-400">Permanently delete your account and all of your content. This action is not reversible.</p>
+        <div className="pt-2">
+          <Button className="bg-red-600 hover:bg-red-700 text-white font-bold h-10 rounded-xl">
+            <Trash2 className="w-4 h-4 mr-2" /> Delete Account
+          </Button>
+        </div>
       </div>
     </div>
   );
