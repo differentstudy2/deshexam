@@ -19,6 +19,10 @@ import {
 } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useAuth } from '@/hooks/use-auth';
+import { getTaxonomyNodesByType, TaxonomyNode } from '@/lib/firebase/taxonomy';
+import { updateUserProfile, uploadFile } from '@/lib/firebase/firestore';
+import { Loader2 } from 'lucide-react';
 
 const TABS = [
   { id: 'personal-info', label: 'Personal Info', icon: User },
@@ -171,89 +175,224 @@ function PrivacyTab() {
 }
 
 function ContactInfoTab() {
-  const [mode, setMode] = useState<'phone'|'email'>('phone');
+  const { user, userProfile } = useAuth();
+  
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [altPhone, setAltPhone] = useState('');
+  const [address, setAddress] = useState('');
+  
+  const [isSaving, setIsSaving] = useState(false);
+  const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    if (userProfile) {
+      setEmail(userProfile.contactEmail || user?.email || '');
+      setPhone(userProfile.phone || user?.phoneNumber || '');
+      setAltPhone(userProfile.altPhone || '');
+      setAddress(userProfile.address || '');
+    } else if (user) {
+      setEmail(user.email || '');
+      setPhone(user.phoneNumber || '');
+    }
+  }, [userProfile, user]);
+
+  const handleSave = async () => {
+    if (!user) return;
+    setIsSaving(true);
+    setMessage('');
+    try {
+      await updateUserProfile(user.uid, {
+        contactEmail: email,
+        phone,
+        altPhone,
+        address,
+      });
+      setMessage('Contact info updated successfully!');
+      setTimeout(() => setMessage(''), 3000);
+    } catch (err) {
+      console.error(err);
+      setMessage('Failed to update contact info.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
-    <div className="space-y-8 max-w-2xl">
+    <div className="space-y-8 max-w-4xl">
       <div>
         <h2 className="text-lg font-bold text-slate-900 dark:text-white">Contact Information</h2>
-        <p className="text-sm font-medium text-slate-500 mt-1">Update your contact information</p>
+        <p className="text-sm font-medium text-slate-500 mt-1">Update your contact details for communication and delivery</p>
       </div>
 
-      <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl w-fit">
-        <button 
-          onClick={() => setMode('phone')}
-          className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${mode === 'phone' ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500'}`}
-        >
-          Phone
-        </button>
-        <button 
-          onClick={() => setMode('email')}
-          className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${mode === 'email' ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500'}`}
-        >
-          Email
-        </button>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+        <div className="space-y-2">
+          <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Email Address</label>
+          <Input 
+            className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-11" 
+            placeholder="Enter your email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+        <div className="space-y-2">
+          <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Primary Phone</label>
+          <Input 
+            className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-11" 
+            placeholder="+91 ..."
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+          />
+        </div>
+        <div className="space-y-2">
+          <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Alternate Phone (Optional)</label>
+          <Input 
+            className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-11" 
+            placeholder="+91 ..."
+            value={altPhone}
+            onChange={(e) => setAltPhone(e.target.value)}
+          />
+        </div>
+        <div className="space-y-2 md:col-span-2">
+          <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Full Address</label>
+          <textarea 
+            className="flex w-full rounded-md border border-slate-200 bg-slate-50 dark:bg-slate-800 dark:border-slate-700 px-3 py-2 text-sm ring-offset-white placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 min-h-[80px]" 
+            placeholder="Street, City, Postal Code..."
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+          ></textarea>
+        </div>
       </div>
 
-      <div className="space-y-2 relative">
-        <label className="text-sm font-bold text-slate-700 dark:text-slate-300">
-          {mode === 'phone' ? 'Phone Number' : 'Email Address'}
-        </label>
-        <Input 
-          className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-12" 
-          placeholder={mode === 'phone' ? '+880 ...' : 'Enter email'}
-        />
-      </div>
-
-      <div className="flex justify-end pt-4">
-        <Button className="bg-[#4f46e5] hover:bg-[#4338ca] text-white px-8 h-11 font-bold shadow-md shadow-indigo-500/20 rounded-xl">
-          <Share2 className="w-4 h-4 mr-2 rotate-90" /> Send OTP
-        </Button>
+      <div className="flex flex-col gap-2 pt-6">
+        <div className="flex justify-end">
+          <Button 
+            onClick={handleSave}
+            disabled={isSaving}
+            className="bg-[#4f46e5] hover:bg-[#4338ca] text-white px-8 h-11 font-bold shadow-md shadow-indigo-500/20 rounded-xl"
+          >
+            {isSaving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Lock className="w-4 h-4 mr-2" />}
+            {isSaving ? 'Saving...' : 'Save Changes'}
+          </Button>
+        </div>
+        {message && (
+          <p className={`text-right text-sm font-semibold mt-2 ${message.includes('success') ? 'text-green-600' : 'text-red-600'}`}>
+            {message}
+          </p>
+        )}
       </div>
     </div>
   );
 }
 
 function AcademicInfoTab() {
-  const [selectedClass, setSelectedClass] = useState('Class 8');
-  
-  const classes = [
-    'Class 3', 'Class 4', 'Class 5', 'Class 6', 
-    'Class 7', 'Class 8', 'SSC', 'HSC',
-    'Admission', 'Jobs', 'Teacher', 'General'
-  ];
+  const { user, userProfile } = useAuth();
+  const [selectedClassId, setSelectedClassId] = useState<string | null>(null);
+  const [classes, setClasses] = useState<TaxonomyNode[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    const fetchClasses = async () => {
+      try {
+        const fetchedClasses = await getTaxonomyNodesByType('academic', 'class');
+        const competitiveCategories = await getTaxonomyNodesByType('competitive', 'category');
+        
+        const allNodes = [...fetchedClasses, ...competitiveCategories];
+        
+        // Sort them similar to how we sort taxonomy nodes
+        const sorted = allNodes.sort((a, b) => {
+          if (typeof a.orderIndex === 'number' && typeof b.orderIndex === 'number' && a.orderIndex !== b.orderIndex) {
+            return a.orderIndex - b.orderIndex;
+          }
+          return (a.title || '').localeCompare(b.title || '', undefined, { numeric: true, sensitivity: 'base' });
+        });
+        
+        setClasses(sorted);
+        
+        if (userProfile?.classId) {
+          setSelectedClassId(userProfile.classId);
+        } else if (sorted.length > 0) {
+          setSelectedClassId(sorted[0].id);
+        }
+      } catch (error) {
+        console.error("Error fetching classes:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchClasses();
+  }, [userProfile]);
+
+  const handleSave = async () => {
+    if (!user || !selectedClassId) return;
+    setIsSaving(true);
+    setMessage('');
+    try {
+      await updateUserProfile(user.uid, {
+        classId: selectedClassId,
+      });
+      setMessage('Class updated successfully!');
+      // Give the system a second to process and update the auth context
+      setTimeout(() => setMessage(''), 3000);
+    } catch (err) {
+      console.error(err);
+      setMessage('Failed to update class. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <div className="space-y-8">
       <div>
         <h2 className="text-lg font-bold text-slate-900 dark:text-white">Academic Information</h2>
-        <p className="text-sm font-medium text-slate-500 mt-1">Update your user type</p>
+        <p className="text-sm font-medium text-slate-500 mt-1">Select your class to personalize your experience</p>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl">
-        {classes.map(c => {
-          const isActive = selectedClass === c;
-          return (
-            <button
-              key={c}
-              onClick={() => setSelectedClass(c)}
-              className={`h-12 rounded-xl border text-sm font-bold transition-all ${
-                isActive 
-                  ? 'border-green-500 bg-green-50/50 dark:bg-green-900/10 text-green-600 dark:text-green-400' 
-                  : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600'
-              }`}
+      {isLoading ? (
+        <div className="flex justify-center py-10">
+          <Loader2 className="w-6 h-6 animate-spin text-[#00a651]" />
+        </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl">
+            {classes.map(c => {
+              const isActive = selectedClassId === c.id;
+              return (
+                <button
+                  key={c.id}
+                  onClick={() => setSelectedClassId(c.id)}
+                  className={`h-12 rounded-xl border text-sm font-bold transition-all ${
+                    isActive 
+                      ? 'border-[#00a651] bg-[#00a651]/10 dark:bg-[#00a651]/20 text-[#00a651] dark:text-[#00a651]' 
+                      : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600'
+                  }`}
+                >
+                  {c.title}
+                </button>
+              )
+            })}
+          </div>
+
+          <div className="pt-6 max-w-4xl flex flex-col gap-2">
+            <Button 
+              onClick={handleSave}
+              disabled={isSaving || !selectedClassId}
+              className="w-full bg-[#00a651] hover:bg-[#008c44] text-white h-12 font-bold tracking-wider rounded-xl shadow-md shadow-green-500/20 disabled:opacity-50"
             >
-              {c}
-            </button>
-          )
-        })}
-      </div>
-
-      <div className="pt-6 max-w-4xl">
-        <Button className="w-full bg-[#00a651] hover:bg-[#008c44] text-white h-12 font-bold tracking-wider rounded-xl shadow-md shadow-green-500/20">
-          CHANGE
-        </Button>
-      </div>
+              {isSaving ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
+              {isSaving ? 'SAVING...' : 'CHANGE'}
+            </Button>
+            {message && (
+              <p className={`text-center text-sm font-semibold mt-2 ${message.includes('success') ? 'text-green-600' : 'text-red-600'}`}>
+                {message}
+              </p>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -414,6 +553,72 @@ function NotificationsTab() {
 // --- MOCKUP TABS ---
 
 function PersonalInfoTab() {
+  const { user, userProfile } = useAuth();
+  
+  const [displayName, setDisplayName] = useState('');
+  const [username, setUsername] = useState('');
+  const [bio, setBio] = useState('');
+  const [photoURL, setPhotoURL] = useState('');
+  
+  const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [message, setMessage] = useState('');
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (userProfile) {
+      setDisplayName(userProfile.displayName || '');
+      setUsername(userProfile.username || '');
+      setBio(userProfile.bio || '');
+      setPhotoURL(userProfile.photoURL || '');
+    } else if (user) {
+      setDisplayName(user.displayName || '');
+      setPhotoURL(user.photoURL || '');
+    }
+  }, [userProfile, user]);
+
+  const handleSave = async () => {
+    if (!user) return;
+    setIsSaving(true);
+    setMessage('');
+    try {
+      await updateUserProfile(user.uid, {
+        displayName,
+        username,
+        bio,
+        photoURL,
+      });
+      setMessage('Profile updated successfully!');
+      setTimeout(() => setMessage(''), 3000);
+    } catch (err) {
+      console.error(err);
+      setMessage('Failed to update profile.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+    
+    setIsUploading(true);
+    try {
+      const url = await uploadFile(file);
+      setPhotoURL(url);
+      
+      // Auto save photoURL
+      await updateUserProfile(user.uid, { photoURL: url });
+      setMessage('Photo updated successfully!');
+      setTimeout(() => setMessage(''), 3000);
+    } catch (err) {
+      console.error(err);
+      setMessage('Failed to upload photo.');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   return (
     <div className="space-y-8 max-w-4xl">
       <div>
@@ -423,10 +628,29 @@ function PersonalInfoTab() {
       
       <div className="flex items-center gap-6 mb-8">
         <div className="w-24 h-24 rounded-full bg-slate-100 dark:bg-slate-800 border-4 border-white dark:border-slate-900 shadow-md flex items-center justify-center overflow-hidden">
-           <User className="w-10 h-10 text-slate-400" />
+           {photoURL ? (
+             <img src={photoURL} alt="Profile" className="w-full h-full object-cover" />
+           ) : (
+             <User className="w-10 h-10 text-slate-400" />
+           )}
         </div>
         <div>
-          <Button variant="outline" className="font-bold rounded-xl mb-2"><Upload className="w-4 h-4 mr-2" /> Upload Photo</Button>
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            className="hidden" 
+            accept="image/*"
+            onChange={handlePhotoUpload}
+          />
+          <Button 
+            variant="outline" 
+            className="font-bold rounded-xl mb-2"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isUploading}
+          >
+            {isUploading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
+            {isUploading ? 'Uploading...' : 'Upload Photo'}
+          </Button>
           <p className="text-[11px] text-slate-400 font-medium">Recommended size: 256x256px. Max 2MB.</p>
         </div>
       </div>
@@ -434,22 +658,49 @@ function PersonalInfoTab() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
         <div className="space-y-2">
           <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Full Name</label>
-          <Input className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-11" defaultValue="Jahanur Miah" />
+          <Input 
+            className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-11" 
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
+            placeholder="Your Name"
+          />
         </div>
         <div className="space-y-2">
           <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Username</label>
-          <Input className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-11" defaultValue="jahanur-miah" />
+          <Input 
+            className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-11" 
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="username"
+          />
         </div>
         <div className="space-y-2 md:col-span-2">
           <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Bio</label>
-          <textarea className="flex w-full rounded-md border border-slate-200 bg-slate-50 dark:bg-slate-800 dark:border-slate-700 px-3 py-2 text-sm ring-offset-white placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 min-h-[100px]" placeholder="Write a short bio about yourself..."></textarea>
+          <textarea 
+            className="flex w-full rounded-md border border-slate-200 bg-slate-50 dark:bg-slate-800 dark:border-slate-700 px-3 py-2 text-sm ring-offset-white placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 min-h-[100px]" 
+            placeholder="Write a short bio about yourself..."
+            value={bio}
+            onChange={(e) => setBio(e.target.value)}
+          ></textarea>
         </div>
       </div>
 
-      <div className="flex justify-end pt-6">
-        <Button className="bg-[#4f46e5] hover:bg-[#4338ca] text-white px-8 h-11 font-bold shadow-md shadow-indigo-500/20 rounded-xl">
-          <Lock className="w-4 h-4 mr-2" /> Save Changes
-        </Button>
+      <div className="flex flex-col gap-2 pt-6">
+        <div className="flex justify-end">
+          <Button 
+            onClick={handleSave}
+            disabled={isSaving}
+            className="bg-[#4f46e5] hover:bg-[#4338ca] text-white px-8 h-11 font-bold shadow-md shadow-indigo-500/20 rounded-xl"
+          >
+            {isSaving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Lock className="w-4 h-4 mr-2" />}
+            {isSaving ? 'Saving...' : 'Save Changes'}
+          </Button>
+        </div>
+        {message && (
+          <p className={`text-right text-sm font-semibold mt-2 ${message.includes('success') ? 'text-green-600' : 'text-red-600'}`}>
+            {message}
+          </p>
+        )}
       </div>
     </div>
   );
