@@ -17,6 +17,7 @@ export interface AdminTodo {
   text: string;
   completed: boolean;
   priority: 'high' | 'medium' | 'low';
+  description?: string;
   dueDate?: Date | null;
   tags?: string[];
   createdAt?: any;

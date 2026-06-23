@@ -37,23 +37,17 @@ export default function AdminTodoPage() {
     return () => unsubscribe();
   }, []);
 
-  const seedInitialTodos = async () => {
-    const initialTodos = [
-      { text: 'Integrate Firebase Identity Platform (Blaze Plan) to make Two-Factor Authentication (2FA) live via SMS/App.', completed: false, priority: 'high' as const },
-      { text: 'Set up Firebase Cloud Functions and an email provider (like Resend) to make Login Alerts live.', completed: false, priority: 'high' as const },
-      { text: 'Design Premium Dashboard Home: Add Current XP, level progress, recent study history, and interactive charts.', completed: false, priority: 'medium' as const },
-      { text: 'Build Admin Panel Analytics: Create beautiful charts and statistics (daily signups, exam taken count, revenue).', completed: false, priority: 'medium' as const },
-      { text: 'Enhance Leaderboard & Gamification: Make the achievements page more attractive to encourage student engagement.', completed: false, priority: 'low' as const },
-      { text: 'Redesign Landing Page: Give the homepage a modern, premium look with 3D elements and smooth animations.', completed: false, priority: 'low' as const },
-      // New Brainstormed Features
-      { text: 'Add Global Search (Command Palette) using Ctrl+K for quick admin navigation', completed: false, priority: 'high' as const },
-      { text: 'Implement Multi-language Support (i18n) for Bengali and English users', completed: false, priority: 'medium' as const },
-      { text: 'Add Offline Mode / PWA support so students can view saved notes without internet', completed: false, priority: 'medium' as const },
-      { text: 'Develop an AI-powered Mock Interview bot for job preparation', completed: false, priority: 'low' as const },
-      { text: 'Create a Referral System to reward students for inviting friends', completed: false, priority: 'high' as const },
-      { text: 'Add Live Chat Support or a helpdesk ticketing system for student queries', completed: false, priority: 'medium' as const },
+  const seedMoreIdeas = async () => {
+    const moreIdeas = [
+      { text: 'Add Dark Mode Toggle for students to switch between Light and Dark themes', completed: false, priority: 'medium' as const },
+      { text: 'Detailed Analytics for Students: Show weak subjects based on past exam results', completed: false, priority: 'high' as const },
+      { text: 'Certificate Generation: Auto-issue a PDF certificate when a student passes a mock test', completed: false, priority: 'low' as const },
+      { text: 'Discussion Forum: Add a community section where students can ask questions', completed: false, priority: 'medium' as const },
+      { text: 'Push Notifications: Notify students about upcoming exams or new materials', completed: false, priority: 'medium' as const },
+      { text: 'Mobile App: Plan a React Native or Flutter mobile app for DeshExam', completed: false, priority: 'low' as const },
+      { text: 'Exam Timer & Auto-Submit: Strict countdown timer for online exams', completed: false, priority: 'high' as const },
     ];
-    for (const todo of initialTodos) {
+    for (const todo of moreIdeas) {
       await addAdminTodo({ ...todo, tags: [] });
     }
   };
@@ -182,8 +176,8 @@ export default function AdminTodoPage() {
               <Button onClick={handleAddTodo} className="bg-[#4f46e5] hover:bg-[#4338ca] text-white">
                 <Plus className="w-4 h-4 mr-2" /> Add
               </Button>
-              <Button onClick={seedInitialTodos} variant="outline" className="border-[#4f46e5] text-[#4f46e5]">
-                💡 Load Ideas
+              <Button onClick={seedMoreIdeas} variant="outline" className="border-[#4f46e5] text-[#4f46e5]">
+                💡 Load More Ideas
               </Button>
             </div>
           </div>
@@ -200,12 +194,7 @@ export default function AdminTodoPage() {
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4f46e5]"></div>
             </div>
           ) : todos.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 bg-slate-50 dark:bg-slate-900/20 rounded-xl border border-dashed border-slate-200 dark:border-slate-800">
-              <p className="text-sm text-slate-500 mb-4">No tasks found. You are all caught up!</p>
-              <Button onClick={seedInitialTodos} variant="outline" className="text-xs">
-                Load Default Developer Tasks
-              </Button>
-            </div>
+            <p className="text-sm text-slate-500 text-center py-12 bg-slate-50 dark:bg-slate-900/20 rounded-xl border border-dashed border-slate-200 dark:border-slate-800">No tasks found. You are all caught up!</p>
           ) : (
             todos.map((todo, index) => (
               <div 
@@ -280,6 +269,11 @@ export default function AdminTodoPage() {
                       <p className={`text-[15px] leading-snug ${todo.completed ? 'text-slate-500 line-through' : 'text-slate-800 dark:text-slate-200 font-medium'}`}>
                         {index + 1}. {todo.text}
                       </p>
+                      {todo.description && (
+                        <p className={`text-[13px] leading-relaxed mt-0.5 ${todo.completed ? 'text-slate-400' : 'text-slate-500 dark:text-slate-400'}`}>
+                          {todo.description}
+                        </p>
+                      )}
                       
                       <div className="flex flex-wrap items-center gap-2 mt-1">
                          <Badge variant="outline" className={cn("text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 border", getPriorityColor(todo.priority))}>
