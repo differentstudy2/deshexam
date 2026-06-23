@@ -707,6 +707,51 @@ function PersonalInfoTab() {
 }
 
 function SocialLinksTab() {
+  const { user, userProfile } = useAuth();
+  
+  const [facebook, setFacebook] = useState('');
+  const [linkedin, setLinkedin] = useState('');
+  const [twitter, setTwitter] = useState('');
+  const [instagram, setInstagram] = useState('');
+  const [website, setWebsite] = useState('');
+  
+  const [isSaving, setIsSaving] = useState(false);
+  const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    if (userProfile?.socialLinks) {
+      setFacebook(userProfile.socialLinks.facebook || '');
+      setLinkedin(userProfile.socialLinks.linkedin || '');
+      setTwitter(userProfile.socialLinks.twitter || '');
+      setInstagram(userProfile.socialLinks.instagram || '');
+      setWebsite(userProfile.socialLinks.website || '');
+    }
+  }, [userProfile]);
+
+  const handleSave = async () => {
+    if (!user) return;
+    setIsSaving(true);
+    setMessage('');
+    try {
+      await updateUserProfile(user.uid, {
+        socialLinks: {
+          facebook,
+          linkedin,
+          twitter,
+          instagram,
+          website,
+        }
+      });
+      setMessage('Social links updated successfully!');
+      setTimeout(() => setMessage(''), 3000);
+    } catch (err) {
+      console.error(err);
+      setMessage('Failed to update social links.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <div className="space-y-8 max-w-2xl">
       <div>
@@ -714,25 +759,70 @@ function SocialLinksTab() {
         <p className="text-sm font-medium text-slate-500 mt-1">Connect your social media profiles</p>
       </div>
 
-      <div className="space-y-4">
-        <div className="space-y-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+        <div className="space-y-2 md:col-span-2">
           <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Facebook URL</label>
-          <Input className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-11" placeholder="https://facebook.com/..." />
+          <Input 
+            className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-11" 
+            placeholder="https://facebook.com/..." 
+            value={facebook}
+            onChange={(e) => setFacebook(e.target.value)}
+          />
         </div>
         <div className="space-y-2">
           <label className="text-sm font-bold text-slate-700 dark:text-slate-300">LinkedIn URL</label>
-          <Input className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-11" placeholder="https://linkedin.com/in/..." />
+          <Input 
+            className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-11" 
+            placeholder="https://linkedin.com/in/..." 
+            value={linkedin}
+            onChange={(e) => setLinkedin(e.target.value)}
+          />
         </div>
         <div className="space-y-2">
-          <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Twitter URL</label>
-          <Input className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-11" placeholder="https://twitter.com/..." />
+          <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Instagram URL</label>
+          <Input 
+            className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-11" 
+            placeholder="https://instagram.com/..." 
+            value={instagram}
+            onChange={(e) => setInstagram(e.target.value)}
+          />
+        </div>
+        <div className="space-y-2">
+          <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Twitter (X) URL</label>
+          <Input 
+            className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-11" 
+            placeholder="https://twitter.com/..." 
+            value={twitter}
+            onChange={(e) => setTwitter(e.target.value)}
+          />
+        </div>
+        <div className="space-y-2">
+          <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Personal Website / Blog</label>
+          <Input 
+            className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-11" 
+            placeholder="https://yourwebsite.com" 
+            value={website}
+            onChange={(e) => setWebsite(e.target.value)}
+          />
         </div>
       </div>
 
-      <div className="flex justify-end pt-6">
-        <Button className="bg-[#4f46e5] hover:bg-[#4338ca] text-white px-8 h-11 font-bold shadow-md shadow-indigo-500/20 rounded-xl">
-          <Lock className="w-4 h-4 mr-2" /> Save Changes
-        </Button>
+      <div className="flex flex-col gap-2 pt-6">
+        <div className="flex justify-end">
+          <Button 
+            onClick={handleSave}
+            disabled={isSaving}
+            className="bg-[#4f46e5] hover:bg-[#4338ca] text-white px-8 h-11 font-bold shadow-md shadow-indigo-500/20 rounded-xl"
+          >
+            {isSaving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Lock className="w-4 h-4 mr-2" />}
+            {isSaving ? 'Saving...' : 'Save Changes'}
+          </Button>
+        </div>
+        {message && (
+          <p className={`text-right text-sm font-semibold mt-2 ${message.includes('success') ? 'text-green-600' : 'text-red-600'}`}>
+            {message}
+          </p>
+        )}
       </div>
     </div>
   );
