@@ -119,18 +119,89 @@ export default function SettingsPage() {
 // --- TAB COMPONENTS ---
 
 function PrivacyTab() {
+  const { user, userProfile } = useAuth();
+  
+  const [profileVisibility, setProfileVisibility] = useState('public');
+  const [searchIndexing, setSearchIndexing] = useState('allow');
+  const [emailPrivacy, setEmailPrivacy] = useState('public');
+  const [phonePrivacy, setPhonePrivacy] = useState('private');
+  const [resumePrivacy, setResumePrivacy] = useState('private');
+  
+  const [isSaving, setIsSaving] = useState(false);
+  const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    if (userProfile?.privacySettings) {
+      setProfileVisibility(userProfile.privacySettings.profileVisibility || 'public');
+      setSearchIndexing(userProfile.privacySettings.searchIndexing || 'allow');
+      setEmailPrivacy(userProfile.privacySettings.email || 'public');
+      setPhonePrivacy(userProfile.privacySettings.phone || 'private');
+      setResumePrivacy(userProfile.privacySettings.resume || 'private');
+    }
+  }, [userProfile]);
+
+  const handleSave = async () => {
+    if (!user) return;
+    setIsSaving(true);
+    setMessage('');
+    try {
+      await updateUserProfile(user.uid, {
+        privacySettings: {
+          profileVisibility,
+          searchIndexing,
+          email: emailPrivacy,
+          phone: phonePrivacy,
+          resume: resumePrivacy,
+        }
+      });
+      setMessage('Privacy settings updated successfully!');
+      setTimeout(() => setMessage(''), 3000);
+    } catch (err) {
+      console.error(err);
+      setMessage('Failed to update privacy settings.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <div className="space-y-8 max-w-2xl">
       <div>
         <h2 className="text-lg font-bold text-slate-900 dark:text-white">Privacy Settings</h2>
-        <p className="text-sm font-medium text-slate-500 mt-1">Manage your privacy preferences</p>
+        <p className="text-sm font-medium text-slate-500 mt-1">Manage your privacy preferences and visibility</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-2 md:col-span-2">
+          <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Profile Visibility</label>
+          <Select value={profileVisibility} onValueChange={setProfileVisibility}>
+            <SelectTrigger className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-11">
+              <SelectValue placeholder="Select visibility" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="public">Public (Visible to everyone)</SelectItem>
+              <SelectItem value="registered">Registered Users Only</SelectItem>
+              <SelectItem value="private">Private (Only me)</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        
+        <div className="space-y-2">
+          <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Search Engine Indexing</label>
+          <Select value={searchIndexing} onValueChange={setSearchIndexing}>
+            <SelectTrigger className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-11">
+              <SelectValue placeholder="Allow indexing" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="allow">Allow (Recommended)</SelectItem>
+              <SelectItem value="block">Block</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
         <div className="space-y-2">
           <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Email Privacy</label>
-          <Select defaultValue="public">
-            <SelectTrigger className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+          <Select value={emailPrivacy} onValueChange={setEmailPrivacy}>
+            <SelectTrigger className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-11">
               <SelectValue placeholder="Select privacy" />
             </SelectTrigger>
             <SelectContent>
@@ -141,8 +212,8 @@ function PrivacyTab() {
         </div>
         <div className="space-y-2">
           <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Phone Privacy</label>
-          <Select defaultValue="public">
-            <SelectTrigger className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+          <Select value={phonePrivacy} onValueChange={setPhonePrivacy}>
+            <SelectTrigger className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-11">
               <SelectValue placeholder="Select privacy" />
             </SelectTrigger>
             <SelectContent>
@@ -153,8 +224,8 @@ function PrivacyTab() {
         </div>
         <div className="space-y-2">
           <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Resume Privacy</label>
-          <Select defaultValue="private">
-            <SelectTrigger className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+          <Select value={resumePrivacy} onValueChange={setResumePrivacy}>
+            <SelectTrigger className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-11">
               <SelectValue placeholder="Select privacy" />
             </SelectTrigger>
             <SelectContent>
@@ -165,10 +236,22 @@ function PrivacyTab() {
         </div>
       </div>
 
-      <div className="flex justify-end pt-4">
-        <Button className="bg-[#4f46e5] hover:bg-[#4338ca] text-white px-6 font-bold shadow-md shadow-indigo-500/20">
-          <Lock className="w-4 h-4 mr-2" /> Save Changes
-        </Button>
+      <div className="flex flex-col gap-2 pt-6">
+        <div className="flex justify-end">
+          <Button 
+            onClick={handleSave}
+            disabled={isSaving}
+            className="bg-[#4f46e5] hover:bg-[#4338ca] text-white px-8 h-11 font-bold shadow-md shadow-indigo-500/20 rounded-xl"
+          >
+            {isSaving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Lock className="w-4 h-4 mr-2" />}
+            {isSaving ? 'Saving...' : 'Save Changes'}
+          </Button>
+        </div>
+        {message && (
+          <p className={`text-right text-sm font-semibold mt-2 ${message.includes('success') ? 'text-green-600' : 'text-red-600'}`}>
+            {message}
+          </p>
+        )}
       </div>
     </div>
   );
@@ -413,6 +496,8 @@ function ProfessionalInfoTab() {
   const [skills, setSkills] = useState('');
   const [experience, setExperience] = useState('');
   const [resumeLink, setResumeLink] = useState('');
+  const [languages, setLanguages] = useState('');
+  const [certifications, setCertifications] = useState('');
   
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState('');
@@ -430,6 +515,8 @@ function ProfessionalInfoTab() {
       setSkills(userProfile.professionalInfo.skills || '');
       setExperience(userProfile.professionalInfo.experience || '');
       setResumeLink(userProfile.professionalInfo.resumeLink || '');
+      setLanguages(userProfile.professionalInfo.languages || '');
+      setCertifications(userProfile.professionalInfo.certifications || '');
     }
   }, [userProfile]);
 
@@ -450,6 +537,8 @@ function ProfessionalInfoTab() {
           skills,
           experience,
           resumeLink,
+          languages,
+          certifications,
         }
       });
       setMessage('Professional info updated successfully!');
@@ -493,6 +582,25 @@ function ProfessionalInfoTab() {
             placeholder="e.g. React, Marketing, English (comma separated)"
             value={skills}
             onChange={(e) => setSkills(e.target.value)}
+          />
+        </div>
+        
+        <div className="space-y-2">
+          <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Languages Known</label>
+          <Input 
+            className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-11" 
+            placeholder="e.g. English, Hindi, Bengali"
+            value={languages}
+            onChange={(e) => setLanguages(e.target.value)}
+          />
+        </div>
+        <div className="space-y-2">
+          <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Certifications / Achievements</label>
+          <Input 
+            className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-11" 
+            placeholder="e.g. AWS Certified, Top Coder"
+            value={certifications}
+            onChange={(e) => setCertifications(e.target.value)}
           />
         </div>
 
