@@ -158,7 +158,7 @@ export function BoardDashboard({
                         {cls}
                       </h4>
                       <p className="text-xs text-slate-500 font-medium relative z-10">
-                        {Math.floor(Math.random() * 5 + 3)} Subjects • {Math.floor(Math.random() * 15 + 5)} Books
+                        {(idx % 5) + 3} Subjects • {(idx * 7 % 15) + 5} Books
                       </p>
                     </div>
                   </Link>
@@ -186,7 +186,7 @@ export function BoardDashboard({
                     <BookOpen className="w-5 h-5 text-slate-400 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors" />
                   </div>
                   <h4 className="font-bold text-slate-900 dark:text-white text-sm mb-1 group-hover:text-emerald-600 dark:group-hover:text-emerald-300 transition-colors">{subj}</h4>
-                  <p className="text-[11px] text-slate-500">Chapters: {Math.floor(Math.random() * 10 + 10)}<br/>Questions: {Math.floor(Math.random() * 10 + 15)}</p>
+                  <p className="text-[11px] text-slate-500">Chapters: {(idx % 10) + 10}<br/>Questions: {(idx * 3 % 10) + 15}</p>
                 </div>
               ))}
             </div>

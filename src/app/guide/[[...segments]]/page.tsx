@@ -17,6 +17,11 @@ export async function generateMetadata({ params }: { params: Promise<{ segments?
   if (segments.length === 0) return { title: 'Academy Guide' };
 
   const requestedPath = segments.join('/');
+  
+  if (requestedPath === 'academy') {
+    return { title: 'Academy | DeshExam' };
+  }
+
   let node = await getTaxonomyNodeBySlug(requestedPath);
   let contentType: ContentType | null = null;
 
@@ -63,10 +68,16 @@ export default async function GuidePage({ params }: { params: Promise<{ segments
   
   if (segments.length === 0) {
     // Redirect or show guide home
-    redirect('/guide/board');
+    redirect('/guide/academy');
   }
 
   const requestedPath = segments.join('/');
+  
+  if (requestedPath === 'academy') {
+    const AcademyClient = (await import('@/app/academy/AcademyClient')).default;
+    return <AcademyClient />;
+  }
+
   let node = await getTaxonomyNodeBySlug(requestedPath);
   let contentType: ContentType | null = null;
 
