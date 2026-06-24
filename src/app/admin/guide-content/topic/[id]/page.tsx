@@ -89,6 +89,7 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false); // mobile drawer
+  const [nodeSlug, setNodeSlug] = useState('');
 
   useEffect(() => {
     const loadContent = async () => {
@@ -100,6 +101,7 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
         if (nodeInfo?.node) {
           if (nodeInfo.node.status) setStatus(nodeInfo.node.status);
           setNodeTitle(nodeInfo.node.title || nodeInfo.node.name || '');
+          setNodeSlug(nodeInfo.node.fullSlug || nodeInfo.node.id);
 
           if (nodeInfo.level === 'chapter' || nodeInfo.level === 'topic') {
             setNodeLevel(nodeInfo.level);
@@ -493,7 +495,7 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
                   {sectionCategories.find(c => c.items.some(i => i.id === activeTab))?.title}
                 </span>
               </div>
-              <Link href={`/guide/${topicId}`} target="_blank">
+              <Link href={`/guide/${nodeSlug || topicId}`} target="_blank">
                 <button className="flex items-center gap-1.5 text-sm text-[#107c41] font-semibold hover:underline">
                   <BookOpen className="w-4 h-4" /> Preview <ChevronRight className="w-4 h-4" />
                 </button>
@@ -504,7 +506,7 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
             <div className="flex items-center gap-2 mb-3 lg:hidden">
               {activeSection && React.createElement(activeSection.icon, { className: "w-4 h-4 text-[#107c41] shrink-0" })}
               <span className="text-sm font-bold text-slate-700 dark:text-slate-200">{activeSection?.label}</span>
-              <Link href={`/guide/${topicId}`} target="_blank" className="ml-auto">
+              <Link href={`/guide/${nodeSlug || topicId}`} target="_blank" className="ml-auto">
                 <button className="flex items-center gap-1 text-[10px] text-[#107c41] font-medium">
                   <BookOpen className="w-3 h-3" /> Preview <ChevronRight className="w-3 h-3" />
                 </button>

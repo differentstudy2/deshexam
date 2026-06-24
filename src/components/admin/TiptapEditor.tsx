@@ -28,7 +28,7 @@ import { AssessmentExtension } from './editor/extensions/AssessmentExtension';
 import { MediaExtension } from './editor/extensions/MediaExtension';
 import { SlashCommand, renderItems } from './editor/extensions/SlashCommand';
 
-import { 
+import {
   Bold, Italic, Underline as UnderlineIcon, Strikethrough,
   Heading1, Heading2, Heading3, Heading4,
   List, ListOrdered, CheckSquare, Quote, Code, Image as ImageIcon, Video, FileText, Music, Table as TableIcon,
@@ -140,7 +140,7 @@ const MenuBar = ({ editor }: { editor: any }) => {
   const [uploading, setUploading] = React.useState(false);
   const [mediaDialogOpen, setMediaDialogOpen] = React.useState(false);
   const [mediaUrlInput, setMediaUrlInput] = React.useState('');
-  const [mediaType, setMediaType] = React.useState<'image'|'video'|'audio'|'pdf'|'youtube'>('image');
+  const [mediaType, setMediaType] = React.useState<'image' | 'video' | 'audio' | 'pdf' | 'youtube'>('image');
   const { toast } = useToast();
 
   if (!editor) {
@@ -164,8 +164,8 @@ const MenuBar = ({ editor }: { editor: any }) => {
       const storageRef = ref(storage, `editor-media/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`);
       const snapshot = await uploadBytes(storageRef, file);
       const url = await getDownloadURL(snapshot.ref);
-      
-      let type: 'image'|'video'|'audio'|'pdf' = 'image';
+
+      let type: 'image' | 'video' | 'audio' | 'pdf' = 'image';
       if (file.type.startsWith('video/')) type = 'video';
       else if (file.type.startsWith('audio/')) type = 'audio';
       else if (file.type === 'application/pdf') type = 'pdf';
@@ -191,9 +191,9 @@ const MenuBar = ({ editor }: { editor: any }) => {
   };
 
   return (
-    <div className="flex flex-wrap gap-1 p-2 border-b border-[#eef2ec] dark:border-slate-800 bg-[#f8faf8] dark:bg-slate-900 sticky top-0 z-40 items-center">
+    <div className="flex flex-wrap gap-1 p-2 border-b border-slate-300 dark:border-slate-800 bg-[#f8faf8] dark:bg-slate-900 sticky top-0 z-40 items-center">
       {/* Headings Dropdown */}
-      <select 
+      <select
         value={getActiveHeading()}
         onChange={(e) => {
           const val = e.target.value;
@@ -211,8 +211,8 @@ const MenuBar = ({ editor }: { editor: any }) => {
         <option value="h3">Heading 3</option>
         <option value="h4">Heading 4</option>
       </select>
-      
-      <div className="w-px h-6 bg-[#c4d6c4] dark:bg-slate-700 mx-1 my-auto" />
+
+      <div className="w-px h-6 bg-slate-300 dark:bg-slate-700 mx-1 my-auto" />
 
       {/* Formatting */}
       <Toggle size="sm" pressed={editor.isActive('bold')} onPressedChange={() => editor.chain().focus().toggleBold().run()}>
@@ -230,8 +230,8 @@ const MenuBar = ({ editor }: { editor: any }) => {
       <Toggle size="sm" pressed={editor.isActive('highlight')} onPressedChange={() => editor.chain().focus().toggleHighlight().run()}>
         <Type className="h-4 w-4 text-yellow-500" />
       </Toggle>
-      
-      <div className="w-px h-6 bg-[#c4d6c4] dark:bg-slate-700 mx-1 my-auto" />
+
+      <div className="w-px h-6 bg-slate-300 dark:bg-slate-700 mx-1 my-auto" />
 
       {/* Alignment */}
       <Toggle size="sm" pressed={editor.isActive({ textAlign: 'left' })} onPressedChange={() => editor.chain().focus().setTextAlign('left').run()}>
@@ -247,7 +247,7 @@ const MenuBar = ({ editor }: { editor: any }) => {
         <AlignJustify className="h-4 w-4" />
       </Toggle>
 
-      <div className="w-px h-6 bg-[#c4d6c4] dark:bg-slate-700 mx-1 my-auto" />
+      <div className="w-px h-6 bg-slate-300 dark:bg-slate-700 mx-1 my-auto" />
 
       {/* Lists & Blocks */}
       <Toggle size="sm" pressed={editor.isActive('bulletList')} onPressedChange={() => editor.chain().focus().toggleBulletList().run()}>
@@ -259,8 +259,8 @@ const MenuBar = ({ editor }: { editor: any }) => {
       <Toggle size="sm" pressed={editor.isActive('taskList')} onPressedChange={() => editor.chain().focus().toggleTaskList().run()}>
         <CheckSquare className="h-4 w-4" />
       </Toggle>
-      
-      <div className="w-px h-6 bg-[#c4d6c4] dark:bg-slate-700 mx-1 my-auto" />
+
+      <div className="w-px h-6 bg-slate-300 dark:bg-slate-700 mx-1 my-auto" />
 
       {/* Advanced Blocks */}
       <Button variant="ghost" size="sm" title="Add Math" onClick={() => editor.chain().focus().setMath().run()}>
@@ -273,8 +273,8 @@ const MenuBar = ({ editor }: { editor: any }) => {
         <TableIcon className="h-4 w-4" />
       </Button>
 
-      <div className="w-px h-6 bg-[#c4d6c4] dark:bg-slate-700 mx-1 my-auto" />
-      
+      <div className="w-px h-6 bg-slate-300 dark:bg-slate-700 mx-1 my-auto" />
+
       {/* Media Dialog */}
       <Dialog open={mediaDialogOpen} onOpenChange={setMediaDialogOpen}>
         <DialogTrigger asChild>
@@ -293,15 +293,15 @@ const MenuBar = ({ editor }: { editor: any }) => {
                 {uploading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <UploadCloud className="w-4 h-4 mr-2" />}
                 {uploading ? 'Uploading...' : 'Choose File'}
               </Button>
-              <input 
-                type="file" 
-                ref={fileInputRef} 
-                onChange={handleFileUpload} 
-                accept="image/*,video/*,audio/*,application/pdf" 
-                className="hidden" 
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileUpload}
+                accept="image/*,video/*,audio/*,application/pdf"
+                className="hidden"
               />
             </div>
-            
+
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <span className="w-full border-t border-slate-200 dark:border-slate-800" />
@@ -313,7 +313,7 @@ const MenuBar = ({ editor }: { editor: any }) => {
 
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium">Embed URL</label>
-              <select 
+              <select
                 className="text-sm border border-slate-200 dark:border-slate-800 rounded p-2 bg-transparent"
                 value={mediaType}
                 onChange={(e) => setMediaType(e.target.value as any)}
@@ -325,8 +325,8 @@ const MenuBar = ({ editor }: { editor: any }) => {
                 <option value="youtube">YouTube URL</option>
               </select>
               <div className="flex gap-2 mt-1">
-                <Input 
-                  placeholder="https://..." 
+                <Input
+                  placeholder="https://..."
                   value={mediaUrlInput}
                   onChange={(e) => setMediaUrlInput(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') handleAddMediaUrl(); }}
@@ -354,14 +354,14 @@ export function TiptapEditor({ content, onChange, maxHeight }: { content: string
       if (!moved && event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files[0]) {
         event.preventDefault();
         const file = event.dataTransfer.files[0];
-        
+
         const uploadFile = async () => {
           try {
             const storageRef = ref(storage, `editor-media/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`);
             const snapshot = await uploadBytes(storageRef, file);
             const url = await getDownloadURL(snapshot.ref);
-            
-            let type: 'image'|'video'|'audio'|'pdf' = 'image';
+
+            let type: 'image' | 'video' | 'audio' | 'pdf' = 'image';
             if (file.type.startsWith('video/')) type = 'video';
             else if (file.type.startsWith('audio/')) type = 'audio';
             else if (file.type === 'application/pdf') type = 'pdf';
@@ -428,7 +428,7 @@ export function TiptapEditor({ content, onChange, maxHeight }: { content: string
     editorProps: {
       handleDrop,
       attributes: {
-        class: 'prose prose-sm dark:prose-invert sm:prose-base lg:prose-lg xl:prose-xl mx-auto focus:outline-none min-h-[400px] pb-32 max-w-none',
+        class: 'prose prose-sm dark:prose-invert sm:prose-base lg:prose-lg xl:prose-xl mx-auto focus:outline-none min-h-[400px] pb-32 max-w-none bg-white dark:bg-[#0f1117] border border-slate-300 dark:border-slate-700 p-6 sm:p-8 rounded-xl shadow-sm mt-2 mb-8',
       },
     },
     onUpdate: ({ editor }) => {
@@ -463,7 +463,7 @@ export function TiptapEditor({ content, onChange, maxHeight }: { content: string
       cleanContent = cleanContent.replace(/\\\*/g, '*');
 
       const hasMarkdown = /(^|\n)(#{1,6}|\*|-|>|\d+\.) /.test(cleanContent) || /\*\*(.*?)\*\*/.test(cleanContent);
-      
+
       if (hasMarkdown && !/<(div|span|table|ul|ol|h[1-6])/.test(cleanContent)) {
         try {
           parsedHTML = marked.parse(cleanContent.trim()) as string;
@@ -471,12 +471,12 @@ export function TiptapEditor({ content, onChange, maxHeight }: { content: string
           console.error("Failed to parse markdown with marked", e);
         }
       }
-      
+
       if (viewMode === 'visual') {
         editor.commands.setContent(parsedHTML);
       }
     }
-    
+
     previousContentRef.current = content;
   }, [content, editor, viewMode]);
 
@@ -500,14 +500,14 @@ export function TiptapEditor({ content, onChange, maxHeight }: { content: string
       const response = await fetch('/api/ai/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          prompt: `Generate the following content using rich HTML tags (e.g. <h1>, <h2>, <p>, <ul>, <li>, <strong>, <em>, <blockquote>, etc.) to make it look highly professional and well-formatted in a Rich Text Editor. DO NOT wrap the output in markdown code blocks like \`\`\`html. Output raw HTML only.\n\nUser Request: ${aiPrompt}` 
+        body: JSON.stringify({
+          prompt: `Generate the following content using rich HTML tags (e.g. <h1>, <h2>, <p>, <ul>, <li>, <strong>, <em>, <blockquote>, etc.) to make it look highly professional and well-formatted in a Rich Text Editor. DO NOT wrap the output in markdown code blocks like \`\`\`html. Output raw HTML only.\n\nUser Request: ${aiPrompt}`
         }),
       });
 
       if (!response.ok) throw new Error('AI Generation failed');
       const data = await response.json();
-      
+
       if (editor) {
         editor.commands.insertContent(data.result);
       }
@@ -523,10 +523,10 @@ export function TiptapEditor({ content, onChange, maxHeight }: { content: string
   };
 
   return (
-    <div className="border border-slate-300 dark:border-slate-700 rounded-2xl overflow-hidden bg-[#fdfefd] dark:bg-slate-950 focus-within:border-emerald-500 dark:focus-within:border-emerald-500 transition-colors shadow-sm flex flex-col">
-      <div className="flex items-center justify-between bg-[#f8faf8] dark:bg-slate-900 border-b border-[#eef2ec] dark:border-slate-800 pr-4">
+    <div className="border border-slate-300 dark:border-slate-700 rounded-2xl overflow-hidden bg-slate-100/50 dark:bg-slate-950 focus-within:border-emerald-500 dark:focus-within:border-emerald-500 transition-colors shadow-sm flex flex-col">
+      <div className="flex items-center justify-between bg-white dark:bg-slate-900 border-b border-slate-300 dark:border-slate-800 pr-4">
         <MenuBar editor={editor} />
-        
+
         <div className="flex items-center gap-2">
           <Dialog open={aiDialogOpen} onOpenChange={setAiDialogOpen}>
             <DialogTrigger asChild>
@@ -542,7 +542,7 @@ export function TiptapEditor({ content, onChange, maxHeight }: { content: string
               <div className="grid gap-4 py-4">
                 <div className="space-y-2">
                   <Label>Prompt for AI</Label>
-                  <Textarea 
+                  <Textarea
                     placeholder="e.g. Write a 3 paragraph admission process for an engineering college..."
                     value={aiPrompt}
                     onChange={(e) => setAiPrompt(e.target.value)}
@@ -557,7 +557,7 @@ export function TiptapEditor({ content, onChange, maxHeight }: { content: string
             </DialogContent>
           </Dialog>
 
-          <select 
+          <select
             value={viewMode}
             onChange={(e) => {
               const newMode = e.target.value as any;
@@ -577,9 +577,9 @@ export function TiptapEditor({ content, onChange, maxHeight }: { content: string
           </select>
         </div>
       </div>
-      
-      <div 
-        className="p-4 sm:p-8 overflow-y-auto scrollbar-thin relative"
+
+      <div
+        className="p-0.5 sm:p-2 overflow-y-auto scrollbar-thin relative"
         style={{ maxHeight: maxHeight || '70vh' }}
       >
         {isGenerating && (
@@ -592,11 +592,11 @@ export function TiptapEditor({ content, onChange, maxHeight }: { content: string
             </div>
           </div>
         )}
-        
+
         {viewMode === 'visual' ? (
           <EditorContent editor={editor} />
         ) : (
-          <textarea 
+          <textarea
             value={rawContent}
             onChange={handleRawContentChange}
             className="w-full h-full min-h-[400px] bg-transparent border-none focus:outline-none focus:ring-0 font-mono text-sm text-slate-700 dark:text-slate-300 resize-y"
