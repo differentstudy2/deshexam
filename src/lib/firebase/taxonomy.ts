@@ -127,6 +127,8 @@ export interface TaxonomyNode {
   // SEO fields & Module 8: SEO Advanced
   seoTitle?: string;
   seoDescription?: string;
+  seoContent?: string;
+  faqs?: { question: string; answer: string }[];
   featureImage?: string; // Module 1
   tags?: string[];
   keywords?: string[];

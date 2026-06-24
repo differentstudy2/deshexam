@@ -51,6 +51,18 @@ export default function TextbookDetailsPage() {
   const [deleteNodeData, setDeleteNodeData] = useState<{ id: string, title: string, type: 'chapter' | 'topic' } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  // New States for Textbook Edit Form
+  const [editTbData, setEditTbData] = useState<{
+    title: string;
+    slug: string;
+    seoContent: string;
+    tags: string;
+    keywords: string;
+    featureImage: string;
+    faqs: { question: string; answer: string }[];
+  } | null>(null);
+  const [isSavingTb, setIsSavingTb] = useState(false);
+
   const loadData = async () => {
       if (!textbookId) return;
 
@@ -60,6 +72,15 @@ export default function TextbookDetailsPage() {
         setTextbook(tbNode);
 
         if (tbNode) {
+          setEditTbData({
+            title: tbNode.title || '',
+            slug: tbNode.slug || '',
+            seoContent: tbNode.seoContent || '',
+            tags: (tbNode.tags || []).join(', '),
+            keywords: (tbNode.keywords || []).join(', '),
+            featureImage: tbNode.featureImage || '',
+            faqs: tbNode.faqs || []
+          });
           // 2. Fetch Client URL base path for textbook by walking up the taxonomy tree
           let baseTextbookSlugPath = tbNode.fullSlug || tbNode.id;
           try {
@@ -244,6 +265,30 @@ export default function TextbookDetailsPage() {
     }
   };
 
+  const handleSaveTextbook = async () => {
+    if (!editTbData || !editTbData.title.trim()) return;
+    setIsSavingTb(true);
+    try {
+      const { updateTaxonomyNode, generateSlug } = await import('@/lib/firebase/taxonomy');
+      await updateTaxonomyNode(textbookId, { 
+        title: editTbData.title.trim(),
+        slug: editTbData.slug.trim() || generateSlug(editTbData.title.trim()),
+        seoContent: editTbData.seoContent,
+        tags: editTbData.tags.split(',').map(s => s.trim()).filter(Boolean),
+        keywords: editTbData.keywords.split(',').map(s => s.trim()).filter(Boolean),
+        featureImage: editTbData.featureImage.trim(),
+        faqs: editTbData.faqs.filter(f => f.question.trim() && f.answer.trim())
+      });
+      await loadData();
+      alert('Textbook info updated successfully!');
+    } catch (e) {
+      console.error(e);
+      alert('Failed to update textbook info');
+    } finally {
+      setIsSavingTb(false);
+    }
+  };
+
   if (loading) {
     return <div className="p-12 text-center text-gray-500 animate-pulse">Loading textbook data...</div>;
   }
@@ -291,6 +336,88 @@ export default function TextbookDetailsPage() {
           </Button>
         </div>
       </div>
+
+      {/* Edit Textbook Info Form */}
+      {editTbData && (
+        <Card className="border-indigo-100 shadow-sm">
+          <CardHeader className="bg-indigo-50/50 border-b border-indigo-100">
+            <CardTitle className="text-xl flex items-center gap-2">
+              <FileText className="h-5 w-5 text-indigo-500" />
+              Textbook Info & SEO
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6">
+            <div className="space-y-6">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Title</Label>
+                  <Input value={editTbData.title} onChange={(e) => setEditTbData({...editTbData, title: e.target.value})} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Slug</Label>
+                  <Input value={editTbData.slug} onChange={(e) => setEditTbData({...editTbData, slug: e.target.value})} />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Description / SEO Content (Markdown supported)</Label>
+                <Textarea rows={6} value={editTbData.seoContent} onChange={(e) => setEditTbData({...editTbData, seoContent: e.target.value})} />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Tags (Comma separated)</Label>
+                  <Input value={editTbData.tags} onChange={(e) => setEditTbData({...editTbData, tags: e.target.value})} placeholder="e.g. math, science" />
+                </div>
+                <div className="space-y-2">
+                  <Label>Keywords (Comma separated)</Label>
+                  <Input value={editTbData.keywords} onChange={(e) => setEditTbData({...editTbData, keywords: e.target.value})} placeholder="e.g. class 10 math, board exam" />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Cover Image URL</Label>
+                <Input value={editTbData.featureImage} onChange={(e) => setEditTbData({...editTbData, featureImage: e.target.value})} placeholder="https://..." />
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between mt-6 border-t pt-4">
+                  <Label className="text-lg">FAQs</Label>
+                  <Button type="button" variant="outline" size="sm" onClick={() => setEditTbData({...editTbData, faqs: [...editTbData.faqs, {question: '', answer: ''}]})}>
+                    <Plus className="w-4 h-4 mr-2" /> Add FAQ
+                  </Button>
+                </div>
+                <div className="space-y-3 mt-2">
+                  {editTbData.faqs.map((faq, idx) => (
+                    <div key={idx} className="flex gap-2 items-start border p-3 rounded-md bg-slate-50">
+                      <div className="flex-1 space-y-2">
+                        <Input placeholder="Question" value={faq.question} onChange={(e) => {
+                          const newFaqs = [...editTbData.faqs];
+                          newFaqs[idx].question = e.target.value;
+                          setEditTbData({...editTbData, faqs: newFaqs});
+                        }} />
+                        <Textarea placeholder="Answer" rows={2} value={faq.answer} onChange={(e) => {
+                          const newFaqs = [...editTbData.faqs];
+                          newFaqs[idx].answer = e.target.value;
+                          setEditTbData({...editTbData, faqs: newFaqs});
+                        }} />
+                      </div>
+                      <Button type="button" variant="ghost" size="icon" className="text-red-500 hover:bg-red-100" onClick={() => {
+                        const newFaqs = editTbData.faqs.filter((_, i) => i !== idx);
+                        setEditTbData({...editTbData, faqs: newFaqs});
+                      }}>
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ))}
+                  {editTbData.faqs.length === 0 && <p className="text-sm text-gray-500 italic">No FAQs added yet.</p>}
+                </div>
+              </div>
+              <div className="flex justify-end border-t pt-4">
+                <Button onClick={handleSaveTextbook} disabled={!editTbData?.title.trim() || isSavingTb} className="bg-indigo-600 hover:bg-indigo-700">
+                  {isSavingTb ? 'Saving...' : 'Save Textbook Info'}
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Chapters & Topics Accordion */}
       <Card>

@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ChevronRight, Share2, MoreVertical, Search, Clock, Play } from 'lucide-react';
+import { ChevronRight, Share2, MoreVertical, Search, Clock, Play, FileText, Library, BookOpen, ChevronDown, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
@@ -9,6 +9,7 @@ import { CurriculumTree } from '@/components/guide/CurriculumTree';
 import { GuideSidebar } from '@/components/guide/GuideSidebar';
 import { Chapter } from '@/app/guide/guide-data';
 import { generateBreadcrumbSchema, generateBookSchema, generateLearningResourceSchema, generateItemListSchema, generateFAQPageSchema } from '@/lib/seo-schemas';
+import ReactMarkdown from 'react-markdown';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 export function SubjectDashboard({
@@ -116,7 +117,7 @@ export function SubjectDashboard({
       schemas.push(generateItemListSchema(itemListElements));
     }
     
-    faqs = [
+    faqs = (node.faqs && node.faqs.length > 0) ? node.faqs : [
       { question: `Which class is ${node.title} for?`, answer: `This is an essential guide for ${classTitle ? classTitle : 'students'}${boardTitle ? ' under the ' + boardTitle + ' curriculum' : ''}.` },
       { question: `Does this guide contain chapter-wise notes?`, answer: `Yes, detailed notes, summaries, and questions-answers are provided for every chapter.` },
       { question: `Are there MCQ practice questions available?`, answer: `Absolutely. We provide ample MCQs for every subject to help you with your preparation.` },
@@ -270,7 +271,9 @@ At DeshExam, we provide high-quality MCQ, short answer questions (SAQ), long ans
           {node && (
             <div className="p-4 sm:p-6 border-t border-slate-200 dark:border-slate-800">
               <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">About {displayTitle}</h2>
-              <div className="prose dark:prose-invert max-w-none text-slate-700 dark:text-slate-300 text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: seoContent.replace(/\n/g, '<br/>') }} />
+              <div className="prose dark:prose-invert max-w-none text-slate-700 dark:text-slate-300 text-sm leading-relaxed">
+                <ReactMarkdown>{seoContent}</ReactMarkdown>
+              </div>
 
               <h2 className="text-xl font-bold text-slate-900 dark:text-white mt-8 mb-4">FAQs</h2>
               <Accordion type="single" collapsible className="w-full">
