@@ -24,10 +24,15 @@ import {
 interface ReadingArticleProps {
   data: ReadingContentData;
   hierarchy?: {
+    boardId?: string;
     boardTitle?: string;
+    classId?: string;
     classTitle?: string;
+    subjectId?: string;
     subjectTitle?: string;
+    textbookId?: string;
     textbookTitle?: string;
+    chapterId?: string;
     chapterTitle?: string;
   };
   navigation?: {
@@ -318,23 +323,33 @@ export function ReadingArticle({ data, hierarchy, navigation }: ReadingArticlePr
           <div className="flex flex-col">
 
             {/* Master Banner */}
-            <div className="bg-[#f0f7f4] dark:bg-emerald-900/10 px-6 py-5 border-b border-emerald-100/50 dark:border-slate-800">
+            <div className="bg-[#f0f7f4] dark:bg-emerald-900/10 px-6 py-1 border-b border-emerald-100/50 dark:border-slate-800">
               <div className="flex justify-between items-start">
                 <div>
-                  <div className="flex flex-wrap items-baseline gap-2 mb-2">
+                  <div className="flex flex-wrap items-baseline gap-2 mb-0">
                     <h1 className="text-[24px] font-bold text-[#2d4a41] dark:text-slate-100">
                       {data.title}
                     </h1>
                     {data.author?.name && (
-                      <span className="text-[15px] font-normal text-slate-400 dark:text-slate-500">
+                      <span className="text-[14px] font-normal text-slate-400 dark:text-slate-500">
                         ({data.author.name})
                       </span>
                     )}
                   </div>
                   {hierarchy && (
-                    <p className="text-[14px] text-[#5e7c70] dark:text-slate-400 mt-1.5">
-                      {data.title} - {hierarchy.boardTitle ? `${hierarchy.boardTitle} - ` : ''}{hierarchy.classTitle ? `${hierarchy.classTitle} - ` : ''}{hierarchy.subjectTitle ? `${hierarchy.subjectTitle}` : ''}
-                    </p>
+                    <div className="flex flex-wrap items-center gap-1 text-[12px] text-[#7d9e8e] dark:text-slate-400 mt-0 font-normal">
+                      {[
+                        hierarchy.boardTitle && hierarchy.boardTitle !== 'Board' ? hierarchy.boardTitle : null,
+                        hierarchy.classTitle && hierarchy.classTitle !== 'Class' ? hierarchy.classTitle : null,
+                        hierarchy.subjectTitle && hierarchy.subjectTitle !== 'Subject' ? hierarchy.subjectTitle : null,
+                        hierarchy.textbookTitle && hierarchy.textbookTitle !== 'Textbook' ? hierarchy.textbookTitle : null
+                      ].filter(Boolean).map((text, i, arr) => (
+                        <React.Fragment key={text as string}>
+                          <span>{text}</span>
+                          {i < arr.length - 1 && <span className="opacity-70">-</span>}
+                        </React.Fragment>
+                      ))}
+                    </div>
                   )}
                 </div>
 
