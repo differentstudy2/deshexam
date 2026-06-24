@@ -42,7 +42,10 @@ export function generateHybridSeo({ node, contentType, siteName = 'DeshExam' }: 
       baseTitle = `${node.title} | Class ${className.replace(/class\s+/i, '')} ${subjectName} Notes, MCQ & Guide`;
     } else if (node.type === 'chapter') {
       const parentName = getAncestorTitle('textbook') || subjectName;
-      baseTitle = `${node.title} Question Answer | ${parentName}`;
+      const boardPrefix = boardName ? `${boardName} ` : '';
+      const cleanClassName = className.replace(/wbbse\s+/i, '').replace(/cbse\s+/i, '').replace(/class\s+/i, '');
+      const classPrefix = cleanClassName ? `Class ${cleanClassName} ` : '';
+      baseTitle = `${boardPrefix}${classPrefix}${node.title} Question Answer | ${parentName}`;
     } else if (node.type === 'topic' || node.type === 'section') {
       baseTitle = `${node.title} Summary & Notes`;
     } else {

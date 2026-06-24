@@ -152,7 +152,10 @@ export const getReadingContent = async (contentId: string): Promise<ReadingConte
         title: taxNode.title,
         subtitle: taxNode.description || '',
         featureImage: taxNode.featureImage || '',
-        author: taxNode.author || '',
+        author: {
+          name: taxNode.contentAuthor?.name || taxNode.author || 'DeshExam Team',
+          avatarUrl: taxNode.contentAuthor?.avatarUrl || 'https://deshexam.com/image/logo.png'
+        },
         createdAt: taxNode.createdAt,
         updatedAt: taxNode.updatedAt,
         type: taxNode.type
@@ -289,14 +292,18 @@ export const getReadingContent = async (contentId: string): Promise<ReadingConte
         }
       }
 
+      // Try to extract author information from taxonomy node or section data
+      const authorName = data.contentAuthor?.name || taxNode?.contentAuthor?.name || taxNode?.author || 'DeshExam Team';
+      const authorAvatar = data.contentAuthor?.avatarUrl || taxNode?.contentAuthor?.avatarUrl || 'https://deshexam.com/image/logo.png';
+
       sections.push({
         id: d.id, // keep id for sorting
         title: SECTION_LABELS[sectionType] || sectionType,
         type,
         ...sectionData,
         author: {
-          name: 'Sattar Uddin Sohel',
-          avatarUrl: 'https://i.pravatar.cc/150?u=sattar'
+          name: authorName,
+          avatarUrl: authorAvatar
         }
       });
     });

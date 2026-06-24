@@ -52,6 +52,11 @@ export interface TaxonomyNode {
   icon?: string;
   description?: string;
   author?: string;
+  contentAuthor?: {
+    name: string;
+    avatarUrl: string;
+    id?: string;
+  };
   
   // Board / Institution specific optional fields
   acronym?: string;

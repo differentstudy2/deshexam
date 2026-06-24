@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Share2, MoreVertical, Eye, ChevronLeft, ChevronRight, Play, CheckCircle2, Printer } from 'lucide-react';
 import { ReadingContentData, ContentSection, ContentAuthor } from '@/app/guide/guide-data';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { CustomVideoPlayer } from '@/components/ui/CustomVideoPlayer';
 import ReactMarkdown from 'react-markdown';
@@ -29,6 +30,10 @@ interface ReadingArticleProps {
     textbookTitle?: string;
     chapterTitle?: string;
   };
+  navigation?: {
+    prev?: { id: string; title: string };
+    next?: { id: string; title: string };
+  };
 }
 
 function SectionFooter({ author }: { author?: ContentAuthor }) {
@@ -40,9 +45,9 @@ function SectionFooter({ author }: { author?: ContentAuthor }) {
       </p>
       <div className="flex items-center gap-3">
         {author.avatarUrl ? (
-          <img 
-            src={author.avatarUrl} 
-            alt={author.name || 'Author'} 
+          <img
+            src={author.avatarUrl}
+            alt={author.name || 'Author'}
             className="w-8 h-8 rounded-full border border-slate-200 dark:border-slate-700"
           />
         ) : (
@@ -60,7 +65,7 @@ function SectionFooter({ author }: { author?: ContentAuthor }) {
 
 import { incrementGuideNodeViews } from '@/lib/firebase/guide';
 
-export function ReadingArticle({ data, hierarchy }: ReadingArticleProps) {
+export function ReadingArticle({ data, hierarchy, navigation }: ReadingArticleProps) {
   const [viewCount, setViewCount] = React.useState(data.views || 0);
 
   React.useEffect(() => {
@@ -96,8 +101,8 @@ export function ReadingArticle({ data, hierarchy }: ReadingArticleProps) {
       <div className="p-6 sm:p-10 flex flex-col gap-8">
         {data.content && typeof data.content === 'string' && (
           <div className="prose dark:prose-invert max-w-none custom-reading-font">
-            <ReactMarkdown 
-              remarkPlugins={[remarkGfm, remarkMath]} 
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm, remarkMath]}
               rehypePlugins={[rehypeRaw, rehypeKatex]}
             >
               {data.content}
@@ -121,7 +126,7 @@ export function ReadingArticle({ data, hierarchy }: ReadingArticleProps) {
 
     return (
       <div key={idx} id={sec.id} className="bg-white dark:bg-slate-900 scroll-mt-20 border-b border-slate-100 dark:border-slate-800">
-        
+
         {/* Section Header */}
         {!isLesson && (
           <div className="flex justify-between items-center p-2">
@@ -144,7 +149,7 @@ export function ReadingArticle({ data, hierarchy }: ReadingArticleProps) {
 
         {/* Section Body */}
         <div className={`p-6 sm:p-8 ${isLesson ? 'pt-6' : ''}`}>
-          
+
           {sec.type === 'article' && sec.badges && (
             <div className="flex flex-wrap items-center gap-2 mb-6">
               {sec.badges.map((b, i) => (
@@ -157,7 +162,8 @@ export function ReadingArticle({ data, hierarchy }: ReadingArticleProps) {
 
           {sec.type === 'article' && (
             <>
-              <style dangerouslySetInnerHTML={{__html: `
+              <style dangerouslySetInnerHTML={{
+                __html: `
                 .custom-reading-font p, 
                 .custom-reading-font li, 
                 .custom-reading-font a, 
@@ -194,8 +200,8 @@ export function ReadingArticle({ data, hierarchy }: ReadingArticleProps) {
                 }
               `}} />
               <div className="prose dark:prose-invert max-w-none custom-reading-font">
-                <ReactMarkdown 
-                  remarkPlugins={[remarkGfm, remarkMath]} 
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm, remarkMath]}
                   rehypePlugins={[rehypeRaw, rehypeKatex]}
                 >
                   {sec.body || ''}
@@ -244,14 +250,14 @@ export function ReadingArticle({ data, hierarchy }: ReadingArticleProps) {
               {sec.pdfData.map((pdf: any, i: number) => pdf.url && (
                 <div key={i} className="flex flex-col items-center justify-center p-6 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-700">
                   <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-xl flex items-center justify-center mb-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M10 13v6"/><path d="M12 13v6"/><path d="M14 13v6"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" /><polyline points="14 2 14 8 20 8" /><path d="M10 13v6" /><path d="M12 13v6" /><path d="M14 13v6" /></svg>
                   </div>
                   <h3 className="text-base font-bold text-slate-800 dark:text-slate-100 mb-4 text-center line-clamp-2">
                     {pdf.title || `Document ${i + 1}`}
                   </h3>
-                  <a 
-                    href={pdf.url} 
-                    target="_blank" 
+                  <a
+                    href={pdf.url}
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-md transition-colors shadow-sm"
                   >
@@ -273,9 +279,9 @@ export function ReadingArticle({ data, hierarchy }: ReadingArticleProps) {
                     </h3>
                   )}
                   <div className="relative w-full aspect-video rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-900 shadow-sm">
-                    <CustomVideoPlayer 
-                      url={vid.url} 
-                      title={vid.title} 
+                    <CustomVideoPlayer
+                      url={vid.url}
+                      title={vid.title}
                     />
                   </div>
                 </div>
@@ -307,81 +313,87 @@ export function ReadingArticle({ data, hierarchy }: ReadingArticleProps) {
   return (
     <div className="flex-1 w-full bg-white dark:bg-[#020817] min-h-screen">
       <div className="w-full mx-auto">
-        
+
         {data.sections ? (
           <div className="flex flex-col">
-            
+
             {/* Master Banner */}
             <div className="bg-[#f0f7f4] dark:bg-emerald-900/10 px-6 py-5 border-b border-emerald-100/50 dark:border-slate-800">
               <div className="flex justify-between items-start">
                 <div>
-                  <h1 className="text-[24px] font-bold text-[#2d4a41] dark:text-slate-100 flex flex-wrap items-center">
-                    {data.title}
-                    {data.author?.name && <span className="text-[#2d4a41] dark:text-slate-100 ml-2">| {data.author.name}</span>}
-                  </h1>
+                  <div className="flex flex-wrap items-baseline gap-2 mb-2">
+                    <h1 className="text-[24px] font-bold text-[#2d4a41] dark:text-slate-100">
+                      {data.title}
+                    </h1>
+                    {data.author?.name && (
+                      <span className="text-[18px] font-normal text-slate-500 dark:text-slate-400">
+                        ({data.author.name})
+                      </span>
+                    )}
+                  </div>
                   {hierarchy && (
                     <p className="text-[14px] text-[#5e7c70] dark:text-slate-400 mt-1.5">
-                      {data.title} {data.author?.name ? `| ${data.author.name}` : ''} - {hierarchy.boardTitle ? `${hierarchy.boardTitle} - ` : ''}{hierarchy.classTitle ? `${hierarchy.classTitle} - ` : ''}{hierarchy.subjectTitle ? `${hierarchy.subjectTitle}` : ''}
+                      {data.title} - {hierarchy.boardTitle ? `${hierarchy.boardTitle} - ` : ''}{hierarchy.classTitle ? `${hierarchy.classTitle} - ` : ''}{hierarchy.subjectTitle ? `${hierarchy.subjectTitle}` : ''}
                     </p>
                   )}
                 </div>
-                
+
                 <div className="flex items-center gap-4 text-[#759388] mt-1">
-                   <div className="flex items-center gap-1.5 text-[15px] font-medium mr-2">
-                     <Eye className="w-4 h-4" />
-                     {viewCount}
-                   </div>
-                   <button 
-                     onClick={() => window.print()}
-                     className="hover:text-[#2d4a41] transition-colors p-1" 
-                     title="Print"
-                   >
-                     <Printer className="w-5 h-5" />
-                   </button>
-                   <button 
-                     onClick={() => {
-                       if (navigator.share) {
-                         navigator.share({ title: data.title, url: window.location.href });
-                       } else {
-                         navigator.clipboard.writeText(window.location.href);
-                         alert('Link copied to clipboard!');
-                       }
-                     }}
-                     className="hover:text-[#2d4a41] transition-colors p-1" 
-                     title="Share"
-                   >
-                     <Share2 className="w-5 h-5" />
-                   </button>
-                   <DropdownMenu>
-                     <DropdownMenuTrigger asChild>
-                       <button className="bg-white dark:bg-slate-800 rounded px-1.5 py-1.5 hover:text-[#2d4a41] shadow-sm border border-slate-200 dark:border-slate-700 transition-colors ml-1">
-                         <MoreVertical className="w-5 h-5" />
-                       </button>
-                     </DropdownMenuTrigger>
-                     <DropdownMenuContent align="end" className="w-48 bg-white dark:bg-slate-900">
-                        <DropdownMenuItem className="cursor-pointer">Test Yourself</DropdownMenuItem>
-                        <DropdownMenuItem className="cursor-pointer">Favorite</DropdownMenuItem>
-                        <DropdownMenuItem className="cursor-pointer">Bookmark</DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem className="cursor-pointer">View MCQ(129)</DropdownMenuItem>
-                        <DropdownMenuItem className="cursor-pointer">View Written(115)</DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem className="cursor-pointer">প্রশ্ন তৈরি করুন</DropdownMenuItem>
-                        <DropdownMenuItem className="cursor-pointer">Show Video</DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem className="cursor-pointer">Add MCQ</DropdownMenuItem>
-                        <DropdownMenuItem className="cursor-pointer">Add Written</DropdownMenuItem>
-                     </DropdownMenuContent>
-                   </DropdownMenu>
+                  <div className="flex items-center gap-1.5 text-[15px] font-medium mr-2">
+                    <Eye className="w-4 h-4" />
+                    {viewCount}
+                  </div>
+                  <button
+                    onClick={() => window.print()}
+                    className="hover:text-[#2d4a41] transition-colors p-1"
+                    title="Print"
+                  >
+                    <Printer className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (navigator.share) {
+                        navigator.share({ title: data.title, url: window.location.href });
+                      } else {
+                        navigator.clipboard.writeText(window.location.href);
+                        alert('Link copied to clipboard!');
+                      }
+                    }}
+                    className="hover:text-[#2d4a41] transition-colors p-1"
+                    title="Share"
+                  >
+                    <Share2 className="w-5 h-5" />
+                  </button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="bg-white dark:bg-slate-800 rounded px-1.5 py-1.5 hover:text-[#2d4a41] shadow-sm border border-slate-200 dark:border-slate-700 transition-colors ml-1">
+                        <MoreVertical className="w-5 h-5" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48 bg-white dark:bg-slate-900">
+                      <DropdownMenuItem className="cursor-pointer">Test Yourself</DropdownMenuItem>
+                      <DropdownMenuItem className="cursor-pointer">Favorite</DropdownMenuItem>
+                      <DropdownMenuItem className="cursor-pointer">Bookmark</DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem className="cursor-pointer">View MCQ(129)</DropdownMenuItem>
+                      <DropdownMenuItem className="cursor-pointer">View Written(115)</DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem className="cursor-pointer">প্রশ্ন তৈরি করুন</DropdownMenuItem>
+                      <DropdownMenuItem className="cursor-pointer">Show Video</DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem className="cursor-pointer">Add MCQ</DropdownMenuItem>
+                      <DropdownMenuItem className="cursor-pointer">Add Written</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </div>
             </div>
 
             {data.sections.map(renderSection)}
-            
+
             {/* Tags and Pagination */}
             <div className="px-6 py-6 sm:px-8 mt-4">
-              
+
               {data.tags && (
                 <div className="mb-8">
                   <h4 className="text-[14px] font-bold text-slate-800 dark:text-slate-200 mb-4">
@@ -389,7 +401,7 @@ export function ReadingArticle({ data, hierarchy }: ReadingArticleProps) {
                   </h4>
                   <div className="flex flex-wrap gap-2">
                     {data.tags.map((tag) => (
-                      <span 
+                      <span
                         key={tag}
                         className="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 text-[13px] font-medium rounded hover:bg-emerald-100 transition-colors"
                       >
@@ -402,14 +414,23 @@ export function ReadingArticle({ data, hierarchy }: ReadingArticleProps) {
 
               {/* Prev/Next Navigation */}
               <div className="flex items-center justify-between pt-6 border-t border-slate-100 dark:border-slate-800">
-                <Button variant="secondary" className="bg-[#dcefe2] hover:bg-[#c2e2cc] text-[#1b6b3e] dark:bg-emerald-900/30 dark:text-emerald-400 dark:hover:bg-emerald-900/50">
-                  <ChevronLeft className="w-4 h-4 mr-1" />
-                  Previous
-                </Button>
-                <Button variant="secondary" className="bg-[#dcefe2] hover:bg-[#c2e2cc] text-[#1b6b3e] dark:bg-emerald-900/30 dark:text-emerald-400 dark:hover:bg-emerald-900/50">
-                  Next
-                  <ChevronRight className="w-4 h-4 ml-1" />
-                </Button>
+                {navigation?.prev ? (
+                  <Link href={`/guide/${navigation.prev.id}`}>
+                    <Button variant="secondary" className="bg-[#dcefe2] hover:bg-[#c2e2cc] text-[#1b6b3e] dark:bg-emerald-900/30 dark:text-emerald-400 dark:hover:bg-emerald-900/50">
+                      <ChevronLeft className="w-4 h-4 mr-1" />
+                      Previous
+                    </Button>
+                  </Link>
+                ) : <div />}
+
+                {navigation?.next ? (
+                  <Link href={`/guide/${navigation.next.id}`}>
+                    <Button variant="secondary" className="bg-[#dcefe2] hover:bg-[#c2e2cc] text-[#1b6b3e] dark:bg-emerald-900/30 dark:text-emerald-400 dark:hover:bg-emerald-900/50">
+                      Next
+                      <ChevronRight className="w-4 h-4 ml-1" />
+                    </Button>
+                  </Link>
+                ) : <div />}
               </div>
             </div>
 
@@ -417,7 +438,7 @@ export function ReadingArticle({ data, hierarchy }: ReadingArticleProps) {
         ) : (
           renderLegacyContent()
         )}
-        
+
       </div>
     </div>
   );

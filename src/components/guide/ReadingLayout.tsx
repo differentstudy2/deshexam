@@ -41,6 +41,21 @@ export function ReadingLayout({
     return <div className="p-20 text-center text-xl text-slate-500">Content not found!</div>;
   }
 
+  // Calculate flat curriculum for next/prev navigation
+  const flatCurriculum: { id: string; title: string }[] = [];
+  (curriculum || []).forEach(chapter => {
+    (chapter.topics || []).forEach(topic => {
+      flatCurriculum.push({ id: topic.id, title: topic.title });
+      (topic.subtopics || []).forEach(subtopic => {
+        flatCurriculum.push({ id: subtopic.id, title: subtopic.title });
+      });
+    });
+  });
+
+  const currentIndex = flatCurriculum.findIndex(item => item.id === id);
+  const prevNode = currentIndex > 0 ? flatCurriculum[currentIndex - 1] : undefined;
+  const nextNode = currentIndex !== -1 && currentIndex < flatCurriculum.length - 1 ? flatCurriculum[currentIndex + 1] : undefined;
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#020817] text-slate-800 dark:text-slate-200 font-sans pb-20">
 
@@ -118,6 +133,10 @@ export function ReadingLayout({
               subjectTitle,
               textbookTitle,
               chapterTitle
+            }}
+            navigation={{
+              prev: prevNode,
+              next: nextNode
             }}
           />
           
