@@ -71,8 +71,24 @@ export default async function GuidePage({ params }: { params: Promise<{ segments
     notFound();
   }
 
-  // Helper to extract titles from ancestors array for Dashboard/ReadingLayout props
   const getAncestorTitle = (type: string) => node.ancestors?.find(a => a.type === type)?.title;
+  
+  const uiBreadcrumbs: { name: string, url: string }[] = [
+    { name: 'Home', url: '/' },
+    { name: 'Academy', url: '/guide/board' }
+  ];
+  let currentRelUrl = '/guide';
+  node.ancestors?.forEach((anc: any) => {
+    currentRelUrl += `/${anc.slug || anc.id}`;
+    uiBreadcrumbs.push({ name: anc.title, url: currentRelUrl });
+  });
+  
+  if (contentType) {
+    uiBreadcrumbs.push({ name: node.title, url: `/guide/${node.fullSlug || node.id}` });
+    uiBreadcrumbs.push({ name: contentType.toUpperCase(), url: `/guide/${node.fullSlug || node.id}/${contentType}` });
+  } else {
+    uiBreadcrumbs.push({ name: node.title, url: `/guide/${node.fullSlug || node.id}` });
+  }
   
   const boardTitle = node.type === 'board' ? node.title : getAncestorTitle('board');
   const classTitle = node.type === 'class' ? node.title : getAncestorTitle('class');
@@ -135,6 +151,11 @@ export default async function GuidePage({ params }: { params: Promise<{ segments
       ? fullCurriculum.filter(c => c.title === textbookTitle) // using title as a fallback match since we only have ancestor titles
       : fullCurriculum;
 
+    const readingBreadcrumbs = [...uiBreadcrumbs];
+    if (readingData && readingData.title && readingData.title !== node.title && !contentType) {
+       readingBreadcrumbs.push({ name: readingData.title, url: '#' });
+    }
+
     return (
       <ReadingLayout 
         id={node.id} 
@@ -146,6 +167,7 @@ export default async function GuidePage({ params }: { params: Promise<{ segments
         subjectTitle={subjectTitle}
         textbookTitle={textbookTitle}
         chapterTitle={chapterTitle}
+        breadcrumbs={readingBreadcrumbs}
       />
     );
   }
@@ -167,6 +189,7 @@ export default async function GuidePage({ params }: { params: Promise<{ segments
       textbookTitle={textbookTitle}
       chapterTitle={chapterTitle}
       node={node}
+      breadcrumbs={uiBreadcrumbs}
     />
   );
 }

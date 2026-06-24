@@ -22,7 +22,8 @@ export function SubjectDashboard({
   subjectTitle,
   textbookTitle,
   chapterTitle,
-  node
+  node,
+  breadcrumbs
 }: {
   id: string;
   pageType: 'board' | 'class' | 'subject' | 'textbook' | 'chapter';
@@ -34,6 +35,7 @@ export function SubjectDashboard({
   textbookTitle?: string;
   chapterTitle?: string;
   node?: any;
+  breadcrumbs?: { name: string, url: string }[];
 }) {
   const displayTitle = 
     pageType === 'chapter' ? (chapterTitle || 'Chapter') : 
@@ -142,41 +144,58 @@ At DeshExam, we provide high-quality MCQ, short answer questions (SAQ), long ans
             <h1 className="font-bold text-[17px] text-slate-900 dark:text-white">Academy</h1>
 
             <div className="hidden sm:flex flex-wrap items-center text-[13px] text-slate-500 dark:text-slate-400 font-medium border-l border-slate-200 dark:border-slate-800 pl-6">
-              <Link href="/" className="hover:text-emerald-600 transition-colors">Home</Link>
-              <ChevronRight className="w-3.5 h-3.5 mx-2" />
-              <Link href="/guide/board" className="hover:text-emerald-600 transition-colors">Boards</Link>
-              {boardTitle && (
+              {breadcrumbs ? (
+                breadcrumbs.map((crumb, idx) => (
+                  <React.Fragment key={idx}>
+                    {idx > 0 && <ChevronRight className="w-3.5 h-3.5 mx-2" />}
+                    {idx === breadcrumbs.length - 1 ? (
+                      <span className="text-slate-800 dark:text-slate-200">{crumb.name}</span>
+                    ) : (
+                      <Link href={crumb.url} className="hover:text-emerald-600 transition-colors">
+                        {crumb.name}
+                      </Link>
+                    )}
+                  </React.Fragment>
+                ))
+              ) : (
                 <>
+                  <Link href="/" className="hover:text-emerald-600 transition-colors">Home</Link>
                   <ChevronRight className="w-3.5 h-3.5 mx-2" />
-                  <span className="hover:text-emerald-600 transition-colors cursor-pointer">{boardTitle}</span>
-                </>
-              )}
-              {classTitle && (
-                <>
-                  <ChevronRight className="w-3.5 h-3.5 mx-2" />
-                  <Link href="/guide/class" className="hover:text-emerald-600 transition-colors">{classTitle}</Link>
-                </>
-              )}
-              {subjectTitle && (
-                <>
-                  <ChevronRight className="w-3.5 h-3.5 mx-2" />
-                  <span className="hover:text-emerald-600 transition-colors cursor-pointer">{subjectTitle}</span>
-                </>
-              )}
-              {textbookTitle && (pageType === 'textbook' || pageType === 'chapter') && (
-                <>
-                  <ChevronRight className="w-3.5 h-3.5 mx-2" />
-                  {pageType === 'textbook' ? (
-                    <span className="text-slate-800 dark:text-slate-200">{textbookTitle}</span>
-                  ) : (
-                    <span className="hover:text-emerald-600 transition-colors cursor-pointer">{textbookTitle}</span>
+                  <Link href="/guide/board" className="hover:text-emerald-600 transition-colors">Boards</Link>
+                  {boardTitle && (
+                    <>
+                      <ChevronRight className="w-3.5 h-3.5 mx-2" />
+                      <span className="hover:text-emerald-600 transition-colors cursor-pointer">{boardTitle}</span>
+                    </>
                   )}
-                </>
-              )}
-              {pageType === 'chapter' && chapterTitle && (
-                <>
-                  <ChevronRight className="w-3.5 h-3.5 mx-2" />
-                  <span className="text-slate-800 dark:text-slate-200">{chapterTitle}</span>
+                  {classTitle && (
+                    <>
+                      <ChevronRight className="w-3.5 h-3.5 mx-2" />
+                      <Link href="/guide/class" className="hover:text-emerald-600 transition-colors">{classTitle}</Link>
+                    </>
+                  )}
+                  {subjectTitle && (
+                    <>
+                      <ChevronRight className="w-3.5 h-3.5 mx-2" />
+                      <span className="hover:text-emerald-600 transition-colors cursor-pointer">{subjectTitle}</span>
+                    </>
+                  )}
+                  {textbookTitle && (pageType === 'textbook' || pageType === 'chapter') && (
+                    <>
+                      <ChevronRight className="w-3.5 h-3.5 mx-2" />
+                      {pageType === 'textbook' ? (
+                        <span className="text-slate-800 dark:text-slate-200">{textbookTitle}</span>
+                      ) : (
+                        <span className="hover:text-emerald-600 transition-colors cursor-pointer">{textbookTitle}</span>
+                      )}
+                    </>
+                  )}
+                  {pageType === 'chapter' && chapterTitle && (
+                    <>
+                      <ChevronRight className="w-3.5 h-3.5 mx-2" />
+                      <span className="text-slate-800 dark:text-slate-200">{chapterTitle}</span>
+                    </>
+                  )}
                 </>
               )}
             </div>

@@ -18,7 +18,8 @@ export function ReadingLayout({
   classTitle,
   subjectTitle,
   textbookTitle,
-  chapterTitle
+  chapterTitle,
+  breadcrumbs
 }: {
   id: string;
   data: any;
@@ -29,6 +30,7 @@ export function ReadingLayout({
   subjectTitle?: string;
   textbookTitle?: string;
   chapterTitle?: string;
+  breadcrumbs?: { name: string, url: string }[];
 }) {
 
   if (!data) {
@@ -45,25 +47,42 @@ export function ReadingLayout({
             <h1 className="font-bold text-[17px] text-slate-900 dark:text-white">Academy</h1>
 
             <div className="hidden sm:flex flex-wrap items-center text-[13px] text-slate-500 dark:text-slate-400 font-medium border-l border-slate-200 dark:border-slate-800 pl-6">
-              <Link href="/" className="hover:text-emerald-600 transition-colors">Home</Link>
-              <ChevronRight className="w-3.5 h-3.5 mx-2" />
-              <Link href="/academy" className="hover:text-emerald-600 transition-colors">Academy</Link>
-              <ChevronRight className="w-3.5 h-3.5 mx-2" />
-              <span className="hover:text-emerald-600 transition-colors cursor-pointer">{boardTitle}</span>
-              <ChevronRight className="w-3.5 h-3.5 mx-2" />
-              <span className="hover:text-emerald-600 transition-colors cursor-pointer">{classTitle}</span>
-              <ChevronRight className="w-3.5 h-3.5 mx-2" />
-              <span className="hover:text-emerald-600 transition-colors cursor-pointer">{subjectTitle}</span>
-              <ChevronRight className="w-3.5 h-3.5 mx-2" />
-              <span className="hover:text-emerald-600 transition-colors cursor-pointer">{textbookTitle}</span>
-              {chapterTitle && (
+              {breadcrumbs ? (
+                breadcrumbs.map((crumb, idx) => (
+                  <React.Fragment key={idx}>
+                    {idx > 0 && <ChevronRight className="w-3.5 h-3.5 mx-2" />}
+                    {idx === breadcrumbs.length - 1 ? (
+                      <span className="text-slate-800 dark:text-slate-200">{crumb.name}</span>
+                    ) : (
+                      <Link href={crumb.url} className="hover:text-emerald-600 transition-colors">
+                        {crumb.name}
+                      </Link>
+                    )}
+                  </React.Fragment>
+                ))
+              ) : (
                 <>
+                  <Link href="/" className="hover:text-emerald-600 transition-colors">Home</Link>
                   <ChevronRight className="w-3.5 h-3.5 mx-2" />
-                  <span className="hover:text-emerald-600 transition-colors cursor-pointer">{chapterTitle}</span>
+                  <Link href="/academy" className="hover:text-emerald-600 transition-colors">Academy</Link>
+                  <ChevronRight className="w-3.5 h-3.5 mx-2" />
+                  <span className="hover:text-emerald-600 transition-colors cursor-pointer">{boardTitle}</span>
+                  <ChevronRight className="w-3.5 h-3.5 mx-2" />
+                  <span className="hover:text-emerald-600 transition-colors cursor-pointer">{classTitle}</span>
+                  <ChevronRight className="w-3.5 h-3.5 mx-2" />
+                  <span className="hover:text-emerald-600 transition-colors cursor-pointer">{subjectTitle}</span>
+                  <ChevronRight className="w-3.5 h-3.5 mx-2" />
+                  <span className="hover:text-emerald-600 transition-colors cursor-pointer">{textbookTitle}</span>
+                  {chapterTitle && (
+                    <>
+                      <ChevronRight className="w-3.5 h-3.5 mx-2" />
+                      <span className="hover:text-emerald-600 transition-colors cursor-pointer">{chapterTitle}</span>
+                    </>
+                  )}
+                  <ChevronRight className="w-3.5 h-3.5 mx-2" />
+                  <span className="text-slate-800 dark:text-slate-200">{data.title}</span>
                 </>
               )}
-              <ChevronRight className="w-3.5 h-3.5 mx-2" />
-              <span className="text-slate-800 dark:text-slate-200">{data.title}</span>
             </div>
           </div>
 
@@ -81,7 +100,7 @@ export function ReadingLayout({
 
         {/* Left Navigation Sidebar */}
         <div className="w-[280px] shrink-0 hidden lg:flex flex-col gap-5 sticky top-6 self-start max-h-[calc(100vh-3rem)] overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-slate-300 dark:[&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full pr-1">
-          <ContentNavigationSidebar curriculum={curriculum} activeId={id} subjectTitle={textbookTitle} />
+          <ContentNavigationSidebar curriculum={curriculum} activeId={id} subjectTitle={textbookTitle || ''} />
         </div>
 
         {/* Main Content Area */}
