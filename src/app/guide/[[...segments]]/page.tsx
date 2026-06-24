@@ -1,8 +1,9 @@
 import React from 'react';
-import { notFound } from 'next/navigation';
+import { redirect, notFound } from 'next/navigation';
 import { getTaxonomyNodeBySlug, VALID_CONTENT_TYPES, ContentType } from '@/lib/firebase/taxonomy';
-import { getReadingContent, getCurriculumBySubject, getGuideSubjects } from '@/lib/firebase/guide';
+import { getReadingContent, getCurriculumBySubject, getCurriculumByClass, getCurriculumByBoard, getGuideSubjects } from '@/lib/firebase/guide';
 import { getTaxonomyNodesByParent } from '@/lib/firebase/taxonomy';
+import { generateHybridSeo } from '@/lib/seo';
 import { ReadingLayout } from '@/components/guide/ReadingLayout';
 import { SubjectDashboard } from '@/components/guide/SubjectDashboard';
 import { Metadata } from 'next';
@@ -29,7 +30,6 @@ export async function generateMetadata({ params }: { params: Promise<{ segments?
 
   if (!node) return { title: 'Not Found' };
 
-  const { generateHybridSeo } = await import('@/lib/seo');
   const metadata = generateHybridSeo({ node, contentType });
   
   if (node.featureImage && metadata.openGraph) {
@@ -51,7 +51,6 @@ export default async function GuidePage({ params }: { params: Promise<{ segments
   
   if (segments.length === 0) {
     // Redirect or show guide home
-    const { redirect } = await import('next/navigation');
     redirect('/guide/board');
   }
 
@@ -116,10 +115,8 @@ export default async function GuidePage({ params }: { params: Promise<{ segments
   if (subjectNode) {
     fullCurriculum = await getCurriculumBySubject(subjectNode.id);
   } else if (node.type === 'class') {
-    const { getCurriculumByClass } = await import('@/lib/firebase/guide');
     fullCurriculum = await getCurriculumByClass(node.id);
   } else if (node.type === 'board') {
-    const { getCurriculumByBoard } = await import('@/lib/firebase/guide');
     fullCurriculum = await getCurriculumByBoard(node.id);
   } else {
     // Fallback if somehow no subject or class or board is determined

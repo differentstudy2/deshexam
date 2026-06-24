@@ -207,7 +207,7 @@ const TreeNode = ({ node, level = 0, onAddClick, onBulkAddClick, onEditClick, on
                   {onMoveUp && <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onMoveUp(); }}><ArrowUp className="w-4 h-4 mr-2 text-slate-500" /> Move Up</DropdownMenuItem>}
                   {onMoveDown && <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onMoveDown(); }}><ArrowDown className="w-4 h-4 mr-2 text-slate-500" /> Move Down</DropdownMenuItem>}
                   <DropdownMenuItem asChild>
-                    <Link href={`/guide/${node.slug || node.id}`} target="_blank" onClick={(e) => e.stopPropagation()}>
+                    <Link href={`/guide/${node.fullSlug || node.id}`} target="_blank" onClick={(e) => e.stopPropagation()}>
                       <Eye className="w-4 h-4 mr-2 text-emerald-500" /> View in Guide
                     </Link>
                   </DropdownMenuItem>
