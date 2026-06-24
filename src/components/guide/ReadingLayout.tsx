@@ -44,6 +44,7 @@ export function ReadingLayout({
   // Calculate flat curriculum for next/prev navigation
   const flatCurriculum: { id: string; title: string }[] = [];
   (curriculum || []).forEach(chapter => {
+    flatCurriculum.push({ id: chapter.id, title: chapter.title });
     (chapter.topics || []).forEach(topic => {
       flatCurriculum.push({ id: topic.id, title: topic.title });
       (topic.subtopics || []).forEach(subtopic => {

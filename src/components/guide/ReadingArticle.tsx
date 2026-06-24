@@ -49,19 +49,19 @@ function SectionFooter({ author }: { author?: ContentAuthor }) {
         CONTENT MANAGER
       </p>
       <div className="flex items-center gap-3">
-        {author.avatarUrl ? (
-          <img
-            src={author.avatarUrl}
-            alt={author.name || 'Author'}
+        {author?.avatarUrl ? (
+          <img 
+            src={author.avatarUrl} 
+            alt="DeshExam Team"
             className="w-8 h-8 rounded-full border border-slate-200 dark:border-slate-700"
           />
         ) : (
           <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-500 font-bold text-xs border border-slate-300 dark:border-slate-600">
-            {author.name ? author.name.charAt(0).toUpperCase() : '?'}
+            D
           </div>
         )}
         <span className="text-[13px] text-slate-600 dark:text-slate-400 font-medium">
-          {author.name || 'Unknown Author'}
+          DeshExam Team
         </span>
       </div>
     </div>
@@ -323,9 +323,9 @@ export function ReadingArticle({ data, hierarchy, navigation }: ReadingArticlePr
           <div className="flex flex-col">
 
             {/* Master Banner */}
-            <div className="bg-[#f0f7f4] dark:bg-emerald-900/10 px-6 py-1 border-b border-emerald-100/50 dark:border-slate-800">
-              <div className="flex justify-between items-start">
-                <div>
+            <div className="bg-[#f0f7f4] dark:bg-emerald-900/10 px-4 sm:px-6 py-2 sm:py-3 border-b border-emerald-100/50 dark:border-slate-800">
+              <div className="flex flex-col sm:flex-row justify-between items-start gap-3 sm:gap-4">
+                <div className="flex-1 w-full">
                   <div className="flex flex-wrap items-baseline gap-2 mb-0">
                     <h1 className="text-[24px] font-bold text-[#2d4a41] dark:text-slate-100">
                       {data.title}
