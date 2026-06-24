@@ -58,9 +58,9 @@ export function CurriculumTree({ curriculum }: CurriculumTreeProps) {
                   )} />
                 </div>
                 <Link href={`/guide/${chapter.id}`} className="hover:opacity-80 transition-opacity">
-                  <span className="font-semibold text-[17px] text-emerald-600 dark:text-emerald-400 hover:underline">
+                  <h3 className="font-semibold text-[17px] text-emerald-600 dark:text-emerald-400 hover:underline">
                     {chapter.title}
-                  </span>
+                  </h3>
                 </Link>
               </div>
               <div className="flex items-center gap-2">
@@ -102,16 +102,16 @@ export function CurriculumTree({ curriculum }: CurriculumTreeProps) {
                         {(!topic.subtopics || topic.subtopics.length === 0) ? (
                           <Link href={`/guide/${topic.id}`} className="flex items-center gap-3 flex-1 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
                             <CircleDot className="w-4 h-4 text-emerald-500 dark:text-emerald-400" strokeWidth={3} />
-                            <span className="font-semibold text-[15px] text-slate-800 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400">
+                            <h4 className="font-semibold text-[15px] text-slate-800 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400 m-0">
                               {topic.title}
-                            </span>
+                            </h4>
                           </Link>
                         ) : (
                           <div className="flex items-center gap-3 flex-1">
                             <CircleDot className="w-4 h-4 text-slate-400 dark:text-slate-500" strokeWidth={3} />
-                            <span className="font-semibold text-[15px] text-slate-800 dark:text-slate-200">
+                            <h4 className="font-semibold text-[15px] text-slate-800 dark:text-slate-200 m-0">
                               {topic.title}
-                            </span>
+                            </h4>
                           </div>
                         )}
                         <div className="flex items-center transition-opacity">

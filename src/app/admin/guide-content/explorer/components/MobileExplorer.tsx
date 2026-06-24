@@ -657,8 +657,10 @@ export function MobileExplorer({ className }: { className?: string }) {
                 <Button variant="ghost" className="justify-start h-12 text-base font-medium rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900" onClick={() => { handleOpenSeo(activeSheetNode.id, activeSheetNode.type, activeSheetNode, fetchRoot); setActiveSheetNode(null); }}>
                    <BarChart2 className="w-5 h-5 mr-4 text-slate-700 dark:text-slate-300" /> View Analytics / SEO
                 </Button>
-                <Button variant="ghost" className="justify-start h-12 text-base font-medium rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900" onClick={() => setActiveSheetNode(null)}>
-                   <Share2 className="w-5 h-5 mr-4 text-slate-700 dark:text-slate-300" /> Share Link
+                <Button variant="ghost" className="justify-start h-12 text-base font-medium rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900" asChild onClick={() => setActiveSheetNode(null)}>
+                   <Link href={`/guide/${activeSheetNode.fullSlug || activeSheetNode.id}`} target="_blank">
+                     <Eye className="w-5 h-5 mr-4 text-emerald-500" /> View in Guide
+                   </Link>
                 </Button>
              </div>
            )}

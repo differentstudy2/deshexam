@@ -48,8 +48,9 @@ function parseSeoSlug(slug: string) {
   };
 }
 
-export async function generateMetadata({ params }: { params: { seoSlug: string } }): Promise<Metadata> {
-  const parsed = parseSeoSlug(params.seoSlug);
+export async function generateMetadata({ params }: { params: Promise<{ seoSlug: string }> }): Promise<Metadata> {
+  const resolvedParams = await params;
+  const parsed = parseSeoSlug(resolvedParams.seoSlug);
   if (!parsed) return {}; // Will be 404
 
   const typeName = parsed.urlType.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
@@ -60,13 +61,14 @@ export async function generateMetadata({ params }: { params: { seoSlug: string }
     title: `Top ${prefixName}${typeName} in ${locName} 2026 | DeshExam`,
     description: `Explore verified ${prefixName.toLowerCase()}${typeName.toLowerCase()} in ${locName}. Compare courses, fees, admissions, facilities and reviews on DeshExam.`,
     alternates: {
-      canonical: `https://deshexam.com/${params.seoSlug}`,
+      canonical: `https://deshexam.com/${resolvedParams.seoSlug}`,
     },
   };
 }
 
-export default function SeoDirectoryPage({ params }: { params: { seoSlug: string } }) {
-  const parsed = parseSeoSlug(params.seoSlug);
+export default async function SeoDirectoryPage({ params }: { params: Promise<{ seoSlug: string }> }) {
+  const resolvedParams = await params;
+  const parsed = parseSeoSlug(resolvedParams.seoSlug);
   
   if (!parsed) {
     // If it doesn't match our programmatic SEO patterns, it's likely a missing page.
@@ -83,15 +85,15 @@ export default function SeoDirectoryPage({ params }: { params: { seoSlug: string
     "@graph": [
       {
         "@type": "CollectionPage",
-        "@id": `https://deshexam.com/${params.seoSlug}/#webpage`,
-        "url": `https://deshexam.com/${params.seoSlug}`,
+        "@id": `https://deshexam.com/${resolvedParams.seoSlug}/#webpage`,
+        "url": `https://deshexam.com/${resolvedParams.seoSlug}`,
         "name": `${prefixName}${typeName} in ${locName}`,
         "description": `Explore verified ${prefixName.toLowerCase()}${typeName.toLowerCase()} in ${locName}.`,
         "inLanguage": "en-US"
       },
       {
         "@type": "BreadcrumbList",
-        "@id": `https://deshexam.com/${params.seoSlug}/#breadcrumb`,
+        "@id": `https://deshexam.com/${resolvedParams.seoSlug}/#breadcrumb`,
         "itemListElement": [
           {
             "@type": "ListItem",
@@ -109,7 +111,7 @@ export default function SeoDirectoryPage({ params }: { params: { seoSlug: string
             "@type": "ListItem",
             "position": 3,
             "name": `${prefixName}${typeName} in ${locName}`,
-            "item": `https://deshexam.com/${params.seoSlug}`
+            "item": `https://deshexam.com/${resolvedParams.seoSlug}`
           }
         ]
       }

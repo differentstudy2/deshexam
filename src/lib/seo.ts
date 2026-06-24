@@ -14,40 +14,57 @@ export function generateHybridSeo({ node, contentType, siteName = 'DeshExam' }: 
   const seo = node.seo || {};
   const isCustomSeo = seo.useCustomSeo;
 
+  const getAncestorTitle = (type: string) => node.ancestors?.find(a => a.type === type)?.title || '';
+  const boardName = getAncestorTitle('board');
+  const className = getAncestorTitle('class') || node.classSlug?.replace('-', ' ') || '';
+  const subjectName = getAncestorTitle('subject');
+
   const truncate = (text: string, maxLen: number) => 
     text.length > maxLen ? text.substring(0, maxLen - 3) + '...' : text;
 
-  // 1. Title Rules: keyword near start, under 65 chars, high CTR, append | DeshExam
-  let title = '';
-  if (isCustomSeo && seo.customTitle) {
-    title = seo.customTitle;
+  // 1. Title Priority Logic
+  let baseTitle = '';
+  const customTitle = node.seoTitle || seo.customTitle;
+
+  if (isCustomSeo && customTitle) {
+    baseTitle = customTitle;
   } else {
     if (contentType) {
-      title = `${node.title} ${contentType.toUpperCase()} - ${node.classSlug?.replace('-', ' ') || 'Guide'}`;
+      baseTitle = `${node.title} ${contentType.toUpperCase()} - ${className || 'Guide'}`;
     } else if (node.type === 'board') {
-      title = `${node.title} Study Materials, Notes & Mock Tests`;
+      baseTitle = `${node.title} Study Materials, Notes & Questions`;
     } else if (node.type === 'class') {
-      title = `${node.title} Curriculum Guide & Syllabus`;
+      baseTitle = `${boardName} ${className} Study Materials & Notes`;
     } else if (node.type === 'subject') {
-      title = `${node.title} Notes & Question Bank`;
+      const boardPrefix = boardName ? `${boardName} ` : '';
+      baseTitle = `${boardPrefix}Class ${className.replace(/class\s+/i, '')} ${node.title} Notes, MCQ & Guide`;
+    } else if (node.type === 'textbook') {
+      baseTitle = `${node.title} | Class ${className.replace(/class\s+/i, '')} ${subjectName} Notes, MCQ & Guide`;
     } else if (node.type === 'chapter') {
-      title = `${node.title} Guide & Notes - ${node.classSlug?.replace('-', ' ') || 'Class'}`;
+      const parentName = getAncestorTitle('textbook') || subjectName;
+      baseTitle = `${node.title} Question Answer | ${parentName}`;
+    } else if (node.type === 'topic' || node.type === 'section') {
+      baseTitle = `${node.title} Summary & Notes`;
     } else {
-      title = node.title || 'Academy Guide';
+      baseTitle = node.title || 'Academy Guide';
     }
 
     // Dynamic Keyword Injection
-    if (seo.focusKeyword && !title.toLowerCase().includes(seo.focusKeyword.toLowerCase())) {
-      title = `${seo.focusKeyword}: ${title}`;
+    if (seo.focusKeyword && !baseTitle.toLowerCase().includes(seo.focusKeyword.toLowerCase())) {
+      baseTitle = `${seo.focusKeyword}: ${baseTitle}`;
     }
-
-    title = truncate(title, 50); // Leave room for " | DeshExam"
-    title = `${title} | ${siteName}`;
   }
 
   // Fallback to strict custom title if provided as a generic override without useCustomSeo
-  if (!isCustomSeo && seo.customTitle) {
-    title = seo.customTitle.includes(siteName) ? seo.customTitle : `${seo.customTitle} | ${siteName}`;
+  if (!isCustomSeo && customTitle) {
+    baseTitle = customTitle;
+  }
+
+  // Ensure brand name is appended and length is managed (50-65 chars target)
+  let title = baseTitle.includes(siteName) ? baseTitle : `${baseTitle} | ${siteName}`;
+  // If title is way too long, try to truncate baseTitle gracefully
+  if (title.length > 70 && !customTitle) {
+    title = `${truncate(baseTitle, 55)} | ${siteName}`;
   }
 
   // 2. Description Rules: 140–160 chars, compelling click intent
@@ -56,13 +73,16 @@ export function generateHybridSeo({ node, contentType, siteName = 'DeshExam' }: 
     description = seo.customDescription;
   } else {
     if (contentType) {
-      description = `Practice ${contentType.toUpperCase()} for ${node.title}. Comprehensive guide, questions, and solutions to boost your exam prep for ${node.classSlug?.replace('-', ' ') || 'your class'}.`;
+      description = `Practice ${contentType.toUpperCase()} for ${node.title}. Comprehensive guide, questions, and solutions to boost your exam prep for ${className || 'your class'}.`;
     } else if (node.type === 'board') {
       description = `Get the best study materials, syllabus, notes, and mock tests for ${node.title}. Prepare effectively for your board exams with our comprehensive resources.`;
     } else if (node.type === 'class') {
       description = `Complete curriculum guide for ${node.title}. Explore subjects, textbooks, notes, and chapter-wise study materials tailored for academic excellence.`;
+    } else if (node.type === 'textbook') {
+      // Read {Textbook Name} for {Board} Class {Class}. Access chapter-wise notes, MCQ, CQ, SAQ, LAQ, summaries, solutions and board exam preparation resources on DeshExam.
+      description = `Read ${node.title} for ${boardName} ${className}. Access chapter-wise notes, MCQ, CQ, SAQ, LAQ, summaries, solutions and board exam preparation resources on DeshExam.`;
     } else if (node.type === 'chapter') {
-      description = `Read detailed notes and guide for ${node.title}. Master the concepts of ${node.classSlug?.replace('-', ' ') || 'this class'} with our extensive study resources.`;
+      description = `Read detailed notes and guide for ${node.title}. Master the concepts of ${className || 'this class'} with our extensive study resources.`;
     } else {
       description = node.description || `Read comprehensive guides and study materials for ${node.title}.`;
     }
@@ -78,11 +98,56 @@ export function generateHybridSeo({ node, contentType, siteName = 'DeshExam' }: 
     description = seo.customDescription;
   }
 
+  let dynamicKeywords = seo.keywords || [];
+  if (dynamicKeywords.length === 0) {
+    if (node.type === 'textbook') {
+      dynamicKeywords = [
+        `${boardName} ${className} ${node.title}`,
+        `${boardName} ${className} ${subjectName} guide`,
+        `${className} ${node.title} notes`,
+        `chapter wise ${node.title} solution`,
+        `${boardName} ${subjectName} textbook class ${className.replace(/Class /i, '')}`
+      ].filter(Boolean);
+    } else if (node.type === 'subject') {
+      dynamicKeywords = [
+        `${node.title} notes`,
+        `${className} ${node.title}`,
+        `${boardName} ${node.title} syllabus`,
+        `${node.title} question bank`,
+        `${className} ${node.title} guide`
+      ].filter(Boolean);
+    } else if (node.type === 'class') {
+      dynamicKeywords = [
+        `${node.title} syllabus`,
+        `${boardName} ${node.title} guide`,
+        `${node.title} notes`,
+        `${boardName} ${node.title} subjects`,
+        `${node.title} study materials`
+      ].filter(Boolean);
+    } else if (node.type === 'board') {
+      dynamicKeywords = [
+        `${node.title} syllabus`,
+        `${node.title} board exams`,
+        `${node.title} study materials`,
+        `${node.title} question papers`,
+        `${node.title} notes`
+      ].filter(Boolean);
+    } else if (node.type === 'chapter') {
+      dynamicKeywords = [
+        `${node.title} notes`,
+        `${className} ${subjectName} ${node.title}`,
+        `${node.title} questions and answers`,
+        `${node.title} mcq`,
+        `${node.title} summary`
+      ].filter(Boolean);
+    }
+  }
+
   // Build Metadata Object
   const metadata: Metadata = {
     title,
     description,
-    keywords: seo.keywords || [],
+    keywords: dynamicKeywords,
   };
 
   if (seo.robotsIndex === false) {

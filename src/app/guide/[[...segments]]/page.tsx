@@ -166,6 +166,7 @@ export default async function GuidePage({ params }: { params: Promise<{ segments
       subjectTitle={subjectTitle}
       textbookTitle={textbookTitle}
       chapterTitle={chapterTitle}
+      node={node}
     />
   );
 }

@@ -8,6 +8,8 @@ import { Progress } from '@/components/ui/progress';
 import { CurriculumTree } from '@/components/guide/CurriculumTree';
 import { GuideSidebar } from '@/components/guide/GuideSidebar';
 import { Chapter } from '@/app/guide/guide-data';
+import { generateBreadcrumbSchema, generateBookSchema, generateLearningResourceSchema, generateItemListSchema, generateFAQPageSchema } from '@/lib/seo-schemas';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 export function SubjectDashboard({
   id,
@@ -18,7 +20,8 @@ export function SubjectDashboard({
   classTitle,
   subjectTitle,
   textbookTitle,
-  chapterTitle
+  chapterTitle,
+  node
 }: {
   id: string;
   pageType: 'board' | 'class' | 'subject' | 'textbook' | 'chapter';
@@ -29,6 +32,7 @@ export function SubjectDashboard({
   subjectTitle?: string;
   textbookTitle?: string;
   chapterTitle?: string;
+  node?: any;
 }) {
   const displayTitle = 
     pageType === 'chapter' ? (chapterTitle || 'Chapter') : 
@@ -61,6 +65,70 @@ export function SubjectDashboard({
         topics: ch.subtopics || []
       })) as any;
     }
+  }
+
+  let schemas: any[] = [];
+  let faqs: { question: string; answer: string }[] = [];
+  let seoContent = '';
+  
+  if (node) {
+    const breadcrumbItems = [
+      { name: 'Home', item: 'https://deshexam.com' },
+      { name: 'Academy', item: 'https://deshexam.com/guide/board' }
+    ];
+    let currentUrl = 'https://deshexam.com/guide';
+    
+    node.ancestors?.forEach((anc: any) => {
+      currentUrl += `/${anc.slug || anc.id}`;
+      breadcrumbItems.push({ name: anc.title, item: currentUrl });
+    });
+    breadcrumbItems.push({ name: node.title, item: `https://deshexam.com/guide/${node.fullSlug || node.id}` });
+    
+    schemas.push(generateBreadcrumbSchema(breadcrumbItems));
+    
+    if (pageType === 'textbook') {
+      schemas.push(generateBookSchema({
+        name: node.title,
+        educationalLevel: classTitle,
+        publisherName: boardTitle
+      }));
+    }
+
+    schemas.push(generateLearningResourceSchema({
+      name: `${node.title} Guide`,
+      educationalLevel: 'Secondary'
+    }));
+    
+    let itemListElements = [];
+    if (pageType === 'textbook') {
+      itemListElements = (curriculum.find(c => c.id === id)?.topics || []).map(t => ({
+        name: t.title,
+        url: `https://deshexam.com/guide/${(t as any).fullSlug || t.id}`
+      }));
+    } else {
+      itemListElements = treeData.map((item: any) => ({
+        name: item.title,
+        url: `https://deshexam.com/guide/${item.fullSlug || item.id}`
+      }));
+    }
+    
+    if (itemListElements.length > 0) {
+      schemas.push(generateItemListSchema(itemListElements));
+    }
+    
+    faqs = [
+      { question: `Which class is ${node.title} for?`, answer: `This is an essential guide for ${classTitle ? classTitle : 'students'}${boardTitle ? ' under the ' + boardTitle + ' curriculum' : ''}.` },
+      { question: `Does this guide contain chapter-wise notes?`, answer: `Yes, detailed notes, summaries, and questions-answers are provided for every chapter.` },
+      { question: `Are there MCQ practice questions available?`, answer: `Absolutely. We provide ample MCQs for every subject to help you with your preparation.` },
+      { question: `How should I prepare for my board exams?`, answer: `By regularly practicing our chapter-wise notes, previous year questions, and mock tests, you can easily get ready for your board exams.` }
+    ];
+    schemas.push(generateFAQPageSchema(faqs));
+
+    seoContent = node.seoContent || `Welcome to the complete guide for **${displayTitle}**. This guide is a crucial part of the **${boardTitle || 'Board'}** curriculum for **${classTitle || 'students'}** studying **${subjectTitle || 'various subjects'}**. Mastering this is essential for scoring well in your exams.
+
+Our study materials provide chapter-wise notes, summaries, and solutions designed to help you build a strong foundation. 
+
+At DeshExam, we provide high-quality MCQ, short answer questions (SAQ), long answer questions (LAQ), and previous year board questions. Whether you're doing a quick revision or deep diving into complex topics, this guide is your perfect companion. Regular practice with our question bank and mock tests will significantly boost your exam preparation.`;
   }
 
   return (
@@ -129,32 +197,39 @@ export function SubjectDashboard({
         <div className="flex-1 w-full flex flex-col bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
 
           {/* Green Header Box */}
-          <div className="bg-[#dcefe2] dark:bg-emerald-900/20 px-6 py-5 relative">
-            <div className="absolute top-5 right-5 flex items-center gap-3 text-[#589d76] dark:text-emerald-500">
-              <div className="flex items-center gap-1 text-[13px] font-bold">
-                <Clock className="w-4 h-4" />
-                5.4k
+          <div className="bg-[#dcefe2] dark:bg-emerald-900/20 px-6 py-5 relative flex items-start gap-6">
+            {pageType === 'textbook' && node?.featureImage && (
+              <div className="shrink-0 w-24 h-32 rounded-lg overflow-hidden shadow-md hidden sm:block">
+                <Image src={node.featureImage} alt={`${displayTitle} textbook cover`} width={96} height={128} className="object-cover w-full h-full" priority />
               </div>
-              <button className="hover:text-[#1b6b3e] dark:hover:text-emerald-400 transition-colors">
-                <Share2 className="w-4 h-4" />
-              </button>
-              <button className="w-6 h-6 flex items-center justify-center bg-white dark:bg-slate-800 rounded-sm hover:text-[#1b6b3e] dark:hover:text-emerald-400 transition-colors">
-                <MoreVertical className="w-4 h-4" />
-              </button>
-            </div>
+            )}
+            <div className="flex-1">
+              <div className="absolute top-5 right-5 flex items-center gap-3 text-[#589d76] dark:text-emerald-500">
+                <div className="flex items-center gap-1 text-[13px] font-bold">
+                  <Clock className="w-4 h-4" />
+                  5.4k
+                </div>
+                <button className="hover:text-[#1b6b3e] dark:hover:text-emerald-400 transition-colors">
+                  <Share2 className="w-4 h-4" />
+                </button>
+                <button className="w-6 h-6 flex items-center justify-center bg-white dark:bg-slate-800 rounded-sm hover:text-[#1b6b3e] dark:hover:text-emerald-400 transition-colors">
+                  <MoreVertical className="w-4 h-4" />
+                </button>
+              </div>
 
-            <h2 className="text-[26px] font-bold text-[#1e293b] dark:text-slate-100 mb-1">
-              {displayTitle}
-            </h2>
-            <p className="text-[14px] text-[#5c7a6b] dark:text-emerald-200/70 mb-8">
-              {pageType === 'board' ? 'All Classes & Curriculum' : pageType === 'class' ? `${boardTitle} Curriculum Guide` : `${classTitle} ${subjectTitle || ''} Guide`}
-            </p>
-
-            <div className="mt-auto">
-              <p className="text-[11px] font-bold text-[#6a8b7a] dark:text-emerald-200/60 mb-2">
-                Started: 4 months ago || Progress: 0.54%
+              <h1 className="text-[26px] font-bold text-[#1e293b] dark:text-slate-100 mb-1">
+                {displayTitle}
+              </h1>
+              <p className="text-[14px] text-[#5c7a6b] dark:text-emerald-200/70 mb-8">
+                {pageType === 'board' ? 'All Classes & Curriculum' : pageType === 'class' ? `${boardTitle} Curriculum Guide` : `${classTitle} ${subjectTitle || ''} Guide`}
               </p>
-              <Progress value={0.54} className="h-1.5 bg-white/60 dark:bg-slate-800" indicatorClassName="bg-[#00a651]" />
+
+              <div className="mt-auto">
+                <p className="text-[11px] font-bold text-[#6a8b7a] dark:text-emerald-200/60 mb-2">
+                  Started: 4 months ago || Progress: 0.54%
+                </p>
+                <Progress value={0.54} className="h-1.5 bg-white/60 dark:bg-slate-800" indicatorClassName="bg-[#00a651]" />
+              </div>
             </div>
           </div>
 
@@ -188,8 +263,42 @@ export function SubjectDashboard({
           </div>
 
           <div className="p-4 sm:p-6">
+            <h2 className="sr-only">Chapters</h2>
             <CurriculumTree curriculum={treeData} />
           </div>
+
+          {node && (
+            <div className="p-4 sm:p-6 border-t border-slate-200 dark:border-slate-800">
+              <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">About {displayTitle}</h2>
+              <div className="prose dark:prose-invert max-w-none text-slate-700 dark:text-slate-300 text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: seoContent.replace(/\n/g, '<br/>') }} />
+
+              <h2 className="text-xl font-bold text-slate-900 dark:text-white mt-8 mb-4">FAQs</h2>
+              <Accordion type="single" collapsible className="w-full">
+                {faqs.map((faq, idx) => (
+                  <AccordionItem key={idx} value={`item-${idx}`}>
+                    <AccordionTrigger className="text-left font-semibold text-slate-800 dark:text-slate-200">{faq.question}</AccordionTrigger>
+                    <AccordionContent className="text-slate-600 dark:text-slate-400">
+                      {faq.answer}
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+
+              {subjects && subjects.length > 0 && (
+                <>
+                  <h2 className="text-xl font-bold text-slate-900 dark:text-white mt-8 mb-4">Related Content</h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {subjects.slice(0, 4).map(sub => (
+                      <Link key={sub.id} href={`/guide/${sub.id}`} className="p-4 border border-slate-200 dark:border-slate-800 rounded-xl hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all">
+                        <h3 className="font-bold text-slate-800 dark:text-slate-200">{sub.title}</h3>
+                        <p className="text-xs text-slate-500 mt-1">{classTitle ? `Class ${classTitle}` : 'View More'}</p>
+                      </Link>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Right Column (Sidebar) */}
@@ -199,6 +308,13 @@ export function SubjectDashboard({
           </div>
         )}
       </div>
+      
+      {schemas.length > 0 && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schemas) }}
+        />
+      )}
     </div>
   );
 }
