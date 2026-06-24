@@ -129,6 +129,8 @@ const adminNavGroups = [
       { href: '/admin/textbooks', label: 'Textbooks (Manager)', icon: <BookOpen className="h-4 w-4" /> },
       { href: '/admin/guide-content', label: 'Guide Manager', icon: <Compass className="h-4 w-4" /> },
       { href: '/admin/kids-zone/manage', label: 'Kids Zone', icon: <ToyBrick className="h-4 w-4" /> },
+      { href: '/admin/guide', label: 'Guides', icon: <Compass className="h-4 w-4" /> },
+      { href: '/admin/content', label: 'Content Manager', icon: <FileText className="h-4 w-4" /> },
     ]
   },
   {
@@ -143,6 +145,8 @@ const adminNavGroups = [
       { href: '/admin/assessment-center/exams', label: 'Exams & Papers', icon: <Award className="h-4 w-4" /> },
       { href: '/admin/assessment-center/daily-challenges', label: 'Daily Challenges', icon: <Trophy className="h-4 w-4" /> },
       { href: '/admin/question-bank/import', label: 'Bulk Import', icon: <Upload className="h-4 w-4" /> },
+      { href: '/admin/questions', label: 'Questions Manager', icon: <ClipboardList className="h-4 w-4" /> },
+      { href: '/admin/quizzes', label: 'Quizzes Manager', icon: <Sparkles className="h-4 w-4" /> },
     ]
   },
   {
@@ -201,6 +205,8 @@ const adminNavGroups = [
       { href: '/admin/settings/theme', label: 'Theme', icon: <LayoutDashboard className="h-4 w-4" /> },
       { href: '/admin/settings/security', label: 'Security', icon: <ShieldCheck className="h-4 w-4" /> },
       { href: '/admin/settings/backup', label: 'Backup', icon: <Upload className="h-4 w-4" /> },
+      { href: '/admin/migrate-seo', label: 'Migrate SEO', icon: <Upload className="h-4 w-4" /> },
+      { href: '/admin/migrate-taxonomy', label: 'Migrate Taxonomy', icon: <Upload className="h-4 w-4" /> },
     ]
   }
 ];
