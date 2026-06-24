@@ -12,11 +12,56 @@ export function ClassDashboard({ classes }: { classes: any[] }) {
   const { user, userProfile } = useAuth();
   const [activeTab, setActiveTab] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+  
+  const [selectedBoard, setSelectedBoard] = useState('');
+  const [selectedMedium, setSelectedMedium] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
 
   const tabs = ['All', 'School', 'Primary', 'Secondary', 'Higher Secondary', 'Competitive'];
 
   const filteredClasses = classes.filter(c => {
-    return c.title.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = c.title.toLowerCase().includes(searchQuery.toLowerCase());
+    if (!matchesSearch) return false;
+    
+    if (activeTab === 'All') return true;
+    
+    const title = c.title.toLowerCase();
+    
+    if (activeTab === 'Primary') {
+      return ['1', '2', '3', '4', '5', 'primary', 'pre'].some(k => title.includes(k));
+    }
+    if (activeTab === 'Secondary') {
+      return ['6', '7', '8', '9', '10', 'secondary'].some(k => title.includes(k));
+    }
+    if (activeTab === 'Higher Secondary') {
+      return ['11', '12', 'higher'].some(k => title.includes(k));
+    }
+    if (activeTab === 'School') {
+      return !['admission', 'job', 'bcs', 'university'].some(k => title.includes(k));
+    }
+    if (activeTab === 'Competitive') {
+      return ['admission', 'job', 'bcs', 'university', 'competitive'].some(k => title.includes(k));
+    }
+    
+    // Dropdown filters logic
+    if (selectedBoard) {
+      // Allow if boardSlug matches, or if it's missing, let's just match title or assume it passes for now to not hide everything 
+      // since mock data might not have boardSlug for all. We'll do a loose text match.
+      const boardMatch = c.boardSlug === selectedBoard || title.includes(selectedBoard.toLowerCase());
+      if (!boardMatch) return false;
+    }
+    
+    if (selectedMedium) {
+      const mediumMatch = c.mediumSlug === selectedMedium || title.includes(selectedMedium.toLowerCase());
+      if (!mediumMatch) return false;
+    }
+    
+    if (selectedCategory) {
+      const catMatch = c.categorySlug === selectedCategory || title.includes(selectedCategory.toLowerCase()) || c.type === selectedCategory;
+      if (!catMatch) return false;
+    }
+
+    return true;
   });
 
   return (
@@ -57,11 +102,49 @@ export function ClassDashboard({ classes }: { classes: any[] }) {
             {/* Filters */}
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 text-sm text-slate-600 dark:text-slate-400">
               <span className="font-medium mr-1">Filter</span>
-              {['Board', 'Medium', 'Category', 'Categories'].map((filter) => (
-                <button key={filter} className="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-800 rounded-full border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
-                  {filter} <ChevronDown className="w-3.5 h-3.5" />
-                </button>
-              ))}
+              
+              <div className="relative">
+                <select 
+                  className="appearance-none bg-white dark:bg-slate-800 rounded-full border border-slate-200 dark:border-slate-700 pl-4 pr-8 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer outline-none focus:ring-2 focus:ring-emerald-500/20 text-slate-700 dark:text-slate-300"
+                  value={selectedBoard}
+                  onChange={(e) => setSelectedBoard(e.target.value)}
+                >
+                  <option value="">Board</option>
+                  <option value="wbbse">WBBSE</option>
+                  <option value="cbse">CBSE</option>
+                  <option value="icse">ICSE</option>
+                  <option value="wbchse">WBCHSE</option>
+                </select>
+                <ChevronDown className="w-3.5 h-3.5 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500" />
+              </div>
+
+              <div className="relative">
+                <select 
+                  className="appearance-none bg-white dark:bg-slate-800 rounded-full border border-slate-200 dark:border-slate-700 pl-4 pr-8 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer outline-none focus:ring-2 focus:ring-emerald-500/20 text-slate-700 dark:text-slate-300"
+                  value={selectedMedium}
+                  onChange={(e) => setSelectedMedium(e.target.value)}
+                >
+                  <option value="">Medium</option>
+                  <option value="bengali">Bengali</option>
+                  <option value="english">English</option>
+                </select>
+                <ChevronDown className="w-3.5 h-3.5 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500" />
+              </div>
+
+              <div className="relative">
+                <select 
+                  className="appearance-none bg-white dark:bg-slate-800 rounded-full border border-slate-200 dark:border-slate-700 pl-4 pr-8 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer outline-none focus:ring-2 focus:ring-emerald-500/20 text-slate-700 dark:text-slate-300"
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                >
+                  <option value="">Category</option>
+                  <option value="school">School</option>
+                  <option value="competitive">Competitive</option>
+                  <option value="skill">Skill</option>
+                </select>
+                <ChevronDown className="w-3.5 h-3.5 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500" />
+              </div>
+
             </div>
           </div>
 
@@ -106,12 +189,8 @@ export function ClassDashboard({ classes }: { classes: any[] }) {
 
       {/* Main Content Area */}
       <div className="max-w-7xl mx-auto px-6 lg:px-24 py-12">
-        <div className="flex flex-col lg:flex-row gap-8">
-          
-          {/* Main Left Column */}
-          <div className="flex-1 min-w-0">
-            
-            {/* Personalized Dashboard Widgets */}
+        
+        {/* Personalized Dashboard Widgets */}
             {user ? (
               <div className="mb-12 space-y-6">
                 <ContinueLearningWidget userProfile={userProfile} />
@@ -146,7 +225,7 @@ export function ClassDashboard({ classes }: { classes: any[] }) {
         {/* Classes Grid */}
         <div className="mb-8">
           <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-6">Available Classes</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredClasses.length > 0 ? filteredClasses.map((cls, idx) => {
               // Fake stats for UI mockup purposes
               const subjectsCount = 25;
@@ -191,15 +270,15 @@ export function ClassDashboard({ classes }: { classes: any[] }) {
                   </div>
 
                   <div className="mt-auto space-y-3">
-                    <div className="flex gap-3">
-                      <Link href={`/guide/${cls.slug || cls.id}`} className="flex-1 bg-[#00a651] hover:bg-[#008c44] text-white text-sm font-bold py-2.5 rounded-xl text-center transition-colors">
+                    <div className="flex flex-col 2xl:flex-row gap-2">
+                      <Link href={`/guide/${cls.slug || cls.id}`} className="flex-1 bg-[#00a651] hover:bg-[#008c44] text-white text-xs sm:text-sm font-bold py-2.5 rounded-xl text-center transition-colors">
                         Explore
                       </Link>
-                      <Link href={`/guide/${cls.slug || cls.id}`} className="flex-1 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-900/20 dark:hover:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 text-sm font-bold py-2.5 rounded-xl text-center transition-colors">
-                        Quick Practice
+                      <Link href={`/guide/${cls.slug || cls.id}`} className="flex-1 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-900/20 dark:hover:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 text-xs sm:text-sm font-bold py-2.5 rounded-xl text-center transition-colors">
+                        Practice
                       </Link>
                     </div>
-                    <Link href={`/guide/${cls.slug || cls.id}`} className="block w-full bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 text-sm font-bold py-2.5 rounded-xl text-center transition-colors">
+                    <Link href={`/guide/${cls.slug || cls.id}`} className="block w-full bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm font-bold py-2.5 rounded-xl text-center transition-colors">
                       Quick Practice
                     </Link>
                   </div>
@@ -234,17 +313,6 @@ export function ClassDashboard({ classes }: { classes: any[] }) {
             ))}
           </div>
         </div>
-
-          </div> {/* End Main Left Column */}
-
-          {/* Right Sidebar (Only for logged in users) */}
-          {user && (
-            <div className="w-full lg:w-80 shrink-0">
-              <DashboardSidebar userProfile={userProfile} />
-            </div>
-          )}
-
-        </div> {/* End Flex Row Layout */}
 
         {/* Promo Banner */}
         <div className="relative w-full bg-gradient-to-r from-[#0a1b14] via-[#0d2a1d] to-[#0a1b14] rounded-3xl p-8 sm:p-12 overflow-hidden border border-emerald-900/30 shadow-[0_0_40px_rgba(0,166,81,0.15)] flex flex-col items-center text-center mt-8">
