@@ -344,7 +344,7 @@ export function TopicQuestionManager({ topicId, tabType, nodeLevel = 'topic' }: 
   return (
     <div className="space-y-2">
 
-      {/* â”€â”€ Inner type sub-pills (Questions tab only) â”€â”€ */}
+      {/* ── Inner type sub-pills (Questions tab only) ── */}
       {tabType === 'questions' && (
         <div className="flex gap-1.5 overflow-x-auto no-scrollbar pb-1 lg:flex-wrap lg:overflow-x-visible lg:pb-0">
           {['MCQ','T/F','FIB','Match','Desc','CQ'].map(t => (
@@ -356,24 +356,24 @@ export function TopicQuestionManager({ topicId, tabType, nodeLevel = 'topic' }: 
         </div>
       )}
 
-      {/* â”€â”€ Mode action pills â”€â”€ */}
+      {/* ── Mode action pills ── */}
       <div className="flex gap-1.5 overflow-x-auto no-scrollbar pb-1 lg:flex-wrap lg:overflow-x-visible lg:pb-0">
         <button onClick={() => setMode('list')} className={`px-3.5 py-1.5 rounded-full text-[11px] font-semibold whitespace-nowrap border transition-all ${ mode === 'list' ? 'bg-slate-800 dark:bg-white text-white dark:text-slate-900 border-slate-800' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-500' }`}>
           All ({questions.length})
         </button>
-        <button onClick={() => { setMode('single'); }} className={`px-3.5 py-1.5 rounded-full text-[11px] font-semibold whitespace-nowrap border transition-all ${ mode === 'single' ? 'bg-[#107c41] text-white border-[#107c41]' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-500' }`}>
-          + Add
+        <button onClick={() => { setMode('single'); }} className={`px-3.5 py-1.5 rounded-full text-[11px] font-semibold flex items-center gap-1 whitespace-nowrap border transition-all ${ mode === 'single' ? 'bg-[#107c41] text-white border-[#107c41]' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-500' }`}>
+          <Plus className="w-3.5 h-3.5" /> Add
         </button>
         {qType === 'MCQ' && (
           <>
-            <button onClick={() => setMode('ai')} className={`px-3.5 py-1.5 rounded-full text-[11px] font-semibold whitespace-nowrap border transition-all ${ mode === 'ai' ? 'bg-violet-600 text-white border-violet-600' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-500' }`}>âœ¦ AI</button>
-            <button onClick={() => setMode('bulk')} className={`px-3.5 py-1.5 rounded-full text-[11px] font-semibold whitespace-nowrap border transition-all ${ mode === 'bulk' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-500' }`}>â¬† Bulk</button>
-            {questions.length > 0 && <button onClick={enterBulkEditMode} className={`px-3.5 py-1.5 rounded-full text-[11px] font-semibold whitespace-nowrap border transition-all ${ mode === 'bulk-edit' ? 'bg-amber-500 text-white border-amber-500' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-500' }`}>âœ Edit All</button>}
+            <button onClick={() => setMode('ai')} className={`px-3.5 py-1.5 rounded-full text-[11px] font-semibold flex items-center gap-1 whitespace-nowrap border transition-all ${ mode === 'ai' ? 'bg-violet-600 text-white border-violet-600' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-500' }`}><Sparkles className="w-3.5 h-3.5" /> AI</button>
+            <button onClick={() => setMode('bulk')} className={`px-3.5 py-1.5 rounded-full text-[11px] font-semibold flex items-center gap-1 whitespace-nowrap border transition-all ${ mode === 'bulk' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-500' }`}><Upload className="w-3.5 h-3.5" /> Bulk</button>
+            {questions.length > 0 && <button onClick={enterBulkEditMode} className={`px-3.5 py-1.5 rounded-full text-[11px] font-semibold flex items-center gap-1 whitespace-nowrap border transition-all ${ mode === 'bulk-edit' ? 'bg-amber-500 text-white border-amber-500' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-500' }`}><Edit className="w-3.5 h-3.5" /> Edit All</button>}
           </>
         )}
       </div>
 
-      {/* â”€â”€ QUESTION LIST â”€â”€ */}
+      {/* ── QUESTION LIST ── */}
       {['list', 'bulk-edit'].includes(mode) && (
         <div className="space-y-2">
 
@@ -509,7 +509,7 @@ export function TopicQuestionManager({ topicId, tabType, nodeLevel = 'topic' }: 
         </div>
       )}
 
-      {/* â”€â”€ ADD / EDIT QUESTION EDITOR â”€â”€ */}
+      {/* ── ADD / EDIT QUESTION EDITOR ── */}
       {(mode === 'single' || mode === 'edit') && !hierarchyLoading && (
         <div className="animate-in fade-in duration-200 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden bg-white dark:bg-slate-950 shadow-sm mt-2">
           {mode === 'edit' && (
@@ -548,7 +548,7 @@ export function TopicQuestionManager({ topicId, tabType, nodeLevel = 'topic' }: 
         </div>
       )}
 
-      {/* â”€â”€ BULK IMPORT â”€â”€ */}
+      {/* ── BULK IMPORT ── */}
       {mode === 'bulk' && !hierarchyLoading && (
         <div className="animate-in fade-in duration-200 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm mt-2">
           <div className="flex items-center gap-2 px-3 py-2.5 bg-blue-50 dark:bg-blue-900/20 border-b border-blue-100 dark:border-blue-900/50">
@@ -572,7 +572,7 @@ export function TopicQuestionManager({ topicId, tabType, nodeLevel = 'topic' }: 
         </div>
       )}
 
-      {/* â”€â”€ BULK EDIT â”€â”€ */}
+      {/* ── BULK EDIT ── */}
       {mode === 'bulk-edit' && !hierarchyLoading && (
         <div className="animate-in fade-in duration-200 bg-white dark:bg-slate-900 border border-amber-200 dark:border-amber-900 rounded-xl overflow-hidden shadow-sm mt-2">
           <div className="flex items-center gap-2 px-3 py-2.5 bg-amber-50 dark:bg-amber-900/20 border-b border-amber-100 dark:border-amber-900/50">
@@ -595,7 +595,7 @@ export function TopicQuestionManager({ topicId, tabType, nodeLevel = 'topic' }: 
         </div>
       )}
 
-      {/* â”€â”€ AI GENERATE â”€â”€ */}
+      {/* ── AI GENERATE ── */}
       {mode === 'ai' && (
         <div className="animate-in fade-in duration-200 bg-white dark:bg-slate-900 border border-violet-200 dark:border-violet-900 rounded-xl overflow-hidden shadow-sm mt-2">
           <div className="flex items-center gap-2 px-3 py-2.5 bg-violet-50 dark:bg-violet-900/20 border-b border-violet-100 dark:border-violet-900/50">
