@@ -326,7 +326,7 @@ export function ReadingArticle({ data, hierarchy, navigation }: ReadingArticlePr
                       {data.title}
                     </h1>
                     {data.author?.name && (
-                      <span className="text-[18px] font-normal text-slate-500 dark:text-slate-400">
+                      <span className="text-[15px] font-normal text-slate-400 dark:text-slate-500">
                         ({data.author.name})
                       </span>
                     )}
