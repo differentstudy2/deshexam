@@ -159,7 +159,7 @@ export default async function GuidePage({ params }: { params: Promise<{ segments
     return (
       <ReadingLayout 
         id={node.id} 
-        data={readingData}
+        data={JSON.parse(JSON.stringify(readingData))}
         subjects={subjects} 
         curriculum={curriculum} 
         boardTitle={boardTitle}

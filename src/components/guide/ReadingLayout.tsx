@@ -1,4 +1,7 @@
+"use client";
+
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -32,6 +35,7 @@ export function ReadingLayout({
   chapterTitle?: string;
   breadcrumbs?: { name: string, url: string }[];
 }) {
+  const router = useRouter();
 
   if (!data) {
     return <div className="p-20 text-center text-xl text-slate-500">Content not found!</div>;
@@ -88,6 +92,7 @@ export function ReadingLayout({
 
           <Button
             variant="outline"
+            onClick={() => router.back()}
             className="h-8 px-5 bg-[#dcefe2] text-[#1b6b3e] border-transparent hover:bg-[#c2e2cc] hover:text-[#11512d] dark:bg-emerald-900/40 dark:text-emerald-400 dark:hover:bg-emerald-900/60 rounded-md font-bold text-sm shadow-sm"
           >
             Back
