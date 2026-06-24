@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search, ChevronDown, ChevronUp, ChevronRight, ExternalLink, Play, ArrowUp, ArrowDown, Loader2, Circle, CircleDot, ChevronsDown, BookOpen, GraduationCap, BookMarked, Lightbulb, Target, Activity, ArrowRight, FileText, ListChecks, HelpCircle } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { cn } from '@/lib/utils';
 import { getTaxonomyNodesByType, getTaxonomyNodeById, TaxonomyNode } from '@/lib/firebase/taxonomy';
 import { useAuth } from "@/hooks/use-auth";
@@ -341,7 +342,7 @@ export default function AcademyClient({
       }
     };
     fetchClasses();
-  }, [authLoading, userProfile]);
+  }, [authLoading, userProfile?.classId]);
 
   // 2. Fetch Textbooks & Chapters dynamically ONLY for the selected Class
   useEffect(() => {
@@ -608,14 +609,6 @@ export default function AcademyClient({
               {/* Bottom Control Bar Removed - Elements merged into Hero */}
             </div>
 
-            {/* SEO Content Block */}
-            <div className="mb-10 p-6 sm:p-8 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
-              <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200 mb-3">{selectedClassTitle} Study Materials & Resources</h2>
-              <p className="text-sm md:text-base text-slate-600 dark:text-slate-400 leading-relaxed">
-                DeshExam Academy helps students prepare for board examinations with structured learning materials including textbooks, chapter-wise notes, MCQs, CQ, SAQ, and mock tests. Students can browse subjects based on their class and board and access curated study resources. Prepare effectively with our comprehensive {selectedClassTitle} guides and solutions designed to maximize your academic success.
-              </p>
-            </div>
-
             {/* Grid of Subjects */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pb-12 items-start">
               {filteredSubjectsData.map((subject, idx) => (
@@ -626,6 +619,103 @@ export default function AcademyClient({
                   No textbooks found for the selected class.
                 </div>
               )}
+            </div>
+
+            {/* Engaging Content & SEO Section */}
+            <div className="border-t border-slate-200 dark:border-slate-800 pt-16 pb-8 space-y-16">
+              
+              {/* Features Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                  <div className="w-12 h-12 mx-auto bg-blue-50 dark:bg-blue-900/30 rounded-full flex items-center justify-center mb-4 text-blue-600 dark:text-blue-400">
+                    <Activity className="w-6 h-6" />
+                  </div>
+                  <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">Interactive Learning</h3>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">Stay motivated with gamified streaks, daily challenges, and real-time progress tracking across all {selectedClassTitle} subjects.</p>
+                </div>
+                
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                  <div className="w-12 h-12 mx-auto bg-emerald-50 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mb-4 text-emerald-600 dark:text-emerald-400">
+                    <BookMarked className="w-6 h-6" />
+                  </div>
+                  <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">Complete Syllabus</h3>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">Access well-organized textbooks, chapter-wise detailed notes, and step-by-step solutions for your exact board and class.</p>
+                </div>
+
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                  <div className="w-12 h-12 mx-auto bg-purple-50 dark:bg-purple-900/30 rounded-full flex items-center justify-center mb-4 text-purple-600 dark:text-purple-400">
+                    <Target className="w-6 h-6" />
+                  </div>
+                  <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">Exam Excellence</h3>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">Prepare confidently with previous year questions, high-quality MCQs, SAQs, and full-length simulated mock tests.</p>
+                </div>
+              </div>
+
+              {/* Study Tips & FAQs */}
+              <div className="grid lg:grid-cols-2 gap-12">
+                <section data-ai-summary className="prose dark:prose-invert prose-slate prose-emerald">
+                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">Mastering {selectedClassTitle} with DeshExam</h2>
+                  <p className="text-slate-600 dark:text-slate-400">
+                    Succeeding in {selectedClassTitle} requires more than just reading; it demands a structured approach to learning. Our platform is meticulously designed to provide you with the exact resources you need to excel.
+                  </p>
+                  
+                  <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200 mt-6 mb-3">Effective Study Strategies:</h3>
+                  <ul className="space-y-3 text-slate-600 dark:text-slate-400">
+                    <li className="flex gap-2 items-start"><ArrowRight className="w-4 h-4 mt-1 text-emerald-500 shrink-0" /> <strong>Consistent Revision:</strong> Use our chapter-wise notes to quickly revise key concepts daily.</li>
+                    <li className="flex gap-2 items-start"><ArrowRight className="w-4 h-4 mt-1 text-emerald-500 shrink-0" /> <strong>Active Recall:</strong> Instead of passive reading, test yourself using our extensive MCQ and CQ question banks.</li>
+                    <li className="flex gap-2 items-start"><ArrowRight className="w-4 h-4 mt-1 text-emerald-500 shrink-0" /> <strong>Mock Tests:</strong> Simulate real exam conditions by taking full-length mock tests before the actual exams.</li>
+                    <li className="flex gap-2 items-start"><ArrowRight className="w-4 h-4 mt-1 text-emerald-500 shrink-0" /> <strong>Track Weaknesses:</strong> Monitor your analytics dashboard to identify and focus on subjects that need more attention.</li>
+                  </ul>
+                  
+                  <div className="mt-8 p-6 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800/50 rounded-2xl">
+                    <h4 className="font-bold text-emerald-800 dark:text-emerald-300 mb-2">Ready to Boost Your Grades?</h4>
+                    <p className="text-sm text-emerald-700 dark:text-emerald-400/80 mb-4">Join thousands of students who have transformed their academic journey with our smart learning tools.</p>
+                    <Button className="bg-emerald-600 hover:bg-emerald-500 text-white rounded-full px-6 shadow-md shadow-emerald-500/20">
+                      Start Practicing Now
+                    </Button>
+                  </div>
+                </section>
+
+                <aside>
+                  <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-sm">
+                    <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">Frequently Asked Questions</h3>
+                    <Accordion type="single" collapsible className="w-full">
+                      <AccordionItem value="faq-1" className="border-slate-200 dark:border-slate-800">
+                        <AccordionTrigger className="text-left font-semibold text-slate-700 dark:text-slate-200 text-[15px] py-4">
+                          How do I track my syllabus progress?
+                        </AccordionTrigger>
+                        <AccordionContent className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                          Your progress is automatically tracked as you read chapters, attempt MCQs, and complete mock tests. You can view your overall completion percentage directly on the subject cards.
+                        </AccordionContent>
+                      </AccordionItem>
+                      <AccordionItem value="faq-2" className="border-slate-200 dark:border-slate-800">
+                        <AccordionTrigger className="text-left font-semibold text-slate-700 dark:text-slate-200 text-[15px] py-4">
+                          Are the mock tests aligned with the latest syllabus?
+                        </AccordionTrigger>
+                        <AccordionContent className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                          Yes, our academic team regularly updates all textbooks, notes, and mock tests to strictly adhere to the latest curriculum and exam patterns prescribed by your specific board.
+                        </AccordionContent>
+                      </AccordionItem>
+                      <AccordionItem value="faq-3" className="border-slate-200 dark:border-slate-800">
+                        <AccordionTrigger className="text-left font-semibold text-slate-700 dark:text-slate-200 text-[15px] py-4">
+                          How can I maintain my learning streak?
+                        </AccordionTrigger>
+                        <AccordionContent className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                          To keep your streak alive, you just need to complete at least one academic activity every day—such as reading a new topic, practicing a quiz, or solving a past paper.
+                        </AccordionContent>
+                      </AccordionItem>
+                      <AccordionItem value="faq-4" className="border-slate-200 dark:border-slate-800">
+                        <AccordionTrigger className="text-left font-semibold text-slate-700 dark:text-slate-200 text-[15px] py-4">
+                          Are detailed solutions provided for MCQs?
+                        </AccordionTrigger>
+                        <AccordionContent className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                          Absolutely. After submitting any practice quiz or mock test, you'll receive a detailed performance report along with step-by-step explanations for every incorrect answer.
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
+                  </div>
+                </aside>
+              </div>
             </div>
           </>
         )}

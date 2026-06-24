@@ -7,6 +7,7 @@ import { generateHybridSeo } from '@/lib/seo';
 import { ReadingLayout } from '@/components/guide/ReadingLayout';
 import { SubjectDashboard } from '@/components/guide/SubjectDashboard';
 import { BoardDashboard } from '@/components/guide/BoardDashboard';
+import AcademyClient from '@/app/academy/AcademyClient';
 import { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
@@ -74,7 +75,6 @@ export default async function GuidePage({ params }: { params: Promise<{ segments
   const requestedPath = segments.join('/');
   
   if (requestedPath === 'academy') {
-    const AcademyClient = (await import('@/app/academy/AcademyClient')).default;
     return <AcademyClient />;
   }
 
