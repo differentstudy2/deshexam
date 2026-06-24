@@ -4,7 +4,7 @@ import React, { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ChevronRight, Share2, MoreVertical, Search, Clock, Play, FileText, Library, BookOpen, ChevronDown, List, ChevronLeft } from 'lucide-react';
+import { ChevronRight, Share2, MoreVertical, Search, Clock, Play, FileText, Library, BookOpen, ChevronDown, List, ChevronLeft, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
@@ -41,6 +41,31 @@ export function SubjectDashboard({
   breadcrumbs?: { name: string, url: string }[];
 }) {
   const router = useRouter();
+
+  // Analytics and Counts
+  const viewCount = node?.metrics?.views || 0; 
+  const formattedViews = viewCount >= 1000 ? `${(viewCount / 1000).toFixed(1)}k` : viewCount.toString();
+  const updatedAt = node?.updatedAt?.seconds ? new Date(node.updatedAt.seconds * 1000).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'Recently';
+
+  let mcqCount = 0;
+  let cqCount = 0;
+  let chapterCount = curriculum?.length || 0;
+  let topicCount = 0;
+
+  curriculum?.forEach(chapter => {
+    chapter.topics?.forEach(topic => {
+      topicCount++;
+      const tTitle = (topic.title || '').toLowerCase();
+      if (tTitle.includes('mcq') || tTitle.includes('বহুনির্বাচনি')) mcqCount++;
+      if (tTitle.includes('cq') || tTitle.includes('সৃজনশীল')) cqCount++;
+      
+      topic.subtopics?.forEach((sub: any) => {
+        const sTitle = (sub.title || '').toLowerCase();
+        if (sTitle.includes('mcq') || sTitle.includes('বহুনির্বাচনি')) mcqCount++;
+        if (sTitle.includes('cq') || sTitle.includes('সৃজনশীল')) cqCount++;
+      });
+    });
+  });
 
   const displayTitle = 
     pageType === 'chapter' ? (chapterTitle || 'Chapter') : 
@@ -281,8 +306,8 @@ At DeshExam, we provide high-quality MCQ, short answer questions (SAQ), long ans
             <div className="flex-1 min-w-0">
               <div className="absolute top-4 right-4 hidden sm:flex items-center gap-3 text-[#589d76] dark:text-emerald-500">
                 <div className="flex items-center gap-1 text-[13px] font-bold">
-                  <Clock className="w-4 h-4" />
-                  5.4k
+                  <Eye className="w-4 h-4" />
+                  {formattedViews}
                 </div>
                 <button className="hover:text-[#1b6b3e] dark:hover:text-emerald-400 transition-colors">
                   <Share2 className="w-4 h-4" />
@@ -299,16 +324,14 @@ At DeshExam, we provide high-quality MCQ, short answer questions (SAQ), long ans
                 {pageType === 'board' ? 'All Classes & Curriculum' : pageType === 'class' ? `${boardTitle} Curriculum Guide` : `${classTitle} ${subjectTitle || ''} Guide`}
               </p>
 
-              <div className="mt-auto">
-                <div className="flex items-center justify-between mb-1.5 sm:mb-2">
-                  <p className="text-[10px] sm:text-[11px] font-bold text-[#6a8b7a] dark:text-emerald-200/60">
-                    Started: 4 months ago
-                  </p>
-                  <p className="text-[10px] sm:text-[11px] font-bold text-[#6a8b7a] dark:text-emerald-200/60">
-                    Progress: 0.54%
-                  </p>
+              <div className="mt-auto flex items-center justify-between">
+                <p className="text-[11px] font-bold text-[#6a8b7a] dark:text-emerald-200/60">
+                  Last Updated: {updatedAt}
+                </p>
+                <div className="flex sm:hidden items-center gap-1 text-[11px] font-bold text-[#6a8b7a] dark:text-emerald-200/60">
+                  <Eye className="w-3.5 h-3.5" />
+                  {formattedViews} Views
                 </div>
-                <Progress value={0.54} className="h-1.5 bg-white/60 dark:bg-slate-800" indicatorClassName="bg-[#00a651]" />
               </div>
             </div>
           </div>
@@ -330,9 +353,10 @@ At DeshExam, we provide high-quality MCQ, short answer questions (SAQ), long ans
           </div>
 
           <div className="px-4 py-3 sm:px-6 sm:py-4 flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-            <span className="shrink-0 px-3 py-1.5 sm:py-1 bg-[#107c41] text-white text-[11px] sm:text-[12px] font-bold rounded-full">MCQ: 2.3k</span>
-            <span className="shrink-0 px-3 py-1.5 sm:py-1 bg-[#107c41] text-white text-[11px] sm:text-[12px] font-bold rounded-full">CQ: 1.8k</span>
-            <span className="shrink-0 px-3 py-1.5 sm:py-1 bg-[#0b5c30] text-white text-[11px] sm:text-[12px] font-bold rounded-full">Board Exam: 1</span>
+            {mcqCount > 0 && <span className="shrink-0 px-3 py-1.5 sm:py-1 bg-[#107c41] text-white text-[11px] sm:text-[12px] font-bold rounded-full">MCQ: {mcqCount}</span>}
+            {cqCount > 0 && <span className="shrink-0 px-3 py-1.5 sm:py-1 bg-[#107c41] text-white text-[11px] sm:text-[12px] font-bold rounded-full">CQ: {cqCount}</span>}
+            <span className="shrink-0 px-3 py-1.5 sm:py-1 bg-[#0b5c30] text-white text-[11px] sm:text-[12px] font-bold rounded-full">Chapters: {chapterCount}</span>
+            <span className="shrink-0 px-3 py-1.5 sm:py-1 bg-[#0b5c30] text-white text-[11px] sm:text-[12px] font-bold rounded-full">Topics: {topicCount}</span>
             <button className="shrink-0 px-3 py-1.5 sm:py-1 bg-white dark:bg-slate-800 border-[1.5px] border-[#107c41] text-[#107c41] dark:text-emerald-400 text-[11px] sm:text-[12px] font-bold rounded-full flex items-center gap-1 hover:bg-[#f0f9f4] dark:hover:bg-emerald-900/20 transition-colors">
               <Play className="w-3 h-3 fill-current" /> Practice
             </button>
