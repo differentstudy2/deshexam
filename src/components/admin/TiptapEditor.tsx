@@ -361,7 +361,7 @@ export function TiptapEditor({ content, onChange, maxHeight }: { content: string
     extensions: [
       StarterKit.configure({
         heading: { levels: [1, 2, 3, 4] }
-      }),
+      }) as any,
       Markdown.configure({
         html: true,
         transformPastedText: true,
@@ -402,17 +402,28 @@ export function TiptapEditor({ content, onChange, maxHeight }: { content: string
       },
     },
     onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
+      const html = editor.getHTML();
+      previousContentRef.current = html;
+      onChange(html);
       if (viewMode !== 'visual') {
-        if (viewMode === 'html') setRawContent(editor.getHTML());
+        if (viewMode === 'html') setRawContent(html);
         if (viewMode === 'text') setRawContent(editor.getText());
         if (viewMode === 'markdown') setRawContent((editor.storage as any).markdown.getMarkdown());
       }
     },
   });
 
+  const previousContentRef = React.useRef(content);
+
   React.useEffect(() => {
-    if (editor && content !== editor.getHTML()) {
+    if (!editor) return;
+
+    // Skip if the incoming content matches what we just sent out (internal update)
+    if (content === previousContentRef.current) {
+      return;
+    }
+
+    if (content !== editor.getHTML()) {
       let cleanContent = content || '';
       let parsedHTML = cleanContent;
 
@@ -435,6 +446,8 @@ export function TiptapEditor({ content, onChange, maxHeight }: { content: string
         editor.commands.setContent(parsedHTML);
       }
     }
+    
+    previousContentRef.current = content;
   }, [content, editor, viewMode]);
 
   // Sync back raw content changes

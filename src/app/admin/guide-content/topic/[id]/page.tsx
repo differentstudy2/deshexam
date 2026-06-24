@@ -201,7 +201,7 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
   const activeSection = sectionTypes.find(s => s.id === activeTab);
 
   // ── Sidebar nav content (shared between desktop sidebar + mobile drawer) ──
-  const SidebarNav = () => (
+  const sidebarNavContent = (
     <div className="flex flex-col h-full overflow-y-auto">
       {/* Brand / ID */}
       <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-800">
@@ -270,7 +270,7 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
   );
 
   // ── Content panel ──
-  const ContentPanel = () => (
+  const mainContentPanel = (
     <div className="animate-in fade-in duration-200">
       {activeTab === 'video' ? (
         <TopicVideoManager topicId={topicId} />
@@ -406,7 +406,7 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
 
         {/* ── Desktop Sidebar ── */}
         <aside className="hidden lg:flex flex-col w-60 xl:w-64 shrink-0 bg-white dark:bg-[#1a1d27] border-r border-slate-200 dark:border-slate-800 sticky top-[73px] h-[calc(100vh-73px)] overflow-hidden">
-          <SidebarNav />
+          {sidebarNavContent}
         </aside>
 
         {/* ── Main content ── */}
@@ -441,7 +441,7 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
               </Link>
             </div>
 
-            <ContentPanel />
+            {mainContentPanel}
           </div>
         </main>
       </div>
