@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ChevronRight, Share2, MoreVertical, Search, Clock, Play, FileText, Library, BookOpen, ChevronDown, List } from 'lucide-react';
+import { ChevronRight, Share2, MoreVertical, Search, Clock, Play, FileText, Library, BookOpen, ChevronDown, List, ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
@@ -138,9 +138,23 @@ At DeshExam, we provide high-quality MCQ, short answer questions (SAQ), long ans
     <div className="min-h-screen bg-slate-50 dark:bg-[#020817] text-slate-800 dark:text-slate-200 font-sans pb-20">
 
       {/* Top Header Bar (White) */}
-      <div className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 sticky top-16 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-6">
+      <div className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 sticky top-0 sm:top-16 z-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between relative">
+          
+          {/* Mobile Back Button & Centered Title */}
+          <div className="flex items-center md:hidden w-full">
+            <Link href=".." className="p-2 -ml-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+              <ChevronLeft className="w-6 h-6" />
+            </Link>
+            <h1 className="font-bold text-[16px] text-slate-900 dark:text-white absolute left-1/2 -translate-x-1/2 max-w-[200px] truncate">
+              {displayTitle}
+            </h1>
+            <button className="p-2 -mr-2 ml-auto text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+              <MoreVertical className="w-5 h-5" />
+            </button>
+          </div>
+
+          <div className="hidden md:flex items-center gap-6">
             <h1 className="font-bold text-[17px] text-slate-900 dark:text-white">Academy</h1>
 
             <div className="hidden sm:flex flex-wrap items-center text-[13px] text-slate-500 dark:text-slate-400 font-medium border-l border-slate-200 dark:border-slate-800 pl-6">
@@ -203,7 +217,7 @@ At DeshExam, we provide high-quality MCQ, short answer questions (SAQ), long ans
 
           <Button
             variant="outline"
-            className="h-8 px-5 bg-[#dcefe2] text-[#1b6b3e] border-transparent hover:bg-[#c2e2cc] hover:text-[#11512d] dark:bg-emerald-900/40 dark:text-emerald-400 dark:hover:bg-emerald-900/60 rounded-md font-bold text-sm shadow-sm"
+            className="hidden md:flex h-8 px-5 bg-[#dcefe2] text-[#1b6b3e] border-transparent hover:bg-[#c2e2cc] hover:text-[#11512d] dark:bg-emerald-900/40 dark:text-emerald-400 dark:hover:bg-emerald-900/60 rounded-md font-bold text-sm shadow-sm"
           >
             Back
           </Button>
@@ -211,20 +225,20 @@ At DeshExam, we provide high-quality MCQ, short answer questions (SAQ), long ans
       </div>
 
       {/* Main Layout Area */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col lg:flex-row gap-6 items-start">
+      <div className="max-w-7xl mx-auto px-0 sm:px-6 lg:px-8 py-0 sm:py-8 flex flex-col lg:flex-row gap-6 items-start">
 
         {/* Left Column (Main Content) */}
-        <div className="flex-1 w-full flex flex-col bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+        <div className="flex-1 w-full flex flex-col bg-white dark:bg-slate-900 sm:rounded-xl shadow-sm sm:border border-slate-200 dark:border-slate-800 overflow-hidden">
 
           {/* Green Header Box */}
-          <div className="bg-[#dcefe2] dark:bg-emerald-900/20 px-6 py-5 relative flex items-start gap-6">
+          <div className="bg-[#dcefe2] dark:bg-emerald-900/20 px-4 py-5 sm:px-6 sm:py-5 relative flex items-start gap-4 sm:gap-6">
             {pageType === 'textbook' && node?.featureImage && (
-              <div className="shrink-0 w-24 h-32 rounded-lg overflow-hidden shadow-md hidden sm:block">
+              <div className="shrink-0 w-20 h-28 sm:w-24 sm:h-32 rounded-lg overflow-hidden shadow-md">
                 <Image src={node.featureImage} alt={`${displayTitle} textbook cover`} width={96} height={128} className="object-cover w-full h-full" priority />
               </div>
             )}
-            <div className="flex-1">
-              <div className="absolute top-5 right-5 flex items-center gap-3 text-[#589d76] dark:text-emerald-500">
+            <div className="flex-1 min-w-0">
+              <div className="absolute top-4 right-4 hidden sm:flex items-center gap-3 text-[#589d76] dark:text-emerald-500">
                 <div className="flex items-center gap-1 text-[13px] font-bold">
                   <Clock className="w-4 h-4" />
                   5.4k
@@ -237,41 +251,49 @@ At DeshExam, we provide high-quality MCQ, short answer questions (SAQ), long ans
                 </button>
               </div>
 
-              <h1 className="text-[26px] font-bold text-[#1e293b] dark:text-slate-100 mb-1">
+              <h1 className="text-[22px] sm:text-[26px] font-bold text-[#1e293b] dark:text-slate-100 mb-1 leading-tight sm:pr-24">
                 {displayTitle}
               </h1>
-              <p className="text-[14px] text-[#5c7a6b] dark:text-emerald-200/70 mb-8">
+              <p className="text-[13px] sm:text-[14px] text-[#5c7a6b] dark:text-emerald-200/70 mb-4 sm:mb-8">
                 {pageType === 'board' ? 'All Classes & Curriculum' : pageType === 'class' ? `${boardTitle} Curriculum Guide` : `${classTitle} ${subjectTitle || ''} Guide`}
               </p>
 
               <div className="mt-auto">
-                <p className="text-[11px] font-bold text-[#6a8b7a] dark:text-emerald-200/60 mb-2">
-                  Started: 4 months ago || Progress: 0.54%
-                </p>
+                <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+                  <p className="text-[10px] sm:text-[11px] font-bold text-[#6a8b7a] dark:text-emerald-200/60">
+                    Started: 4 months ago
+                  </p>
+                  <p className="text-[10px] sm:text-[11px] font-bold text-[#6a8b7a] dark:text-emerald-200/60">
+                    Progress: 0.54%
+                  </p>
+                </div>
                 <Progress value={0.54} className="h-1.5 bg-white/60 dark:bg-slate-800" indicatorClassName="bg-[#00a651]" />
               </div>
             </div>
           </div>
 
-          <div className="relative border-b border-slate-200 dark:border-slate-800">
-            <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none">
-              <Search className="h-5 w-5 text-slate-400" />
+          {/* Mobile native search bar */}
+          <div className="px-4 py-3 sm:p-0 relative sm:border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+            <div className="relative bg-slate-100 dark:bg-slate-950/50 rounded-xl sm:rounded-none overflow-hidden sm:bg-transparent flex items-center">
+              <div className="pl-3 sm:absolute sm:inset-y-0 sm:left-6 flex items-center pointer-events-none">
+                <Search className="h-4 w-4 sm:h-5 sm:w-5 text-slate-400" />
+              </div>
+              <Input
+                type="text"
+                placeholder="Search chapters or topics"
+                className="h-10 sm:h-14 bg-transparent border-none focus-visible:ring-0 w-full text-[14px] sm:text-base placeholder:text-slate-400 placeholder:font-medium font-medium text-slate-700 shadow-none px-2 sm:pl-14"
+              />
             </div>
-            <Input
-              type="text"
-              placeholder="Search"
-              className="pl-14 h-14 bg-transparent border-none focus-visible:ring-0 w-full text-base placeholder:text-slate-400 placeholder:font-medium font-medium text-slate-700"
-            />
           </div>
 
-          <div className="px-6 py-4 flex flex-wrap items-center gap-2 border-b border-slate-200 dark:border-slate-800">
-            <span className="px-3 py-1 bg-[#107c41] text-white text-[12px] font-bold rounded-full">MCQ: 2.3k</span>
-            <span className="px-3 py-1 bg-[#107c41] text-white text-[12px] font-bold rounded-full">CQ: 1.8k</span>
-            <span className="px-3 py-1 bg-[#0b5c30] text-white text-[12px] font-bold rounded-full">Board Exam: 1</span>
-            <button className="px-3 py-1 bg-white dark:bg-slate-800 border-2 border-[#107c41] text-[#107c41] dark:text-emerald-400 text-[12px] font-bold rounded-full flex items-center gap-1 hover:bg-[#f0f9f4] dark:hover:bg-emerald-900/20 transition-colors">
+          <div className="px-4 py-3 sm:px-6 sm:py-4 flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            <span className="shrink-0 px-3 py-1.5 sm:py-1 bg-[#107c41] text-white text-[11px] sm:text-[12px] font-bold rounded-full">MCQ: 2.3k</span>
+            <span className="shrink-0 px-3 py-1.5 sm:py-1 bg-[#107c41] text-white text-[11px] sm:text-[12px] font-bold rounded-full">CQ: 1.8k</span>
+            <span className="shrink-0 px-3 py-1.5 sm:py-1 bg-[#0b5c30] text-white text-[11px] sm:text-[12px] font-bold rounded-full">Board Exam: 1</span>
+            <button className="shrink-0 px-3 py-1.5 sm:py-1 bg-white dark:bg-slate-800 border-[1.5px] border-[#107c41] text-[#107c41] dark:text-emerald-400 text-[11px] sm:text-[12px] font-bold rounded-full flex items-center gap-1 hover:bg-[#f0f9f4] dark:hover:bg-emerald-900/20 transition-colors">
               <Play className="w-3 h-3 fill-current" /> Practice
             </button>
-            <div className="ml-auto">
+            <div className="ml-auto shrink-0 pl-2 hidden sm:block">
               <Image
                 src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
                 alt="Get it on Google Play"
@@ -282,7 +304,7 @@ At DeshExam, we provide high-quality MCQ, short answer questions (SAQ), long ans
             </div>
           </div>
 
-          <div className="p-4 sm:p-6">
+          <div className="p-0 sm:p-6 pb-6">
             <h2 className="sr-only">Chapters</h2>
             <CurriculumTree curriculum={treeData} />
           </div>
