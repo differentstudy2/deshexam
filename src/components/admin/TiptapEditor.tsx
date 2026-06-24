@@ -523,7 +523,7 @@ export function TiptapEditor({ content, onChange, maxHeight }: { content: string
   };
 
   return (
-    <div className="border border-[#d3e3d3] dark:border-slate-800 rounded-2xl overflow-hidden bg-[#fdfefd] dark:bg-slate-950 focus-within:border-emerald-500 dark:focus-within:border-emerald-500 transition-colors shadow-sm flex flex-col">
+    <div className="border border-slate-300 dark:border-slate-700 rounded-2xl overflow-hidden bg-[#fdfefd] dark:bg-slate-950 focus-within:border-emerald-500 dark:focus-within:border-emerald-500 transition-colors shadow-sm flex flex-col">
       <div className="flex items-center justify-between bg-[#f8faf8] dark:bg-slate-900 border-b border-[#eef2ec] dark:border-slate-800 pr-4">
         <MenuBar editor={editor} />
         

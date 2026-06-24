@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { getTopicSections, saveTopicSections, updateTopicStatus } from '@/lib/firebase/guide';
@@ -81,6 +82,9 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
   const [activeTab, setActiveTab] = useState('lesson');
   const [contentMap, setContentMap] = useState<Record<string, any>>({});
   const [status, setStatus] = useState<'draft' | 'published'>('draft');
+  const [flatCurriculum, setFlatCurriculum] = useState<any[]>([]);
+  const [nodeTitle, setNodeTitle] = useState<string>('');
+  const router = useRouter();
   const [nodeLevel, setNodeLevel] = useState<'chapter' | 'topic'>('topic');
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -90,12 +94,34 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
     const loadContent = async () => {
       setLoading(true);
       try {
-        const { findGuideNodeAnyLevel } = await import('@/lib/firebase/guide');
+        const { findGuideNodeAnyLevel, getCurriculumBySubject } = await import('@/lib/firebase/guide');
         const nodeInfo = await findGuideNodeAnyLevel(topicId);
-        if (nodeInfo?.node?.status) setStatus(nodeInfo.node.status);
-        if (nodeInfo?.level === 'chapter' || nodeInfo?.level === 'topic') {
-          setNodeLevel(nodeInfo.level);
+        
+        if (nodeInfo?.node) {
+          if (nodeInfo.node.status) setStatus(nodeInfo.node.status);
+          setNodeTitle(nodeInfo.node.title || nodeInfo.node.name || '');
+
+          if (nodeInfo.level === 'chapter' || nodeInfo.level === 'topic') {
+            setNodeLevel(nodeInfo.level);
+          }
+
+          const subject = nodeInfo.node.ancestors?.find((a: any) => a.type === 'subject');
+          if (subject) {
+            const curriculum = await getCurriculumBySubject(subject.id);
+            const flat: any[] = [];
+            curriculum.forEach((ch: any) => {
+              flat.push({ id: ch.dbId || ch.id, title: ch.title });
+              (ch.topics || []).forEach((t: any) => {
+                flat.push({ id: t.dbId || t.id, title: t.title });
+                (t.subtopics || []).forEach((st: any) => {
+                  flat.push({ id: st.dbId || st.id, title: st.title });
+                });
+              });
+            });
+            setFlatCurriculum(flat);
+          }
         }
+        
         const sections = await getTopicSections(topicId);
         const initial: Record<string, any> = {};
         sectionTypes.forEach(s => {
@@ -200,13 +226,57 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
 
   const activeSection = sectionTypes.find(s => s.id === activeTab);
 
+  const currentIndex = flatCurriculum.findIndex(item => item.id === topicId);
+  const prevNode = currentIndex > 0 ? flatCurriculum[currentIndex - 1] : undefined;
+  const nextNode = currentIndex !== -1 && currentIndex < flatCurriculum.length - 1 ? flatCurriculum[currentIndex + 1] : undefined;
+
   // ── Sidebar nav content (shared between desktop sidebar + mobile drawer) ──
   const sidebarNavContent = (
     <div className="flex flex-col h-full overflow-y-auto">
       {/* Brand / ID */}
       <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-800">
-        <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">Topic ID</p>
-        <p className="text-xs font-mono text-slate-500 dark:text-slate-400 truncate">{topicId.slice(0, 20)}…</p>
+        <div className="flex items-center justify-between mb-0.5">
+          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Topic ID</p>
+          <div className="flex items-center gap-1">
+            <button 
+              disabled={!prevNode} 
+              onClick={() => router.push(`/admin/guide-content/topic/${prevNode?.id}`)} 
+              title={prevNode ? `Previous: ${prevNode.title}` : undefined}
+              className="p-1 rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 disabled:opacity-30 disabled:pointer-events-none transition-colors"
+            >
+              <ArrowLeft className="w-3 h-3" />
+            </button>
+            <button 
+              disabled={!nextNode} 
+              onClick={() => router.push(`/admin/guide-content/topic/${nextNode?.id}`)}
+              title={nextNode ? `Next: ${nextNode.title}` : undefined}
+              className="p-1 rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 disabled:opacity-30 disabled:pointer-events-none transition-colors"
+            >
+              <ChevronRight className="w-3 h-3" />
+            </button>
+          </div>
+        </div>
+        <p className="text-xs font-mono text-slate-500 dark:text-slate-400 truncate" title={topicId}>{topicId.slice(0, 16)}…</p>
+        {flatCurriculum.length > 0 ? (
+          <select 
+            value={topicId}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (val !== topicId) {
+                router.push(`/admin/guide-content/topic/${val}`);
+              }
+            }}
+            className="w-full mt-1.5 text-xs bg-slate-50 border border-slate-200 dark:bg-slate-900/50 dark:border-slate-800 rounded-md py-1.5 px-2 text-slate-700 dark:text-slate-300 cursor-pointer focus:ring-1 focus:ring-emerald-500 outline-none"
+          >
+            {flatCurriculum.map(item => (
+              <option key={item.id} value={item.id}>
+                {item.title}
+              </option>
+            ))}
+          </select>
+        ) : (
+          nodeTitle && <p className="text-[11px] font-medium text-slate-700 dark:text-slate-300 mt-1 truncate" title={nodeTitle}>{nodeTitle}</p>
+        )}
       </div>
 
       {/* Status + Save */}

@@ -53,10 +53,11 @@ const buildCurriculumFromTextbooks = (textbooks: any[], allNodes: any[]): Chapte
     const tbChapters = sortNodes(allNodes.filter(n => n.parentId === tb.id && n.type === 'chapter'))
       .map(ch => {
         const chTopics = sortNodes(allNodes.filter(n => n.parentId === ch.id && n.type === 'topic'))
-          .map(t => ({ id: t.fullSlug || t.id, title: t.title, type: 'topic' as const, subtopics: [] }));
+          .map(t => ({ id: t.fullSlug || t.id, dbId: t.id, title: t.title, type: 'topic' as const, subtopics: [] }));
 
         return {
           id: ch.fullSlug || ch.id,
+          dbId: ch.id,
           title: ch.title,
           type: 'chapter' as const,
           subtopics: chTopics
@@ -65,6 +66,7 @@ const buildCurriculumFromTextbooks = (textbooks: any[], allNodes: any[]): Chapte
 
     return {
       id: tb.fullSlug || tb.id,
+      dbId: tb.id,
       title: tb.title,
       topics: tbChapters
     };
