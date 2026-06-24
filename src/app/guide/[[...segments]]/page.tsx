@@ -1,11 +1,12 @@
 import React from 'react';
 import { redirect, notFound } from 'next/navigation';
-import { getTaxonomyNodeBySlug, VALID_CONTENT_TYPES, ContentType } from '@/lib/firebase/taxonomy';
-import { getReadingContent, getCurriculumBySubject, getCurriculumByClass, getCurriculumByBoard, getGuideSubjects } from '@/lib/firebase/guide';
+import { getTaxonomyNodeBySlug, getTaxonomyNodeById, VALID_CONTENT_TYPES, ContentType } from '@/lib/firebase/taxonomy';
+import { getReadingContent, getCurriculumBySubject, getCurriculumByClass, getCurriculumByBoard, getGuideSubjects, findGuideNodeAnyLevel } from '@/lib/firebase/guide';
 import { getTaxonomyNodesByParent } from '@/lib/firebase/taxonomy';
 import { generateHybridSeo } from '@/lib/seo';
 import { ReadingLayout } from '@/components/guide/ReadingLayout';
 import { SubjectDashboard } from '@/components/guide/SubjectDashboard';
+import { BoardDashboard } from '@/components/guide/BoardDashboard';
 import { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
@@ -24,7 +25,18 @@ export async function generateMetadata({ params }: { params: Promise<{ segments?
     if (VALID_CONTENT_TYPES.includes(lastSegment as ContentType)) {
       const parentPath = segments.slice(0, -1).join('/');
       node = await getTaxonomyNodeBySlug(parentPath);
+      
+      // Fallback for ID-based URL with content type (e.g. /12345/mcq)
+      if (!node && segments.length === 2) {
+        const result = await findGuideNodeAnyLevel(segments[0]);
+        if (result) node = result.node;
+      }
+      
       if (node) contentType = lastSegment as ContentType;
+    } else if (segments.length === 1) {
+      // Fallback for single segment ID-based URL (e.g. /12345)
+      const result = await findGuideNodeAnyLevel(segments[0]);
+      if (result) node = result.node;
     }
   }
 
@@ -63,7 +75,18 @@ export default async function GuidePage({ params }: { params: Promise<{ segments
     if (VALID_CONTENT_TYPES.includes(lastSegment as ContentType)) {
       const parentPath = segments.slice(0, -1).join('/');
       node = await getTaxonomyNodeBySlug(parentPath);
+      
+      // Fallback for ID-based URL with content type (e.g. /12345/mcq)
+      if (!node && segments.length === 2) {
+        const result = await findGuideNodeAnyLevel(segments[0]);
+        if (result) node = result.node;
+      }
+
       if (node) contentType = lastSegment as ContentType;
+    } else if (segments.length === 1) {
+      // Fallback for single segment ID-based URL (e.g. /12345)
+      const result = await findGuideNodeAnyLevel(segments[0]);
+      if (result) node = result.node;
     }
   }
 
@@ -108,7 +131,7 @@ export default async function GuidePage({ params }: { params: Promise<{ segments
       title: n.title || (n as any).name,
       countStr: ''
     }));
-  } else if (node.type === 'board') {
+  } else if (node.type?.toLowerCase() === 'board') {
     const boardNodes = await getTaxonomyNodesByParent(node.id);
     const classes = boardNodes.filter(n => n.type === 'class');
     // Sort classes by orderIndex if available
@@ -132,7 +155,7 @@ export default async function GuidePage({ params }: { params: Promise<{ segments
     fullCurriculum = await getCurriculumBySubject(subjectNode.id);
   } else if (node.type === 'class') {
     fullCurriculum = await getCurriculumByClass(node.id);
-  } else if (node.type === 'board') {
+  } else if (node.type?.toLowerCase() === 'board') {
     fullCurriculum = await getCurriculumByBoard(node.id);
   } else {
     // Fallback if somehow no subject or class or board is determined
@@ -176,6 +199,18 @@ export default async function GuidePage({ params }: { params: Promise<{ segments
   const curriculum = node.type === 'textbook'
     ? fullCurriculum.filter(c => c.title === node.title)
     : fullCurriculum;
+
+  if (node.type?.toLowerCase() === 'board') {
+    return (
+      <BoardDashboard 
+        id={node.id}
+        node={JSON.parse(JSON.stringify(node))}
+        classes={subjects} // At board level, subjects array contains classes
+        boardTitle={boardTitle || node.title}
+        breadcrumbs={uiBreadcrumbs}
+      />
+    );
+  }
 
   return (
     <SubjectDashboard 
