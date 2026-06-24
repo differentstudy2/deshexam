@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ChevronRight, Share2, MoreVertical, Search, Clock, Play, FileText, Library, BookOpen, ChevronDown, List, ChevronLeft } from 'lucide-react';
@@ -39,6 +40,8 @@ export function SubjectDashboard({
   node?: any;
   breadcrumbs?: { name: string, url: string }[];
 }) {
+  const router = useRouter();
+
   const displayTitle = 
     pageType === 'chapter' ? (chapterTitle || 'Chapter') : 
     pageType === 'textbook' ? (textbookTitle || 'Textbook') : 
@@ -180,9 +183,9 @@ At DeshExam, we provide high-quality MCQ, short answer questions (SAQ), long ans
           
           {/* Mobile Back Button & Centered Title */}
           <div className="flex items-center md:hidden w-full">
-            <Link href=".." className="p-2 -ml-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+            <button onClick={() => router.back()} className="p-2 -ml-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
               <ChevronLeft className="w-6 h-6" />
-            </Link>
+            </button>
             <h1 className="font-bold text-[16px] text-slate-900 dark:text-white absolute left-1/2 -translate-x-1/2 max-w-[200px] truncate">
               {displayTitle}
             </h1>
@@ -254,6 +257,7 @@ At DeshExam, we provide high-quality MCQ, short answer questions (SAQ), long ans
 
           <Button
             variant="outline"
+            onClick={() => router.back()}
             className="hidden md:flex h-8 px-5 bg-[#dcefe2] text-[#1b6b3e] border-transparent hover:bg-[#c2e2cc] hover:text-[#11512d] dark:bg-emerald-900/40 dark:text-emerald-400 dark:hover:bg-emerald-900/60 rounded-md font-bold text-sm shadow-sm"
           >
             Back
