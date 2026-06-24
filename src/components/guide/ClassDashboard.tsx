@@ -4,8 +4,12 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { Search, GraduationCap, ChevronDown, Star, BookOpen, Layers, BookMarked, MoreVertical, Library } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { useAuth } from '@/hooks/use-auth';
+import { DashboardSidebar } from './DashboardSidebar';
+import { ContinueLearningWidget, DailyGoalWidget, WeakSubjectsWidget, RecommendedCarousel } from './DashboardWidgets';
 
 export function ClassDashboard({ classes }: { classes: any[] }) {
+  const { user, userProfile } = useAuth();
   const [activeTab, setActiveTab] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -26,6 +30,11 @@ export function ClassDashboard({ classes }: { classes: any[] }) {
           
           {/* Left Content */}
           <div className="flex-1 text-center lg:text-left">
+            {user && userProfile && (
+              <div className="inline-block px-4 py-1.5 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md rounded-full border border-slate-200 dark:border-slate-800 text-sm font-semibold text-slate-700 dark:text-slate-300 mb-6 shadow-sm">
+                👋 Welcome back, <span className="text-emerald-600 dark:text-emerald-400">{userProfile.displayName || 'Student'}</span>!
+              </div>
+            )}
             <h1 className="text-4xl lg:text-5xl font-extrabold text-slate-900 dark:text-white mb-6 leading-tight tracking-tight">
               Choose Your Class & <br className="hidden lg:block"/> Start Learning
             </h1>
@@ -97,39 +106,22 @@ export function ClassDashboard({ classes }: { classes: any[] }) {
 
       {/* Main Content Area */}
       <div className="max-w-7xl mx-auto px-6 lg:px-24 py-12">
-        
-        {/* Recommended For You */}
-        <div className="mb-12">
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-6">Recommended For You</h2>
-          <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row items-center gap-6 relative">
-            <button className="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
-              <MoreVertical className="w-5 h-5" />
-            </button>
-            <div className="shrink-0 w-24 h-24 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center relative overflow-hidden">
-              <div className="absolute right-0 bottom-0 w-16 h-16 bg-emerald-500 rounded-tl-full opacity-20"></div>
-              <GraduationCap className="w-10 h-10 text-emerald-400" />
-            </div>
-            <div className="flex-1 w-full">
-              <p className="text-xs font-medium text-slate-500 mb-1">Logged in student's profile</p>
-              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3">Class 10</h3>
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 w-full">
-                <div className="flex-1">
-                  <div className="flex justify-between text-sm mb-1.5 font-medium text-slate-600 dark:text-slate-300">
-                    <span>Resume learning progress</span>
-                    <span className="text-emerald-600 dark:text-emerald-400">18%</span>
-                  </div>
-                  <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 overflow-hidden">
-                    <div className="bg-[#00a651] h-full rounded-full" style={{ width: '18%' }}></div>
-                  </div>
-                  <p className="text-[11px] text-slate-500 mt-1.5">Completed 3/24 chapters</p>
+        <div className="flex flex-col lg:flex-row gap-8">
+          
+          {/* Main Left Column */}
+          <div className="flex-1 min-w-0">
+            
+            {/* Personalized Dashboard Widgets */}
+            {user ? (
+              <div className="mb-12 space-y-6">
+                <ContinueLearningWidget userProfile={userProfile} />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <DailyGoalWidget userProfile={userProfile} />
+                  <WeakSubjectsWidget userProfile={userProfile} />
                 </div>
-                <Link href="#" className="shrink-0 bg-[#00a651] hover:bg-[#008c44] text-white px-6 py-2.5 rounded-xl font-bold text-sm transition-colors mt-4 sm:mt-0 text-center">
-                  Continue Learning
-                </Link>
+                <RecommendedCarousel userProfile={userProfile} />
               </div>
-            </div>
-          </div>
-        </div>
+            ) : null}
 
         {/* Quick Filters */}
         <div className="mb-10">
@@ -242,6 +234,17 @@ export function ClassDashboard({ classes }: { classes: any[] }) {
             ))}
           </div>
         </div>
+
+          </div> {/* End Main Left Column */}
+
+          {/* Right Sidebar (Only for logged in users) */}
+          {user && (
+            <div className="w-full lg:w-80 shrink-0">
+              <DashboardSidebar userProfile={userProfile} />
+            </div>
+          )}
+
+        </div> {/* End Flex Row Layout */}
 
         {/* Promo Banner */}
         <div className="relative w-full bg-gradient-to-r from-[#0a1b14] via-[#0d2a1d] to-[#0a1b14] rounded-3xl p-8 sm:p-12 overflow-hidden border border-emerald-900/30 shadow-[0_0_40px_rgba(0,166,81,0.15)] flex flex-col items-center text-center mt-8">

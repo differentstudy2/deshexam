@@ -6,6 +6,9 @@ export const dynamic = 'force-dynamic';
 
 export default async function GuideClassPage() {
   const classes = await getTaxonomyNodesByType('academic', 'class');
+  
+  // Serialize to prevent Server Component serialization errors with Firestore Timestamps
+  const serializedClasses = JSON.parse(JSON.stringify(classes));
 
-  return <ClassDashboard classes={classes} />;
+  return <ClassDashboard classes={serializedClasses} />;
 }
