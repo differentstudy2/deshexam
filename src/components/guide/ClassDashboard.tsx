@@ -81,7 +81,7 @@ export function ClassDashboard({ classes }: { classes: any[] }) {
               </div>
             )}
             <h1 className="text-4xl lg:text-5xl font-extrabold text-slate-900 dark:text-white mb-6 leading-tight tracking-tight">
-              Choose Your Class & <br className="hidden lg:block"/> Start Learning
+              Browse Classes & Start Learning
             </h1>
             <p className="text-slate-600 dark:text-slate-400 mb-8 max-w-xl mx-auto lg:mx-0 text-lg leading-relaxed">
               Explore board-wise textbooks, subjects, notes, MCQ, CQ, practice tests and chapter-wise learning resources.
@@ -248,11 +248,13 @@ export function ClassDashboard({ classes }: { classes: any[] }) {
                     </div>
                   )}
 
-                  <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
-                    <GraduationCap className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform" aria-label={`Class ${cls.title} study materials on DeshExam`}>
+                    <GraduationCap className="w-6 h-6 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
                   </div>
 
-                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">{cls.title}</h3>
+                  <Link href={`/guide/${cls.slug || cls.id}`}>
+                    <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-4 hover:text-emerald-600 transition-colors">{cls.title}</h3>
+                  </Link>
 
                   <div className="grid grid-cols-3 gap-2 mb-6 border-b border-slate-100 dark:border-slate-800 pb-6">
                     <div className="text-center">
@@ -272,14 +274,14 @@ export function ClassDashboard({ classes }: { classes: any[] }) {
                   <div className="mt-auto space-y-3">
                     <div className="flex flex-col 2xl:flex-row gap-2">
                       <Link href={`/guide/${cls.slug || cls.id}`} className="flex-1 bg-[#00a651] hover:bg-[#008c44] text-white text-xs sm:text-sm font-bold py-2.5 rounded-xl text-center transition-colors">
-                        Explore
+                        Explore <span className="sr-only">{cls.title} Study Materials</span>
                       </Link>
                       <Link href={`/guide/${cls.slug || cls.id}`} className="flex-1 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-900/20 dark:hover:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 text-xs sm:text-sm font-bold py-2.5 rounded-xl text-center transition-colors">
-                        Practice
+                        Practice <span className="sr-only">{cls.title} Mock Tests</span>
                       </Link>
                     </div>
                     <Link href={`/guide/${cls.slug || cls.id}`} className="block w-full bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm font-bold py-2.5 rounded-xl text-center transition-colors">
-                      Quick Practice
+                      Quick Practice <span className="sr-only">{cls.title} Questions</span>
                     </Link>
                   </div>
 
@@ -296,7 +298,7 @@ export function ClassDashboard({ classes }: { classes: any[] }) {
         {/* Popular Boards */}
         <div className="mb-16 mt-16">
           <div className="mb-6">
-            <h2 className="text-xl font-bold text-slate-900 dark:text-white">Popular Boards</h2>
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white">Popular Subjects & Boards</h2>
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">The most popular boards and exams</p>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
@@ -335,6 +337,83 @@ export function ClassDashboard({ classes }: { classes: any[] }) {
             <Link href="#" className="bg-white hover:bg-slate-100 text-slate-900 px-8 py-3.5 rounded-xl font-bold transition-colors w-full sm:w-auto">
               Try Mock Test
             </Link>
+          </div>
+        </div>
+
+        {/* SEO Content Block */}
+        <div className="mt-20 pt-16 border-t border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400">
+          <div className="max-w-4xl mx-auto space-y-10">
+            <section>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-5">Why Study with DeshExam Academy?</h2>
+              <div className="space-y-4 text-base leading-relaxed">
+                <p>
+                  Welcome to DeshExam Academy, your ultimate destination for comprehensive, class-wise online learning. 
+                  Whether you are preparing for primary school assessments, secondary board exams, or higher secondary competitive tests, 
+                  our platform provides everything you need in one place. We meticulously organize class-wise learning resources, 
+                  so you can easily access chapter-wise textbooks, curated notes, and extensive MCQ practice sets.
+                </p>
+                <p>
+                  By choosing DeshExam Academy, you are embracing smart study techniques. From detailed explanations to mock tests 
+                  and previous year questions, we ensure your board exam preparation is completely guided and structured. 
+                  Our personalized dashboard allows you to track your learning progress, identify weak subjects, and focus on recommended topics.
+                </p>
+              </div>
+            </section>
+            
+            <section>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-5">Class-Wise Learning & Board Exam Preparation</h2>
+              <p className="mb-6 text-base leading-relaxed">
+                We cover a wide array of educational boards and classes. Our materials are tailored for specific curriculum requirements, ensuring that every student gets relevant and up-to-date content for maximum score improvement.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Available Boards</h3>
+                  <ul className="space-y-3">
+                    <li><Link href="/academy/wbbse" className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium transition-colors flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>WBBSE (West Bengal Board)</Link></li>
+                    <li><Link href="/academy/wbchse" className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium transition-colors flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>WBCHSE (Higher Secondary)</Link></li>
+                    <li><Link href="/academy/cbse" className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium transition-colors flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>CBSE (Central Board)</Link></li>
+                    <li><Link href="/academy/icse" className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium transition-colors flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>ICSE (Indian Certificate)</Link></li>
+                  </ul>
+                </div>
+                <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Popular Classes</h3>
+                  <ul className="space-y-3">
+                    <li><Link href="/academy/class-5" className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium transition-colors flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>Class 5 Online Textbooks</Link></li>
+                    <li><Link href="/academy/class-6" className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium transition-colors flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>Class 6 Study Materials</Link></li>
+                    <li><Link href="/academy/class-10" className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium transition-colors flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>Class 10 Bengali Textbooks & Notes</Link></li>
+                    <li><Link href="/academy/madhyamik" className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium transition-colors flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>Madhyamik Exam Preparation</Link></li>
+                    <li><Link href="/academy/hs" className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium transition-colors flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>HS (Higher Secondary) MCQ Practice</Link></li>
+                  </ul>
+                </div>
+              </div>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-5">Comprehensive Study Resources</h2>
+              <p className="mb-6 text-base leading-relaxed">
+                Access a vast library of structured study materials, carefully curated by expert educators to help you master every subject and crack competitive exams with confidence.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Study Materials</h3>
+                  <ul className="space-y-3">
+                    <li><Link href="/academy/textbooks" className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium transition-colors flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>Textbooks & PDF Notes</Link></li>
+                    <li><Link href="/academy/mcq-practice" className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium transition-colors flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>Chapter-wise MCQ Practice</Link></li>
+                    <li><Link href="/academy/pyq" className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium transition-colors flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>Previous Year Questions (PYQ)</Link></li>
+                    <li><Link href="/academy/solutions" className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium transition-colors flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>Subject-wise Solutions</Link></li>
+                  </ul>
+                </div>
+                <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Tests & Assessments</h3>
+                  <ul className="space-y-3">
+                    <li><Link href="/academy/mock-tests" className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium transition-colors flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>Mock Tests & Exam Series</Link></li>
+                    <li><Link href="/academy/dpp" className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium transition-colors flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>Daily Practice Problems (DPP)</Link></li>
+                    <li><Link href="/dashboard/analytics" className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium transition-colors flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>Performance Analytics</Link></li>
+                    <li><Link href="/dashboard/weak-areas" className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium transition-colors flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>Weak Area Improvement</Link></li>
+                  </ul>
+                </div>
+              </div>
+            </section>
           </div>
         </div>
 

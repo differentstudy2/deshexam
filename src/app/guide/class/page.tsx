@@ -6,13 +6,35 @@ import { ClassDashboard } from '@/components/guide/ClassDashboard';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Choose Your Class | DeshExam Academy',
-  description: 'Explore board-wise textbooks, subjects, notes, MCQ, CQ, practice tests, and chapter-wise learning resources for School, Primary, Secondary, and Higher Secondary classes.',
-  keywords: 'deshexam academy, classes, primary class, secondary class, higher secondary, online learning, mock tests',
+  title: 'Classes & Study Materials for All Boards | Textbooks, Notes & MCQ | DeshExam',
+  description: 'Explore class-wise study materials on DeshExam Academy. Access textbooks, subjects, notes, MCQ practice, mock tests, previous year questions and smart learning resources for all boards and classes.',
+  keywords: 'deshexam classes, online class textbooks, class wise study materials, board exam preparation, mcq practice, online academy india, class 10 textbook, wbchse study material, wbbse notes, competitive exam learning',
+  alternates: {
+    canonical: 'https://deshexam.com/academy/classes',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    'max-image-preview': 'large',
+  },
   openGraph: {
-    title: 'Choose Your Class | DeshExam Academy',
-    description: 'Explore board-wise textbooks, subjects, notes, MCQ, CQ, practice tests, and chapter-wise learning resources.',
+    title: 'Classes & Study Materials for All Boards | DeshExam',
+    description: 'Browse classes, subjects and textbooks with smart learning resources.',
     type: 'website',
+    url: 'https://deshexam.com/academy/classes',
+    images: [
+      {
+        url: '/og/academy-classes.png',
+        width: 1200,
+        height: 630,
+        alt: 'Classes on DeshExam Academy',
+      }
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Classes & Study Materials | DeshExam',
+    description: 'Access class-wise textbooks, MCQs and notes.',
   }
 };
 
@@ -22,5 +44,65 @@ export default async function GuideClassPage() {
   // Serialize to prevent Server Component serialization errors with Firestore Timestamps
   const serializedClasses = JSON.parse(JSON.stringify(classes));
 
-  return <ClassDashboard classes={serializedClasses} />;
+  const collectionSchema = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Classes on DeshExam Academy",
+    "description": "Browse classes and study materials",
+    "url": "https://deshexam.com/academy/classes"
+  };
+
+  const itemListSchema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "itemListElement": classes.map((c: any, index: number) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "name": c.title,
+      "url": `https://deshexam.com/academy/classes/${c.slug || c.id}`
+    }))
+  };
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://deshexam.com"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Academy",
+        "item": "https://deshexam.com/academy"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Classes",
+        "item": "https://deshexam.com/academy/classes"
+      }
+    ]
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <ClassDashboard classes={serializedClasses} />
+    </>
+  );
 }
