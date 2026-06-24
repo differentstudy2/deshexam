@@ -1,4 +1,6 @@
-import React from 'react';
+"use client";
+
+import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ChevronRight, Share2, MoreVertical, Search, Clock, Play, FileText, Library, BookOpen, ChevronDown, List, ChevronLeft } from 'lucide-react';
@@ -69,6 +71,41 @@ export function SubjectDashboard({
       })) as any;
     }
   }
+
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredTreeData = useMemo(() => {
+    if (!searchQuery) return treeData;
+    const lowerQ = searchQuery.toLowerCase();
+
+    return treeData.map((chapter: any) => {
+      const chapterMatch = chapter.title.toLowerCase().includes(lowerQ);
+
+      const filteredTopics = (chapter.topics || []).map((topic: any) => {
+        const topicMatch = topic.title.toLowerCase().includes(lowerQ);
+
+        const filteredSubtopics = (topic.subtopics || []).filter((sub: any) => 
+          sub.title.toLowerCase().includes(lowerQ)
+        );
+
+        if (chapterMatch || topicMatch || filteredSubtopics.length > 0) {
+          return {
+            ...topic,
+            subtopics: (chapterMatch || topicMatch) ? topic.subtopics : filteredSubtopics
+          };
+        }
+        return null;
+      }).filter(Boolean);
+
+      if (chapterMatch || filteredTopics.length > 0) {
+        return {
+          ...chapter,
+          topics: chapterMatch ? chapter.topics : filteredTopics
+        };
+      }
+      return null;
+    }).filter(Boolean);
+  }, [treeData, searchQuery]);
 
   let schemas: any[] = [];
   let faqs: { question: string; answer: string }[] = [];
@@ -282,6 +319,8 @@ At DeshExam, we provide high-quality MCQ, short answer questions (SAQ), long ans
                 type="text"
                 placeholder="Search chapters or topics"
                 className="h-10 sm:h-14 bg-transparent border-none focus-visible:ring-0 w-full text-[14px] sm:text-base placeholder:text-slate-400 placeholder:font-medium font-medium text-slate-700 shadow-none px-2 sm:pl-14"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
           </div>
@@ -306,7 +345,13 @@ At DeshExam, we provide high-quality MCQ, short answer questions (SAQ), long ans
 
           <div className="p-0 sm:p-6 pb-6">
             <h2 className="sr-only">Chapters</h2>
-            <CurriculumTree curriculum={treeData} />
+            {filteredTreeData.length > 0 ? (
+              <CurriculumTree curriculum={filteredTreeData} />
+            ) : (
+              <div className="py-12 text-center">
+                <p className="text-slate-500 dark:text-slate-400">No chapters or topics found matching "{searchQuery}"</p>
+              </div>
+            )}
           </div>
 
           {node && (

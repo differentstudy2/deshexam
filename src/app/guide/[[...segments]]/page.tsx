@@ -188,7 +188,7 @@ export default async function GuidePage({ params }: { params: Promise<{ segments
       subjectTitle={subjectTitle}
       textbookTitle={textbookTitle}
       chapterTitle={chapterTitle}
-      node={node}
+      node={JSON.parse(JSON.stringify(node))}
       breadcrumbs={uiBreadcrumbs}
     />
   );
