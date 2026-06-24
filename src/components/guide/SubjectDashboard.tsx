@@ -305,10 +305,6 @@ At DeshExam, we provide high-quality MCQ, short answer questions (SAQ), long ans
             )}
             <div className="flex-1 min-w-0">
               <div className="absolute top-4 right-4 hidden sm:flex items-center gap-3 text-[#589d76] dark:text-emerald-500">
-                <div className="flex items-center gap-1 text-[13px] font-bold">
-                  <Eye className="w-4 h-4" />
-                  {formattedViews}
-                </div>
                 <button className="hover:text-[#1b6b3e] dark:hover:text-emerald-400 transition-colors">
                   <Share2 className="w-4 h-4" />
                 </button>
@@ -328,8 +324,8 @@ At DeshExam, we provide high-quality MCQ, short answer questions (SAQ), long ans
                 <p className="text-[11px] font-bold text-[#6a8b7a] dark:text-emerald-200/60">
                   Last Updated: {updatedAt}
                 </p>
-                <div className="flex sm:hidden items-center gap-1 text-[11px] font-bold text-[#6a8b7a] dark:text-emerald-200/60">
-                  <Eye className="w-3.5 h-3.5" />
+                <div className="flex items-center gap-1 text-[11px] sm:text-[12px] font-bold text-[#6a8b7a] dark:text-emerald-200/60">
+                  <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   {formattedViews} Views
                 </div>
               </div>
