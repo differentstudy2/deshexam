@@ -30,7 +30,7 @@ import { SlashCommand, renderItems } from './editor/extensions/SlashCommand';
 
 import { 
   Bold, Italic, Underline as UnderlineIcon, Strikethrough,
-  Heading1, Heading2, Heading3, 
+  Heading1, Heading2, Heading3, Heading4,
   List, ListOrdered, CheckSquare, Quote, Code, Image as ImageIcon, Video, FileText, Music, Table as TableIcon,
   AlignLeft, AlignCenter, AlignRight, AlignJustify, Type, Info, Sigma, HelpCircle
 } from 'lucide-react';
@@ -182,8 +182,38 @@ const MenuBar = ({ editor }: { editor: any }) => {
     }
   };
 
+  const getActiveHeading = () => {
+    if (editor.isActive('heading', { level: 1 })) return 'h1';
+    if (editor.isActive('heading', { level: 2 })) return 'h2';
+    if (editor.isActive('heading', { level: 3 })) return 'h3';
+    if (editor.isActive('heading', { level: 4 })) return 'h4';
+    return 'p';
+  };
+
   return (
-    <div className="flex flex-wrap gap-1 p-2 border-b border-[#eef2ec] dark:border-slate-800 bg-[#f8faf8] dark:bg-slate-900 sticky top-0 z-40">
+    <div className="flex flex-wrap gap-1 p-2 border-b border-[#eef2ec] dark:border-slate-800 bg-[#f8faf8] dark:bg-slate-900 sticky top-0 z-40 items-center">
+      {/* Headings Dropdown */}
+      <select 
+        value={getActiveHeading()}
+        onChange={(e) => {
+          const val = e.target.value;
+          if (val === 'p') editor.chain().focus().setParagraph().run();
+          else if (val === 'h1') editor.chain().focus().toggleHeading({ level: 1 }).run();
+          else if (val === 'h2') editor.chain().focus().toggleHeading({ level: 2 }).run();
+          else if (val === 'h3') editor.chain().focus().toggleHeading({ level: 3 }).run();
+          else if (val === 'h4') editor.chain().focus().toggleHeading({ level: 4 }).run();
+        }}
+        className="text-xs h-7 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded px-2 font-medium text-slate-600 dark:text-slate-300 focus:ring-0 focus:outline-none cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
+      >
+        <option value="p">Normal text</option>
+        <option value="h1">Heading 1</option>
+        <option value="h2">Heading 2</option>
+        <option value="h3">Heading 3</option>
+        <option value="h4">Heading 4</option>
+      </select>
+      
+      <div className="w-px h-6 bg-[#c4d6c4] dark:bg-slate-700 mx-1 my-auto" />
+
       {/* Formatting */}
       <Toggle size="sm" pressed={editor.isActive('bold')} onPressedChange={() => editor.chain().focus().toggleBold().run()}>
         <Bold className="h-4 w-4" />
