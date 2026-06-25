@@ -9,10 +9,11 @@ import { useToast } from '@/hooks/use-toast';
 import { MockTest } from '@/lib/assessment-types';
 import { getAssessments, saveAssessment, deleteAssessment } from '@/lib/firebase/assessment';
 import { submitReview, bulkSubmitReviews } from '@/lib/firebase/reviews';
+import { getTaxonomyNodesByTrack, TaxonomyNode } from '@/lib/firebase/taxonomy';
 import { AssessmentEditor } from '@/components/admin/AssessmentEditor';
 import Link from 'next/link';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
-import { Star, MessageSquare, Wand2, Copy as CopyIcon, CheckSquare, MoreVertical, Unlock, Lock, ImageIcon, LayoutGrid, List } from 'lucide-react';
+import { Star, MessageSquare, Wand2, Copy as CopyIcon, CheckSquare, MoreVertical, Unlock, Lock, ImageIcon, LayoutGrid, List, Search } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
@@ -44,6 +45,37 @@ export default function MockTestsPage() {
     // Display Mode State
     const [displayMode, setDisplayMode] = useState<'list' | 'grid'>('list');
 
+    // Filters State
+    const [searchQuery, setSearchQuery] = useState('');
+    const [statusFilter, setStatusFilter] = useState('all');
+    const [accessFilter, setAccessFilter] = useState('all');
+
+    // Taxonomy States
+    const [boards, setBoards] = useState<TaxonomyNode[]>([]);
+    const [classes, setClasses] = useState<TaxonomyNode[]>([]);
+    const [subjects, setSubjects] = useState<TaxonomyNode[]>([]);
+    const [exams, setExams] = useState<TaxonomyNode[]>([]);
+    
+    // Taxonomy Filter State
+    const [boardFilter, setBoardFilter] = useState('all');
+    const [classFilter, setClassFilter] = useState('all');
+    const [subjectFilter, setSubjectFilter] = useState('all');
+    const [examFilter, setExamFilter] = useState('all');
+
+    const filteredMockTests = mockTests.filter(test => {
+        const matchesSearch = test.title.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesStatus = statusFilter === 'all' || test.status === statusFilter;
+        const matchesAccess = accessFilter === 'all' || test.accessType === accessFilter;
+        
+        const testAny = test as any;
+        const matchesBoard = boardFilter === 'all' || testAny.boardId === boardFilter;
+        const matchesClass = classFilter === 'all' || testAny.classId === classFilter;
+        const matchesSubject = subjectFilter === 'all' || testAny.subjectId === subjectFilter;
+        const matchesExam = examFilter === 'all' || testAny.examId === examFilter || (Array.isArray(testAny.examIds) && testAny.examIds.includes(examFilter));
+
+        return matchesSearch && matchesStatus && matchesAccess && matchesBoard && matchesClass && matchesSubject && matchesExam;
+    });
+
     useEffect(() => {
         fetchMockTests();
     }, []);
@@ -53,6 +85,15 @@ export default function MockTestsPage() {
         try {
             const data = await getAssessments('mockTests');
             setMockTests(data as MockTest[]);
+
+            // Fetch taxonomies
+            const allAcademic = await getTaxonomyNodesByTrack('academic');
+            setBoards(allAcademic.filter((n: any) => n.type === 'board'));
+            setClasses(allAcademic.filter((n: any) => n.type === 'class'));
+            setSubjects(allAcademic.filter((n: any) => n.type === 'subject'));
+
+            const allCompetitive = await getTaxonomyNodesByTrack('competitive');
+            setExams(allCompetitive.filter((n: any) => n.type === 'exam'));
         } catch (error) {
             console.error(error);
             toast({ title: 'Error fetching mock tests', variant: 'destructive' });
@@ -263,17 +304,17 @@ export default function MockTestsPage() {
             <div className="flex items-center justify-between">
                 <h1 className="text-3xl font-bold">Mock Tests</h1>
                 <div className="flex items-center gap-4">
-                    <div className="flex items-center bg-slate-100 p-1 rounded-lg border border-slate-200">
+                    <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700">
                         <button 
                             onClick={() => setDisplayMode('list')} 
-                            className={`p-2 rounded-md transition-all ${displayMode === 'list' ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-500 hover:text-slate-700'}`}
+                            className={`p-2 rounded-md transition-all ${displayMode === 'list' ? 'bg-white dark:bg-slate-700 shadow-sm text-indigo-600 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'}`}
                             title="List View"
                         >
                             <List className="w-4 h-4" />
                         </button>
                         <button 
                             onClick={() => setDisplayMode('grid')} 
-                            className={`p-2 rounded-md transition-all ${displayMode === 'grid' ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-500 hover:text-slate-700'}`}
+                            className={`p-2 rounded-md transition-all ${displayMode === 'grid' ? 'bg-white dark:bg-slate-700 shadow-sm text-indigo-600 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'}`}
                             title="Grid View"
                         >
                             <LayoutGrid className="w-4 h-4" />
@@ -285,14 +326,93 @@ export default function MockTestsPage() {
                 </div>
             </div>
 
+            {/* Filters */}
+            <div className="flex flex-col gap-4 bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="relative flex-1">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                        <Input 
+                            placeholder="Search mock tests by title..." 
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="pl-9"
+                        />
+                    </div>
+                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                        <SelectTrigger className="w-full sm:w-[180px]">
+                            <SelectValue placeholder="Status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All Status</SelectItem>
+                            <SelectItem value="Published">Published</SelectItem>
+                            <SelectItem value="Draft">Draft</SelectItem>
+                            <SelectItem value="Archived">Archived</SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <Select value={accessFilter} onValueChange={setAccessFilter}>
+                        <SelectTrigger className="w-full sm:w-[180px]">
+                            <SelectValue placeholder="Access Type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All Access</SelectItem>
+                            <SelectItem value="free">Free</SelectItem>
+                            <SelectItem value="premium">Premium</SelectItem>
+                            <SelectItem value="subscription">Subscription</SelectItem>
+                            <SelectItem value="one_time">One Time</SelectItem>
+                            <SelectItem value="both">Both</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+                
+                {/* Taxonomy Filters */}
+                <div className="flex flex-wrap gap-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+                    <Select value={boardFilter} onValueChange={setBoardFilter}>
+                        <SelectTrigger className="w-[160px]">
+                            <SelectValue placeholder="Board" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All Boards</SelectItem>
+                            {boards.map(b => <SelectItem key={b.id} value={b.id}>{b.title}</SelectItem>)}
+                        </SelectContent>
+                    </Select>
+                    <Select value={classFilter} onValueChange={setClassFilter}>
+                        <SelectTrigger className="w-[160px]">
+                            <SelectValue placeholder="Class" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All Classes</SelectItem>
+                            {classes.map(c => <SelectItem key={c.id} value={c.id}>{c.title}</SelectItem>)}
+                        </SelectContent>
+                    </Select>
+                    <Select value={subjectFilter} onValueChange={setSubjectFilter}>
+                        <SelectTrigger className="w-[160px]">
+                            <SelectValue placeholder="Subject" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All Subjects</SelectItem>
+                            {subjects.map(s => <SelectItem key={s.id} value={s.id}>{s.title}</SelectItem>)}
+                        </SelectContent>
+                    </Select>
+                    <Select value={examFilter} onValueChange={setExamFilter}>
+                        <SelectTrigger className="w-[160px]">
+                            <SelectValue placeholder="Exam" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All Exams</SelectItem>
+                            {exams.map(e => <SelectItem key={e.id} value={e.id}>{e.title}</SelectItem>)}
+                        </SelectContent>
+                    </Select>
+                </div>
+            </div>
+
             <Card>
                 <CardHeader>
                     <div className="flex items-center justify-between">
                         <CardTitle>All Mock Tests</CardTitle>
                         {selectedIds.length > 0 && (
-                            <div className="flex items-center gap-2 bg-indigo-50 px-4 py-2 rounded-lg border border-indigo-100">
-                                <span className="text-sm font-medium text-indigo-800">{selectedIds.length} selected</span>
-                                <Button size="sm" variant="outline" className="bg-white border-indigo-200 text-indigo-700 hover:bg-indigo-100" onClick={() => setIsBulkEditModalOpen(true)}>
+                            <div className="flex items-center gap-2 bg-indigo-50 dark:bg-indigo-900/20 px-4 py-2 rounded-lg border border-indigo-100 dark:border-indigo-800/30">
+                                <span className="text-sm font-medium text-indigo-800 dark:text-indigo-300">{selectedIds.length} selected</span>
+                                <Button size="sm" variant="outline" className="bg-white dark:bg-slate-800 border-indigo-200 dark:border-indigo-700 text-indigo-700 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/50" onClick={() => setIsBulkEditModalOpen(true)}>
                                     <CheckSquare className="w-4 h-4 mr-2" /> Bulk Edit
                                 </Button>
                             </div>
@@ -323,11 +443,11 @@ export default function MockTestsPage() {
                         <TableBody>
                             {loading ? (
                                 <TableRow><TableCell colSpan={9}><Loader2 className="animate-spin mx-auto" /></TableCell></TableRow>
-                            ) : mockTests.length === 0 ? (
-                                <TableRow><TableCell colSpan={9} className="text-center">No mock tests found.</TableCell></TableRow>
+                            ) : filteredMockTests.length === 0 ? (
+                                <TableRow><TableCell colSpan={9} className="text-center">No mock tests found matching your filters.</TableCell></TableRow>
                             ) : (
-                                mockTests.map(test => (
-                                    <TableRow key={test.id} className={selectedIds.includes(test.id) ? "bg-indigo-50/50" : ""}>
+                                filteredMockTests.map(test => (
+                                    <TableRow key={test.id} className={selectedIds.includes(test.id) ? "bg-indigo-50/50 dark:bg-indigo-900/10" : ""}>
                                         <TableCell>
                                             <Checkbox 
                                                 checked={selectedIds.includes(test.id)}
@@ -336,10 +456,10 @@ export default function MockTestsPage() {
                                         </TableCell>
                                         <TableCell>
                                             {test.thumbnail ? (
-                                                <img src={test.thumbnail} alt={test.title} className="w-10 h-10 object-cover rounded-md border border-slate-200" />
+                                                <img src={test.thumbnail} alt={test.title} className="w-10 h-10 object-cover rounded-md border border-slate-200 dark:border-slate-700" />
                                             ) : (
-                                                <div className="w-10 h-10 bg-slate-100 rounded-md border border-slate-200 flex items-center justify-center">
-                                                    <ImageIcon className="w-5 h-5 text-slate-400" />
+                                                <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-md border border-slate-200 dark:border-slate-700 flex items-center justify-center">
+                                                    <ImageIcon className="w-5 h-5 text-slate-400 dark:text-slate-500" />
                                                 </div>
                                             )}
                                         </TableCell>
@@ -353,7 +473,7 @@ export default function MockTestsPage() {
                                             </span>
                                         </TableCell>
                                         <TableCell>
-                                            <div className="flex items-center gap-1.5 font-medium text-slate-700">
+                                            <div className="flex items-center gap-1.5 font-medium text-slate-700 dark:text-slate-300">
                                                 {test.accessType === 'free' ? (
                                                     <Unlock className="w-3.5 h-3.5 text-emerald-600" />
                                                 ) : (
@@ -407,22 +527,22 @@ export default function MockTestsPage() {
                         <div className="mt-4">
                             {loading ? (
                                 <div className="flex justify-center py-12"><Loader2 className="animate-spin text-indigo-500" /></div>
-                            ) : mockTests.length === 0 ? (
-                                <div className="text-center py-12 text-slate-500 border rounded-xl bg-slate-50">No mock tests found.</div>
+                            ) : filteredMockTests.length === 0 ? (
+                                <div className="text-center py-12 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50 dark:bg-slate-900/50">No mock tests found matching your filters.</div>
                             ) : (
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                    {mockTests.map(test => (
-                                        <div key={test.id} className={`group relative flex flex-col bg-white border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow ${selectedIds.includes(test.id) ? 'ring-2 ring-indigo-500 border-transparent' : 'border-slate-200'}`}>
+                                    {filteredMockTests.map(test => (
+                                        <div key={test.id} className={`group relative flex flex-col bg-white dark:bg-slate-900 border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow ${selectedIds.includes(test.id) ? 'ring-2 ring-indigo-500 border-transparent' : 'border-slate-200 dark:border-slate-800'}`}>
                                             {/* Top Image Area */}
-                                            <div className="relative h-40 bg-slate-100 flex items-center justify-center border-b border-slate-100">
+                                            <div className="relative h-40 bg-slate-100 dark:bg-slate-800 flex items-center justify-center border-b border-slate-100 dark:border-slate-800">
                                                 {test.thumbnail ? (
                                                     <img src={test.thumbnail} alt={test.title} className="w-full h-full object-cover" />
                                                 ) : (
-                                                    <ImageIcon className="w-8 h-8 text-slate-300" />
+                                                    <ImageIcon className="w-8 h-8 text-slate-300 dark:text-slate-600" />
                                                 )}
                                                 
                                                 {/* Checkbox */}
-                                                <div className="absolute top-3 left-3 bg-white/90 backdrop-blur rounded p-1 shadow-sm">
+                                                <div className="absolute top-3 left-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur rounded p-1 shadow-sm">
                                                     <Checkbox 
                                                         checked={selectedIds.includes(test.id)}
                                                         onCheckedChange={(checked) => handleToggleSelect(test.id, !!checked)}
@@ -439,18 +559,18 @@ export default function MockTestsPage() {
 
                                             {/* Content Area */}
                                             <div className="p-4 flex-1 flex flex-col">
-                                                <h3 className="font-semibold text-slate-900 line-clamp-2 mb-2 pr-6">{test.title}</h3>
+                                                <h3 className="font-semibold text-slate-900 dark:text-slate-100 line-clamp-2 mb-2 pr-6">{test.title}</h3>
                                                 
                                                 {/* Meta Info */}
-                                                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-500 mb-4 mt-auto">
-                                                    <div><span className="font-medium text-slate-700">{test.durationMin}</span> min</div>
-                                                    <div><span className="font-medium text-slate-700">{test.totalMarks}</span> marks</div>
-                                                    <div><span className="font-medium text-slate-700">{test.questionIds?.length || 0}</span> Qs</div>
+                                                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-500 dark:text-slate-400 mb-4 mt-auto">
+                                                    <div><span className="font-medium text-slate-700 dark:text-slate-300">{test.durationMin}</span> min</div>
+                                                    <div><span className="font-medium text-slate-700 dark:text-slate-300">{test.totalMarks}</span> marks</div>
+                                                    <div><span className="font-medium text-slate-700 dark:text-slate-300">{test.questionIds?.length || 0}</span> Qs</div>
                                                 </div>
 
                                                 {/* Footer Line: Price & Actions */}
-                                                <div className="flex items-center justify-between pt-3 border-t border-slate-100 mt-auto">
-                                                    <div className="flex items-center gap-1.5 font-medium text-slate-700 text-sm">
+                                                <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800 mt-auto">
+                                                    <div className="flex items-center gap-1.5 font-medium text-slate-700 dark:text-slate-300 text-sm">
                                                         {test.accessType === 'free' ? (
                                                             <Unlock className="w-4 h-4 text-emerald-600" />
                                                         ) : (
@@ -687,6 +807,70 @@ export default function MockTestsPage() {
                                     value={bulkEditData.price ?? ''}
                                     onChange={(e) => setBulkEditData(prev => ({ ...prev, price: e.target.value ? Number(e.target.value) : undefined }))}
                                 />
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">Board</label>
+                                <Select 
+                                    value={(bulkEditData as any).boardId || ''} 
+                                    onValueChange={(val: any) => setBulkEditData(prev => ({ ...prev, boardId: val }))}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="No Change" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {boards.map(b => <SelectItem key={b.id} value={b.id}>{b.title}</SelectItem>)}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">Class</label>
+                                <Select 
+                                    value={(bulkEditData as any).classId || ''} 
+                                    onValueChange={(val: any) => setBulkEditData(prev => ({ ...prev, classId: val }))}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="No Change" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {classes.map(c => <SelectItem key={c.id} value={c.id}>{c.title}</SelectItem>)}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">Subject</label>
+                                <Select 
+                                    value={(bulkEditData as any).subjectId || ''} 
+                                    onValueChange={(val: any) => setBulkEditData(prev => ({ ...prev, subjectId: val }))}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="No Change" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {subjects.map(s => <SelectItem key={s.id} value={s.id}>{s.title}</SelectItem>)}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">Exam</label>
+                                <Select 
+                                    value={(bulkEditData as any).examId || ''} 
+                                    onValueChange={(val: any) => setBulkEditData(prev => ({ ...prev, examId: val }))}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="No Change" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {exams.map(e => <SelectItem key={e.id} value={e.id}>{e.title}</SelectItem>)}
+                                    </SelectContent>
+                                </Select>
                             </div>
                         </div>
                     </div>
