@@ -12,7 +12,7 @@ import { submitReview, bulkSubmitReviews } from '@/lib/firebase/reviews';
 import { AssessmentEditor } from '@/components/admin/AssessmentEditor';
 import Link from 'next/link';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
-import { Star, MessageSquare, Wand2, Copy as CopyIcon, CheckSquare, MoreVertical, Unlock, Lock } from 'lucide-react';
+import { Star, MessageSquare, Wand2, Copy as CopyIcon, CheckSquare, MoreVertical, Unlock, Lock, ImageIcon } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
@@ -288,6 +288,7 @@ export default function MockTestsPage() {
                                         onCheckedChange={(checked) => handleToggleSelectAll(!!checked)}
                                     />
                                 </TableHead>
+                                <TableHead className="w-[60px]">Image</TableHead>
                                 <TableHead>Title</TableHead>
                                 <TableHead>Duration</TableHead>
                                 <TableHead>Marks</TableHead>
@@ -299,9 +300,9 @@ export default function MockTestsPage() {
                         </TableHeader>
                         <TableBody>
                             {loading ? (
-                                <TableRow><TableCell colSpan={6}><Loader2 className="animate-spin mx-auto" /></TableCell></TableRow>
+                                <TableRow><TableCell colSpan={9}><Loader2 className="animate-spin mx-auto" /></TableCell></TableRow>
                             ) : mockTests.length === 0 ? (
-                                <TableRow><TableCell colSpan={6} className="text-center">No mock tests found.</TableCell></TableRow>
+                                <TableRow><TableCell colSpan={9} className="text-center">No mock tests found.</TableCell></TableRow>
                             ) : (
                                 mockTests.map(test => (
                                     <TableRow key={test.id} className={selectedIds.includes(test.id) ? "bg-indigo-50/50" : ""}>
@@ -310,6 +311,15 @@ export default function MockTestsPage() {
                                                 checked={selectedIds.includes(test.id)}
                                                 onCheckedChange={(checked) => handleToggleSelect(test.id, !!checked)}
                                             />
+                                        </TableCell>
+                                        <TableCell>
+                                            {test.thumbnail ? (
+                                                <img src={test.thumbnail} alt={test.title} className="w-10 h-10 object-cover rounded-md border border-slate-200" />
+                                            ) : (
+                                                <div className="w-10 h-10 bg-slate-100 rounded-md border border-slate-200 flex items-center justify-center">
+                                                    <ImageIcon className="w-5 h-5 text-slate-400" />
+                                                </div>
+                                            )}
                                         </TableCell>
                                         <TableCell className="font-medium">{test.title}</TableCell>
                                         <TableCell>{test.durationMin} min</TableCell>
