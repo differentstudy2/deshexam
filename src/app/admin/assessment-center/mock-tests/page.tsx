@@ -12,7 +12,11 @@ import { submitReview, bulkSubmitReviews } from '@/lib/firebase/reviews';
 import { AssessmentEditor } from '@/components/admin/AssessmentEditor';
 import Link from 'next/link';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
-import { Star, MessageSquare, Wand2, Copy as CopyIcon } from 'lucide-react';
+import { Star, MessageSquare, Wand2, Copy as CopyIcon, CheckSquare, MoreVertical, Unlock, Lock } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 
 export default function MockTestsPage() {
     const { toast } = useToast();
@@ -30,6 +34,12 @@ export default function MockTestsPage() {
     const [bulkImportTest, setBulkImportTest] = useState<MockTest | null>(null);
     const [bulkJson, setBulkJson] = useState('');
     const [isBulkSubmitting, setIsBulkSubmitting] = useState(false);
+
+    // Bulk Edit State
+    const [selectedIds, setSelectedIds] = useState<string[]>([]);
+    const [isBulkEditModalOpen, setIsBulkEditModalOpen] = useState(false);
+    const [isBulkEditing, setIsBulkEditing] = useState(false);
+    const [bulkEditData, setBulkEditData] = useState<Partial<MockTest>>({});
 
     useEffect(() => {
         fetchMockTests();
@@ -161,6 +171,60 @@ export default function MockTestsPage() {
         return `Act as 10 different students who just completed a mock test titled '${title}'. Write 10 realistic reviews for this specific test. Mix the languages (70% Bengali, 30% English). Give realistic ratings between 4 and 5. Return ONLY a valid JSON array in this exact format, with no markdown formatting or extra text: \n\n[\n  { "name": "Student Name", "rating": 5, "content": "The review text..." }\n]`;
     };
 
+    const handleToggleSelectAll = (checked: boolean) => {
+        if (checked) {
+            setSelectedIds(mockTests.map(t => t.id));
+        } else {
+            setSelectedIds([]);
+        }
+    };
+
+    const handleToggleSelect = (id: string, checked: boolean) => {
+        if (checked) {
+            setSelectedIds(prev => [...prev, id]);
+        } else {
+            setSelectedIds(prev => prev.filter(testId => testId !== id));
+        }
+    };
+
+    const handleBulkEditSubmit = async () => {
+        if (selectedIds.length === 0) return;
+        
+        // Remove undefined/empty fields from bulkEditData to avoid overwriting existing valid data with empty strings
+        const cleanedBulkData: any = {};
+        if (bulkEditData.status) cleanedBulkData.status = bulkEditData.status;
+        if (bulkEditData.difficulty) cleanedBulkData.difficulty = bulkEditData.difficulty;
+        if (bulkEditData.accessType) cleanedBulkData.accessType = bulkEditData.accessType;
+        if (bulkEditData.price !== undefined && bulkEditData.price !== null && bulkEditData.price.toString() !== '') cleanedBulkData.price = Number(bulkEditData.price);
+
+        if (Object.keys(cleanedBulkData).length === 0) {
+            toast({ title: 'No changes selected for bulk edit', variant: 'destructive' });
+            return;
+        }
+
+        setIsBulkEditing(true);
+        try {
+            // Update all selected tests concurrently
+            await Promise.all(selectedIds.map(async (id) => {
+                const existingTest = mockTests.find(t => t.id === id);
+                if (existingTest) {
+                    await saveAssessment('mockTests', id, { ...existingTest, ...cleanedBulkData });
+                }
+            }));
+            
+            toast({ title: `Successfully updated ${selectedIds.length} mock tests!` });
+            setIsBulkEditModalOpen(false);
+            setBulkEditData({});
+            setSelectedIds([]);
+            fetchMockTests();
+        } catch (error) {
+            console.error(error);
+            toast({ title: 'Failed to update mock tests', variant: 'destructive' });
+        } finally {
+            setIsBulkEditing(false);
+        }
+    };
+
     if (view === 'editor') {
         return (
             <AssessmentEditor
@@ -202,17 +266,34 @@ export default function MockTestsPage() {
 
             <Card>
                 <CardHeader>
-                    <CardTitle>All Mock Tests</CardTitle>
+                    <div className="flex items-center justify-between">
+                        <CardTitle>All Mock Tests</CardTitle>
+                        {selectedIds.length > 0 && (
+                            <div className="flex items-center gap-2 bg-indigo-50 px-4 py-2 rounded-lg border border-indigo-100">
+                                <span className="text-sm font-medium text-indigo-800">{selectedIds.length} selected</span>
+                                <Button size="sm" variant="outline" className="bg-white border-indigo-200 text-indigo-700 hover:bg-indigo-100" onClick={() => setIsBulkEditModalOpen(true)}>
+                                    <CheckSquare className="w-4 h-4 mr-2" /> Bulk Edit
+                                </Button>
+                            </div>
+                        )}
+                    </div>
                 </CardHeader>
                 <CardContent>
                     <Table>
                         <TableHeader>
                             <TableRow>
+                                <TableHead className="w-[50px]">
+                                    <Checkbox 
+                                        checked={mockTests.length > 0 && selectedIds.length === mockTests.length}
+                                        onCheckedChange={(checked) => handleToggleSelectAll(!!checked)}
+                                    />
+                                </TableHead>
                                 <TableHead>Title</TableHead>
                                 <TableHead>Duration</TableHead>
                                 <TableHead>Marks</TableHead>
                                 <TableHead>Questions</TableHead>
                                 <TableHead>Status</TableHead>
+                                <TableHead>Pricing</TableHead>
                                 <TableHead>Actions</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -223,27 +304,73 @@ export default function MockTestsPage() {
                                 <TableRow><TableCell colSpan={6} className="text-center">No mock tests found.</TableCell></TableRow>
                             ) : (
                                 mockTests.map(test => (
-                                    <TableRow key={test.id}>
+                                    <TableRow key={test.id} className={selectedIds.includes(test.id) ? "bg-indigo-50/50" : ""}>
+                                        <TableCell>
+                                            <Checkbox 
+                                                checked={selectedIds.includes(test.id)}
+                                                onCheckedChange={(checked) => handleToggleSelect(test.id, !!checked)}
+                                            />
+                                        </TableCell>
                                         <TableCell className="font-medium">{test.title}</TableCell>
                                         <TableCell>{test.durationMin} min</TableCell>
                                         <TableCell>{test.totalMarks}</TableCell>
                                         <TableCell>{test.questionIds?.length || 0}</TableCell>
-                                        <TableCell>{test.status}</TableCell>
                                         <TableCell>
-                                            <div className="flex gap-2">
-                                                <Button variant="ghost" size="sm" asChild title="View on Site">
-                                                    <Link href={`/mock-tests/${test.slug}`} target="_blank"><Eye className="h-4 w-4" /></Link>
-                                                </Button>
-                                                <Button variant="ghost" size="sm" onClick={() => setReviewTest(test)} title="Add Review">
-                                                    <MessageSquare className="h-4 w-4 text-indigo-500" />
-                                                </Button>
-                                                <Button variant="ghost" size="sm" onClick={() => setBulkImportTest(test)} title="AI Bulk Import">
-                                                    <Wand2 className="h-4 w-4 text-purple-500" />
-                                                </Button>
-                                                <Button variant="ghost" size="sm" onClick={() => handleEdit(test)} title="Edit"><Pencil className="h-4 w-4" /></Button>
-                                                <Button variant="ghost" size="sm" onClick={() => handleClone(test)} title="Clone"><Copy className="h-4 w-4" /></Button>
-                                                <Button variant="ghost" size="sm" className="text-red-500" onClick={() => handleDelete(test.id)} title="Delete"><Trash2 className="h-4 w-4" /></Button>
+                                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${test.status === 'Published' ? 'bg-emerald-100 text-emerald-700' : test.status === 'Archived' ? 'bg-slate-100 text-slate-700' : 'bg-amber-100 text-amber-700'}`}>
+                                                {test.status}
+                                            </span>
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex flex-col gap-1">
+                                                <div className="flex items-center gap-1 text-xs font-medium">
+                                                    {test.accessType === 'free' ? (
+                                                        <span className="flex items-center text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">
+                                                            <Unlock className="w-3 h-3 mr-1" /> Free
+                                                        </span>
+                                                    ) : (
+                                                        <span className="flex items-center text-amber-600 bg-amber-50 px-2 py-0.5 rounded">
+                                                            <Lock className="w-3 h-3 mr-1" /> Premium
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                {test.accessType !== 'free' && test.price ? (
+                                                    <span className="text-xs text-slate-500 font-medium ml-1">₹ {test.price}</span>
+                                                ) : null}
                                             </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button variant="ghost" className="h-8 w-8 p-0">
+                                                        <span className="sr-only">Open menu</span>
+                                                        <MoreVertical className="h-4 w-4" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end" className="w-48">
+                                                    <DropdownMenuItem asChild>
+                                                        <Link href={`/mock-tests/${test.slug}`} target="_blank" className="cursor-pointer">
+                                                            <Eye className="mr-2 h-4 w-4" /> View on Site
+                                                        </Link>
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => handleEdit(test)} className="cursor-pointer">
+                                                        <Pencil className="mr-2 h-4 w-4" /> Edit
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => handleClone(test)} className="cursor-pointer">
+                                                        <Copy className="mr-2 h-4 w-4" /> Clone
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuSeparator />
+                                                    <DropdownMenuItem onClick={() => setReviewTest(test)} className="cursor-pointer">
+                                                        <MessageSquare className="mr-2 h-4 w-4 text-indigo-500" /> Add Review
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => setBulkImportTest(test)} className="cursor-pointer">
+                                                        <Wand2 className="mr-2 h-4 w-4 text-purple-500" /> AI Bulk Import
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuSeparator />
+                                                    <DropdownMenuItem onClick={() => handleDelete(test.id)} className="cursor-pointer text-red-600 focus:text-red-600">
+                                                        <Trash2 className="mr-2 h-4 w-4" /> Delete
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
                                         </TableCell>
                                     </TableRow>
                                 ))
@@ -359,6 +486,94 @@ export default function MockTestsPage() {
                         <Button onClick={handleBulkImport} disabled={isBulkSubmitting} className="bg-purple-600 hover:bg-purple-700 text-white">
                             {isBulkSubmitting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                             Validate & Import
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+            {/* Bulk Edit Modal */}
+            <Dialog open={isBulkEditModalOpen} onOpenChange={setIsBulkEditModalOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Bulk Edit Mock Tests ({selectedIds.length} selected)</DialogTitle>
+                        <DialogDescription>
+                            Leave fields empty if you don't want to change them.
+                        </DialogDescription>
+                    </DialogHeader>
+                    
+                    <div className="space-y-4 py-4">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">Status</label>
+                                <Select 
+                                    value={bulkEditData.status || ''} 
+                                    onValueChange={(val: any) => setBulkEditData(prev => ({ ...prev, status: val }))}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="No Change" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="Draft">Draft</SelectItem>
+                                        <SelectItem value="Published">Published</SelectItem>
+                                        <SelectItem value="Archived">Archived</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">Difficulty</label>
+                                <Select 
+                                    value={bulkEditData.difficulty || ''} 
+                                    onValueChange={(val: any) => setBulkEditData(prev => ({ ...prev, difficulty: val }))}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="No Change" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="Easy">Easy</SelectItem>
+                                        <SelectItem value="Medium">Medium</SelectItem>
+                                        <SelectItem value="Hard">Hard</SelectItem>
+                                        <SelectItem value="Expert">Expert</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">Access Type</label>
+                                <Select 
+                                    value={bulkEditData.accessType || ''} 
+                                    onValueChange={(val: any) => setBulkEditData(prev => ({ ...prev, accessType: val }))}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="No Change" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="free">Free</SelectItem>
+                                        <SelectItem value="subscription">Subscription</SelectItem>
+                                        <SelectItem value="one_time">One Time Purchase</SelectItem>
+                                        <SelectItem value="both">Both</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">Price (INR)</label>
+                                <Input 
+                                    type="number"
+                                    placeholder="Leave empty for no change"
+                                    value={bulkEditData.price ?? ''}
+                                    onChange={(e) => setBulkEditData(prev => ({ ...prev, price: e.target.value ? Number(e.target.value) : undefined }))}
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => { setIsBulkEditModalOpen(false); setBulkEditData({}); }}>Cancel</Button>
+                        <Button onClick={handleBulkEditSubmit} disabled={isBulkEditing}>
+                            {isBulkEditing ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                            Apply Changes
                         </Button>
                     </DialogFooter>
                 </DialogContent>
