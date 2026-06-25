@@ -28,11 +28,14 @@ export function AssessmentListing({ collectionName, title, description, type, ba
   const [boards, setBoards] = useState<TaxonomyNode[]>([]);
   const [classes, setClasses] = useState<TaxonomyNode[]>([]);
   const [subjects, setSubjects] = useState<TaxonomyNode[]>([]);
+  const [exams, setExams] = useState<TaxonomyNode[]>([]);
   
   // Selected Filters
   const [boardId, setBoardId] = useState('All');
   const [classId, setClassId] = useState('All');
   const [subjectId, setSubjectId] = useState('All');
+  const [examId, setExamId] = useState('All');
+  const [year, setYear] = useState('All');
 
   useEffect(() => {
     async function loadData() {
@@ -47,6 +50,9 @@ export function AssessmentListing({ collectionName, title, description, type, ba
         setBoards(allAcademic.filter((n: any) => n.type === 'board'));
         setClasses(allAcademic.filter((n: any) => n.type === 'class'));
         setSubjects(allAcademic.filter((n: any) => n.type === 'subject'));
+
+        const allCompetitive = await getTaxonomyNodesByTrack('competitive');
+        setExams(allCompetitive.filter((n: any) => n.type === 'exam'));
         
       } catch (e) {
         console.error(e);
@@ -69,7 +75,16 @@ export function AssessmentListing({ collectionName, title, description, type, ba
     const matchesClass = classId === 'All' || assessmentWithTaxonomy.classId === classId;
     const matchesSubject = subjectId === 'All' || assessmentWithTaxonomy.subjectId === subjectId;
     
-    return matchesSearch && matchesDiff && matchesBoard && matchesClass && matchesSubject;
+    const matchesExam = examId === 'All' || 
+                        assessmentWithTaxonomy.examId === examId || 
+                        (Array.isArray(assessmentWithTaxonomy.examIds) && assessmentWithTaxonomy.examIds.includes(examId));
+                        
+    const matchesYear = year === 'All' || 
+                        assessmentWithTaxonomy.yearId === year || 
+                        (assessmentWithTaxonomy.year && assessmentWithTaxonomy.year.toString() === year) ||
+                        a.title.includes(year);
+    
+    return matchesSearch && matchesDiff && matchesBoard && matchesClass && matchesSubject && matchesExam && matchesYear;
   });
 
   return (
@@ -158,6 +173,36 @@ export function AssessmentListing({ collectionName, title, description, type, ba
                     <SelectItem value="All">All Subjects</SelectItem>
                     {subjects.map(s => (
                       <SelectItem key={s.id} value={s.id}>{s.title}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-slate-700 mb-1.5 block">Exam</label>
+                <Select value={examId} onValueChange={setExamId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Exams" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="All">All Exams</SelectItem>
+                    {exams.map(e => (
+                      <SelectItem key={e.id} value={e.id}>{e.title}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-slate-700 mb-1.5 block">Year</label>
+                <Select value={year} onValueChange={setYear}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Years" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="All">All Years</SelectItem>
+                    {Array.from({ length: 15 }, (_, i) => new Date().getFullYear() - i).map(y => (
+                      <SelectItem key={y} value={y.toString()}>{y}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
