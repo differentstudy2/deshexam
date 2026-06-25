@@ -280,6 +280,19 @@ export function TopicQuestionManager({ topicId, tabType, nodeLevel = 'topic' }: 
     }
   };
 
+  const handleOpenAiMode = () => {
+      const parts = [];
+      if (hierarchy?.boardTitle) parts.push(hierarchy.boardTitle);
+      if (hierarchy?.classTitle) parts.push(hierarchy.classTitle);
+      if (hierarchy?.subjectTitle) parts.push(hierarchy.subjectTitle);
+      if (hierarchy?.chapterTitle) parts.push(hierarchy.chapterTitle);
+      if (hierarchy?.topicTitle) parts.push(hierarchy.topicTitle);
+      
+      const defaultPrompt = parts.length > 0 ? parts.join(', ') : '';
+      setAiPrompt(defaultPrompt);
+      setMode('ai');
+  };
+
   const handleDelete = async (id: string) => {
     if (confirm('Are you sure you want to delete this question globally?')) {
         try {
@@ -366,7 +379,7 @@ export function TopicQuestionManager({ topicId, tabType, nodeLevel = 'topic' }: 
         </button>
         {qType === 'MCQ' && (
           <>
-            <button onClick={() => setMode('ai')} className={`px-3.5 py-1.5 rounded-full text-[11px] font-semibold flex items-center gap-1 whitespace-nowrap border transition-all ${ mode === 'ai' ? 'bg-violet-600 text-white border-violet-600' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-500' }`}><Sparkles className="w-3.5 h-3.5" /> AI</button>
+            <button onClick={handleOpenAiMode} className={`px-3.5 py-1.5 rounded-full text-[11px] font-semibold flex items-center gap-1 whitespace-nowrap border transition-all ${ mode === 'ai' ? 'bg-violet-600 text-white border-violet-600' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-500' }`}><Sparkles className="w-3.5 h-3.5" /> AI</button>
             <button onClick={() => setMode('bulk')} className={`px-3.5 py-1.5 rounded-full text-[11px] font-semibold flex items-center gap-1 whitespace-nowrap border transition-all ${ mode === 'bulk' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-500' }`}><Upload className="w-3.5 h-3.5" /> Bulk</button>
             {questions.length > 0 && <button onClick={enterBulkEditMode} className={`px-3.5 py-1.5 rounded-full text-[11px] font-semibold flex items-center gap-1 whitespace-nowrap border transition-all ${ mode === 'bulk-edit' ? 'bg-amber-500 text-white border-amber-500' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-500' }`}><Edit className="w-3.5 h-3.5" /> Edit All</button>}
           </>

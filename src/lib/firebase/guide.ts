@@ -396,12 +396,14 @@ export const getTopicHierarchy = async (nodeId: string) => {
     let subjectId: string | null = null;
     let classId: string | null = null;
     let boardId: string | null = null;
+    let topicId: string | null = null;
     
     let textbookTitle: string = 'Textbook';
     let subjectTitle: string = 'Subject';
     let chapterTitle: string = 'Chapter';
     let classTitle: string = 'Class';
     let boardTitle: string = 'Board';
+    let topicTitle: string = 'Topic';
 
     // Walk up the hierarchy tree using parentId
     while (currentNode) {
@@ -420,13 +422,16 @@ export const getTopicHierarchy = async (nodeId: string) => {
       } else if (currentNode.type === 'chapter') {
         chapterId = currentNode.id;
         chapterTitle = currentNode.title;
+      } else if (currentNode.type === 'topic') {
+        topicId = currentNode.id;
+        topicTitle = currentNode.title;
       }
       
       if (!currentNode.parentId) break;
       currentNode = await getTaxonomyNodeById(currentNode.parentId);
     }
 
-    return { boardId, boardTitle, classId, classTitle, subjectId, subjectTitle, textbookId, textbookTitle, chapterId, chapterTitle };
+    return { boardId, boardTitle, classId, classTitle, subjectId, subjectTitle, textbookId, textbookTitle, chapterId, chapterTitle, topicId, topicTitle };
   } catch (error) {
     console.error("Error finding topic hierarchy:", error);
     return null;

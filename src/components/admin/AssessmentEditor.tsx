@@ -257,7 +257,30 @@ export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock 
     };
 
     const handleAIGenerate = () => {
-        setAiTopic('');
+        const parts = [];
+        if (editData.boardId) {
+            const b = boards.find(b => b.id === editData.boardId);
+            if (b) parts.push(b.name);
+        }
+        if (editData.classId) {
+            const b = classes.find(b => b.id === editData.classId);
+            if (b) parts.push(b.name);
+        }
+        if (editData.subjectId) {
+            const b = subjects.find(b => b.id === editData.subjectId);
+            if (b) parts.push(b.name);
+        }
+        if (editData.chapterId) {
+            const b = chapters.find(b => b.id === editData.chapterId);
+            if (b) parts.push(b.name);
+        }
+        if (editData.topicId) {
+            const b = topics.find(b => b.id === editData.topicId);
+            if (b) parts.push(b.name);
+        }
+        
+        const defaultTopic = parts.length > 0 ? parts.join(', ') : '';
+        setAiTopic(defaultTopic);
         setShowAIDialog(true);
     };
 
