@@ -97,26 +97,41 @@ export async function submitReview(
     }
 
     const testData = testDoc.data();
+    // Sanitize rating to integer between 1 and 5
+    let numRating = Number(rating);
+    if (isNaN(numRating)) numRating = 5;
+    const sanitizedRating = Math.max(1, Math.min(5, Math.round(numRating)));
+    
+    let numOldRating = Number(oldRating);
+    if (isNaN(numOldRating)) numOldRating = 5;
+    const oldSanitizedRating = oldRating ? Math.max(1, Math.min(5, Math.round(numOldRating))) : null;
+
     let currentStats = testData.reviewStats || {
       averageRating: 0,
       totalReviews: 0,
       ratingDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
     };
 
-    // Calculate new stats
-    let newTotal = currentStats.totalReviews;
-    const newDist = { ...currentStats.ratingDistribution };
+    // Calculate new stats, ensuring robust fallback for corrupted distribution keys
+    let newTotal = currentStats.totalReviews || 0;
+    const newDist: Record<number, number> = { 
+      1: currentStats.ratingDistribution?.[1] || 0,
+      2: currentStats.ratingDistribution?.[2] || 0,
+      3: currentStats.ratingDistribution?.[3] || 0,
+      4: currentStats.ratingDistribution?.[4] || 0,
+      5: currentStats.ratingDistribution?.[5] || 0,
+    };
 
-    if (isUpdate) {
+    if (isUpdate && oldSanitizedRating) {
       // User changed their rating
-      if (oldRating !== rating) {
-        newDist[oldRating as keyof typeof newDist] = Math.max(0, newDist[oldRating as keyof typeof newDist] - 1);
-        newDist[rating as keyof typeof newDist] += 1;
+      if (oldSanitizedRating !== sanitizedRating) {
+        newDist[oldSanitizedRating] = Math.max(0, newDist[oldSanitizedRating] - 1);
+        newDist[sanitizedRating] += 1;
       }
     } else {
       // Completely new review
       newTotal += 1;
-      newDist[rating as keyof typeof newDist] += 1;
+      newDist[sanitizedRating] += 1;
     }
 
     // Calculate new average
@@ -138,7 +153,7 @@ export async function submitReview(
       userId,
       userName,
       userAvatar: userAvatar || '',
-      rating,
+      rating: sanitizedRating,
       content,
       updatedAt: new Date().toISOString()
     };
