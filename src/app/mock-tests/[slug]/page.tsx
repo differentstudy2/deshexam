@@ -123,6 +123,10 @@ export default async function MockTestLandingPage({ params }: Props) {
           "value": "0",
           "currency": "INR"
         },
+        "shippingDestination": {
+          "@type": "DefinedRegion",
+          "addressCountry": "IN"
+        },
         "deliveryTime": {
           "@type": "ShippingDeliveryTime",
           "handlingTime": {
