@@ -4,7 +4,7 @@ import React from 'react';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Clock, HelpCircle, ShieldCheck, Trophy, FileText, ArrowRight } from 'lucide-react';
+import { Clock, HelpCircle, ShieldCheck, Trophy, FileText, ArrowRight, Star } from 'lucide-react';
 import Link from 'next/link';
 import { AssessmentBase } from '@/lib/assessment-types';
 import Image from 'next/image';
@@ -61,7 +61,17 @@ export function AssessmentCard({ assessment, type, href }: AssessmentCardProps) 
             <Icon className="w-3 h-3 mr-1" />
             {type}
           </Badge>
-          <Badge variant="secondary" className={diffColor}>{assessment.difficulty}</Badge>
+          <div className="flex items-center gap-1.5">
+            {assessment.reviewStats && assessment.reviewStats.totalReviews > 0 && (
+              <div className="flex items-center gap-1 text-[11px] font-bold text-amber-500 bg-amber-50 dark:bg-amber-900/20 px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-800/50">
+                <Star className="w-3 h-3 fill-amber-500" />
+                {assessment.reviewStats.averageRating}
+              </div>
+            )}
+            {assessment.difficulty && (
+              <Badge variant="secondary" className={diffColor}>{assessment.difficulty}</Badge>
+            )}
+          </div>
         </div>
         <h3 className="font-bold text-lg leading-tight line-clamp-2 text-slate-800 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
           {assessment.title}

@@ -2,10 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Star, ThumbsUp, MessageSquare, Loader2 } from 'lucide-react';
+import { Star, ThumbsUp, ThumbsDown, MessageSquare, Loader2, BadgeCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/use-auth';
-import { getRecentReviews, getUserReview, submitReview, MockTestReview } from '@/lib/firebase/reviews';
+import { getRecentReviews, getUserReview, submitReview, incrementReviewHelpful, incrementReviewUnhelpful, MockTestReview } from '@/lib/firebase/reviews';
 import { ReviewStats } from '@/lib/assessment-types';
 import {
   Dialog,
@@ -34,6 +34,8 @@ export function MockTestReviews({ testId, slug, stats }: MockTestReviewsProps) {
   const [rating, setRating] = useState(5);
   const [content, setContent] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [likedReviews, setLikedReviews] = useState<Set<string>>(new Set());
+  const [dislikedReviews, setDislikedReviews] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     async function loadData() {
@@ -110,6 +112,32 @@ export function MockTestReviews({ testId, slug, stats }: MockTestReviewsProps) {
       alert("Failed to submit review. Please try again.");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleHelpful = async (reviewId: string) => {
+    if (likedReviews.has(reviewId) || dislikedReviews.has(reviewId)) return;
+    
+    setLikedReviews(prev => new Set(prev).add(reviewId));
+    setReviews(prev => prev.map(r => r.id === reviewId ? { ...r, likes: (r.likes || 0) + 1 } : r));
+
+    try {
+      await incrementReviewHelpful(reviewId);
+    } catch (err) {
+      console.error("Failed to like review", err);
+    }
+  };
+
+  const handleUnhelpful = async (reviewId: string) => {
+    if (likedReviews.has(reviewId) || dislikedReviews.has(reviewId)) return;
+    
+    setDislikedReviews(prev => new Set(prev).add(reviewId));
+    setReviews(prev => prev.map(r => r.id === reviewId ? { ...r, dislikes: (r.dislikes || 0) + 1 } : r));
+
+    try {
+      await incrementReviewUnhelpful(reviewId);
+    } catch (err) {
+      console.error("Failed to dislike review", err);
     }
   };
 
@@ -224,7 +252,12 @@ export function MockTestReviews({ testId, slug, stats }: MockTestReviewsProps) {
                 <div className="flex-1">
                   <div className="flex justify-between items-start mb-1">
                     <div>
-                      <h4 className="font-bold text-slate-800 dark:text-slate-100">{review.userName}</h4>
+                      <h4 className="font-bold text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
+                        {review.userName}
+                        <span title="Verified User" className="flex items-center">
+                          <BadgeCheck className="w-4 h-4 text-emerald-500 cursor-help" />
+                        </span>
+                      </h4>
                       <div className="flex items-center gap-2 mt-0.5">
                         <div className="flex items-center text-amber-500">
                           {[1, 2, 3, 4, 5].map((star) => (
@@ -240,9 +273,31 @@ export function MockTestReviews({ testId, slug, stats }: MockTestReviewsProps) {
                   <p className="text-slate-600 dark:text-slate-300 text-sm mt-2 leading-relaxed whitespace-pre-wrap">
                     {review.content}
                   </p>
-                  <div className="flex items-center gap-1 mt-3">
-                    <button className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
-                      <ThumbsUp className="w-3.5 h-3.5" /> Helpful ({review.likes || 0})
+                  <div className="flex items-center gap-4 mt-3">
+                    <button 
+                      onClick={() => handleHelpful(review.id)}
+                      disabled={likedReviews.has(review.id) || dislikedReviews.has(review.id)}
+                      className={`flex items-center gap-1.5 text-[11px] font-semibold transition-colors ${
+                        likedReviews.has(review.id) 
+                          ? 'text-indigo-600 dark:text-indigo-400' 
+                          : 'text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400'
+                      }`}
+                    >
+                      <ThumbsUp className={`w-3.5 h-3.5 ${likedReviews.has(review.id) ? 'fill-current' : ''}`} /> 
+                      Helpful ({review.likes || 0})
+                    </button>
+                    
+                    <button 
+                      onClick={() => handleUnhelpful(review.id)}
+                      disabled={likedReviews.has(review.id) || dislikedReviews.has(review.id)}
+                      className={`flex items-center gap-1.5 text-[11px] font-semibold transition-colors ${
+                        dislikedReviews.has(review.id) 
+                          ? 'text-red-500 dark:text-red-400' 
+                          : 'text-slate-400 hover:text-red-500 dark:hover:text-red-400'
+                      }`}
+                    >
+                      <ThumbsDown className={`w-3.5 h-3.5 ${dislikedReviews.has(review.id) ? 'fill-current' : ''}`} /> 
+                      Not Helpful ({(review as any).dislikes || 0})
                     </button>
                   </div>
                 </div>

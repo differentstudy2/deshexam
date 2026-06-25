@@ -22,6 +22,7 @@ export interface MockTestReview {
   createdAt: string; // ISO string
   updatedAt?: string; // ISO string
   likes: number;
+  dislikes?: number;
 }
 
 export const REVIEWS_COLLECTION = 'mockTestReviews';
@@ -161,6 +162,7 @@ export async function submitReview(
     if (!isUpdate) {
       reviewData.createdAt = new Date().toISOString();
       reviewData.likes = 0;
+      reviewData.dislikes = 0;
       transaction.set(reviewRef, reviewData);
     } else {
       transaction.update(reviewRef, reviewData);
@@ -191,4 +193,31 @@ export async function bulkSubmitReviews(
       review.content
     );
   }
+}
+
+/**
+ * Increment the helpful (likes) count of a specific review.
+ */
+export async function incrementReviewHelpful(reviewId: string): Promise<void> {
+  const reviewRef = doc(db, 'mockTestReviews', reviewId);
+  // Using a transaction to ensure atomic increment if there are concurrent likes
+  await runTransaction(db, async (transaction) => {
+    const reviewDoc = await transaction.get(reviewRef);
+    if (!reviewDoc.exists()) throw new Error('Review not found');
+    const currentLikes = reviewDoc.data().likes || 0;
+    transaction.update(reviewRef, { likes: currentLikes + 1 });
+  });
+}
+
+/**
+ * Increment the unhelpful (dislikes) count of a specific review.
+ */
+export async function incrementReviewUnhelpful(reviewId: string): Promise<void> {
+  const reviewRef = doc(db, 'mockTestReviews', reviewId);
+  await runTransaction(db, async (transaction) => {
+    const reviewDoc = await transaction.get(reviewRef);
+    if (!reviewDoc.exists()) throw new Error('Review not found');
+    const currentDislikes = reviewDoc.data().dislikes || 0;
+    transaction.update(reviewRef, { dislikes: currentDislikes + 1 });
+  });
 }

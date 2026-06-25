@@ -39,6 +39,13 @@ export interface AssessmentBase {
   accessType?: AccessType;
   price?: number;
   allowedSubscriptionPlans?: string[]; // e.g., ['pro', 'pass']
+
+  // Reviews
+  reviewStats?: {
+    averageRating: number;
+    totalReviews: number;
+    ratingDistribution: Record<string, number>;
+  };
 }
 
 export interface PracticeSet extends AssessmentBase {

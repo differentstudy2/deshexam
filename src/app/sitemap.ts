@@ -11,6 +11,7 @@ import {
   getClasses
 } from '@/lib/firebase/firestore';
 import { getTaxonomyNodesByType } from '@/lib/firebase/taxonomy';
+import { getAssessments } from '@/lib/firebase/assessment';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://deshexam.com';
@@ -162,6 +163,33 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
+  // 8. New Assessments (Mock Tests, Practice Sets, Quizzes, Exams)
+  const collections = [
+    { name: 'mockTests', prefix: '/mock-tests' },
+    { name: 'practiceSets', prefix: '/practice-sets' },
+    { name: 'quizzes', prefix: '/quizzes' },
+    { name: 'examSeries', prefix: '/exams' },
+    { name: 'examPapers', prefix: '/exam-papers' },
+  ] as const;
+  
+  const assessmentRoutes: MetadataRoute.Sitemap = [];
+  for (const { name, prefix } of collections) {
+    try {
+      const items = await getAssessments(name) as any[];
+      for (const item of items) {
+        if (item.status === 'Published') {
+          assessmentRoutes.push({
+            url: `${baseUrl}${prefix}/${item.slug || item.id}`,
+            lastModified: item.updatedAt ? new Date(item.updatedAt) : new Date(),
+            priority: 0.8,
+          });
+        }
+      }
+    } catch (e) {
+      console.error(`Error fetching ${name} for sitemap:`, e);
+    }
+  }
+
   return [
     ...staticRoutes,
     ...classRoutes,
@@ -170,5 +198,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...questionRoutes,
     ...textbookTreeRoutes,
     ...institutionRoutes,
+    ...assessmentRoutes,
   ];
 }
