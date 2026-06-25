@@ -321,21 +321,13 @@ export default function MockTestsPage() {
                                             </span>
                                         </TableCell>
                                         <TableCell>
-                                            <div className="flex flex-col gap-1">
-                                                <div className="flex items-center gap-1 text-xs font-medium">
-                                                    {test.accessType === 'free' ? (
-                                                        <span className="flex items-center text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">
-                                                            <Unlock className="w-3 h-3 mr-1" /> Free
-                                                        </span>
-                                                    ) : (
-                                                        <span className="flex items-center text-amber-600 bg-amber-50 px-2 py-0.5 rounded">
-                                                            <Lock className="w-3 h-3 mr-1" /> Premium
-                                                        </span>
-                                                    )}
-                                                </div>
-                                                {test.accessType !== 'free' && test.price ? (
-                                                    <span className="text-xs text-slate-500 font-medium ml-1">₹ {test.price}</span>
-                                                ) : null}
+                                            <div className="flex items-center gap-1.5 font-medium text-slate-700">
+                                                {test.accessType === 'free' ? (
+                                                    <Unlock className="w-3.5 h-3.5 text-emerald-600" />
+                                                ) : (
+                                                    <Lock className="w-3.5 h-3.5 text-amber-600" />
+                                                )}
+                                                <span>₹ {test.accessType === 'free' ? '0' : (test.price || 0)}</span>
                                             </div>
                                         </TableCell>
                                         <TableCell>
