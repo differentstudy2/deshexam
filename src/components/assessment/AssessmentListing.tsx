@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, SlidersHorizontal, Loader2 } from 'lucide-react';
 import { AssessmentCollectionType } from '@/lib/firebase/assessment';
+import { getTaxonomyNodesByTrack, TaxonomyNode } from '@/lib/firebase/taxonomy';
 
 interface AssessmentListingProps {
   collectionName: AssessmentCollectionType;
@@ -22,6 +23,16 @@ export function AssessmentListing({ collectionName, title, description, type, ba
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [difficulty, setDifficulty] = useState('All');
+  
+  // Taxonomy States
+  const [boards, setBoards] = useState<TaxonomyNode[]>([]);
+  const [classes, setClasses] = useState<TaxonomyNode[]>([]);
+  const [subjects, setSubjects] = useState<TaxonomyNode[]>([]);
+  
+  // Selected Filters
+  const [boardId, setBoardId] = useState('All');
+  const [classId, setClassId] = useState('All');
+  const [subjectId, setSubjectId] = useState('All');
 
   useEffect(() => {
     async function loadData() {
@@ -30,6 +41,13 @@ export function AssessmentListing({ collectionName, title, description, type, ba
         const data = await getAssessments(collectionName);
         // Only show published
         setAssessments((data as AssessmentBase[]).filter(a => a.status === 'Published'));
+        
+        // Fetch taxonomies
+        const allAcademic = await getTaxonomyNodesByTrack('academic');
+        setBoards(allAcademic.filter((n: any) => n.type === 'board'));
+        setClasses(allAcademic.filter((n: any) => n.type === 'class'));
+        setSubjects(allAcademic.filter((n: any) => n.type === 'subject'));
+        
       } catch (e) {
         console.error(e);
       } finally {
@@ -43,7 +61,15 @@ export function AssessmentListing({ collectionName, title, description, type, ba
     const matchesSearch = a.title.toLowerCase().includes(search.toLowerCase()) || 
                           (a.description || '').toLowerCase().includes(search.toLowerCase());
     const matchesDiff = difficulty === 'All' || a.difficulty === difficulty;
-    return matchesSearch && matchesDiff;
+    
+    // Explicitly cast to any because boardId/classId/subjectId are not on AssessmentBase but are on MockTest/PracticeSet
+    const assessmentWithTaxonomy = a as any;
+    
+    const matchesBoard = boardId === 'All' || assessmentWithTaxonomy.boardId === boardId;
+    const matchesClass = classId === 'All' || assessmentWithTaxonomy.classId === classId;
+    const matchesSubject = subjectId === 'All' || assessmentWithTaxonomy.subjectId === subjectId;
+    
+    return matchesSearch && matchesDiff && matchesBoard && matchesClass && matchesSubject;
   });
 
   return (
@@ -91,7 +117,51 @@ export function AssessmentListing({ collectionName, title, description, type, ba
                 </Select>
               </div>
 
-              {/* In the future, add Board, Class, Subject Selectors here by querying taxonomies */}
+              {/* Taxonomy Filters */}
+              <div>
+                <label className="text-sm font-medium text-slate-700 mb-1.5 block">Board</label>
+                <Select value={boardId} onValueChange={setBoardId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Boards" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="All">All Boards</SelectItem>
+                    {boards.map(b => (
+                      <SelectItem key={b.id} value={b.id}>{b.title}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-slate-700 mb-1.5 block">Class</label>
+                <Select value={classId} onValueChange={setClassId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Classes" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="All">All Classes</SelectItem>
+                    {classes.map(c => (
+                      <SelectItem key={c.id} value={c.id}>{c.title}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-slate-700 mb-1.5 block">Subject</label>
+                <Select value={subjectId} onValueChange={setSubjectId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Subjects" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="All">All Subjects</SelectItem>
+                    {subjects.map(s => (
+                      <SelectItem key={s.id} value={s.id}>{s.title}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
         </div>
