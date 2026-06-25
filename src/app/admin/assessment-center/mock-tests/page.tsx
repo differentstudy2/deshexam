@@ -12,7 +12,7 @@ import { submitReview, bulkSubmitReviews } from '@/lib/firebase/reviews';
 import { AssessmentEditor } from '@/components/admin/AssessmentEditor';
 import Link from 'next/link';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
-import { Star, MessageSquare, Wand2, Copy as CopyIcon, CheckSquare, MoreVertical, Unlock, Lock, ImageIcon } from 'lucide-react';
+import { Star, MessageSquare, Wand2, Copy as CopyIcon, CheckSquare, MoreVertical, Unlock, Lock, ImageIcon, LayoutGrid, List } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
@@ -40,6 +40,9 @@ export default function MockTestsPage() {
     const [isBulkEditModalOpen, setIsBulkEditModalOpen] = useState(false);
     const [isBulkEditing, setIsBulkEditing] = useState(false);
     const [bulkEditData, setBulkEditData] = useState<Partial<MockTest>>({});
+
+    // Display Mode State
+    const [displayMode, setDisplayMode] = useState<'list' | 'grid'>('list');
 
     useEffect(() => {
         fetchMockTests();
@@ -259,9 +262,27 @@ export default function MockTestsPage() {
         <div className="p-6 space-y-6">
             <div className="flex items-center justify-between">
                 <h1 className="text-3xl font-bold">Mock Tests</h1>
-                <Button onClick={() => { setEditData({}); setView('editor'); }}>
-                    <PlusCircle className="mr-2 h-4 w-4" /> Create Mock Test
-                </Button>
+                <div className="flex items-center gap-4">
+                    <div className="flex items-center bg-slate-100 p-1 rounded-lg border border-slate-200">
+                        <button 
+                            onClick={() => setDisplayMode('list')} 
+                            className={`p-2 rounded-md transition-all ${displayMode === 'list' ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-500 hover:text-slate-700'}`}
+                            title="List View"
+                        >
+                            <List className="w-4 h-4" />
+                        </button>
+                        <button 
+                            onClick={() => setDisplayMode('grid')} 
+                            className={`p-2 rounded-md transition-all ${displayMode === 'grid' ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-500 hover:text-slate-700'}`}
+                            title="Grid View"
+                        >
+                            <LayoutGrid className="w-4 h-4" />
+                        </button>
+                    </div>
+                    <Button onClick={() => { setEditData({}); setView('editor'); }}>
+                        <PlusCircle className="mr-2 h-4 w-4" /> Create Mock Test
+                    </Button>
+                </div>
             </div>
 
             <Card>
@@ -279,6 +300,7 @@ export default function MockTestsPage() {
                     </div>
                 </CardHeader>
                 <CardContent>
+                    {displayMode === 'list' && (
                     <Table>
                         <TableHeader>
                             <TableRow>
@@ -379,6 +401,104 @@ export default function MockTestsPage() {
                             )}
                         </TableBody>
                     </Table>
+                    )}
+                    
+                    {displayMode === 'grid' && (
+                        <div className="mt-4">
+                            {loading ? (
+                                <div className="flex justify-center py-12"><Loader2 className="animate-spin text-indigo-500" /></div>
+                            ) : mockTests.length === 0 ? (
+                                <div className="text-center py-12 text-slate-500 border rounded-xl bg-slate-50">No mock tests found.</div>
+                            ) : (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                    {mockTests.map(test => (
+                                        <div key={test.id} className={`group relative flex flex-col bg-white border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow ${selectedIds.includes(test.id) ? 'ring-2 ring-indigo-500 border-transparent' : 'border-slate-200'}`}>
+                                            {/* Top Image Area */}
+                                            <div className="relative h-40 bg-slate-100 flex items-center justify-center border-b border-slate-100">
+                                                {test.thumbnail ? (
+                                                    <img src={test.thumbnail} alt={test.title} className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <ImageIcon className="w-8 h-8 text-slate-300" />
+                                                )}
+                                                
+                                                {/* Checkbox */}
+                                                <div className="absolute top-3 left-3 bg-white/90 backdrop-blur rounded p-1 shadow-sm">
+                                                    <Checkbox 
+                                                        checked={selectedIds.includes(test.id)}
+                                                        onCheckedChange={(checked) => handleToggleSelect(test.id, !!checked)}
+                                                    />
+                                                </div>
+
+                                                {/* Status Badge */}
+                                                <div className="absolute top-3 right-3">
+                                                    <span className={`px-2 py-1 text-[10px] font-bold uppercase tracking-wider rounded shadow-sm ${test.status === 'Published' ? 'bg-emerald-500 text-white' : test.status === 'Archived' ? 'bg-slate-500 text-white' : 'bg-amber-500 text-white'}`}>
+                                                        {test.status}
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            {/* Content Area */}
+                                            <div className="p-4 flex-1 flex flex-col">
+                                                <h3 className="font-semibold text-slate-900 line-clamp-2 mb-2 pr-6">{test.title}</h3>
+                                                
+                                                {/* Meta Info */}
+                                                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-500 mb-4 mt-auto">
+                                                    <div><span className="font-medium text-slate-700">{test.durationMin}</span> min</div>
+                                                    <div><span className="font-medium text-slate-700">{test.totalMarks}</span> marks</div>
+                                                    <div><span className="font-medium text-slate-700">{test.questionIds?.length || 0}</span> Qs</div>
+                                                </div>
+
+                                                {/* Footer Line: Price & Actions */}
+                                                <div className="flex items-center justify-between pt-3 border-t border-slate-100 mt-auto">
+                                                    <div className="flex items-center gap-1.5 font-medium text-slate-700 text-sm">
+                                                        {test.accessType === 'free' ? (
+                                                            <Unlock className="w-4 h-4 text-emerald-600" />
+                                                        ) : (
+                                                            <Lock className="w-4 h-4 text-amber-600" />
+                                                        )}
+                                                        <span>₹ {test.accessType === 'free' ? '0' : (test.price || 0)}</span>
+                                                    </div>
+
+                                                    <DropdownMenu>
+                                                        <DropdownMenuTrigger asChild>
+                                                            <Button variant="ghost" className="h-8 w-8 p-0">
+                                                                <span className="sr-only">Open menu</span>
+                                                                <MoreVertical className="h-4 w-4" />
+                                                            </Button>
+                                                        </DropdownMenuTrigger>
+                                                        <DropdownMenuContent align="end" className="w-48">
+                                                            <DropdownMenuItem asChild>
+                                                                <Link href={`/mock-tests/${test.slug}`} target="_blank" className="cursor-pointer">
+                                                                    <Eye className="mr-2 h-4 w-4" /> View on Site
+                                                                </Link>
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuItem onClick={() => handleEdit(test)} className="cursor-pointer">
+                                                                <Pencil className="mr-2 h-4 w-4" /> Edit
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuItem onClick={() => handleClone(test)} className="cursor-pointer">
+                                                                <Copy className="mr-2 h-4 w-4" /> Clone
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuSeparator />
+                                                            <DropdownMenuItem onClick={() => setReviewTest(test)} className="cursor-pointer">
+                                                                <MessageSquare className="mr-2 h-4 w-4 text-indigo-500" /> Add Review
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuItem onClick={() => setBulkImportTest(test)} className="cursor-pointer">
+                                                                <Wand2 className="mr-2 h-4 w-4 text-purple-500" /> AI Bulk Import
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuSeparator />
+                                                            <DropdownMenuItem onClick={() => handleDelete(test.id)} className="cursor-pointer text-red-600 focus:text-red-600">
+                                                                <Trash2 className="mr-2 h-4 w-4" /> Delete
+                                                            </DropdownMenuItem>
+                                                        </DropdownMenuContent>
+                                                    </DropdownMenu>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </CardContent>
             </Card>
 
