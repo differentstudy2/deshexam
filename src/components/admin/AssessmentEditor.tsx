@@ -712,6 +712,14 @@ export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock 
                     onOpenChange={setShowPicker} 
                     onSelectQuestions={handleQuestionsSelected}
                     preSelectedIds={editData.questionIds || []}
+                    initialFilters={{
+                        ...(editData.boardId ? { boardId: editData.boardId } : {}),
+                        ...(editData.classId ? { classId: editData.classId } : {}),
+                        ...(editData.subjectId ? { subjectId: editData.subjectId } : {}),
+                        ...(editData.textbookId ? { textbookId: editData.textbookId } : {}),
+                        ...(editData.chapterId ? { chapterId: editData.chapterId } : {}),
+                        ...(editData.topicId ? { topicId: editData.topicId } : {})
+                    }}
                 />
 
                 <QuestionImportModal

@@ -16,9 +16,10 @@ interface QuestionPickerModalProps {
     onOpenChange: (open: boolean) => void;
     onSelectQuestions: (questions: QuestionBankEntry[]) => void;
     preSelectedIds?: string[];
+    initialFilters?: Record<string, string | undefined>;
 }
 
-export function QuestionPickerModal({ open, onOpenChange, onSelectQuestions, preSelectedIds = [] }: QuestionPickerModalProps) {
+export function QuestionPickerModal({ open, onOpenChange, onSelectQuestions, preSelectedIds = [], initialFilters }: QuestionPickerModalProps) {
     const [questions, setQuestions] = useState<QuestionBankEntry[]>([]);
     const [loading, setLoading] = useState(false);
     const [selectedMap, setSelectedMap] = useState<Record<string, QuestionBankEntry>>({});
@@ -27,6 +28,9 @@ export function QuestionPickerModal({ open, onOpenChange, onSelectQuestions, pre
     const [search, setSearch] = useState('');
     const [difficulty, setDifficulty] = useState<string>('all');
     const [verifiedOnly, setVerifiedOnly] = useState(false);
+    const [applyTaxonomyFilters, setApplyTaxonomyFilters] = useState(true);
+
+    const hasInitialFilters = initialFilters && Object.values(initialFilters).some(v => !!v);
 
     useEffect(() => {
         if (open) {
@@ -44,6 +48,9 @@ export function QuestionPickerModal({ open, onOpenChange, onSelectQuestions, pre
             // Note: In a real prod environment with Algolia, we'd use Algolia here.
             // For now, using standard getQuestions. We limit to 50 for performance.
             const filters: any = {};
+            if (applyTaxonomyFilters && initialFilters) {
+                Object.assign(filters, initialFilters);
+            }
             if (difficulty !== 'all') filters.difficulty = difficulty;
             
             let data = await getQuestions(filters, 50);
@@ -133,9 +140,26 @@ export function QuestionPickerModal({ open, onOpenChange, onSelectQuestions, pre
                         />
                         <label htmlFor="verified-only" className="text-sm font-medium flex items-center cursor-pointer">
                             <ShieldCheck className="w-4 h-4 mr-1 text-indigo-500" />
-                            Verified Only
+                            Verified
                         </label>
                     </div>
+                    {hasInitialFilters && (
+                        <div className="flex items-center gap-2 border rounded-md px-3 bg-blue-50/50 border-blue-200">
+                            <Checkbox 
+                                id="taxonomy-filter" 
+                                checked={applyTaxonomyFilters} 
+                                onCheckedChange={(c) => {
+                                    setApplyTaxonomyFilters(!!c);
+                                    // Let the next render handle fetch if needed, or user can click Filter manually.
+                                    // Actually better to just let user click Filter.
+                                }} 
+                            />
+                            <label htmlFor="taxonomy-filter" className="text-sm font-medium flex items-center cursor-pointer whitespace-nowrap text-blue-800">
+                                <Filter className="w-4 h-4 mr-1 text-blue-500" />
+                                Match Taxonomy
+                            </label>
+                        </div>
+                    )}
                     <Button onClick={fetchQuestions} variant="secondary">Filter</Button>
                 </div>
 

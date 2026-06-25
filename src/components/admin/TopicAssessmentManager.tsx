@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useToast } from "@/hooks/use-toast";
-import { PlusCircle, Pencil, Trash2, ArrowLeft, Loader2, Copy } from 'lucide-react';
+import { PlusCircle, Pencil, Trash2, ArrowLeft, Loader2, Copy, ExternalLink } from 'lucide-react';
 import { getAssessmentsByNode, saveAssessment, deleteAssessment, AssessmentCollectionType } from '@/lib/firebase/assessment';
 import { getTopicHierarchy } from '@/lib/firebase/guide';
 import { AssessmentEditor } from '@/components/admin/AssessmentEditor';
@@ -26,6 +26,14 @@ export function TopicAssessmentManager({ topicId, tabType, nodeLevel = 'topic' }
     return 'practiceSets';
   };
   const collectionName = mapTabToCollection(tabType);
+
+  const getFrontendUrl = (tab: string, slug: string) => {
+    if (tab === 'practice_sets') return `/practice/${slug}`;
+    if (tab === 'quizzes') return `/quizzes/${slug}`;
+    if (tab === 'mock_tests' || tab === 'model_test') return `/mock-tests/${slug}`;
+    if (tab === 'exams_papers') return `/previous-year-papers/${slug}`;
+    return `/practice/${slug}`;
+  };
 
   const fetchAssessments = async () => {
     setLoading(true);
@@ -175,6 +183,9 @@ export function TopicAssessmentManager({ topicId, tabType, nodeLevel = 'topic' }
                   </div>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
+                  <a href={getFrontendUrl(tabType, set.slug || set.id)} target="_blank" rel="noopener noreferrer" title="View Frontend" className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">
+                    <ExternalLink className="w-3.5 h-3.5 text-blue-500" />
+                  </a>
                   <button onClick={() => handleEdit(set)} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">
                     <Pencil className="w-3.5 h-3.5 text-slate-500" />
                   </button>

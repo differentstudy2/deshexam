@@ -90,6 +90,7 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false); // mobile drawer
   const [nodeSlug, setNodeSlug] = useState('');
+  const [nodeDbId, setNodeDbId] = useState<string>('');
 
   useEffect(() => {
     const loadContent = async () => {
@@ -102,6 +103,7 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
           if (nodeInfo.node.status) setStatus(nodeInfo.node.status);
           setNodeTitle(nodeInfo.node.title || nodeInfo.node.name || '');
           setNodeSlug(nodeInfo.node.fullSlug || nodeInfo.node.id);
+          setNodeDbId(nodeInfo.node.id);
 
           if (nodeInfo.level === 'chapter' || nodeInfo.level === 'topic') {
             setNodeLevel(nodeInfo.level);
@@ -377,9 +379,9 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
           </button>
         </div>
       ) : ['questions','mcq','creative_question','descriptive'].includes(activeTab) ? (
-        <TopicQuestionManager topicId={topicId} tabType={activeTab} nodeLevel={nodeLevel} />
+        <TopicQuestionManager topicId={nodeDbId || topicId} tabType={activeTab} nodeLevel={nodeLevel} />
       ) : ['model_test','practice_sets','quizzes','mock_tests','exams_papers'].includes(activeTab) ? (
-        <TopicAssessmentManager topicId={topicId} tabType={activeTab} nodeLevel={nodeLevel} />
+        <TopicAssessmentManager topicId={nodeDbId || topicId} tabType={activeTab} nodeLevel={nodeLevel} />
       ) : (
         <div className="flex flex-col items-center justify-center py-20 text-center text-slate-400">
           <FileText className="w-10 h-10 mb-3 opacity-30" />
