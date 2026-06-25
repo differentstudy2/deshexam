@@ -25,9 +25,25 @@ export async function generateMetadata({ params }: Props, parent: ResolvingMetad
   const { slug } = await params;
   const test = await getAssessmentBySlug('mockTests', slug) as MockTest | null;
   if (!test) return { title: 'Mock Test Not Found' };
+  const imageUrl = test.thumbnail || "https://deshexam.com/og/mock-tests.jpg";
+  const title = `${formatTitleForBrowser(test.title)} | Mock Test | DeshExam`;
+  const description = test.description || `Take the mock test: ${test.title}.`;
+
   return {
-    title: `${formatTitleForBrowser(test.title)} | Mock Test | DeshExam`,
-    description: test.description || `Take the mock test: ${test.title}.`,
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [{ url: imageUrl }],
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [imageUrl],
+    }
   };
 }
 
