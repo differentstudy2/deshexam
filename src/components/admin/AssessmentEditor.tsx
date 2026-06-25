@@ -454,33 +454,33 @@ export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock 
                                         label="Board" 
                                         placeholder="Board" 
                                         value={boards.find(b => b.id === editData.boardId)?.name || ''} 
-                                        onClick={() => openTaxonomySheet('board', 'Select Board', boards, editData.boardId || '', (v) => setEditData({...editData, boardId: v, classId: '', subjectId: '', textbookId: '', chapterId: '', topicId: ''}))} 
+                                        onClick={() => openTaxonomySheet('board', 'Select Board', boards, editData.boardId || '', (v) => setEditData(prev => ({...prev, boardId: v, classId: '', subjectId: '', textbookId: '', chapterId: '', topicId: ''})))} 
                                     />
                                     <MD3SelectField 
                                         label="Class" 
                                         placeholder="Class" 
                                         value={classes.find(b => b.id === editData.classId)?.name || ''} 
-                                        onClick={() => openTaxonomySheet('class', 'Select Class', classes.filter(b => !editData.boardId || b.parentId === editData.boardId), editData.classId || '', (v) => setEditData({...editData, classId: v, subjectId: '', textbookId: '', chapterId: '', topicId: ''}))} 
+                                        onClick={() => openTaxonomySheet('class', 'Select Class', classes.filter(b => !editData.boardId || b.parentId === editData.boardId), editData.classId || '', (v) => setEditData(prev => ({...prev, classId: v, subjectId: '', textbookId: '', chapterId: '', topicId: ''})))} 
                                     />
                                 </div>
                                 <MD3SelectField 
                                     label="Subject" 
                                     placeholder="Subject" 
                                     value={subjects.find(b => b.id === editData.subjectId)?.name || ''} 
-                                    onClick={() => openTaxonomySheet('subject', 'Select Subject', subjects.filter(b => !editData.classId || b.parentId === editData.classId), editData.subjectId || '', (v) => setEditData({...editData, subjectId: v, textbookId: '', chapterId: '', topicId: ''}))} 
+                                    onClick={() => openTaxonomySheet('subject', 'Select Subject', subjects.filter(b => !editData.classId || b.parentId === editData.classId), editData.subjectId || '', (v) => setEditData(prev => ({...prev, subjectId: v, textbookId: '', chapterId: '', topicId: ''})))} 
                                 />
                                 <div className="grid grid-cols-1 gap-4">
                                     <MD3SelectField 
                                         label="Textbook" 
                                         placeholder="Textbook" 
                                         value={textbooks.find(b => b.id === editData.textbookId)?.name || ''} 
-                                        onClick={() => openTaxonomySheet('textbook', 'Select Textbook', textbooks.filter(b => !editData.subjectId || b.parentId === editData.subjectId), editData.textbookId || '', (v) => setEditData({...editData, textbookId: v, chapterId: '', topicId: ''}))} 
+                                        onClick={() => openTaxonomySheet('textbook', 'Select Textbook', textbooks.filter(b => !editData.subjectId || b.parentId === editData.subjectId), editData.textbookId || '', (v) => setEditData(prev => ({...prev, textbookId: v, chapterId: '', topicId: ''})))} 
                                     />
                                     <MD3SelectField 
                                         label="Chapter" 
                                         placeholder="Chapter" 
                                         value={chapters.find(b => b.id === editData.chapterId)?.name || ''} 
-                                        onClick={() => openTaxonomySheet('chapter', 'Select Chapter', chapters.filter(b => !editData.textbookId || b.parentId === editData.textbookId), editData.chapterId || '', (v) => setEditData({...editData, chapterId: v, topicId: ''}))} 
+                                        onClick={() => openTaxonomySheet('chapter', 'Select Chapter', chapters.filter(b => !editData.textbookId || b.parentId === editData.textbookId), editData.chapterId || '', (v) => setEditData(prev => ({...prev, chapterId: v, topicId: ''})))} 
                                     />
                                 </div>
                                 <div className="grid grid-cols-1 gap-4">
@@ -488,13 +488,13 @@ export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock 
                                         label="Topic" 
                                         placeholder="Topic" 
                                         value={topics.find(b => b.id === editData.topicId)?.name || ''} 
-                                        onClick={() => openTaxonomySheet('topic', 'Select Topic', topics.filter(b => !editData.chapterId || b.parentId === editData.chapterId), editData.topicId || '', (v) => setEditData({...editData, topicId: v}))} 
+                                        onClick={() => openTaxonomySheet('topic', 'Select Topic', topics.filter(b => !editData.chapterId || b.parentId === editData.chapterId), editData.topicId || '', (v) => setEditData(prev => ({...prev, topicId: v})))} 
                                     />
                                     <MD3SelectField 
                                         label="Competitive Exam" 
                                         placeholder="Select Exam" 
                                         value={exams.find(b => b.id === (editData.examIds?.[0] || ''))?.name || ''} 
-                                        onClick={() => openTaxonomySheet('exam', 'Select Exam', exams, editData.examIds?.[0] || '', (v) => setEditData({...editData, examIds: [v]}))} 
+                                        onClick={() => openTaxonomySheet('exam', 'Select Exam', exams, editData.examIds?.[0] || '', (v) => setEditData(prev => ({...prev, examIds: [v]})))} 
                                     />
                                 </div>
                             </CardContent>
