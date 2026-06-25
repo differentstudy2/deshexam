@@ -21,10 +21,10 @@ export async function getAssessments(collectionName: AssessmentCollectionType) {
   return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 }
 
-// Fetch by Node (Chapter or Topic)
-export async function getAssessmentsByNode(collectionName: AssessmentCollectionType, level: 'chapter' | 'topic', nodeId: string) {
+// Fetch by Node (Board, Class, Subject, Textbook, Chapter, or Topic)
+export async function getAssessmentsByNode(collectionName: AssessmentCollectionType, level: 'board' | 'class' | 'subject' | 'textbook' | 'chapter' | 'topic', nodeId: string) {
   const colRef = collection(db, ASSESSMENT_COLLECTIONS[collectionName]);
-  const fieldToMatch = level === 'chapter' ? 'chapterId' : 'topicId';
+  const fieldToMatch = `${level}Id`;
   const q = query(colRef, where(fieldToMatch, '==', nodeId));
   const snapshot = await getDocs(q);
   if (snapshot.empty) return [];

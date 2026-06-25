@@ -190,6 +190,18 @@ export default async function GuidePage({ params }: { params: Promise<{ segments
        readingBreadcrumbs.push({ name: readingData.title, url: '#' });
     }
 
+    const assessmentTypes = ['practice', 'practice-set', 'practice-sets', 'mock-test', 'mock-tests', 'model-test', 'quiz', 'quizzes', 'exam-papers'];
+    if (contentType && assessmentTypes.includes(contentType)) {
+      const { NodeAssessmentListPage } = await import('@/components/guide/NodeAssessmentListPage');
+      return (
+        <NodeAssessmentListPage 
+          node={JSON.parse(JSON.stringify(node))} 
+          contentType={contentType} 
+          breadcrumbs={uiBreadcrumbs} 
+        />
+      );
+    }
+
     return (
       <ReadingLayout 
         id={node.id} 
