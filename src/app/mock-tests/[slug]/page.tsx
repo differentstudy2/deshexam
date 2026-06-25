@@ -155,6 +155,12 @@ export default async function MockTestLandingPage({ params }: Props) {
                       <ShieldCheck className="w-3 h-3" /> {badge}
                     </span>
                   ))}
+                  {test.reviewStats && test.reviewStats.totalReviews > 0 && (
+                    <span className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-400 bg-amber-400/10 border border-amber-400/20 px-3 py-1 rounded-full">
+                      <Star className="w-3.5 h-3.5 fill-amber-400" />
+                      {test.reviewStats.averageRating} ({test.reviewStats.totalReviews} Reviews)
+                    </span>
+                  )}
                 </div>
 
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight">

@@ -437,6 +437,7 @@ export default function QuizzesPage() {
                                 <TableHead>Questions</TableHead>
                                 <TableHead>Status</TableHead>
                                 <TableHead>Pricing</TableHead>
+                                <TableHead>Reviews</TableHead>
                                 <TableHead>Actions</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -480,6 +481,15 @@ export default function QuizzesPage() {
                                                     <Lock className="w-3.5 h-3.5 text-amber-600" />
                                                 )}
                                                 <span>₹ {test.accessType === 'free' ? '0' : (test.price || 0)}</span>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex flex-col">
+                                                <div className="flex items-center gap-1 text-sm font-medium">
+                                                    <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+                                                    {test.reviewStats?.averageRating || 0}
+                                                </div>
+                                                <span className="text-xs text-slate-500">{test.reviewStats?.totalReviews || 0} reviews</span>
                                             </div>
                                         </TableCell>
                                         <TableCell>
@@ -577,6 +587,11 @@ export default function QuizzesPage() {
                                                             <Lock className="w-4 h-4 text-amber-600" />
                                                         )}
                                                         <span>₹ {test.accessType === 'free' ? '0' : (test.price || 0)}</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-1 text-sm font-medium ml-3">
+                                                        <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+                                                        {test.reviewStats?.averageRating || 0}
+                                                        <span className="text-[10px] text-slate-400 font-normal ml-0.5">({test.reviewStats?.totalReviews || 0})</span>
                                                     </div>
 
                                                     <DropdownMenu>
