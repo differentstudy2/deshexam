@@ -942,7 +942,7 @@ export const getBoards = async () => {
     try {
         const q = query(collection(db, "boards"), orderBy("name"));
         const querySnapshot = await getDocs(q);
-        const boards = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as { name: string } }));
+        const boards = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as { name: string, acronym?: string } }));
         return boards;
     } catch (e) {
         console.error("Error getting boards: ", e);

@@ -358,7 +358,7 @@ export function TaxonomyDataTable({ type, title }: Props) {
       current = parent;
     }
     
-    return path.map(p => p.title).join(' > ');
+    return path.map(p => p.type === 'board' && p.acronym ? p.acronym : p.title).join(' > ');
   };
 
   return (
@@ -654,7 +654,7 @@ export function TaxonomyDataTable({ type, title }: Props) {
                     }}
                   >
                     <option value="all">All Boards</option>
-                    {availableBoards.map(b => <option key={b.id} value={b.id}>{b.title}</option>)}
+                    {availableBoards.map(b => <option key={b.id} value={b.id}>{b.acronym || b.title}</option>)}
                   </select>
                   <Filter className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 dark:text-slate-500 pointer-events-none" />
                 </div>

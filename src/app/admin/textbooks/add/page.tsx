@@ -76,7 +76,7 @@ type FormValues = z.infer<typeof formSchema>;
 type Subject = { id: string, name: string };
 type ClassCategory = { id: string, name: string };
 type Grade = { id: string, name: string };
-type Board = { id: string, name: string };
+type Board = { id: string, name: string, acronym?: string };
 type State = { id: string, name: string };
 type ExamType = { id: string, name: string };
 type Exam = { id: string, name: string };
@@ -419,7 +419,9 @@ export default function AddTextbookPage() {
                                 </FormControl>
                                 <SelectContent>
                                 {boards.map((b) => (
-                                    <SelectItem key={b.id} value={b.name}>{b.name}</SelectItem>
+                                    <SelectItem key={b.id} value={b.name}>
+                                        {b.acronym || b.name}
+                                    </SelectItem>
                                 ))}
                                 </SelectContent>
                             </Select>

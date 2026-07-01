@@ -77,7 +77,7 @@ type FormValues = z.infer<typeof formSchema>;
 type Subject = { id: string, name: string };
 type ClassCategory = { id: string, name: string };
 type Grade = { id: string, name: string };
-type Board = { id: string, name: string };
+type Board = { id: string, name: string, acronym?: string };
 type State = { id: string, name: string };
 type ExamType = { id: string, name: string };
 type Exam = { id: string, name: string };
@@ -256,13 +256,13 @@ export default function EditContentPage() {
         setExamCategories(examTypeData);
 
         if (contentData) {
-          form.reset(contentData as FormValues);
-          if (contentData.classCategory) {
-            const initialGrades = await getGradesByClass(contentData.classCategory);
+          form.reset(contentData as unknown as FormValues);
+          if ((contentData as any).classCategory) {
+            const initialGrades = await getGradesByClass((contentData as any).classCategory);
             setGrades(initialGrades);
           }
-          if (contentData.examCategory) {
-            const initialExams = await getExamsByCategory(contentData.examCategory);
+          if ((contentData as any).examCategory) {
+            const initialExams = await getExamsByCategory((contentData as any).examCategory);
             setExams(initialExams);
           }
         } else {
@@ -432,7 +432,7 @@ export default function EditContentPage() {
                                 <SelectContent>
                                 {boards.map((b) => (
                                     <SelectItem key={b.id} value={b.name}>
-                                    {b.name}
+                                        {b.acronym || b.name}
                                     </SelectItem>
                                 ))}
                                 </SelectContent>

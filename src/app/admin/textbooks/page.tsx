@@ -27,7 +27,7 @@ import { TextbookStats } from '@/components/feature/textbook-stats';
 import { TextbookFilters } from '@/components/feature/textbook-filters';
 import { Loader2 } from 'lucide-react';
 
-type MetafieldItem = { id: string, name: string };
+type MetafieldItem = { id: string, name: string, acronym?: string };
 
 export default function ManageTextbooksPage() {
   const [allTextbooks, setAllTextbooks] = useState<Textbook[]>([]);
@@ -200,7 +200,7 @@ export default function ManageTextbooksPage() {
             </CardHeader>
             <CardContent className="flex-grow p-4 flex flex-col overflow-y-auto">
               <h3 className="font-bold text-lg flex items-center gap-2 flex-grow"><Book /> {book.title}</h3>
-              {book.board && <Badge variant="outline">{book.board}</Badge>}
+              {book.board && <Badge variant="outline">{boards.find(b => b.name === book.board)?.acronym || book.board}</Badge>}
               <TextbookStats textbookId={book.id} />
             </CardContent>
             <CardFooter className="flex flex-col gap-2 p-4 border-t">
