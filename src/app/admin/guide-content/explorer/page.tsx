@@ -8,7 +8,7 @@ export default function ExplorerPage() {
   return (
     <>
       <DesktopExplorer className="hidden md:block" />
-      <MobileExplorer className="block md:hidden h-[calc(100vh-100px)]" />
+      <MobileExplorer className="block md:hidden h-[calc(100dvh-160px)]" />
     </>
   );
 }

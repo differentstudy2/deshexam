@@ -32,11 +32,12 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 import { 
-  getGuideBoards, getGuideClassesByBoard, getGuideClasses, getGuideSubjectsByClass, getGuideTextbooksBySubject, getGuideChaptersByTextbook, getGuideTopicsByChapter, getTopicSections, 
-  createGuideBoard, createGuideClass, createGuideSubject, createGuideTextbook, createGuideChapter, createGuideTopic,
-  deleteGuideBoard, deleteGuideClass, deleteGuideSubject, deleteGuideTextbook, deleteGuideChapter, deleteGuideTopic,
-  updateGuideNodeTitle, migrateOldTextbooksToGuide, updateGuideNodeOrders, updateGuideNodeSEO, getGuideNodeById,
-  moveGuideNode, getGuideAllChapters, getGuideTextbooks
+  getTaxonomyNodesByTrack, getTaxonomyNodesByType, getTaxonomyNodesByParent,
+  createTaxonomyNode, updateTaxonomyNode, deleteTaxonomyNode, getTaxonomyNodeById,
+  updateTaxonomyNodeOrders, generateSlug, NodeType
+} from '@/lib/firebase/taxonomy';
+import { 
+  getTopicSections, migrateOldTextbooksToGuide, getGuideAllChapters, getGuideTextbooks
 } from '@/lib/firebase/guide';
 import { db } from '@/lib/firebase/client';
 import { collection, query, getDocs, doc, setDoc } from 'firebase/firestore';
@@ -150,26 +151,14 @@ export function MobileExplorer({ className }: { className?: string }) {
       let fetched: any[] = [];
       const node = navigationStack[navigationStack.length - 1];
       if (node.type === 'root') {
-        const cls = (await getGuideBoards()) as any[];
-        fetched = cls.map((c, i) => ({ id: c.id, name: c.title || c.name || c.id, type: 'board', status: c.status || 'published', author: c.author, orderIndex: c.orderIndex ?? i }));
-      } else if (node.type === 'board') {
-        const res = (await getGuideClassesByBoard(node.id)) as any[];
-        fetched = res.map((r, i) => ({ id: r.id, name: r.title, type: 'class', status: r.status || 'published', author: r.author, orderIndex: r.orderIndex ?? i }));
-      } else if (node.type === 'class') {
-        const res = (await getGuideSubjectsByClass(node.id)) as any[];
-        fetched = res.map((r, i) => ({ id: r.id, name: r.title, type: 'subject', status: r.status || 'published', author: r.author, orderIndex: r.orderIndex ?? i }));
-      } else if (node.type === 'subject') {
-        const res = (await getGuideTextbooksBySubject(node.id)) as any[];
-        fetched = res.map((r, i) => ({ id: r.id, name: r.title, type: 'textbook', status: r.status || 'published', author: r.author, orderIndex: r.orderIndex ?? i }));
-      } else if (node.type === 'textbook') {
-        const res = (await getGuideChaptersByTextbook(node.id)) as any[];
-        fetched = res.map((r, i) => ({ id: r.id, name: r.title, type: 'chapter', status: r.status || 'published', author: r.author, orderIndex: r.orderIndex ?? i }));
-      } else if (node.type === 'chapter') {
-        const res = (await getGuideTopicsByChapter(node.id)) as any[];
-        fetched = res.map((r, i) => ({ id: r.id, name: r.title, type: 'topic', status: r.status || 'published', author: r.author, orderIndex: r.orderIndex ?? i }));
+        const cls = await getTaxonomyNodesByType('academic', 'board');
+        fetched = cls.map((c, i) => ({ id: c.id, name: c.title, type: 'board', status: c.status, author: c.author, orderIndex: c.orderIndex ?? i }));
       } else if (node.type === 'topic') {
         const res = (await getTopicSections(node.id)) as Record<string, any>;
         fetched = Object.keys(res).map((key, i) => ({ id: key, name: key, type: 'section', status: 'published', orderIndex: i }));
+      } else {
+        const res = await getTaxonomyNodesByParent(node.id);
+        fetched = res.map((r, i) => ({ id: r.id, name: r.title, type: r.type, status: r.status, author: r.author, orderIndex: r.orderIndex ?? i }));
       }
       fetched.sort((a, b) => a.orderIndex - b.orderIndex);
       setNodes(fetched);
@@ -207,7 +196,7 @@ export function MobileExplorer({ className }: { className?: string }) {
     setNodes(newNodes);
 
     try {
-      await updateGuideNodeOrders(newNodes[0].type, newNodes.map(c => ({ id: c.id, orderIndex: c.orderIndex })));
+      await updateTaxonomyNodeOrders(newNodes.map(c => ({ id: c.id, orderIndex: c.orderIndex })));
     } catch (e) {
       console.error("Failed to reorder", e);
     }
@@ -225,18 +214,20 @@ export function MobileExplorer({ className }: { className?: string }) {
     setSaving(true);
     try {
       const items = titleInput.split(/[\n,]/).map(s => s.trim()).filter(Boolean);
-      if (dialogState.parentType === 'root') {
-        for (const item of items) await createGuideBoard(item);
-      } else if (dialogState.parentType === 'board') {
-        for (const item of items) await createGuideClass(dialogState.parentId, item);
-      } else if (dialogState.parentType === 'class') {
-        for (const item of items) await createGuideSubject(dialogState.parentId, item);
-      } else if (dialogState.parentType === 'subject') {
-        for (const item of items) await createGuideTextbook(dialogState.parentId, item, authorInput);
-      } else if (dialogState.parentType === 'textbook') {
-        for (const item of items) await createGuideChapter(dialogState.parentId, item, authorInput);
-      } else if (dialogState.parentType === 'chapter') {
-        for (const item of items) await createGuideTopic(dialogState.parentId, item, authorInput);
+      for (const item of items) {
+        let nType: NodeType = 'board';
+        if (dialogState.parentType === 'board') nType = 'class';
+        else if (dialogState.parentType === 'class') nType = 'subject';
+        else if (dialogState.parentType === 'subject') nType = 'textbook';
+        else if (dialogState.parentType === 'textbook') nType = 'chapter';
+        else if (dialogState.parentType === 'chapter') nType = 'topic';
+        await createTaxonomyNode({
+          title: item,
+          type: nType,
+          track: 'academic',
+          parentId: dialogState.parentType === 'root' ? null : dialogState.parentId,
+          status: 'published'
+        });
       }
 
       dialogState.onSuccess();
@@ -252,7 +243,7 @@ export function MobileExplorer({ className }: { className?: string }) {
 
   const handleOpenSeo = async (nodeId: string, nodeType: string, nodeData: any, onSuccess: () => void) => {
     // We fetch fresh data from the db so the dialog doesn't show stale/empty data for previously updated children
-    const freshNode = await getGuideNodeById(nodeId) || nodeData;
+    const freshNode = await getTaxonomyNodeById(nodeId) || nodeData;
 
     setSeoInput({
       title: freshNode.title || '',
@@ -272,19 +263,20 @@ export function MobileExplorer({ className }: { className?: string }) {
       const parsedTags = seoInput.tags.split(',').map(t => t.trim()).filter(Boolean);
       const parsedKeywords = seoInput.keywords.split(',').map(k => k.trim()).filter(Boolean);
       
-      const success = await updateGuideNodeSEO(seoDialog.nodeType, seoDialog.nodeId, {
-        ...seoInput,
-        tags: parsedTags,
-        keywords: parsedKeywords
+      await updateTaxonomyNode(seoDialog.nodeId, {
+        slug: seoInput.slug,
+        featureImage: seoInput.featureImage,
+        seo: {
+          customTitle: seoInput.seoTitle,
+          customDescription: seoInput.description,
+          keywords: parsedKeywords
+        },
+        tags: parsedTags
       });
 
-      if (success) {
-        toast({ title: "Success", description: "SEO metadata saved successfully." });
-        setSeoDialog(prev => ({ ...prev, isOpen: false }));
-        seoDialog.onSuccess();
-      } else {
-        toast({ title: "Error", description: "Failed to save SEO metadata.", variant: "destructive" });
-      }
+      toast({ title: "Success", description: "SEO metadata saved successfully." });
+      setSeoDialog(prev => ({ ...prev, isOpen: false }));
+      seoDialog.onSuccess();
     } catch (e) {
       console.error(e);
       toast({ title: "Error", description: "An error occurred while saving.", variant: "destructive" });
@@ -303,7 +295,7 @@ export function MobileExplorer({ className }: { className?: string }) {
     if (!editTitleInput.trim()) return;
     setEditing(true);
     try {
-      await updateGuideNodeTitle(editDialog.nodeId, editDialog.nodeType, editTitleInput, editAuthorInput);
+      await updateTaxonomyNode(editDialog.nodeId, { title: editTitleInput, author: editAuthorInput });
       if (editDialog.nodeType === 'class') fetchRoot();
       editDialog.onSuccess();
       setEditDialog(prev => ({ ...prev, isOpen: false }));
@@ -334,20 +326,20 @@ export function MobileExplorer({ className }: { className?: string }) {
 
       let textbookId = null;
       if (nodeType === 'chapter') {
-        const nodeData: any = await getGuideNodeById(nodeId);
-        textbookId = nodeData?.textbookId;
+        const nodeData: any = await getTaxonomyNodeById(nodeId);
+        textbookId = nodeData?.parentId;
       } else if (nodeType === 'topic') {
-        const nodeData: any = await getGuideNodeById(nodeId);
-        const chapterId = nodeData?.chapterId;
+        const nodeData: any = await getTaxonomyNodeById(nodeId);
+        const chapterId = nodeData?.parentId;
         if (chapterId) {
-          const chapData: any = await getGuideNodeById(chapterId);
-          textbookId = chapData?.textbookId;
+          const chapData: any = await getTaxonomyNodeById(chapterId);
+          textbookId = chapData?.parentId;
         }
       }
 
       if (textbookId) {
         filteredTextbooks = textbooks.filter((t: any) => t.id === textbookId);
-        filteredChapters = chapters.filter((c: any) => c.textbookId === textbookId);
+        filteredChapters = chapters.filter((c: any) => c.parentId === textbookId);
       }
       
       const dests = [
@@ -367,16 +359,12 @@ export function MobileExplorer({ className }: { className?: string }) {
       const dest = moveDestinations.find(d => d.id === selectedDestination);
       if (!dest) throw new Error("Invalid destination");
 
-      const res = await moveGuideNode(moveNodeDialog.nodeId, moveNodeDialog.nodeType as any, dest.id, dest.type as any);
+      await updateTaxonomyNode(moveNodeDialog.nodeId, { parentId: dest.id });
       
-      if (res.success) {
-        toast({ title: "Success", description: res.message });
-        moveNodeDialog.onSuccess();
-        fetchRoot(); // Refresh root to reflect structural changes
-        setMoveNodeDialog({ ...moveNodeDialog, isOpen: false });
-      } else {
-        toast({ title: "Move failed", description: res.message, variant: "destructive" });
-      }
+      toast({ title: "Success", description: "Moved successfully." });
+      moveNodeDialog.onSuccess();
+      fetchRoot(); // Refresh root to reflect structural changes
+      setMoveNodeDialog({ ...moveNodeDialog, isOpen: false });
     } catch (e: any) {
       toast({ title: "Error", description: e.message || "Failed to move node", variant: "destructive" });
     } finally {
@@ -388,12 +376,7 @@ export function MobileExplorer({ className }: { className?: string }) {
     setDeleting(true);
     try {
       const { nodeId, nodeType } = deleteDialog;
-      if (nodeType === 'board') await deleteGuideBoard(nodeId);
-      else if (nodeType === 'class') await deleteGuideClass(nodeId);
-      else if (nodeType === 'subject') await deleteGuideSubject(nodeId);
-      else if (nodeType === 'textbook') await deleteGuideTextbook(nodeId);
-      else if (nodeType === 'chapter') await deleteGuideChapter(nodeId);
-      else if (nodeType === 'topic') await deleteGuideTopic(nodeId);
+      await deleteTaxonomyNode(nodeId);
 
       // If we deleted a root-level board, we need to refresh root
       if (nodeType === 'board') {
@@ -417,7 +400,13 @@ export function MobileExplorer({ className }: { className?: string }) {
       const boardsSnap = await getDocs(query(collection(db, 'guide_boards')));
       let boardId = '';
       if (boardsSnap.empty) {
-        boardId = await createGuideBoard('National Curriculum');
+        boardId = await createTaxonomyNode({
+          title: 'National Curriculum',
+          type: 'board',
+          track: 'academic',
+          parentId: null,
+          status: 'published'
+        });
       } else {
         boardId = boardsSnap.docs[0].id;
       }
@@ -444,7 +433,7 @@ export function MobileExplorer({ className }: { className?: string }) {
   const handleOpenBulkMove = async () => {
     setBulkMoveDialog(true);
     try {
-      const [boards, classes] = await Promise.all([getGuideBoards(), getGuideClasses()]);
+      const [boards, classes] = await Promise.all([getTaxonomyNodesByType('academic', 'board'), getTaxonomyNodesByType('academic', 'class')]);
       setAllBoardsForMove(boards);
       setAllClassesForMove(classes);
       setSelectedClassesForMove([]);
@@ -479,7 +468,7 @@ export function MobileExplorer({ className }: { className?: string }) {
   );
 
   return (
-    <div className={`flex flex-col h-full bg-[#f6faf8] dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden ${className || ''}`}>
+    <div className={`flex flex-col relative h-full bg-[#f6faf8] dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden ${className || ''}`}>
       {/* Mobile App Header (Green Theme) */}
       <div className="flex items-center justify-between p-4 bg-[#3b8c4c] text-white shrink-0 shadow-sm relative z-10">
         <div className="flex items-center gap-3 overflow-hidden">
