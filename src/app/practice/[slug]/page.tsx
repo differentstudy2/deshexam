@@ -241,7 +241,7 @@ export default async function PracticeLandingPage({ params }: Props) {
 
                 {/* Mobile CTA */}
                 <div className="lg:hidden">
-                  <StartTestButton slug={test.slug} accessType={test.accessType} price={test.price} allowedSubscriptionPlans={test.allowedSubscriptionPlans} />
+                  <StartTestButton slug={test.slug} accessType={test.accessType} price={test.price} allowedSubscriptionPlans={test.allowedSubscriptionPlans} basePath="/practice" />
                 </div>
               </div>
 
@@ -282,7 +282,7 @@ export default async function PracticeLandingPage({ params }: Props) {
                     ))}
 
                     <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
-                      <StartTestButton slug={test.slug} accessType={test.accessType} price={test.price} allowedSubscriptionPlans={test.allowedSubscriptionPlans} />
+                      <StartTestButton slug={test.slug} accessType={test.accessType} price={test.price} allowedSubscriptionPlans={test.allowedSubscriptionPlans} basePath="/practice" />
                     </div>
 
                     <p className="text-center text-[11px] text-slate-400">Strictly timed · Negative marking applies</p>
@@ -423,7 +423,7 @@ export default async function PracticeLandingPage({ params }: Props) {
                   </div>
                 </div>
 
-                <StartTestButton slug={test.slug} accessType={test.accessType} price={test.price} allowedSubscriptionPlans={test.allowedSubscriptionPlans} />
+                <StartTestButton slug={test.slug} accessType={test.accessType} price={test.price} allowedSubscriptionPlans={test.allowedSubscriptionPlans} basePath="/practice" />
 
                 {test.accessType !== 'subscription' && test.accessType !== 'both' && test.accessType !== 'one_time' && (
                   <p className="text-center text-[11px] text-slate-400">Free · No sign-up required to start</p>
@@ -443,7 +443,7 @@ export default async function PracticeLandingPage({ params }: Props) {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 {related.map(r => (
-                  <AssessmentCard key={r.id} assessment={r} type="Practice Set" href={`/practice/${r.slug}`} />
+                  <AssessmentCard key={r.id} assessment={r} type="Practice" href={`/practice/${r.slug}`} />
                 ))}
               </div>
             </section>
@@ -452,7 +452,7 @@ export default async function PracticeLandingPage({ params }: Props) {
 
         {/* Mobile sticky bottom CTA */}
         <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 px-4 py-3 shadow-xl transition-colors duration-300">
-          <StartTestButton slug={test.slug} accessType={test.accessType} price={test.price} allowedSubscriptionPlans={test.allowedSubscriptionPlans} />
+          <StartTestButton slug={test.slug} accessType={test.accessType} price={test.price} allowedSubscriptionPlans={test.allowedSubscriptionPlans} basePath="/practice" />
         </div>
       </div>
     </>

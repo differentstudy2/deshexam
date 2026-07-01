@@ -23,9 +23,10 @@ interface StartTestButtonProps {
   accessType?: 'free' | 'subscription' | 'one_time' | 'both';
   price?: number;
   allowedSubscriptionPlans?: string[];
+  basePath?: string;
 }
 
-export function StartTestButton({ slug, accessType = 'free', price = 0, allowedSubscriptionPlans = [] }: StartTestButtonProps) {
+export function StartTestButton({ slug, accessType = 'free', price = 0, allowedSubscriptionPlans = [], basePath = '/mock-tests' }: StartTestButtonProps) {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const { toast } = useToast();
@@ -81,7 +82,7 @@ export function StartTestButton({ slug, accessType = 'free', price = 0, allowedS
     } catch (err) {
       console.error("Fullscreen request failed:", err);
     }
-    router.push(`/mock-tests/${slug}/take`);
+    router.push(`${basePath}/${slug}/take`);
   };
 
   const handlePurchase = async () => {
