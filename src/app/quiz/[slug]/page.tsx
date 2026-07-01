@@ -47,7 +47,7 @@ export default async function QuizLandingPage({ params }: Props) {
     const { getContentById } = await import('@/lib/firebase/firestore');
     const legacyQuizData = await getContentById(slug);
     
-    if (legacyQuizData && legacyQuizData.testType === 'Quiz') {
+    if (legacyQuizData && (legacyQuizData as any).testType === 'Quiz') {
       // Serialize the timestamps for the client component
       const serializeTimestamps = (data: any): any => {
           if (!data) return data;
