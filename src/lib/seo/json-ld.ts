@@ -75,13 +75,16 @@ export function getOrganizationSchema() {
 export function getQuestionSchema(questionText: string, answerText: string) {
   return {
     "@context": "https://schema.org",
-    "@type": "Question",
-    name: questionText,
-    text: questionText,
-    answerCount: 1,
-    acceptedAnswer: {
-      "@type": "Answer",
-      text: answerText
+    "@type": "QAPage",
+    mainEntity: {
+      "@type": "Question",
+      name: questionText.substring(0, 100),
+      text: questionText,
+      answerCount: 1,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: answerText
+      }
     }
   };
 }
