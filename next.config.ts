@@ -87,10 +87,10 @@ const nextConfig: NextConfig = {
         source: '/mock-test/:id*',
         destination: '/content/:id*',
       },
-      {
-        source: '/quiz/:id*',
-        destination: '/content/:id*',
-      },
+      // {
+      //   source: '/quiz/:id*',
+      //   destination: '/content/:id*',
+      // },
       {
         source: '/exam/:id*',
         destination: '/content/:id*',
