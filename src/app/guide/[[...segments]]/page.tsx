@@ -143,7 +143,7 @@ export default async function GuidePage({ params }: { params: Promise<{ segments
 
   const courseSchema = getCourseSchema(
     node.title || 'Academy Guide',
-    node.seo?.metaDescription || `Study materials and guide for ${node.title}`,
+    node.seo?.customDescription || `Study materials and guide for ${node.title}`,
     `https://deshexam.com/guide/${requestedPath}`
   );
 
