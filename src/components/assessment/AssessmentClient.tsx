@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { MockTest } from '@/lib/assessment-types';
-import { getAssessments } from '@/lib/firebase/assessment';
+import { getAssessments, AssessmentCollectionType } from '@/lib/firebase/assessment';
 import { getTopLeaderboard, getDailyChallenges } from '@/lib/firebase/student-analytics';
 import { FeaturedMockTestCard } from '@/components/assessment/FeaturedMockTestCard';
 import { MockTestListCard } from '@/components/assessment/MockTestListCard';
@@ -13,7 +13,32 @@ import { Search, Loader2, ChevronRight, CheckCircle2, LayoutGrid, List as ListIc
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
-export default function MockTestsClient() {
+export interface AssessmentClientProps {
+  collectionName: AssessmentCollectionType;
+  type: string;
+  heroBadgeText: string;
+  heroTitle: React.ReactNode;
+  heroDescription: string;
+  primaryButtonText: string;
+  baseHref: string;
+  stats: {
+    total: string;
+    attempts: string;
+    rating: string;
+    successRate: string;
+  };
+}
+
+export function AssessmentClient({
+  collectionName,
+  type,
+  heroBadgeText,
+  heroTitle,
+  heroDescription,
+  primaryButtonText,
+  baseHref,
+  stats,
+}: AssessmentClientProps) {
   const [assessments, setAssessments] = useState<MockTest[]>([]);
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const [challenges, setChallenges] = useState<any[]>([]);
@@ -35,7 +60,7 @@ export default function MockTestsClient() {
       setLoading(true);
       try {
         const [data, lbData, chData] = await Promise.all([
-          getAssessments('mockTests'),
+          getAssessments(collectionName),
           getTopLeaderboard(4),
           getDailyChallenges()
         ]);
@@ -49,7 +74,7 @@ export default function MockTestsClient() {
       }
     }
     loadData();
-  }, []);
+  }, [collectionName]);
 
   const categories = ['All', 'WBBSE', 'WBCHSE', 'ICSE', 'WBCS', 'NEET', 'JEE', 'GK', 'Math', 'Science'];
 
@@ -103,18 +128,18 @@ export default function MockTestsClient() {
             {/* Hero Text */}
             <div className="flex-1 text-center lg:text-left mt-8">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-md text-white text-[13px] sm:text-sm font-semibold mb-6 shadow-xl">
-                <span>🔥</span> 70,000+ Mock Tests Available
+                <span>🔥</span> {heroBadgeText}
               </div>
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-[1.2] lg:leading-[1.1] mb-4 sm:mb-6 tracking-tight px-2 sm:px-0">
-                Online Mock Tests for <br className="hidden lg:block" /> Smarter Exam Preparation
+                {heroTitle}
               </h1>
               <p className="text-base sm:text-lg md:text-xl text-blue-100/80 mb-8 sm:mb-10 max-w-2xl mx-auto lg:mx-0 leading-relaxed px-4 lg:px-0">
-                Practice exam-style mock tests, improve speed, accuracy, and boost rank with AI-powered analytics.
+                {heroDescription}
               </p>
               
               <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 sm:gap-4 mb-8 sm:mb-10 w-full px-4 sm:px-0">
                 <Button className="w-full sm:w-auto h-12 sm:h-14 px-8 rounded-xl bg-[#16A34A] hover:bg-green-700 text-white font-bold text-base sm:text-lg shadow-lg shadow-green-600/20 transition-all hover:scale-105">
-                  Start Free Test
+                  {primaryButtonText}
                 </Button>
                 <Button variant="outline" className="w-full sm:w-auto h-12 sm:h-14 px-8 rounded-xl border-2 border-white/30 bg-white/5 hover:bg-white/10 text-white font-bold text-base sm:text-lg backdrop-blur-md transition-all">
                   Explore Categories
@@ -135,20 +160,20 @@ export default function MockTestsClient() {
               <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-[24px] p-8 shadow-2xl shadow-black/50">
                 <div className="space-y-6">
                   <div className="flex justify-between items-center border-b border-white/10 pb-4">
-                    <span className="text-blue-100 text-lg font-medium">Mock Tests:</span>
-                    <span className="text-white text-2xl font-bold">70,000+</span>
+                    <span className="text-blue-100 text-lg font-medium">{type}s:</span>
+                    <span className="text-white text-2xl font-bold">{stats.total}</span>
                   </div>
                   <div className="flex justify-between items-center border-b border-white/10 pb-4">
                     <span className="text-blue-100 text-lg font-medium">Daily Attempts:</span>
-                    <span className="text-white text-2xl font-bold">120K+</span>
+                    <span className="text-white text-2xl font-bold">{stats.attempts}</span>
                   </div>
                   <div className="flex justify-between items-center border-b border-white/10 pb-4">
                     <span className="text-blue-100 text-lg font-medium">Avg Rating:</span>
-                    <span className="text-white text-2xl font-bold">4.8</span>
+                    <span className="text-white text-2xl font-bold">{stats.rating}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-blue-100 text-lg font-medium">Success Rate:</span>
-                    <span className="text-white text-2xl font-bold">92%</span>
+                    <span className="text-white text-2xl font-bold">{stats.successRate}</span>
                   </div>
                 </div>
               </div>
@@ -166,7 +191,7 @@ export default function MockTestsClient() {
             <Input 
               value={search} 
               onChange={e => setSearch(e.target.value)} 
-              placeholder="Search by exam, class, subject, topic..." 
+              placeholder={`Search by exam, class, subject, topic...`} 
               className="w-full h-12 pl-12 pr-4 bg-slate-50/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 rounded-xl text-[15px] font-medium placeholder:text-slate-400 focus-visible:ring-[#16A34A]"
             />
           </div>
@@ -260,10 +285,10 @@ export default function MockTestsClient() {
         </div>
       </div>
 
-      {/* --- FEATURED MOCK TESTS SECTION --- */}
+      {/* --- FEATURED SECTION --- */}
       <div className="container max-w-7xl mx-auto px-4 mt-10">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white">Featured Mock Tests</h2>
+          <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white">Featured {type}s</h2>
           <Button variant="link" className="text-[#16A34A] font-bold">View All</Button>
         </div>
         
@@ -275,21 +300,21 @@ export default function MockTestsClient() {
               <FeaturedMockTestCard 
                 key={assessment.id} 
                 mockTest={assessment} 
-                baseHref="/mock-tests" 
+                baseHref={baseHref} 
               />
             ))}
           </div>
         )}
       </div>
 
-      {/* --- BROWSE MOCK TESTS SECTION --- */}
+      {/* --- BROWSE ALL SECTION --- */}
       <div className="container max-w-7xl mx-auto px-4 mt-16">
         
         {/* Section Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white">Browse All Mock Tests</h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{sorted.length.toLocaleString()} tests found</p>
+            <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white">Browse All {type}s</h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{sorted.length.toLocaleString()} items found</p>
           </div>
           
           {/* View Toggle */}
@@ -316,11 +341,11 @@ export default function MockTestsClient() {
             {loading ? (
               <div className="flex flex-col items-center justify-center py-24 text-slate-400">
                 <Loader2 className="w-10 h-10 animate-spin mb-4 text-[#16A34A]" />
-                <p className="font-medium">Loading premium mock tests...</p>
+                <p className="font-medium">Loading {type.toLowerCase()}s...</p>
               </div>
             ) : sorted.length === 0 ? (
               <div className="text-center py-24 bg-white dark:bg-slate-900 rounded-3xl border border-dashed border-slate-300 dark:border-slate-700 shadow-sm">
-                <p className="text-lg text-slate-500 dark:text-slate-400 font-medium">No mock tests found matching your criteria.</p>
+                <p className="text-lg text-slate-500 dark:text-slate-400 font-medium">No items found matching your criteria.</p>
                 <Button onClick={handleReset} variant="outline" className="mt-4 border-slate-300">Clear Filters</Button>
               </div>
             ) : viewMode === 'grid' ? (
@@ -329,7 +354,7 @@ export default function MockTestsClient() {
                   <FeaturedMockTestCard 
                     key={assessment.id} 
                     mockTest={assessment} 
-                    baseHref="/mock-tests" 
+                    baseHref={baseHref} 
                   />
                 ))}
               </div>
@@ -339,7 +364,7 @@ export default function MockTestsClient() {
                   <MockTestListCard 
                     key={assessment.id} 
                     mockTest={assessment} 
-                    baseHref="/mock-tests" 
+                    baseHref={baseHref} 
                   />
                 ))}
               </div>
@@ -355,7 +380,7 @@ export default function MockTestsClient() {
               <span className="inline-block bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase mb-4">
                 Premium Upgrade
               </span>
-              <h3 className="text-2xl font-extrabold leading-tight mb-4">Unlock Unlimited<br/>Mock Tests</h3>
+              <h3 className="text-2xl font-extrabold leading-tight mb-4">Unlock Unlimited<br/>Access</h3>
               <ul className="space-y-2 mb-6">
                 <li className="flex items-center gap-2 text-sm font-medium"><CheckCircle className="w-4 h-4 text-purple-200" /> Unlimited access</li>
                 <li className="flex items-center gap-2 text-sm font-medium"><CheckCircle className="w-4 h-4 text-purple-200" /> AI analytics</li>

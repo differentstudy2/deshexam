@@ -1,4 +1,4 @@
-import { AssessmentListing } from '@/components/assessment/AssessmentListing';
+import { AssessmentClient } from '@/components/assessment/AssessmentClient';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -8,12 +8,20 @@ export const metadata: Metadata = {
 
 export default function PracticeListingPage() {
   return (
-    <AssessmentListing 
+    <AssessmentClient 
       collectionName="practiceSets"
-      title="Practice Sets"
-      description="Topic-wise casual practice to build your foundation. Practice without the stress of a timer and get instant explanations for your mistakes."
       type="Practice"
+      heroBadgeText="Comprehensive Practice Sets"
+      heroTitle={<>Topic-wise Casual Practice <br className="hidden lg:block" /> to Build Your Foundation</>}
+      heroDescription="Practice without the stress of a timer and get instant explanations for your mistakes."
+      primaryButtonText="Start Practice"
       baseHref="/practice"
+      stats={{
+        total: "25,000+",
+        attempts: "80K+",
+        rating: "4.9",
+        successRate: "95%"
+      }}
     />
   );
 }

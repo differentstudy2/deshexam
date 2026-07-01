@@ -1,4 +1,4 @@
-import MockTestsClient from './mock-tests-client';
+import { AssessmentClient } from '@/components/assessment/AssessmentClient';
 import { Metadata } from 'next';
 import Link from 'next/link';
 
@@ -152,7 +152,21 @@ export default function MockTestsListingPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdOrg) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdSoftwareApp) }} />
       
-      <MockTestsClient />
+      <AssessmentClient 
+        collectionName="mockTests"
+        type="Mock Test"
+        heroBadgeText="70,000+ Mock Tests Available"
+        heroTitle={<>Online Mock Tests for <br className="hidden lg:block" /> Smarter Exam Preparation</>}
+        heroDescription="Practice exam-style mock tests, improve speed, accuracy, and boost rank with AI-powered analytics."
+        primaryButtonText="Start Free Test"
+        baseHref="/mock-tests"
+        stats={{
+          total: "70,000+",
+          attempts: "120K+",
+          rating: "4.8",
+          successRate: "92%"
+        }}
+      />
 
       {/* SEO Contextual Content Block */}
       <div className="container max-w-5xl mx-auto px-4 py-16 text-slate-700 dark:text-slate-300">
