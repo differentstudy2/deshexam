@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { AssessmentCard } from '@/components/assessment/AssessmentCard';
-import { StartTestButton } from './StartTestButton';
+import { StartTestButton } from '@/components/assessment/StartTestButton';
 import { MockTestReviews } from '@/components/assessment/MockTestReviews';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
