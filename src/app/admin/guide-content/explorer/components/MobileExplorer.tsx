@@ -483,9 +483,9 @@ export function MobileExplorer({ className }: { className?: string }) {
           )}
           <h1 className="text-xl font-bold truncate flex items-center gap-2">
             {activeLevel.type === 'root' ? 'DeshExam Explorer' : 
-             activeLevel.type === 'board' ? `${activeLevel.name} - Subjects` :
-             activeLevel.type === 'class' ? `${activeLevel.name} - Chapters` :
-             activeLevel.name}
+             activeLevel.type === 'board' ? `${activeLevel.name}${activeLevel.acronym ? ` (${activeLevel.acronym})` : ''} - Subjects` :
+             activeLevel.type === 'class' ? `${activeLevel.name}${activeLevel.acronym ? ` (${activeLevel.acronym})` : ''} - Chapters` :
+             `${activeLevel.name}${activeLevel.acronym ? ` (${activeLevel.acronym})` : ''}`}
           </h1>
         </div>
         <div className="flex items-center gap-2 shrink-0">
@@ -555,7 +555,7 @@ export function MobileExplorer({ className }: { className?: string }) {
                       <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center mb-2">
                          {getIcon(node.type)}
                       </div>
-                      <h3 className="text-sm font-bold text-slate-900 dark:text-white text-center mb-1 line-clamp-2">{node.name}</h3>
+                      <h3 className="text-sm font-bold text-slate-900 dark:text-white text-center mb-1 line-clamp-2">{node.title || node.name}{node.acronym ? ` (${node.acronym})` : ''}</h3>
                       <p className="text-[11px] font-medium text-[#3b8c4c] dark:text-[#4ade80]">Explore Classes</p>
                     </div>
                  );
@@ -569,7 +569,7 @@ export function MobileExplorer({ className }: { className?: string }) {
                         {getIcon(node.type)}
                       </div>
                       <div className="flex-1 min-w-0 py-0.5">
-                        <p className="font-bold text-slate-900 dark:text-slate-100 text-sm leading-tight mb-0.5">{node.name}</p>
+                        <p className="font-bold text-slate-900 dark:text-slate-100 text-sm leading-tight mb-0.5">{node.title || node.name}{node.acronym ? ` (${node.acronym})` : ''}</p>
                         <p className="text-[11px] text-slate-500 font-medium">
                            {isChapterLevel ? `${Math.floor(Math.random() * 5) + 1} Chapters` : `Chapters: ${Math.floor(Math.random() * 60) + 1}`}
                         </p>

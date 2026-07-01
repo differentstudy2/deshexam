@@ -154,7 +154,7 @@ const TreeNode = ({ node, level = 0, onAddClick, onBulkAddClick, onEditClick, on
           <Icon className={`w-5 h-5 ${conf.color}`} />
           <div className="flex flex-col">
             <span className={`font-semibold text-gray-800 ${level === 0 ? 'text-lg' : ''}`}>
-              {node.title || node.name}
+              {node.title || node.name}{node.acronym ? ` (${node.acronym})` : ''}
             </span>
             {node.author && (
               <span className="text-xs text-slate-500 italic mt-0.5">Author: {node.author}</span>

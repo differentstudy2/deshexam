@@ -48,7 +48,17 @@ export async function generateMetadata({ params }: { params: Promise<{ segments?
 
   if (!node) return { title: 'Not Found' };
 
-  const metadata = generateHybridSeo({ node, contentType });
+  let boardNode = null;
+  if (node.type === 'board') {
+    boardNode = node;
+  } else {
+    const boardAncestor = node.ancestors?.find(a => a.type === 'board');
+    if (boardAncestor?.id) {
+      boardNode = await getTaxonomyNodeById(boardAncestor.id);
+    }
+  }
+
+  const metadata = generateHybridSeo({ node, contentType, boardNode });
   
   if (node.featureImage && metadata.openGraph) {
     metadata.openGraph.images = [{ url: node.featureImage }];

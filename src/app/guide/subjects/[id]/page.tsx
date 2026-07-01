@@ -27,8 +27,8 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   }
 
   return {
-    title: `Subjects for ${node.title} - Academy Guide`,
-    description: `Browse all subjects available for ${node.title}.`,
+    title: `Subjects for ${node.acronym || node.title} - Academy Guide`,
+    description: `Browse all subjects available for ${node.acronym || node.title}.`,
   };
 }
 

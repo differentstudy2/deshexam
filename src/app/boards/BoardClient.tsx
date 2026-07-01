@@ -245,7 +245,7 @@ function BoardCard({ board, gradient, viewMode }: { board: IndianBoard, gradient
                 </h3>
                 {board.state && <Badge variant="secondary" className="text-xs font-normal">{board.state}</Badge>}
               </div>
-              <p className="text-slate-600 dark:text-slate-400 text-sm line-clamp-1">{board.title}</p>
+              <p className="text-slate-600 dark:text-slate-400 text-sm line-clamp-1">{board.title}{board.acronym ? ` (${board.acronym})` : ''}</p>
             </div>
             <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-indigo-500 transition-colors transform group-hover:translate-x-1" />
           </CardContent>
@@ -284,7 +284,7 @@ function BoardCard({ board, gradient, viewMode }: { board: IndianBoard, gradient
               )}
             </div>
             <p className="text-slate-500 dark:text-slate-400 text-sm font-medium line-clamp-2 min-h-[40px]">
-              {board.title}
+              {board.title}{board.acronym ? ` (${board.acronym})` : ''}
             </p>
           </div>
         </CardContent>

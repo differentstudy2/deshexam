@@ -5,17 +5,19 @@ interface SeoParams {
   node: TaxonomyNode;
   contentType?: ContentType | null;
   siteName?: string;
+  boardNode?: TaxonomyNode | null;
 }
 
 /**
  * Generates Hybrid SEO Metadata based on Custom Overrides, Dynamic Content, and Fallbacks.
  */
-export function generateHybridSeo({ node, contentType, siteName = 'DeshExam' }: SeoParams): Metadata {
+export function generateHybridSeo({ node, contentType, siteName = 'DeshExam', boardNode }: SeoParams): Metadata {
   const seo = node.seo || {};
   const isCustomSeo = seo.useCustomSeo;
 
   const getAncestorTitle = (type: string) => node.ancestors?.find(a => a.type === type)?.title || '';
-  const boardName = getAncestorTitle('board');
+  const actualBoardNode = node.type === 'board' ? node : boardNode;
+  const boardName = actualBoardNode?.acronym || actualBoardNode?.title || getAncestorTitle('board');
   const className = getAncestorTitle('class') || node.classSlug?.replace('-', ' ') || '';
   const subjectName = getAncestorTitle('subject');
 
@@ -32,7 +34,7 @@ export function generateHybridSeo({ node, contentType, siteName = 'DeshExam' }: 
     if (contentType) {
       baseTitle = `${node.title} ${contentType.toUpperCase()} - ${className || 'Guide'}`;
     } else if (node.type === 'board') {
-      baseTitle = `${node.title} Study Materials, Notes & Questions`;
+      baseTitle = `${boardName} Study Materials, Notes & Questions`;
     } else if (node.type === 'class') {
       baseTitle = `${boardName} ${className} Study Materials & Notes`;
     } else if (node.type === 'subject') {

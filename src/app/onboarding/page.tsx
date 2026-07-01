@@ -193,7 +193,7 @@ export default function OnboardingPage() {
                   >
                     <option value="">-- Choose Board --</option>
                     {boards.map(board => (
-                      <option key={board.id} value={board.id}>{board.title}</option>
+                      <option key={board.id} value={board.id}>{board.title}{board.acronym ? ` (${board.acronym})` : ''}</option>
                     ))}
                   </select>
                 </div>
