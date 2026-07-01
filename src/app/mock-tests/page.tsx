@@ -1,6 +1,10 @@
 import { AssessmentClient } from '@/components/assessment/AssessmentClient';
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { getAssessments } from '@/lib/firebase/assessment';
+import { getTopLeaderboard, getDailyChallenges } from '@/lib/firebase/student-analytics';
+import { serializeTimestamps } from '@/lib/utils';
+import { MockTest } from '@/lib/assessment-types';
 
 export const metadata: Metadata = {
   title: 'DeshExam Mock Tests – Free Online Practice Tests & Test Series',
@@ -143,7 +147,20 @@ const jsonLdSoftwareApp = {
   }
 };
 
-export default function MockTestsListingPage() {
+export const dynamic = 'force-dynamic';
+
+export default async function MockTestsListingPage() {
+  const [data, lbData, chData] = await Promise.all([
+    getAssessments('mockTests'),
+    getTopLeaderboard(4),
+    getDailyChallenges()
+  ]);
+
+  const publishedMockTests = (data as MockTest[]).filter(a => a.status === 'Published');
+  const initialAssessments = serializeTimestamps(publishedMockTests);
+  const initialLeaderboard = serializeTimestamps(lbData);
+  const initialChallenges = serializeTimestamps(chData);
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdCollection) }} />
@@ -153,6 +170,9 @@ export default function MockTestsListingPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdSoftwareApp) }} />
       
       <AssessmentClient 
+        initialAssessments={initialAssessments}
+        initialLeaderboard={initialLeaderboard}
+        initialChallenges={initialChallenges}
         collectionName="mockTests"
         type="Mock Test"
         heroBadgeText="70,000+ Mock Tests Available"

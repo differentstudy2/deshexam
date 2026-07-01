@@ -1,14 +1,34 @@
 import { AssessmentClient } from '@/components/assessment/AssessmentClient';
 import { Metadata } from 'next';
+import { getAssessments } from '@/lib/firebase/assessment';
+import { getTopLeaderboard, getDailyChallenges } from '@/lib/firebase/student-analytics';
+import { serializeTimestamps } from '@/lib/utils';
+import { MockTest } from '@/lib/assessment-types';
 
 export const metadata: Metadata = {
   title: 'Practice Sets | DeshExam',
-  description: 'Topic-wise casual practice to build your foundation.',
+  description: 'Practice questions by topic and chapter to improve your knowledge.',
 };
 
-export default function PracticeListingPage() {
+export const dynamic = 'force-dynamic';
+
+export default async function PracticeListingPage() {
+  const [data, lbData, chData] = await Promise.all([
+    getAssessments('practiceSets'),
+    getTopLeaderboard(4),
+    getDailyChallenges()
+  ]);
+
+  const publishedPracticeSets = (data as MockTest[]).filter(a => a.status === 'Published');
+  const initialAssessments = serializeTimestamps(publishedPracticeSets);
+  const initialLeaderboard = serializeTimestamps(lbData);
+  const initialChallenges = serializeTimestamps(chData);
+
   return (
     <AssessmentClient 
+      initialAssessments={initialAssessments}
+      initialLeaderboard={initialLeaderboard}
+      initialChallenges={initialChallenges} 
       collectionName="practiceSets"
       type="Practice"
       heroBadgeText="Comprehensive Practice Sets"

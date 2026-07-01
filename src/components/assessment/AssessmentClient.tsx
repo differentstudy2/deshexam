@@ -2,8 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { MockTest } from '@/lib/assessment-types';
-import { getAssessments, AssessmentCollectionType } from '@/lib/firebase/assessment';
-import { getTopLeaderboard, getDailyChallenges } from '@/lib/firebase/student-analytics';
 import { FeaturedMockTestCard } from '@/components/assessment/FeaturedMockTestCard';
 import { MockTestListCard } from '@/components/assessment/MockTestListCard';
 import { MockTestsFooter } from '@/components/assessment/MockTestsFooter';
@@ -14,7 +12,10 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 export interface AssessmentClientProps {
-  collectionName: AssessmentCollectionType;
+  initialAssessments?: MockTest[];
+  initialLeaderboard?: any[];
+  initialChallenges?: any[];
+  collectionName: string;
   type: string;
   heroBadgeText: string;
   heroTitle: React.ReactNode;
@@ -38,11 +39,14 @@ export function AssessmentClient({
   primaryButtonText,
   baseHref,
   stats,
+  initialAssessments = [],
+  initialLeaderboard = [],
+  initialChallenges = [],
 }: AssessmentClientProps) {
-  const [assessments, setAssessments] = useState<MockTest[]>([]);
-  const [leaderboard, setLeaderboard] = useState<any[]>([]);
-  const [challenges, setChallenges] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [assessments, setAssessments] = useState<MockTest[]>(initialAssessments);
+  const [leaderboard, setLeaderboard] = useState<any[]>(initialLeaderboard);
+  const [challenges, setChallenges] = useState<any[]>(initialChallenges);
+  const [loading, setLoading] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   
   // Filters
@@ -55,26 +59,7 @@ export function AssessmentClient({
   const [language, setLanguage] = useState('All');
   const [sort, setSort] = useState('Popularity');
 
-  useEffect(() => {
-    async function loadData() {
-      setLoading(true);
-      try {
-        const [data, lbData, chData] = await Promise.all([
-          getAssessments(collectionName),
-          getTopLeaderboard(4),
-          getDailyChallenges()
-        ]);
-        setAssessments((data as MockTest[]).filter(a => a.status === 'Published'));
-        setLeaderboard(lbData);
-        setChallenges(chData);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadData();
-  }, [collectionName]);
+
 
   const categories = ['All', 'WBBSE', 'WBCHSE', 'ICSE', 'WBCS', 'NEET', 'JEE', 'GK', 'Math', 'Science'];
 

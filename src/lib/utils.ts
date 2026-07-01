@@ -32,3 +32,17 @@ export function slugify(text: string): string {
         .replace(/-+$/, '')                // Trim - from end of text
         .substring(0, 100);                // Cap length to 100 chars max
 }
+
+export const serializeTimestamps = (data: any): any => {
+  if (!data) return data;
+  if (Array.isArray(data)) return data.map(item => serializeTimestamps(item));
+  if (typeof data === 'object' && data !== null) {
+      if (data.hasOwnProperty('seconds') && typeof (data as any).toDate === 'function') {
+          return (data as any).toDate().toISOString();
+      }
+      const newObj: { [key: string]: any } = {};
+      for (const key in data) newObj[key] = serializeTimestamps(data[key]);
+      return newObj;
+  }
+  return data;
+};
