@@ -2,12 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutGrid, Users, FileText, Settings } from "lucide-react";
+import { LayoutGrid, Users, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const bottomNavItems = [
   { href: "/admin", label: "Dashboard", icon: <LayoutGrid className="h-5 w-5" /> },
-  { href: "/admin/content", label: "Content", icon: <FileText className="h-5 w-5" /> },
   { href: "/admin/users", label: "Users", icon: <Users className="h-5 w-5" /> },
   { href: "/admin/settings", label: "Settings", icon: <Settings className="h-5 w-5" /> },
 ];
