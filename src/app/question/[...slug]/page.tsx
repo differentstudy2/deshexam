@@ -165,7 +165,16 @@ export default async function DynamicQuestionPage({ params }: Props) {
             question.questionText, 
             question.explanation || (question.options && question.correctAnswer && question.options[question.correctAnswer.toLowerCase() as keyof typeof question.options]) || question.correctAnswer || "Answer not provided",
             `https://deshexam.com/question/${lastSlug}`,
-            question.createdAt ? new Date(question.createdAt).toISOString() : "2024-01-01T00:00:00Z"
+            (function() {
+                try {
+                    if (!question.createdAt) return "2024-01-01T00:00:00Z";
+                    if (typeof question.createdAt?.toDate === 'function') return question.createdAt.toDate().toISOString();
+                    if (question.createdAt?.seconds) return new Date(question.createdAt.seconds * 1000).toISOString();
+                    const d = new Date(question.createdAt);
+                    if (!isNaN(d.getTime())) return d.toISOString();
+                } catch(e) {}
+                return "2024-01-01T00:00:00Z";
+            })()
         ),
         getFAQSchema([
             { q: "How can I save this question for later?", a: "You can click the \"Bookmark\" icon on the question card to save it to your dashboard." },
