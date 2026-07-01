@@ -24,26 +24,52 @@ export const revalidate = 0;
 export async function generateMetadata({ params }: Props, parent: ResolvingMetadata): Promise<Metadata> {
   const { slug } = await params;
   const test = await getAssessmentBySlug('quizzes', slug) as MockTest | null;
+  
   if (!test) return { title: 'Quiz Not Found' };
+  
   const imageUrl = test.thumbnail || "https://deshexam.com/og/quiz.jpg";
   const title = `${formatTitleForBrowser(test.title)} | Quiz | DeshExam`;
-  const description = test.description || `Take the quiz: ${test.title}.`;
+  const description = test.description || `Take the ${test.title} quiz to test your preparation for ${test.boardId || 'competitive'} exams.`;
+  
+  // Generate keywords based on taxonomy if available
+  const keywords = [
+    'online quiz', 'mcq test', 'mock test', 
+    test.boardId, test.classId, test.subjectId, test.chapterId
+  ].filter(Boolean).join(', ') + ', deshexam quizzes, free govt job preparation';
 
   return {
     title,
     description,
+    keywords,
+    alternates: {
+      canonical: `https://deshexam.com/quiz/${slug}`,
+    },
     openGraph: {
       title,
       description,
-      images: [{ url: imageUrl }],
+      url: `https://deshexam.com/quiz/${slug}`,
+      siteName: 'DeshExam',
+      images: [{ url: imageUrl, width: 1200, height: 630, alt: title }],
       type: 'website',
+      locale: 'en_US',
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
       images: [imageUrl],
-    }
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
   };
 }
 
