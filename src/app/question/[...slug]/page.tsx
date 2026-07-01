@@ -167,10 +167,11 @@ export default async function DynamicQuestionPage({ params }: Props) {
             `https://deshexam.com/question/${lastSlug}`,
             (function() {
                 try {
-                    if (!question.createdAt) return "2024-01-01T00:00:00Z";
-                    if (typeof question.createdAt?.toDate === 'function') return question.createdAt.toDate().toISOString();
-                    if (question.createdAt?.seconds) return new Date(question.createdAt.seconds * 1000).toISOString();
-                    const d = new Date(question.createdAt);
+                    const cDate = question.createdAt as any;
+                    if (!cDate) return "2024-01-01T00:00:00Z";
+                    if (typeof cDate?.toDate === 'function') return cDate.toDate().toISOString();
+                    if (cDate?.seconds) return new Date(cDate.seconds * 1000).toISOString();
+                    const d = new Date(cDate);
                     if (!isNaN(d.getTime())) return d.toISOString();
                 } catch(e) {}
                 return "2024-01-01T00:00:00Z";
