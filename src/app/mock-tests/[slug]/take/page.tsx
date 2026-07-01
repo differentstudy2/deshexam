@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { unstable_cache } from 'next/cache';
-import { ExamClient } from './exam-client';
+import { ExamClient } from '@/components/assessment/ExamClient';
 import { getAssessmentBySlug } from '@/lib/firebase/assessment';
 import { getQuestionsByIds } from '@/lib/firebase/question-bank';
 import { MockTest } from '@/lib/assessment-types';

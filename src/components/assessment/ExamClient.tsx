@@ -8,7 +8,6 @@ import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
-import { MockTest } from '@/lib/assessment-types';
 import { QuestionBankEntry } from '@/lib/question-bank-types';
 import { useAuth } from '@/hooks/use-auth';
 import { getUserProfile } from '@/lib/firebase/firestore';
@@ -16,8 +15,23 @@ import { saveExamAttempt, getUserExamAttemptsCount } from '@/lib/firebase/studen
 
 type QuestionState = 'unvisited' | 'answered' | 'skipped' | 'review' | 'current';
 
+export interface ExamConfig {
+  id: string;
+  slug: string;
+  title: string;
+  durationMin?: number;
+  totalMarks?: number;
+  negativeMarking?: number;
+  attemptsAllowed?: number;
+  isStrictMode?: boolean;
+  shuffleQuestions?: boolean;
+  shuffleOptions?: boolean;
+  accessType?: 'free' | 'subscription' | 'one_time' | 'both';
+  allowedSubscriptionPlans?: string[];
+}
+
 interface ExamClientProps {
-  mockTest: MockTest;
+  mockTest: ExamConfig;
   initialQuestions: QuestionBankEntry[];
 }
 
