@@ -72,7 +72,15 @@ export function getOrganizationSchema() {
   };
 }
 
-export function getQuestionSchema(questionText: string, answerText: string) {
+export function getQuestionSchema(questionText: string, answerText: string, url?: string, datePublished?: string) {
+  const author = {
+    "@type": "Organization",
+    name: "DeshExam",
+    url: "https://deshexam.com"
+  };
+  const publishedDate = datePublished || "2024-01-01T00:00:00Z";
+  const questionUrl = url || "https://deshexam.com";
+
   return {
     "@context": "https://schema.org",
     "@type": "QAPage",
@@ -81,9 +89,15 @@ export function getQuestionSchema(questionText: string, answerText: string) {
       name: questionText.substring(0, 100),
       text: questionText,
       answerCount: 1,
+      author: author,
+      datePublished: publishedDate,
       acceptedAnswer: {
         "@type": "Answer",
-        text: answerText
+        text: answerText,
+        url: questionUrl + "#answer",
+        author: author,
+        datePublished: publishedDate,
+        upvoteCount: 1
       }
     }
   };

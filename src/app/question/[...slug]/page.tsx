@@ -163,7 +163,9 @@ export default async function DynamicQuestionPage({ params }: Props) {
         getBreadcrumbSchema(breadcrumbItems),
         getQuestionSchema(
             question.questionText, 
-            question.explanation || (question.options && question.correctAnswer && question.options[question.correctAnswer.toLowerCase() as keyof typeof question.options]) || question.correctAnswer || "Answer not provided"
+            question.explanation || (question.options && question.correctAnswer && question.options[question.correctAnswer.toLowerCase() as keyof typeof question.options]) || question.correctAnswer || "Answer not provided",
+            `https://deshexam.com/question/${lastSlug}`,
+            question.createdAt ? new Date(question.createdAt).toISOString() : "2024-01-01T00:00:00Z"
         ),
         getFAQSchema([
             { q: "How can I save this question for later?", a: "You can click the \"Bookmark\" icon on the question card to save it to your dashboard." },
