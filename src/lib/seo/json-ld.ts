@@ -88,3 +88,18 @@ export function getQuestionSchema(questionText: string, answerText: string) {
     }
   };
 }
+
+export function getCourseSchema(courseName: string, description: string, url: string, providerName: string = "DeshExam") {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    name: courseName,
+    description: description,
+    url: url,
+    provider: {
+      "@type": "Organization",
+      name: providerName,
+      sameAs: "https://deshexam.com"
+    }
+  };
+}

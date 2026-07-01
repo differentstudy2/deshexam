@@ -9,6 +9,7 @@ import { SubjectDashboard } from '@/components/guide/SubjectDashboard';
 import { BoardDashboard } from '@/components/guide/BoardDashboard';
 import AcademyClient from '@/app/academy/AcademyClient';
 import { Metadata } from 'next';
+import { getCourseSchema } from '@/lib/seo/json-ld';
 
 export const dynamic = 'force-dynamic';
 
@@ -140,6 +141,12 @@ export default async function GuidePage({ params }: { params: Promise<{ segments
   const textbookTitle = node.type === 'textbook' ? node.title : getAncestorTitle('textbook');
   const chapterTitle = node.type === 'chapter' ? node.title : getAncestorTitle('chapter');
 
+  const courseSchema = getCourseSchema(
+    node.title || 'Academy Guide',
+    node.seo?.metaDescription || `Study materials and guide for ${node.title}`,
+    `https://deshexam.com/guide/${requestedPath}`
+  );
+
   // Fetch subjects for sidebar
   let subjects: any[] = [];
   const classNode = node.ancestors?.find(a => a.type === 'class') || (node.type === 'class' ? node : null);
@@ -204,27 +211,33 @@ export default async function GuidePage({ params }: { params: Promise<{ segments
     if (contentType && assessmentTypes.includes(contentType)) {
       const { NodeAssessmentListPage } = await import('@/components/guide/NodeAssessmentListPage');
       return (
-        <NodeAssessmentListPage 
-          node={JSON.parse(JSON.stringify(node))} 
-          contentType={contentType} 
-          breadcrumbs={uiBreadcrumbs} 
-        />
+        <>
+          <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }} />
+          <NodeAssessmentListPage 
+            node={JSON.parse(JSON.stringify(node))} 
+            contentType={contentType} 
+            breadcrumbs={uiBreadcrumbs} 
+          />
+        </>
       );
     }
 
     return (
-      <ReadingLayout 
-        id={node.id} 
-        data={JSON.parse(JSON.stringify(readingData))}
-        subjects={subjects} 
-        curriculum={curriculum} 
-        boardTitle={boardTitle}
-        classTitle={classTitle}
-        subjectTitle={subjectTitle}
-        textbookTitle={textbookTitle}
-        chapterTitle={chapterTitle}
-        breadcrumbs={readingBreadcrumbs}
-      />
+      <>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }} />
+        <ReadingLayout 
+          id={node.id} 
+          data={JSON.parse(JSON.stringify(readingData))}
+          subjects={subjects} 
+          curriculum={curriculum} 
+          boardTitle={boardTitle}
+          classTitle={classTitle}
+          subjectTitle={subjectTitle}
+          textbookTitle={textbookTitle}
+          chapterTitle={chapterTitle}
+          breadcrumbs={readingBreadcrumbs}
+        />
+      </>
     );
   }
 
@@ -235,19 +248,24 @@ export default async function GuidePage({ params }: { params: Promise<{ segments
 
   if (node.type?.toLowerCase() === 'board') {
     return (
-      <BoardDashboard 
-        id={node.id}
-        node={JSON.parse(JSON.stringify(node))}
-        classes={subjects} // At board level, subjects array contains classes
-        boardTitle={boardTitle || node.title}
-        breadcrumbs={uiBreadcrumbs}
-      />
+      <>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }} />
+        <BoardDashboard 
+          id={node.id}
+          node={JSON.parse(JSON.stringify(node))}
+          classes={subjects} // At board level, subjects array contains classes
+          boardTitle={boardTitle || node.title}
+          breadcrumbs={uiBreadcrumbs}
+        />
+      </>
     );
   }
 
   return (
-    <SubjectDashboard 
-      id={node.id} 
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }} />
+      <SubjectDashboard 
+        id={node.id} 
       pageType={node.type as "board" | "class" | "subject" | "textbook" | "chapter"}
       subjects={subjects} 
       curriculum={curriculum} 
@@ -259,5 +277,6 @@ export default async function GuidePage({ params }: { params: Promise<{ segments
       node={JSON.parse(JSON.stringify(node))}
       breadcrumbs={uiBreadcrumbs}
     />
+    </>
   );
 }

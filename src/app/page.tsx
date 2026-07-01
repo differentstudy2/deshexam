@@ -18,6 +18,7 @@ import {
   ClipboardList
 } from "lucide-react";
 import type { Metadata } from 'next';
+import { getSearchActionSchema, getOrganizationSchema, getFAQSchema } from '@/lib/seo/json-ld';
 
 export const metadata: Metadata = {
   title: "DeshExam - Best Online Learning Platform & Mock Test App",
@@ -179,8 +180,19 @@ const topContributors = [
 ];
 
 export default function Home() {
+  const schemas = [
+    getSearchActionSchema(),
+    getOrganizationSchema(),
+    getFAQSchema([
+      { q: "What is DeshExam?", a: "DeshExam is the ultimate online educational platform featuring 2M+ questions, live classes, model tests, and study materials for HSC, SSC, Admission, and Job preparations in Bangladesh." },
+      { q: "Are there mock tests available?", a: "Yes, DeshExam offers extensive mock tests and a massive question bank to help you prepare effectively." },
+      { q: "Is DeshExam suitable for Job Preparation?", a: "Absolutely! DeshExam provides comprehensive materials, questions, and model tests specifically designed for BCS, Primary, Bank, and other Govt. Job exams." }
+    ])
+  ];
+
   return (
     <div className="flex flex-col min-h-screen bg-slate-50 dark:bg-[#0f172a] font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemas) }} />
       {/* Hero Section */}
       <section className="relative w-full bg-[#0f172a] pt-24 pb-32 overflow-hidden">
         {/* Abstract Clouds/Shapes in background (simulated with absolute divs) */}
