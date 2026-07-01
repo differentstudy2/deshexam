@@ -191,7 +191,7 @@ const MenuBar = ({ editor }: { editor: any }) => {
   };
 
   return (
-    <div className="flex flex-wrap gap-1 p-2 border-b border-slate-300 dark:border-slate-800 bg-[#f8faf8] dark:bg-slate-900 sticky top-0 z-40 items-center">
+    <div className="flex flex-wrap gap-1 p-2 bg-[#f8faf8] dark:bg-slate-900 sticky top-0 z-40 items-center">
       {/* Headings Dropdown */}
       <select
         value={getActiveHeading()}
@@ -524,10 +524,12 @@ export function TiptapEditor({ content, onChange, maxHeight }: { content: string
 
   return (
     <div className="border border-slate-300 dark:border-slate-700 rounded-2xl overflow-hidden bg-slate-100/50 dark:bg-slate-950 focus-within:border-emerald-500 dark:focus-within:border-emerald-500 transition-colors shadow-sm flex flex-col">
-      <div className="flex items-center justify-between bg-white dark:bg-slate-900 border-b border-slate-300 dark:border-slate-800 pr-4">
-        <MenuBar editor={editor} />
+      <div className="flex flex-col xl:flex-row xl:items-start justify-between bg-white dark:bg-slate-900 border-b border-slate-300 dark:border-slate-800">
+        <div className="flex-1 w-full border-b xl:border-b-0 border-slate-200 dark:border-slate-800">
+          <MenuBar editor={editor} />
+        </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-end gap-2 p-2 shrink-0 bg-slate-50 dark:bg-slate-900/50">
           <Dialog open={aiDialogOpen} onOpenChange={setAiDialogOpen}>
             <DialogTrigger asChild>
               <Button variant="ghost" size="sm" className="h-8 gap-1 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 hover:text-indigo-700">
@@ -557,6 +559,8 @@ export function TiptapEditor({ content, onChange, maxHeight }: { content: string
             </DialogContent>
           </Dialog>
 
+          <div className="w-px h-6 bg-slate-300 dark:bg-slate-700 mx-1" />
+
           <select
             value={viewMode}
             onChange={(e) => {
@@ -568,7 +572,7 @@ export function TiptapEditor({ content, onChange, maxHeight }: { content: string
                 if (newMode === 'markdown') setRawContent((editor.storage as any).markdown.getMarkdown());
               }
             }}
-            className="text-xs border-none bg-transparent font-medium text-slate-600 focus:ring-0 cursor-pointer"
+            className="text-xs border-none bg-transparent font-medium text-slate-600 focus:ring-0 cursor-pointer p-0"
           >
             <option value="visual">Visual</option>
             <option value="html">HTML</option>
