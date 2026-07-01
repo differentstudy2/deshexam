@@ -632,8 +632,15 @@ export function MobileExplorer({ className }: { className?: string }) {
            </SheetHeader>
            {activeSheetNode && (
              <div className="flex flex-col gap-1 px-4">
+                {(activeSheetNode.type === 'chapter' || activeSheetNode.type === 'topic') && (
+                   <Button variant="ghost" className="justify-start h-12 text-base font-medium rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 text-emerald-600 hover:text-emerald-700" asChild onClick={() => setActiveSheetNode(null)}>
+                      <Link href={`/admin/guide-content/topic/${activeSheetNode.id}`}>
+                        <BookOpen className="w-5 h-5 mr-4" /> Manage Content (Notes/MCQ)
+                      </Link>
+                   </Button>
+                )}
                 <Button variant="ghost" className="justify-start h-12 text-base font-medium rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900" onClick={() => { handleOpenEdit(activeSheetNode.id, activeSheetNode.type, activeSheetNode.name, activeSheetNode.author, fetchRoot); setActiveSheetNode(null); }}>
-                   <Edit2 className="w-5 h-5 mr-4 text-slate-700 dark:text-slate-300" /> Edit Content
+                   <Edit2 className="w-5 h-5 mr-4 text-slate-700 dark:text-slate-300" /> Rename Title
                 </Button>
                 {(activeSheetNode.type === 'chapter' || activeSheetNode.type === 'topic') && (
                    <Button variant="ghost" className="justify-start h-12 text-base font-medium rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900" onClick={() => { handleMoveNodeClick(activeSheetNode.id, activeSheetNode.type, activeSheetNode.name, fetchRoot); setActiveSheetNode(null); }}>
