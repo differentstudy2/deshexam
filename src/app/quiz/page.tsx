@@ -61,21 +61,50 @@ export default async function QuizListingPage() {
   const initialLeaderboard = serializeTimestamps(lbData);
   const initialChallenges = serializeTimestamps(chData);
 
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'WebPage',
-    name: 'Free Online Quizzes & MCQs for Govt Job Exams | DeshExam',
-    description: 'Boost your exam preparation with interactive online quizzes, daily challenges, and mock tests for WBCS, PSC, SSC, TET, and WBP.',
-    url: 'https://deshexam.com/quiz',
-    publisher: {
-      '@type': 'Organization',
-      name: 'DeshExam',
-      logo: {
-        '@type': 'ImageObject',
-        url: 'https://deshexam.com/favicon-bg.png'
+  const jsonLd = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'WebPage',
+      name: 'Free Online Quizzes & MCQs for Govt Job Exams | DeshExam',
+      description: 'Boost your exam preparation with interactive online quizzes, daily challenges, and mock tests for WBCS, PSC, SSC, TET, and WBP.',
+      url: 'https://deshexam.com/quiz',
+      publisher: {
+        '@type': 'Organization',
+        name: 'DeshExam',
+        logo: {
+          '@type': 'ImageObject',
+          url: 'https://deshexam.com/favicon-bg.png'
+        }
       }
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        {
+          '@type': 'ListItem',
+          position: 1,
+          name: 'Home',
+          item: 'https://deshexam.com'
+        },
+        {
+          '@type': 'ListItem',
+          position: 2,
+          name: 'Quizzes',
+          item: 'https://deshexam.com/quiz'
+        }
+      ]
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      itemListElement: publishedQuizzes.slice(0, 10).map((quiz, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        url: `https://deshexam.com/quiz/${quiz.slug}`
+      }))
     }
-  };
+  ];
 
   return (
     <>
