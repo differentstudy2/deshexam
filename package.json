@@ -111,6 +111,7 @@
   "devDependencies": {
     "@capacitor/android": "^8.4.0",
     "@capacitor/cli": "^8.4.0",
+    "@tailwindcss/typography": "^0.5.20",
     "@types/katex": "^0.16.7",
     "@types/node": "^20",
     "@types/react": "^18",

@@ -28,7 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
+import { RichTextEditor } from '@/components/admin/RichTextEditor';
 import { useToast } from '@/hooks/use-toast';
 import { addContent, updateContent } from '@/lib/firebase/firestore';
 import { Loader2, Save, ArrowLeft } from 'lucide-react';
@@ -219,10 +219,9 @@ export function PostEditor({ contentType, initialData, contentId, backUrl }: Pos
                   <FormItem>
                     <FormLabel>Content / Body</FormLabel>
                     <FormControl>
-                      <Textarea 
-                        placeholder={`Write your ${contentType.toLowerCase()} content here...`} 
-                        className="min-h-[300px]" 
-                        {...field} 
+                      <RichTextEditor 
+                        content={field.value} 
+                        onChange={field.onChange} 
                       />
                     </FormControl>
                     <FormMessage />
