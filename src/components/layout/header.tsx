@@ -134,6 +134,14 @@ const adminNavGroups = [
     ]
   },
   {
+    title: "Blog & Updates",
+    items: [
+      { href: '/admin/blog', label: 'Blog Posts', icon: <FileText className="h-4 w-4" /> },
+      { href: '/admin/job', label: 'Job Circulars', icon: <Briefcase className="h-4 w-4" /> },
+      { href: '/admin/news', label: 'News & Notices', icon: <Bell className="h-4 w-4" /> },
+    ]
+  },
+  {
     title: "Assessment Center",
     items: [
       { href: '/admin/question-bank/questions', label: 'Question Bank', icon: <ClipboardList className="h-4 w-4" /> },

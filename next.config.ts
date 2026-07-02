@@ -87,6 +87,18 @@ const nextConfig: NextConfig = {
         source: '/mock-test/:id*',
         destination: '/content/:id*',
       },
+      {
+        source: '/blog/:id*',
+        destination: '/content/:id*',
+      },
+      {
+        source: '/job/:id*',
+        destination: '/content/:id*',
+      },
+      {
+        source: '/news/:id*',
+        destination: '/content/:id*',
+      },
       // {
       //   source: '/quiz/:id*',
       //   destination: '/content/:id*',
