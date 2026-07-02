@@ -69,7 +69,7 @@ type TreeNodeProps = {
   onEditClick: (nodeId: string, nodeName: string, nodeAuthor: string | undefined, onSuccess: () => void) => void;
   onDeleteClick: (nodeId: string, nodeName: string, onSuccess: () => void) => void;
   onSeoClick: (nodeId: string, nodeData: any, onSuccess: () => void) => void;
-  onMoveClick: (nodeId: string, nodeName: string, onSuccess: () => void) => void;
+  onMoveClick: (node: any, onSuccess: () => void) => void;
   onBulkMigrateClick?: (nodeId: string, nodeType: NodeType, onSuccess: () => void) => void;
   onMoveUp?: () => void;
   onMoveDown?: () => void;
@@ -273,7 +273,7 @@ const TreeNode = ({ node, level = 0, onAddClick, onBulkAddClick, onEditClick, on
                 <Settings className="w-4 h-4 mr-2 text-amber-500" /> SEO Settings
               </DropdownMenuItem>
               {(node.type === 'chapter' || node.type === 'topic') && (
-                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onMoveClick(node.id, node.title || node.name, () => { if (refreshParent) refreshParent(); }); }}>
+                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onMoveClick(node, () => { if (refreshParent) refreshParent(); }); }}>
                   <ArrowRightLeft className="w-4 h-4 mr-2 text-indigo-500" /> Move / Convert Node
                 </DropdownMenuItem>
               )}
@@ -513,15 +513,32 @@ export function DesktopExplorer({ className }: { className?: string }) {
     } catch (e) { toast({ title: "Error", description: "Failed to delete item.", variant: "destructive" }); } finally { setDeleting(false); }
   };
 
-  const handleMoveNodeClick = async (nodeId: string, nodeName: string, onSuccess: () => void) => {
-    setMoveNodeDialog({ isOpen: true, nodeId, nodeName, onSuccess }); setSelectedDestination('');
+  const handleMoveNodeClick = async (node: any, onSuccess: () => void) => {
+    setMoveNodeDialog({ isOpen: true, nodeId: node.id, nodeName: node.title || node.name, onSuccess }); 
+    setSelectedDestination('');
     try {
-      const textbooks = await getTaxonomyNodesByType('academic', 'textbook'); 
-      const chapters = await getTaxonomyNodesByType('academic', 'chapter');
-      setMoveDestinations([
-        ...textbooks.map((t: any) => ({ id: t.id, name: t.title, type: 'textbook', label: `Textbook: ${t.title}` })),
-        ...chapters.map((c: any) => ({ id: c.id, name: c.title, type: 'chapter', label: `Chapter: ${c.title}` }))
-      ].filter(d => d.id !== nodeId));
+      let dests: any[] = [];
+      if (node.type === 'chapter') {
+        if (node.parentId) {
+           const siblings = await getTaxonomyNodesByParent(node.parentId);
+           dests = siblings.map(c => ({ id: c.id, name: c.title, type: 'chapter', label: `Chapter: ${c.title}` }));
+        }
+      } else if (node.type === 'topic') {
+        if (node.parentId) {
+           const parentChapter = await getTaxonomyNodeById(node.parentId);
+           if (parentChapter?.parentId) {
+              const textbookId = parentChapter.parentId;
+              const textbook = await getTaxonomyNodeById(textbookId);
+              const chapters = await getTaxonomyNodesByParent(textbookId);
+              
+              if (textbook) {
+                 dests.push({ id: textbook.id, name: textbook.title, type: 'textbook', label: `Textbook: ${textbook.title} (Convert to Chapter)` });
+              }
+              dests.push(...chapters.map(c => ({ id: c.id, name: c.title, type: 'chapter', label: `Chapter: ${c.title}` })));
+           }
+        }
+      }
+      setMoveDestinations(dests.filter(d => d.id !== node.id));
     } catch (e) { toast({ title: "Error", description: "Failed to load destinations", variant: "destructive" }); }
   };
 
