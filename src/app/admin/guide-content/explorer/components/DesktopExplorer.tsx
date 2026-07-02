@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
@@ -25,9 +26,12 @@ import { Label } from '@/components/ui/label';
 import { 
   FolderTree, ChevronRight, ChevronDown, GraduationCap, Library, BookOpen, Layers, FileText,
   Plus, MoreVertical, Edit2, Loader2, Trash2, ArrowUp, ArrowDown, Settings, Eye, ArrowRightLeft, 
-  Search, AlignLeft, BarChart3, Bookmark, LayoutGrid, List
+  Search, AlignLeft, BarChart3, Bookmark, LayoutGrid, List, GripVertical, MoveRight
 } from 'lucide-react';
 import Link from 'next/link';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { 
   getTaxonomyNodesByTrack, getTaxonomyNodesByType, getTaxonomyNodesByParent,
   createTaxonomyNode, updateTaxonomyNode, deleteTaxonomyNode, getTaxonomyNodeById,
@@ -66,15 +70,50 @@ type TreeNodeProps = {
   onDeleteClick: (nodeId: string, nodeName: string, onSuccess: () => void) => void;
   onSeoClick: (nodeId: string, nodeData: any, onSuccess: () => void) => void;
   onMoveClick: (nodeId: string, nodeName: string, onSuccess: () => void) => void;
+  onBulkMigrateClick?: (nodeId: string, nodeType: NodeType, onSuccess: () => void) => void;
   onMoveUp?: () => void;
   onMoveDown?: () => void;
   refreshParent?: () => void;
+  dragListeners?: any;
+  dragAttributes?: any;
 };
 
-const TreeNode = ({ node, level = 0, onAddClick, onBulkAddClick, onEditClick, onDeleteClick, onSeoClick, onMoveClick, onMoveUp, onMoveDown, refreshParent }: TreeNodeProps) => {
+const SortableTreeNode = (props: TreeNodeProps) => {
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: props.node.id });
+  const style = { transform: CSS.Transform.toString(transform), transition };
+  return (
+    <div ref={setNodeRef} style={style}>
+      <TreeNode {...props} dragListeners={listeners} dragAttributes={attributes} />
+    </div>
+  );
+};
+
+const TreeNode = ({ node, level = 0, onAddClick, onBulkAddClick, onEditClick, onDeleteClick, onSeoClick, onMoveClick, onBulkMigrateClick, onMoveUp, onMoveDown, refreshParent, dragListeners, dragAttributes }: TreeNodeProps) => {
   const [expanded, setExpanded] = useState(false);
   const [children, setChildren] = useState<any[] | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (active.id !== over?.id && children) {
+      const oldIndex = children.findIndex((c) => c.id === active.id);
+      const newIndex = children.findIndex((c) => c.id === over?.id);
+      
+      const newChildren = arrayMove(children, oldIndex, newIndex);
+      newChildren.forEach((child, i) => { child.orderIndex = i; });
+      setChildren(newChildren);
+      try {
+        await updateTaxonomyNodeOrders(newChildren.map(c => ({ id: c.id, orderIndex: c.orderIndex })));
+      } catch (e) {
+        console.error("Failed to reorder", e);
+      }
+    }
+  };
 
   const handleToggle = async (forceReload = false) => {
     const isExpanding = forceReload ? true : !expanded;
@@ -161,6 +200,13 @@ const TreeNode = ({ node, level = 0, onAddClick, onBulkAddClick, onEditClick, on
       <div className={`group flex items-center justify-between p-3 rounded-xl transition-all ${conf.bg} ${conf.border} ${level === 0 ? 'shadow-sm hover:shadow-md mb-3 border-gray-200' : 'mb-1.5'}`}>
         
         <div className="flex items-center gap-3 cursor-pointer flex-1" onClick={() => hasChildren && handleToggle()}>
+          
+          {dragListeners && (
+            <div {...dragListeners} {...dragAttributes} className="cursor-grab p-1 -ml-2 rounded text-slate-300 hover:text-slate-600 hover:bg-slate-200" onClick={(e) => e.stopPropagation()}>
+              <GripVertical className="w-4 h-4" />
+            </div>
+          )}
+          
           <div className={`w-6 flex justify-center items-center ${conf.color} bg-white rounded-full h-6 shadow-sm border border-gray-100`}>
             {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : hasChildren ? (
               expanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />
@@ -193,66 +239,51 @@ const TreeNode = ({ node, level = 0, onAddClick, onBulkAddClick, onEditClick, on
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-          
-          {/* Section Edit Link */}
-          {node.type === 'topic' || node.type === 'chapter' ? (
-            <Link href={`/admin/guide-content/topic/${node.id}`}>
-              <Button variant="ghost" size="sm" className="h-8 px-2 text-xs bg-emerald-50 text-emerald-600 hover:bg-emerald-100">
-                <Edit2 className="w-3 h-3 mr-1" /> Content
-              </Button>
-            </Link>
-          ) : null}
-
-          {/* Core Actions */}
-          {node.type !== 'section' && (
-            <>
-              {node.type !== 'topic' && (
-                <>
-                  <Button variant="ghost" size="sm" className="h-8 px-2 text-xs text-emerald-600 hover:bg-emerald-50" onClick={node.type === 'chapter' ? () => window.location.href = `/admin/guide-content/topic/create?chapterId=${node.id}` : handleAddChild}>
-                    <Plus className="w-4 h-4 mr-1" /> {getChildTypeName()}
-                  </Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-600 hover:bg-blue-50" onClick={handleBulkAddChild} title={`Bulk Add ${getChildTypeName()}s`}>
-                    <AlignLeft className="w-4 h-4" />
-                  </Button>
-                </>
-              )}
-              
-              <Button variant="ghost" size="icon" className="h-8 w-8 text-amber-600 hover:bg-amber-50" onClick={(e) => { e.stopPropagation(); onEditClick(node.id, node.title || node.name, node.author, () => { if (refreshParent) refreshParent(); }); }} title="Rename">
-                <Edit2 className="w-4 h-4" />
-              </Button>
-              
-              <Button variant="ghost" size="icon" className="h-8 w-8 text-red-600 hover:bg-red-50" onClick={(e) => { e.stopPropagation(); onDeleteClick(node.id, node.title || node.name, () => { if (refreshParent) refreshParent(); }); }} title="Delete">
-                <Trash2 className="w-4 h-4" />
-              </Button>
-
-              {/* Advanced Actions Dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:bg-slate-100" onClick={(e) => e.stopPropagation()}>
-                    <MoreVertical className="w-4 h-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48" onClick={(e) => e.stopPropagation()}>
-                  {onMoveUp && <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onMoveUp(); }}><ArrowUp className="w-4 h-4 mr-2 text-slate-500" /> Move Up</DropdownMenuItem>}
-                  {onMoveDown && <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onMoveDown(); }}><ArrowDown className="w-4 h-4 mr-2 text-slate-500" /> Move Down</DropdownMenuItem>}
-                  <DropdownMenuItem asChild>
-                    <Link href={`/guide/${node.fullSlug || node.id}`} target="_blank" onClick={(e) => e.stopPropagation()}>
-                      <Eye className="w-4 h-4 mr-2 text-emerald-500" /> View in Guide
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onSeoClick(node.id, node, () => { if (refreshParent) refreshParent(); }); }}>
-                    <Settings className="w-4 h-4 mr-2 text-amber-500" /> SEO Settings
-                  </DropdownMenuItem>
-                  {(node.type === 'chapter' || node.type === 'topic') && (
-                    <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onMoveClick(node.id, node.title || node.name, () => { if (refreshParent) refreshParent(); }); }}>
-                      <ArrowRightLeft className="w-4 h-4 mr-2 text-indigo-500" /> Move / Convert
-                    </DropdownMenuItem>
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </>
+        <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+          {getChildTypeName() && (
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-emerald-600 hover:bg-emerald-50" onClick={handleAddChild} title={`Add ${getChildTypeName()}`}>
+              <Plus className="w-4 h-4" />
+            </Button>
           )}
+          
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-600 hover:bg-blue-50" onClick={(e) => { e.stopPropagation(); onEditClick(node.id, node.title || node.name, node.author, () => { if (refreshParent) refreshParent(); }); }} title="Rename">
+            <Edit2 className="w-4 h-4" />
+          </Button>
+          
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-red-600 hover:bg-red-50" onClick={(e) => { e.stopPropagation(); onDeleteClick(node.id, node.title || node.name, () => { if (refreshParent) refreshParent(); }); }} title="Delete">
+            <Trash2 className="w-4 h-4" />
+          </Button>
+
+          {/* Advanced Actions Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:bg-slate-100" onClick={(e) => e.stopPropagation()}>
+                <MoreVertical className="w-4 h-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56" onClick={(e) => e.stopPropagation()}>
+              {onMoveUp && <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onMoveUp(); }}><ArrowUp className="w-4 h-4 mr-2 text-slate-500" /> Move Up</DropdownMenuItem>}
+              {onMoveDown && <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onMoveDown(); }}><ArrowDown className="w-4 h-4 mr-2 text-slate-500" /> Move Down</DropdownMenuItem>}
+              <DropdownMenuItem asChild>
+                <Link href={`/guide/${node.fullSlug || node.id}`} target="_blank" onClick={(e) => e.stopPropagation()}>
+                  <Eye className="w-4 h-4 mr-2 text-emerald-500" /> View in Guide
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onSeoClick(node.id, node, () => { if (refreshParent) refreshParent(); }); }}>
+                <Settings className="w-4 h-4 mr-2 text-amber-500" /> SEO Settings
+              </DropdownMenuItem>
+              {(node.type === 'chapter' || node.type === 'topic') && (
+                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onMoveClick(node.id, node.title || node.name, () => { if (refreshParent) refreshParent(); }); }}>
+                  <ArrowRightLeft className="w-4 h-4 mr-2 text-indigo-500" /> Move / Convert Node
+                </DropdownMenuItem>
+              )}
+              {(node.type === 'textbook' || node.type === 'chapter') && onBulkMigrateClick && (
+                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onBulkMigrateClick(node.id, node.type as NodeType, () => { if (refreshParent) refreshParent(); }); }}>
+                  <MoveRight className="w-4 h-4 mr-2 text-purple-500" /> Bulk Move Items
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
@@ -265,22 +296,32 @@ const TreeNode = ({ node, level = 0, onAddClick, onBulkAddClick, onEditClick, on
             {children.length === 0 ? (
               <div className="text-xs text-slate-400 italic py-3">No items found.</div>
             ) : (
-              children.map((child, index) => (
-                <TreeNode 
-                  key={child.id} 
-                  node={child} 
-                  level={level + 1} 
-                  refreshParent={() => handleToggle(true)}
-                  onAddClick={onAddClick} 
-                  onBulkAddClick={onBulkAddClick}
-                  onMoveUp={index > 0 ? () => handleMoveChild(index, -1) : undefined}
-                  onMoveDown={index < children.length - 1 ? () => handleMoveChild(index, 1) : undefined}
-                  onSeoClick={onSeoClick}
-                  onEditClick={onEditClick}
-                  onDeleteClick={onDeleteClick}
-                  onMoveClick={onMoveClick}
-                />
-              ))
+              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                <SortableContext items={children.map(c => c.id)} strategy={verticalListSortingStrategy}>
+                  {children.map((child, index) => {
+                    const isSortable = child.type === 'chapter' || child.type === 'topic';
+                    const NodeComponent = isSortable ? SortableTreeNode : TreeNode;
+                    
+                    return (
+                      <NodeComponent 
+                        key={child.id} 
+                        node={child} 
+                        level={level + 1} 
+                        refreshParent={() => handleToggle(true)}
+                        onAddClick={onAddClick} 
+                        onBulkAddClick={onBulkAddClick}
+                        onMoveUp={!isSortable && index > 0 ? () => handleMoveChild(index, -1) : undefined}
+                        onMoveDown={!isSortable && index < children.length - 1 ? () => handleMoveChild(index, 1) : undefined}
+                        onSeoClick={onSeoClick}
+                        onEditClick={onEditClick}
+                        onDeleteClick={onDeleteClick}
+                        onMoveClick={onMoveClick}
+                        onBulkMigrateClick={onBulkMigrateClick}
+                      />
+                    );
+                  })}
+                </SortableContext>
+              </DndContext>
             )}
           </div>
         </div>
@@ -323,6 +364,14 @@ export function DesktopExplorer({ className }: { className?: string }) {
   const [movingNode, setMovingNode] = useState(false);
   const [moveDestinations, setMoveDestinations] = useState<any[]>([]);
   const [selectedDestination, setSelectedDestination] = useState<string>('');
+
+  // Bulk Migrate Dialog State
+  const [bulkMigrateDialog, setBulkMigrateDialog] = useState({ isOpen: false, parentId: '', parentType: '' as NodeType, onSuccess: () => {} });
+  const [bulkMigrateItems, setBulkMigrateItems] = useState<any[]>([]);
+  const [selectedBulkItems, setSelectedBulkItems] = useState<string[]>([]);
+  const [bulkMigrateDestinations, setBulkMigrateDestinations] = useState<any[]>([]);
+  const [selectedBulkDestination, setSelectedBulkDestination] = useState<string>('');
+  const [migratingBulkItems, setMigratingBulkItems] = useState(false);
 
   const fetchRootAndStats = async () => {
     setLoading(true);
@@ -484,6 +533,57 @@ export function DesktopExplorer({ className }: { className?: string }) {
       toast({ title: "Success", description: "Successfully moved!" }); 
       moveNodeDialog.onSuccess(); fetchRootAndStats(); setMoveNodeDialog(prev => ({ ...prev, isOpen: false })); 
     } catch (e: any) { toast({ title: "Error", description: e.message, variant: "destructive" }); } finally { setMovingNode(false); }
+  };
+
+  const handleBulkMigrateClick = async (nodeId: string, nodeType: NodeType, onSuccess: () => void) => {
+    setLoading(true);
+    try {
+      const items = await getTaxonomyNodesByParent(nodeId);
+      setBulkMigrateItems(items.sort((a, b) => a.orderIndex - b.orderIndex));
+      setSelectedBulkItems([]);
+      setSelectedBulkDestination('');
+
+      const nodeInfo = await getTaxonomyNodeById(nodeId);
+      let dests: any[] = [];
+      
+      if (nodeType === 'textbook') {
+         // moving chapters -> destinations are other textbooks
+         dests = await getTaxonomyNodesByType('academic', 'textbook');
+      } else if (nodeType === 'chapter') {
+         // moving topics -> destinations are other chapters in the SAME textbook
+         if (nodeInfo?.parentId) {
+           dests = await getTaxonomyNodesByParent(nodeInfo.parentId); 
+         }
+      }
+
+      setBulkMigrateDestinations(dests.map(d => ({ id: d.id, label: d.title || d.name })));
+      setBulkMigrateDialog({ isOpen: true, parentId: nodeId, parentType: nodeType, onSuccess });
+    } catch (e) {
+      console.error(e);
+      toast({ title: 'Error loading data', variant: 'destructive' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleExecuteBulkMigrate = async () => {
+    if (!selectedBulkDestination || selectedBulkItems.length === 0) return;
+    setMigratingBulkItems(true);
+    try {
+      const promises = selectedBulkItems.map(itemId => 
+        updateTaxonomyNode(itemId, { parentId: selectedBulkDestination })
+      );
+      await Promise.all(promises);
+      toast({ title: 'Success', description: `Successfully migrated ${selectedBulkItems.length} items.` });
+      setBulkMigrateDialog(prev => ({ ...prev, isOpen: false }));
+      bulkMigrateDialog.onSuccess();
+      fetchRootAndStats();
+    } catch (e: any) {
+      console.error(e);
+      toast({ title: 'Error migrating', description: e.message, variant: 'destructive' });
+    } finally {
+      setMigratingBulkItems(false);
+    }
   };
 
   const filteredClasses = classes.filter(c => (c.title || c.name || '').toLowerCase().includes(searchQuery.toLowerCase()));
@@ -714,6 +814,68 @@ export function DesktopExplorer({ className }: { className?: string }) {
             </Select>
           </div>
           <DialogFooter><Button onClick={handleMoveNodeSubmit} disabled={movingNode || !selectedDestination}>Confirm Move</Button></DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Bulk Migrate Dialog */}
+      <Dialog open={bulkMigrateDialog.isOpen} onOpenChange={(open) => !open && setBulkMigrateDialog(prev => ({ ...prev, isOpen: false }))}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Bulk Move Items</DialogTitle>
+            <DialogDescription>
+              Select items to move, and pick a new destination within this tree.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4 space-y-6">
+            <div className="space-y-3">
+              <Label>Target Destination</Label>
+              <Select value={selectedBulkDestination} onValueChange={setSelectedBulkDestination}>
+                <SelectTrigger><SelectValue placeholder="Select destination..." /></SelectTrigger>
+                <SelectContent className="max-h-[250px]">
+                  {bulkMigrateDestinations.map(b => <SelectItem key={b.id} value={b.id}>{b.label}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-3">
+              <Label>Select Items to Move</Label>
+              <div className="max-h-[300px] overflow-y-auto border border-slate-200 dark:border-slate-800 rounded-md p-3 space-y-2">
+                {bulkMigrateItems.map(item => {
+                  return (
+                    <div key={item.id} className="flex items-start space-x-3 p-2 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-md">
+                      <Checkbox 
+                        id={`blk-${item.id}`} 
+                        checked={selectedBulkItems.includes(item.id)}
+                        onCheckedChange={(checked) => {
+                          if (checked) setSelectedBulkItems(prev => [...prev, item.id]);
+                          else setSelectedBulkItems(prev => prev.filter(id => id !== item.id));
+                        }}
+                      />
+                      <label htmlFor={`blk-${item.id}`} className="text-sm font-medium leading-none cursor-pointer flex-1">
+                        {item.title || item.name}
+                      </label>
+                    </div>
+                  );
+                })}
+                {bulkMigrateItems.length === 0 && (
+                  <div className="text-sm text-slate-500 text-center py-4">No items available to move.</div>
+                )}
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setBulkMigrateDialog(prev => ({ ...prev, isOpen: false }))}>
+              Cancel
+            </Button>
+            <Button 
+              className="bg-[#107c41] hover:bg-[#0b5c30] text-white" 
+              onClick={handleExecuteBulkMigrate} 
+              disabled={migratingBulkItems || !selectedBulkDestination || selectedBulkItems.length === 0}
+            >
+              {migratingBulkItems ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+              Move {selectedBulkItems.length} Items
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
