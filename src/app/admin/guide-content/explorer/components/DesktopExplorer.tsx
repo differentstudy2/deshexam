@@ -48,6 +48,15 @@ const getLevelConfig = (type: string) => {
   }
 };
 
+const generateAcronym = (text: string) => {
+  if (!text) return '';
+  if (text.length <= 5 && text === text.toUpperCase()) return text; // already an acronym like WBBSE
+  const ignoreWords = ['of', 'and', 'for', 'the', 'in', 'on', 'at', '&', 'state', 'board', 'council'];
+  const words = text.split(/[\s-]+/).filter(w => !ignoreWords.includes(w.toLowerCase()));
+  if (words.length <= 1) return text;
+  return words.map(w => w.charAt(0).toUpperCase()).join('');
+};
+
 type TreeNodeProps = {
   node: any;
   level?: number;
@@ -141,23 +150,44 @@ const TreeNode = ({ node, level = 0, onAddClick, onBulkAddClick, onEditClick, on
   const conf = getLevelConfig(node.type);
   const Icon = conf.icon;
 
+  const displayName = node.title || node.name || '';
+  const isAcronymLike = displayName.length <= 6 && displayName === displayName.toUpperCase();
+  const displayAcronym = node.acronym || (level === 0 && !isAcronymLike ? generateAcronym(displayName) : '');
+  const finalMainName = (level === 0 && displayAcronym) ? displayAcronym : displayName;
+  const finalSubName = (level === 0 && displayAcronym && displayAcronym !== displayName) ? displayName : '';
+
   return (
-    <div className={`mt-2 ${level > 0 ? "ml-8" : ""}`}>
-      <div className={`group flex items-center justify-between p-3 rounded-lg shadow-sm transition-all ${conf.bg} ${conf.border}`}>
+    <div className={`mt-2`}>
+      <div className={`group flex items-center justify-between p-3 rounded-xl transition-all ${conf.bg} ${conf.border} ${level === 0 ? 'shadow-sm hover:shadow-md mb-3 border-gray-200' : 'mb-1.5'}`}>
         
         <div className="flex items-center gap-3 cursor-pointer flex-1" onClick={() => hasChildren && handleToggle()}>
-          <div className={`w-5 flex justify-center ${conf.color}`}>
-            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : hasChildren ? (
-              expanded ? <ChevronDown className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />
-            ) : <div className="w-4" />}
+          <div className={`w-6 flex justify-center items-center ${conf.color} bg-white rounded-full h-6 shadow-sm border border-gray-100`}>
+            {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : hasChildren ? (
+              expanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />
+            ) : <div className="w-3.5" />}
           </div>
-          <Icon className={`w-5 h-5 ${conf.color}`} />
-          <div className="flex flex-col">
-            <span className={`font-semibold text-gray-800 ${level === 0 ? 'text-lg' : ''}`}>
-              {node.title || node.name}{node.acronym ? ` (${node.acronym})` : ''}
-            </span>
+          <div className={`p-1.5 rounded-lg bg-white/60 shadow-sm`}>
+            <Icon className={`w-4 h-4 ${conf.color}`} />
+          </div>
+          
+          <div className="flex flex-col flex-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className={`font-semibold text-gray-800 ${level === 0 ? 'text-lg tracking-tight' : ''}`}>
+                {finalMainName}
+              </span>
+              {finalSubName && (
+                <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200 truncate max-w-[200px] md:max-w-[400px]" title={finalSubName}>
+                  {finalSubName}
+                </span>
+              )}
+              {level > 0 && node.acronym && !finalSubName && (
+                <span className="text-[11px] font-medium px-1.5 py-0.5 rounded bg-slate-100 text-slate-500">
+                  {node.acronym}
+                </span>
+              )}
+            </div>
             {node.author && (
-              <span className="text-xs text-slate-500 italic mt-0.5">Author: {node.author}</span>
+              <span className="text-xs text-slate-400 italic mt-0.5">Author: {node.author}</span>
             )}
           </div>
         </div>
@@ -227,27 +257,32 @@ const TreeNode = ({ node, level = 0, onAddClick, onBulkAddClick, onEditClick, on
       </div>
 
       {expanded && children && (
-        <div className="relative">
-          {children.length === 0 ? (
-            <div className="text-xs text-slate-400 italic py-3 ml-8">No items found.</div>
-          ) : (
-            children.map((child, index) => (
-              <TreeNode 
-                key={child.id} 
-                node={child} 
-                level={level + 1} 
-                refreshParent={() => handleToggle(true)}
-                onAddClick={onAddClick} 
-                onBulkAddClick={onBulkAddClick}
-                onMoveUp={index > 0 ? () => handleMoveChild(index, -1) : undefined}
-                onMoveDown={index < children.length - 1 ? () => handleMoveChild(index, 1) : undefined}
-                onSeoClick={onSeoClick}
-                onEditClick={onEditClick}
-                onDeleteClick={onDeleteClick}
-                onMoveClick={onMoveClick}
-              />
-            ))
-          )}
+        <div className="relative mt-1">
+          {/* Tree Guide Line */}
+          <div className="absolute left-6 top-0 bottom-3 w-[1.5px] bg-slate-200" />
+          
+          <div className="pl-10">
+            {children.length === 0 ? (
+              <div className="text-xs text-slate-400 italic py-3">No items found.</div>
+            ) : (
+              children.map((child, index) => (
+                <TreeNode 
+                  key={child.id} 
+                  node={child} 
+                  level={level + 1} 
+                  refreshParent={() => handleToggle(true)}
+                  onAddClick={onAddClick} 
+                  onBulkAddClick={onBulkAddClick}
+                  onMoveUp={index > 0 ? () => handleMoveChild(index, -1) : undefined}
+                  onMoveDown={index < children.length - 1 ? () => handleMoveChild(index, 1) : undefined}
+                  onSeoClick={onSeoClick}
+                  onEditClick={onEditClick}
+                  onDeleteClick={onDeleteClick}
+                  onMoveClick={onMoveClick}
+                />
+              ))
+            )}
+          </div>
         </div>
       )}
     </div>
