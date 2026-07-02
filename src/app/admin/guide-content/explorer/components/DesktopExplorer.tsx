@@ -76,6 +76,7 @@ type TreeNodeProps = {
   refreshParent?: () => void;
   dragListeners?: any;
   dragAttributes?: any;
+  onExpand?: (isExpanding: boolean) => void;
 };
 
 const SortableTreeNode = (props: TreeNodeProps) => {
@@ -88,10 +89,17 @@ const SortableTreeNode = (props: TreeNodeProps) => {
   );
 };
 
-const TreeNode = ({ node, level = 0, onAddClick, onBulkAddClick, onEditClick, onDeleteClick, onSeoClick, onMoveClick, onBulkMigrateClick, onMoveUp, onMoveDown, refreshParent, dragListeners, dragAttributes }: TreeNodeProps) => {
+const TreeNode = ({ node, level = 0, onAddClick, onBulkAddClick, onEditClick, onDeleteClick, onSeoClick, onMoveClick, onBulkMigrateClick, onMoveUp, onMoveDown, refreshParent, dragListeners, dragAttributes, onExpand }: TreeNodeProps) => {
   const [expanded, setExpanded] = useState(false);
   const [children, setChildren] = useState<any[] | null>(null);
   const [loading, setLoading] = useState(false);
+  const [activeChildId, setActiveChildId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (children && activeChildId && !children.find(c => c.id === activeChildId)) {
+      setActiveChildId(null);
+    }
+  }, [children, activeChildId]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -118,6 +126,12 @@ const TreeNode = ({ node, level = 0, onAddClick, onBulkAddClick, onEditClick, on
   const handleToggle = async (forceReload = false) => {
     const isExpanding = forceReload ? true : !expanded;
     setExpanded(isExpanding);
+    if (onExpand && !forceReload) {
+      onExpand(isExpanding);
+    }
+    if (!isExpanding) {
+      setActiveChildId(null);
+    }
 
     if (isExpanding && (children === null || forceReload) && node.type !== 'section') {
       setLoading(true);
@@ -297,9 +311,11 @@ const TreeNode = ({ node, level = 0, onAddClick, onBulkAddClick, onEditClick, on
               <div className="text-xs text-slate-400 italic py-3">No items found.</div>
             ) : (
               <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                <SortableContext items={children.map(c => c.id)} strategy={verticalListSortingStrategy}>
-                  {children.map((child, index) => {
-                    const isSortable = child.type === 'chapter' || child.type === 'topic';
+                <SortableContext items={children.filter(c => activeChildId ? c.id === activeChildId : true).map(c => c.id)} strategy={verticalListSortingStrategy}>
+                  {children
+                    .filter(c => activeChildId ? c.id === activeChildId : true)
+                    .map((child, index) => {
+                      const isSortable = child.type === 'chapter' || child.type === 'topic';
                     const NodeComponent = isSortable ? SortableTreeNode : TreeNode;
                     
                     return (
@@ -317,6 +333,7 @@ const TreeNode = ({ node, level = 0, onAddClick, onBulkAddClick, onEditClick, on
                         onDeleteClick={onDeleteClick}
                         onMoveClick={onMoveClick}
                         onBulkMigrateClick={onBulkMigrateClick}
+                        onExpand={(isExpanding) => setActiveChildId(isExpanding ? child.id : null)}
                       />
                     );
                   })}
@@ -337,6 +354,7 @@ export function DesktopExplorer({ className }: { className?: string }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('grid');
   const [stats, setStats] = useState({ boards: 0, classes: 0, subjects: 0, textbooks: 0, chapters: 0, topics: 0 });
+  const [activeBoardId, setActiveBoardId] = useState<string | null>(null);
 
   // Dialog States
   const [dialogState, setDialogState] = useState({ isOpen: false, parentId: '', typeName: '' as NodeType, onSuccess: () => {} });
@@ -372,6 +390,12 @@ export function DesktopExplorer({ className }: { className?: string }) {
   const [bulkMigrateDestinations, setBulkMigrateDestinations] = useState<any[]>([]);
   const [selectedBulkDestination, setSelectedBulkDestination] = useState<string>('');
   const [migratingBulkItems, setMigratingBulkItems] = useState(false);
+
+  useEffect(() => {
+    if (classes.length > 0 && activeBoardId && !classes.find(c => c.id === activeBoardId)) {
+      setActiveBoardId(null);
+    }
+  }, [classes, activeBoardId]);
 
   const fetchRootAndStats = async () => {
     setLoading(true);
@@ -669,7 +693,9 @@ export function DesktopExplorer({ className }: { className?: string }) {
               ) : filteredClasses.length === 0 ? (
                 <div className="text-center py-8 text-slate-500 bg-white rounded-lg border border-dashed border-gray-300 col-span-full">No boards found. Add some to get started!</div>
               ) : (
-                filteredClasses.map((c, index) => (
+                filteredClasses
+                  .filter(c => activeBoardId ? c.id === activeBoardId : true)
+                  .map((c, index) => (
                   <TreeNode 
                     key={c.id} 
                     node={c} 
@@ -682,6 +708,7 @@ export function DesktopExplorer({ className }: { className?: string }) {
                     onDeleteClick={handleDeleteClick} 
                     onSeoClick={handleOpenSeo} 
                     onMoveClick={handleMoveNodeClick} 
+                    onExpand={(isExpanding) => setActiveBoardId(isExpanding ? c.id : null)}
                   />
                 ))
               )}
