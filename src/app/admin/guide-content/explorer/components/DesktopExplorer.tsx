@@ -25,7 +25,7 @@ import { Label } from '@/components/ui/label';
 import { 
   FolderTree, ChevronRight, ChevronDown, GraduationCap, Library, BookOpen, Layers, FileText,
   Plus, MoreVertical, Edit2, Loader2, Trash2, ArrowUp, ArrowDown, Settings, Eye, ArrowRightLeft, 
-  Search, AlignLeft, BarChart3, Bookmark
+  Search, AlignLeft, BarChart3, Bookmark, LayoutGrid, List
 } from 'lucide-react';
 import Link from 'next/link';
 import { 
@@ -294,6 +294,7 @@ export function DesktopExplorer({ className }: { className?: string }) {
   const [classes, setClasses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [viewMode, setViewMode] = useState<'list' | 'grid'>('grid');
   const [stats, setStats] = useState({ boards: 0, classes: 0, subjects: 0, textbooks: 0, chapters: 0, topics: 0 });
 
   // Dialog States
@@ -514,38 +515,60 @@ export function DesktopExplorer({ className }: { className?: string }) {
         {/* Main Tree Section */}
         <div className="lg:col-span-3 space-y-4">
           
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <Input 
-              placeholder="Search Boards..." 
-              className="pl-10 h-12 bg-white border-gray-200 rounded-xl shadow-sm text-lg"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-
-          <div className="space-y-2">
-            {loading ? (
-              <div className="p-8 text-center text-gray-500 animate-pulse">Loading Tree...</div>
-            ) : filteredClasses.length === 0 ? (
-              <div className="text-center py-8 text-slate-500 bg-white rounded-lg border border-dashed border-gray-300">No boards found. Add some to get started!</div>
-            ) : (
-              filteredClasses.map((c, index) => (
-                <TreeNode 
-                  key={c.id} 
-                  node={c} 
-                  refreshParent={fetchRootAndStats} 
-                  onMoveUp={index > 0 ? () => handleMoveBoard(index, -1) : undefined} 
-                  onMoveDown={index < filteredClasses.length - 1 ? () => handleMoveBoard(index, 1) : undefined} 
-                  onAddClick={handleOpenDialog} 
-                  onBulkAddClick={handleOpenBulkAdd}
-                  onEditClick={handleOpenEdit} 
-                  onDeleteClick={handleDeleteClick} 
-                  onSeoClick={handleOpenSeo} 
-                  onMoveClick={handleMoveNodeClick} 
+          <div className="flex-1 max-w-5xl mx-auto w-full flex flex-col gap-4 mt-6 pb-20">
+            <div className="flex items-center gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <Input 
+                  placeholder="Search Boards..." 
+                  className="pl-10 h-12 bg-white border-gray-200 rounded-xl shadow-sm text-lg w-full"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                 />
-              ))
-            )}
+              </div>
+              <div className="flex bg-white rounded-xl shadow-sm border border-gray-200 p-1">
+                <Button 
+                  variant={viewMode === 'grid' ? 'secondary' : 'ghost'} 
+                  size="icon" 
+                  onClick={() => setViewMode('grid')}
+                  className={viewMode === 'grid' ? 'bg-slate-100' : ''}
+                >
+                  <LayoutGrid className="w-5 h-5 text-slate-600" />
+                </Button>
+                <Button 
+                  variant={viewMode === 'list' ? 'secondary' : 'ghost'} 
+                  size="icon" 
+                  onClick={() => setViewMode('list')}
+                  className={viewMode === 'list' ? 'bg-slate-100' : ''}
+                >
+                  <List className="w-5 h-5 text-slate-600" />
+                </Button>
+              </div>
+            </div>
+
+            <div className={viewMode === 'grid' ? "grid grid-cols-1 md:grid-cols-2 gap-4 items-start" : "space-y-2"}>
+              {loading ? (
+                <div className="p-8 text-center text-gray-500 animate-pulse col-span-full">Loading Tree...</div>
+              ) : filteredClasses.length === 0 ? (
+                <div className="text-center py-8 text-slate-500 bg-white rounded-lg border border-dashed border-gray-300 col-span-full">No boards found. Add some to get started!</div>
+              ) : (
+                filteredClasses.map((c, index) => (
+                  <TreeNode 
+                    key={c.id} 
+                    node={c} 
+                    refreshParent={fetchRootAndStats} 
+                    onMoveUp={index > 0 ? () => handleMoveBoard(index, -1) : undefined} 
+                    onMoveDown={index < filteredClasses.length - 1 ? () => handleMoveBoard(index, 1) : undefined} 
+                    onAddClick={handleOpenDialog} 
+                    onBulkAddClick={handleOpenBulkAdd}
+                    onEditClick={handleOpenEdit} 
+                    onDeleteClick={handleDeleteClick} 
+                    onSeoClick={handleOpenSeo} 
+                    onMoveClick={handleMoveNodeClick} 
+                  />
+                ))
+              )}
+            </div>
           </div>
         </div>
 
