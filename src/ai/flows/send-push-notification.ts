@@ -103,11 +103,26 @@ const sendPushNotificationFlow = ai.defineFlow(
         const failedTokens: string[] = [];
         response.responses.forEach((resp, idx) => {
           if (!resp.success) {
-            failedTokens.push(tokens[idx]);
+            // Check for specific error codes related to expired/invalid tokens
+            const errCode = resp.error?.code;
+            if (errCode === 'messaging/invalid-registration-token' ||
+                errCode === 'messaging/registration-token-not-registered') {
+              failedTokens.push(tokens[idx]);
+            }
           }
         });
-        console.log('List of tokens that caused failures: ' + failedTokens);
-        // Here you might want to remove the failed tokens from your database
+        console.log(`Found ${failedTokens.length} dead tokens. Removing from database...`);
+        
+        // Remove failed tokens from Firestore in chunks of 500
+        for (let i = 0; i < failedTokens.length; i += 500) {
+          const batch = db.batch();
+          failedTokens.slice(i, i + 500).forEach(token => {
+            const docRef = db.collection('fcmTokens').doc(token);
+            batch.delete(docRef);
+          });
+          await batch.commit();
+        }
+        console.log(`Successfully cleaned up ${failedTokens.length} expired tokens.`);
       }
 
     } catch (error) {
