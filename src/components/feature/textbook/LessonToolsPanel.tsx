@@ -7,8 +7,10 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Progress } from '@/components/ui/progress';
-import { Send, Sparkles, BookOpen, FileQuestion, PenTool, Bookmark, ChevronRight } from 'lucide-react';
+import { Send, Sparkles, BookOpen, FileQuestion, PenTool, Bookmark, ChevronRight, LogOut } from 'lucide-react';
 import Link from 'next/link';
+import { useAuth } from '@/hooks/use-auth';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import type { Chapter, Topic, Exam } from '@/lib/types';
 
 interface LessonToolsPanelProps {
@@ -38,34 +40,26 @@ export function LessonToolsPanel({
     setTimeout(() => setSavingNote(false), 1000);
   };
 
+  const { user, logOut } = useAuth();
+
   return (
     <div className="space-y-6">
-      {/* Progress Widget */}
-      <Card>
-        <CardContent className="p-4 flex items-center gap-4">
-          <div className="relative w-14 h-14 flex items-center justify-center shrink-0">
-            <svg className="w-full h-full -rotate-90 transform" viewBox="0 0 100 100">
-              <circle className="text-muted stroke-current" strokeWidth="8" cx="50" cy="50" r="40" fill="transparent" />
-              <circle
-                className="text-primary stroke-current transition-all duration-500 ease-in-out"
-                strokeWidth="8"
-                strokeLinecap="round"
-                cx="50"
-                cy="50"
-                r="40"
-                fill="transparent"
-                strokeDasharray={`${251.2 * (progress / 100)} 251.2`}
-              />
-            </svg>
-            <span className="absolute text-sm font-semibold">{Math.round(progress)}%</span>
-          </div>
-          <div>
-            <h4 className="font-semibold text-sm">Lesson Progress</h4>
-            <p className="text-xs text-muted-foreground">{progress === 100 ? '100% Complete' : `${progress}% Complete`}</p>
-            <p className="text-xs text-muted-foreground">{sectionsFinished} sections finished</p>
-          </div>
-        </CardContent>
-      </Card>
+      {/* User Profile Widget */}
+      <div className="flex items-center justify-between p-3 w-full rounded-xl bg-card border shadow-sm">
+         <div className="flex items-center gap-3">
+             <Avatar className="h-10 w-10 border border-slate-200 shrink-0">
+                 <AvatarImage src={user?.photoURL || `https://picsum.photos/seed/${user?.uid}/40/40`} />
+                 <AvatarFallback>{user?.displayName?.[0] || 'U'}</AvatarFallback>
+             </Avatar>
+             <div className="flex flex-col overflow-hidden">
+                 <span className="text-sm font-bold text-slate-800 leading-tight truncate">{user?.displayName || "Jonas Koptel"}</span>
+                 <span className="text-[11px] text-slate-500 leading-tight mt-0.5 truncate">{user?.email || "jonas@example.com"}</span>
+             </div>
+         </div>
+         <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 text-slate-400 hover:text-red-500 hover:bg-red-50" onClick={logOut}>
+             <LogOut className="h-4 w-4"/>
+         </Button>
+      </div>
 
       {/* Quick Actions */}
       <div className="space-y-2">
@@ -84,6 +78,9 @@ export function LessonToolsPanel({
         </Button>
         <Button variant="outline" className="w-full justify-start text-muted-foreground hover:text-foreground">
           <Bookmark className="w-4 h-4 mr-2" /> Add Bookmark
+        </Button>
+        <Button variant="outline" className="w-full justify-start text-muted-foreground hover:text-foreground">
+          <FileDownIcon className="w-4 h-4 mr-2" /> Download PDF
         </Button>
       </div>
 
@@ -201,6 +198,28 @@ function CheckCircle2Icon(props: any) {
     >
       <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
       <path d="m9 12 2 2 4-4" />
+    </svg>
+  )
+}
+
+function FileDownIcon(props: any) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+      <polyline points="14 2 14 8 20 8" />
+      <path d="M12 18v-6" />
+      <path d="m9 15 3 3 3-3" />
     </svg>
   )
 }

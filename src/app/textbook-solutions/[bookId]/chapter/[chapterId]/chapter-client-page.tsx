@@ -119,10 +119,19 @@ export default function ChapterClientPage() {
     useEffect(() => {
       if (activeChapter?.content) {
         const idMap = new Map();
-        const matches = activeChapter.content.matchAll(/^(#+)\s+(.*)/gm);
-        const newHeadings = Array.from(matches).map((match, index) => {
-          const level = match[1].length;
-          const text = match[2];
+        
+        // Match both Markdown (# Heading) and HTML (<h1...>Heading</h1>)
+        const matches = Array.from(activeChapter.content.matchAll(/(?:^(#+)\s+(.*))|(?:<h([1-6])[^>]*>(.*?)<\/h\3>)/gim));
+        
+        const newHeadings = matches.map((match) => {
+          const levelRaw = match[1] || match[3];
+          const textRaw = match[2] || match[4];
+          
+          const level = match[1] ? match[1].length : parseInt(levelRaw);
+          const text = textRaw ? textRaw.replace(/<[^>]*>?/gm, '').trim() : '';
+          
+          if (!text) return null;
+
           const baseId = text.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
           
           let id = baseId;
@@ -134,7 +143,8 @@ export default function ChapterClientPage() {
           idMap.set(id, true);
 
           return { id, text, level };
-        });
+        }).filter(Boolean) as { id: string; text: string; level: number }[];
+        
         setHeadings(newHeadings);
       } else {
         setHeadings([]);
@@ -193,14 +203,14 @@ export default function ChapterClientPage() {
     const leftSidebar = (
          <div className="flex flex-col h-full bg-card">
             {/* Textbook Info Header */}
-            <div className="p-6 border-b text-center flex flex-col items-center">
-                <div className="w-24 h-32 relative mb-4 shadow-md rounded overflow-hidden">
+            <div className="p-4 pt-5 border-b text-center flex flex-col items-center">
+                <div className="w-24 h-32 relative mb-3 shadow-md rounded overflow-hidden">
                     <Image src={textbook?.featureImage || '/image/logo.png'} alt="Cover" fill className="object-cover" />
                 </div>
                 <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">{textbook?.subject}</p>
                 <h3 className="font-bold text-lg leading-tight mt-1 px-2 line-clamp-3 text-balance">{textbook?.title}</h3>
                 
-                <div className="mt-6 flex items-center justify-start gap-3 w-full border rounded-2xl p-2 bg-muted/10 text-left">
+                <div className="mt-3 flex items-center justify-start gap-3 w-full border rounded-2xl p-2 bg-muted/10 text-left">
                     <div className="relative w-10 h-10 flex items-center justify-center shrink-0">
                         <svg className="w-full h-full -rotate-90 transform" viewBox="0 0 100 100">
                             <circle className="text-muted stroke-current" strokeWidth="10" cx="50" cy="50" r="40" fill="transparent" />
@@ -212,36 +222,18 @@ export default function ChapterClientPage() {
                 </div>
             </div>
 
-            {/* Search */}
-            <div className="p-4 pb-0">
-                <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input placeholder="Search within chapter..." className="pl-9 bg-muted/50 text-sm h-9" />
-                </div>
-            </div>
-
             {/* Scroll Spy Nav Header */}
             <div className="px-4 py-3 mt-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b">
                 Sections in this lesson
             </div>
             
             {/* Scroll Spy Nav List */}
-            <div className="flex-grow overflow-y-auto pb-6 pt-2">
+            <div className="pb-6 pt-2">
                 <ScrollSpyNav 
                     headings={headings} 
                     activeHeadingId={activeHeadingId} 
                     onHeadingClick={handleHeadingClick} 
                 />
-            </div>
-
-            {/* Footer Actions */}
-            <div className="p-4 border-t space-y-2 bg-background">
-                <Button variant="outline" className="w-full justify-start text-sm">
-                    <FileDown className="w-4 h-4 mr-2" /> Download PDF
-                </Button>
-                <Button variant="outline" className="w-full justify-start text-sm">
-                    <Bookmark className="w-4 h-4 mr-2" /> Bookmark Chapter
-                </Button>
             </div>
         </div>
     );
@@ -266,7 +258,7 @@ export default function ChapterClientPage() {
                 
                 {/* Left Sidebar - Desktop */}
                 <aside className={cn(
-                    "hidden md:block h-[calc(100vh-64px)] sticky top-16 border-r overflow-hidden transition-all duration-300",
+                    "hidden md:block h-[calc(100vh-64px)] sticky top-16 border-r overflow-y-auto transition-all duration-300",
                     focusMode ? "-ml-[280px] opacity-0 pointer-events-none" : "ml-0 opacity-100"
                 )}>
                     {leftSidebar}
