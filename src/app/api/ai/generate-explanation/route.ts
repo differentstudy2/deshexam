@@ -46,7 +46,7 @@ export async function POST(req: Request) {
             contents: [{ parts: [{ text: prompt }] }],
             generationConfig: {
                 temperature: 0.3,
-                maxOutputTokens: 800,
+                maxOutputTokens: 2048,
                 responseMimeType: "application/json",
             }
         })
@@ -60,7 +60,11 @@ export async function POST(req: Request) {
     }
 
     try {
-        const resultJson = JSON.parse(resultText);
+        let cleanResultText = resultText.trim();
+        if (cleanResultText.startsWith('```')) {
+            cleanResultText = cleanResultText.replace(/^```(json)?\s*/i, '').replace(/\s*```$/i, '');
+        }
+        const resultJson = JSON.parse(cleanResultText);
         return NextResponse.json({ 
             explanation: resultJson.explanation,
             optionExplanations: resultJson.optionExplanations
