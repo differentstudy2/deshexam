@@ -34,20 +34,38 @@ type NotificationFormValues = z.infer<typeof notificationSchema>;
 export default function PushNotificationPage() {
     const { toast } = useToast();
     const [subscriberCount, setSubscriberCount] = useState(0);
+    const [campaigns, setCampaigns] = useState<any[]>([]);
     const { user } = useAuth();
 
     useEffect(() => {
-        let unsubscribe: () => void;
+        let unsubscribeTokens: () => void;
+        let unsubscribeCampaigns: () => void;
         if(user) {
             const tokensCollection = collection(db, 'fcmTokens');
-            unsubscribe = onSnapshot(tokensCollection, (snapshot) => {
+            unsubscribeTokens = onSnapshot(tokensCollection, (snapshot) => {
                 setSubscriberCount(snapshot.size);
             }, (error) => {
                 console.error("Error fetching subscriber count in real-time: ", error);
             });
+
+            const campaignsCollection = collection(db, 'pushCampaigns');
+            unsubscribeCampaigns = onSnapshot(campaignsCollection, (snapshot) => {
+                const fetchedCampaigns = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                })).sort((a: any, b: any) => {
+                    const timeA = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+                    const timeB = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+                    return timeB - timeA;
+                });
+                setCampaigns(fetchedCampaigns);
+            }, (error) => {
+                console.error("Error fetching campaigns: ", error);
+            });
         }
         return () => {
-          if (unsubscribe) unsubscribe();
+          if (unsubscribeTokens) unsubscribeTokens();
+          if (unsubscribeCampaigns) unsubscribeCampaigns();
         };
     }, [user]);
 
@@ -295,32 +313,29 @@ export default function PushNotificationPage() {
                        </tr>
                      </thead>
                      <tbody className="divide-y divide-slate-100">
-                       <tr className="hover:bg-slate-50/50 transition-colors">
-                         <td className="px-6 py-4 font-medium text-slate-900">
-                           Mock Test Alert
-                           <div className="text-[10px] font-normal text-slate-400 mt-0.5">Auto pull new mock title</div>
-                         </td>
-                         <td className="px-6 py-4 text-slate-600">Push</td>
-                         <td className="px-6 py-4 text-slate-600">52,410 users</td>
-                         <td className="px-6 py-4 text-slate-600">199</td>
-                         <td className="px-6 py-4 text-emerald-600 font-medium">8.5%</td>
-                         <td className="px-6 py-4">
-                           <Badge variant="outline" className="bg-emerald-50 text-emerald-600 border-emerald-200 text-[10px]">Sent</Badge>
-                         </td>
-                       </tr>
-                       <tr className="hover:bg-slate-50/50 transition-colors">
-                         <td className="px-6 py-4 font-medium text-slate-900">
-                           Daily Practice Reminder
-                           <div className="text-[10px] font-normal text-slate-400 mt-0.5">Continue your practice streak</div>
-                         </td>
-                         <td className="px-6 py-4 text-slate-600">Push</td>
-                         <td className="px-6 py-4 text-slate-600">Premium</td>
-                         <td className="px-6 py-4 text-slate-600">--</td>
-                         <td className="px-6 py-4 text-slate-600 font-medium">--</td>
-                         <td className="px-6 py-4">
-                           <Badge variant="outline" className="bg-amber-50 text-amber-600 border-amber-200 text-[10px]">Scheduled</Badge>
-                         </td>
-                       </tr>
+                       {campaigns.length === 0 ? (
+                         <tr>
+                           <td colSpan={6} className="px-6 py-8 text-center text-slate-500">
+                             No campaigns sent yet.
+                           </td>
+                         </tr>
+                       ) : campaigns.map(campaign => (
+                         <tr key={campaign.id} className="hover:bg-slate-50/50 transition-colors">
+                           <td className="px-6 py-4 font-medium text-slate-900">
+                             {campaign.title}
+                             <div className="text-[10px] font-normal text-slate-400 mt-0.5 truncate max-w-[200px]">{campaign.body}</div>
+                           </td>
+                           <td className="px-6 py-4 text-slate-600">{campaign.type || 'Push'}</td>
+                           <td className="px-6 py-4 text-slate-600">{campaign.audience?.toLocaleString() || 0} users</td>
+                           <td className="px-6 py-4 text-slate-600">{campaign.sentCount?.toLocaleString() || 0}</td>
+                           <td className="px-6 py-4 text-emerald-600 font-medium">
+                             {campaign.sentCount ? ((campaign.sentCount / campaign.audience) * 100).toFixed(1) : 0}%
+                           </td>
+                           <td className="px-6 py-4">
+                             <Badge variant="outline" className="bg-emerald-50 text-emerald-600 border-emerald-200 text-[10px]">{campaign.status || 'Sent'}</Badge>
+                           </td>
+                         </tr>
+                       ))}
                      </tbody>
                    </table>
                  </div>

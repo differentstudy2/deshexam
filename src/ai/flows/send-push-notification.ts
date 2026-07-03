@@ -86,6 +86,19 @@ const sendPushNotificationFlow = ai.defineFlow(
       const response = await getMessaging(adminApp).sendEachForMulticast(message as any);
       console.log(`${response.successCount} messages were sent successfully`);
 
+      // Save campaign history
+      const { FieldValue } = await import('firebase-admin/firestore');
+      await db.collection('pushCampaigns').add({
+        title,
+        body,
+        type: 'Push',
+        audience: tokens.length,
+        sentCount: response.successCount,
+        failedCount: response.failureCount,
+        status: 'Sent',
+        createdAt: FieldValue.serverTimestamp(),
+      });
+
       if (response.failureCount > 0) {
         const failedTokens: string[] = [];
         response.responses.forEach((resp, idx) => {
