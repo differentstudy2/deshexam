@@ -24,6 +24,7 @@ import { ThemeToggle } from "./theme-toggle";
 import { getUserProfile } from "@/lib/firebase/firestore";
 import { ScrollArea } from "../ui/scroll-area";
 import { useAuthDialog } from "@/hooks/use-auth-dialog";
+import { useFcm } from "@/hooks/use-fcm";
 
 const mainNavLinks = [
     { href: "/academy", label: "Academy", icon: <BookOpen className="h-5 w-5" /> },
@@ -227,6 +228,7 @@ type UserProfile = {
 
 export const NotificationBell = () => {
   const { user } = useAuth();
+  const { notificationPermissionStatus, requestPermission, error, fcmToken } = useFcm();
   const [notifications, setNotifications] = useState<any[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
@@ -268,6 +270,21 @@ export const NotificationBell = () => {
           {unreadCount > 0 && <span className="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full">{unreadCount} new</span>}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        
+        {notificationPermissionStatus === 'default' && (
+          <div className="p-3 m-2 bg-blue-50 border border-blue-100 rounded-lg text-center flex flex-col gap-2">
+            <p className="text-xs text-blue-700 font-medium">Turn on push notifications to never miss an update!</p>
+            <Button size="sm" variant="outline" className="bg-white hover:bg-blue-100 text-blue-600 h-7" onClick={(e) => { e.preventDefault(); requestPermission(); }}>
+              Enable Push
+            </Button>
+          </div>
+        )}
+        {notificationPermissionStatus === 'denied' && (
+          <div className="p-2 mx-2 mb-2 bg-red-50 text-red-600 text-[10px] rounded text-center">
+            Push notifications blocked by browser.
+          </div>
+        )}
+
         <ScrollArea className="h-80">
           {notifications.length === 0 ? (
             <div className="p-4 text-center text-sm text-slate-500">No notifications yet.</div>
