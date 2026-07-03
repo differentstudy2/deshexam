@@ -215,7 +215,7 @@ export default function QuestionCard({ question, index, testMode = false, isList
         const qLang = question.language || 'Bangla';
 
         // Build Options HTML
-        const optionKeys = ['a', 'b', 'c', 'd', 'e', 'f'];
+        const optionKeys = ['a', 'b', 'c', 'd'];
         let optionsHtml = '';
         optionKeys.forEach(key => {
             const value = (question.options as any)?.[key];
@@ -554,7 +554,7 @@ export default function QuestionCard({ question, index, testMode = false, isList
             {/* MCQ Options */}
             {!isMatching && !isTrueFalse && !isFillInTheBlank && question.options && Object.values(question.options).some(o => !!o) && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-4 mb-4">
-                    {['a', 'b', 'c', 'd', 'e', 'f'].map(key => {
+                    {['a', 'b', 'c', 'd'].map(key => {
                         const value = (question.options as any)?.[key];
                         if (!value) return null;
                         
@@ -764,7 +764,7 @@ export default function QuestionCard({ question, index, testMode = false, isList
 
                     {question.optionExplanations && Object.keys(question.optionExplanations).length > 0 && (
                         <div className="space-y-2 mt-3 pt-3 border-t border-blue-200/30 dark:border-blue-800/30">
-                            {['a', 'b', 'c', 'd', 'e', 'f'].map(key => {
+                            {['a', 'b', 'c', 'd'].map(key => {
                                 const exp = (question.optionExplanations as any)?.[key];
                                 const opt = (question.options as any)?.[key];
                                 if (!exp) return null;

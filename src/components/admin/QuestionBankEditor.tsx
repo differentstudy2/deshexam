@@ -798,37 +798,7 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                                           )}
                                       </div>
                                   )})}
-                                  <div className="flex flex-col gap-3 pt-2">
-                                      <div className="flex flex-col gap-2">
-                                          <div className="flex items-center gap-3">
-                                              <button 
-                                                  className={cn("w-6 h-6 rounded-full border flex items-center justify-center shrink-0 transition-colors", editData.correctAnswer?.toUpperCase() === 'E' ? "border-[#4a634a] dark:border-emerald-500/50 border-[#eef2ec] dark:border-slate-800 bg-transparent" : "border-[#c4d6c4] dark:border-emerald-800/50")}
-                                                  onClick={() => setEditData({...editData, correctAnswer: 'E'})}
-                                              >
-                                                  {editData.correctAnswer?.toUpperCase() === 'E' && <div className="w-3 h-3 bg-[#4a634a] rounded-full" />}
-                                              </button>
-                                              <div className="flex-1">
-                                                  <MD3Input label="Option E (optional)" placeholder="Option E" value={editData.options?.e || ''} onChange={e => setEditData({...editData, options: {...editData.options!, e: e.target.value}})} />
-                                              </div>
-                                              <button className="text-[#4a634a] dark:text-emerald-400 hover:text-emerald-700 dark:text-emerald-400 shrink-0 px-2"><Plus className="w-5 h-5" /></button>
-                                          </div>
-                                          {(editData.options?.e || editData.optionExplanations?.e) && (
-                                              <div className="pl-9 pr-9">
-                                                  <Input 
-                                                      className="text-xs border-[#eef2ec] dark:border-slate-800 bg-[#f4f8f4]/50 dark:bg-slate-900 focus-visible:ring-[#4a634a] dark:focus-visible:ring-emerald-500 rounded-lg h-7 w-full" 
-                                                      placeholder="Explanation for why E is correct/incorrect (Optional)"
-                                                      value={editData.optionExplanations?.e || ''}
-                                                      onChange={e => {
-                                                          const newExp = { ...(editData.optionExplanations || {}) };
-                                                          newExp.e = e.target.value;
-                                                          setEditData({...editData, optionExplanations: newExp});
-                                                      }}
-                                                  />
-                                              </div>
-                                          )}
-                                      </div>
-                                      <Button variant="outline" className="w-fit mt-2 rounded-full border-[#d3e3d3] dark:border-emerald-900/50 text-[#4a634a] dark:text-emerald-400 bg-[#fdfefd] dark:bg-slate-900 hover:bg-[#f4f8f4] dark:bg-emerald-900/20">Add Option</Button>
-                                  </div>
+
                               </div>
                           ) : ['T/F'].includes(editData.questionType || '') ? (
                               <div className="space-y-4">
