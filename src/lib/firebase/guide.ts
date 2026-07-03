@@ -1,6 +1,6 @@
 import { collection, query, orderBy, getDocs, doc, getDoc, where, setDoc, deleteDoc, getCountFromServer, serverTimestamp, addDoc, updateDoc, increment } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
-import { SidebarSubject, Chapter, ReadingContentData } from "@/app/guide/guide-data"; // Types
+import { SidebarSubject, Chapter, ReadingContentData } from "@/app/[locale]/guide/guide-data"; // Types
 import { getTaxonomyNodesByTrack } from "./taxonomy";
 
 export const getGuideSubjects = async (): Promise<SidebarSubject[]> => {

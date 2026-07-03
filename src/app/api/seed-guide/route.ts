@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getFirestore } from 'firebase-admin/firestore';
 import { initializeApp, getApps, cert, App } from 'firebase-admin/app';
-import { sidebarSubjects, curriculumData, readingContentData } from '@/app/guide/guide-data';
+import { sidebarSubjects, curriculumData, readingContentData } from '@/app/[locale]/guide/guide-data';
 
 // Initialize Firebase Admin SDK with a unique name to avoid conflicts
 const adminAppName = 'firebase-admin-app-deshexam';

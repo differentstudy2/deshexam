@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Share2, MoreVertical, Eye, ChevronLeft, ChevronRight, Play, CheckCircle2, Printer } from 'lucide-react';
-import { ReadingContentData, ContentSection, ContentAuthor } from '@/app/guide/guide-data';
+import { ReadingContentData, ContentSection, ContentAuthor } from '@/app/[locale]/guide/guide-data';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';

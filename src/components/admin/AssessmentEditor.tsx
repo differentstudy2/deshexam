@@ -21,7 +21,7 @@ import { QuestionBankEntry, TaxonomyNode } from '@/lib/question-bank-types';
 import { getQuestionsByIds } from '@/lib/firebase/question-bank';
 import { getTaxonomyNodesByTrack } from '@/lib/firebase/taxonomy';
 import { cn } from '@/lib/utils';
-import { generateMockTestMetadata, generateImagePrompt, generateImageWithGemini } from '@/app/admin/assessment-center/mock-tests/actions';
+import { generateMockTestMetadata, generateImagePrompt, generateImageWithGemini } from '@/app/[locale]/admin/assessment-center/mock-tests/actions';
 import {
   Dialog,
   DialogContent,

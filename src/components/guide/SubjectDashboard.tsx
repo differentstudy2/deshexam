@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { CurriculumTree } from '@/components/guide/CurriculumTree';
 import { GuideSidebar } from '@/components/guide/GuideSidebar';
-import { Chapter } from '@/app/guide/guide-data';
+import { Chapter } from '@/app/[locale]/guide/guide-data';
 import { generateBreadcrumbSchema, generateBookSchema, generateLearningResourceSchema, generateItemListSchema, generateFAQPageSchema } from '@/lib/seo-schemas';
 import ReactMarkdown from 'react-markdown';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';

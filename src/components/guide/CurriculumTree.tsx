@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { ChevronsRight, CircleDot, MoreHorizontal, ArrowUp, ArrowDown } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import { Chapter } from '@/app/guide/guide-data';
+import { Chapter } from '@/app/[locale]/guide/guide-data';
 import {
   DropdownMenu,
   DropdownMenuContent,

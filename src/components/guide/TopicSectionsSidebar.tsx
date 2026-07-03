@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { BookOpen, FileText, Type, Target, Info, User, Lightbulb, PenTool, HelpCircle, Brain, CheckSquare, FileArchive, FileImage, Video, ClipboardList, StickyNote, Key, Timer, Award } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { ContentSection } from '@/app/guide/guide-data';
+import { ContentSection } from '@/app/[locale]/guide/guide-data';
 
 const SECTION_ICONS: Record<string, any> = {
   'lesson': BookOpen,
