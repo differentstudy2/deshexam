@@ -10,9 +10,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Send, Image as ImageIcon, Link as LinkIcon, PlusCircle, CheckCircle2 } from 'lucide-react';
+import { Send, Image as ImageIcon, Link as LinkIcon, PlusCircle, CheckCircle2, Trash2 } from 'lucide-react';
 import { sendPushNotification } from '@/ai/flows/send-push-notification';
-import { collection, onSnapshot } from 'firebase/firestore';
+import { collection, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -78,6 +78,49 @@ export default function PushNotificationPage() {
             imageUrl: '',
         },
     });
+
+    // Load template data into form
+    const loadTemplate = (type: 'mock' | 'blog' | 'reminder' | 'streak') => {
+        switch (type) {
+            case 'mock':
+                form.setValue('title', 'New Mock Test Available! 📝');
+                form.setValue('body', 'Test your knowledge with our newly added mock test. Try it now!');
+                form.setValue('link', 'https://deshexam.com/mock-tests');
+                break;
+            case 'blog':
+                form.setValue('title', 'New Blog Post 📰');
+                form.setValue('body', 'Read our latest article to boost your exam preparation strategy.');
+                form.setValue('link', 'https://deshexam.com/blog');
+                break;
+            case 'reminder':
+                form.setValue('title', 'Time to Practice! ⏰');
+                form.setValue('body', 'Don\'t forget to complete your daily practice session today.');
+                form.setValue('link', '');
+                break;
+            case 'streak':
+                form.setValue('title', 'Keep Your Streak Alive! 🔥');
+                form.setValue('body', 'You are on a roll! Log in now to keep your daily learning streak going.');
+                form.setValue('link', '');
+                break;
+        }
+    };
+
+    // Delete a campaign from history
+    const handleDeleteCampaign = async (id: string) => {
+        try {
+            await deleteDoc(doc(db, 'pushCampaigns', id));
+            toast({
+                title: 'Deleted',
+                description: 'Campaign history has been deleted.',
+            });
+        } catch (err) {
+            toast({
+                variant: 'destructive',
+                title: 'Error',
+                description: 'Failed to delete campaign.',
+            });
+        }
+    };
 
     const onSubmit: SubmitHandler<NotificationFormValues> = async (data) => {
         try {
@@ -154,15 +197,15 @@ export default function PushNotificationPage() {
                           </TabsList>
                         </Tabs>
                         
-                        <div className="mt-5">
-                          <p className="text-[11px] font-semibold text-slate-500 mb-2">Automated examples (Templates)</p>
-                          <div className="grid grid-cols-2 gap-2">
-                            <Button variant="outline" size="sm" type="button" className="justify-start text-xs h-8 border-dashed hover:border-emerald-400 hover:text-emerald-600 transition-colors bg-white">New mock test</Button>
-                            <Button variant="outline" size="sm" type="button" className="justify-start text-xs h-8 border-dashed hover:border-emerald-400 hover:text-emerald-600 transition-colors bg-white">New blog post</Button>
-                            <Button variant="outline" size="sm" type="button" className="justify-start text-xs h-8 border-dashed hover:border-emerald-400 hover:text-emerald-600 transition-colors bg-white">Practice reminder</Button>
-                            <Button variant="outline" size="sm" type="button" className="justify-start text-xs h-8 border-dashed hover:border-emerald-400 hover:text-emerald-600 transition-colors bg-white">Daily streak</Button>
+                          <div className="mt-5">
+                            <p className="text-[11px] font-semibold text-slate-500 mb-2">Automated examples (Templates)</p>
+                            <div className="grid grid-cols-2 gap-2">
+                              <Button onClick={() => loadTemplate('mock')} variant="outline" size="sm" type="button" className="justify-start text-xs h-8 border-dashed hover:border-emerald-400 hover:text-emerald-600 transition-colors bg-white">New mock test</Button>
+                              <Button onClick={() => loadTemplate('blog')} variant="outline" size="sm" type="button" className="justify-start text-xs h-8 border-dashed hover:border-emerald-400 hover:text-emerald-600 transition-colors bg-white">New blog post</Button>
+                              <Button onClick={() => loadTemplate('reminder')} variant="outline" size="sm" type="button" className="justify-start text-xs h-8 border-dashed hover:border-emerald-400 hover:text-emerald-600 transition-colors bg-white">Practice reminder</Button>
+                              <Button onClick={() => loadTemplate('streak')} variant="outline" size="sm" type="button" className="justify-start text-xs h-8 border-dashed hover:border-emerald-400 hover:text-emerald-600 transition-colors bg-white">Daily streak</Button>
+                            </div>
                           </div>
-                        </div>
                       </CardContent>
                     </Card>
 
@@ -310,12 +353,13 @@ export default function PushNotificationPage() {
                          <th className="px-6 py-4 font-semibold tracking-wider">Sent</th>
                          <th className="px-6 py-4 font-semibold tracking-wider">Open Rate</th>
                          <th className="px-6 py-4 font-semibold tracking-wider">Status</th>
+                         <th className="px-6 py-4 font-semibold tracking-wider text-right">Actions</th>
                        </tr>
                      </thead>
                      <tbody className="divide-y divide-slate-100">
                        {campaigns.length === 0 ? (
                          <tr>
-                           <td colSpan={6} className="px-6 py-8 text-center text-slate-500">
+                           <td colSpan={7} className="px-6 py-8 text-center text-slate-500">
                              No campaigns sent yet.
                            </td>
                          </tr>
@@ -333,6 +377,11 @@ export default function PushNotificationPage() {
                            </td>
                            <td className="px-6 py-4">
                              <Badge variant="outline" className="bg-emerald-50 text-emerald-600 border-emerald-200 text-[10px]">{campaign.status || 'Sent'}</Badge>
+                           </td>
+                           <td className="px-6 py-4 text-right">
+                             <Button type="button" variant="ghost" size="icon" className="text-slate-400 hover:text-red-500 hover:bg-red-50 h-8 w-8 transition-colors" onClick={() => handleDeleteCampaign(campaign.id)}>
+                               <Trash2 className="w-4 h-4" />
+                             </Button>
                            </td>
                          </tr>
                        ))}
