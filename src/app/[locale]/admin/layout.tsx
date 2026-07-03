@@ -56,16 +56,16 @@ export default function AdminLayout({
         const userProfile = await getUserProfile(user.uid);
         if (userProfile && userProfile.role === 'admin') {
           // User is an admin, allow access
+          setVerifying(false);
         } else {
           // If not an admin, redirect to user dashboard
-          router.push('/dashboard');
+          // Notice we DO NOT set verifying to false, so the layout stays in loading state until the redirect completes
+          router.replace('/dashboard');
         }
       } catch (error) {
         console.error("Failed to verify admin status:", error);
         // Redirect on error as a security measure
-        router.push('/dashboard');
-      } finally {
-        setVerifying(false);
+        router.replace('/dashboard');
       }
     };
 
