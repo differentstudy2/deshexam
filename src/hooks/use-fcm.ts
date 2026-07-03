@@ -87,11 +87,12 @@ export function useFcm() {
            const unsubscribe = onMessage(messaging, (payload) => {
              console.log('Message received in foreground: ', payload);
              // You can customize foreground notification behavior here
-             // e.g., show a toast or a custom in-app banner
              if (payload.notification) {
-                 new Notification(payload.notification.title || 'Notification', {
-                     body: payload.notification.body,
-                     icon: payload.notification.icon || '/icon.png'
+                 navigator.serviceWorker.ready.then((registration) => {
+                     registration.showNotification(payload.notification?.title || 'Notification', {
+                         body: payload.notification?.body,
+                         icon: payload.notification?.image || payload.notification?.icon || '/favicon.ico'
+                     });
                  });
              }
            });
