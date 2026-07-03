@@ -6,12 +6,14 @@ import { app } from '@/lib/firebase/client';
 import { db } from '@/lib/firebase/client';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { useAuth } from './use-auth';
+import { useToast } from '@/hooks/use-toast';
 
 export function useFcm() {
   const [fcmToken, setFcmToken] = useState<string | null>(null);
   const [notificationPermissionStatus, setNotificationPermissionStatus] = useState<NotificationPermission | null>(null);
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
+  const { toast } = useToast();
 
   const requestPermission = useCallback(async () => {
     try {
@@ -71,9 +73,9 @@ export function useFcm() {
   useEffect(() => {
     if (typeof window !== 'undefined' && 'Notification' in window) {
       setNotificationPermissionStatus(Notification.permission);
-
-      // Auto-request permission on mount/login if not decided yet
-      if (user && Notification.permission === 'default') {
+      
+      // Auto-request or initialize if permission is default OR already granted
+      if (user && (Notification.permission === 'default' || Notification.permission === 'granted')) {
         requestPermission();
       }
     }
