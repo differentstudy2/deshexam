@@ -3,6 +3,47 @@ import { Loader2, CheckCircle2, Circle } from 'lucide-react';
 import Image from 'next/image';
 
 export function AdminLoadingScreen() {
+  const [step, setStep] = React.useState(0);
+  const [progress, setProgress] = React.useState(15);
+
+  React.useEffect(() => {
+    // Fast simulated animation so it doesn't artificially block but shows progression
+    const t1 = setTimeout(() => { setStep(1); setProgress(45); }, 200);
+    const t2 = setTimeout(() => { setStep(2); setProgress(80); }, 450);
+    const t3 = setTimeout(() => { setProgress(95); }, 700);
+    
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
+  }, []);
+
+  const renderStep = (stepIndex: number, text: string) => {
+    if (step > stepIndex) {
+      // Completed
+      return (
+        <div className="flex items-center gap-3 px-4 py-2 transition-all duration-300">
+          <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
+          <span className="text-sm font-medium text-slate-700">{text}</span>
+        </div>
+      );
+    } else if (step === stepIndex) {
+      // Active
+      return (
+        <div className="flex items-center gap-3 px-4 py-2.5 bg-white rounded-xl shadow-sm border border-slate-100 ring-1 ring-slate-900/5 relative overflow-hidden transition-all duration-300 transform scale-[1.02]">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-slate-50 to-transparent w-[200%] animate-[shimmer_2s_infinite] opacity-50" />
+          <Loader2 className="w-5 h-5 text-blue-500 shrink-0 animate-spin relative z-10" />
+          <span className="text-sm font-semibold text-slate-900 relative z-10">{text}</span>
+        </div>
+      );
+    } else {
+      // Pending
+      return (
+        <div className="flex items-center gap-3 px-4 py-2 opacity-50 transition-all duration-300">
+          <Circle className="w-5 h-5 text-slate-400 shrink-0" />
+          <span className="text-sm font-medium text-slate-500">{text}</span>
+        </div>
+      );
+    }
+  };
+
   return (
     <div className="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-gradient-to-br from-[#F8FAFC] to-[#EEF2FF]">
       
@@ -64,30 +105,18 @@ export function AdminLoadingScreen() {
         </p>
 
         {/* Progress Steps */}
-        <div className="w-full space-y-3 mb-10 text-left">
-          {/* Step 1: Completed */}
-          <div className="flex items-center gap-3 px-4 py-2">
-            <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
-            <span className="text-sm font-medium text-slate-700">Authentication verified</span>
-          </div>
-          
-          {/* Step 2: Active */}
-          <div className="flex items-center gap-3 px-4 py-2.5 bg-white rounded-xl shadow-sm border border-slate-100 ring-1 ring-slate-900/5 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-slate-50 to-transparent w-[200%] animate-[shimmer_2s_infinite] opacity-50" />
-            <Loader2 className="w-5 h-5 text-blue-500 shrink-0 animate-spin relative z-10" />
-            <span className="text-sm font-semibold text-slate-900 relative z-10">Checking admin permissions</span>
-          </div>
-
-          {/* Step 3: Pending */}
-          <div className="flex items-center gap-3 px-4 py-2 opacity-50">
-            <Circle className="w-5 h-5 text-slate-400 shrink-0" />
-            <span className="text-sm font-medium text-slate-500">Loading dashboard modules</span>
-          </div>
+        <div className="w-full space-y-3 mb-10 text-left relative min-h-[140px]">
+          {renderStep(0, "Authentication verified")}
+          {renderStep(1, "Checking admin permissions")}
+          {renderStep(2, "Loading dashboard modules")}
         </div>
 
         {/* Progress Bar */}
         <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
-          <div className="h-full w-[65%] bg-gradient-to-r from-emerald-400 to-blue-500 rounded-full relative overflow-hidden transition-all duration-500 ease-out">
+          <div 
+            className="h-full bg-gradient-to-r from-emerald-400 to-blue-500 rounded-full relative overflow-hidden transition-all duration-300 ease-out"
+            style={{ width: `${progress}%` }}
+          >
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent w-[200%] animate-[shimmer_1.5s_infinite]" />
           </div>
         </div>
