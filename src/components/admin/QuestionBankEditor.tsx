@@ -272,10 +272,10 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
   };
 
   const sampleJSONData: Record<string, string> = {
-    MCQ: `[\n  {\n    "Question Type": "MCQ",\n    "Question": "What is the capital of France?",\n    "Option A": "London",\n    "Option B": "Berlin",\n    "Option C": "Paris",\n    "Option D": "Madrid",\n    "Correct Answer": "c",\n    "Explanation": "Paris is the capital of France.",\n    "Option Explanations": {\n      "a": "London is the capital of the UK.",\n      "c": "Correct! Paris is the capital of France."\n    },\n    "Difficulty": "Easy",\n    "Subject": "Geography",\n    "Chapter": "Europe"\n  }\n]`,
-    "T/F": `[\n  {\n    "Question Type": "T/F",\n    "Question": "The earth is flat.",\n    "Correct Answer": "false"\n  }\n]`,
-    FIB: `[\n  {\n    "Question Type": "FIB",\n    "Question": "The color of the sky is [blank] and the grass is [blank].",\n    "Correct Answer": "blue, green",\n    "Option A": "red",\n    "Option B": "yellow",\n    "Option C": "purple",\n    "Option D": "orange"\n  }\n]`,
-    Match: `[\n  {\n    "Question Type": "Match",\n    "Question": "Match the following countries with their capitals",\n    "matchingPairs": [\n      { "left": "France", "right": "Paris" },\n      { "left": "UK", "right": "London" }\n    ]\n  }\n]`,
+    MCQ: `[\n  {\n    "Question Type": "MCQ",\n    "Question": "What is the capital of France?",\n    "Option A": "London",\n    "Option B": "Berlin",\n    "Option C": "Paris",\n    "Option D": "Madrid",\n    "Correct Answer": "c",\n    "Explanation": "Paris is the capital of France.",\n    "Explanation A": "London is the capital of the UK.",\n    "Explanation B": "Berlin is the capital of Germany.",\n    "Explanation C": "Correct! Paris is the capital of France.",\n    "Explanation D": "Madrid is the capital of Spain.",\n    "Difficulty": "Easy",\n    "Subject": "Geography",\n    "Chapter": "Europe"\n  }\n]`,
+    "T/F": `[\n  {\n    "Question Type": "T/F",\n    "Question": "The earth is flat.",\n    "Correct Answer": "false",\n    "Explanation": "Scientific evidence shows the Earth is roughly spherical."\n  }\n]`,
+    FIB: `[\n  {\n    "Question Type": "FIB",\n    "Question": "The color of the sky is [blank] and the grass is [blank].",\n    "Correct Answer": "blue, green",\n    "Option A": "red",\n    "Option B": "yellow",\n    "Option C": "purple",\n    "Option D": "orange",\n    "Explanation": "During the day, a clear sky is blue, and healthy grass contains chlorophyll making it green."\n  }\n]`,
+    Match: `[\n  {\n    "Question Type": "Match",\n    "Question": "Match the following countries with their capitals",\n    "matchingPairs": [\n      { "left": "France", "right": "Paris" },\n      { "left": "UK", "right": "London" }\n    ],\n    "Explanation": "Paris is the capital of France, and London is the capital of the UK."\n  }\n]`,
     Desc: `[\n  {\n    "Question Type": "Desc",\n    "Question": "Explain Newton's first law of motion.",\n    "Answer": "An object will remain at rest or in uniform motion...",\n    "Explanation": "Also known as the law of inertia."\n  }\n]`
   };
 
@@ -304,7 +304,12 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
               if (raw["Option B"]) options.b = raw["Option B"];
               if (raw["Option C"]) options.c = raw["Option C"];
               if (raw["Option D"]) options.d = raw["Option D"];
-              if (raw["Option E"]) options.e = raw["Option E"];
+
+              const optionExplanations: any = raw.optionExplanations || raw["Option Explanations"] || {};
+              if (raw["Explanation A"]) optionExplanations.a = raw["Explanation A"];
+              if (raw["Explanation B"]) optionExplanations.b = raw["Explanation B"];
+              if (raw["Explanation C"]) optionExplanations.c = raw["Explanation C"];
+              if (raw["Explanation D"]) optionExplanations.d = raw["Explanation D"];
 
               const mappedType = qTypeMap[raw["Question Type"]] || raw.questionType || "MCQ";
               let correct = raw["Correct Answer"] || raw["Answer"] || raw["Answer Key"] || raw.correctAnswer || "";
@@ -319,7 +324,7 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                   options: Object.keys(options).length > 0 ? options : undefined,
                   correctAnswer: correct,
                   explanation: raw["Explanation"] || raw.explanation,
-                  optionExplanations: raw["Option Explanations"] || raw.optionExplanations,
+                  optionExplanations: Object.keys(optionExplanations).length > 0 ? optionExplanations : undefined,
                   difficulty: raw["Difficulty"] || raw.difficulty,
                   // Custom tags to store the raw Subject/Chapter names if provided
                   sourceSubject: raw["Subject"] || raw.sourceSubject,
