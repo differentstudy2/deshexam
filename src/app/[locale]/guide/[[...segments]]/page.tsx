@@ -69,7 +69,12 @@ export async function generateMetadata({ params }: { params: Promise<{ segments?
     ...metadata,
     alternates: {
       ...metadata.alternates,
-      canonical: metadata.alternates?.canonical || `https://deshexam.com/guide/${requestedPath}`
+      canonical: metadata.alternates?.canonical || `https://deshexam.com/guide/${requestedPath}`,
+      languages: {
+        'en': `https://deshexam.com/en/guide/${requestedPath}`,
+        'bn': `https://deshexam.com/bn/guide/${requestedPath}`,
+        'x-default': `https://deshexam.com/en/guide/${requestedPath}`
+      }
     }
   };
 }

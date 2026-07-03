@@ -25,6 +25,7 @@ import { getUserProfile } from "@/lib/firebase/firestore";
 import { ScrollArea } from "../ui/scroll-area";
 import { useAuthDialog } from "@/hooks/use-auth-dialog";
 import { useFcm } from "@/hooks/use-fcm";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 const mainNavLinks = [
     { href: "/academy", label: "Academy", icon: <BookOpen className="h-5 w-5" /> },
@@ -718,6 +719,7 @@ export function Header() {
               Premium Upgrade
             </Link>
           </Button>
+          <LanguageSwitcher />
           <ThemeToggle />
           <NotificationBell />
           <div className="hidden md:flex">
