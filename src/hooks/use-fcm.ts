@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 import { app } from '@/lib/firebase/client';
 import { db } from '@/lib/firebase/client';
@@ -13,13 +13,7 @@ export function useFcm() {
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
 
-  useEffect(() => {
-    if (typeof window !== 'undefined' && 'Notification' in window) {
-      setNotificationPermissionStatus(Notification.permission);
-    }
-  }, []);
-
-  const requestPermission = async () => {
+  const requestPermission = useCallback(async () => {
     try {
       if (typeof window !== 'undefined' && 'Notification' in window) {
         const permission = await Notification.requestPermission();
@@ -72,7 +66,18 @@ export function useFcm() {
       setError((err as Error).message);
     }
     return null;
-  };
+  }, [user]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      setNotificationPermissionStatus(Notification.permission);
+      
+      // Auto-request permission on mount/login if not decided yet
+      if (user && Notification.permission === 'default') {
+        requestPermission();
+      }
+    }
+  }, [user, requestPermission]);
 
   // Optional: Listen for foreground messages
   useEffect(() => {
