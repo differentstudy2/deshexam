@@ -31,7 +31,7 @@ export function useFcm() {
 
           if (currentToken) {
             setFcmToken(currentToken);
-            
+
             // Save token to Firestore if user is logged in
             if (user) {
               const tokenRef = doc(db, 'fcmTokens', currentToken);
@@ -42,15 +42,15 @@ export function useFcm() {
                 deviceInfo: navigator.userAgent
               }, { merge: true });
             } else {
-               // Save anonymously
-               const tokenRef = doc(db, 'fcmTokens', currentToken);
-               await setDoc(tokenRef, {
-                 token: currentToken,
-                 updatedAt: serverTimestamp(),
-                 deviceInfo: navigator.userAgent
-               }, { merge: true });
+              // Save anonymously
+              const tokenRef = doc(db, 'fcmTokens', currentToken);
+              await setDoc(tokenRef, {
+                token: currentToken,
+                updatedAt: serverTimestamp(),
+                deviceInfo: navigator.userAgent
+              }, { merge: true });
             }
-            
+
             return currentToken;
           } else {
             console.log('No registration token available. Request permission to generate one.');
@@ -71,7 +71,7 @@ export function useFcm() {
   useEffect(() => {
     if (typeof window !== 'undefined' && 'Notification' in window) {
       setNotificationPermissionStatus(Notification.permission);
-      
+
       // Auto-request permission on mount/login if not decided yet
       if (user && Notification.permission === 'default') {
         requestPermission();
@@ -82,24 +82,29 @@ export function useFcm() {
   // Optional: Listen for foreground messages
   useEffect(() => {
     if (typeof window !== 'undefined' && 'Notification' in window && notificationPermissionStatus === 'granted') {
-       try {
-           const messaging = getMessaging(app);
-           const unsubscribe = onMessage(messaging, (payload) => {
-             console.log('Message received in foreground: ', payload);
-             // You can customize foreground notification behavior here
-             if (payload.notification) {
-                 navigator.serviceWorker.ready.then((registration) => {
-                     registration.showNotification(payload.notification?.title || 'Notification', {
-                         body: payload.notification?.body,
-                         icon: payload.notification?.image || payload.notification?.icon || '/favicon.ico'
-                     });
-                 });
-             }
-           });
-           return () => unsubscribe();
-       } catch (e) {
-           console.log("Messaging not supported or blocked", e);
-       }
+      try {
+        const messaging = getMessaging(app);
+        const unsubscribe = onMessage(messaging, (payload) => {
+          console.log('Message received in foreground: ', payload);
+          // You can customize foreground notification behavior here
+          if (payload.notification) {
+            toast({
+              title: payload.notification?.title || 'Notification',
+              description: payload.notification?.body,
+            });
+
+            navigator.serviceWorker.ready.then((registration) => {
+              registration.showNotification(payload.notification?.title || 'Notification', {
+                body: payload.notification?.body,
+                icon: payload.notification?.image || payload.notification?.icon || '/favicon.ico'
+              });
+            });
+          }
+        });
+        return () => unsubscribe();
+      } catch (e) {
+        console.log("Messaging not supported or blocked", e);
+      }
     }
   }, [notificationPermissionStatus]);
 
