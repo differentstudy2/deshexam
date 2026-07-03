@@ -479,7 +479,8 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
               body: JSON.stringify({
                   questionText: editData.questionText,
                   options: editData.options,
-                  correctAnswer: editData.correctAnswer
+                  correctAnswer: editData.correctAnswer,
+                  language: editData.language || 'Bangla'
               })
           });
           const data = await res.json();

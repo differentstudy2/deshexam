@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
   try {
-    const { questionText, options, correctAnswer } = await req.json();
+    const { questionText, options, correctAnswer, language } = await req.json();
 
     if (!questionText) {
       return NextResponse.json({ error: 'Question text is required' }, { status: 400 });
@@ -13,11 +13,17 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'GEMINI_API_KEY is not set' }, { status: 500 });
     }
 
+    const optionsText = options && Object.keys(options).length > 0 
+      ? `Options: ${Object.entries(options).filter(([k,v]) => v).map(([k,v]) => `${k.toUpperCase()}) ${v}`).join(' ')}` 
+      : '';
+
+    const langInstruction = language ? `\n    IMPORTANT: You MUST write the ENTIRE explanation (both main and options) in ${language}.` : '';
+
     const prompt = `
-    You are an expert educator. Please provide a clear, concise, and helpful explanation for the following question.
+    You are an expert educator. Please provide a clear, concise, and helpful explanation for the following question.${langInstruction}
     
     Question: ${questionText}
-    ${options ? `Options: A) ${options.a} B) ${options.b} C) ${options.c} D) ${options.d}` : ''}
+    ${optionsText}
     Correct Answer: ${correctAnswer}
 
     Generate a JSON object with the following structure:
