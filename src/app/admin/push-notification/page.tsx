@@ -120,7 +120,7 @@ export default function PushNotificationPage() {
         {/* Analytics Section */}
         <div className="space-y-3">
           <h2 className="text-[11px] font-bold text-slate-400 tracking-[0.2em] uppercase">Page Overview Analytics</h2>
-          <AnalyticsBar subscriberCount={subscriberCount} />
+          <AnalyticsBar subscriberCount={subscriberCount} campaigns={campaigns} />
         </div>
 
         {/* Main Content Grid */}
