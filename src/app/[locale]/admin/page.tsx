@@ -1,27 +1,16 @@
 'use client';
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  CardFooter,
-} from '@/components/ui/card';
-import { Users, FileText, BarChart2, Activity, PlusCircle, FilePlus, Eye, Trash2, Book, ArrowUpRight, TrendingUp, Search } from 'lucide-react';
-import Link from 'next/link';
+import { Card, CardContent } from '@/components/ui/card';
+import { Users, FileText, BarChart2, PlusCircle, FilePlus, Book, ArrowUpRight, TrendingUp, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { getPaginatedSubmissions, getAllContent, getUserProfile, deleteSubmissions, getAllUsers } from '@/lib/firebase/firestore';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { ScoreCircle } from '@/components/feature/score-circle';
-import { Checkbox } from '@/components/ui/checkbox';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { DocumentSnapshot } from 'firebase/firestore';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { Input } from '@/components/ui/input';
+import { ActivityChart } from '@/components/admin/overview/ActivityChart';
+import { SubmissionsTable } from '@/components/admin/overview/SubmissionsTable';
+import { Link } from '@/i18n/routing';
 
 type Submission = {
   id: string;
@@ -130,14 +119,6 @@ export default function AdminDashboardPage() {
           setSubmissionsCurrentPage(prevPage);
       }
   }
-
-  const getUrlForResults = (sub: Submission) => {
-    if (sub.testType === 'Practice Set') {
-      return `/textbook-solutions/practice-set/${sub.testId}/results?submissionId=${sub.id}`;
-    }
-    const typeSlug = (sub.testType || 'content').toLowerCase().replace(/\s+/g, '-');
-    return `/${typeSlug}/${sub.testId}/results?submissionId=${sub.id}`;
-  };
   
   const handleSelectSubmission = (id: string) => {
     setSelectedSubmissions(prev => 
@@ -160,290 +141,170 @@ export default function AdminDashboardPage() {
     }
   }
 
+  const currentDate = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-10 animate-in fade-in duration-500 pb-10 max-w-7xl mx-auto">
       
-      {/* Header Section */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      {/* Background Soft Gradients */}
+      <div className="fixed top-0 left-0 w-full h-[50vh] bg-gradient-to-b from-blue-50/50 to-transparent pointer-events-none -z-10" />
+      
+      {/* Hero Header Section */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 pt-4">
         <div>
-            <h1 className="text-3xl font-bold tracking-tight text-slate-900">Dashboard Overview</h1>
-            <p className="text-muted-foreground mt-1">
-                Here's what's happening with your platform today.
+            <p className="text-sm font-semibold text-emerald-600 tracking-wide uppercase mb-1">{currentDate}</p>
+            <h1 className="text-4xl font-bold tracking-tight text-slate-900 font-lexend">Good Morning, Admin</h1>
+            <p className="text-muted-foreground mt-2 text-lg max-w-xl">
+                Here is what's happening with your platform today.
             </p>
         </div>
-        <div className="flex items-center gap-2">
-            <div className="relative">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input type="search" placeholder="Search..." className="w-64 pl-8 bg-white" />
-            </div>
+        <div className="w-full md:w-auto relative group">
+            <div className="absolute inset-0 bg-emerald-400/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <Search className="absolute left-4 top-3.5 h-5 w-5 text-slate-400 z-10" />
+            <Input 
+              type="search" 
+              placeholder="Search users, tests, content..." 
+              className="w-full md:w-80 h-12 pl-12 bg-white/70 backdrop-blur-md border-slate-200/60 shadow-[0_4px_12px_rgba(0,0,0,0.03)] rounded-2xl relative z-10 text-base focus-visible:ring-emerald-500/50" 
+            />
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card className="border-none shadow-sm bg-white overflow-hidden relative">
-          <div className="absolute top-0 right-0 p-4 opacity-10">
-            <Users className="w-16 h-16" />
+      {/* Premium Stat Cards (Top Row) */}
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Total Users */}
+        <Card className="border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-white/80 backdrop-blur-xl overflow-hidden relative group rounded-3xl hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300">
+          <div className="absolute -right-4 -top-4 bg-indigo-50 w-24 h-24 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+            <Users className="w-8 h-8 text-indigo-400 mr-2 mt-2" />
           </div>
-          <CardHeader className="flex flex-row items-center justify-between pb-2 z-10 relative">
-            <CardTitle className="text-sm font-medium text-slate-500 uppercase tracking-wider">Total Users</CardTitle>
-          </CardHeader>
-          <CardContent className="z-10 relative">
-            {loading ? <Skeleton className="h-8 w-24" /> : (
-              <div className="flex items-baseline gap-2">
-                <div className="text-3xl font-bold text-slate-900">{stats.totalUsers}</div>
-                <span className="text-sm font-medium text-green-600 flex items-center"><ArrowUpRight className="w-3 h-3 mr-1"/> 12%</span>
+          <CardContent className="p-6 relative z-10">
+            <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-2">Total Users</p>
+            {loading ? <Skeleton className="h-10 w-24 rounded-lg" /> : (
+              <div className="flex flex-col gap-1">
+                <div className="text-4xl font-bold text-slate-900 font-lexend">{stats.totalUsers}</div>
+                <div className="flex items-center gap-1.5 mt-2">
+                  <span className="flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 text-emerald-600"><ArrowUpRight className="w-3 h-3"/></span>
+                  <span className="text-sm font-medium text-slate-600"><span className="text-emerald-600 font-semibold">12%</span> vs last month</span>
+                </div>
               </div>
             )}
           </CardContent>
         </Card>
 
-        <Card className="border-none shadow-sm bg-white overflow-hidden relative">
-          <div className="absolute top-0 right-0 p-4 opacity-10">
-            <FileText className="w-16 h-16" />
+        {/* Total Content */}
+        <Card className="border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-white/80 backdrop-blur-xl overflow-hidden relative group rounded-3xl hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300">
+          <div className="absolute -right-4 -top-4 bg-blue-50 w-24 h-24 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+            <FileText className="w-8 h-8 text-blue-400 mr-2 mt-2" />
           </div>
-          <CardHeader className="flex flex-row items-center justify-between pb-2 z-10 relative">
-            <CardTitle className="text-sm font-medium text-slate-500 uppercase tracking-wider">Total Content</CardTitle>
-          </CardHeader>
-          <CardContent className="z-10 relative">
-            {loading ? <Skeleton className="h-8 w-24" /> : (
-              <div className="flex items-baseline gap-2">
-                <div className="text-3xl font-bold text-slate-900">{stats.totalContent}</div>
-                <span className="text-sm font-medium text-green-600 flex items-center"><ArrowUpRight className="w-3 h-3 mr-1"/> 4%</span>
+          <CardContent className="p-6 relative z-10">
+            <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-2">Total Content</p>
+            {loading ? <Skeleton className="h-10 w-24 rounded-lg" /> : (
+              <div className="flex flex-col gap-1">
+                <div className="text-4xl font-bold text-slate-900 font-lexend">{stats.totalContent}</div>
+                <div className="flex items-center gap-1.5 mt-2">
+                  <span className="flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 text-emerald-600"><ArrowUpRight className="w-3 h-3"/></span>
+                  <span className="text-sm font-medium text-slate-600"><span className="text-emerald-600 font-semibold">4%</span> vs last month</span>
+                </div>
               </div>
             )}
           </CardContent>
         </Card>
 
-        <Card className="border-none shadow-sm bg-white overflow-hidden relative">
-          <div className="absolute top-0 right-0 p-4 opacity-10">
-            <BarChart2 className="w-16 h-16" />
+        {/* Submissions */}
+        <Card className="border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-white/80 backdrop-blur-xl overflow-hidden relative group rounded-3xl hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300">
+          <div className="absolute -right-4 -top-4 bg-purple-50 w-24 h-24 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+            <BarChart2 className="w-8 h-8 text-purple-400 mr-2 mt-2" />
           </div>
-          <CardHeader className="flex flex-row items-center justify-between pb-2 z-10 relative">
-            <CardTitle className="text-sm font-medium text-slate-500 uppercase tracking-wider">Submissions</CardTitle>
-          </CardHeader>
-          <CardContent className="z-10 relative">
-            {loading ? <Skeleton className="h-8 w-24" /> : (
-              <div className="flex items-baseline gap-2">
-                <div className="text-3xl font-bold text-slate-900">1,248</div>
-                <span className="text-sm font-medium text-green-600 flex items-center"><ArrowUpRight className="w-3 h-3 mr-1"/> 24%</span>
+          <CardContent className="p-6 relative z-10">
+            <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-2">Submissions</p>
+            {loading ? <Skeleton className="h-10 w-24 rounded-lg" /> : (
+              <div className="flex flex-col gap-1">
+                <div className="text-4xl font-bold text-slate-900 font-lexend">1,248</div>
+                <div className="flex items-center gap-1.5 mt-2">
+                  <span className="flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 text-emerald-600"><ArrowUpRight className="w-3 h-3"/></span>
+                  <span className="text-sm font-medium text-slate-600"><span className="text-emerald-600 font-semibold">24%</span> vs last month</span>
+                </div>
               </div>
             )}
           </CardContent>
         </Card>
 
-        <Card className="border-none shadow-sm bg-[#00a651] text-white overflow-hidden relative">
-          <div className="absolute top-0 right-0 p-4 opacity-10">
-             <TrendingUp className="w-16 h-16" />
+        {/* Revenue */}
+        <Card className="border-none shadow-[0_12px_40px_rgb(16,185,129,0.15)] bg-gradient-to-br from-emerald-500 to-teal-600 text-white overflow-hidden relative group rounded-3xl hover:shadow-[0_12px_40px_rgb(16,185,129,0.25)] transition-all duration-300">
+          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10" />
+          <div className="absolute -right-6 -top-6 bg-white/10 w-32 h-32 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-700 blur-[2px]">
+             <TrendingUp className="w-12 h-12 text-white/50 mr-4 mt-4" />
           </div>
-          <CardHeader className="flex flex-row items-center justify-between pb-2 z-10 relative">
-            <CardTitle className="text-sm font-medium text-green-100 uppercase tracking-wider">Revenue (Monthly)</CardTitle>
-          </CardHeader>
-          <CardContent className="z-10 relative">
-            <div className="flex items-baseline gap-2">
-              <div className="text-3xl font-bold">₹ 45,200</div>
+          <CardContent className="p-6 relative z-10 h-full flex flex-col justify-between">
+            <p className="text-sm font-semibold text-emerald-50 uppercase tracking-wider mb-2">Revenue (Monthly)</p>
+            <div className="flex flex-col gap-1">
+              <div className="text-4xl font-bold font-lexend drop-shadow-sm">₹ 45,200</div>
+              <div className="flex items-center gap-1.5 mt-2 text-emerald-100">
+                <span className="text-sm font-medium">Record high this month</span>
+              </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
+      {/* Middle Row (Bento Grid) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        {/* Main Chart Area */}
-        <Card className="lg:col-span-2 border-none shadow-sm">
-            <CardHeader>
-                <CardTitle>Activity Overview</CardTitle>
-                <CardDescription>Daily test submissions over the last week.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <div className="h-[300px] w-full">
-                    <ResponsiveContainer width="100%" height="100%">
-                        <AreaChart data={activityData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                            <defs>
-                                <linearGradient id="colorSubmissions" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#00a651" stopOpacity={0.3}/>
-                                    <stop offset="95%" stopColor="#00a651" stopOpacity={0}/>
-                                </linearGradient>
-                            </defs>
-                            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#94a3b8'}} />
-                            <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8'}} />
-                            <RechartsTooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                            <Area type="monotone" dataKey="submissions" stroke="#00a651" strokeWidth={3} fillOpacity={1} fill="url(#colorSubmissions)" />
-                        </AreaChart>
-                    </ResponsiveContainer>
-                </div>
-            </CardContent>
-        </Card>
+        {/* Activity Chart component */}
+        <ActivityChart data={activityData} />
 
-        {/* Quick Actions */}
-        <Card className="border-none shadow-sm">
-            <CardHeader>
-                <CardTitle>Quick Actions</CardTitle>
-                <CardDescription>Common administrative tasks.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <div className="grid grid-cols-2 gap-3">
-                    <Link href="/admin/add-content" className="flex flex-col items-center justify-center p-4 border rounded-xl hover:bg-[#00a651] hover:text-white hover:border-[#00a651] transition-all group">
-                        <PlusCircle className="mb-2 h-6 w-6 text-slate-500 group-hover:text-white" />
-                        <span className="text-sm font-medium">Add Quiz</span>
-                    </Link>
-                    <Link href="/admin/add-article" className="flex flex-col items-center justify-center p-4 border rounded-xl hover:bg-[#00a651] hover:text-white hover:border-[#00a651] transition-all group">
-                        <FilePlus className="mb-2 h-6 w-6 text-slate-500 group-hover:text-white" />
-                        <span className="text-sm font-medium">Add Article</span>
-                    </Link>
-                    <Link href="/admin/users" className="flex flex-col items-center justify-center p-4 border rounded-xl hover:bg-slate-100 transition-all">
-                        <Users className="mb-2 h-6 w-6 text-slate-500" />
-                        <span className="text-sm font-medium">Users</span>
-                    </Link>
-                    <Link href="/admin/textbooks" className="flex flex-col items-center justify-center p-4 border rounded-xl hover:bg-slate-100 transition-all">
-                        <Book className="mb-2 h-6 w-6 text-slate-500" />
-                        <span className="text-sm font-medium">Textbooks</span>
-                    </Link>
+        {/* Quick Actions (Bento Box) */}
+        <div className="col-span-1 grid grid-cols-2 gap-4 h-full">
+            <Link href="/admin/add-content" className="relative overflow-hidden group bg-white/80 backdrop-blur-md rounded-[24px] p-6 border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_rgb(16,185,129,0.15)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
+                <div className="absolute right-0 top-0 w-24 h-24 bg-emerald-400/10 rounded-bl-[100px] transition-colors duration-300 group-hover:bg-emerald-500" />
+                <PlusCircle className="w-8 h-8 text-slate-700 group-hover:text-emerald-50 relative z-10 transition-colors" />
+                <div className="mt-6 relative z-10">
+                  <h3 className="font-bold text-slate-900 text-lg">Add Quiz</h3>
+                  <p className="text-xs text-slate-500 mt-1">Create new assessment</p>
                 </div>
-            </CardContent>
-        </Card>
+            </Link>
+
+            <Link href="/admin/add-article" className="relative overflow-hidden group bg-white/80 backdrop-blur-md rounded-[24px] p-6 border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_rgb(59,130,246,0.15)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
+                <div className="absolute right-0 top-0 w-24 h-24 bg-blue-500/10 rounded-bl-[100px] transition-colors duration-300 group-hover:bg-blue-600" />
+                <FilePlus className="w-8 h-8 text-slate-700 group-hover:text-blue-50 relative z-10 transition-colors" />
+                <div className="mt-6 relative z-10">
+                  <h3 className="font-bold text-slate-900 text-lg">Add Article</h3>
+                  <p className="text-xs text-slate-500 mt-1">Publish new reading</p>
+                </div>
+            </Link>
+
+            <Link href="/admin/users" className="relative overflow-hidden group bg-white/80 backdrop-blur-md rounded-[24px] p-6 border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_rgb(99,102,241,0.15)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
+                <div className="absolute right-0 top-0 w-24 h-24 bg-indigo-500/10 rounded-bl-[100px] transition-colors duration-300 group-hover:bg-indigo-600" />
+                <Users className="w-8 h-8 text-slate-700 group-hover:text-indigo-50 relative z-10 transition-colors" />
+                <div className="mt-6 relative z-10">
+                  <h3 className="font-bold text-slate-900 text-lg">Users</h3>
+                  <p className="text-xs text-slate-500 mt-1">Manage accounts</p>
+                </div>
+            </Link>
+
+            <Link href="/admin/textbooks" className="relative overflow-hidden group bg-white/80 backdrop-blur-md rounded-[24px] p-6 border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_rgb(245,158,11,0.15)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
+                <div className="absolute right-0 top-0 w-24 h-24 bg-amber-500/10 rounded-bl-[100px] transition-colors duration-300 group-hover:bg-amber-500" />
+                <Book className="w-8 h-8 text-slate-700 group-hover:text-amber-50 relative z-10 transition-colors" />
+                <div className="mt-6 relative z-10">
+                  <h3 className="font-bold text-slate-900 text-lg">Textbooks</h3>
+                  <p className="text-xs text-slate-500 mt-1">Library config</p>
+                </div>
+            </Link>
+        </div>
       </div>
 
-      {/* Submissions Table */}
-      <Card className="border-none shadow-sm">
-        <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-                <CardTitle>Recent Submissions</CardTitle>
-                <CardDescription>Latest test results from users across the platform.</CardDescription>
-            </div>
-            {selectedSubmissions.length > 0 && (
-                <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                        <Button variant="destructive" size="sm" className="shadow-sm">
-                            <Trash2 className="mr-2 h-4 w-4"/>
-                            Delete ({selectedSubmissions.length})
-                        </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                        <AlertDialogHeader>
-                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                            <AlertDialogDescription>This will permanently delete {selectedSubmissions.length} submission(s).</AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleDelete(selectedSubmissions)} className="bg-red-600 hover:bg-red-700">Delete</AlertDialogAction>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialog>
-            )}
-        </CardHeader>
-        <CardContent>
-            {loading ? (
-                <div className="space-y-4">
-                    <Skeleton className="h-16 w-full rounded-xl" />
-                    <Skeleton className="h-16 w-full rounded-xl" />
-                    <Skeleton className="h-16 w-full rounded-xl" />
-                </div>
-            ) : recentSubmissions.length > 0 ? (
-                <div className="rounded-md border border-slate-100">
-                    <table className="w-full text-sm text-left">
-                        <thead className="bg-slate-50/50 text-slate-500 text-xs uppercase font-semibold">
-                            <tr>
-                                <th className="px-4 py-3 w-10"></th>
-                                <th className="px-4 py-3">User</th>
-                                <th className="px-4 py-3">Test Title</th>
-                                <th className="px-4 py-3 text-center">Score</th>
-                                <th className="px-4 py-3 text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-100">
-                            {recentSubmissions.map(sub => (
-                                <tr key={sub.id} className="hover:bg-slate-50/50 transition-colors group">
-                                    <td className="px-4 py-3">
-                                        <Checkbox 
-                                            checked={selectedSubmissions.includes(sub.id)}
-                                            onCheckedChange={() => handleSelectSubmission(sub.id)}
-                                        />
-                                    </td>
-                                    <td className="px-4 py-3">
-                                        <div className="flex items-center gap-3">
-                                            <Avatar className="h-8 w-8 border">
-                                                <AvatarImage src={sub.user?.photoURL} />
-                                                <AvatarFallback className="bg-primary/10 text-primary text-xs">{sub.user?.displayName?.[0]}</AvatarFallback>
-                                            </Avatar>
-                                            <span className="font-medium text-slate-900">{sub.user?.displayName}</span>
-                                        </div>
-                                    </td>
-                                    <td className="px-4 py-3 text-slate-600">{sub.testTitle}</td>
-                                    <td className="px-4 py-3 text-center">
-                                        <div className="flex justify-center">
-                                            <ScoreCircle score={(sub.score / sub.totalQuestions) * 100} size={32} />
-                                        </div>
-                                    </td>
-                                    <td className="px-4 py-3 text-right">
-                                        <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <Button asChild variant="outline" size="icon" className="h-8 w-8 text-slate-500 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50">
-                                                <Link href={getUrlForResults(sub)}>
-                                                    <Eye className="h-4 w-4" />
-                                                </Link>
-                                            </Button>
-                                            <AlertDialog>
-                                                <AlertDialogTrigger asChild>
-                                                    <Button variant="outline" size="icon" className="h-8 w-8 text-slate-500 hover:text-red-600 hover:border-red-200 hover:bg-red-50">
-                                                        <Trash2 className="h-4 w-4"/>
-                                                    </Button>
-                                                </AlertDialogTrigger>
-                                                <AlertDialogContent>
-                                                    <AlertDialogHeader>
-                                                        <AlertDialogTitle>Delete Submission?</AlertDialogTitle>
-                                                        <AlertDialogDescription>This will permanently delete this submission record. It cannot be undone.</AlertDialogDescription>
-                                                    </AlertDialogHeader>
-                                                    <AlertDialogFooter>
-                                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                        <AlertDialogAction onClick={() => handleDelete([sub.id])} className="bg-red-600 hover:bg-red-700">Delete</AlertDialogAction>
-                                                    </AlertDialogFooter>
-                                                </AlertDialogContent>
-                                            </AlertDialog>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            ) : (
-                <div className="flex flex-col items-center justify-center py-12 text-center">
-                    <div className="h-12 w-12 rounded-full bg-slate-100 flex items-center justify-center mb-4">
-                        <FileText className="h-6 w-6 text-slate-400" />
-                    </div>
-                    <h3 className="font-medium text-slate-900">No submissions found</h3>
-                    <p className="text-sm text-slate-500 mt-1">There hasn't been any test activity yet.</p>
-                </div>
-            )}
-        </CardContent>
-        <CardFooter className="border-t border-slate-100 bg-slate-50/50 rounded-b-xl py-3">
-            <div className="flex items-center justify-between w-full">
-                <span className="text-xs text-slate-500">
-                    Showing Page {submissionsCurrentPage}
-                </span>
-                <div className="flex items-center space-x-2">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handlePrevPage}
-                        disabled={submissionsCurrentPage === 1 || loading}
-                        className="h-8 text-xs"
-                    >
-                        Previous
-                    </Button>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handleNextPage}
-                        disabled={!hasMoreSubmissions || loading}
-                        className="h-8 text-xs"
-                    >
-                        Next
-                    </Button>
-                </div>
-            </div>
-        </CardFooter>
-      </Card>
+      {/* Submissions Table Component */}
+      <SubmissionsTable 
+        loading={loading}
+        submissions={recentSubmissions}
+        selectedSubmissions={selectedSubmissions}
+        onSelectSubmission={handleSelectSubmission}
+        onDeleteSubmissions={handleDelete}
+        currentPage={submissionsCurrentPage}
+        hasMore={hasMoreSubmissions}
+        onNextPage={handleNextPage}
+        onPrevPage={handlePrevPage}
+      />
+
     </div>
   );
 }
