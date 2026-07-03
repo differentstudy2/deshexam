@@ -299,17 +299,25 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                   "Matching": "Match", "Match": "Match",
                   "CQ": "CQ"
               };
+              const getVal = (obj: any, key: string) => {
+                  if (!obj) return undefined;
+                  const found = Object.keys(obj).find(k => k.toLowerCase().trim() === key.toLowerCase().trim());
+                  return found ? obj[found] : undefined;
+              };
+
               const options: any = raw.options || {};
-              if (raw["Option A"]) options.a = raw["Option A"];
-              if (raw["Option B"]) options.b = raw["Option B"];
-              if (raw["Option C"]) options.c = raw["Option C"];
-              if (raw["Option D"]) options.d = raw["Option D"];
+              if (getVal(raw, "Option A")) options.a = getVal(raw, "Option A");
+              if (getVal(raw, "Option B")) options.b = getVal(raw, "Option B");
+              if (getVal(raw, "Option C")) options.c = getVal(raw, "Option C");
+              if (getVal(raw, "Option D")) options.d = getVal(raw, "Option D");
+              if (getVal(raw, "Option E")) options.e = getVal(raw, "Option E");
 
               const optionExplanations: any = raw.optionExplanations || raw["Option Explanations"] || {};
-              if (raw["Explanation A"]) optionExplanations.a = raw["Explanation A"];
-              if (raw["Explanation B"]) optionExplanations.b = raw["Explanation B"];
-              if (raw["Explanation C"]) optionExplanations.c = raw["Explanation C"];
-              if (raw["Explanation D"]) optionExplanations.d = raw["Explanation D"];
+              if (getVal(raw, "Explanation A")) optionExplanations.a = getVal(raw, "Explanation A");
+              if (getVal(raw, "Explanation B")) optionExplanations.b = getVal(raw, "Explanation B");
+              if (getVal(raw, "Explanation C")) optionExplanations.c = getVal(raw, "Explanation C");
+              if (getVal(raw, "Explanation D")) optionExplanations.d = getVal(raw, "Explanation D");
+              if (getVal(raw, "Explanation E")) optionExplanations.e = getVal(raw, "Explanation E");
 
               const mappedType = qTypeMap[raw["Question Type"]] || raw.questionType || "MCQ";
               let correct = raw["Correct Answer"] || raw["Answer"] || raw["Answer Key"] || raw.correctAnswer || "";

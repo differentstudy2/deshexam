@@ -259,6 +259,14 @@ const TreeNode = ({ node, level = 0, onAddClick, onBulkAddClick, onEditClick, on
               <Plus className="w-4 h-4" />
             </Button>
           )}
+
+          {(node.type === 'chapter' || node.type === 'topic') && (
+            <Button asChild variant="ghost" size="icon" className="h-8 w-8 text-purple-600 hover:bg-purple-50" title="Manage Content">
+              <Link href={`/admin/guide-content/topic/${node.id}`} onClick={(e) => e.stopPropagation()}>
+                <FileText className="w-4 h-4" />
+              </Link>
+            </Button>
+          )}
           
           <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-600 hover:bg-blue-50" onClick={(e) => { e.stopPropagation(); onEditClick(node.id, node.title || node.name, node.author, () => { if (refreshParent) refreshParent(); }); }} title="Rename">
             <Edit2 className="w-4 h-4" />
