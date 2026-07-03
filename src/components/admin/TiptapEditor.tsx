@@ -135,7 +135,7 @@ const getSuggestionItems = ({ query }: { query: string }) => {
 };
 
 
-const MenuBar = ({ editor }: { editor: any }) => {
+const MenuBar = ({ editor, children }: { editor: any, children?: React.ReactNode }) => {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = React.useState(false);
   const [mediaDialogOpen, setMediaDialogOpen] = React.useState(false);
@@ -337,6 +337,9 @@ const MenuBar = ({ editor }: { editor: any }) => {
           </div>
         </DialogContent>
       </Dialog>
+
+      <div className="flex-1 min-w-[1rem]" />
+      {children}
     </div>
   );
 };
@@ -524,62 +527,60 @@ export function TiptapEditor({ content, onChange, maxHeight }: { content: string
 
   return (
     <div className="border border-slate-300 dark:border-slate-700 rounded-2xl overflow-hidden bg-slate-100/50 dark:bg-slate-950 focus-within:border-emerald-500 dark:focus-within:border-emerald-500 transition-colors shadow-sm flex flex-col">
-      <div className="flex flex-col xl:flex-row xl:items-start justify-between bg-white dark:bg-slate-900 border-b border-slate-300 dark:border-slate-800">
-        <div className="flex-1 w-full border-b xl:border-b-0 border-slate-200 dark:border-slate-800">
-          <MenuBar editor={editor} />
-        </div>
-
-        <div className="flex items-center justify-end gap-2 p-2 shrink-0 bg-slate-50 dark:bg-slate-900/50">
-          <Dialog open={aiDialogOpen} onOpenChange={setAiDialogOpen}>
-            <DialogTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-8 gap-1 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 hover:text-indigo-700">
-                <Sparkles className="w-4 h-4" />
-                <span className="hidden sm:inline">AI Generate</span>
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Generate Content with AI</DialogTitle>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="space-y-2">
-                  <Label>Prompt for AI</Label>
-                  <Textarea
-                    placeholder="e.g. Write a 3 paragraph admission process for an engineering college..."
-                    value={aiPrompt}
-                    onChange={(e) => setAiPrompt(e.target.value)}
-                    rows={4}
-                  />
-                  <p className="text-xs text-slate-500">The AI is instructed to use rich HTML tags automatically for the best formatting.</p>
-                </div>
-                <Button onClick={handleGenerateAI} disabled={isGenerating || !aiPrompt.trim()} className="w-full">
-                  {isGenerating ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...</> : 'Generate'}
+      <div className="bg-white dark:bg-slate-900 border-b border-slate-300 dark:border-slate-800">
+        <MenuBar editor={editor}>
+          <div className="flex items-center gap-1 sm:gap-2">
+            <Dialog open={aiDialogOpen} onOpenChange={setAiDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-8 gap-1 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 hover:text-indigo-700">
+                  <Sparkles className="w-4 h-4" />
+                  <span className="hidden sm:inline">AI Generate</span>
                 </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Generate Content with AI</DialogTitle>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="space-y-2">
+                    <Label>Prompt for AI</Label>
+                    <Textarea
+                      placeholder="e.g. Write a 3 paragraph admission process for an engineering college..."
+                      value={aiPrompt}
+                      onChange={(e) => setAiPrompt(e.target.value)}
+                      rows={4}
+                    />
+                    <p className="text-xs text-slate-500">The AI is instructed to use rich HTML tags automatically for the best formatting.</p>
+                  </div>
+                  <Button onClick={handleGenerateAI} disabled={isGenerating || !aiPrompt.trim()} className="w-full">
+                    {isGenerating ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...</> : 'Generate'}
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
 
-          <div className="w-px h-6 bg-slate-300 dark:bg-slate-700 mx-1" />
+            <div className="w-px h-6 bg-slate-300 dark:bg-slate-700 mx-1 hidden sm:block" />
 
-          <select
-            value={viewMode}
-            onChange={(e) => {
-              const newMode = e.target.value as any;
-              setViewMode(newMode);
-              if (editor) {
-                if (newMode === 'html') setRawContent(editor.getHTML());
-                if (newMode === 'text') setRawContent(editor.getText());
-                if (newMode === 'markdown') setRawContent((editor.storage as any).markdown.getMarkdown());
-              }
-            }}
-            className="text-xs border-none bg-transparent font-medium text-slate-600 focus:ring-0 cursor-pointer p-0"
-          >
-            <option value="visual">Visual</option>
-            <option value="html">HTML</option>
-            <option value="markdown">Markdown</option>
-            <option value="text">Plain Text</option>
-          </select>
-        </div>
+            <select
+              value={viewMode}
+              onChange={(e) => {
+                const newMode = e.target.value as any;
+                setViewMode(newMode);
+                if (editor) {
+                  if (newMode === 'html') setRawContent(editor.getHTML());
+                  if (newMode === 'text') setRawContent(editor.getText());
+                  if (newMode === 'markdown') setRawContent((editor.storage as any).markdown.getMarkdown());
+                }
+              }}
+              className="text-xs border-none bg-transparent font-medium text-slate-600 focus:ring-0 cursor-pointer p-0 pr-1 h-8"
+            >
+              <option value="visual">Visual</option>
+              <option value="html">HTML</option>
+              <option value="markdown">Markdown</option>
+              <option value="text">Plain Text</option>
+            </select>
+          </div>
+        </MenuBar>
       </div>
 
       <div

@@ -576,6 +576,7 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                           </div>
                       </CardHeader>
                       <CardContent className="space-y-3 flex-1 flex flex-col pt-3">
+                          <div className="grid grid-cols-2 gap-3">
                               <div className="relative border border-[#c4d6c4] dark:border-emerald-800/50 rounded-lg pt-2 pb-1 hover:bg-[#f4f8f4] dark:bg-emerald-900/20 transition-colors bg-white dark:bg-slate-950 focus-within:border-[#4a634a] dark:border-emerald-500/50 focus-within:ring-1 focus-within:ring-[#4a634a] dark:focus-within:ring-emerald-500">
                                   <label className="absolute top-0 left-2 -translate-y-1/2 bg-white dark:bg-slate-950 px-1 text-[10px] font-medium text-[#4a634a] dark:text-emerald-400 pointer-events-none">Question Type</label>
                                   <Select value={editData.questionType as string} onValueChange={v => {
@@ -585,15 +586,30 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                                       <SelectTrigger className="border-0 focus:ring-0 shadow-none h-8 pt-0 bg-transparent font-medium text-[#2d3b2d] dark:text-emerald-200">
                                           <SelectValue placeholder="Select type" />
                                       </SelectTrigger>
-                                  <SelectContent>
-                                      <SelectItem value="MCQ">MCQ</SelectItem>
-                                      <SelectItem value="T/F">T/F</SelectItem>
-                                      <SelectItem value="FIB">FIB</SelectItem>
-                                      <SelectItem value="Match">Match</SelectItem>
-                                      <SelectItem value="CQ">CQ</SelectItem>
-                                      <SelectItem value="Desc">Desc</SelectItem>
-                                  </SelectContent>
-                              </Select>
+                                      <SelectContent>
+                                          <SelectItem value="MCQ">MCQ</SelectItem>
+                                          <SelectItem value="T/F">T/F</SelectItem>
+                                          <SelectItem value="FIB">FIB</SelectItem>
+                                          <SelectItem value="Match">Match</SelectItem>
+                                          <SelectItem value="CQ">CQ</SelectItem>
+                                          <SelectItem value="Desc">Desc</SelectItem>
+                                      </SelectContent>
+                                  </Select>
+                              </div>
+                              <div className="relative border border-[#c4d6c4] dark:border-emerald-800/50 rounded-lg pt-2 pb-1 hover:bg-[#f4f8f4] dark:bg-emerald-900/20 transition-colors bg-white dark:bg-slate-950 focus-within:border-[#4a634a] dark:border-emerald-500/50 focus-within:ring-1 focus-within:ring-[#4a634a] dark:focus-within:ring-emerald-500">
+                                  <label className="absolute top-0 left-2 -translate-y-1/2 bg-white dark:bg-slate-950 px-1 text-[10px] font-medium text-[#4a634a] dark:text-emerald-400 pointer-events-none">Question Language</label>
+                                  <Select value={editData.language as string} onValueChange={v => setEditData({...editData, language: v as any})}>
+                                      <SelectTrigger className="border-0 focus:ring-0 shadow-none h-8 pt-0 bg-transparent font-medium text-[#2d3b2d] dark:text-emerald-200">
+                                          <SelectValue placeholder="Select language" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                          <SelectItem value="English">English</SelectItem>
+                                          <SelectItem value="Bangla">Bangla</SelectItem>
+                                          <SelectItem value="Hindi">Hindi</SelectItem>
+                                          <SelectItem value="Bengali, English">Bengali, English</SelectItem>
+                                      </SelectContent>
+                                  </Select>
+                              </div>
                           </div>
                           <MD3Input 
                               label="Question Title (Optional)" 
@@ -990,18 +1006,6 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                                   onChange={e => setEditData({...editData, marks: parseInt(e.target.value) || undefined})} 
                                   className="h-8 text-xs"
                               />
-                          </div>
-                          <div>
-                              <label className="text-xs font-semibold mb-1 block">Language</label>
-                              <Select value={editData.language as string} onValueChange={v => setEditData({...editData, language: v as any})}>
-                                  <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                                  <SelectContent>
-                                      <SelectItem value="English">English</SelectItem>
-                                      <SelectItem value="Bangla">Bangla</SelectItem>
-                                      <SelectItem value="Hindi">Hindi</SelectItem>
-                                      <SelectItem value="Bengali, English">Bengali, English</SelectItem>
-                                  </SelectContent>
-                              </Select>
                           </div>
                           <div>
                               <label className="text-xs font-semibold mb-2 block">Tags</label>
