@@ -74,6 +74,14 @@ export interface QuestionBankEntry {
     e?: string;
   };
   
+  optionExplanations?: {
+    a?: string;
+    b?: string;
+    c?: string;
+    d?: string;
+    e?: string;
+  };
+  
   correctAnswer: string; // E.g., 'A', 'B', 'C', 'D' or actual text
   
   // Matching Questions

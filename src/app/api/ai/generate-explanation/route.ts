@@ -20,8 +20,17 @@ export async function POST(req: Request) {
     ${options ? `Options: A) ${options.a} B) ${options.b} C) ${options.c} D) ${options.d}` : ''}
     Correct Answer: ${correctAnswer}
 
-    Write a 2-3 paragraph explanation detailing why the correct answer is right, and optionally why the other common distractors are wrong.
-    Do not repeat the question or start with "The correct answer is", just dive straight into the explanation.
+    Generate a JSON object with the following structure:
+    {
+      "explanation": "A 2-3 paragraph main explanation detailing why the correct answer is right. Do not repeat the question or start with 'The correct answer is'.",
+      "optionExplanations": {
+        "a": "Explanation of why option A is right or wrong",
+        "b": "Explanation of why option B is right or wrong",
+        "c": "Explanation of why option C is right or wrong",
+        "d": "Explanation of why option D is right or wrong"
+      }
+    }
+    Make sure the response is valid JSON. Omit option keys that are not provided in the question.
     `;
 
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
@@ -31,19 +40,29 @@ export async function POST(req: Request) {
             contents: [{ parts: [{ text: prompt }] }],
             generationConfig: {
                 temperature: 0.3,
-                maxOutputTokens: 500,
+                maxOutputTokens: 800,
+                responseMimeType: "application/json",
             }
         })
     });
 
     const data = await response.json();
-    const explanation = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    const resultText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
 
-    if (!explanation) {
+    if (!resultText) {
         throw new Error('Failed to generate content from Gemini');
     }
 
-    return NextResponse.json({ explanation });
+    try {
+        const resultJson = JSON.parse(resultText);
+        return NextResponse.json({ 
+            explanation: resultJson.explanation,
+            optionExplanations: resultJson.optionExplanations
+        });
+    } catch (parseError) {
+        console.error('Failed to parse AI JSON:', resultText);
+        return NextResponse.json({ error: 'Failed to parse AI response' }, { status: 500 });
+    }
   } catch (error: any) {
     console.error('AI Generation Error:', error);
     return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });

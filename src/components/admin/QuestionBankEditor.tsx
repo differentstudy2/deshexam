@@ -272,7 +272,7 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
   };
 
   const sampleJSONData: Record<string, string> = {
-    MCQ: `[\n  {\n    "Question Type": "MCQ",\n    "Question": "What is the capital of France?",\n    "Option A": "London",\n    "Option B": "Berlin",\n    "Option C": "Paris",\n    "Option D": "Madrid",\n    "Correct Answer": "c",\n    "Explanation": "Paris is the capital of France.",\n    "Difficulty": "Easy",\n    "Subject": "Geography",\n    "Chapter": "Europe"\n  }\n]`,
+    MCQ: `[\n  {\n    "Question Type": "MCQ",\n    "Question": "What is the capital of France?",\n    "Option A": "London",\n    "Option B": "Berlin",\n    "Option C": "Paris",\n    "Option D": "Madrid",\n    "Correct Answer": "c",\n    "Explanation": "Paris is the capital of France.",\n    "Option Explanations": {\n      "a": "London is the capital of the UK.",\n      "c": "Correct! Paris is the capital of France."\n    },\n    "Difficulty": "Easy",\n    "Subject": "Geography",\n    "Chapter": "Europe"\n  }\n]`,
     "T/F": `[\n  {\n    "Question Type": "T/F",\n    "Question": "The earth is flat.",\n    "Correct Answer": "false"\n  }\n]`,
     FIB: `[\n  {\n    "Question Type": "FIB",\n    "Question": "The color of the sky is [blank] and the grass is [blank].",\n    "Correct Answer": "blue, green",\n    "Option A": "red",\n    "Option B": "yellow",\n    "Option C": "purple",\n    "Option D": "orange"\n  }\n]`,
     Match: `[\n  {\n    "Question Type": "Match",\n    "Question": "Match the following countries with their capitals",\n    "matchingPairs": [\n      { "left": "France", "right": "Paris" },\n      { "left": "UK", "right": "London" }\n    ]\n  }\n]`,
@@ -319,6 +319,7 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                   options: Object.keys(options).length > 0 ? options : undefined,
                   correctAnswer: correct,
                   explanation: raw["Explanation"] || raw.explanation,
+                  optionExplanations: raw["Option Explanations"] || raw.optionExplanations,
                   difficulty: raw["Difficulty"] || raw.difficulty,
                   // Custom tags to store the raw Subject/Chapter names if provided
                   sourceSubject: raw["Subject"] || raw.sourceSubject,
@@ -437,6 +438,17 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
               });
           }
           
+          if (cleanDataToSave.optionExplanations) {
+              Object.keys(cleanDataToSave.optionExplanations).forEach(k => {
+                  if (!cleanDataToSave.optionExplanations[k] || String(cleanDataToSave.optionExplanations[k]).trim() === '') {
+                      delete cleanDataToSave.optionExplanations[k];
+                  }
+              });
+              if (Object.keys(cleanDataToSave.optionExplanations).length === 0) {
+                  delete cleanDataToSave.optionExplanations;
+              }
+          }
+          
           if (cleanDataToSave.id) {
               await updateQuestion(cleanDataToSave.id, cleanDataToSave as Partial<QuestionBankEntry>);
               toast({ title: 'Question updated successfully' });
@@ -472,7 +484,11 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
           });
           const data = await res.json();
           if (data.explanation) {
-              setEditData(prev => ({ ...prev, explanation: data.explanation }));
+              setEditData(prev => ({ 
+                ...prev, 
+                explanation: data.explanation,
+                optionExplanations: data.optionExplanations || prev.optionExplanations
+              }));
               toast({ title: 'Explanation Generated!' });
           } else {
               throw new Error(data.error || 'Failed to generate');
@@ -750,32 +766,66 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                               </div>
                           ) : ['MCQ'].includes(editData.questionType || 'MCQ') ? (
                               <div className="space-y-3">
-                                  {['A', 'B', 'C', 'D'].map((optKey) => (
-                                      <div key={optKey} className="flex items-center gap-3">
-                                          <button 
-                                              className={cn("w-6 h-6 rounded-full border flex items-center justify-center shrink-0 transition-colors", editData.correctAnswer?.toUpperCase() === optKey ? "border-[#4a634a] dark:border-emerald-500/50 border-[#eef2ec] dark:border-slate-800 bg-transparent" : "border-[#c4d6c4] dark:border-emerald-800/50")}
-                                              onClick={() => setEditData({...editData, correctAnswer: optKey})}
-                                          >
-                                              {editData.correctAnswer?.toUpperCase() === optKey && <div className="w-3 h-3 bg-[#4a634a] rounded-full" />}
-                                          </button>
-                                          <div className="flex-1">
-                                              <MD3Input label={`Option ${optKey}`} placeholder={`Option ${optKey}`} value={editData.options?.[optKey.toLowerCase() as keyof typeof editData.options] || ''} onChange={e => setEditData({...editData, options: {...editData.options!, [optKey.toLowerCase()]: e.target.value}})} />
+                                  {['A', 'B', 'C', 'D'].map((optKey) => {
+                                      const keyLower = optKey.toLowerCase() as keyof typeof editData.options;
+                                      return (
+                                      <div key={optKey} className="flex flex-col gap-2">
+                                          <div className="flex items-center gap-3">
+                                              <button 
+                                                  className={cn("w-6 h-6 rounded-full border flex items-center justify-center shrink-0 transition-colors", editData.correctAnswer?.toUpperCase() === optKey ? "border-[#4a634a] dark:border-emerald-500/50 border-[#eef2ec] dark:border-slate-800 bg-transparent" : "border-[#c4d6c4] dark:border-emerald-800/50")}
+                                                  onClick={() => setEditData({...editData, correctAnswer: optKey})}
+                                              >
+                                                  {editData.correctAnswer?.toUpperCase() === optKey && <div className="w-3 h-3 bg-[#4a634a] rounded-full" />}
+                                              </button>
+                                              <div className="flex-1">
+                                                  <MD3Input label={`Option ${optKey}`} placeholder={`Option ${optKey}`} value={editData.options?.[keyLower] || ''} onChange={e => setEditData({...editData, options: {...editData.options!, [keyLower]: e.target.value}})} />
+                                              </div>
+                                              <button className="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:text-slate-400 shrink-0 px-2" onClick={() => setEditData({...editData, options: {...editData.options!, [keyLower]: ''}})}><X className="w-4 h-4" /></button>
                                           </div>
-                                          <button className="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:text-slate-400 shrink-0 px-2" onClick={() => setEditData({...editData, options: {...editData.options!, [optKey.toLowerCase()]: ''}})}><X className="w-4 h-4" /></button>
+                                          {(editData.options?.[keyLower] || editData.optionExplanations?.[keyLower]) && (
+                                              <div className="pl-9 pr-9">
+                                                  <Input 
+                                                      className="text-xs border-[#eef2ec] dark:border-slate-800 bg-[#f4f8f4]/50 dark:bg-slate-900 focus-visible:ring-[#4a634a] dark:focus-visible:ring-emerald-500 rounded-lg h-7 w-full" 
+                                                      placeholder={`Explanation for why ${optKey} is correct/incorrect (Optional)`}
+                                                      value={editData.optionExplanations?.[keyLower] || ''}
+                                                      onChange={e => {
+                                                          const newExp = { ...(editData.optionExplanations || {}) } as any;
+                                                          newExp[keyLower] = e.target.value;
+                                                          setEditData({...editData, optionExplanations: newExp});
+                                                      }}
+                                                  />
+                                              </div>
+                                          )}
                                       </div>
-                                  ))}
+                                  )})}
                                   <div className="flex flex-col gap-3 pt-2">
-                                      <div className="flex items-center gap-3">
-                                          <button 
-                                              className={cn("w-6 h-6 rounded-full border flex items-center justify-center shrink-0 transition-colors", editData.correctAnswer?.toUpperCase() === 'E' ? "border-[#4a634a] dark:border-emerald-500/50 border-[#eef2ec] dark:border-slate-800 bg-transparent" : "border-[#c4d6c4] dark:border-emerald-800/50")}
-                                              onClick={() => setEditData({...editData, correctAnswer: 'E'})}
-                                          >
-                                              {editData.correctAnswer?.toUpperCase() === 'E' && <div className="w-3 h-3 bg-[#4a634a] rounded-full" />}
-                                          </button>
-                                          <div className="flex-1">
-                                              <MD3Input label="Option E (optional)" placeholder="Option E" value={editData.options?.e || ''} onChange={e => setEditData({...editData, options: {...editData.options!, e: e.target.value}})} />
+                                      <div className="flex flex-col gap-2">
+                                          <div className="flex items-center gap-3">
+                                              <button 
+                                                  className={cn("w-6 h-6 rounded-full border flex items-center justify-center shrink-0 transition-colors", editData.correctAnswer?.toUpperCase() === 'E' ? "border-[#4a634a] dark:border-emerald-500/50 border-[#eef2ec] dark:border-slate-800 bg-transparent" : "border-[#c4d6c4] dark:border-emerald-800/50")}
+                                                  onClick={() => setEditData({...editData, correctAnswer: 'E'})}
+                                              >
+                                                  {editData.correctAnswer?.toUpperCase() === 'E' && <div className="w-3 h-3 bg-[#4a634a] rounded-full" />}
+                                              </button>
+                                              <div className="flex-1">
+                                                  <MD3Input label="Option E (optional)" placeholder="Option E" value={editData.options?.e || ''} onChange={e => setEditData({...editData, options: {...editData.options!, e: e.target.value}})} />
+                                              </div>
+                                              <button className="text-[#4a634a] dark:text-emerald-400 hover:text-emerald-700 dark:text-emerald-400 shrink-0 px-2"><Plus className="w-5 h-5" /></button>
                                           </div>
-                                          <button className="text-[#4a634a] dark:text-emerald-400 hover:text-emerald-700 dark:text-emerald-400 shrink-0 px-2"><Plus className="w-5 h-5" /></button>
+                                          {(editData.options?.e || editData.optionExplanations?.e) && (
+                                              <div className="pl-9 pr-9">
+                                                  <Input 
+                                                      className="text-xs border-[#eef2ec] dark:border-slate-800 bg-[#f4f8f4]/50 dark:bg-slate-900 focus-visible:ring-[#4a634a] dark:focus-visible:ring-emerald-500 rounded-lg h-7 w-full" 
+                                                      placeholder="Explanation for why E is correct/incorrect (Optional)"
+                                                      value={editData.optionExplanations?.e || ''}
+                                                      onChange={e => {
+                                                          const newExp = { ...(editData.optionExplanations || {}) };
+                                                          newExp.e = e.target.value;
+                                                          setEditData({...editData, optionExplanations: newExp});
+                                                      }}
+                                                  />
+                                              </div>
+                                          )}
                                       </div>
                                       <Button variant="outline" className="w-fit mt-2 rounded-full border-[#d3e3d3] dark:border-emerald-900/50 text-[#4a634a] dark:text-emerald-400 bg-[#fdfefd] dark:bg-slate-900 hover:bg-[#f4f8f4] dark:bg-emerald-900/20">Add Option</Button>
                                   </div>

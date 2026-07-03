@@ -41,11 +41,15 @@ export async function trackQuestionEvent(
   metadata?: AnalyticsMetadata
 ) {
   try {
+    const cleanMetadata = metadata ? Object.fromEntries(
+      Object.entries(metadata).filter(([_, v]) => v !== undefined)
+    ) : {};
+
     const eventPayload = {
       eventType,
       questionId: questionId || null,
       userId: userId || null,
-      metadata: metadata || {},
+      metadata: cleanMetadata,
       timestamp: serverTimestamp(),
       url: typeof window !== 'undefined' ? window.location.href : null,
       userAgent: typeof window !== 'undefined' ? navigator.userAgent : null,

@@ -751,13 +751,41 @@ export default function QuestionCard({ question, index, testMode = false, isList
             )}
 
             {/* Explanation Section */}
-            {showAnswer && question.explanation && (
+            {showAnswer && (question.explanation || question.optionExplanations) && (
                 <div className="mt-4 mb-2 p-4 rounded-xl bg-blue-50/50 dark:bg-blue-900/10 !text-[0.8rem] text-slate-700 dark:text-slate-300 !leading-snug animate-in fade-in slide-in-from-top-2 duration-300 border border-blue-100 dark:border-blue-800/30">
                     <div className="font-bold text-blue-900 dark:text-blue-300 flex items-center gap-1.5 mb-2 border-b border-blue-200/50 dark:border-blue-800/50 pb-2">
                         <Lightbulb className="w-4 h-4 text-amber-500" />
                         {isDetailView ? <h2 className="text-base m-0">Explanation</h2> : "Explanation"}
                     </div>
-                    <div className="prose dark:prose-invert max-w-none opacity-90 !text-[0.8rem] prose-p:!text-[0.8rem] prose-p:!my-0.5 prose-headings:!text-[0.85rem] prose-headings:!my-1 prose-li:!text-[0.8rem] prose-li:!my-0" dangerouslySetInnerHTML={{ __html: question.explanation }} />
+                    
+                    {question.explanation && (
+                        <div className="prose dark:prose-invert max-w-none opacity-90 !text-[0.8rem] prose-p:!text-[0.8rem] prose-p:!my-0.5 prose-headings:!text-[0.85rem] prose-headings:!my-1 prose-li:!text-[0.8rem] prose-li:!my-0 mb-3" dangerouslySetInnerHTML={{ __html: question.explanation }} />
+                    )}
+
+                    {question.optionExplanations && Object.keys(question.optionExplanations).length > 0 && (
+                        <div className="space-y-2 mt-3 pt-3 border-t border-blue-200/30 dark:border-blue-800/30">
+                            {['a', 'b', 'c', 'd', 'e', 'f'].map(key => {
+                                const exp = (question.optionExplanations as any)?.[key];
+                                const opt = (question.options as any)?.[key];
+                                if (!exp) return null;
+                                const isCorrect = question.correctAnswer?.toLowerCase() === key.toLowerCase();
+                                return (
+                                    <div key={key} className="flex flex-col gap-1 text-[0.85rem] bg-white/60 dark:bg-slate-900/40 p-3 rounded-lg border border-blue-100/50 dark:border-blue-800/30">
+                                        <div className="flex items-center gap-2 font-semibold text-slate-800 dark:text-slate-200 mb-1">
+                                            <span className="uppercase text-[11px] bg-slate-200 dark:bg-slate-700 w-5 h-5 flex items-center justify-center rounded text-slate-700 dark:text-slate-300">
+                                                {getOptionLabel(key, question.language)}
+                                            </span>
+                                            <span className="line-clamp-1">{opt}</span>
+                                            {isCorrect ? <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" /> : <XCircle className="w-4 h-4 text-red-500 shrink-0" />}
+                                        </div>
+                                        <div className="pl-7 opacity-90 text-slate-700 dark:text-slate-300">
+                                            {exp}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
                 </div>
             )}
 
