@@ -67,6 +67,7 @@ export default function PushNotificationPage() {
                 title: data.title,
                 body: data.body,
                 link: data.link || undefined,
+                imageUrl: data.imageUrl || undefined,
             });
             toast({
                 title: 'Success!',

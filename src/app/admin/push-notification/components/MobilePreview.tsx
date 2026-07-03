@@ -10,7 +10,8 @@ interface MobilePreviewProps {
 }
 
 export function MobilePreview({ title, message, imageUrl, appName = "DeshExam" }: MobilePreviewProps) {
-  const timeString = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  // Use a static time to prevent hydration mismatch errors
+  const timeString = "09:41";
 
   return (
     <Card className="shadow-lg border-muted/50 overflow-hidden sticky top-6 bg-slate-50/50 backdrop-blur-xl">

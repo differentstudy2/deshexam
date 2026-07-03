@@ -36,6 +36,7 @@ const PushNotificationInputSchema = z.object({
   title: z.string().describe('The title of the notification.'),
   body: z.string().describe('The main message content of the notification.'),
   link: z.string().url().optional().describe('The URL to open when the notification is clicked.'),
+  imageUrl: z.string().url().optional().describe('The URL of the banner image to show in the notification.'),
 });
 export type PushNotificationInput = z.infer<typeof PushNotificationInputSchema>;
 
@@ -49,7 +50,7 @@ const sendPushNotificationFlow = ai.defineFlow(
     inputSchema: PushNotificationInputSchema,
     outputSchema: z.void(),
   },
-  async ({ title, body, link }) => {
+  async ({ title, body, link, imageUrl }) => {
     try {
       const tokensSnapshot = await db.collection('fcmTokens').get();
       if (tokensSnapshot.empty) {
@@ -68,6 +69,7 @@ const sendPushNotificationFlow = ai.defineFlow(
         notification: {
           title,
           body,
+          imageUrl,
         },
         webpush: {
           fcm_options: {
@@ -75,6 +77,7 @@ const sendPushNotificationFlow = ai.defineFlow(
           },
           notification: {
             icon: '/icon.png',
+            image: imageUrl,
           },
         },
         tokens: tokens,
