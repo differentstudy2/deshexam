@@ -154,7 +154,7 @@ export type ContentAuthor = {
 };
 
 export type ContentSection =
-  | { id?: string; type: 'article'; title: string; body: string; author: ContentAuthor; badges?: string[] }
+  | { id?: string; type: 'article'; title: string; body: string; body_en?: string; author: ContentAuthor; badges?: string[] }
   | { id?: string; type: 'mcq'; title: string; questions: { q: string; options: string[]; correctIdx: number }[]; author: ContentAuthor }
   | { id?: string; type: 'subtopic'; title: string; content: { word?: string; meaning?: string; text?: string }[]; author: ContentAuthor }
   | { id?: string; type: 'pdf'; title: string; pdfData: { id?: string; title?: string; url?: string; description?: string; tags?: string }[]; author: ContentAuthor }

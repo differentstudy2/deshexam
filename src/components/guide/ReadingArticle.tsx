@@ -5,6 +5,7 @@ import { Share2, MoreVertical, Eye, ChevronLeft, ChevronRight, Play, CheckCircle
 import { ReadingContentData, ContentSection, ContentAuthor } from '@/app/[locale]/guide/guide-data';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { CustomVideoPlayer } from '@/components/ui/CustomVideoPlayer';
 import ReactMarkdown from 'react-markdown';
@@ -71,6 +72,8 @@ function SectionFooter({ author }: { author?: ContentAuthor }) {
 import { incrementGuideNodeViews } from '@/lib/firebase/guide';
 
 export function ReadingArticle({ data, hierarchy, navigation }: ReadingArticleProps) {
+  const params = useParams();
+  const locale = params?.locale as string || 'bn';
   const [viewCount, setViewCount] = React.useState(data.views || 0);
 
   React.useEffect(() => {
@@ -209,7 +212,7 @@ export function ReadingArticle({ data, hierarchy, navigation }: ReadingArticlePr
                   remarkPlugins={[remarkGfm, remarkMath]}
                   rehypePlugins={[rehypeRaw, rehypeKatex]}
                 >
-                  {sec.body || ''}
+                  {(locale === 'en' && sec.body_en) ? sec.body_en : (sec.body || '')}
                 </ReactMarkdown>
               </div>
             </>

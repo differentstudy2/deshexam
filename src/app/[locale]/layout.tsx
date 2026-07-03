@@ -14,6 +14,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
+import { GoogleTranslateWidget } from '@/components/GoogleTranslateWidget';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -85,6 +86,7 @@ export default async function RootLayout({
                 </AuthDialogProvider>
               </AuthProvider>
               <CookieConsent />
+              <GoogleTranslateWidget />
               <Toaster />
               <Script src="https://checkout.razorpay.com/v1/checkout.js" />
               <Script src="https://accounts.google.com/gsi/client" strategy="beforeInteractive" />

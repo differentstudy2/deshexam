@@ -6,7 +6,7 @@ import {
   ArrowLeft, Save, BookOpen, FileText, Type, Target, Info, User,
   Lightbulb, PenTool, HelpCircle, Brain, CheckSquare, FileArchive,
   FileImage, Video, Headphones, Plus, Trash2, ClipboardList, StickyNote,
-  Key, Timer, Award, Bookmark, ChevronRight, LayoutDashboard
+  Key, Timer, Award, Bookmark, ChevronRight, LayoutDashboard, Globe
 } from 'lucide-react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
@@ -91,6 +91,8 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
   const [sidebarOpen, setSidebarOpen] = useState(false); // mobile drawer
   const [nodeSlug, setNodeSlug] = useState('');
   const [nodeDbId, setNodeDbId] = useState<string>('');
+  const [contentLang, setContentLang] = useState<'bn' | 'en'>('bn');
+  const [isTranslating, setIsTranslating] = useState(false);
 
   useEffect(() => {
     const loadContent = async () => {
@@ -131,10 +133,13 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
         sectionTypes.forEach(s => {
           if (sections[s.id]) {
             let content = sections[s.id].content || '';
+            let content_en = sections[s.id].content_en || '';
             if (content === '<p>Start typing here...</p>') content = '';
             initial[s.id] = content;
+            initial[`${s.id}_en`] = content_en;
           } else if (!['word_meaning', 'mcq', 'pdf', 'video', 'audio'].includes(s.id)) {
             initial[s.id] = '';
+            initial[`${s.id}_en`] = '';
           }
         });
         setContentMap(initial);
@@ -148,7 +153,8 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
   }, [topicId]);
 
   const handleRichTextChange = (html: string) => {
-    setContentMap(prev => ({ ...prev, [activeTab]: html }));
+    const key = contentLang === 'en' ? `${activeTab}_en` : activeTab;
+    setContentMap(prev => ({ ...prev, [key]: html }));
   };
 
   const getMediaData = (type: string): any[] => {
@@ -212,7 +218,14 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
     setSaving(true);
     try {
       const formatted: Record<string, any> = {};
-      Object.entries(contentMap).forEach(([k, v]) => { formatted[k] = { content: v }; });
+      sectionTypes.forEach(s => {
+        if (contentMap[s.id] !== undefined || contentMap[`${s.id}_en`] !== undefined) {
+          formatted[s.id] = { 
+            content: contentMap[s.id] || '',
+            ...(contentMap[`${s.id}_en`] !== undefined ? { content_en: contentMap[`${s.id}_en`] } : {})
+          };
+        }
+      });
       await saveTopicSections(topicId, formatted);
       await updateTopicStatus(topicId, status);
       toast({ title: "Saved!", description: "Content saved successfully." });
@@ -233,6 +246,34 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
   const currentIndex = flatCurriculum.findIndex(item => item.id === topicId);
   const prevNode = currentIndex > 0 ? flatCurriculum[currentIndex - 1] : undefined;
   const nextNode = currentIndex !== -1 && currentIndex < flatCurriculum.length - 1 ? flatCurriculum[currentIndex + 1] : undefined;
+
+  const handleAITranslate = async () => {
+    const sourceContent = contentMap[activeTab];
+    if (!sourceContent) {
+      toast({ title: 'No content', description: 'Please add some content in Bengali first.', variant: 'destructive' });
+      return;
+    }
+    
+    setIsTranslating(true);
+    try {
+      const res = await fetch('/api/admin/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: sourceContent, targetLanguage: 'English' })
+      });
+      if (!res.ok) throw new Error('Translation failed');
+      const data = await res.json();
+      
+      setContentMap(prev => ({ ...prev, [`${activeTab}_en`]: data.result }));
+      setContentLang('en');
+      toast({ title: 'Translated successfully', description: 'Switched to English view.' });
+    } catch (error: any) {
+      console.error(error);
+      toast({ title: 'Translation failed', description: error.message, variant: 'destructive' });
+    } finally {
+      setIsTranslating(false);
+    }
+  };
 
   // ── Sidebar nav content (shared between desktop sidebar + mobile drawer) ──
   const sidebarNavContent = (
@@ -351,8 +392,13 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
       ) : activeTab === 'pdf' ? (
         <TopicDocumentManager topicId={topicId} />
       ) : ['lesson','guide_content','objective','introduction','author','explanation','exercise','notes','solutions','bookmark','word_meaning'].includes(activeTab) ? (
-        <div className="bg-white dark:bg-[#1a1d27] rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
-          <TiptapEditor key={activeTab} content={contentMap[activeTab] || ''} onChange={handleRichTextChange} />
+        <div className="bg-white dark:bg-[#1a1d27] rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm relative">
+          {contentLang === 'en' && (
+            <div className="absolute top-0 right-0 m-2 px-2 py-1 bg-blue-100 text-blue-800 text-xs font-bold rounded z-10 flex items-center gap-1 shadow-sm">
+              <Globe className="w-3 h-3" /> English Variant
+            </div>
+          )}
+          <TiptapEditor key={`${activeTab}_${contentLang}`} content={contentMap[contentLang === 'en' ? `${activeTab}_en` : activeTab] || ''} onChange={handleRichTextChange} />
         </div>
       ) : activeTab === 'audio' ? (
         <div className="space-y-3">
@@ -424,6 +470,16 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
 
           {/* Right: status + save */}
           <div className="flex items-center gap-1.5 shrink-0">
+            <Select value={contentLang} onValueChange={(val: any) => setContentLang(val)}>
+              <SelectTrigger className="h-7 text-xs px-2 w-[110px] rounded-full border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="bn">Bengali (bn)</SelectItem>
+                <SelectItem value="en">English (en)</SelectItem>
+              </SelectContent>
+            </Select>
+            <div className="w-px h-4 bg-slate-300 dark:bg-slate-700 mx-1" />
             <Select value={status} onValueChange={(val: any) => setStatus(val)}>
               <SelectTrigger className="h-7 text-xs px-2 w-[92px] rounded-full border-slate-300 dark:border-slate-700">
                 <SelectValue />
@@ -497,11 +553,19 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
                   {sectionCategories.find(c => c.items.some(i => i.id === activeTab))?.title}
                 </span>
               </div>
-              <Link href={`/guide/${nodeSlug || topicId}`} target="_blank">
-                <button className="flex items-center gap-1.5 text-sm text-[#107c41] font-semibold hover:underline">
-                  <BookOpen className="w-4 h-4" /> Preview <ChevronRight className="w-4 h-4" />
-                </button>
-              </Link>
+              <div className="flex items-center gap-3">
+                {['lesson','guide_content','objective','introduction','author','explanation','exercise','notes','solutions','bookmark','word_meaning'].includes(activeTab) && contentLang === 'bn' && (
+                  <Button size="sm" variant="outline" className="h-8 gap-1 border-indigo-200 text-indigo-700 hover:bg-indigo-50 dark:border-indigo-800 dark:text-indigo-400 dark:hover:bg-indigo-900/30" onClick={handleAITranslate} disabled={isTranslating}>
+                    {isTranslating ? <span className="w-3 h-3 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin" /> : <Brain className="w-4 h-4" />}
+                    Translate to EN
+                  </Button>
+                )}
+                <Link href={`/guide/${nodeSlug || topicId}`} target="_blank">
+                  <button className="flex items-center gap-1.5 text-sm text-[#107c41] font-semibold hover:underline">
+                    <BookOpen className="w-4 h-4" /> Preview <ChevronRight className="w-4 h-4" />
+                  </button>
+                </Link>
+              </div>
             </div>
 
             {/* Mobile section mini-header */}

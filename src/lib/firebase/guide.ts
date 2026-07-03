@@ -259,7 +259,7 @@ export const getReadingContent = async (contentId: string): Promise<ReadingConte
       }
       
       let type = 'article';
-      let sectionData: any = { body: data.content };
+      let sectionData: any = { body: data.content, body_en: data.content_en };
       
       if (sectionType === 'mcq') {
         type = 'mcq';
