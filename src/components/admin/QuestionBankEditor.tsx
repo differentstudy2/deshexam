@@ -272,11 +272,11 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
   };
 
   const sampleJSONData: Record<string, string> = {
-    MCQ: `[\n  {\n    "Question Type": "MCQ",\n    "Question": "What is the capital of France?",\n    "Option A": "London",\n    "Option B": "Berlin",\n    "Option C": "Paris",\n    "Option D": "Madrid",\n    "Correct Answer": "c",\n    "Explanation": "Paris is the capital of France.",\n    "Explanation A": "London is the capital of the UK.",\n    "Explanation B": "Berlin is the capital of Germany.",\n    "Explanation C": "Correct! Paris is the capital of France.",\n    "Explanation D": "Madrid is the capital of Spain.",\n    "Difficulty": "Easy",\n    "Subject": "Geography",\n    "Chapter": "Europe"\n  }\n]`,
-    "T/F": `[\n  {\n    "Question Type": "T/F",\n    "Question": "The earth is flat.",\n    "Correct Answer": "false",\n    "Explanation": "Scientific evidence shows the Earth is roughly spherical."\n  }\n]`,
-    FIB: `[\n  {\n    "Question Type": "FIB",\n    "Question": "The color of the sky is [blank] and the grass is [blank].",\n    "Correct Answer": "blue, green",\n    "Option A": "red",\n    "Option B": "yellow",\n    "Option C": "purple",\n    "Option D": "orange",\n    "Explanation": "During the day, a clear sky is blue, and healthy grass contains chlorophyll making it green."\n  }\n]`,
-    Match: `[\n  {\n    "Question Type": "Match",\n    "Question": "Match the following countries with their capitals",\n    "matchingPairs": [\n      { "left": "France", "right": "Paris" },\n      { "left": "UK", "right": "London" }\n    ],\n    "Explanation": "Paris is the capital of France, and London is the capital of the UK."\n  }\n]`,
-    Desc: `[\n  {\n    "Question Type": "Desc",\n    "Question": "Explain Newton's first law of motion.",\n    "Answer": "An object will remain at rest or in uniform motion...",\n    "Explanation": "Also known as the law of inertia."\n  }\n]`
+    MCQ: `[\n  {\n    "Question Type": "MCQ",\n    "Question": "What is the capital of France?",\n    "Language": "English",\n    "Option A": "London",\n    "Option B": "Berlin",\n    "Option C": "Paris",\n    "Option D": "Madrid",\n    "Correct Answer": "c",\n    "Explanation": "Paris is the capital of France.",\n    "Explanation A": "London is the capital of the UK.",\n    "Explanation B": "Berlin is the capital of Germany.",\n    "Explanation C": "Correct! Paris is the capital of France.",\n    "Explanation D": "Madrid is the capital of Spain.",\n    "Difficulty": "Easy",\n    "Subject": "Geography",\n    "Chapter": "Europe"\n  }\n]`,
+    "T/F": `[\n  {\n    "Question Type": "T/F",\n    "Question": "The earth is flat.",\n    "Language": "English",\n    "Correct Answer": "false",\n    "Explanation": "Scientific evidence shows the Earth is roughly spherical."\n  }\n]`,
+    FIB: `[\n  {\n    "Question Type": "FIB",\n    "Question": "The color of the sky is [blank] and the grass is [blank].",\n    "Language": "English",\n    "Correct Answer": "blue, green",\n    "Option A": "red",\n    "Option B": "yellow",\n    "Option C": "purple",\n    "Option D": "orange",\n    "Explanation": "During the day, a clear sky is blue, and healthy grass contains chlorophyll making it green."\n  }\n]`,
+    Match: `[\n  {\n    "Question Type": "Match",\n    "Question": "Match the following countries with their capitals",\n    "Language": "English",\n    "matchingPairs": [\n      { "left": "France", "right": "Paris" },\n      { "left": "UK", "right": "London" }\n    ],\n    "Explanation": "Paris is the capital of France, and London is the capital of the UK."\n  }\n]`,
+    Desc: `[\n  {\n    "Question Type": "Desc",\n    "Question": "Explain Newton's first law of motion.",\n    "Language": "English",\n    "Answer": "An object will remain at rest or in uniform motion...",\n    "Explanation": "Also known as the law of inertia."\n  }\n]`
   };
 
   const processBulkImportPreview = (content: string) => {
@@ -334,6 +334,7 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                   explanation: raw["Explanation"] || raw.explanation,
                   optionExplanations: Object.keys(optionExplanations).length > 0 ? optionExplanations : undefined,
                   difficulty: raw["Difficulty"] || raw.difficulty,
+                  language: raw["Language"] || raw.language,
                   // Custom tags to store the raw Subject/Chapter names if provided
                   sourceSubject: raw["Subject"] || raw.sourceSubject,
                   sourceChapter: raw["Chapter"] || raw.sourceChapter
@@ -576,7 +577,7 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                           </div>
                       </CardHeader>
                       <CardContent className="space-y-3 flex-1 flex flex-col pt-3">
-                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                               <div className="relative border border-[#c4d6c4] dark:border-emerald-800/50 rounded-lg pt-2 pb-1 hover:bg-[#f4f8f4] dark:bg-emerald-900/20 transition-colors bg-white dark:bg-slate-950 focus-within:border-[#4a634a] dark:border-emerald-500/50 focus-within:ring-1 focus-within:ring-[#4a634a] dark:focus-within:ring-emerald-500">
                                   <label className="absolute top-0 left-2 -translate-y-1/2 bg-white dark:bg-slate-950 px-1 text-[10px] font-medium text-[#4a634a] dark:text-emerald-400 pointer-events-none">Question Type</label>
                                   <Select value={editData.questionType as string} onValueChange={v => {
@@ -610,13 +611,21 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                                       </SelectContent>
                                   </Select>
                               </div>
+                              <MD3SelectField 
+                                  label="Exam Year / Source" 
+                                  placeholder="Select Year" 
+                                  value={years.find(b => b.id === editData.yearId)?.name || ''} 
+                                  onClick={() => openTaxonomySheet('year', 'Select Exam Year', years, editData.yearId || '', (v) => setEditData({...editData, yearId: v}))} 
+                              />
                               <div className="relative border border-[#c4d6c4] dark:border-emerald-800/50 rounded-lg pt-2 pb-1 hover:bg-[#f4f8f4] dark:bg-emerald-900/20 transition-colors bg-white dark:bg-slate-950 focus-within:border-[#4a634a] dark:border-emerald-500/50 focus-within:ring-1 focus-within:ring-[#4a634a] dark:focus-within:ring-emerald-500">
-                                  <label className="absolute top-0 left-2 -translate-y-1/2 bg-white dark:bg-slate-950 px-1 text-[10px] font-medium text-[#4a634a] dark:text-emerald-400 pointer-events-none">Exam Year</label>
+                                  <label className="absolute top-0 left-2 -translate-y-1/2 bg-white dark:bg-slate-950 px-1 text-[10px] font-medium text-[#4a634a] dark:text-emerald-400 pointer-events-none">Marks</label>
                                   <Input 
+                                      type="number" 
+                                      min="1" 
                                       className="border-0 focus-visible:ring-0 shadow-none h-8 pt-0 bg-transparent font-medium text-[#2d3b2d] dark:text-emerald-200"
-                                      placeholder="e.g. 2023"
-                                      value={editData.sourceYear || ''}
-                                      onChange={e => setEditData({...editData, sourceYear: e.target.value})}
+                                      placeholder="e.g. 1"
+                                      value={editData.marks || ''}
+                                      onChange={e => setEditData({...editData, marks: parseInt(e.target.value) || undefined})}
                                   />
                               </div>
                           </div>
@@ -953,12 +962,6 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                                   value={textbooks.find(b => b.id === editData.textbookId)?.name || ''} 
                                   onClick={() => openTaxonomySheet('textbook', 'Select Textbook', textbooks.filter(b => !editData.subjectId || b.parentId === editData.subjectId), editData.textbookId || '', (v) => setEditData({...editData, textbookId: v, chapterId: '', topicId: ''}))} 
                               />
-                              <MD3SelectField 
-                                  label="Book / Guide" 
-                                  placeholder="Book / Guide" 
-                                  value={years.find(b => b.id === editData.yearId)?.name || ''} 
-                                  onClick={() => openTaxonomySheet('year', 'Select Book / Guide', years, editData.yearId || '', (v) => setEditData({...editData, yearId: v}))} 
-                              />
                           </div>
                           <div className="grid grid-cols-1 gap-4">
                               <MD3SelectField 
@@ -1004,17 +1007,6 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                                   <button onClick={() => setEditData({...editData, difficulty: 'Medium'})} className={cn("flex-1 text-xs py-1.5 rounded-full font-medium transition-colors", editData.difficulty === 'Medium' ? "bg-green-100 text-green-800 shadow-sm border border-green-200" : "text-slate-600 dark:text-slate-400 hover:text-slate-900")}>Medium</button>
                                   <button onClick={() => setEditData({...editData, difficulty: 'Hard'})} className={cn("flex-1 text-xs py-1.5 rounded-full font-medium transition-colors", editData.difficulty === 'Hard' ? "bg-green-100 text-green-800 shadow-sm border border-green-200" : "text-slate-600 dark:text-slate-400 hover:text-slate-900")}>Hard</button>
                               </div>
-                          </div>
-                          <div>
-                              <label className="text-xs font-semibold mb-2 block">Marks (Optional)</label>
-                              <Input 
-                                  type="number" 
-                                  min="1" 
-                                  placeholder="e.g. 3, 5, 10" 
-                                  value={editData.marks || ''} 
-                                  onChange={e => setEditData({...editData, marks: parseInt(e.target.value) || undefined})} 
-                                  className="h-8 text-xs"
-                              />
                           </div>
                           <div>
                               <label className="text-xs font-semibold mb-2 block">Tags</label>
