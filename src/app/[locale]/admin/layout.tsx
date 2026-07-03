@@ -23,6 +23,7 @@ import {
 import Link from "next/link";
 import { useTheme } from "next-themes";
 import { AdminMobileBottomNav } from '@/components/layout/admin-mobile-bottom-nav';
+import { AdminLoadingScreen } from '@/components/admin/AdminLoadingScreen';
 
 const AdminSidebarWrapper = ({ logOut }: { logOut: () => void }) => {
   const { setOpenMobile, isMobile } = useSidebar();
@@ -89,12 +90,7 @@ export default function AdminLayout({
   }, [pathname]);
 
   if (verifying) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <Loader2 className="mr-2 h-8 w-8 animate-spin" />
-        <p>Verifying admin access...</p>
-      </div>
-    );
+    return <AdminLoadingScreen />;
   }
 
   return (
