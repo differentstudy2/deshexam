@@ -201,6 +201,7 @@ export function TopicQuestionManager({ topicId, tabType, nodeLevel = 'topic' }: 
 
             if (item.title) newQuestion.title = item.title;
             if (qType === 'MCQ' && item.options) newQuestion.options = item.options;
+            if (item.optionExplanations) newQuestion.optionExplanations = item.optionExplanations;
             
             await createQuestion(newQuestion);
         }

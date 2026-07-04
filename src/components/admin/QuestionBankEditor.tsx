@@ -534,13 +534,16 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
           const topicName = topics.find(b => b.id === editData.topicId)?.name || 'Any Topic';
           
           const prompt = `You are an expert curriculum designer and educator. 
-Generate a high-quality academic question based on the following context:
-- Board: ${boardName}
-- Class/Grade: ${className}
-- Subject: ${subjectName}
-- Textbook: ${textbookName}
-- Chapter: ${chapterName}
-- Topic: ${topicName}
+  Generate a HIGH-QUALITY, STANDARD academic question based on the following context.
+  Test deep understanding rather than simple recall. If applicable, create plausible and tricky distractors for the options.
+  IMPORTANT: Option text MUST be extremely short and concise (typically 1-4 words). NEVER write full sentences, explanations, or examples inside the options. Explanations belong ONLY in the 'optionExplanations' and 'explanation' fields.
+  
+  - Board: ${boardName}
+  - Class/Grade: ${className}
+  - Subject: ${subjectName}
+  - Textbook: ${textbookName}
+  - Chapter: ${chapterName}
+  - Topic: ${topicName}
 
 Requirements:
 - Question Type: ${editData.questionType}
@@ -550,25 +553,25 @@ ${autoGenerateSourceText ? `- Base the question STRICTLY on the following source
 ${autoGeneratePrompt ? `- Additional Instructions: ${autoGeneratePrompt}` : ''}
 
 Output the result as a strict JSON object with NO markdown formatting, NO markdown code blocks (\`\`\`json). Just the raw JSON object.
-The JSON object must have this exact structure:
-{
-  "questionText": "The text of the question. Use HTML for formatting if needed like <strong> or <br>",
-  "options": {
-     "a": "First option (if MCQ, T/F, FIB)",
-     "b": "Second option",
-     "c": "Third option",
-     "d": "Fourth option"
-  },
-  "optionExplanations": {
-     "a": "Explanation for why option A is correct or incorrect",
-     "b": "Explanation for why option B is correct or incorrect",
-     "c": "Explanation for why option C is correct or incorrect",
-     "d": "Explanation for why option D is correct or incorrect"
-  },
-  "correctAnswer": "The correct answer key (e.g. 'a', 'b', 'c', 'd' or true/false or exact string for FIB)",
-  "explanation": "Detailed explanation of why the answer is correct.",
-  "title": "A short, 2-5 word title summarizing the core concept of the question"
-}
+  The JSON object must have this exact structure:
+  {
+    "questionText": "ভাষার বা শব্দের ক্ষুদ্রতম অংশকে কী বলে?",
+    "options": {
+       "a": "ধ্বনি",
+       "b": "বর্ণ",
+       "c": "বাক্য",
+       "d": "শব্দ"
+    },
+    "optionExplanations": {
+       "a": "সঠিক! শব্দের ক্ষুদ্রতম একক হল ধ্বনি।",
+       "b": "বর্ণ হলো ধ্বনির লিখিত রূপ, শব্দের ক্ষুদ্রতম অংশ নয়।",
+       "c": "বাক্য হলো একাধিক শব্দের সমষ্টি।",
+       "d": "শব্দ হলো ধ্বনির সমষ্টি।"
+    },
+    "correctAnswer": "a",
+    "explanation": "মানুষের মুখের উচ্চারিত শব্দের ক্ষুদ্রতম অংশকে ধ্বনি বলে।",
+    "title": "A short, 2-5 word title summarizing the core concept of the question"
+  }
 If the Question Type is not MCQ, you can omit the options and optionExplanations objects or leave them empty. For T/F, use options 'a': 'True', 'b': 'False'.`;
 
           const res = await fetch('/api/ai/generate', {

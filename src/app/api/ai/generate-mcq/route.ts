@@ -18,24 +18,26 @@ export async function POST(request: Request) {
 Generate multiple choice questions based on the prompt. 
 Ensure the questions are of HIGH QUALITY, STANDARD, and test deep understanding rather than simple recall.
 Create plausible and tricky distractors (wrong options) to properly test the student.
+The length of the questions should be perfectly balanced for a board exam standard.
+IMPORTANT: Option text MUST be extremely short and concise (typically 1-4 words). NEVER write full sentences, explanations, or examples inside the options. Explanations belong ONLY in the 'optionExplanations' and 'explanation' fields.
 Return ONLY a raw JSON array (no markdown code blocks, no backticks).
 The format MUST exactly match:
 [
   {
-    "questionText": "What is 2+2?",
+    "questionText": "ভাষার বা শব্দের ক্ষুদ্রতম অংশকে কী বলে?",
     "options": {
-      "a": "3",
-      "b": "4",
-      "c": "5",
-      "d": "6"
+      "a": "ধ্বনি",
+      "b": "বর্ণ",
+      "c": "বাক্য",
+      "d": "শব্দ"
     },
-    "correctAnswer": "b",
-    "explanation": "2+2 equals 4.",
+    "correctAnswer": "a",
+    "explanation": "মানুষের মুখের উচ্চারিত শব্দের ক্ষুদ্রতম অংশকে ধ্বনি বলে।",
     "optionExplanations": {
-      "a": "Incorrect. 3 is less than 4.",
-      "b": "Correct! 2 plus 2 is exactly 4.",
-      "c": "Incorrect. 5 is greater than 4.",
-      "d": "Incorrect. 6 is greater than 4."
+      "a": "সঠিক! শব্দের ক্ষুদ্রতম একক হল ধ্বনি।",
+      "b": "বর্ণ হলো ধ্বনির লিখিত রূপ, শব্দের ক্ষুদ্রতম অংশ নয়।",
+      "c": "বাক্য হলো একাধিক শব্দের সমষ্টি।",
+      "d": "শব্দ হলো ধ্বনির সমষ্টি।"
     }
   }
 ]`;
@@ -48,7 +50,7 @@ The format MUST exactly match:
       },
       body: JSON.stringify({
         system_instruction: {
-            parts: { text: systemInstruction }
+            parts: [{ text: systemInstruction }]
         },
         contents: [
           {
