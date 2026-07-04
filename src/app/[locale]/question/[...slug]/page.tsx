@@ -196,19 +196,37 @@ export default async function DynamicQuestionPage({ params }: Props) {
             <Link href="/questions" className="hover:text-[#107c41] shrink-0">Question Bank</Link>
             
             {safeQuestion.taxonomyTags.length > 0 ? (
-                safeQuestion.taxonomyTags.map((tag: string, i: number) => (
-                    <React.Fragment key={`tag-${i}`}>
-                        <ChevronRight className="w-3 h-3 md:w-4 md:h-4 mx-1 md:mx-2 shrink-0" />
-                        <span className="capitalize text-slate-500">{tag}</span>
-                    </React.Fragment>
-                ))
+                safeQuestion.taxonomyTags.map((tag: string, i: number) => {
+                    let displayTag = tag;
+                    if (i === 0 && tag.length > 12) {
+                        const ignoreWords = ['of', 'and', 'for', 'the', '&', 'in', 'on', 'at'];
+                        const acronym = tag.split(/[\s-]+/).filter(w => w && !ignoreWords.includes(w.toLowerCase())).map(w => w[0]?.toUpperCase()).join('');
+                        if (acronym.length > 1) displayTag = acronym;
+                    }
+                    const href = `/questions/${slugArray.slice(0, i + 1).join('/')}`;
+                    return (
+                        <React.Fragment key={`tag-${i}`}>
+                            <ChevronRight className="w-3 h-3 md:w-4 md:h-4 mx-1 md:mx-2 shrink-0" />
+                            <Link href={href} className="capitalize text-slate-500 hover:text-[#107c41] shrink-0 whitespace-nowrap">{displayTag}</Link>
+                        </React.Fragment>
+                    );
+                })
             ) : (
-                slugArray.slice(0, -1).map((s, i) => (
-                    <React.Fragment key={`slug-${i}`}>
-                        <ChevronRight className="w-3 h-3 md:w-4 md:h-4 mx-1 md:mx-2 shrink-0" />
-                        <span className="capitalize text-slate-500">{decodeURIComponent(s).replace(/-/g, ' ')}</span>
-                    </React.Fragment>
-                ))
+                slugArray.slice(0, -1).map((s, i) => {
+                    let displayTag = decodeURIComponent(s).replace(/-/g, ' ');
+                    if (i === 0 && displayTag.length > 12) {
+                        const ignoreWords = ['of', 'and', 'for', 'the', '&', 'in', 'on', 'at'];
+                        const acronym = displayTag.split(/[\s-]+/).filter(w => w && !ignoreWords.includes(w.toLowerCase())).map(w => w[0]?.toUpperCase()).join('');
+                        if (acronym.length > 1) displayTag = acronym;
+                    }
+                    const href = `/questions/${slugArray.slice(0, i + 1).join('/')}`;
+                    return (
+                        <React.Fragment key={`slug-${i}`}>
+                            <ChevronRight className="w-3 h-3 md:w-4 md:h-4 mx-1 md:mx-2 shrink-0" />
+                            <Link href={href} className="capitalize text-slate-500 hover:text-[#107c41] shrink-0 whitespace-nowrap">{displayTag}</Link>
+                        </React.Fragment>
+                    );
+                })
             )}
 
             <ChevronRight className="w-3 h-3 md:w-4 md:h-4 mx-1 md:mx-2 shrink-0" />
