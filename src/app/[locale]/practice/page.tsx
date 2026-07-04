@@ -6,8 +6,34 @@ import { serializeTimestamps } from '@/lib/utils';
 import { MockTest } from '@/lib/assessment-types';
 
 export const metadata: Metadata = {
-  title: 'Practice Sets | DeshExam',
-  description: 'Practice questions by topic and chapter to improve your knowledge.',
+  title: 'Free Practice Sets & Chapter-wise Questions | DeshExam',
+  description: 'Boost your exam preparation with topic-wise and chapter-wise practice sets. Practice without time limits, review detailed explanations, and track your progress daily on DeshExam.',
+  keywords: [
+    'practice sets',
+    'topic-wise questions',
+    'chapter-wise practice',
+    'deshexam practice',
+    'free exam practice',
+    'online practice questions',
+    'foundation building',
+    'study practice',
+    'concept building questions'
+  ],
+  alternates: {
+    canonical: 'https://deshexam.com/practice'
+  },
+  openGraph: {
+    title: 'Free Practice Sets & Chapter-wise Questions | DeshExam',
+    description: 'Practice topic-wise questions at your own pace. Build your foundation with instant explanations and daily challenges.',
+    type: 'website',
+    url: 'https://deshexam.com/practice',
+    images: [{ url: 'https://deshexam.com/og-practice.jpg' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Practice Sets & Questions | DeshExam',
+    description: 'Boost your exam preparation with chapter-wise practice sets and instant explanations.',
+  }
 };
 
 export const dynamic = 'force-dynamic';
