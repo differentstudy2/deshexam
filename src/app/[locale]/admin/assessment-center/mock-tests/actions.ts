@@ -12,21 +12,25 @@ export const generateMockTestMetadata = async (topic: string) => {
       - title: A catchy, SEO-friendly title (e.g., "WBCS Prelims Full Length Mock Test 1").
       - slug: A URL-friendly slug based on the title (e.g., "wbcs-prelims-mock-test-1").
       - description: A compelling, 2-3 sentence meta description to attract students and rank well on Google.
-      - instructions: A helpful list of instructions for taking the exam (e.g., mentioning negative marking, time limits, or general tips). Use line breaks (\\n) to format the instructions nicely, keeping points on separate lines.`,
+      - instructions: A helpful list of instructions for taking the exam (e.g., mentioning negative marking, time limits, or general tips). Return this as an array of strings, where each string is a single instruction point.`,
       output: {
         schema: z.object({
           title: z.string(),
           slug: z.string(),
           description: z.string(),
-          instructions: z.string(),
+          instructions: z.array(z.string()),
         })
       }
     });
 
     // Genkit puts structured output in response.output
     const data = response.output;
+    const finalData = {
+      ...data,
+      instructions: Array.isArray(data?.instructions) ? data.instructions.join('\n') : data?.instructions
+    };
 
-    return { success: true, data };
+    return { success: true, data: finalData };
   } catch (error: any) {
     console.error("AI Generation failed:", error);
     const msg = error?.message || error?.toString() || "Unknown error occurred";

@@ -590,26 +590,26 @@ export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
                                         <label className="text-sm font-medium">Duration (Min)</label>
-                                        <Input type="number" value={editData.durationMin || ''} onChange={e => setEditData({...editData, durationMin: parseInt(e.target.value)})} disabled={autoCalc} />
+                                        <Input type="number" value={editData.durationMin || ''} onChange={e => setEditData({...editData, durationMin: e.target.value === '' ? undefined : parseInt(e.target.value)})} disabled={autoCalc} />
                                     </div>
                                     <div>
                                         <label className="text-sm font-medium">Total Marks</label>
-                                        <Input type="number" value={editData.totalMarks || ''} onChange={e => setEditData({...editData, totalMarks: parseInt(e.target.value)})} disabled={autoCalc} />
+                                        <Input type="number" value={editData.totalMarks || ''} onChange={e => setEditData({...editData, totalMarks: e.target.value === '' ? undefined : parseInt(e.target.value)})} disabled={autoCalc} />
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
                                         <label className="text-sm font-medium">Pass Marks</label>
-                                        <Input type="number" value={editData.passingMarks || ''} onChange={e => setEditData({...editData, passingMarks: parseInt(e.target.value)})} disabled={autoCalc} />
+                                        <Input type="number" value={editData.passingMarks || ''} onChange={e => setEditData({...editData, passingMarks: e.target.value === '' ? undefined : parseInt(e.target.value)})} disabled={autoCalc} />
                                     </div>
                                     <div>
                                         <label className="text-sm font-medium">Negative Mark</label>
-                                        <Input type="number" step="0.01" value={editData.negativeMarking ?? ''} onChange={e => setEditData({...editData, negativeMarking: parseFloat(e.target.value)})} />
+                                        <Input type="number" step="0.01" value={editData.negativeMarking ?? ''} onChange={e => setEditData({...editData, negativeMarking: e.target.value === '' ? undefined : parseFloat(e.target.value)})} />
                                     </div>
                                 </div>
                                 <div>
                                     <label className="text-sm font-medium">Attempts Allowed</label>
-                                    <Input type="number" value={editData.attemptsAllowed ?? 1} onChange={e => setEditData({...editData, attemptsAllowed: parseInt(e.target.value)})} />
+                                    <Input type="number" value={editData.attemptsAllowed ?? 1} onChange={e => setEditData({...editData, attemptsAllowed: e.target.value === '' ? undefined : parseInt(e.target.value)})} />
                                     <p className="text-xs text-slate-500 mt-1">Set 0 for unlimited, 1 for strict simulation.</p>
                                 </div>
                                 
@@ -689,7 +689,7 @@ export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock 
                                         {(editData.accessType === 'one_time' || editData.accessType === 'both') && (
                                             <div className="pt-1 border-t">
                                                 <label className="text-sm font-medium">Price (₹)</label>
-                                                <Input type="number" value={editData.price || 0} onChange={e => setEditData({...editData, price: parseFloat(e.target.value)})} className="mt-1" />
+                                                <Input type="number" value={editData.price || 0} onChange={e => setEditData({...editData, price: e.target.value === '' ? undefined : parseFloat(e.target.value)})} className="mt-1" />
                                             </div>
                                         )}
                                     </div>
