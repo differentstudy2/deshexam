@@ -256,41 +256,38 @@ export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock 
         }
     };
 
-    const handleAIGenerate = () => {
+    const handleAIGenerate = async () => {
         const parts = [];
         if (editData.boardId) {
             const b = boards.find(b => b.id === editData.boardId);
-            if (b) parts.push(b.name);
+            if (b) parts.push(`Board: ${b.name}`);
         }
         if (editData.classId) {
             const b = classes.find(b => b.id === editData.classId);
-            if (b) parts.push(b.name);
+            if (b) parts.push(`Class: ${b.name}`);
         }
         if (editData.subjectId) {
             const b = subjects.find(b => b.id === editData.subjectId);
-            if (b) parts.push(b.name);
+            if (b) parts.push(`Subject: ${b.name}`);
         }
         if (editData.chapterId) {
             const b = chapters.find(b => b.id === editData.chapterId);
-            if (b) parts.push(b.name);
+            if (b) parts.push(`Chapter: ${b.name}`);
         }
         if (editData.topicId) {
             const b = topics.find(b => b.id === editData.topicId);
-            if (b) parts.push(b.name);
+            if (b) parts.push(`Topic: ${b.name}`);
         }
         
-        const defaultTopic = parts.length > 0 ? parts.join(', ') : '';
-        setAiTopic(defaultTopic);
-        setShowAIDialog(true);
-    };
-
-    const confirmAIGenerate = async () => {
-        if (!aiTopic.trim()) return;
+        const topicContext = parts.length > 0 ? parts.join(', ') : '';
+        if (!topicContext) {
+            toast({ title: 'Taxonomy Required', description: 'Please select at least a Board, Subject, or Chapter to generate metadata.', variant: 'destructive' });
+            return;
+        }
 
         setIsGeneratingAI(true);
-        setShowAIDialog(false);
         try {
-            const res = await generateMockTestMetadata(aiTopic);
+            const res = await generateMockTestMetadata(topicContext);
             if (res.success && res.data) {
                 setEditData(prev => ({
                     ...prev,
@@ -734,31 +731,7 @@ export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock 
                     }}
                 />
 
-                <Dialog open={showAIDialog} onOpenChange={setShowAIDialog}>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Auto-Generate with AI</DialogTitle>
-                            <DialogDescription>
-                                Enter a topic and Gemini will write an SEO-optimized title, slug, meta description, and student instructions for you.
-                            </DialogDescription>
-                        </DialogHeader>
-                        <div className="py-4">
-                            <label className="text-sm font-medium mb-2 block">Topic / Subject</label>
-                            <Input 
-                                placeholder="E.g., SSC CGL Tier 1 Full Mock, WBCS History..." 
-                                value={aiTopic}
-                                onChange={(e) => setAiTopic(e.target.value)}
-                                autoFocus
-                            />
-                        </div>
-                        <DialogFooter>
-                            <Button variant="outline" onClick={() => setShowAIDialog(false)}>Cancel</Button>
-                            <Button onClick={confirmAIGenerate} disabled={!aiTopic.trim() || isGeneratingAI}>
-                                <Sparkles className="h-4 w-4 mr-2" /> Generate
-                            </Button>
-                        </DialogFooter>
-                    </DialogContent>
-                </Dialog>
+
                 <Dialog open={taxonomySheet.isOpen} onOpenChange={(open) => setTaxonomySheet({...taxonomySheet, isOpen: open})}>
                     <DialogContent className="sm:max-w-[540px] h-[80vh] flex flex-col p-0 bg-white dark:bg-slate-900 overflow-hidden">
                         <DialogHeader className="p-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 shrink-0">

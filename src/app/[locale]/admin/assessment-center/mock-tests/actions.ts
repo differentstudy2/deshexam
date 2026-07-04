@@ -12,7 +12,7 @@ export const generateMockTestMetadata = async (topic: string) => {
       - title: A catchy, SEO-friendly title (e.g., "WBCS Prelims Full Length Mock Test 1").
       - slug: A URL-friendly slug based on the title (e.g., "wbcs-prelims-mock-test-1").
       - description: A compelling, 2-3 sentence meta description to attract students and rank well on Google.
-      - instructions: A helpful list of instructions for taking the exam (e.g., mentioning negative marking, time limits, or general tips). Keep it formatted nicely.`,
+      - instructions: A helpful list of instructions for taking the exam (e.g., mentioning negative marking, time limits, or general tips). Use line breaks (\\n) to format the instructions nicely, keeping points on separate lines.`,
       output: {
         schema: z.object({
           title: z.string(),
