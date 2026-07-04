@@ -169,6 +169,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logOut = () => {
     if (!auth) throw new Error("Auth service is not available");
+    if (typeof window !== 'undefined') sessionStorage.removeItem('deshexam_is_admin');
     return signOut(auth);
   };
 

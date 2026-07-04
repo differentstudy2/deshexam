@@ -41,12 +41,19 @@ export default function AdminLayout({
   const [verifying, setVerifying] = useState(true);
 
   useEffect(() => {
+    if (typeof window !== 'undefined' && sessionStorage.getItem('deshexam_is_admin') === 'true') {
+      setVerifying(false);
+    }
+  }, []);
+
+  useEffect(() => {
     // Wait until authentication status is determined
     if (authLoading) {
       return;
     }
 
     if (!user) {
+      if (typeof window !== 'undefined') sessionStorage.removeItem('deshexam_is_admin');
       router.push('/sign-in');
       return;
     }
@@ -56,15 +63,16 @@ export default function AdminLayout({
         const userProfile = await getUserProfile(user.uid);
         if (userProfile && userProfile.role === 'admin') {
           // User is an admin, allow access
+          if (typeof window !== 'undefined') sessionStorage.setItem('deshexam_is_admin', 'true');
           setVerifying(false);
         } else {
           // If not an admin, redirect to user dashboard
-          // Notice we DO NOT set verifying to false, so the layout stays in loading state until the redirect completes
+          if (typeof window !== 'undefined') sessionStorage.removeItem('deshexam_is_admin');
           router.replace('/dashboard');
         }
       } catch (error) {
         console.error("Failed to verify admin status:", error);
-        // Redirect on error as a security measure
+        if (typeof window !== 'undefined') sessionStorage.removeItem('deshexam_is_admin');
         router.replace('/dashboard');
       }
     };
