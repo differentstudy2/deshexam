@@ -192,9 +192,19 @@ export default function OnboardingPage() {
                     disabled={isFetchingTaxonomy}
                   >
                     <option value="">-- Choose Board --</option>
-                    {boards.map(board => (
-                      <option key={board.id} value={board.id}>{board.title}{board.acronym ? ` (${board.acronym})` : ''}</option>
-                    ))}
+                    {boards.map(board => {
+                      const generateAcronym = (name: string) => {
+                        const ignoreWords = ['of', 'and', 'for', 'the', '&', 'in', 'on', 'at'];
+                        return name.split(/[\s-]+/)
+                          .filter(word => word && !ignoreWords.includes(word.toLowerCase()))
+                          .map(word => word[0]?.toUpperCase())
+                          .join('');
+                      };
+                      const shortName = board.acronym || generateAcronym(board.title);
+                      return (
+                        <option key={board.id} value={board.id}>{shortName}</option>
+                      );
+                    })}
                   </select>
                 </div>
 
