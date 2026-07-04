@@ -206,8 +206,8 @@ export default async function DynamicQuestionPage({ params }: Props) {
                     const href = `/questions/${slugArray.slice(0, i + 1).join('/')}`;
                     return (
                         <React.Fragment key={`tag-${i}`}>
-                            <ChevronRight className="w-3 h-3 md:w-4 md:h-4 mx-1 md:mx-2 shrink-0" />
-                            <Link href={href} className="capitalize text-slate-500 hover:text-[#107c41] shrink-0 whitespace-nowrap">{displayTag}</Link>
+                            <ChevronRight className="w-3 h-3 md:w-4 md:h-4 mx-1 md:mx-2 shrink-0 text-slate-400" />
+                            <Link href={href} className="capitalize text-slate-700 hover:text-[#107c41] font-medium hover:underline transition-colors shrink-0 whitespace-nowrap">{displayTag}</Link>
                         </React.Fragment>
                     );
                 })
@@ -222,8 +222,8 @@ export default async function DynamicQuestionPage({ params }: Props) {
                     const href = `/questions/${slugArray.slice(0, i + 1).join('/')}`;
                     return (
                         <React.Fragment key={`slug-${i}`}>
-                            <ChevronRight className="w-3 h-3 md:w-4 md:h-4 mx-1 md:mx-2 shrink-0" />
-                            <Link href={href} className="capitalize text-slate-500 hover:text-[#107c41] shrink-0 whitespace-nowrap">{displayTag}</Link>
+                            <ChevronRight className="w-3 h-3 md:w-4 md:h-4 mx-1 md:mx-2 shrink-0 text-slate-400" />
+                            <Link href={href} className="capitalize text-slate-700 hover:text-[#107c41] font-medium hover:underline transition-colors shrink-0 whitespace-nowrap">{displayTag}</Link>
                         </React.Fragment>
                     );
                 })
