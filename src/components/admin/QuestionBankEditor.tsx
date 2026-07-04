@@ -572,14 +572,7 @@ If the Question Type is not MCQ, you can omit the options object or leave them e
           const rawData = await res.json();
           if (rawData.error) throw new Error(rawData.error);
           
-          // The AI might return the JSON wrapped in markdown code blocks despite instructions
-          let jsonString = rawData.generatedContent || rawData.content || rawData;
-          if (typeof jsonString !== 'string') {
-            jsonString = JSON.stringify(jsonString);
-          }
-          jsonString = jsonString.replace(/^```json/i, '').replace(/^```/, '').replace(/```$/, '').trim();
-          
-          const generatedData = JSON.parse(jsonString);
+          const generatedData = rawData;
           
           setEditData(prev => ({
               ...prev,

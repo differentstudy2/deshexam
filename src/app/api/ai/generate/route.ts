@@ -21,6 +21,7 @@ export async function POST(req: Request) {
             generationConfig: {
                 temperature: 0.5,
                 maxOutputTokens: 2000,
+                responseMimeType: "application/json",
             }
         })
     });
@@ -32,14 +33,17 @@ export async function POST(req: Request) {
         throw new Error('Failed to generate content from Gemini');
     }
 
-    // Clean up markdown code block wrappers if Gemini accidentally includes them despite instructions
-    if (result.startsWith('```html')) {
-      result = result.replace(/^```html\s*/, '').replace(/\s*```$/, '');
-    } else if (result.startsWith('```')) {
-      result = result.replace(/^```\s*/, '').replace(/\s*```$/, '');
+    try {
+        let cleanResultText = result.trim();
+        if (cleanResultText.startsWith('```')) {
+            cleanResultText = cleanResultText.replace(/^```(json)?\s*/i, '').replace(/\s*```$/i, '');
+        }
+        const resultJson = JSON.parse(cleanResultText);
+        return NextResponse.json(resultJson);
+    } catch (parseError) {
+        console.error('Failed to parse AI JSON:', result);
+        return NextResponse.json({ error: 'Failed to parse AI response' }, { status: 500 });
     }
-
-    return NextResponse.json({ result });
   } catch (error: any) {
     console.error('AI Generation Error:', error);
     return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
