@@ -203,7 +203,7 @@ export default async function DynamicQuestionPage({ params }: Props) {
                         const acronym = tag.split(/[\s-]+/).filter(w => w && !ignoreWords.includes(w.toLowerCase())).map(w => w[0]?.toUpperCase()).join('');
                         if (acronym.length > 1) displayTag = acronym;
                     }
-                    const href = `/questions/${slugArray.slice(0, i + 1).join('/')}`;
+                    const href = `/guide/${slugArray.slice(0, i + 1).join('/')}`;
                     return (
                         <React.Fragment key={`tag-${i}`}>
                             <ChevronRight className="w-3 h-3 md:w-4 md:h-4 mx-1 md:mx-2 shrink-0 text-slate-400" />
@@ -219,7 +219,7 @@ export default async function DynamicQuestionPage({ params }: Props) {
                         const acronym = displayTag.split(/[\s-]+/).filter(w => w && !ignoreWords.includes(w.toLowerCase())).map(w => w[0]?.toUpperCase()).join('');
                         if (acronym.length > 1) displayTag = acronym;
                     }
-                    const href = `/questions/${slugArray.slice(0, i + 1).join('/')}`;
+                    const href = `/guide/${slugArray.slice(0, i + 1).join('/')}`;
                     return (
                         <React.Fragment key={`slug-${i}`}>
                             <ChevronRight className="w-3 h-3 md:w-4 md:h-4 mx-1 md:mx-2 shrink-0 text-slate-400" />

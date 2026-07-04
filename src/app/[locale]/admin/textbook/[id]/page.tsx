@@ -464,6 +464,11 @@ export default function TextbookDetailsPage() {
                         <ExternalLink className="h-4 w-4 text-gray-500" />
                       </Link>
                     </Button>
+                    <Button asChild variant="ghost" size="icon" className="h-8 w-8 hover:bg-indigo-100 z-10" onClick={(e) => e.stopPropagation()}>
+                      <Link href={`/admin/guide-content/topic/${chapter.id}`} target="_blank" title="Manage Content">
+                        <FileText className="h-4 w-4 text-indigo-600" />
+                      </Link>
+                    </Button>
                     <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-gray-200 z-10" onClick={(e) => { e.stopPropagation(); setEditNodeData({ id: chapter.id, title: chapter.title, type: 'chapter' }); setIsEditModalOpen(true); }}>
                       <Edit2 className="h-4 w-4 text-gray-500" />
                     </Button>
@@ -494,6 +499,11 @@ export default function TextbookDetailsPage() {
                                 <Button asChild variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity">
                                   <Link href={topic.clientUrl} target="_blank">
                                     <ExternalLink className="h-3 w-3 text-indigo-600" />
+                                  </Link>
+                                </Button>
+                                <Button asChild variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-indigo-100">
+                                  <Link href={`/admin/guide-content/topic/${topic.id}`} target="_blank" title="Manage Content">
+                                    <FileText className="h-3 w-3 text-indigo-600" />
                                   </Link>
                                 </Button>
                                 <Button variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => { e.stopPropagation(); setEditNodeData({ id: topic.id, title: topic.title, type: 'topic' }); setIsEditModalOpen(true); }}>
