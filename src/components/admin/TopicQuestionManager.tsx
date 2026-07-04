@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Trash2, Edit, Save, ExternalLink, Loader2, Sparkles, Upload, ChevronLeft, ChevronRight } from 'lucide-react';
 import { getQuestions, createQuestion, deleteQuestion, bulkEditQuestions, bulkUpdateQuestions, bulkDeleteQuestions } from '@/lib/firebase/question-bank';
-import { getTopicHierarchy } from '@/lib/firebase/guide';
+import { getTopicHierarchy, getTopicSections } from '@/lib/firebase/guide';
 import { QuestionBankEditor } from '@/components/admin/QuestionBankEditor';
 import { QuestionBankEntry } from '@/lib/question-bank-types';
 import Link from 'next/link';
@@ -43,6 +43,12 @@ export function TopicQuestionManager({ topicId, tabType, nodeLevel = 'topic' }: 
   // Bulk and AI state
   const [bulkJson, setBulkJson] = useState('');
   const [aiPrompt, setAiPrompt] = useState('');
+  const [aiSettings, setAiSettings] = useState({
+      count: '10',
+      difficulty: 'Medium',
+      language: 'Bangla',
+      questionType: 'MCQ'
+  });
   const [isProcessing, setIsProcessing] = useState(false);
   const [innerQType, setInnerQType] = useState('MCQ');
   
@@ -254,17 +260,24 @@ export function TopicQuestionManager({ topicId, tabType, nodeLevel = 'topic' }: 
   };
 
   const handleGenerateAI = async () => {
-    if (!aiPrompt) {
-        toast({ title: 'Prompt is required', variant: 'destructive' });
-        return;
-    }
-    setIsProcessing(true);
-    try {
-        const res = await fetch('/api/ai/generate-mcq', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt: aiPrompt })
-        });
+      if (!aiPrompt) {
+          toast({ title: 'Prompt is required', variant: 'destructive' });
+          return;
+      }
+      setIsProcessing(true);
+      try {
+          const finalPrompt = `Task: Generate exactly ${aiSettings.count} ${aiSettings.questionType} questions.
+Difficulty Level: ${aiSettings.difficulty}
+Language: ${aiSettings.language}
+
+Additional Instructions / Context:
+${aiPrompt}`;
+
+          const res = await fetch('/api/ai/generate-mcq', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ prompt: finalPrompt })
+          });
         
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Failed to generate');
@@ -280,17 +293,40 @@ export function TopicQuestionManager({ topicId, tabType, nodeLevel = 'topic' }: 
     }
   };
 
-  const handleOpenAiMode = () => {
-      const parts = [];
-      if (hierarchy?.boardTitle) parts.push(hierarchy.boardTitle);
-      if (hierarchy?.classTitle) parts.push(hierarchy.classTitle);
-      if (hierarchy?.subjectTitle) parts.push(hierarchy.subjectTitle);
-      if (hierarchy?.chapterTitle) parts.push(hierarchy.chapterTitle);
-      if (hierarchy?.topicTitle) parts.push(hierarchy.topicTitle);
-      
-      const defaultPrompt = parts.length > 0 ? parts.join(', ') : '';
-      setAiPrompt(defaultPrompt);
+  const handleOpenAiMode = async () => {
+      // First, switch to AI mode immediately to show the prompt box
       setMode('ai');
+      setIsProcessing(true); // Re-using isProcessing for the loading state while we fetch
+      
+      try {
+          const parts = [];
+          if (hierarchy?.boardTitle) parts.push(hierarchy.boardTitle);
+          if (hierarchy?.classTitle) parts.push(hierarchy.classTitle);
+          if (hierarchy?.subjectTitle) parts.push(hierarchy.subjectTitle);
+          if (hierarchy?.chapterTitle) parts.push(hierarchy.chapterTitle);
+          if (hierarchy?.topicTitle) parts.push(hierarchy.topicTitle);
+          
+          let defaultPrompt = parts.length > 0 ? parts.join(', ') : '';
+          
+          // Fetch guide content
+          const sections = await getTopicSections(topicId);
+          let rawHtml = '';
+          if (sections['lesson']?.content) rawHtml += sections['lesson'].content + '\n';
+          if (sections['guide_content']?.content) rawHtml += sections['guide_content'].content + '\n';
+          if (sections['notes']?.content) rawHtml += sections['notes'].content + '\n';
+          
+          const cleanText = rawHtml.replace(/<[^>]*>?/gm, ' ').trim();
+          
+          if (cleanText) {
+              defaultPrompt += `\n\n=== SOURCE MATERIAL ===\n${cleanText}`;
+          }
+          
+          setAiPrompt(defaultPrompt);
+      } catch (err) {
+          console.error("Failed to fetch topic sections for AI", err);
+      } finally {
+          setIsProcessing(false);
+      }
   };
 
   const handleDelete = async (id: string) => {
@@ -616,12 +652,74 @@ export function TopicQuestionManager({ topicId, tabType, nodeLevel = 'topic' }: 
             <span className="text-xs font-bold text-violet-700 dark:text-violet-400">Generate with AI</span>
           </div>
           <div className="p-3 space-y-3">
+            
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              <div className="relative border border-slate-200 dark:border-slate-800 rounded-lg pt-2 pb-1 bg-white dark:bg-slate-950">
+                  <label className="absolute top-0 left-2 -translate-y-1/2 bg-white dark:bg-slate-950 px-1 text-[10px] font-medium text-slate-500 pointer-events-none">Questions</label>
+                  <Select value={aiSettings.count} onValueChange={v => setAiSettings({...aiSettings, count: v})}>
+                      <SelectTrigger className="border-0 focus:ring-0 shadow-none h-8 pt-0 bg-transparent font-medium text-slate-700 dark:text-slate-300">
+                          <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                          <SelectItem value="5">5 Questions</SelectItem>
+                          <SelectItem value="10">10 Questions</SelectItem>
+                          <SelectItem value="15">15 Questions</SelectItem>
+                          <SelectItem value="20">20 Questions</SelectItem>
+                          <SelectItem value="30">30 Questions</SelectItem>
+                          <SelectItem value="50">50 Questions</SelectItem>
+                      </SelectContent>
+                  </Select>
+              </div>
+              <div className="relative border border-slate-200 dark:border-slate-800 rounded-lg pt-2 pb-1 bg-white dark:bg-slate-950">
+                  <label className="absolute top-0 left-2 -translate-y-1/2 bg-white dark:bg-slate-950 px-1 text-[10px] font-medium text-slate-500 pointer-events-none">Type</label>
+                  <Select value={aiSettings.questionType} onValueChange={v => setAiSettings({...aiSettings, questionType: v})}>
+                      <SelectTrigger className="border-0 focus:ring-0 shadow-none h-8 pt-0 bg-transparent font-medium text-slate-700 dark:text-slate-300">
+                          <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                          <SelectItem value="MCQ">MCQ</SelectItem>
+                          <SelectItem value="T/F">True/False</SelectItem>
+                          <SelectItem value="FIB">Fill in Blanks</SelectItem>
+                          <SelectItem value="Match">Matching</SelectItem>
+                          <SelectItem value="Desc">Descriptive</SelectItem>
+                          <SelectItem value="CQ">Creative Question</SelectItem>
+                      </SelectContent>
+                  </Select>
+              </div>
+              <div className="relative border border-slate-200 dark:border-slate-800 rounded-lg pt-2 pb-1 bg-white dark:bg-slate-950">
+                  <label className="absolute top-0 left-2 -translate-y-1/2 bg-white dark:bg-slate-950 px-1 text-[10px] font-medium text-slate-500 pointer-events-none">Language</label>
+                  <Select value={aiSettings.language} onValueChange={v => setAiSettings({...aiSettings, language: v})}>
+                      <SelectTrigger className="border-0 focus:ring-0 shadow-none h-8 pt-0 bg-transparent font-medium text-slate-700 dark:text-slate-300">
+                          <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                          <SelectItem value="Bangla">Bangla</SelectItem>
+                          <SelectItem value="English">English</SelectItem>
+                          <SelectItem value="Hindi">Hindi</SelectItem>
+                      </SelectContent>
+                  </Select>
+              </div>
+              <div className="relative border border-slate-200 dark:border-slate-800 rounded-lg pt-2 pb-1 bg-white dark:bg-slate-950">
+                  <label className="absolute top-0 left-2 -translate-y-1/2 bg-white dark:bg-slate-950 px-1 text-[10px] font-medium text-slate-500 pointer-events-none">Difficulty</label>
+                  <Select value={aiSettings.difficulty} onValueChange={v => setAiSettings({...aiSettings, difficulty: v})}>
+                      <SelectTrigger className="border-0 focus:ring-0 shadow-none h-8 pt-0 bg-transparent font-medium text-slate-700 dark:text-slate-300">
+                          <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                          <SelectItem value="Easy">Easy</SelectItem>
+                          <SelectItem value="Medium">Medium</SelectItem>
+                          <SelectItem value="Hard">Hard</SelectItem>
+                      </SelectContent>
+                  </Select>
+              </div>
+            </div>
+
             <div>
-              <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide">Prompt</label>
+              <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide">Additional Instructions / Source Content</label>
               <Textarea
                 value={aiPrompt}
                 onChange={e => setAiPrompt(e.target.value)}
-                placeholder="e.g., Generate 5 MCQs about Newton's laws. Make them difficult and conceptual."
+                placeholder="e.g., Make them conceptual and tricky."
                 className="mt-1 min-h-[100px] text-sm rounded-xl"
               />
             </div>

@@ -15,7 +15,9 @@ export async function POST(request: Request) {
     }
 
     const systemInstruction = `You are an expert exam question generator. 
-Generate multiple choice questions based on the prompt.
+Generate multiple choice questions based on the prompt. 
+Ensure the questions are of HIGH QUALITY, STANDARD, and test deep understanding rather than simple recall.
+Create plausible and tricky distractors (wrong options) to properly test the student.
 Return ONLY a raw JSON array (no markdown code blocks, no backticks).
 The format MUST exactly match:
 [
@@ -28,7 +30,13 @@ The format MUST exactly match:
       "d": "6"
     },
     "correctAnswer": "b",
-    "explanation": "2+2 equals 4."
+    "explanation": "2+2 equals 4.",
+    "optionExplanations": {
+      "a": "Incorrect. 3 is less than 4.",
+      "b": "Correct! 2 plus 2 is exactly 4.",
+      "c": "Incorrect. 5 is greater than 4.",
+      "d": "Incorrect. 6 is greater than 4."
+    }
   }
 ]`;
 

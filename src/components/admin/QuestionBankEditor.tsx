@@ -559,11 +559,17 @@ The JSON object must have this exact structure:
      "c": "Third option",
      "d": "Fourth option"
   },
+  "optionExplanations": {
+     "a": "Explanation for why option A is correct or incorrect",
+     "b": "Explanation for why option B is correct or incorrect",
+     "c": "Explanation for why option C is correct or incorrect",
+     "d": "Explanation for why option D is correct or incorrect"
+  },
   "correctAnswer": "The correct answer key (e.g. 'a', 'b', 'c', 'd' or true/false or exact string for FIB)",
   "explanation": "Detailed explanation of why the answer is correct.",
   "title": "A short, 2-5 word title summarizing the core concept of the question"
 }
-If the Question Type is not MCQ, you can omit the options object or leave them empty. For T/F, use options 'a': 'True', 'b': 'False'.`;
+If the Question Type is not MCQ, you can omit the options and optionExplanations objects or leave them empty. For T/F, use options 'a': 'True', 'b': 'False'.`;
 
           const res = await fetch('/api/ai/generate', {
               method: 'POST',
@@ -581,6 +587,7 @@ If the Question Type is not MCQ, you can omit the options object or leave them e
               title: generatedData.title || prev.title,
               questionText: generatedData.questionText || prev.questionText,
               options: generatedData.options ? { ...prev.options, ...generatedData.options } : prev.options,
+              optionExplanations: generatedData.optionExplanations ? { ...prev.optionExplanations, ...generatedData.optionExplanations } : prev.optionExplanations,
               correctAnswer: generatedData.correctAnswer || prev.correctAnswer,
               explanation: generatedData.explanation || prev.explanation,
           }));
