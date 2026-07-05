@@ -81,6 +81,7 @@ export default function QuestionBankQuestionsPage() {
   const [exams, setExams] = useState<TaxonomyNode[]>([]);
   const [years, setYears] = useState<TaxonomyNode[]>([]);
   const [tags, setTags] = useState<TaxonomyNode[]>([]);
+  const [activeBoardIds, setActiveBoardIds] = useState<Set<string>>(new Set());
 
   // View state
   const [view, setView] = useState<'list' | 'editor'>('list');
@@ -230,8 +231,35 @@ export default function QuestionBankQuestionsPage() {
   };
 
   useEffect(() => {
-    fetchTaxonomies();
-    
+      fetchTaxonomies();
+  }, []);
+
+  useEffect(() => {
+      if (boards.length === 0) return;
+      const fetchActiveBoards = async () => {
+          try {
+              const { collection, query, where, limit, getDocs } = await import('firebase/firestore');
+              const { db } = await import('@/lib/firebase/client');
+              const colRef = collection(db, 'question_bank');
+              const activeIds = new Set<string>();
+              
+              await Promise.all(boards.map(async (board) => {
+                  const q = query(colRef, where('boardId', '==', board.id), limit(1));
+                  const snap = await getDocs(q);
+                  if (!snap.empty) {
+                      activeIds.add(board.id);
+                  }
+              }));
+              
+              setActiveBoardIds(activeIds);
+          } catch(e) {
+              console.error('Failed to fetch active boards:', e);
+          }
+      };
+      fetchActiveBoards();
+  }, [boards]);
+
+  useEffect(() => {
     if (typeof window !== 'undefined') {
         const params = new URLSearchParams(window.location.search);
         const topicIdParam = params.get('topicId');
@@ -516,7 +544,7 @@ export default function QuestionBankQuestionsPage() {
               <SheetTitle>Filters</SheetTitle>
             </SheetHeader>
             <div className="grid grid-cols-1 gap-4 py-4">
-              <Select value={filters.boardId} onValueChange={(v) => setFilters({...filters, boardId: v, classId: 'all', subjectId: 'all', textbookId: 'all'})}><SelectTrigger><SelectValue placeholder="All Boards" /></SelectTrigger><SelectContent><SelectItem value="all">All Boards</SelectItem>{boards.map(b => <SelectItem key={b.id} value={b.id}>{b.acronym || b.name}</SelectItem>)}</SelectContent></Select>
+              <Select value={filters.boardId} onValueChange={(v) => setFilters({...filters, boardId: v, classId: 'all', subjectId: 'all', textbookId: 'all'})}><SelectTrigger><SelectValue placeholder="All Boards" /></SelectTrigger><SelectContent><SelectItem value="all">All Boards</SelectItem>{boards.filter(b => activeBoardIds.has(b.id)).map(b => <SelectItem key={b.id} value={b.id}>{b.acronym || b.name}</SelectItem>)}</SelectContent></Select>
               <Select value={filters.classId} onValueChange={(v) => setFilters({...filters, classId: v, subjectId: 'all', textbookId: 'all'})}><SelectTrigger><SelectValue placeholder="All Classes" /></SelectTrigger><SelectContent><SelectItem value="all">All Classes</SelectItem>{classes.filter(c => filters.boardId === 'all' || c.parentId === filters.boardId || c.rootId === filters.boardId).map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}</SelectContent></Select>
               <Select value={filters.subjectId} onValueChange={(v) => setFilters({...filters, subjectId: v, textbookId: 'all'})}><SelectTrigger><SelectValue placeholder="All Subjects" /></SelectTrigger><SelectContent><SelectItem value="all">All Subjects</SelectItem>{subjects.filter(s => filters.classId === 'all' || s.parentId === filters.classId).map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent></Select>
               <Select value={filters.textbookId} onValueChange={(v) => setFilters({...filters, textbookId: v})}><SelectTrigger><SelectValue placeholder="All Textbooks" /></SelectTrigger><SelectContent><SelectItem value="all">All Textbooks</SelectItem>{textbooks.filter(t => filters.subjectId === 'all' || t.parentId === filters.subjectId).map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}</SelectContent></Select>
@@ -534,7 +562,7 @@ export default function QuestionBankQuestionsPage() {
               <SelectTrigger className="bg-white dark:bg-slate-950 border-slate-200/60 dark:border-slate-800 shadow-sm transition-all hover:border-indigo-300 focus:ring-indigo-500/20"><SelectValue placeholder="All Boards" /></SelectTrigger>
               <SelectContent>
                   <SelectItem value="all">All Boards</SelectItem>
-                  {boards.map(b => <SelectItem key={b.id} value={b.id}>{b.acronym || b.name}</SelectItem>)}
+                  {boards.filter(b => activeBoardIds.has(b.id)).map(b => <SelectItem key={b.id} value={b.id}>{b.acronym || b.name}</SelectItem>)}
               </SelectContent>
           </Select>
           <Select value={filters.classId} onValueChange={(v) => setFilters({...filters, classId: v, subjectId: 'all', textbookId: 'all'})}>
