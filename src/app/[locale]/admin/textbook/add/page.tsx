@@ -28,6 +28,9 @@ export default function AddTextbookPage() {
   const [seoContent, setSeoContent] = useState('');
   const [tags, setTags] = useState('');
   const [keywords, setKeywords] = useState('');
+  const [author, setAuthor] = useState('');
+  const [description, setDescription] = useState('');
+  const [language, setLanguage] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -49,7 +52,10 @@ export default function AddTextbookPage() {
 
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (!title.trim() || !subjectId) return;
+    if (!title.trim()) return;
+
+    const getValidId = (id: string) => id && id !== 'none' ? id : null;
+    const finalParentId = getValidId(subjectId) || getValidId(classId) || getValidId(boardId) || null;
 
     setIsSaving(true);
     try {
@@ -58,12 +64,15 @@ export default function AddTextbookPage() {
         slug: slug.trim(),
         type: 'textbook',
         track: 'academic',
-        parentId: subjectId,
+        parentId: finalParentId,
         status: 'draft',
         featureImage: featureImage.trim(),
         seoContent: seoContent.trim(),
         tags: tags.split(',').map(t => t.trim()).filter(Boolean),
         keywords: keywords.split(',').map(k => k.trim()).filter(Boolean),
+        author: author.trim(),
+        description: description.trim(),
+        mediumOfInstruction: language ? language.split(',').map(l => l.trim()).filter(Boolean) : undefined,
         faqs: []
       });
       router.push(`/admin/textbook/${newTextbookId}`);
@@ -108,7 +117,7 @@ export default function AddTextbookPage() {
           <Button type="button" variant="outline" asChild className="h-9 text-xs sm:text-sm">
             <Link href="/admin/textbook">Cancel</Link>
           </Button>
-          <Button onClick={handleSubmit} disabled={!title.trim() || !subjectId || isSaving} className="h-9 bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm text-xs sm:text-sm">
+          <Button onClick={handleSubmit} disabled={!title.trim() || isSaving} className="h-9 bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm text-xs sm:text-sm">
             {isSaving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
             {isSaving ? 'Publishing...' : 'Publish'}
           </Button>
@@ -146,6 +155,18 @@ export default function AddTextbookPage() {
                   }}>Edit</Button>
                 </div>
               </div>
+            </div>
+
+            {/* Short Excerpt */}
+            <div className="bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-gray-200 dark:border-slate-800 p-5 sm:p-6">
+              <Label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">Short Description / Excerpt</Label>
+              <Textarea 
+                rows={3} 
+                value={description} 
+                onChange={(e) => setDescription(e.target.value)} 
+                placeholder="Write a brief 1-2 sentence summary of the textbook..." 
+                className="w-full bg-slate-50 dark:bg-slate-900/50 resize-y"
+              />
             </div>
 
             {/* Main Editor Block (Description) */}
@@ -201,7 +222,7 @@ export default function AddTextbookPage() {
                 </div>
               </CardContent>
               <div className="p-4 bg-slate-50/80 dark:bg-slate-800/80 border-t border-gray-100 dark:border-slate-800 flex justify-end">
-                <Button onClick={handleSubmit} disabled={!title.trim() || !subjectId || isSaving} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm">
+                <Button onClick={handleSubmit} disabled={!title.trim() || isSaving} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm">
                   {isSaving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                   {isSaving ? 'Publishing...' : 'Publish Textbook'}
                 </Button>
@@ -232,12 +253,13 @@ export default function AddTextbookPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold text-gray-500 dark:text-slate-400">Class <span className="text-red-500">*</span></Label>
+                  <Label className="text-xs font-semibold text-gray-500 dark:text-slate-400">Class (Optional)</Label>
                   <Select value={classId} onValueChange={(val) => { setClassId(val); setSubjectId(''); }}>
                     <SelectTrigger className="h-10 bg-slate-50 dark:bg-slate-900/50">
                       <SelectValue placeholder="Select Class" />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="none" className="italic text-gray-500">None / Independent</SelectItem>
                       {availableClasses.map(c => (
                         <SelectItem key={c.id} value={c.id}>{c.title}</SelectItem>
                       ))}
@@ -246,17 +268,35 @@ export default function AddTextbookPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold text-gray-500 dark:text-slate-400">Subject <span className="text-red-500">*</span></Label>
+                  <Label className="text-xs font-semibold text-gray-500 dark:text-slate-400">Subject (Optional)</Label>
                   <Select disabled={!classId} value={subjectId} onValueChange={setSubjectId}>
                     <SelectTrigger className="h-10 bg-slate-50 dark:bg-slate-900/50">
                       <SelectValue placeholder="Select Subject" />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="none" className="italic text-gray-500">None / Independent</SelectItem>
                       {availableSubjects.map(s => (
                         <SelectItem key={s.id} value={s.id}>{s.title}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Book Details */}
+            <Card className="border-gray-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow duration-300 rounded-lg overflow-hidden">
+              <CardHeader className="border-b border-gray-100 dark:border-slate-800 px-4 py-3 bg-slate-50/80 dark:bg-slate-800/80">
+                <CardTitle className="text-sm font-semibold text-gray-700 dark:text-slate-300">Book Info</CardTitle>
+              </CardHeader>
+              <CardContent className="p-5 space-y-5">
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-semibold text-gray-500 dark:text-slate-400">Author / Publisher</Label>
+                  <Input value={author} onChange={(e) => setAuthor(e.target.value)} placeholder="e.g. Dr. Jafar Iqbal, NCTB" className="h-9 text-sm bg-slate-50 dark:bg-slate-900/50" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-semibold text-gray-500 dark:text-slate-400">Language / Medium</Label>
+                  <Input value={language} onChange={(e) => setLanguage(e.target.value)} placeholder="e.g. Bangla, English" className="h-9 text-sm bg-slate-50 dark:bg-slate-900/50" />
                 </div>
               </CardContent>
             </Card>
