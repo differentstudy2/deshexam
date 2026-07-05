@@ -642,12 +642,12 @@ export default function QuestionBankQuestionsPage() {
             <TableHeader className="bg-slate-50/80 dark:bg-slate-900/80 sticky top-0 backdrop-blur-sm z-10">
               <TableRow className="border-b-slate-200 dark:border-slate-800">
                 <TableHead className="w-[50px] pl-6"><input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 transition-all cursor-pointer" checked={questions.length > 0 && selectedIds.length === questions.length} onChange={toggleSelectAll} /></TableHead>
-                <TableHead className="font-semibold text-slate-700 dark:text-slate-300">Text</TableHead>
-                <TableHead className="font-semibold text-slate-700 dark:text-slate-300">Type</TableHead>
-                <TableHead className="font-semibold text-slate-700 dark:text-slate-300">Difficulty</TableHead>
+                <TableHead className="font-semibold text-slate-700 dark:text-slate-300 w-full min-w-[300px]">Text</TableHead>
+                <TableHead className="font-semibold text-slate-700 dark:text-slate-300 w-[100px] text-center">Type</TableHead>
+                <TableHead className="font-semibold text-slate-700 dark:text-slate-300 w-[100px] text-center">Difficulty</TableHead>
                 <TableHead className="font-semibold text-slate-700 dark:text-slate-300 w-[80px] text-center">Status</TableHead>
                 <TableHead className="font-semibold text-slate-700 dark:text-slate-300 w-[80px] text-center">Verified</TableHead>
-                <TableHead className="font-semibold text-slate-700 dark:text-slate-300 text-right pr-6">Actions</TableHead>
+                <TableHead className="font-semibold text-slate-700 dark:text-slate-300 w-[120px] text-right pr-6">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -700,13 +700,13 @@ export default function QuestionBankQuestionsPage() {
                            </div>
                         )}
                       </TableCell>
-                      <TableCell>
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                      <TableCell className="text-center">
+                        <span className="inline-flex items-center justify-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                           {q.questionType || (q.options?.a ? 'MCQ' : 'Subjective')}
                         </span>
                       </TableCell>
-                      <TableCell>
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border
+                      <TableCell className="text-center">
+                        <span className={`inline-flex items-center justify-center px-2 py-0.5 rounded text-xs font-medium border
                           ${q.difficulty === 'Easy' ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800' : ''}
                           ${q.difficulty === 'Medium' ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800' : ''}
                           ${q.difficulty === 'Hard' ? 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-900/30 dark:text-rose-400 dark:border-rose-800' : ''}
