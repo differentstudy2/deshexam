@@ -193,38 +193,39 @@ export default function QuestionBankQuestionsPage() {
   };
 
   const fetchTaxonomies = async () => {
-      const fetchGuideCol = async (colName: string) => {
-          try {
-              const snap = await getDocs(collection(db, colName));
-              return snap.docs.map(d => {
-                  const data = d.data();
-                  return { id: d.id, name: data.title || data.name, ...data };
-              });
-          } catch(e) {
-              return [];
-          }
-      };
-
-      const fetchCombinedCol = async (guideCol: string, questionCol: string) => {
-          const [g, q] = await Promise.all([fetchGuideCol(guideCol), fetchGuideCol(questionCol)]);
-          const combined = [...g, ...q];
-          // Filter duplicates by ID
-          return Array.from(new Map(combined.map(item => [item.id, item])).values());
-      };
-
-      const [b, c, s, t, ch, tp, ex, yr, tg] = await Promise.all([
-          fetchCombinedCol('guide_boards', 'question_boards'),
-          fetchCombinedCol('guide_classes', 'question_classes'),
-          fetchCombinedCol('guide_subjects', 'question_subjects'),
-          fetchCombinedCol('guide_textbooks', 'question_textbooks'),
-          fetchCombinedCol('guide_chapters', 'question_chapters'),
-          fetchCombinedCol('guide_topics', 'question_topics'),
-          fetchGuideCol('question_exams'),
-          fetchGuideCol('question_years'),
-          fetchGuideCol('question_tags')
-      ]);
-      setBoards(b as TaxonomyNode[]); setClasses(c as TaxonomyNode[]); setSubjects(s as TaxonomyNode[]);
-      setTextbooks(t as TaxonomyNode[]); setChapters(ch as TaxonomyNode[]); setTopics(tp as TaxonomyNode[]); setExams(ex as TaxonomyNode[]); setYears(yr as TaxonomyNode[]); setTags(tg as TaxonomyNode[]);
+      try {
+          const { getTaxonomyNodesByTrack } = await import('@/lib/firebase/taxonomy');
+          const allAcademic = await getTaxonomyNodesByTrack('academic');
+          const allCompetitive = await getTaxonomyNodesByTrack('competitive');
+          
+          const mapNodes = (nodes: any[]) => nodes.map(n => ({ ...n, name: n.title || n.name }));
+          
+          setBoards(mapNodes(allAcademic.filter((n: any) => n.type === 'board')));
+          setClasses(mapNodes(allAcademic.filter((n: any) => n.type === 'class')));
+          setSubjects(mapNodes(allAcademic.filter((n: any) => n.type === 'subject')));
+          setTextbooks(mapNodes(allAcademic.filter((n: any) => n.type === 'textbook')));
+          setChapters(mapNodes(allAcademic.filter((n: any) => n.type === 'chapter')));
+          setTopics(mapNodes(allAcademic.filter((n: any) => n.type === 'topic')));
+          
+          setExams(mapNodes(allCompetitive.filter((n: any) => n.type === 'exam')));
+          
+          const fetchGuideCol = async (colName: string) => {
+              try {
+                  const snap = await getDocs(collection(db, colName));
+                  return snap.docs.map(d => {
+                      const data = d.data();
+                      return { id: d.id, name: data.title || data.name, ...data };
+                  });
+              } catch(e) {
+                  return [];
+              }
+          };
+          
+          setYears(await fetchGuideCol('question_years') as any);
+          setTags(await fetchGuideCol('question_tags') as any);
+      } catch (e) {
+          console.error("Failed to fetch taxonomies", e);
+      }
   };
 
   useEffect(() => {
