@@ -90,6 +90,13 @@ export async function getQuestions(filters?: Record<string, any>, limitCount = 5
   return results;
 }
 
+export async function getAllQuestionBankEntries() {
+  const colRef = collection(db, QUESTIONS_COLLECTION);
+  const q = query(colRef, orderBy('createdAt', 'desc'));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as QuestionBankEntry);
+}
+
 export async function getQuestionsPaginated(filters?: Record<string, any>, limitCount = 50, startAfterDoc?: any) {
   const colRef = collection(db, QUESTIONS_COLLECTION);
   let conditions = [];

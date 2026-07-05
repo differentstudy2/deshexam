@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { 
   getAllContent, 
-  getAllQuestions, 
   getAllTextbooks, 
   getChaptersByTextbookId, 
   getTopicsByChapterId, 
@@ -10,6 +9,7 @@ import {
 } from '@/lib/firebase/firestore';
 import { getTaxonomyNodesByType } from '@/lib/firebase/taxonomy';
 import { getAssessments } from '@/lib/firebase/assessment';
+import { getAllQuestionBankEntries } from '@/lib/firebase/question-bank';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 86400; // Cache for 24 hours (1 day)
@@ -118,7 +118,7 @@ export async function GET() {
     }));
 
     // 5. Questions
-    const allQuestions = await getAllQuestions();
+    const allQuestions = await getAllQuestionBankEntries();
     allRoutes.push(...allQuestions.map((q: any) => {
       const date = q.createdAt?.toDate?.() || new Date();
       return {
