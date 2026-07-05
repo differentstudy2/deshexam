@@ -401,10 +401,18 @@ export function TaxonomyDataTable({ type, title }: Props) {
                 <LayoutList className="w-4 h-4 mr-1.5" /> List
               </Button>
             </div>
-            <Button onClick={() => setIsAddModalOpen(true)}
-              className="h-10 px-4 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 text-white shadow-sm shadow-indigo-500/20 transition-all rounded-lg">
-              <PlusCircle className="w-4 h-4 mr-2" /> Add New
-            </Button>
+            {type === 'textbook' ? (
+              <Button asChild className="h-10 px-4 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 text-white shadow-sm shadow-indigo-500/20 transition-all rounded-lg">
+                <Link href="/admin/textbook/add">
+                  <PlusCircle className="w-4 h-4 mr-2" /> Add New
+                </Link>
+              </Button>
+            ) : (
+              <Button onClick={() => setIsAddModalOpen(true)}
+                className="h-10 px-4 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 text-white shadow-sm shadow-indigo-500/20 transition-all rounded-lg">
+                <PlusCircle className="w-4 h-4 mr-2" /> Add New
+              </Button>
+            )}
           </div>
         </div>
       </div>
