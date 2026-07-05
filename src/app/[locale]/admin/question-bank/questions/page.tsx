@@ -183,8 +183,9 @@ export default function QuestionBankQuestionsPage() {
         }
         setLastDoc(newLastDoc);
         setHasMore(newQuestions.length === 50);
-    } catch (e) {
-      toast({ title: 'Error fetching questions', variant: 'destructive' });
+    } catch (e: any) {
+      toast({ title: 'Error fetching questions', description: e.message || 'Unknown error', variant: 'destructive' });
+      console.error("Filter Error:", e);
     } finally {
       setLoading(false);
       setIsBulkLoading(false);
