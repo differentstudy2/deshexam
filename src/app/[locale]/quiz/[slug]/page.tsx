@@ -396,12 +396,14 @@ export default async function QuizLandingPage({ params }: Props) {
                         )
                       }}
                     >
-                      {test.instructions || `* **Stable Connection Required:** Ensure you have a reliable and fast internet connection before starting.
-* **Do Not Refresh:** Never refresh the page or press F5 during the exam. Doing so may cause data loss or premature submission.
-* **Fullscreen Enforcement:** This test must be taken in strict fullscreen mode. Exiting fullscreen will trigger an anti-cheat violation.
-* **Navigation Palette:** Use the question palette on the right to easily track your progress and jump between questions.
-* **Mark for Review:** If you are unsure about an answer, you can mark the question for review and revisit it before the final submission.
-* **Auto-Submission:** The exam will automatically submit your recorded answers the moment the countdown timer reaches zero.`}
+                      {test.instructions || `* এই পরীক্ষায় মোট প্রশ্ন সংখ্যা এবং তার জন্য বরাদ্দ সময় নির্দিষ্ট করা থাকবে।
+* প্রতিটি সঠিক উত্তরের জন্য 1 নম্বর পাবেন।
+* প্রতিটি ভুল উত্তরের জন্য 0.25 নম্বর কাটা যাবে (নেগেটিভ মার্কিং)।
+* সমস্ত প্রশ্নের উত্তর দেওয়া বাধ্যতামূলক নয়, তবে চেষ্টা করুন যতটা সম্ভব সঠিক উত্তর দিতে।
+* প্রশ্নগুলি মনোযোগ সহকারে পড়ুন এবং তারপর উত্তর নির্বাচন করুন।
+* পরীক্ষা শেষ হওয়ার পর আপনার স্কোর এবং সঠিক উত্তরগুলি দেখতে পাবেন।
+* কোনো ইলেকট্রনিক ডিভাইস বা বই ব্যবহার করা যাবে না।
+* আপনার পরীক্ষার জন্য শুভকামনা রইল!`}
                     </ReactMarkdown>
                   </div>
                   {test.examRules && (

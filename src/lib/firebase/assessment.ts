@@ -15,11 +15,14 @@ export type AssessmentCollectionType = keyof typeof ASSESSMENT_COLLECTIONS;
 
 // Generic Fetch All
 export async function getAssessments(collectionName: AssessmentCollectionType) {
-  const colRef = collection(db, ASSESSMENT_COLLECTIONS[collectionName]);
-  const q = query(colRef, orderBy('createdAt', 'desc'));
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-}
+    const colRef = collection(db, ASSESSMENT_COLLECTIONS[collectionName]);
+    const snapshot = await getDocs(colRef);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a: any, b: any) => {
+      const aDate = new Date(a.createdAt || 0).getTime();
+      const bDate = new Date(b.createdAt || 0).getTime();
+      return bDate - aDate;
+    });
+  }
 
 // Fetch by Node (Board, Class, Subject, Textbook, Chapter, or Topic)
 export async function getAssessmentsByNode(collectionName: AssessmentCollectionType, level: 'board' | 'class' | 'subject' | 'textbook' | 'chapter' | 'topic', nodeId: string) {
