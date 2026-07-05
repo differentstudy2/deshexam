@@ -9,14 +9,17 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, BookPlus, Loader2 } from 'lucide-react';
+import { ArrowLeft, BookPlus, Loader2, UploadCloud } from 'lucide-react';
 import Link from 'next/link';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { storage } from '@/lib/firebase/client';
 
 export default function AddTextbookPage() {
   const router = useRouter();
   const [allNodes, setAllNodes] = useState<TaxonomyNode[]>([]);
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   // Form State
   const [boardId, setBoardId] = useState('');
@@ -45,6 +48,23 @@ export default function AddTextbookPage() {
     };
     fetchData();
   }, []);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploading(true);
+    try {
+      const storageRef = ref(storage, `textbook_covers/${file.name}_${Date.now()}`);
+      await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(storageRef);
+      setFeatureImage(url);
+    } catch (err) {
+      console.error(err);
+      alert('Image upload failed');
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const availableBoards = allNodes.filter(n => n.type === 'board');
   const availableClasses = boardId && boardId !== 'none' ? allNodes.filter(n => n.type === 'class' && n.parentId === boardId) : allNodes.filter(n => n.type === 'class');
@@ -316,12 +336,28 @@ export default function AddTextbookPage() {
                     </Button>
                   </div>
                 ) : (
-                  <div className="py-10 bg-slate-50 dark:bg-slate-800/50 border-2 border-dashed border-gray-200 dark:border-slate-700 rounded-md">
-                    <p className="text-xs text-gray-500 dark:text-slate-400">No image selected</p>
+                  <div className="relative py-10 bg-slate-50 dark:bg-slate-800/50 border-2 border-dashed border-gray-200 dark:border-slate-700 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer group">
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" 
+                      onChange={handleImageUpload}
+                      disabled={isUploading}
+                    />
+                    <div className="flex flex-col items-center justify-center pointer-events-none">
+                      {isUploading ? (
+                        <Loader2 className="w-8 h-8 text-indigo-500 animate-spin mb-2" />
+                      ) : (
+                        <UploadCloud className="w-8 h-8 text-gray-400 dark:text-slate-500 group-hover:text-indigo-500 transition-colors mb-2" />
+                      )}
+                      <p className="text-xs font-medium text-gray-600 dark:text-slate-400">
+                        {isUploading ? 'Uploading...' : 'Click or drag image to upload'}
+                      </p>
+                    </div>
                   </div>
                 )}
                 <div className="space-y-1.5 text-left pt-2 border-t border-gray-100 dark:border-slate-800">
-                  <Label className="text-xs font-semibold text-gray-500 dark:text-slate-400">Image URL</Label>
+                  <Label className="text-xs font-semibold text-gray-500 dark:text-slate-400">Or Image URL</Label>
                   <Input value={featureImage} onChange={(e) => setFeatureImage(e.target.value)} placeholder="https://..." className="h-9 text-xs" />
                 </div>
               </CardContent>
