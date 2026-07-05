@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { getQuestions, getQuestionsPaginated, createQuestion, updateQuestion, deleteQuestion, getTaxonomyNodes, bulkUpdateQuestions, bulkDeleteQuestions } from '@/lib/firebase/question-bank';
 import { QuestionBankEntry, TaxonomyNode } from '@/lib/question-bank-types';
-import { PlusCircle, Pencil, Trash2, Loader2, ArrowLeft, Sparkles, Eye, Play, Image as ImageIcon, Video, ShieldCheck, Upload, FileJson, Copy, CheckCircle2, Filter, Layers, X, Search, CheckCircle } from 'lucide-react';
+import { PlusCircle, Pencil, Trash2, Loader2, ArrowLeft, Sparkles, Eye, Play, Image as ImageIcon, Video, ShieldCheck, Upload, FileJson, Copy, CheckCircle2, Filter, Layers, X, Search, CheckCircle, Archive, FileEdit, ShieldAlert } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
@@ -486,16 +486,25 @@ export default function QuestionBankQuestionsPage() {
       transition={{ duration: 0.4, ease: "easeOut" }}
       className="p-4 md:p-6 space-y-6 md:space-y-8 pb-32"
     >
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/40 dark:bg-slate-900/40 p-4 rounded-xl backdrop-blur-md border border-slate-200/60 dark:border-slate-800/60 shadow-sm">
-        <div>
-            <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-600 dark:from-slate-100 dark:to-slate-400 bg-clip-text text-transparent">Question Bank</h1>
-            <p className="text-sm text-slate-500 mt-1">Manage, filter, and curate your academic and competitive questions.</p>
+      <div className="relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-5 bg-white/60 dark:bg-slate-900/60 p-5 md:p-6 rounded-2xl backdrop-blur-xl border border-white/50 dark:border-slate-700/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] mb-6">
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-500"></div>
+        <div className="absolute -top-24 -right-24 w-48 h-48 bg-indigo-500/10 dark:bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
+        
+        <div className="relative z-10 flex flex-col gap-1">
+            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-br from-slate-900 via-slate-700 to-slate-500 dark:from-white dark:via-slate-200 dark:to-slate-400 bg-clip-text text-transparent flex items-center gap-3">
+              <Layers className="h-8 w-8 text-indigo-500" />
+              Question Bank
+            </h1>
+            <p className="text-sm md:text-base text-slate-500 dark:text-slate-400 max-w-xl">
+               Manage, filter, and curate your academic and competitive questions in one unified place.
+            </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2 md:gap-3">
+        
+        <div className="relative z-10 flex flex-wrap md:flex-nowrap items-center gap-3 w-full md:w-auto mt-2 md:mt-0">
             <Dialog>
                 <DialogTrigger asChild>
-                    <Button variant="outline" size="icon" className="bg-white/50 backdrop-blur-sm hover:bg-slate-100 transition-all border-slate-200" title="Bulk Import JSON Format">
-                        <FileJson className="h-4 w-4 text-slate-600" />
+                    <Button variant="outline" size="icon" className="h-11 w-11 shrink-0 rounded-xl bg-white/50 dark:bg-slate-800/50 backdrop-blur-md hover:bg-slate-100 dark:hover:bg-slate-700 transition-all border border-slate-200/60 dark:border-slate-700/60 shadow-sm" title="Bulk Import JSON Format">
+                        <FileJson className="h-5 w-5 text-slate-600 dark:text-slate-300" />
                     </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
@@ -518,14 +527,14 @@ export default function QuestionBankQuestionsPage() {
                     </div>
                 </DialogContent>
             </Dialog>
-            <Link href="/admin/question-bank/academic-questions/add">
-                <Button variant="default" className="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white shadow-md shadow-indigo-500/20 transition-all flex gap-2 border-0">
-                    <PlusCircle className="h-4 w-4" /> Add Academic Question
+            <Link href="/admin/question-bank/academic-questions/add" className="flex-1 md:flex-none">
+                <Button variant="default" className="w-full md:w-auto h-11 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white shadow-lg shadow-indigo-500/25 transition-all flex items-center justify-center gap-2 border-0 font-medium">
+                    <PlusCircle className="h-5 w-5" /> <span className="whitespace-nowrap">Add Academic</span>
                 </Button>
             </Link>
-            <Link href="/admin/question-bank/exam/add">
-                <Button variant="default" className="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white shadow-md shadow-emerald-600/20 transition-all flex gap-2 border-0">
-                    <PlusCircle className="h-4 w-4" /> Add Exam Question
+            <Link href="/admin/question-bank/exam/add" className="flex-1 md:flex-none">
+                <Button variant="default" className="w-full md:w-auto h-11 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-lg shadow-emerald-500/25 transition-all flex items-center justify-center gap-2 border-0 font-medium">
+                    <PlusCircle className="h-5 w-5" /> <span className="whitespace-nowrap">Add Exam</span>
                 </Button>
             </Link>
         </div>
@@ -636,8 +645,8 @@ export default function QuestionBankQuestionsPage() {
                 <TableHead className="font-semibold text-slate-700 dark:text-slate-300">Text</TableHead>
                 <TableHead className="font-semibold text-slate-700 dark:text-slate-300">Type</TableHead>
                 <TableHead className="font-semibold text-slate-700 dark:text-slate-300">Difficulty</TableHead>
-                <TableHead className="font-semibold text-slate-700 dark:text-slate-300">Status</TableHead>
-                <TableHead className="font-semibold text-slate-700 dark:text-slate-300">Verified</TableHead>
+                <TableHead className="font-semibold text-slate-700 dark:text-slate-300 w-[80px] text-center">Status</TableHead>
+                <TableHead className="font-semibold text-slate-700 dark:text-slate-300 w-[80px] text-center">Verified</TableHead>
                 <TableHead className="font-semibold text-slate-700 dark:text-slate-300 text-right pr-6">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -707,25 +716,27 @@ export default function QuestionBankQuestionsPage() {
                         </span>
                       </TableCell>
                       <TableCell>
-                        <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium border
-                          ${q.status === 'Published' ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800' : ''}
-                          ${q.status === 'Draft' ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800' : ''}
-                          ${q.status === 'Archived' ? 'bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700' : ''}
-                        `}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${q.status === 'Published' ? 'bg-emerald-500' : q.status === 'Draft' ? 'bg-amber-500' : 'bg-slate-500'}`}></span>
-                          {q.status}
-                        </span>
+                        <div className={`flex items-center justify-center w-8 h-8 rounded-full border shadow-sm transition-colors mx-auto
+                          ${q.status === 'Published' ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800' : ''}
+                          ${q.status === 'Draft' ? 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800' : ''}
+                          ${q.status === 'Archived' ? 'bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700' : ''}
+                        `} title={q.status}>
+                          {q.status === 'Published' ? <CheckCircle2 className="w-4 h-4" /> : q.status === 'Draft' ? <FileEdit className="w-4 h-4" /> : <Archive className="w-4 h-4" />}
+                        </div>
                       </TableCell>
                       <TableCell>
                           {q.isVerified ? (
-                              <div className="flex items-center text-xs text-indigo-600 dark:text-indigo-400 font-medium bg-indigo-50 dark:bg-indigo-900/30 px-2 py-0.5 rounded border border-indigo-100 dark:border-indigo-800/50 w-fit" title={q.verifiedByName}>
-                                  <ShieldCheck className="w-3.5 h-3.5 mr-1" />
-                                  Verified
+                              <div className="flex items-center justify-center w-8 h-8 rounded-full mx-auto text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800/50 shadow-sm transition-colors" title={`Verified by ${q.verifiedByName || 'Admin'}`}>
+                                  <ShieldCheck className="w-4 h-4" />
                               </div>
-                          ) : <span className="text-xs text-slate-400 dark:text-slate-500 italic">Unverified</span>}
+                          ) : (
+                              <div className="flex items-center justify-center w-8 h-8 rounded-full mx-auto text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm transition-colors" title="Unverified">
+                                  <ShieldAlert className="w-4 h-4" />
+                              </div>
+                          )}
                       </TableCell>
                       <TableCell className="pr-6 text-right">
-                        <div className="flex gap-1 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex gap-1 justify-end transition-opacity">
                             <Link href={`/question/${q.slug || q.id}`} target="_blank" rel="noopener noreferrer">
                                 <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-500 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/30" title="View Public Page"><Eye className="h-4 w-4" /></Button>
                             </Link>
