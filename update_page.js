@@ -1,457 +1,20 @@
-'use client';
+const fs = require('fs');
+const path = require('path');
 
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Switch } from '@/components/ui/switch';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { getQuestions, getQuestionsPaginated, createQuestion, updateQuestion, deleteQuestion, getTaxonomyNodes, bulkUpdateQuestions, bulkDeleteQuestions } from '@/lib/firebase/question-bank';
-import { QuestionBankEntry, TaxonomyNode } from '@/lib/question-bank-types';
-import { PlusCircle, Pencil, Trash2, Loader2, ArrowLeft, Sparkles, Eye, Play, Image as ImageIcon, Video, ShieldCheck, Upload, FileJson, Copy, CheckCircle2, Filter, Layers, X, Search, CheckCircle } from 'lucide-react';
-import Link from 'next/link';
-import { useAuth } from '@/hooks/use-auth';
-import { useToast } from '@/hooks/use-toast';
-import { slugify } from '@/lib/utils';
-import { doc, collection, getDocs } from 'firebase/firestore';
-import { db, storage } from '@/lib/firebase/client';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import dynamic from 'next/dynamic';
-import { QuestionBankEditor } from '@/components/admin/QuestionBankEditor';
+const filePath = path.join(__dirname, 'src/app/[locale]/admin/question-bank/questions/page.tsx');
+let content = fs.readFileSync(filePath, 'utf8');
 
-const TiptapEditor = dynamic(() => import('@/components/admin/TiptapEditor').then(mod => mod.TiptapEditor), {
-  ssr: false,
-  loading: () => <div className="min-h-[200px] flex items-center justify-center bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-md">Loading Editor...</div>
-});
+// 1. Add framer-motion import
+if (!content.includes("framer-motion")) {
+    content = content.replace("import React, { useState, useEffect } from 'react';", "import React, { useState, useEffect } from 'react';\nimport { motion, AnimatePresence } from 'framer-motion';");
+}
 
-const QA_CHECKLIST_ITEMS = [
-  'Answer Verified',
-  'Syllabus Checked',
-  'Explanation Reviewed',
-  'Exam Pattern Verified',
-  'Fact Checked',
-  'Previous Year Source Verified',
-  'Language Proofread'
-];
+// 2. Add some Lucide icons if missing
+content = content.replace("import { PlusCircle, Pencil, Trash2, Loader2, ArrowLeft, Sparkles, Eye, Play, Image as ImageIcon, Video, ShieldCheck, Upload, FileJson, Copy, CheckCircle2, Filter, Layers } from 'lucide-react';",
+"import { PlusCircle, Pencil, Trash2, Loader2, ArrowLeft, Sparkles, Eye, Play, Image as ImageIcon, Video, ShieldCheck, Upload, FileJson, Copy, CheckCircle2, Filter, Layers, X, Search, CheckCircle } from 'lucide-react';");
 
-const VERIFICATION_LEVELS = [
-  'Academic Team Verified',
-  'Subject Expert Verified',
-  'Senior Teacher Verified',
-  'Board Exam Specialist Verified',
-  'University Faculty Verified',
-  'Competitive Exam Expert Verified',
-  'Question Review Committee Verified',
-  'Content Team Reviewed',
-  'Fact Checked',
-  'Previous Year Question Verified',
-  'Official Syllabus Verified',
-  'Exam Pattern Verified',
-  'Answer Key Verified',
-  'Curriculum Verified',
-  'Premium Verified Content'
-];
-
-export default function QuestionBankQuestionsPage() {
-  const { toast } = useToast();
-  const { user } = useAuth();
-  const [questions, setQuestions] = useState<QuestionBankEntry[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [isBulkLoading, setIsBulkLoading] = useState(false);
-  const [isBulkTaxonomyOpen, setIsBulkTaxonomyOpen] = useState(false);
-  const [bulkTaxonomyData, setBulkTaxonomyData] = useState({ boardId: 'no_change', classId: 'no_change', subjectId: 'no_change', textbookId: 'no_change', chapterId: 'no_change', topicId: 'no_change', yearId: 'no_change', examIds: [] as string[] });
-  const [filters, setFilters] = useState({ boardId: 'all', classId: 'all', subjectId: 'all', textbookId: 'all', difficulty: 'all', status: 'all', isVerified: 'all' });
-  const [lastDoc, setLastDoc] = useState<any>(null);
-  const [hasMore, setHasMore] = useState(true);
-  
-  // Taxonomies for dropdowns
-  const [boards, setBoards] = useState<TaxonomyNode[]>([]);
-  const [classes, setClasses] = useState<TaxonomyNode[]>([]);
-  const [subjects, setSubjects] = useState<TaxonomyNode[]>([]);
-  const [textbooks, setTextbooks] = useState<TaxonomyNode[]>([]);
-  const [chapters, setChapters] = useState<TaxonomyNode[]>([]);
-  const [topics, setTopics] = useState<TaxonomyNode[]>([]);
-  const [exams, setExams] = useState<TaxonomyNode[]>([]);
-  const [years, setYears] = useState<TaxonomyNode[]>([]);
-  const [tags, setTags] = useState<TaxonomyNode[]>([]);
-
-  // View state
-  const [view, setView] = useState<'list' | 'editor'>('list');
-  const [editData, setEditData] = useState<Partial<QuestionBankEntry>>({
-      questionType: 'MCQ',
-      difficulty: 'Medium',
-      status: 'Published',
-      language: 'English',
-      options: { a: '', b: '', c: '', d: '', e: '' },
-      examIds: [],
-      qaChecklist: []
-  });
-  const [isSaving, setIsSaving] = useState(false);
-  const [isGeneratingAI, setIsGeneratingAI] = useState(false);
-  const [isUploadingMedia, setIsUploadingMedia] = useState(false);
-  const [hasCopied, setHasCopied] = useState(false);
-
-  const demoJsonFormat = [
-      {
-          "Question Type": "Multiple Choice",
-          "Subject": "General Knowledge",
-          "Chapter": "Geography",
-          "Question": "What is the capital of France?",
-          "Option A": "Berlin",
-          "Option B": "Madrid",
-          "Option C": "Paris",
-          "Option D": "Rome",
-          "Correct Answer": "C",
-          "Difficulty": "Easy",
-          "Explanation": "Paris is the capital and most populous city of France."
-      },
-      {
-          "Question Type": "True/False",
-          "Subject": "Science",
-          "Chapter": "Astronomy",
-          "Question": "The Earth is the fourth planet from the Sun.",
-          "Option A": "True",
-          "Option B": "False",
-          "Correct Answer": "B",
-          "Difficulty": "Medium",
-          "Explanation": "Earth is the third planet from the Sun. Mars is the fourth."
-      },
-      {
-          "Question Type": "Matching",
-          "Subject": "History",
-          "Chapter": "World War II",
-          "Question": "Match the leader to their respective country.",
-          "Option A": "Churchill=UK, FDR=USA",
-          "Correct Answer": "1-A, 2-B"
-      }
-  ];
-
-  const handleCopyJson = () => {
-      navigator.clipboard.writeText(JSON.stringify(demoJsonFormat, null, 2));
-      setHasCopied(true);
-      toast({ title: 'JSON Copied to clipboard!' });
-      setTimeout(() => setHasCopied(false), 2000);
-  };
-
-  const handleMediaUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: 'questionImage' | 'questionAudio' | 'questionVideo') => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-      setIsUploadingMedia(true);
-      try {
-          const folder = field === 'questionImage' ? 'images' : field === 'questionAudio' ? 'audio' : 'video';
-          const storageRef = ref(storage, `questions/${folder}/${Date.now()}_${file.name}`);
-          await uploadBytes(storageRef, file);
-          const url = await getDownloadURL(storageRef);
-          setEditData(prev => ({ ...prev, [field]: url }));
-          toast({ title: 'Success', description: 'File uploaded successfully' });
-      } catch(e) {
-          toast({ title: 'Upload Failed', variant: 'destructive' });
-      } finally {
-          setIsUploadingMedia(false);
-      }
-  };
-
-  const fetchQuestions = async (isLoadMore = false) => {
-    if (!isLoadMore) {
-        setLoading(true);
-        setQuestions([]);
-    } else {
-        setIsBulkLoading(true);
-    }
-    try {
-        const queryFilters: any = {};
-        if (filters.boardId !== 'all') queryFilters.boardId = filters.boardId;
-        if (filters.classId !== 'all') queryFilters.classId = filters.classId;
-        if (filters.subjectId !== 'all') queryFilters.subjectId = filters.subjectId;
-        if (filters.textbookId !== 'all') queryFilters.textbookId = filters.textbookId;
-        if (filters.difficulty !== 'all') queryFilters.difficulty = filters.difficulty;
-        if (filters.status !== 'all') queryFilters.status = filters.status;
-        if (filters.isVerified !== 'all') queryFilters.isVerified = filters.isVerified === 'true';
-
-        const { questions: newQuestions, lastDoc: newLastDoc } = await getQuestionsPaginated(queryFilters, 50, isLoadMore ? lastDoc : null);
-        
-        if (isLoadMore) {
-            setQuestions(prev => [...prev, ...newQuestions]);
-        } else {
-            setQuestions(newQuestions);
-        }
-        setLastDoc(newLastDoc);
-        setHasMore(newQuestions.length === 50);
-    } catch (e: any) {
-      toast({ title: 'Error fetching questions', description: e.message || 'Unknown error', variant: 'destructive' });
-      console.error("Filter Error:", e);
-    } finally {
-      setLoading(false);
-      setIsBulkLoading(false);
-    }
-  };
-
-  const fetchTaxonomies = async () => {
-      try {
-          const { getTaxonomyNodesByTrack } = await import('@/lib/firebase/taxonomy');
-          const allAcademic = await getTaxonomyNodesByTrack('academic');
-          const allCompetitive = await getTaxonomyNodesByTrack('competitive');
-          
-          const mapNodes = (nodes: any[]) => nodes.map(n => ({ ...n, name: n.title || n.name }));
-          
-          setBoards(mapNodes(allAcademic.filter((n: any) => n.type === 'board')));
-          setClasses(mapNodes(allAcademic.filter((n: any) => n.type === 'class')));
-          setSubjects(mapNodes(allAcademic.filter((n: any) => n.type === 'subject')));
-          setTextbooks(mapNodes(allAcademic.filter((n: any) => n.type === 'textbook')));
-          setChapters(mapNodes(allAcademic.filter((n: any) => n.type === 'chapter')));
-          setTopics(mapNodes(allAcademic.filter((n: any) => n.type === 'topic')));
-          
-          setExams(mapNodes(allCompetitive.filter((n: any) => n.type === 'exam')));
-          
-          const fetchGuideCol = async (colName: string) => {
-              try {
-                  const snap = await getDocs(collection(db, colName));
-                  return snap.docs.map(d => {
-                      const data = d.data();
-                      return { id: d.id, name: data.title || data.name, ...data };
-                  });
-              } catch(e) {
-                  return [];
-              }
-          };
-          
-          setYears(await fetchGuideCol('question_years') as any);
-          setTags(await fetchGuideCol('question_tags') as any);
-      } catch (e) {
-          console.error("Failed to fetch taxonomies", e);
-      }
-  };
-
-  useEffect(() => {
-    fetchTaxonomies();
-    
-    if (typeof window !== 'undefined') {
-        const params = new URLSearchParams(window.location.search);
-        const topicIdParam = params.get('topicId');
-        if (topicIdParam) {
-            import('@/lib/firebase/guide').then(({ getTopicHierarchy }) => {
-                getTopicHierarchy(topicIdParam).then((hierarchy) => {
-                    setView('editor');
-                    if (hierarchy) {
-                        setEditData(prev => ({
-                            ...prev, 
-                            topicId: topicIdParam,
-                            boardId: hierarchy.boardId || '',
-                            classId: hierarchy.classId || '',
-                            subjectId: hierarchy.subjectId || '',
-                            textbookId: hierarchy.textbookId || '',
-                            chapterId: hierarchy.chapterId || '',
-                        }));
-                    } else {
-                        setEditData(prev => ({ ...prev, topicId: topicIdParam }));
-                    }
-                });
-            });
-        }
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchQuestions(false);
-  }, [filters.boardId, filters.classId, filters.subjectId, filters.textbookId, filters.difficulty, filters.status, filters.isVerified]);
-
-  const handleSave = async () => {
-      if (!editData.questionText || !editData.correctAnswer) {
-          toast({ title: 'Validation Error', description: 'Question Text and Correct Answer are required.', variant: 'destructive' });
-          return;
-      }
-      setIsSaving(true);
-      try {
-          const generatedSlug = editData.slug || slugify(editData.title || editData.questionText.substring(0, 50));
-          const dataToSave = {
-              ...editData,
-              slug: generatedSlug,
-          };
-          
-          if (dataToSave.id) {
-              await updateQuestion(dataToSave.id, dataToSave as Partial<QuestionBankEntry>);
-              toast({ title: 'Question updated successfully' });
-          } else {
-              dataToSave.id = `q_${Date.now()}`;
-              await createQuestion(dataToSave as any);
-              toast({ title: 'Question created successfully' });
-          }
-          setView('list');
-          fetchQuestions();
-      } catch(e) {
-          toast({ title: 'Error saving question', variant: 'destructive' });
-      } finally {
-          setIsSaving(false);
-      }
-  }
-
-  const resetForm = () => {
-      setEditData({
-          id: '',
-          title: '',
-          questionText: '',
-          options: { a: '', b: '', c: '', d: '' },
-          correctAnswer: '',
-          explanation: '',
-          difficulty: 'Medium',
-          status: 'Published',
-          language: 'English',
-          marks: 1,
-          slug: '',
-          sourceYear: '',
-          tags: [],
-          boardId: '', classId: '', subjectId: '', textbookId: '', chapterId: '', topicId: '', yearId: '',
-          examIds: [],
-          isVerified: false,
-          qaChecklist: []
-      });
-  }
-
-  const handleGenerateAI = async () => {
-      if (!editData.questionText || !editData.correctAnswer) {
-          toast({ title: 'AI Error', description: 'Question Text and Correct Answer are required for the AI to generate an explanation.', variant: 'destructive' });
-          return;
-      }
-      setIsGeneratingAI(true);
-      try {
-          const res = await fetch('/api/ai/generate-explanation', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                  questionText: editData.questionText,
-                  options: editData.options,
-                  correctAnswer: editData.correctAnswer
-              })
-          });
-          const data = await res.json();
-          if (data.explanation) {
-              setEditData(prev => ({ ...prev, explanation: data.explanation }));
-              toast({ title: 'Explanation Generated!' });
-          } else {
-              throw new Error(data.error || 'Failed to generate');
-          }
-      } catch (err: any) {
-          toast({ title: 'AI Generation Failed', description: err.message, variant: 'destructive' });
-      } finally {
-          setIsGeneratingAI(false);
-      }
-  }
-
-  const toggleSelectAll = () => {
-      if (selectedIds.length === questions.length) setSelectedIds([]);
-      else setSelectedIds(questions.map(q => q.id));
-  };
-
-  const toggleSelect = (id: string) => {
-      if (selectedIds.includes(id)) setSelectedIds(selectedIds.filter(i => i !== id));
-      else setSelectedIds([...selectedIds, id]);
-  };
-
-  const handleBulkDelete = async () => {
-      if (!confirm('Are you sure you want to delete selected questions?')) return;
-      setIsBulkLoading(true);
-      try {
-          await bulkDeleteQuestions(selectedIds);
-          toast({ title: 'Deleted successfully' });
-          setSelectedIds([]);
-          fetchQuestions();
-      } catch(e) {
-          toast({ title: 'Delete failed', variant: 'destructive' });
-      } finally {
-          setIsBulkLoading(false);
-      }
-  };
-
-  const handleBulkUpdateStatus = async (status: string) => {
-      setIsBulkLoading(true);
-      try {
-          await bulkUpdateQuestions(selectedIds, { status: status as any });
-          toast({ title: 'Status updated successfully' });
-          setSelectedIds([]);
-          fetchQuestions();
-      } catch(e) {
-          toast({ title: 'Update failed', variant: 'destructive' });
-      } finally {
-          setIsBulkLoading(false);
-      }
-  };
-
-  const handleBulkVerify = async (isVerified: boolean) => {
-      setIsBulkLoading(true);
-      try {
-          const updateData: any = { isVerified };
-          if (isVerified && user) {
-              updateData.verifiedBy = user.uid;
-              updateData.verifiedByName = user.displayName || user.email || '';
-              updateData.verifiedAt = new Date().toISOString();
-          } else if (!isVerified) {
-              updateData.verifiedBy = '';
-              updateData.verifiedByName = '';
-              updateData.verifiedAt = null;
-          }
-          await bulkUpdateQuestions(selectedIds, updateData);
-          toast({ title: isVerified ? 'Questions Verified' : 'Verification Removed' });
-          setSelectedIds([]);
-          fetchQuestions();
-      } catch(e) {
-          toast({ title: 'Bulk Verification failed', variant: 'destructive' });
-      } finally {
-          setIsBulkLoading(false);
-      }
-  };
-
-  const handleBulkUpdateTaxonomy = async () => {
-      setIsBulkLoading(true);
-      try {
-          const updateData: any = {};
-          if (bulkTaxonomyData.boardId && bulkTaxonomyData.boardId !== 'no_change') updateData.boardId = bulkTaxonomyData.boardId;
-          if (bulkTaxonomyData.classId && bulkTaxonomyData.classId !== 'no_change') updateData.classId = bulkTaxonomyData.classId;
-          if (bulkTaxonomyData.subjectId && bulkTaxonomyData.subjectId !== 'no_change') updateData.subjectId = bulkTaxonomyData.subjectId;
-          if (bulkTaxonomyData.textbookId && bulkTaxonomyData.textbookId !== 'no_change') updateData.textbookId = bulkTaxonomyData.textbookId;
-          if (bulkTaxonomyData.chapterId && bulkTaxonomyData.chapterId !== 'no_change') updateData.chapterId = bulkTaxonomyData.chapterId;
-          if (bulkTaxonomyData.topicId && bulkTaxonomyData.topicId !== 'no_change') updateData.topicId = bulkTaxonomyData.topicId;
-          if (bulkTaxonomyData.yearId && bulkTaxonomyData.yearId !== 'no_change') updateData.yearId = bulkTaxonomyData.yearId;
-          if (bulkTaxonomyData.examIds.length > 0 && bulkTaxonomyData.examIds[0] !== 'no_change') updateData.examIds = bulkTaxonomyData.examIds;
-
-          if (Object.keys(updateData).length === 0) {
-              toast({ title: 'No changes selected', variant: 'destructive' });
-              setIsBulkLoading(false);
-              return;
-          }
-
-          await bulkUpdateQuestions(selectedIds, updateData);
-          toast({ title: 'Taxonomy updated successfully' });
-          setSelectedIds([]);
-          setIsBulkTaxonomyOpen(false);
-          setBulkTaxonomyData({ boardId: 'no_change', classId: 'no_change', subjectId: 'no_change', textbookId: 'no_change', chapterId: 'no_change', topicId: 'no_change', yearId: 'no_change', examIds: [] });
-          fetchQuestions();
-      } catch(e) {
-          toast({ title: 'Taxonomy update failed', variant: 'destructive' });
-      } finally {
-          setIsBulkLoading(false);
-      }
-  };
-
-  if (view === 'editor') {
-      return (
-          <QuestionBankEditor 
-              initialData={editData} 
-              onSaveComplete={() => {
-                  setView('list');
-                  fetchQuestions();
-              }}
-              onCancel={() => setView('list')}
-          />
-      );
-  }
-  return (
+// 3. Replace the return block
+const newReturnBlock = `  return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -516,10 +79,10 @@ export default function QuestionBankQuestionsPage() {
               <SheetTitle>Filters</SheetTitle>
             </SheetHeader>
             <div className="grid grid-cols-1 gap-4 py-4">
-              <Select value={filters.boardId} onValueChange={(v) => setFilters({...filters, boardId: v, classId: 'all', subjectId: 'all', textbookId: 'all'})}><SelectTrigger><SelectValue placeholder="All Boards" /></SelectTrigger><SelectContent><SelectItem value="all">All Boards</SelectItem>{boards.map(b => <SelectItem key={b.id} value={b.id}>{b.acronym || b.name}</SelectItem>)}</SelectContent></Select>
-              <Select value={filters.classId} onValueChange={(v) => setFilters({...filters, classId: v, subjectId: 'all', textbookId: 'all'})}><SelectTrigger><SelectValue placeholder="All Classes" /></SelectTrigger><SelectContent><SelectItem value="all">All Classes</SelectItem>{classes.filter(c => filters.boardId === 'all' || c.parentId === filters.boardId || c.rootId === filters.boardId).map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}</SelectContent></Select>
-              <Select value={filters.subjectId} onValueChange={(v) => setFilters({...filters, subjectId: v, textbookId: 'all'})}><SelectTrigger><SelectValue placeholder="All Subjects" /></SelectTrigger><SelectContent><SelectItem value="all">All Subjects</SelectItem>{subjects.filter(s => filters.classId === 'all' || s.parentId === filters.classId).map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent></Select>
-              <Select value={filters.textbookId} onValueChange={(v) => setFilters({...filters, textbookId: v})}><SelectTrigger><SelectValue placeholder="All Textbooks" /></SelectTrigger><SelectContent><SelectItem value="all">All Textbooks</SelectItem>{textbooks.filter(t => filters.subjectId === 'all' || t.parentId === filters.subjectId).map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}</SelectContent></Select>
+              <Select value={filters.boardId} onValueChange={(v) => setFilters({...filters, boardId: v})}><SelectTrigger><SelectValue placeholder="All Boards" /></SelectTrigger><SelectContent><SelectItem value="all">All Boards</SelectItem>{boards.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent></Select>
+              <Select value={filters.classId} onValueChange={(v) => setFilters({...filters, classId: v})}><SelectTrigger><SelectValue placeholder="All Classes" /></SelectTrigger><SelectContent><SelectItem value="all">All Classes</SelectItem>{classes.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}</SelectContent></Select>
+              <Select value={filters.subjectId} onValueChange={(v) => setFilters({...filters, subjectId: v})}><SelectTrigger><SelectValue placeholder="All Subjects" /></SelectTrigger><SelectContent><SelectItem value="all">All Subjects</SelectItem>{subjects.map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent></Select>
+              <Select value={filters.textbookId} onValueChange={(v) => setFilters({...filters, textbookId: v})}><SelectTrigger><SelectValue placeholder="All Textbooks" /></SelectTrigger><SelectContent><SelectItem value="all">All Textbooks</SelectItem>{textbooks.map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}</SelectContent></Select>
               <Select value={filters.difficulty} onValueChange={(v) => setFilters({...filters, difficulty: v})}><SelectTrigger><SelectValue placeholder="All Difficulties" /></SelectTrigger><SelectContent><SelectItem value="all">All Difficulties</SelectItem><SelectItem value="Easy">Easy</SelectItem><SelectItem value="Medium">Medium</SelectItem><SelectItem value="Hard">Hard</SelectItem><SelectItem value="Expert">Expert</SelectItem></SelectContent></Select>
               <Select value={filters.status} onValueChange={(v) => setFilters({...filters, status: v})}><SelectTrigger><SelectValue placeholder="All Statuses" /></SelectTrigger><SelectContent><SelectItem value="all">All Statuses</SelectItem><SelectItem value="Published">Published</SelectItem><SelectItem value="Draft">Draft</SelectItem><SelectItem value="Archived">Archived</SelectItem></SelectContent></Select>
               <Select value={filters.isVerified} onValueChange={(v) => setFilters({...filters, isVerified: v})}><SelectTrigger><SelectValue placeholder="Verification Status" /></SelectTrigger><SelectContent><SelectItem value="all">All Verification</SelectItem><SelectItem value="true">Verified</SelectItem><SelectItem value="false">Not Verified</SelectItem></SelectContent></Select>
@@ -530,32 +93,32 @@ export default function QuestionBankQuestionsPage() {
 
       {/* Desktop Filters (Glassmorphism Toolbar) */}
       <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 mb-6 p-4 rounded-xl bg-white/40 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/50 dark:border-slate-800/50 shadow-sm">
-          <Select value={filters.boardId} onValueChange={(v) => setFilters({...filters, boardId: v, classId: 'all', subjectId: 'all', textbookId: 'all'})}>
+          <Select value={filters.boardId} onValueChange={(v) => setFilters({...filters, boardId: v})}>
               <SelectTrigger className="bg-white dark:bg-slate-950 border-slate-200/60 dark:border-slate-800 shadow-sm transition-all hover:border-indigo-300 focus:ring-indigo-500/20"><SelectValue placeholder="All Boards" /></SelectTrigger>
               <SelectContent>
                   <SelectItem value="all">All Boards</SelectItem>
-                  {boards.map(b => <SelectItem key={b.id} value={b.id}>{b.acronym || b.name}</SelectItem>)}
+                  {boards.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}
               </SelectContent>
           </Select>
-          <Select value={filters.classId} onValueChange={(v) => setFilters({...filters, classId: v, subjectId: 'all', textbookId: 'all'})}>
+          <Select value={filters.classId} onValueChange={(v) => setFilters({...filters, classId: v})}>
               <SelectTrigger className="bg-white dark:bg-slate-950 border-slate-200/60 dark:border-slate-800 shadow-sm transition-all hover:border-indigo-300 focus:ring-indigo-500/20"><SelectValue placeholder="All Classes" /></SelectTrigger>
               <SelectContent>
                   <SelectItem value="all">All Classes</SelectItem>
-                  {classes.filter(c => filters.boardId === 'all' || c.parentId === filters.boardId || c.rootId === filters.boardId).map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
+                  {classes.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
               </SelectContent>
           </Select>
-          <Select value={filters.subjectId} onValueChange={(v) => setFilters({...filters, subjectId: v, textbookId: 'all'})}>
+          <Select value={filters.subjectId} onValueChange={(v) => setFilters({...filters, subjectId: v})}>
               <SelectTrigger className="bg-white dark:bg-slate-950 border-slate-200/60 dark:border-slate-800 shadow-sm transition-all hover:border-indigo-300 focus:ring-indigo-500/20"><SelectValue placeholder="All Subjects" /></SelectTrigger>
               <SelectContent>
                   <SelectItem value="all">All Subjects</SelectItem>
-                  {subjects.filter(s => filters.classId === 'all' || s.parentId === filters.classId).map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}
+                  {subjects.map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}
               </SelectContent>
           </Select>
           <Select value={filters.textbookId} onValueChange={(v) => setFilters({...filters, textbookId: v})}>
               <SelectTrigger className="bg-white dark:bg-slate-950 border-slate-200/60 dark:border-slate-800 shadow-sm transition-all hover:border-indigo-300 focus:ring-indigo-500/20"><SelectValue placeholder="All Textbooks" /></SelectTrigger>
               <SelectContent>
                   <SelectItem value="all">All Textbooks</SelectItem>
-                  {textbooks.filter(t => filters.subjectId === 'all' || t.parentId === filters.subjectId).map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
+                  {textbooks.map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
               </SelectContent>
           </Select>
           <Select value={filters.difficulty} onValueChange={(v) => setFilters({...filters, difficulty: v})}>
@@ -637,29 +200,15 @@ export default function QuestionBankQuestionsPage() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.95 }}
                       transition={{ duration: 0.2, delay: Math.min(i * 0.02, 0.2) }}
-                      className={`group hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors border-b border-slate-100 dark:border-slate-800 ${selectedIds.includes(q.id) ? 'bg-indigo-50/50 dark:bg-indigo-900/20' : ''}`}
+                      className={\`group hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors border-b border-slate-100 dark:border-slate-800 \${selectedIds.includes(q.id) ? 'bg-indigo-50/50 dark:bg-indigo-900/20' : ''}\`}
                     >
                       <TableCell className="pl-6"><input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer transition-all" checked={selectedIds.includes(q.id)} onChange={() => toggleSelect(q.id)} /></TableCell>
                       <TableCell className="max-w-[400px]">
                         <div className="font-medium text-slate-800 dark:text-slate-200 line-clamp-2">{q.questionText}</div>
-                        {(q.boardId || q.classId || q.subjectId || q.textbookId) && (
-                           <div className="text-xs text-slate-500 mt-1.5 flex flex-wrap items-center gap-1.5">
-                             {(() => {
-                               const b = boards.find(b => b.id === q.boardId);
-                               return b ? <span className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-[10px] font-medium border border-slate-200 dark:border-slate-700" title={b.name}>{b.acronym || b.name}</span> : null;
-                             })()}
-                             {(() => {
-                               const c = classes.find(c => c.id === q.classId);
-                               return c ? <span className="bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 px-1.5 py-0.5 rounded text-[10px] font-medium border border-indigo-100 dark:border-indigo-800/50">{c.name}</span> : null;
-                             })()}
-                             {(() => {
-                               const s = subjects.find(s => s.id === q.subjectId);
-                               return s ? <span className="bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 px-1.5 py-0.5 rounded text-[10px] font-medium border border-blue-100 dark:border-blue-800/50">{s.name}</span> : null;
-                             })()}
-                             {(() => {
-                               const tb = textbooks.find(t => t.id === q.textbookId);
-                               return tb ? <span className="bg-orange-50 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 px-1.5 py-0.5 rounded text-[10px] font-medium border border-orange-100 dark:border-orange-800/50" title={tb.name}>{(tb.name?.length > 25 ? tb.name.substring(0, 25) + '...' : tb.name)}</span> : null;
-                             })()}
+                        {(q.boardId || q.subjectId) && (
+                           <div className="text-xs text-slate-500 mt-1 flex items-center gap-2">
+                             {boards.find(b => b.id === q.boardId)?.name && <span className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">{boards.find(b => b.id === q.boardId)?.name}</span>}
+                             {subjects.find(s => s.id === q.subjectId)?.name && <span className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">{subjects.find(s => s.id === q.subjectId)?.name}</span>}
                            </div>
                         )}
                       </TableCell>
@@ -669,22 +218,22 @@ export default function QuestionBankQuestionsPage() {
                         </span>
                       </TableCell>
                       <TableCell>
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border
-                          ${q.difficulty === 'Easy' ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800' : ''}
-                          ${q.difficulty === 'Medium' ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800' : ''}
-                          ${q.difficulty === 'Hard' ? 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-900/30 dark:text-rose-400 dark:border-rose-800' : ''}
-                          ${q.difficulty === 'Expert' ? 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-800' : ''}
-                        `}>
+                        <span className={\`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border
+                          \${q.difficulty === 'Easy' ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800' : ''}
+                          \${q.difficulty === 'Medium' ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800' : ''}
+                          \${q.difficulty === 'Hard' ? 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-900/30 dark:text-rose-400 dark:border-rose-800' : ''}
+                          \${q.difficulty === 'Expert' ? 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-800' : ''}
+                        \`}>
                           {q.difficulty}
                         </span>
                       </TableCell>
                       <TableCell>
-                        <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium border
-                          ${q.status === 'Published' ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800' : ''}
-                          ${q.status === 'Draft' ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800' : ''}
-                          ${q.status === 'Archived' ? 'bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700' : ''}
-                        `}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${q.status === 'Published' ? 'bg-emerald-500' : q.status === 'Draft' ? 'bg-amber-500' : 'bg-slate-500'}`}></span>
+                        <span className={\`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium border
+                          \${q.status === 'Published' ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800' : ''}
+                          \${q.status === 'Draft' ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800' : ''}
+                          \${q.status === 'Archived' ? 'bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700' : ''}
+                        \`}>
+                          <span className={\`w-1.5 h-1.5 rounded-full \${q.status === 'Published' ? 'bg-emerald-500' : q.status === 'Draft' ? 'bg-amber-500' : 'bg-slate-500'}\`}></span>
                           {q.status}
                         </span>
                       </TableCell>
@@ -698,11 +247,11 @@ export default function QuestionBankQuestionsPage() {
                       </TableCell>
                       <TableCell className="pr-6 text-right">
                         <div className="flex gap-1 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Link href={`/question/${q.slug || q.id}`} target="_blank" rel="noopener noreferrer">
+                            <Link href={\`/question/\${q.slug || q.id}\`} target="_blank" rel="noopener noreferrer">
                                 <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-500 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/30" title="View Public Page"><Eye className="h-4 w-4" /></Button>
                             </Link>
                             {q.contentType === 'academic' ? (
-                                <Link href={`/admin/question-bank/academic-questions/${q.id}`}>
+                                <Link href={\`/admin/question-bank/academic-questions/\${q.id}\`}>
                                     <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 dark:text-slate-400 dark:hover:bg-indigo-900/30" title="Edit Academic Question"><Pencil className="h-4 w-4" /></Button>
                                 </Link>
                             ) : (
@@ -738,40 +287,18 @@ export default function QuestionBankQuestionsPage() {
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: i * 0.05 }}
                     key={q.id} 
-                    className={`flex flex-col p-4 border rounded-xl gap-3 bg-white dark:bg-slate-900 shadow-sm transition-all ${selectedIds.includes(q.id) ? 'ring-2 ring-indigo-500 border-indigo-500' : 'border-slate-200 dark:border-slate-800'}`}
+                    className={\`flex flex-col p-4 border rounded-xl gap-3 bg-white dark:bg-slate-900 shadow-sm transition-all \${selectedIds.includes(q.id) ? 'ring-2 ring-indigo-500 border-indigo-500' : 'border-slate-200 dark:border-slate-800'}\`}
                   >
                       <div className="flex items-start justify-between gap-2">
-                          <div className="flex items-start gap-3 w-full">
-                              <input type="checkbox" className="w-5 h-5 mt-0.5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 flex-shrink-0" checked={selectedIds.includes(q.id)} onChange={() => toggleSelect(q.id)} />
-                              <div className="w-full">
-                                  <div className="text-sm font-medium line-clamp-3 leading-snug">{q.questionText}</div>
-                                  {(q.boardId || q.classId || q.subjectId || q.textbookId) && (
-                                     <div className="text-xs text-slate-500 mt-2 flex flex-wrap items-center gap-1.5">
-                                       {(() => {
-                                         const b = boards.find(b => b.id === q.boardId);
-                                         return b ? <span className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-[10px] font-medium border border-slate-200 dark:border-slate-700" title={b.name}>{b.acronym || b.name}</span> : null;
-                                       })()}
-                                       {(() => {
-                                         const c = classes.find(c => c.id === q.classId);
-                                         return c ? <span className="bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 px-1.5 py-0.5 rounded text-[10px] font-medium border border-indigo-100 dark:border-indigo-800/50">{c.name}</span> : null;
-                                       })()}
-                                       {(() => {
-                                         const s = subjects.find(s => s.id === q.subjectId);
-                                         return s ? <span className="bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 px-1.5 py-0.5 rounded text-[10px] font-medium border border-blue-100 dark:border-blue-800/50">{s.name}</span> : null;
-                                       })()}
-                                       {(() => {
-                                         const tb = textbooks.find(t => t.id === q.textbookId);
-                                         return tb ? <span className="bg-orange-50 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 px-1.5 py-0.5 rounded text-[10px] font-medium border border-orange-100 dark:border-orange-800/50" title={tb.name}>{(tb.name?.length > 20 ? tb.name.substring(0, 20) + '...' : tb.name)}</span> : null;
-                                       })()}
-                                     </div>
-                                  )}
-                              </div>
+                          <div className="flex items-start gap-3">
+                              <input type="checkbox" className="w-5 h-5 mt-0.5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" checked={selectedIds.includes(q.id)} onChange={() => toggleSelect(q.id)} />
+                              <div className="text-sm font-medium line-clamp-3 leading-snug">{q.questionText}</div>
                           </div>
                       </div>
                       <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 pl-8">
                           <span className="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded-md font-medium">{q.questionType || (q.options?.a ? 'MCQ' : 'Subjective')}</span>
-                          <span className={`px-2 py-1 rounded-md font-medium border ${q.difficulty === 'Easy' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : q.difficulty === 'Medium' ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-rose-50 text-rose-700 border-rose-200'}`}>{q.difficulty}</span>
-                          <span className={`px-2 py-1 rounded-md font-medium border ${q.status === 'Published' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200'}`}>{q.status}</span>
+                          <span className={\`px-2 py-1 rounded-md font-medium border \${q.difficulty === 'Easy' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : q.difficulty === 'Medium' ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-rose-50 text-rose-700 border-rose-200'}\`}>{q.difficulty}</span>
+                          <span className={\`px-2 py-1 rounded-md font-medium border \${q.status === 'Published' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200'}\`}>{q.status}</span>
                           {q.isVerified && (
                               <span className="flex items-center text-indigo-600 bg-indigo-50 border border-indigo-200 px-2 py-1 rounded-md font-medium" title={q.verifiedByName}>
                                   <ShieldCheck className="w-3 h-3 mr-1" /> Verified
@@ -779,7 +306,7 @@ export default function QuestionBankQuestionsPage() {
                           )}
                       </div>
                       <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800 mt-1">
-                          <Link href={`/question/${q.slug || q.id}`} target="_blank" rel="noopener noreferrer">
+                          <Link href={\`/question/\${q.slug || q.id}\`} target="_blank" rel="noopener noreferrer">
                               <Button variant="outline" size="sm" className="text-blue-500"><Eye className="h-4 w-4 mr-1" /> View</Button>
                           </Link>
                           <Button variant="outline" size="sm" onClick={() => { setEditData(q); setView('editor'); }}><Pencil className="h-4 w-4 mr-1" /> Edit</Button>
@@ -980,3 +507,10 @@ export default function QuestionBankQuestionsPage() {
     </motion.div>
   );
 }
+`;
+
+const returnRegex = /  return \([\s\S]*\}\n/m;
+content = content.replace(returnRegex, newReturnBlock);
+
+fs.writeFileSync(filePath, content, 'utf8');
+console.log("File updated successfully.");
