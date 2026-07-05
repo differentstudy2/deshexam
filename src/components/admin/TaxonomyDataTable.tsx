@@ -7,9 +7,9 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { 
-  Plus, Edit2, Trash2, Hash, FileText, CheckSquare, EyeOff, LayoutGrid, 
+  Plus, Edit2, Trash2, Hash, FileText, CheckSquare, EyeOff, LayoutGrid, LayoutList,
   ChevronRight, Filter, Database, BookOpen, Layers, Target, Eye, ChevronLeft, Calendar, Activity, PlusCircle, Search, Tag,
-  ArrowUpDown, Download, SortAsc, SortDesc, ImageIcon, Globe, RefreshCw, X as XIcon
+  ArrowUpDown, Download, SortAsc, SortDesc, ImageIcon, Globe, RefreshCw, X as XIcon, MoreVertical, ShieldCheck, CheckCircle2, ShieldAlert
 } from 'lucide-react';
 import Link from 'next/link';
 import { format } from 'date-fns';
@@ -53,6 +53,7 @@ export function TaxonomyDataTable({ type, title }: Props) {
   const [filterTextbookId, setFilterTextbookId] = useState('all');
   const [filterChapterId, setFilterChapterId] = useState('all');
   // New filters
+  const [viewMode, setViewMode] = useState<'list' | 'grid'>('grid');
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'title-asc' | 'title-desc'>('newest');
   const [filterHasImage, setFilterHasImage] = useState<'all' | 'yes' | 'no'>('all');
   const [filterInstitutionType, setFilterInstitutionType] = useState('all');
@@ -363,56 +364,61 @@ export function TaxonomyDataTable({ type, title }: Props) {
 
   return (
     <div className="max-w-6xl mx-auto p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-slate-100 flex items-center gap-2">
-            <Layers className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
-            {title}
-          </h1>
-          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">View and manage all academic {title.toLowerCase()} in the database.</p>
+      {/* Premium Header */}
+      <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 sm:p-8">
+        <div className="absolute top-0 right-0 -mt-16 -mr-16 w-64 h-64 bg-indigo-500/10 dark:bg-indigo-500/5 blur-3xl rounded-full pointer-events-none"></div>
+        <div className="absolute bottom-0 left-0 -mb-16 -ml-16 w-64 h-64 bg-emerald-500/10 dark:bg-emerald-500/5 blur-3xl rounded-full pointer-events-none"></div>
+        
+        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 dark:from-indigo-400 dark:to-indigo-300 flex items-center gap-3">
+              <div className="p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl">
+                <Layers className="w-7 h-7 text-indigo-600 dark:text-indigo-400" />
+              </div>
+              {title}
+            </h1>
+            <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400 mt-2 max-w-xl">
+              View and manage all academic {title.toLowerCase()} in the database. Organize your educational structure efficiently.
+            </p>
+          </div>
+          
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => setViewMode('grid')}
+                className={`px-3 py-1.5 h-8 rounded-md transition-all ${viewMode === 'grid' ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+              >
+                <LayoutGrid className="w-4 h-4 mr-1.5" /> Grid
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => setViewMode('list')}
+                className={`px-3 py-1.5 h-8 rounded-md transition-all ${viewMode === 'list' ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+              >
+                <LayoutList className="w-4 h-4 mr-1.5" /> List
+              </Button>
+            </div>
+            <Button onClick={() => setIsAddModalOpen(true)}
+              className="h-10 px-4 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 text-white shadow-sm shadow-indigo-500/20 transition-all rounded-lg">
+              <PlusCircle className="w-4 h-4 mr-2" /> Add New
+            </Button>
+          </div>
         </div>
       </div>
 
-      <Card className="border-gray-100 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-900">
-        <CardHeader className="pb-3 border-b border-gray-100 dark:border-slate-700/60 bg-white dark:bg-slate-800/50">
+      <Card className="border-gray-200/60 dark:border-slate-700/60 shadow-sm bg-white dark:bg-slate-900 overflow-hidden rounded-xl">
+        <CardHeader className="pb-3 border-b border-gray-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
           <div className="flex flex-col gap-3">
-            {/* Row 1: Title + count + Add + Reset */}
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2 min-w-0">
-                <DatabaseZap className="w-5 h-5 text-emerald-500 dark:text-emerald-400 shrink-0" />
-                <CardTitle className="text-base font-semibold text-gray-800 dark:text-slate-200">
-                  Data Table
-                </CardTitle>
-                <Badge variant="secondary" className="ml-1 bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 font-mono text-xs">
-                  {sortedNodes.length}
-                </Badge>
-                {activeFilterCount > 0 && (
-                  <Badge className="bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 text-xs border-0">
-                    {activeFilterCount} filter{activeFilterCount > 1 ? 's' : ''} active
-                  </Badge>
-                )}
-              </div>
-              <div className="flex items-center gap-2 shrink-0">
-                {activeFilterCount > 0 && (
-                  <Button variant="ghost" size="sm" onClick={resetAllFilters}
-                    className="h-8 text-xs text-gray-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 gap-1">
-                    <XIcon className="w-3 h-3" /> Reset
-                  </Button>
-                )}
-                <Button onClick={() => setIsAddModalOpen(true)}
-                  className="h-9 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white text-sm">
-                  <PlusCircle className="w-4 h-4 mr-1.5" /> Add New
-                </Button>
-              </div>
-            </div>
-
-            {/* Row 2: Search + Sort + Status */}
-            <div className="flex items-center gap-2">
-              <div className="relative flex-1">
+            {/* Row 1: Search + Sort + Status + Reset */}
+            <div className="flex flex-col sm:flex-row items-center gap-2">
+              <div className="relative flex-1 w-full">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500 w-4 h-4" />
                 <Input
                   placeholder="Search title, slug, address..."
-                  className="pl-9 h-9 bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-600 text-sm w-full text-slate-900 dark:text-slate-100 placeholder:text-gray-400 dark:placeholder:text-slate-500"
+                  className="pl-9 h-9 bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-sm w-full text-slate-900 dark:text-slate-100 placeholder:text-gray-400 dark:placeholder:text-slate-500 transition-all focus:ring-2 focus:ring-indigo-500/20"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -446,6 +452,15 @@ export function TaxonomyDataTable({ type, title }: Props) {
                 </select>
                 <Filter className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 dark:text-slate-500 pointer-events-none" />
               </div>
+              {/* Reset Filters */}
+              {activeFilterCount > 0 && (
+                <div className="shrink-0">
+                  <Button variant="ghost" size="sm" onClick={resetAllFilters}
+                    className="h-9 px-3 text-xs text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 gap-1 transition-all">
+                    <XIcon className="w-3.5 h-3.5" /> Reset
+                  </Button>
+                </div>
+              )}
             </div>
 
             {/* Row 3: Advanced filters — shown only for institution type */}
@@ -514,6 +529,114 @@ export function TaxonomyDataTable({ type, title }: Props) {
                     <option value="month">This Month</option>
                   </select>
                   <Calendar className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 dark:text-slate-500 pointer-events-none" />
+                </div>
+              </div>
+            )}
+            {/* Dedicated Filters Section */}
+            {['class', 'subject', 'textbook', 'chapter', 'topic'].includes(type) && (
+              <div className="pt-3 border-t border-gray-200/50 dark:border-slate-700/50 mt-1">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-4">
+
+                {['class', 'subject', 'textbook', 'chapter', 'topic'].includes(type) && (
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Filter by Board</Label>
+                    <div className="relative">
+                      <select 
+                        className="h-9 w-full px-3 py-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-md text-sm text-gray-700 dark:text-slate-300 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none pr-8 cursor-pointer transition-all"
+                        value={filterBoardId}
+                        onChange={(e) => {
+                          setFilterBoardId(e.target.value);
+                          setFilterClassId('all'); setFilterSubjectId('all'); setFilterTextbookId('all'); setFilterChapterId('all');
+                        }}
+                      >
+                        <option value="all">All Boards</option>
+                        {availableBoards.map(b => <option key={b.id} value={b.id}>{b.acronym || b.title}</option>)}
+                      </select>
+                      <Filter className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 dark:text-slate-500 pointer-events-none" />
+                    </div>
+                  </div>
+                )}
+
+                {['subject', 'textbook', 'chapter', 'topic'].includes(type) && (
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Filter by Class</Label>
+                    <div className="relative">
+                      <select 
+                        className="h-9 w-full px-3 py-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-md text-sm text-gray-700 dark:text-slate-300 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none pr-8 cursor-pointer disabled:opacity-50 transition-all"
+                        value={filterClassId}
+                        onChange={(e) => {
+                          setFilterClassId(e.target.value);
+                          setFilterSubjectId('all'); setFilterTextbookId('all'); setFilterChapterId('all');
+                        }}
+                        disabled={filterBoardId !== 'all' && availableClasses.length === 0}
+                      >
+                        <option value="all">All Classes</option>
+                        {availableClasses.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
+                      </select>
+                      <Filter className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 dark:text-slate-500 pointer-events-none" />
+                    </div>
+                  </div>
+                )}
+
+                {['textbook', 'chapter', 'topic'].includes(type) && (
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Filter by Subject</Label>
+                    <div className="relative">
+                      <select 
+                        className="h-9 w-full px-3 py-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-md text-sm text-gray-700 dark:text-slate-300 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none pr-8 cursor-pointer disabled:opacity-50 transition-all"
+                        value={filterSubjectId}
+                        onChange={(e) => {
+                          setFilterSubjectId(e.target.value);
+                          setFilterTextbookId('all'); setFilterChapterId('all');
+                        }}
+                        disabled={filterClassId !== 'all' && availableSubjects.length === 0}
+                      >
+                        <option value="all">All Subjects</option>
+                        {availableSubjects.map(s => <option key={s.id} value={s.id}>{s.title}</option>)}
+                      </select>
+                      <Filter className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 dark:text-slate-500 pointer-events-none" />
+                    </div>
+                  </div>
+                )}
+
+                {['chapter', 'topic'].includes(type) && (
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Filter by Textbook</Label>
+                    <div className="relative">
+                      <select 
+                        className="h-9 w-full px-3 py-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-md text-sm text-gray-700 dark:text-slate-300 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none pr-8 cursor-pointer disabled:opacity-50 transition-all"
+                        value={filterTextbookId}
+                        onChange={(e) => {
+                          setFilterTextbookId(e.target.value);
+                          setFilterChapterId('all');
+                        }}
+                        disabled={filterSubjectId !== 'all' && availableTextbooks.length === 0}
+                      >
+                        <option value="all">All Textbooks</option>
+                        {availableTextbooks.map(t => <option key={t.id} value={t.id}>{t.title}</option>)}
+                      </select>
+                      <Filter className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 dark:text-slate-500 pointer-events-none" />
+                    </div>
+                  </div>
+                )}
+
+                {['topic'].includes(type) && (
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Filter by Chapter</Label>
+                    <div className="relative">
+                      <select 
+                        className="h-9 w-full px-3 py-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-md text-sm text-gray-700 dark:text-slate-300 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none pr-8 cursor-pointer disabled:opacity-50 transition-all"
+                        value={filterChapterId}
+                        onChange={(e) => setFilterChapterId(e.target.value)}
+                        disabled={filterTextbookId !== 'all' && availableChapters.length === 0}
+                      >
+                        <option value="all">All Chapters</option>
+                        {availableChapters.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
+                      </select>
+                      <Filter className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 dark:text-slate-500 pointer-events-none" />
+                    </div>
+                  </div>
+                )}
                 </div>
               </div>
             )}
@@ -636,120 +759,94 @@ export function TaxonomyDataTable({ type, title }: Props) {
           </div>
         )}
 
-        {/* Dedicated Filters Section */}
-        {['class', 'subject', 'textbook', 'chapter', 'topic'].includes(type) && (
-          <div className="p-3 sm:p-4 border-b border-gray-100 dark:border-slate-700/60 bg-gray-50/30 dark:bg-slate-800/30">
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-4">
-
-            {['class', 'subject', 'textbook', 'chapter', 'topic'].includes(type) && (
-              <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Filter by Board</Label>
-                <div className="relative">
-                  <select 
-                    className="h-9 w-full px-3 py-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-md text-sm text-gray-700 dark:text-slate-300 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none pr-8 cursor-pointer"
-                    value={filterBoardId}
-                    onChange={(e) => {
-                      setFilterBoardId(e.target.value);
-                      setFilterClassId('all'); setFilterSubjectId('all'); setFilterTextbookId('all'); setFilterChapterId('all');
-                    }}
-                  >
-                    <option value="all">All Boards</option>
-                    {availableBoards.map(b => <option key={b.id} value={b.id}>{b.acronym || b.title}</option>)}
-                  </select>
-                  <Filter className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 dark:text-slate-500 pointer-events-none" />
-                </div>
-              </div>
-            )}
-
-            {['subject', 'textbook', 'chapter', 'topic'].includes(type) && (
-              <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Filter by Class</Label>
-                <div className="relative">
-                  <select 
-                    className="h-9 w-full px-3 py-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-md text-sm text-gray-700 dark:text-slate-300 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none pr-8 cursor-pointer disabled:opacity-50"
-                    value={filterClassId}
-                    onChange={(e) => {
-                      setFilterClassId(e.target.value);
-                      setFilterSubjectId('all'); setFilterTextbookId('all'); setFilterChapterId('all');
-                    }}
-                    disabled={filterBoardId !== 'all' && availableClasses.length === 0}
-                  >
-                    <option value="all">All Classes</option>
-                    {availableClasses.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
-                  </select>
-                  <Filter className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 dark:text-slate-500 pointer-events-none" />
-                </div>
-              </div>
-            )}
-
-            {['textbook', 'chapter', 'topic'].includes(type) && (
-              <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Filter by Subject</Label>
-                <div className="relative">
-                  <select 
-                    className="h-9 w-full px-3 py-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-md text-sm text-gray-700 dark:text-slate-300 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none pr-8 cursor-pointer disabled:opacity-50"
-                    value={filterSubjectId}
-                    onChange={(e) => {
-                      setFilterSubjectId(e.target.value);
-                      setFilterTextbookId('all'); setFilterChapterId('all');
-                    }}
-                    disabled={filterClassId !== 'all' && availableSubjects.length === 0}
-                  >
-                    <option value="all">All Subjects</option>
-                    {availableSubjects.map(s => <option key={s.id} value={s.id}>{s.title}</option>)}
-                  </select>
-                  <Filter className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 dark:text-slate-500 pointer-events-none" />
-                </div>
-              </div>
-            )}
-
-            {['chapter', 'topic'].includes(type) && (
-              <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Filter by Textbook</Label>
-                <div className="relative">
-                  <select 
-                    className="h-9 w-full px-3 py-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-md text-sm text-gray-700 dark:text-slate-300 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none pr-8 cursor-pointer disabled:opacity-50"
-                    value={filterTextbookId}
-                    onChange={(e) => {
-                      setFilterTextbookId(e.target.value);
-                      setFilterChapterId('all');
-                    }}
-                    disabled={filterSubjectId !== 'all' && availableTextbooks.length === 0}
-                  >
-                    <option value="all">All Textbooks</option>
-                    {availableTextbooks.map(t => <option key={t.id} value={t.id}>{t.title}</option>)}
-                  </select>
-                  <Filter className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 dark:text-slate-500 pointer-events-none" />
-                </div>
-              </div>
-            )}
-
-            {['topic'].includes(type) && (
-              <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Filter by Chapter</Label>
-                <div className="relative">
-                  <select 
-                    className="h-9 w-full px-3 py-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-md text-sm text-gray-700 dark:text-slate-300 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none pr-8 cursor-pointer disabled:opacity-50"
-                    value={filterChapterId}
-                    onChange={(e) => setFilterChapterId(e.target.value)}
-                    disabled={filterTextbookId !== 'all' && availableChapters.length === 0}
-                  >
-                    <option value="all">All Chapters</option>
-                    {availableChapters.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
-                  </select>
-                  <Filter className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 dark:text-slate-500 pointer-events-none" />
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-        )}
-
         <CardContent className="p-0">
           {loading ? (
             <div className="p-12 text-center text-gray-500 dark:text-slate-400 animate-pulse">Loading data...</div>
           ) : paginatedNodes.length === 0 ? (
             <div className="p-12 text-center text-gray-500 dark:text-slate-400">No records found.</div>
+          ) : viewMode === 'grid' ? (
+            <div className="p-4 sm:p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 bg-slate-50/30 dark:bg-slate-900/30">
+              {paginatedNodes.map((node) => (
+                <div key={node.id} className={`group relative flex flex-col bg-white dark:bg-slate-800 rounded-2xl border transition-all hover:shadow-lg hover:-translate-y-1 ${selectedIds.includes(node.id) ? 'border-indigo-500 ring-1 ring-indigo-500 shadow-sm' : 'border-slate-200 dark:border-slate-700'}`}>
+                  
+                  {/* Card Header (Checkbox + Status) */}
+                  <div className="flex items-start justify-between p-4 border-b border-slate-100 dark:border-slate-700/60">
+                    <Checkbox
+                      checked={selectedIds.includes(node.id)}
+                      onCheckedChange={(checked) => handleToggleSelect(node.id, checked === true)}
+                      className="mt-0.5 z-10"
+                    />
+                    <div className="flex items-center gap-1.5 z-10">
+                      <span className="text-xs text-slate-400 dark:text-slate-500 font-mono bg-slate-50 dark:bg-slate-900 px-1.5 py-0.5 rounded border border-slate-100 dark:border-slate-700">#{node.orderIndex || 0}</span>
+                      <div className={`flex items-center justify-center w-6 h-6 rounded-full border shadow-sm transition-colors
+                          ${node.status === 'published' ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800' : ''}
+                          ${node.status === 'active' ? 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800' : ''}
+                          ${node.status === 'draft' ? 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800' : ''}
+                          ${node.status === 'inactive' ? 'bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700' : ''}
+                        `} title={node.status}>
+                          {(node.status === 'published' || node.status === 'active') ? <CheckCircle2 className="w-3 h-3" /> : node.status === 'draft' ? <Edit2 className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Card Body */}
+                  <div className="p-4 flex-1 flex flex-col cursor-pointer" onClick={() => handleToggleSelect(node.id, !selectedIds.includes(node.id))}>
+                    <h3 className="font-semibold text-slate-800 dark:text-slate-200 text-lg leading-tight line-clamp-2 mb-1.5 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                      {node.title}
+                      {node.acronym && (
+                        <span className="ml-2 text-xs font-semibold px-2 py-0.5 bg-indigo-50 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-300 rounded-md border border-indigo-200 dark:border-indigo-500/30 align-middle inline-block">{node.acronym}</span>
+                      )}
+                    </h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 font-mono mb-2 line-clamp-1 truncate bg-slate-50 dark:bg-slate-900 px-2 py-0.5 rounded w-fit">{node.slug}</p>
+                    
+                    {type !== 'board' && (
+                      <div className="mt-auto pt-2">
+                        <div className="text-[11px] font-medium text-slate-500 uppercase tracking-wider mb-1">Context</div>
+                        <div className="text-sm text-slate-600 dark:text-slate-300 line-clamp-2 bg-slate-50 dark:bg-slate-900/50 p-2 rounded-lg border border-slate-100 dark:border-slate-800">
+                          {getParentContext(node) || '—'}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Card Footer (Actions) */}
+                  <div className="p-3 border-t border-slate-100 dark:border-slate-700/60 bg-slate-50/50 dark:bg-slate-800/20 rounded-b-2xl flex items-center justify-between">
+                    <Button variant="ghost" size="sm" onClick={() => handleToggleStatus(node)} className="h-8 text-xs text-slate-600 dark:text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30">
+                      {node.status === 'active' || node.status === 'published' ? <><EyeOff className="w-3.5 h-3.5 mr-1.5" /> Deactivate</> : <><CheckSquare className="w-3.5 h-3.5 mr-1.5" /> Activate</>}
+                    </Button>
+                    <div className="flex items-center gap-1">
+                      {type === 'textbook' && (
+                        <Button asChild variant="ghost" size="icon" className="h-8 w-8 text-blue-500 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/30" title="View Details">
+                          <Link href={`/admin/textbook/${node.id}`}><Eye className="w-4 h-4" /></Link>
+                        </Button>
+                      )}
+                      {type === 'institution' && node.slug && (
+                        <Button asChild variant="ghost" size="icon" className="h-8 w-8 text-blue-500 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/30" title="View Public Page">
+                          <Link href={`/institutions/${node.slug}`} target="_blank"><Eye className="w-4 h-4" /></Link>
+                        </Button>
+                      )}
+                      {type === 'board' ? (
+                        <Button asChild variant="ghost" size="icon" className="h-8 w-8 text-indigo-500 hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-900/30" title="Edit">
+                          <Link href={`/admin/board/${node.id}`}><Edit2 className="w-4 h-4" /></Link>
+                        </Button>
+                      ) : type === 'institution' ? (
+                        <Button asChild variant="ghost" size="icon" className="h-8 w-8 text-indigo-500 hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-900/30" title="Edit">
+                          <Link href={`/admin/institution/${node.id}`}><Edit2 className="w-4 h-4" /></Link>
+                        </Button>
+                      ) : (
+                        <Button variant="ghost" size="icon" onClick={() => handleEditClick(node)} className="h-8 w-8 text-indigo-500 hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-900/30" title="Edit">
+                          <Edit2 className="w-4 h-4" />
+                        </Button>
+                      )}
+                      <Button variant="ghost" size="icon" onClick={() => handleDelete(node)} className="h-8 w-8 text-rose-500 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-900/30" title="Delete">
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+
+                </div>
+              ))}
+            </div>
           ) : (
             <div className="flex flex-col">
               <div className="overflow-x-auto -mx-px">
@@ -782,7 +879,12 @@ export function TaxonomyDataTable({ type, title }: Props) {
                         />
                       </TableCell>
                       <TableCell className="py-2 pr-2">
-                        <div className="font-medium text-sm text-gray-900 dark:text-slate-200 line-clamp-2">{node.title}</div>
+                        <div className="font-medium text-sm text-gray-900 dark:text-slate-200 line-clamp-2 inline-flex items-center gap-2">
+                          {node.title}
+                          {node.acronym && (
+                            <span className="text-[10px] font-bold px-1.5 py-0.5 bg-indigo-50 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-300 rounded border border-indigo-200 dark:border-indigo-500/30 whitespace-nowrap">{node.acronym}</span>
+                          )}
+                        </div>
                         {node.icon && <span className="text-xs text-gray-400 dark:text-slate-500 bg-gray-100 dark:bg-slate-700 px-1.5 py-0.5 rounded mt-0.5 inline-block">Icon: {node.icon}</span>}
                         {/* Mobile: show context & slug inline */}
                         {type !== 'board' && (
