@@ -409,22 +409,22 @@ export default function QuestionSelectionInterface({ initialFilters }: { initial
                     <tbody className="bg-white">
                       <tr className="border-b border-gray-100">
                         <td className="py-3 px-1 border-r border-gray-100">T-BASIC</td>
-                        <td className="py-3 px-1 border-r border-gray-100"><span className="text-red-400 line-through text-xs mr-1">799</span><span className="font-semibold text-gray-700 text-base">599৳</span></td>
+                        <td className="py-3 px-1 border-r border-gray-100"><span className="text-red-400 line-through text-xs mr-1">₹799</span><span className="font-semibold text-gray-700 text-base">₹599</span></td>
                         <td className="py-3 px-1"><Button variant="secondary" size="sm" className="h-7 text-xs bg-gray-100 hover:bg-gray-200 text-gray-800">SUBSCRIBE</Button></td>
                       </tr>
                       <tr className="border-b border-gray-100">
                         <td className="py-3 px-1 border-r border-gray-100">T-PLUS</td>
-                        <td className="py-3 px-1 border-r border-gray-100"><span className="text-red-400 line-through text-xs mr-1">1599</span><span className="font-semibold text-gray-700 text-base">1199৳</span></td>
+                        <td className="py-3 px-1 border-r border-gray-100"><span className="text-red-400 line-through text-xs mr-1">₹1599</span><span className="font-semibold text-gray-700 text-base">₹1199</span></td>
                         <td className="py-3 px-1"><Button variant="secondary" size="sm" className="h-7 text-xs bg-gray-100 hover:bg-gray-200 text-gray-800">SUBSCRIBE</Button></td>
                       </tr>
                       <tr className="border-b border-gray-100">
                         <td className="py-3 px-1 border-r border-gray-100">T-PRO</td>
-                        <td className="py-3 px-1 border-r border-gray-100 flex flex-col items-center justify-center"><span className="text-red-400 line-through text-xs">1999</span><span className="font-semibold text-gray-700 text-base">1599৳</span></td>
+                        <td className="py-3 px-1 border-r border-gray-100 flex flex-col items-center justify-center"><span className="text-red-400 line-through text-xs">₹1999</span><span className="font-semibold text-gray-700 text-base">₹1599</span></td>
                         <td className="py-3 px-1"><Button variant="secondary" size="sm" className="h-7 text-xs bg-gray-100 hover:bg-gray-200 text-gray-800">SUBSCRIBE</Button></td>
                       </tr>
                       <tr>
                         <td className="py-3 px-1 border-r border-gray-100">T-Pro-<br />Max</td>
-                        <td className="py-3 px-1 border-r border-gray-100 flex flex-col items-center justify-center"><span className="text-red-400 line-through text-xs">5000</span><span className="font-semibold text-gray-700 text-base">2200৳</span></td>
+                        <td className="py-3 px-1 border-r border-gray-100 flex flex-col items-center justify-center"><span className="text-red-400 line-through text-xs">₹5000</span><span className="font-semibold text-gray-700 text-base">₹2200</span></td>
                         <td className="py-3 px-1"><Button variant="secondary" size="sm" className="h-7 text-xs bg-gray-100 hover:bg-gray-200 text-gray-800">SUBSCRIBE</Button></td>
                       </tr>
                     </tbody>
@@ -441,41 +441,41 @@ export default function QuestionSelectionInterface({ initialFilters }: { initial
                 <thead className="bg-[#e8eaf6] text-gray-800">
                   <tr>
                     <th className="py-2 px-1 font-semibold border-r border-gray-200">প্রশ্ন পরিসর</th>
-                    <th className="py-2 px-1 font-semibold">মূল্য (৳)</th>
+                    <th className="py-2 px-1 font-semibold">মূল্য (₹)</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white">
                   <tr className="border-b border-gray-100">
                     <td className="py-2 px-1 border-r border-gray-100 text-gray-700">1 - 30</td>
-                    <td className="py-2 px-1 text-gray-800 font-medium">৳.60/প্রশ্ন</td>
+                    <td className="py-2 px-1 text-gray-800 font-medium">₹.60/প্রশ্ন</td>
                   </tr>
                   <tr className="border-b border-gray-100 bg-[#fbfbfc]">
                     <td className="py-2 px-1 border-r border-gray-100 text-gray-700">31 - 50</td>
-                    <td className="py-2 px-1 text-gray-800 font-medium">৳.55/প্রশ্ন</td>
+                    <td className="py-2 px-1 text-gray-800 font-medium">₹.55/প্রশ্ন</td>
                   </tr>
                   <tr className="border-b border-gray-100">
                     <td className="py-2 px-1 border-r border-gray-100 text-gray-700">51 - 70</td>
-                    <td className="py-2 px-1 text-gray-800 font-medium">৳.50/প্রশ্ন</td>
+                    <td className="py-2 px-1 text-gray-800 font-medium">₹.50/প্রশ্ন</td>
                   </tr>
                   <tr className="border-b border-gray-100 bg-[#fbfbfc]">
                     <td className="py-2 px-1 border-r border-gray-100 text-gray-700">71 - 100</td>
-                    <td className="py-2 px-1 text-gray-800 font-medium">৳.45/প্রশ্ন</td>
+                    <td className="py-2 px-1 text-gray-800 font-medium">₹.45/প্রশ্ন</td>
                   </tr>
                   <tr className="border-b border-gray-100">
                     <td className="py-2 px-1 border-r border-gray-100 text-gray-700">101 - 200</td>
-                    <td className="py-2 px-1 text-gray-800 font-medium">৳.40/প্রশ্ন</td>
+                    <td className="py-2 px-1 text-gray-800 font-medium">₹.40/প্রশ্ন</td>
                   </tr>
                   <tr className="border-b border-gray-100 bg-[#fbfbfc]">
                     <td className="py-2 px-1 border-r border-gray-100 text-gray-700">201 - 500</td>
-                    <td className="py-2 px-1 text-gray-800 font-medium">৳.35/প্রশ্ন</td>
+                    <td className="py-2 px-1 text-gray-800 font-medium">₹.35/প্রশ্ন</td>
                   </tr>
                   <tr className="border-b border-gray-100">
                     <td className="py-2 px-1 border-r border-gray-100 text-gray-700">501 - 1000</td>
-                    <td className="py-2 px-1 text-gray-800 font-medium">৳.30/প্রশ্ন</td>
+                    <td className="py-2 px-1 text-gray-800 font-medium">₹.30/প্রশ্ন</td>
                   </tr>
                   <tr className="bg-[#fbfbfc]">
                     <td className="py-2 px-1 border-r border-gray-100 text-gray-700">1001 - 5000</td>
-                    <td className="py-2 px-1 text-gray-800 font-medium">৳.25/প্রশ্ন</td>
+                    <td className="py-2 px-1 text-gray-800 font-medium">₹.25/প্রশ্ন</td>
                   </tr>
                 </tbody>
               </table>
