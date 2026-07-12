@@ -101,15 +101,29 @@ export default function QuestionSelectionInterface({ initialFilters }: { initial
     fetchTaxonomies();
   }, []);
 
-  // Local active filters
   const [activeFilters, setActiveFilters] = useState({
     subjectId: initialFilters.subjectId,
     chapterId: initialFilters.chapterId,
     topicId: initialFilters.topicId,
     difficulty: 'all',
     type: 'all',
-    search: ''
+    search: '',
+    selectedTypes: [] as string[],
+    selectedBoards: [] as string[],
+    selectedSchools: [] as string[],
+    selectedLevels: [] as string[],
+    selectedSort: 'Recently Added'
   });
+
+  const toggleArrayFilter = (key: 'selectedTypes' | 'selectedBoards' | 'selectedSchools' | 'selectedLevels', value: string) => {
+    setActiveFilters(prev => {
+      const arr = prev[key];
+      if (arr.includes(value)) {
+        return { ...prev, [key]: arr.filter(v => v !== value) };
+      }
+      return { ...prev, [key]: [...arr, value] };
+    });
+  };
 
   // Sidebar filters (mock arrays based on screenshot)
   const questionTypes = [
@@ -119,28 +133,37 @@ export default function QuestionSelectionInterface({ initialFilters }: { initial
     { id: 'board', label: 'বোর্ড প্রশ্ন' }
   ];
 
-  const sourceBoards = [
-    { id: 'all', label: 'সকল বোর্ড' },
-    { id: 'dhaka', label: 'ঢাকা বোর্ড' },
-    { id: 'rajshahi', label: 'রাজশাহী বোর্ড' },
-    { id: 'cumilla', label: 'কুমিল্লা বোর্ড' },
-    { id: 'jessore', label: 'যশোর বোর্ড' },
-    { id: 'chittagong', label: 'চট্টগ্রাম বোর্ড' },
-    { id: 'barishal', label: 'বরিশাল বোর্ড' },
-    { id: 'sylhet', label: 'সিলেট বোর্ড' },
-    { id: 'dinajpur', label: 'দিনাজপুর বোর্ড' },
-    { id: 'mymensingh', label: 'ময়মনসিংহ বোর্ড' },
-  ];
+  const [sourceBoards, setSourceBoards] = useState<any[]>([{ id: 'all', label: 'সকল বোর্ড' }]);
+  const [schools, setSchools] = useState<any[]>([]);
 
-  const schools = [
-    'ভিকারুননিসা নূন স্কুল এন্ড কলেজ, ঢাকা',
-    'আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল, ঢাকা',
-    'উইলস্ লিট্ল ফ্লাওয়ার স্কুল এন্ড কলেজ, ঢাকা',
-    'মির্জাপুর ক্যাডেট কলেজ , টাঙ্গাইল',
-    'ময়মনসিংহ গার্লস ক্যাডেট কলেজ',
-    'রাজশাহী ক্যাডেট কলেজ',
-    'পাবনা ক্যাডেট কলেজ'
-  ];
+  useEffect(() => {
+    const fetchSidebars = async () => {
+      try {
+        const { collection, getDocs, query, limit, where } = await import('firebase/firestore');
+        const { db } = await import('@/lib/firebase/client');
+        const snap = await getDocs(collection(db, 'taxonomy_nodes'));
+        const allNodes = snap.docs.map(d => ({ id: d.id, ...d.data() as any }));
+        
+        const boards = allNodes.filter(n => n.type === 'board' || n.type === 'category');
+        const institutions = allNodes.filter(n => n.type === 'institution');
+
+        const activeBoards: any[] = [{ id: 'all', label: 'সকল বোর্ড' }];
+        await Promise.all(boards.map(async (b) => {
+          try {
+            const q = query(collection(db, 'question_bank'), where('boardId', '==', b.id), limit(1));
+            const qSnap = await getDocs(q);
+            if (!qSnap.empty) {
+              activeBoards.push({ id: b.id, label: b.acronym || b.shortName || b.name || b.title });
+            }
+          } catch(e){}
+        }));
+        setSourceBoards(activeBoards);
+        
+        setSchools(institutions.map(inst => ({ id: inst.id, label: inst.acronym || inst.shortName || inst.name || inst.title })));
+      } catch(e){}
+    };
+    fetchSidebars();
+  }, []);
 
   const levels = [
     'বোর্ড পরীক্ষা প্রশ্ন',
@@ -189,12 +212,31 @@ export default function QuestionSelectionInterface({ initialFilters }: { initial
         data = data.filter(q => q.questionText.toLowerCase().includes(lowerSearch));
       }
 
-      if (activeFilters.type !== 'all') {
-        if (activeFilters.type === 'MCQ') {
-          data = data.filter(q => q.options?.a); // simple check
-        } else {
-          data = data.filter(q => !q.options?.a);
-        }
+      if (activeFilters.selectedTypes.length > 0) {
+        data = data.filter(q => {
+          let match = false;
+          if (activeFilters.selectedTypes.includes('mcq') && q.options?.a) match = true;
+          if (activeFilters.selectedTypes.includes('cq') && !q.options?.a) match = true;
+          // Note: Assuming gk and board require explicit tags or flags in DB
+          if (activeFilters.selectedTypes.includes('board') && q.boardId) match = true;
+          return match;
+        });
+      }
+
+      if (activeFilters.selectedBoards.length > 0 && !activeFilters.selectedBoards.includes('all')) {
+        data = data.filter(q => q.boardId && activeFilters.selectedBoards.includes(q.boardId));
+      }
+
+      if (activeFilters.selectedSchools.length > 0) {
+        data = data.filter(q => (q as any).institutionId && activeFilters.selectedSchools.includes((q as any).institutionId));
+      }
+
+      if (activeFilters.selectedSort === 'Oldest First') {
+        data = data.sort((a: any, b: any) => {
+          const tA = a.createdAt?.seconds || a.createdAt?.getTime?.() / 1000 || 0;
+          const tB = b.createdAt?.seconds || b.createdAt?.getTime?.() / 1000 || 0;
+          return tA - tB;
+        });
       }
 
       setQuestions(data);
@@ -282,8 +324,12 @@ export default function QuestionSelectionInterface({ initialFilters }: { initial
             <div className="mt-2 space-y-1">
               {questionTypes.map(qt => (
                 <div key={qt.id} className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded cursor-pointer">
-                  <Checkbox id={`qt-${qt.id}`} />
-                  <label htmlFor={`qt-${qt.id}`} className="text-sm text-gray-700 cursor-pointer">{qt.label}</label>
+                  <Checkbox 
+                    id={`qt-${qt.id}`} 
+                    checked={activeFilters.selectedTypes.includes(qt.id)}
+                    onCheckedChange={() => toggleArrayFilter('selectedTypes', qt.id)}
+                  />
+                  <label htmlFor={`qt-${qt.id}`} className="text-sm text-gray-700 cursor-pointer flex-1">{qt.label}</label>
                 </div>
               ))}
             </div>
@@ -301,7 +347,12 @@ export default function QuestionSelectionInterface({ initialFilters }: { initial
               <div className="max-h-40 overflow-y-auto pr-1">
                 {sourceBoards.map(sb => (
                   <div key={sb.id} className="flex items-start gap-2 p-1.5 hover:bg-gray-50 rounded cursor-pointer">
-                    <Checkbox id={`sb-${sb.id}`} className="mt-0.5" />
+                    <Checkbox 
+                      id={`sb-${sb.id}`} 
+                      className="mt-0.5" 
+                      checked={activeFilters.selectedBoards.includes(sb.id)}
+                      onCheckedChange={() => toggleArrayFilter('selectedBoards', sb.id)}
+                    />
                     <label htmlFor={`sb-${sb.id}`} className="text-sm text-gray-700 cursor-pointer flex-1 leading-snug">{sb.label}</label>
                   </div>
                 ))}
@@ -320,9 +371,14 @@ export default function QuestionSelectionInterface({ initialFilters }: { initial
               </div>
               <div className="max-h-48 overflow-y-auto pr-1">
                 {schools.map((school, i) => (
-                  <div key={i} className="flex items-start gap-2 p-1.5 hover:bg-gray-50 rounded cursor-pointer">
-                    <Checkbox id={`sc-${i}`} className="mt-0.5" />
-                    <label htmlFor={`sc-${i}`} className="text-[13px] text-gray-700 cursor-pointer flex-1 leading-tight">{school}</label>
+                  <div key={school.id || i} className="flex items-start gap-2 p-1.5 hover:bg-gray-50 rounded cursor-pointer">
+                    <Checkbox 
+                      id={`sc-${school.id || i}`} 
+                      className="mt-0.5" 
+                      checked={activeFilters.selectedSchools.includes(school.id)}
+                      onCheckedChange={() => toggleArrayFilter('selectedSchools', school.id)}
+                    />
+                    <label htmlFor={`sc-${school.id || i}`} className="text-[13px] text-gray-700 cursor-pointer flex-1 leading-tight">{school.label}</label>
                   </div>
                 ))}
               </div>
@@ -337,7 +393,11 @@ export default function QuestionSelectionInterface({ initialFilters }: { initial
             <div className="mt-2 space-y-1 px-2 pb-3 pt-1">
               {levels.map((level, i) => (
                 <div key={i} className="flex items-center gap-2 p-1.5 hover:bg-gray-100 rounded cursor-pointer">
-                  <Checkbox id={`lv-${i}`} />
+                  <Checkbox 
+                    id={`lv-${i}`} 
+                    checked={activeFilters.selectedLevels.includes(level)}
+                    onCheckedChange={() => toggleArrayFilter('selectedLevels', level)}
+                  />
                   <label htmlFor={`lv-${i}`} className="text-[15px] text-gray-800 cursor-pointer flex-1">{level}</label>
                 </div>
               ))}
@@ -350,7 +410,11 @@ export default function QuestionSelectionInterface({ initialFilters }: { initial
               Sort By <span className="text-lg leading-none">-</span>
             </h3>
             <div className="mt-2 px-3 pb-3 pt-2">
-              <RadioGroup defaultValue="Recently Added" className="space-y-3">
+              <RadioGroup 
+                value={activeFilters.selectedSort} 
+                onValueChange={(val) => setActiveFilters(prev => ({ ...prev, selectedSort: val }))}
+                className="space-y-3"
+              >
                 {sortOptions.map((opt, i) => (
                   <div key={i} className="flex items-center space-x-2">
                     <RadioGroupItem value={opt} id={`sort-${i}`} />

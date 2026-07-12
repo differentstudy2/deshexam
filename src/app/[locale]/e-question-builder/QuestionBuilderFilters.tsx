@@ -34,8 +34,24 @@ export default function QuestionBuilderFilters() {
         const snap = await getDocs(collection(db, 'taxonomy_nodes'));
         const allNodes = snap.docs.map(d => ({ id: d.id, ...d.data() as any }));
         
+        let fetchedBoards = allNodes.filter(n => n.type === 'board' || n.type === 'category');
+        
+        // Filter out boards with no questions
+        const { query, where, limit } = await import('firebase/firestore');
+        const activeBoardIds = new Set<string>();
+        
+        await Promise.all(fetchedBoards.map(async (b) => {
+          try {
+            const q = query(collection(db, 'question_bank'), where('boardId', '==', b.id), limit(1));
+            const qSnap = await getDocs(q);
+            if (!qSnap.empty) {
+              activeBoardIds.add(b.id);
+            }
+          } catch(e) {}
+        }));
+        
         setTaxonomies({
-          boards: allNodes.filter(n => n.type === 'board' || n.type === 'category'),
+          boards: fetchedBoards.filter(b => activeBoardIds.has(b.id)),
           classes: allNodes.filter(n => n.type === 'class' || n.type === 'subcategory'),
           subjects: allNodes.filter(n => n.type === 'subject'),
           textbooks: allNodes.filter(n => n.type === 'textbook' || n.type === 'exam'),
@@ -112,7 +128,7 @@ export default function QuestionBuilderFilters() {
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-3">
       <Select value={filters.boardId} onValueChange={handleBoardChange}>
         <SelectTrigger className="bg-white dark:bg-slate-900"><SelectValue placeholder="বোর্ড" /></SelectTrigger>
-        <SelectContent><SelectItem value="all">সকল বোর্ড</SelectItem>{taxonomies.boards.map(b => <SelectItem key={b.id} value={b.id}>{b.name || b.title}</SelectItem>)}</SelectContent>
+        <SelectContent><SelectItem value="all">সকল বোর্ড</SelectItem>{taxonomies.boards.map(b => <SelectItem key={b.id} value={b.id}>{b.acronym || b.shortName || b.name || b.title}</SelectItem>)}</SelectContent>
       </Select>
       <Select value={filters.classId} onValueChange={handleClassChange}>
         <SelectTrigger className="bg-white dark:bg-slate-900"><SelectValue placeholder="শ্রেণি" /></SelectTrigger>
