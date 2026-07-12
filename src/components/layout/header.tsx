@@ -69,6 +69,7 @@ const dashboardNavGroups = [
       { href: '/dashboard/courses', label: 'Courses', icon: <BookOpen className="h-4 w-4" /> },
       { href: '/dashboard/skill-development', label: 'Skill Development', icon: <Zap className="h-4 w-4" /> },
       { href: '/dashboard/hand-notes', label: 'Hand Notes', icon: <FileText className="h-4 w-4" /> },
+      { href: '/dashboard/my-papers', label: 'My Saved Papers', icon: <FilePlus className="h-4 w-4" /> },
       { href: '/dashboard/question-papers', label: 'Question Papers', icon: <FilePlus className="h-4 w-4" /> },
       { href: '/dashboard/dynamic-print', label: 'Dynamic Print', icon: <Printer className="h-4 w-4" /> },
     ]

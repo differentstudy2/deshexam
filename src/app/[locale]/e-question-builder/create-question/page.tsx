@@ -13,6 +13,7 @@ interface Props {
     subject_id?: string;
     chapter_id?: string;
     paper_name?: string;
+    draft_id?: string;
   }>;
 }
 
@@ -26,7 +27,8 @@ export default async function CreateQuestionPage({ searchParams }: Props) {
         textbookId={params.textbook_id}
         subjectId={params.subject_id} 
         chapterId={params.chapter_id} 
-        paperName={params.paper_name} 
+        paperName={params.paper_name}
+        draftId={params.draft_id}
       />
     </div>
   );

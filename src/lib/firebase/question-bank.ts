@@ -408,4 +408,63 @@ export async function bulkEditQuestions(updates: (Partial<QuestionBankEntry> & {
   }
 }
 
+// ----------------------------------------------------
+// Saved Question Papers (Drafts)
+// ----------------------------------------------------
 
+export const SAVED_PAPERS_COLLECTION = 'saved_question_papers';
+
+export interface SavedQuestionPaper {
+  id?: string;
+  userId: string;
+  title: string;
+  questions: any[];
+  templateSettings: any;
+  createdAt?: any;
+  updatedAt?: any;
+}
+
+export async function saveQuestionPaperDraft(userId: string, title: string, questions: any[], templateSettings: any, draftId?: string) {
+  const colRef = collection(db, SAVED_PAPERS_COLLECTION);
+  let docRef;
+  
+  if (draftId) {
+    docRef = doc(db, SAVED_PAPERS_COLLECTION, draftId);
+    await updateDoc(docRef, {
+      title,
+      questions,
+      templateSettings,
+      updatedAt: serverTimestamp()
+    });
+    return draftId;
+  } else {
+    docRef = await addDoc(colRef, {
+      userId,
+      title,
+      questions,
+      templateSettings,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+    return docRef.id;
+  }
+}
+
+export async function getUserQuestionPaperDrafts(userId: string) {
+  const colRef = collection(db, SAVED_PAPERS_COLLECTION);
+  const q = query(colRef, where('userId', '==', userId), orderBy('updatedAt', 'desc'));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as SavedQuestionPaper[];
+}
+
+export async function getQuestionPaperDraft(draftId: string) {
+  const docRef = doc(db, SAVED_PAPERS_COLLECTION, draftId);
+  const snap = await getDoc(docRef);
+  if (!snap.exists()) return null;
+  return { id: snap.id, ...snap.data() } as SavedQuestionPaper;
+}
+
+export async function deleteQuestionPaperDraft(draftId: string) {
+  const docRef = doc(db, SAVED_PAPERS_COLLECTION, draftId);
+  await deleteDoc(docRef);
+}

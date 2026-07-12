@@ -11,7 +11,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { Input } from '@/components/ui/input';
 import { Download, Settings, FileText, Shuffle, Save, ArrowLeft, Edit, Book, Monitor, Lightbulb, User, Tag, Star, Grid3X3, Columns, Barcode, Hash, LayoutGrid, FileDigit, Heading, MapPin, Landmark, Layers, HelpCircle, RefreshCw, Printer, Languages, QrCode, ImageIcon, Waves, PlusCircle, Plus, CheckCircle, CircleDot, Zap, Loader2, GripVertical, Trash2, Database, Sparkles, ZoomIn, ZoomOut, Lock, Copy } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
-import { getQuestionsByIds, getTaxonomyNodes } from '@/lib/firebase/question-bank';
+import { getQuestionsByIds, getTaxonomyNodes, saveQuestionPaperDraft, getQuestionPaperDraft } from '@/lib/firebase/question-bank';
 import { QuestionBankEntry } from '@/lib/question-bank-types';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -36,9 +36,10 @@ interface Props {
   subjectId?: string;
   chapterId?: string;
   paperName?: string;
+  draftId?: string;
 }
 
-export default function QuestionPaperBuilder({ boardId, classId, textbookId, subjectId, chapterId, paperName }: Props) {
+export default function QuestionPaperBuilder({ boardId, classId, textbookId, subjectId, chapterId, paperName, draftId }: Props) {
   const router = useRouter();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -61,6 +62,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
   const [hasUsedBulkImport, setHasUsedBulkImport] = useState(false);
   const [paywallFeatures, setPaywallFeatures] = useState<{feature: string, tier: 'pass' | 'pro'}[]>([]);
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
+  const [loadedDraftTitle, setLoadedDraftTitle] = useState('');
 
   const checkExportPermissions = () => {
     const premiumUsage: {feature: string, tier: 'pass' | 'pro'}[] = [];
@@ -669,15 +671,99 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
     setSectionHeaderText('');
   };
 
+  const [isSavingDraft, setIsSavingDraft] = useState(false);
+
+  const handleSaveDraft = async () => {
+    if (!user) {
+      toast({ title: 'Please login to save drafts.', variant: 'destructive' });
+      openAuthDialog('sign-in');
+      return;
+    }
+    
+    setIsSavingDraft(true);
+    try {
+      const settings = {
+        format, optionStyle, paperColumns, optionShape, optionLabelType,
+        optionColumns, rowGap, colGap, fontFamily, fontSize, questionOptionGap,
+        headerTitle, headerAddress, headerClassName, headerSubjectName,
+        headerSettingsEnabled, brandingEnabled, watermarkText, watermarkSize, watermarkOpacity,
+        footerText, enableLatex,
+        headerTime, headerMarks, qrCodeEnabled, qrCodeValue, activeSetCode, headerImageEnabled, headerImageFit
+      };
+      
+      const draftTitleToSave = loadedDraftTitle || paperName || (headerTitle !== translations[appLanguage]?.['defaultHeaderTitle'] ? headerTitle : 'Untitled Question Paper');
+
+      const newDraftId = await saveQuestionPaperDraft(
+        user.uid,
+        draftTitleToSave,
+        questions,
+        settings,
+        draftId
+      );
+      
+      toast({ title: 'Draft saved successfully!' });
+      
+      if (!draftId && newDraftId) {
+        // Update URL to include draftId without refreshing
+        const url = new URL(window.location.href);
+        url.searchParams.set('draft_id', newDraftId);
+        window.history.pushState({}, '', url.toString());
+      }
+    } catch (err) {
+      console.error(err);
+      toast({ title: 'Failed to save draft.', variant: 'destructive' });
+    } finally {
+      setIsSavingDraft(false);
+    }
+  };
+
   useEffect(() => {
     const fetchSelectedQuestions = async () => {
       try {
-        const storedIds = sessionStorage.getItem('selectedQuestionIds');
-        if (storedIds) {
-          const ids = JSON.parse(storedIds);
-          if (ids && ids.length > 0) {
-            const fetched = await getQuestionsByIds(ids);
-            setQuestions(fetched);
+        if (draftId && user) {
+          const draft = await getQuestionPaperDraft(draftId);
+          if (draft && draft.userId === user.uid) {
+            setLoadedDraftTitle(draft.title || '');
+            setQuestions(draft.questions || []);
+            const s = draft.templateSettings || {};
+            if (s.format) setFormat(s.format);
+            if (s.optionStyle) setOptionStyle(s.optionStyle);
+            if (s.paperColumns) setPaperColumns(s.paperColumns);
+            if (s.optionShape) setOptionShape(s.optionShape);
+            if (s.optionLabelType) setOptionLabelType(s.optionLabelType);
+            if (s.optionColumns) setOptionColumns(s.optionColumns);
+            if (s.rowGap !== undefined) setRowGap(s.rowGap);
+            if (s.colGap !== undefined) setColGap(s.colGap);
+            if (s.fontFamily) setFontFamily(s.fontFamily);
+            if (s.fontSize) setFontSize(s.fontSize);
+            if (s.questionOptionGap !== undefined) setQuestionOptionGap(s.questionOptionGap);
+            if (s.headerTitle) setHeaderTitle(s.headerTitle);
+            if (s.headerAddress) setHeaderAddress(s.headerAddress);
+            if (s.headerClassName) setHeaderClassName(s.headerClassName);
+            if (s.headerSubjectName) setHeaderSubjectName(s.headerSubjectName);
+            if (s.headerSettingsEnabled !== undefined) setHeaderSettingsEnabled(s.headerSettingsEnabled);
+            if (s.brandingEnabled !== undefined) setBrandingEnabled(s.brandingEnabled);
+            if (s.watermarkText !== undefined) setWatermarkText(s.watermarkText);
+            if (s.watermarkSize !== undefined) setWatermarkSize(s.watermarkSize);
+            if (s.watermarkOpacity !== undefined) setWatermarkOpacity(s.watermarkOpacity);
+            if (s.footerText !== undefined) setFooterText(s.footerText);
+            if (s.enableLatex !== undefined) setEnableLatex(s.enableLatex);
+            if (s.headerTime) setHeaderTime(s.headerTime);
+            if (s.headerMarks) setHeaderMarks(s.headerMarks);
+            if (s.qrCodeEnabled !== undefined) setQrCodeEnabled(s.qrCodeEnabled);
+            if (s.qrCodeValue !== undefined) setQrCodeValue(s.qrCodeValue);
+            if (s.activeSetCode) setActiveSetCode(s.activeSetCode);
+            if (s.headerImageEnabled !== undefined) setHeaderImageEnabled(s.headerImageEnabled);
+            if (s.headerImageFit) setHeaderImageFit(s.headerImageFit);
+          }
+        } else {
+          const storedIds = sessionStorage.getItem('selectedQuestionIds');
+          if (storedIds) {
+            const ids = JSON.parse(storedIds);
+            if (ids && ids.length > 0) {
+              const fetched = await getQuestionsByIds(ids);
+              setQuestions(fetched);
+            }
           }
         }
       } catch (err) {
@@ -687,7 +773,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
       }
     };
     fetchSelectedQuestions();
-  }, []);
+  }, [draftId, user]);
 
   const handlePrint = () => {
     handleInterceptedExport(() => {
@@ -771,9 +857,15 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
 
           <div className="bg-[#1e88e5] text-white p-3 rounded-t-lg flex justify-between items-center sticky top-0 z-20">
             <h3 className="font-bold flex items-center gap-2"><Settings className="w-4 h-4" /> {t('quickActions', appLanguage)}</h3>
-            <Button size="sm" className="bg-[#5c6bc0] hover:bg-[#3f51b5] h-7 px-3 text-xs" onClick={handleSaveTemplate}>
-              <Save className="w-3 h-3 mr-1" /> {t('saveTemplate', appLanguage)}
-            </Button>
+            <div className="flex gap-2">
+              <Button size="sm" className="bg-orange-500 hover:bg-orange-600 h-7 px-3 text-xs" onClick={handleSaveDraft} disabled={isSavingDraft}>
+                {isSavingDraft ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Save className="w-3 h-3 mr-1" />}
+                Save Draft
+              </Button>
+              <Button size="sm" className="bg-[#5c6bc0] hover:bg-[#3f51b5] h-7 px-3 text-xs" onClick={handleSaveTemplate}>
+                <Save className="w-3 h-3 mr-1" /> {t('saveTemplate', appLanguage)}
+              </Button>
+            </div>
           </div>
 
           <div className="p-4 space-y-4 border-b border-gray-100">
