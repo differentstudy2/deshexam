@@ -145,8 +145,10 @@ export default function TestClientPage({ test }: { test: Test }) {
         return q;
       });
       setTestWithShuffledOptions({ ...test, questions: questionsWithMatchingOptions });
+    } else if (test) {
+      setTestWithShuffledOptions({ ...test, questions: [] });
     }
-    questionRefs.current = Array(test.questions.length).fill(null);
+    questionRefs.current = Array(test?.questions?.length || 0).fill(null);
   }, [test]);
 
    useEffect(() => {
