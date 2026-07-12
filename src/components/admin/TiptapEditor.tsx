@@ -350,6 +350,7 @@ export function TiptapEditor({ content, onChange, maxHeight }: { content: string
   const [rawContent, setRawContent] = React.useState(content);
   const [aiDialogOpen, setAiDialogOpen] = React.useState(false);
   const [aiPrompt, setAiPrompt] = React.useState('');
+  const [aiFile, setAiFile] = React.useState<File | null>(null);
   const [isGenerating, setIsGenerating] = React.useState(false);
 
   const handleDrop = useCallback(
@@ -497,16 +498,34 @@ export function TiptapEditor({ content, onChange, maxHeight }: { content: string
   };
 
   const handleGenerateAI = async () => {
-    if (!aiPrompt.trim()) return;
+    if (!aiPrompt.trim() && !aiFile) return;
     setIsGenerating(true);
     try {
-      const response = await fetch('/api/ai/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          prompt: `Generate the following content using rich HTML tags (e.g. <h1>, <h2>, <p>, <ul>, <li>, <strong>, <em>, <blockquote>, etc.) to make it look highly professional and well-formatted in a Rich Text Editor. DO NOT wrap the output in markdown code blocks like \`\`\`html. Output raw HTML only.\n\nUser Request: ${aiPrompt}`
-        }),
-      });
+      let response;
+      if (aiFile) {
+        toast({ title: 'Uploading file...', description: 'Please wait while the file is being uploaded to the server.' });
+        const storageRef = ref(storage, `ai-uploads/${Date.now()}_${aiFile.name.replace(/[^a-zA-Z0-9.]/g, '_')}`);
+        const snapshot = await uploadBytes(storageRef, aiFile);
+        const url = await getDownloadURL(snapshot.ref);
+
+        response = await fetch('/api/ai/generate-from-file', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            fileUrl: url,
+            mimeType: aiFile.type,
+            prompt: `Generate the following content using rich HTML tags (e.g. <h1>, <h2>, <p>, <ul>, <li>, <strong>, <em>, <blockquote>, etc.) to make it look highly professional and well-formatted in a Rich Text Editor. DO NOT wrap the output in markdown code blocks like \`\`\`html. Output raw HTML only.\n\nUser Request: ${aiPrompt || 'Extract the content from the provided file and format it appropriately.'}`
+          }),
+        });
+      } else {
+        response = await fetch('/api/ai/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            prompt: `Generate the following content using rich HTML tags (e.g. <h1>, <h2>, <p>, <ul>, <li>, <strong>, <em>, <blockquote>, etc.) to make it look highly professional and well-formatted in a Rich Text Editor. DO NOT wrap the output in markdown code blocks like \`\`\`html. Output raw HTML only.\n\nUser Request: ${aiPrompt}`
+          }),
+        });
+      }
 
       if (!response.ok) throw new Error('AI Generation failed');
       const data = await response.json();
@@ -516,6 +535,7 @@ export function TiptapEditor({ content, onChange, maxHeight }: { content: string
       }
       setAiDialogOpen(false);
       setAiPrompt('');
+      setAiFile(null);
       toast({ title: 'AI Content Generated', description: 'Content successfully inserted.' });
     } catch (error) {
       console.error(error);
@@ -530,7 +550,13 @@ export function TiptapEditor({ content, onChange, maxHeight }: { content: string
       <div className="bg-white dark:bg-slate-900 border-b border-slate-300 dark:border-slate-800">
         <MenuBar editor={editor}>
           <div className="flex items-center gap-1 sm:gap-2">
-            <Dialog open={aiDialogOpen} onOpenChange={setAiDialogOpen}>
+            <Dialog open={aiDialogOpen} onOpenChange={(open) => {
+              setAiDialogOpen(open);
+              if (!open) {
+                setAiPrompt('');
+                setAiFile(null);
+              }
+            }}>
               <DialogTrigger asChild>
                 <Button variant="ghost" size="sm" className="h-8 gap-1 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 hover:text-indigo-700">
                   <Sparkles className="w-4 h-4" />
@@ -542,17 +568,44 @@ export function TiptapEditor({ content, onChange, maxHeight }: { content: string
                   <DialogTitle>Generate Content with AI</DialogTitle>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
-                  <div className="space-y-2">
-                    <Label>Prompt for AI</Label>
-                    <Textarea
-                      placeholder="e.g. Write a 3 paragraph admission process for an engineering college..."
-                      value={aiPrompt}
-                      onChange={(e) => setAiPrompt(e.target.value)}
-                      rows={4}
-                    />
-                    <p className="text-xs text-slate-500">The AI is instructed to use rich HTML tags automatically for the best formatting.</p>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>Source File (Optional)</Label>
+                      <Input 
+                        type="file" 
+                        accept="image/png,image/jpeg,image/webp,application/pdf,text/plain"
+                        onChange={(e) => setAiFile(e.target.files?.[0] || null)}
+                      />
+                      <p className="text-[11px] text-slate-500">Upload a PDF, image, or text file to extract content from. Max size: 100MB.</p>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <Label>Prompt for AI</Label>
+                        <select 
+                          className="text-[10px] border border-slate-200 dark:border-slate-700 rounded px-1 py-0.5 bg-slate-50 dark:bg-slate-800 text-slate-600 outline-none cursor-pointer w-[140px] truncate"
+                          onChange={(e) => {
+                            if (e.target.value) setAiPrompt(e.target.value);
+                            e.target.value = ""; // Reset select
+                          }}
+                        >
+                          <option value="">Quick Prompts...</option>
+                          <option value="Extract all text from the file and format it beautifully with headings and paragraphs.">Extract & Format Text</option>
+                          <option value="Extract all questions from the document and format them properly. If they are MCQs, format them with options.">Extract Questions/MCQ</option>
+                          <option value="Summarize the key points of this document into a structured bulleted list.">Summarize Key Points</option>
+                          <option value="Translate the contents of this document into clear, academic Bengali.">Translate to Bengali</option>
+                          <option value="Fix grammatical errors and improve the language of the provided text.">Proofread & Improve</option>
+                        </select>
+                      </div>
+                      <Textarea
+                        placeholder="e.g. Extract the text and format it with headings... or Write a 3 paragraph admission process..."
+                        value={aiPrompt}
+                        onChange={(e) => setAiPrompt(e.target.value)}
+                        rows={4}
+                      />
+                      <p className="text-[11px] text-slate-500">The AI is instructed to use rich HTML tags automatically for the best formatting.</p>
+                    </div>
                   </div>
-                  <Button onClick={handleGenerateAI} disabled={isGenerating || !aiPrompt.trim()} className="w-full">
+                  <Button onClick={handleGenerateAI} disabled={isGenerating || (!aiPrompt.trim() && !aiFile)} className="w-full">
                     {isGenerating ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...</> : 'Generate'}
                   </Button>
                 </div>
