@@ -855,14 +855,14 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
   const renderSidebarSettings = () => (
     <>
 
-          <div className="bg-[#1e88e5] text-white p-3 rounded-t-lg flex justify-between items-center sticky top-0 z-20">
+          <div className="bg-[#1e88e5] text-white p-3 rounded-t-lg flex flex-col gap-2 sticky top-0 z-20">
             <h3 className="font-bold flex items-center gap-2"><Settings className="w-4 h-4" /> {t('quickActions', appLanguage)}</h3>
-            <div className="flex gap-2">
-              <Button size="sm" className="bg-orange-500 hover:bg-orange-600 h-7 px-3 text-xs" onClick={handleSaveDraft} disabled={isSavingDraft}>
+            <div className="flex gap-2 w-full">
+              <Button size="sm" className="flex-1 bg-orange-500 hover:bg-orange-600 h-7 px-2 text-xs" onClick={handleSaveDraft} disabled={isSavingDraft}>
                 {isSavingDraft ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Save className="w-3 h-3 mr-1" />}
                 Save Draft
               </Button>
-              <Button size="sm" className="bg-[#5c6bc0] hover:bg-[#3f51b5] h-7 px-3 text-xs" onClick={handleSaveTemplate}>
+              <Button size="sm" className="flex-1 bg-[#5c6bc0] hover:bg-[#3f51b5] h-7 px-2 text-xs" onClick={handleSaveTemplate}>
                 <Save className="w-3 h-3 mr-1" /> {t('saveTemplate', appLanguage)}
               </Button>
             </div>
