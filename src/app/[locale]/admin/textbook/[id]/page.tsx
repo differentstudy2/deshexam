@@ -7,7 +7,7 @@ import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firesto
 import { db } from '@/lib/firebase/client';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, BookOpen, Layers, Target, FileText, Activity, Eye, ExternalLink } from 'lucide-react';
+import { ArrowLeft, BookOpen, Layers, Target, FileText, Activity, Eye, ExternalLink, LayoutGrid, List } from 'lucide-react';
 import Link from 'next/link';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
@@ -40,6 +40,7 @@ export default function TextbookDetailsPage() {
   const [isAddChapterOpen, setIsAddChapterOpen] = useState(false);
   const [isAddTopicOpen, setIsAddTopicOpen] = useState(false);
   const [activeChapterId, setActiveChapterId] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [newItemTitle, setNewItemTitle] = useState('');
   const [isAdding, setIsAdding] = useState(false);
 
@@ -427,9 +428,19 @@ export default function TextbookDetailsPage() {
               <Layers className="h-5 w-5 text-indigo-500" />
               Chapters & Topics Content Map
             </CardTitle>
-            <Button onClick={() => setIsAddChapterOpen(true)} size="sm" className="gap-2">
-              <Plus className="w-4 h-4" /> Add Chapter
-            </Button>
+            <div className="flex items-center gap-3">
+              <div className="flex bg-gray-100/80 p-1 rounded-lg border border-gray-200">
+                 <button onClick={() => setViewMode('grid')} className={`p-1.5 rounded-md transition-all ${viewMode === 'grid' ? 'bg-white shadow-sm text-indigo-600' : 'text-gray-500 hover:text-gray-700'}`} title="Grid View">
+                    <LayoutGrid className="w-4 h-4" />
+                 </button>
+                 <button onClick={() => setViewMode('list')} className={`p-1.5 rounded-md transition-all ${viewMode === 'list' ? 'bg-white shadow-sm text-indigo-600' : 'text-gray-500 hover:text-gray-700'}`} title="List View">
+                    <List className="w-4 h-4" />
+                 </button>
+              </div>
+              <Button onClick={() => setIsAddChapterOpen(true)} size="sm" className="gap-2">
+                <Plus className="w-4 h-4" /> Add Chapter
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent className="p-6">
@@ -482,12 +493,66 @@ export default function TextbookDetailsPage() {
                   
                   <AccordionContent className="pt-0 pb-0">
                     <div className="border-t border-gray-100">
-                      {chapter.topics.length === 0 ? (
-                        <div className="p-6 text-center text-gray-500 bg-gray-50 text-sm flex flex-col items-center justify-center gap-3">
-                          <p>No topics found under this chapter.</p>
-                          <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); setActiveChapterId(chapter.id); setIsAddTopicOpen(true); }} className="gap-2">
-                            <Plus className="w-3 h-3" /> Add First Topic
-                          </Button>
+                      {viewMode === 'grid' ? (
+                        <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 bg-slate-50/50">
+                          {chapter.topics.map((topic) => (
+                            <div key={topic.id} className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition-all hover:border-indigo-300 group flex flex-col justify-between h-full relative overflow-hidden">
+                              <div className="flex items-start gap-3 mb-4">
+                                <div className="mt-1 bg-indigo-50 p-1.5 rounded-lg text-indigo-500 shrink-0">
+                                   <Target className="h-4 w-4" />
+                                </div>
+                                <span className="font-semibold text-gray-800 text-sm leading-snug">{topic.title}</span>
+                              </div>
+                              
+                              {/* Contents Types & Counts */}
+                              <div className="flex items-center gap-2 mt-auto pb-4 border-b border-gray-100">
+                                <Badge 
+                                  variant="outline" 
+                                  className={`flex items-center gap-1 font-normal text-[10.5px] px-2 py-0.5 ${topic.contentsCount > 0 ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-gray-50 text-gray-500 border-gray-200'}`}
+                                >
+                                  <FileText className="h-3 w-3" />
+                                  {topic.contentsCount} Res
+                                </Badge>
+                                
+                                <Badge 
+                                  variant="outline" 
+                                  className={`flex items-center gap-1 font-normal text-[10.5px] px-2 py-0.5 ${topic.questionCount > 0 ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-gray-50 text-gray-500 border-gray-200'}`}
+                                >
+                                  <Activity className="h-3 w-3" />
+                                  {topic.questionCount} Qs
+                                </Badge>
+                              </div>
+
+                              <div className="flex items-center justify-between pt-3">
+                                 <Button asChild variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50">
+                                   <Link href={topic.clientUrl} target="_blank" title="View Client Page">
+                                     <ExternalLink className="h-4 w-4" />
+                                   </Link>
+                                 </Button>
+                                 <Button asChild variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50">
+                                   <Link href={`/admin/guide-content/topic/${topic.id}`} target="_blank" title="Manage Content">
+                                     <FileText className="h-4 w-4" />
+                                   </Link>
+                                 </Button>
+                                 <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50" onClick={(e) => { e.stopPropagation(); setEditNodeData({ id: topic.id, title: topic.title, type: 'topic' }); setIsEditModalOpen(true); }} title="Edit Topic">
+                                   <Edit2 className="h-4 w-4" />
+                                 </Button>
+                                 <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-red-600 hover:bg-red-50" onClick={(e) => { e.stopPropagation(); setDeleteNodeData({ id: topic.id, title: topic.title, type: 'topic' }); setIsDeleteDialogOpen(true); }} title="Delete Topic">
+                                   <Trash2 className="h-4 w-4" />
+                                 </Button>
+                              </div>
+                            </div>
+                          ))}
+                          
+                          <div 
+                             onClick={() => { setActiveChapterId(chapter.id); setIsAddTopicOpen(true); }}
+                             className="border-2 border-dashed border-gray-200 rounded-xl p-4 flex flex-col items-center justify-center text-gray-400 hover:text-indigo-600 hover:border-indigo-300 hover:bg-indigo-50/50 transition-colors cursor-pointer min-h-[150px]"
+                          >
+                             <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center mb-2 group-hover:bg-indigo-100 transition-colors">
+                               <Plus className="w-5 h-5 text-gray-500" />
+                             </div>
+                             <span className="text-sm font-semibold text-gray-600">Add New Topic</span>
+                          </div>
                         </div>
                       ) : (
                         <ul className="divide-y divide-gray-100">
