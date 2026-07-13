@@ -34,8 +34,8 @@ export async function POST(req: Request) {
 
     try {
         let cleanResultText = result.trim();
-        // Remove ```html, ```xml, or just ``` along with the newline
-        cleanResultText = cleanResultText.replace(/```[a-zA-Z]*\n?/g, '').trim();
+        // Remove any markdown code block wrappers anywhere in the text
+        cleanResultText = cleanResultText.replace(/```(html)?/gi, '').trim();
         return NextResponse.json({ result: cleanResultText });
     } catch (parseError) {
         console.error('Failed to parse AI response:', result);

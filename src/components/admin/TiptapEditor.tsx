@@ -350,7 +350,7 @@ export function TiptapEditor({ content, onChange, maxHeight }: { content: string
   const [rawContent, setRawContent] = React.useState(content);
   const [aiDialogOpen, setAiDialogOpen] = React.useState(false);
   const [aiPrompt, setAiPrompt] = React.useState('');
-  const [aiFiles, setAiFiles] = React.useState<File[]>([]);
+  const [aiFile, setAiFile] = React.useState<File | null>(null);
   const [isGenerating, setIsGenerating] = React.useState(false);
 
   const handleDrop = useCallback(
@@ -498,27 +498,23 @@ export function TiptapEditor({ content, onChange, maxHeight }: { content: string
   };
 
   const handleGenerateAI = async () => {
-    if (!aiPrompt.trim() && aiFiles.length === 0) return;
+    if (!aiPrompt.trim() && !aiFile) return;
     setIsGenerating(true);
     try {
       let response;
-      if (aiFiles.length > 0) {
-        toast({ title: 'Uploading files...', description: `Please wait while ${aiFiles.length} file(s) are being uploaded.` });
-        
-        const uploadedFilesData = [];
-        for (const file of aiFiles) {
-          const storageRef = ref(storage, `ai-uploads/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`);
-          const snapshot = await uploadBytes(storageRef, file);
-          const url = await getDownloadURL(snapshot.ref);
-          uploadedFilesData.push({ url, mimeType: file.type });
-        }
+      if (aiFile) {
+        toast({ title: 'Uploading file...', description: 'Please wait while the file is being uploaded to the server.' });
+        const storageRef = ref(storage, `ai-uploads/${Date.now()}_${aiFile.name.replace(/[^a-zA-Z0-9.]/g, '_')}`);
+        const snapshot = await uploadBytes(storageRef, aiFile);
+        const url = await getDownloadURL(snapshot.ref);
 
         response = await fetch('/api/ai/generate-from-file', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            files: uploadedFilesData,
-            prompt: `Extract the content from the provided file(s) and preserve its EXACT original formatting, structure, and layout (including headings, lists, bold text, etc.). Use ONLY standard rich text HTML tags (e.g., <h1>, <h2>, <h3>, <p>, <ul>, <ol>, <li>, <strong>, <em>, <blockquote>) to replicate the original format as closely as possible. DO NOT use <div>, <span>, or custom CSS classes. DO NOT wrap the output in markdown code blocks (like \`\`\`html). Output raw HTML string only.\n\nUser Request: ${aiPrompt || 'Extract the content and preserve the exact format.'}`
+            fileUrl: url,
+            mimeType: aiFile.type,
+            prompt: `Generate the following content using rich HTML tags (e.g. <h1>, <h2>, <p>, <ul>, <li>, <strong>, <em>, <blockquote>, etc.) to make it look highly professional and well-formatted in a Rich Text Editor. DO NOT wrap the output in markdown code blocks like \`\`\`html. Output raw HTML only.\n\nUser Request: ${aiPrompt || 'Extract the content from the provided file and format it appropriately.'}`
           }),
         });
       } else {
@@ -526,7 +522,7 @@ export function TiptapEditor({ content, onChange, maxHeight }: { content: string
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            prompt: `Generate content based on the following request. Structure the response beautifully using ONLY standard rich text HTML tags (e.g., <h1>, <h2>, <h3>, <p>, <ul>, <ol>, <li>, <strong>, <em>, <blockquote>). DO NOT use <div>, <span>, or custom CSS classes. DO NOT wrap the output in markdown code blocks (like \`\`\`html). Output raw HTML string only.\n\nUser Request: ${aiPrompt}`
+            prompt: `Generate the following content using rich HTML tags (e.g. <h1>, <h2>, <p>, <ul>, <li>, <strong>, <em>, <blockquote>, etc.) to make it look highly professional and well-formatted in a Rich Text Editor. DO NOT wrap the output in markdown code blocks like \`\`\`html. Output raw HTML only.\n\nUser Request: ${aiPrompt}`
           }),
         });
       }
@@ -539,7 +535,7 @@ export function TiptapEditor({ content, onChange, maxHeight }: { content: string
       }
       setAiDialogOpen(false);
       setAiPrompt('');
-      setAiFiles([]);
+      setAiFile(null);
       toast({ title: 'AI Content Generated', description: 'Content successfully inserted.' });
     } catch (error) {
       console.error(error);
@@ -558,7 +554,7 @@ export function TiptapEditor({ content, onChange, maxHeight }: { content: string
               setAiDialogOpen(open);
               if (!open) {
                 setAiPrompt('');
-                setAiFiles([]);
+                setAiFile(null);
               }
             }}>
               <DialogTrigger asChild>
@@ -574,16 +570,13 @@ export function TiptapEditor({ content, onChange, maxHeight }: { content: string
                 <div className="grid gap-4 py-4">
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <Label>Source Files (Optional)</Label>
+                      <Label>Source File (Optional)</Label>
                       <Input 
                         type="file" 
                         accept="image/png,image/jpeg,image/webp,application/pdf,text/plain"
-                        multiple
-                        onChange={(e) => setAiFiles(Array.from(e.target.files || []))}
+                        onChange={(e) => setAiFile(e.target.files?.[0] || null)}
                       />
-                      <p className="text-[11px] text-slate-500">
-                        {aiFiles.length > 0 ? `${aiFiles.length} file(s) selected.` : 'Upload PDFs, images, or text files to extract content from. Max size: 100MB.'}
-                      </p>
+                      <p className="text-[11px] text-slate-500">Upload a PDF, image, or text file to extract content from. Max size: 100MB.</p>
                     </div>
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
@@ -612,7 +605,7 @@ export function TiptapEditor({ content, onChange, maxHeight }: { content: string
                       <p className="text-[11px] text-slate-500">The AI is instructed to use rich HTML tags automatically for the best formatting.</p>
                     </div>
                   </div>
-                  <Button onClick={handleGenerateAI} disabled={isGenerating || (!aiPrompt.trim() && aiFiles.length === 0)} className="w-full">
+                  <Button onClick={handleGenerateAI} disabled={isGenerating || (!aiPrompt.trim() && !aiFile)} className="w-full">
                     {isGenerating ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...</> : 'Generate'}
                   </Button>
                 </div>
