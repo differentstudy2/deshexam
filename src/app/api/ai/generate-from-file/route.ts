@@ -45,7 +45,7 @@ export async function POST(req: Request) {
     geminiFileName = uploadResult.file.name;
 
     // 3. Generate Content using the Gemini File API reference
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" }); // Using Pro for better document analysis
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" }); // Using Flash for file analysis
 
     const result = await model.generateContent([
       prompt,
@@ -62,12 +62,7 @@ export async function POST(req: Request) {
     
     // Clean up potential markdown formatting from the response
     if (generatedText) {
-      generatedText = generatedText.trim();
-      if (generatedText.startsWith('```html')) {
-        generatedText = generatedText.replace(/^```html\s*/i, '').replace(/\s*```$/i, '');
-      } else if (generatedText.startsWith('```')) {
-        generatedText = generatedText.replace(/^```\s*/i, '').replace(/\s*```$/i, '');
-      }
+      generatedText = generatedText.replace(/```(html)?/gi, '').trim();
     }
 
     // Clean up files asynchronously

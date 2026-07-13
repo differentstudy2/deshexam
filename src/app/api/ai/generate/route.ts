@@ -21,7 +21,6 @@ export async function POST(req: Request) {
             generationConfig: {
                 temperature: 0.5,
                 maxOutputTokens: 2000,
-                responseMimeType: "application/json",
             }
         })
     });
@@ -35,14 +34,12 @@ export async function POST(req: Request) {
 
     try {
         let cleanResultText = result.trim();
-        if (cleanResultText.startsWith('```')) {
-            cleanResultText = cleanResultText.replace(/^```(json)?\s*/i, '').replace(/\s*```$/i, '');
-        }
-        const resultJson = JSON.parse(cleanResultText);
-        return NextResponse.json(resultJson);
+        // Remove any markdown code block wrappers anywhere in the text
+        cleanResultText = cleanResultText.replace(/```(html)?/gi, '').trim();
+        return NextResponse.json({ result: cleanResultText });
     } catch (parseError) {
-        console.error('Failed to parse AI JSON:', result);
-        return NextResponse.json({ error: 'Failed to parse AI response' }, { status: 500 });
+        console.error('Failed to parse AI response:', result);
+        return NextResponse.json({ error: 'Failed to process AI response' }, { status: 500 });
     }
   } catch (error: any) {
     console.error('AI Generation Error:', error);
