@@ -62,7 +62,8 @@ export async function POST(req: Request) {
     
     // Clean up potential markdown formatting from the response
     if (generatedText) {
-      generatedText = generatedText.replace(/```(html)?/gi, '').trim();
+      // Remove ```html, ```xml, or just ``` along with the newline
+      generatedText = generatedText.replace(/```[a-zA-Z]*\n?/g, '').trim();
     }
 
     // Clean up files asynchronously

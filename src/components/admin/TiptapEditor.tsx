@@ -514,7 +514,7 @@ export function TiptapEditor({ content, onChange, maxHeight }: { content: string
           body: JSON.stringify({
             fileUrl: url,
             mimeType: aiFile.type,
-            prompt: `Generate the following content using rich HTML tags (e.g. <h1>, <h2>, <p>, <ul>, <li>, <strong>, <em>, <blockquote>, etc.) to make it look highly professional and well-formatted in a Rich Text Editor. DO NOT wrap the output in markdown code blocks like \`\`\`html. Output raw HTML only.\n\nUser Request: ${aiPrompt || 'Extract the content from the provided file and format it appropriately.'}`
+            prompt: `Extract and format the content from the provided file. Use ONLY standard rich text HTML tags (e.g., <h1>, <h2>, <h3>, <p>, <ul>, <ol>, <li>, <strong>, <em>, <blockquote>). DO NOT use <div>, <span>, or custom CSS classes. DO NOT wrap the output in markdown code blocks (like \`\`\`html). Output raw HTML string only.\n\nUser Request: ${aiPrompt || 'Extract the content and format it nicely.'}`
           }),
         });
       } else {
@@ -522,7 +522,7 @@ export function TiptapEditor({ content, onChange, maxHeight }: { content: string
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            prompt: `Generate the following content using rich HTML tags (e.g. <h1>, <h2>, <p>, <ul>, <li>, <strong>, <em>, <blockquote>, etc.) to make it look highly professional and well-formatted in a Rich Text Editor. DO NOT wrap the output in markdown code blocks like \`\`\`html. Output raw HTML only.\n\nUser Request: ${aiPrompt}`
+            prompt: `Generate content based on the following request. Use ONLY standard rich text HTML tags (e.g., <h1>, <h2>, <h3>, <p>, <ul>, <ol>, <li>, <strong>, <em>, <blockquote>). DO NOT use <div>, <span>, or custom CSS classes. DO NOT wrap the output in markdown code blocks (like \`\`\`html). Output raw HTML string only.\n\nUser Request: ${aiPrompt}`
           }),
         });
       }
