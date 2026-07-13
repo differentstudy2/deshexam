@@ -514,7 +514,7 @@ export function TiptapEditor({ content, onChange, maxHeight }: { content: string
           body: JSON.stringify({
             fileUrl: url,
             mimeType: aiFile.type,
-            prompt: `Extract and format the content from the provided file. Use ONLY standard rich text HTML tags (e.g., <h1>, <h2>, <h3>, <p>, <ul>, <ol>, <li>, <strong>, <em>, <blockquote>). DO NOT use <div>, <span>, or custom CSS classes. DO NOT wrap the output in markdown code blocks (like \`\`\`html). Output raw HTML string only.\n\nUser Request: ${aiPrompt || 'Extract the content and format it nicely.'}`
+            prompt: `Extract the content from the provided file and preserve its EXACT original formatting, structure, and layout (including headings, lists, bold text, etc.). Use ONLY standard rich text HTML tags (e.g., <h1>, <h2>, <h3>, <p>, <ul>, <ol>, <li>, <strong>, <em>, <blockquote>) to replicate the original format as closely as possible. DO NOT use <div>, <span>, or custom CSS classes. DO NOT wrap the output in markdown code blocks (like \`\`\`html). Output raw HTML string only.\n\nUser Request: ${aiPrompt || 'Extract the content and preserve the exact format.'}`
           }),
         });
       } else {
@@ -522,7 +522,7 @@ export function TiptapEditor({ content, onChange, maxHeight }: { content: string
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            prompt: `Generate content based on the following request. Use ONLY standard rich text HTML tags (e.g., <h1>, <h2>, <h3>, <p>, <ul>, <ol>, <li>, <strong>, <em>, <blockquote>). DO NOT use <div>, <span>, or custom CSS classes. DO NOT wrap the output in markdown code blocks (like \`\`\`html). Output raw HTML string only.\n\nUser Request: ${aiPrompt}`
+            prompt: `Generate content based on the following request. Structure the response beautifully using ONLY standard rich text HTML tags (e.g., <h1>, <h2>, <h3>, <p>, <ul>, <ol>, <li>, <strong>, <em>, <blockquote>). DO NOT use <div>, <span>, or custom CSS classes. DO NOT wrap the output in markdown code blocks (like \`\`\`html). Output raw HTML string only.\n\nUser Request: ${aiPrompt}`
           }),
         });
       }
