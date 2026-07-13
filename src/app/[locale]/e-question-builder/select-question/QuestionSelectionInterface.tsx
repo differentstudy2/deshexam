@@ -115,6 +115,9 @@ export default function QuestionSelectionInterface({ initialFilters }: { initial
     selectedSort: 'Recently Added'
   });
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20;
+
   const toggleArrayFilter = (key: 'selectedTypes' | 'selectedBoards' | 'selectedSchools' | 'selectedLevels', value: string) => {
     setActiveFilters(prev => {
       const arr = prev[key];
@@ -240,6 +243,7 @@ export default function QuestionSelectionInterface({ initialFilters }: { initial
       }
 
       setQuestions(data);
+      setCurrentPage(1); // Reset page on filter change
     } catch (error) {
       console.error("Failed to fetch questions:", error);
     } finally {
@@ -255,6 +259,14 @@ export default function QuestionSelectionInterface({ initialFilters }: { initial
       newSet.add(id);
     }
     setSelectedIds(newSet);
+  };
+
+  const handleSelectAll = () => {
+    if (selectedIds.size === questions.length && questions.length > 0) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(questions.map(q => q.id)));
+    }
   };
 
   const handleNextStep = () => {
@@ -658,20 +670,36 @@ export default function QuestionSelectionInterface({ initialFilters }: { initial
               <p className="text-gray-500 text-sm">অনুগ্রহ করে ফিল্টার পরিবর্তন করে আবার চেষ্টা করুন।</p>
             </div>
           ) : (
-            <div className="space-y-3">
-              {questions.map((q, index) => {
-                const isSelected = selectedIds.has(q.id);
-                return (
-                  <div
-                    key={q.id}
-                    onClick={() => toggleSelect(q.id)}
-                    className={`bg-white border rounded-lg p-4 shadow-sm transition-colors cursor-pointer ${isSelected ? 'border-[#4caf50] ring-1 ring-[#4caf50] bg-[#f1f8e9]' : 'border-gray-200 hover:border-blue-300'
-                      }`}
-                  >
-                    <div className="flex justify-between items-start gap-3">
-                      <div className="flex items-start gap-3 flex-1">
-                        <span className="font-bold text-gray-600 mt-0.5">{index + 1}.</span>
-                        <div className="flex-1">
+            <>
+              <div className="flex justify-between items-center mb-3">
+                <span className="text-sm font-medium text-gray-600 px-1">{questions.length} টি প্রশ্ন পাওয়া গেছে</span>
+                <div className="flex items-center gap-2 bg-white px-3 py-1.5 border border-gray-200 rounded-md shadow-sm">
+                  <Checkbox 
+                    id="select-all" 
+                    checked={selectedIds.size === questions.length && questions.length > 0} 
+                    onCheckedChange={handleSelectAll} 
+                    className="text-[#1e88e5] border-gray-300"
+                  />
+                  <label htmlFor="select-all" className="text-sm font-medium text-gray-700 cursor-pointer select-none">
+                    সবগুলো সিলেক্ট করুন
+                  </label>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                {questions.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((q, index) => {
+                  const globalIndex = (currentPage - 1) * itemsPerPage + index;
+                  const isSelected = selectedIds.has(q.id);
+                  return (
+                    <div
+                      key={q.id}
+                      onClick={() => toggleSelect(q.id)}
+                      className={`bg-white border rounded-lg p-4 shadow-sm transition-colors cursor-pointer flex flex-col justify-between ${isSelected ? 'border-[#4caf50] ring-1 ring-[#4caf50] bg-[#f1f8e9]' : 'border-gray-200 hover:border-blue-300'
+                        }`}
+                    >
+                    <div className="w-full flex-1">
+                      <div className="flex items-start gap-3 w-full mb-4">
+                        <span className="font-bold text-gray-600 mt-0.5">{globalIndex + 1}.</span>
+                        <div className="flex-1 w-full overflow-hidden">
                           <div className="text-gray-800 text-[15px] font-medium leading-relaxed mb-3">
                             <div dangerouslySetInnerHTML={{ __html: q.questionText }} />
                           </div>
@@ -778,8 +806,8 @@ export default function QuestionSelectionInterface({ initialFilters }: { initial
                         </div>
                       </div>
 
-                      {/* ACTIONS (Right Side) */}
-                      <div className="flex flex-col items-end justify-between h-full space-y-8">
+                      {/* ACTIONS (Bottom) */}
+                      <div className="flex items-center justify-between border-t border-gray-100 pt-3 mt-auto w-full">
                         <Button
                           variant="ghost"
                           size="sm"
@@ -801,6 +829,34 @@ export default function QuestionSelectionInterface({ initialFilters }: { initial
                 );
               })}
             </div>
+
+            {/* PAGINATION */}
+            {Math.ceil(questions.length / itemsPerPage) > 1 && (
+              <div className="flex justify-center items-center gap-4 mt-8 pb-4">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="border-gray-300"
+                >
+                  আগের পাতা
+                </Button>
+                <span className="text-sm font-medium text-gray-700">
+                  পৃষ্ঠা {currentPage} / {Math.ceil(questions.length / itemsPerPage)}
+                </span>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => setCurrentPage(p => Math.min(Math.ceil(questions.length / itemsPerPage), p + 1))}
+                  disabled={currentPage === Math.ceil(questions.length / itemsPerPage)}
+                  className="border-gray-300"
+                >
+                  পরের পাতা
+                </Button>
+              </div>
+            )}
+            </>
           )}
         </div>
 
