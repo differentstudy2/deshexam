@@ -86,13 +86,13 @@ export default function QuestionSelectionInterface({ initialFilters }: { initial
           getTaxonomyNodes('board')
         ]);
         const eMap: Record<string, string> = {};
-        exams.forEach((e: any) => eMap[e.id] = e.name);
+        exams.forEach((e: any) => eMap[e.id] = e.shortName || e.acronym || e.name);
         setExamMap(eMap);
         const yMap: Record<string, string> = {};
-        years.forEach((y: any) => yMap[y.id] = y.name);
+        years.forEach((y: any) => yMap[y.id] = y.shortName || y.acronym || y.name);
         setYearMap(yMap);
         const bMap: Record<string, string> = {};
-        boards.forEach((b: any) => bMap[b.id] = b.name);
+        boards.forEach((b: any) => bMap[b.id] = b.shortName || b.acronym || b.name);
         setBoardMap(bMap);
       } catch (e) {
         console.error("Failed to load taxonomies", e);
@@ -208,7 +208,7 @@ export default function QuestionSelectionInterface({ initialFilters }: { initial
 
       if (activeFilters.difficulty !== 'all') qFilters.difficulty = activeFilters.difficulty;
 
-      let data = await getQuestions(qFilters, 50);
+      let data = await getQuestions(qFilters, 2000); // Fetch a large number for client side filtering/pagination
 
       if (activeFilters.search) {
         const lowerSearch = activeFilters.search.toLowerCase();
@@ -697,11 +697,11 @@ export default function QuestionSelectionInterface({ initialFilters }: { initial
                         }`}
                     >
                     <div className="w-full flex-1">
-                      <div className="flex items-start gap-3 w-full mb-4">
-                        <span className="font-bold text-gray-600 mt-0.5">{globalIndex + 1}.</span>
+                      <div className="flex items-start gap-2 w-full mb-4">
+                        <span className="font-bold text-gray-600 shrink-0">{globalIndex + 1}.</span>
                         <div className="flex-1 w-full overflow-hidden">
                           <div className="text-gray-800 text-[15px] font-medium leading-relaxed mb-3">
-                            <div dangerouslySetInnerHTML={{ __html: q.questionText }} />
+                            <div dangerouslySetInnerHTML={{ __html: q.questionText }} className="[&>p:first-child]:mt-0 [&>p:last-child]:mb-0 [&>p]:inline" />
                           </div>
 
                           {/* OPTIONS (If MCQ) */}
