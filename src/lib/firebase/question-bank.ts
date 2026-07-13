@@ -113,8 +113,7 @@ export async function getQuestionsPaginated(filters?: Record<string, any>, limit
       if (startAfterDoc) {
           q = query(colRef, ...conditions, startAfter(startAfterDoc), limit(limitCount));
       } else {
-          // Fetch more so client-side sorting can find the newest ones
-          q = query(colRef, ...conditions, limit(2000));
+          q = query(colRef, ...conditions, limit(limitCount));
       }
   } else {
       if (startAfterDoc) {
@@ -126,16 +125,6 @@ export async function getQuestionsPaginated(filters?: Record<string, any>, limit
   
   const snapshot = await getDocs(q);
   let results = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as QuestionBankEntry);
-  
-  if (conditions.length > 0) {
-      results.sort((a, b) => {
-          const timeA = (a.createdAt as any)?.seconds || ((a.createdAt as any)?.getTime?.() / 1000) || 0;
-          const timeB = (b.createdAt as any)?.seconds || ((b.createdAt as any)?.getTime?.() / 1000) || 0;
-          return timeB - timeA;
-      });
-      // If we fetched up to 2000, we don't slice because we want to show all on the first filtered page
-      // so the user doesn't have to paginate through improperly ordered filtered data.
-  }
 
   return {
       questions: results,

@@ -12,6 +12,7 @@ import { Loader2, Search, Edit, ArrowRight, BookOpen, AlertCircle, Sparkles, Fil
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 interface InitialFilters {
   boardId: string;
@@ -116,6 +117,8 @@ export default function QuestionSelectionInterface({ initialFilters }: { initial
   });
 
   const [currentPage, setCurrentPage] = useState(1);
+  const [pageCursors, setPageCursors] = useState<any[]>([null]);
+  const [hasNextPage, setHasNextPage] = useState(true);
   const itemsPerPage = 20;
 
   const toggleArrayFilter = (key: 'selectedTypes' | 'selectedBoards' | 'selectedSchools' | 'selectedLevels', value: string) => {
@@ -188,16 +191,18 @@ export default function QuestionSelectionInterface({ initialFilters }: { initial
   const years = ['2023', '2022', '2021', '2020', '2019', '2018', '2017', '2016'];
 
   useEffect(() => {
-    fetchQuestions();
+    // Reset pagination on filter change
+    setCurrentPage(1);
+    setPageCursors([null]);
+    setHasNextPage(true);
+    fetchQuestions(1, [null]);
   }, [activeFilters]);
 
-  const fetchQuestions = async () => {
+  const fetchQuestions = async (page: number = currentPage, cursors: any[] = pageCursors) => {
     setLoading(true);
     try {
       const qFilters: any = {};
 
-      // Map frontend filters to backend fields. 
-      // Use only the most specific node to avoid missing questions if higher-up taxonomy tree is broken.
       if (activeFilters.topicId && activeFilters.topicId !== 'all') {
         qFilters.topicId = activeFilters.topicId;
       } else if (activeFilters.chapterId && activeFilters.chapterId !== 'all') {
@@ -208,42 +213,19 @@ export default function QuestionSelectionInterface({ initialFilters }: { initial
 
       if (activeFilters.difficulty !== 'all') qFilters.difficulty = activeFilters.difficulty;
 
-      let data = await getQuestions(qFilters, 2000); // Fetch a large number for client side filtering/pagination
+      const { getQuestionsPaginated } = await import('@/lib/firebase/question-bank');
+      
+      const startAfterDoc = cursors[page - 1] || null;
+      const res = await getQuestionsPaginated(qFilters, itemsPerPage, startAfterDoc);
 
-      if (activeFilters.search) {
-        const lowerSearch = activeFilters.search.toLowerCase();
-        data = data.filter(q => q.questionText.toLowerCase().includes(lowerSearch));
+      setQuestions(res.questions);
+      setHasNextPage(res.questions.length === itemsPerPage);
+
+      if (res.lastDoc) {
+        const newCursors = [...cursors];
+        newCursors[page] = res.lastDoc;
+        setPageCursors(newCursors);
       }
-
-      if (activeFilters.selectedTypes.length > 0) {
-        data = data.filter(q => {
-          let match = false;
-          if (activeFilters.selectedTypes.includes('mcq') && q.options?.a) match = true;
-          if (activeFilters.selectedTypes.includes('cq') && !q.options?.a) match = true;
-          // Note: Assuming gk and board require explicit tags or flags in DB
-          if (activeFilters.selectedTypes.includes('board') && q.boardId) match = true;
-          return match;
-        });
-      }
-
-      if (activeFilters.selectedBoards.length > 0 && !activeFilters.selectedBoards.includes('all')) {
-        data = data.filter(q => q.boardId && activeFilters.selectedBoards.includes(q.boardId));
-      }
-
-      if (activeFilters.selectedSchools.length > 0) {
-        data = data.filter(q => (q as any).institutionId && activeFilters.selectedSchools.includes((q as any).institutionId));
-      }
-
-      if (activeFilters.selectedSort === 'Oldest First') {
-        data = data.sort((a: any, b: any) => {
-          const tA = a.createdAt?.seconds || a.createdAt?.getTime?.() / 1000 || 0;
-          const tB = b.createdAt?.seconds || b.createdAt?.getTime?.() / 1000 || 0;
-          return tA - tB;
-        });
-      }
-
-      setQuestions(data);
-      setCurrentPage(1); // Reset page on filter change
     } catch (error) {
       console.error("Failed to fetch questions:", error);
     } finally {
@@ -642,17 +624,20 @@ export default function QuestionSelectionInterface({ initialFilters }: { initial
             </div>
 
             <div className="flex items-center gap-2">
-              <div className="relative">
+              <div className="relative hidden">
                 <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3 w-3 text-gray-400" />
                 <Input
                   className="h-8 pl-7 text-xs w-[200px]"
-                  placeholder="প্রশ্ন খুঁজুন..."
+                  placeholder="প্রশ্ন খুঁজুন... (Disabled for Server Pagination)"
+                  disabled
                   value={activeFilters.search}
                   onChange={e => setActiveFilters({ ...activeFilters, search: e.target.value })}
                 />
               </div>
               <Button variant="outline" className="h-8 text-xs px-3 border-gray-300">ক্লিয়ার</Button>
-              <Button className="h-8 text-xs bg-[#e91e63] hover:bg-pink-700 text-white px-4">+ নতুন</Button>
+              <Link href="/admin/question-bank/questions" target="_blank">
+                <Button className="h-8 text-xs bg-[#e91e63] hover:bg-pink-700 text-white px-4">+ নতুন</Button>
+              </Link>
             </div>
           </div>
         </div>
@@ -672,21 +657,21 @@ export default function QuestionSelectionInterface({ initialFilters }: { initial
           ) : (
             <>
               <div className="flex justify-between items-center mb-3">
-                <span className="text-sm font-medium text-gray-600 px-1">{questions.length} টি প্রশ্ন পাওয়া গেছে</span>
+                <span className="text-sm font-medium text-gray-600 px-1">বর্তমান পৃষ্ঠায় {questions.length} টি প্রশ্ন রয়েছে</span>
                 <div className="flex items-center gap-2 bg-white px-3 py-1.5 border border-gray-200 rounded-md shadow-sm">
                   <Checkbox 
                     id="select-all" 
-                    checked={selectedIds.size === questions.length && questions.length > 0} 
+                    checked={selectedIds.size > 0 && questions.every(q => selectedIds.has(q.id))} 
                     onCheckedChange={handleSelectAll} 
                     className="text-[#1e88e5] border-gray-300"
                   />
                   <label htmlFor="select-all" className="text-sm font-medium text-gray-700 cursor-pointer select-none">
-                    সবগুলো সিলেক্ট করুন
+                    সবগুলো সিলেক্ট করুন (বর্তমান পাতা)
                   </label>
                 </div>
               </div>
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-                {questions.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((q, index) => {
+                {questions.map((q, index) => {
                   const globalIndex = (currentPage - 1) * itemsPerPage + index;
                   const isSelected = selectedIds.has(q.id);
                   return (
@@ -831,25 +816,33 @@ export default function QuestionSelectionInterface({ initialFilters }: { initial
             </div>
 
             {/* PAGINATION */}
-            {Math.ceil(questions.length / itemsPerPage) > 1 && (
+            {(currentPage > 1 || hasNextPage) && (
               <div className="flex justify-center items-center gap-4 mt-8 pb-4">
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  onClick={() => {
+                     const prevPage = Math.max(1, currentPage - 1);
+                     setCurrentPage(prevPage);
+                     fetchQuestions(prevPage, pageCursors);
+                  }}
                   disabled={currentPage === 1}
                   className="border-gray-300"
                 >
                   আগের পাতা
                 </Button>
                 <span className="text-sm font-medium text-gray-700">
-                  পৃষ্ঠা {currentPage} / {Math.ceil(questions.length / itemsPerPage)}
+                  পৃষ্ঠা {currentPage}
                 </span>
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  onClick={() => setCurrentPage(p => Math.min(Math.ceil(questions.length / itemsPerPage), p + 1))}
-                  disabled={currentPage === Math.ceil(questions.length / itemsPerPage)}
+                  onClick={() => {
+                     const nextPage = currentPage + 1;
+                     setCurrentPage(nextPage);
+                     fetchQuestions(nextPage, pageCursors);
+                  }}
+                  disabled={!hasNextPage}
                   className="border-gray-300"
                 >
                   পরের পাতা
