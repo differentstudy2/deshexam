@@ -79,7 +79,7 @@ export default function AddTextbookPage() {
 
     setIsSaving(true);
     try {
-      const newTextbookId = await createTaxonomyNode({
+      const payload: any = {
         title: title.trim(),
         slug: slug.trim(),
         type: 'textbook',
@@ -92,9 +92,14 @@ export default function AddTextbookPage() {
         keywords: keywords.split(',').map(k => k.trim()).filter(Boolean),
         author: author.trim(),
         description: description.trim(),
-        mediumOfInstruction: language ? language.split(',').map(l => l.trim()).filter(Boolean) : undefined,
         faqs: []
-      });
+      };
+      
+      if (language) {
+        payload.mediumOfInstruction = language.split(',').map((l: string) => l.trim()).filter(Boolean);
+      }
+
+      const newTextbookId = await createTaxonomyNode(payload);
       router.push(`/admin/textbook/${newTextbookId}`);
     } catch (error) {
       console.error('Failed to create textbook:', error);
