@@ -8,7 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { getQuestions, getTaxonomyNodes } from '@/lib/firebase/question-bank';
 import { QuestionBankEntry } from '@/lib/question-bank-types';
-import { Loader2, Search, Edit, ArrowRight, BookOpen, AlertCircle, Sparkles, Filter, ChevronDown, Bot } from 'lucide-react';
+import { Loader2, Search, Edit, ArrowRight, BookOpen, AlertCircle, Sparkles, Filter, ChevronDown, Bot, Eye } from 'lucide-react';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useRouter } from 'next/navigation';
@@ -793,14 +793,25 @@ export default function QuestionSelectionInterface({ initialFilters }: { initial
 
                       {/* ACTIONS (Bottom) */}
                       <div className="flex items-center justify-between border-t border-gray-100 pt-3 mt-auto w-full">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => e.stopPropagation()}
-                          className="h-7 text-xs text-blue-600 hover:text-blue-800 p-0 px-2 border border-transparent hover:border-blue-200"
-                        >
-                          <Edit className="w-3 h-3 mr-1" /> Edit
-                        </Button>
+                        <div className="flex gap-2">
+                          <Link href={`/question/${q.slug || q.id}`} target="_blank" onClick={(e) => e.stopPropagation()}>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-7 text-xs text-gray-500 hover:text-gray-800 p-0 px-2 border border-transparent hover:border-gray-200"
+                            >
+                              <Eye className="w-3 h-3 mr-1" /> View
+                            </Button>
+                          </Link>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => e.stopPropagation()}
+                            className="h-7 text-xs text-blue-600 hover:text-blue-800 p-0 px-2 border border-transparent hover:border-blue-200"
+                          >
+                            <Edit className="w-3 h-3 mr-1" /> Edit
+                          </Button>
+                        </div>
                         <div onClick={(e) => e.stopPropagation()}>
                           <Checkbox
                             checked={isSelected}
