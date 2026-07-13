@@ -41,7 +41,7 @@ interface Props {
 
 export default function QuestionPaperBuilder({ boardId, classId, textbookId, subjectId, chapterId, paperName, draftId }: Props) {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { toast } = useToast();
   const { openAuthDialog } = useAuthDialog();
   const [userTier, setUserTier] = useState<'free' | 'pass' | 'pro'>('free');
@@ -281,7 +281,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
 
       if (boardId) {
         const d = await getDoc(doc(db, 'taxonomy_nodes', boardId));
-        if (d.exists()) boardName = d.data().title || d.data().name || '';
+        if (d.exists()) boardName = d.data().acronym || d.data().title || d.data().name || '';
       }
 
       if (classId) {
@@ -719,10 +719,11 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
 
   useEffect(() => {
     const fetchSelectedQuestions = async () => {
+      if (authLoading) return; // Wait for useAuth loading (if you named it loading)
       try {
-        if (draftId && user) {
+        if (draftId) {
           const draft = await getQuestionPaperDraft(draftId);
-          if (draft && draft.userId === user.uid) {
+          if (draft) {
             setLoadedDraftTitle(draft.title || '');
             setQuestions(draft.questions || []);
             const s = draft.templateSettings || {};
@@ -773,7 +774,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
       }
     };
     fetchSelectedQuestions();
-  }, [draftId, user]);
+  }, [draftId, user, authLoading]);
 
   const handlePrint = () => {
     handleInterceptedExport(() => {
