@@ -16,6 +16,19 @@ import Link from 'next/link';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import katex from 'katex';
+import 'katex/dist/katex.min.css';
+
+const renderMathInHtml = (htmlString: string) => {
+  if (!htmlString) return '';
+  try {
+    return htmlString.replace(/\$([^\$]+)\$/g, (match, math) => {
+      return katex.renderToString(math, { throwOnError: false });
+    });
+  } catch(e) {
+    return htmlString;
+  }
+};
 
 interface TopicQuestionManagerProps {
   topicId: string;
@@ -55,12 +68,29 @@ export function TopicQuestionManager({ topicId, tabType, nodeLevel = 'topic' }: 
   // Selection state
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   
+  // Filters state
+  const [filterText, setFilterText] = useState('');
+  const [filterDifficulty, setFilterDifficulty] = useState('All');
+  const [filterStatus, setFilterStatus] = useState('All');
+  const [filterLanguage, setFilterLanguage] = useState('All');
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
   
-  const totalPages = Math.ceil(questions.length / itemsPerPage);
-  const currentQuestions = questions.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const filteredQuestions = questions.filter(q => {
+    if (filterDifficulty !== 'All' && q.difficulty !== filterDifficulty) return false;
+    if (filterStatus !== 'All' && q.status !== filterStatus) return false;
+    if (filterLanguage !== 'All' && q.language !== filterLanguage) return false;
+    if (filterText) {
+      const txt = filterText.toLowerCase();
+      if (!q.questionText?.toLowerCase().includes(txt)) return false;
+    }
+    return true;
+  });
+
+  const totalPages = Math.ceil(filteredQuestions.length / itemsPerPage);
+  const currentQuestions = filteredQuestions.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
   
   const mapTabToQuestionType = (tab: string) => {
       if (tab === 'questions') return innerQType;
@@ -427,30 +457,74 @@ ${aiPrompt}`;
       {['list', 'bulk-edit'].includes(mode) && (
         <div className="space-y-2">
 
-          {/* Bulk select bar */}
-          {questions.length > 0 && (
-            <div className="flex items-center gap-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-2.5 rounded-xl sticky top-0 z-10 shadow-sm">
-              <input type="checkbox" className="w-4 h-4 accent-[#107c41] rounded" checked={selectedIds.size > 0 && selectedIds.size === questions.length} onChange={toggleAllSelection} id="select-all" />
-              <label htmlFor="select-all" className="text-xs font-semibold text-slate-600 dark:text-slate-400 cursor-pointer flex-1">
-                {selectedIds.size > 0 ? `${selectedIds.size} selected` : `${questions.length} questions`}
-              </label>
+          {/* Filter Bar */}
+          <div className="flex flex-col md:flex-row items-start md:items-center gap-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-2.5 rounded-xl sticky top-[73px] lg:top-0 z-20 shadow-sm">
+            <div className="flex items-center gap-2 flex-1 w-full shrink-0">
+               <input type="checkbox" className="w-4 h-4 accent-[#107c41] rounded" checked={selectedIds.size > 0 && selectedIds.size === filteredQuestions.length} onChange={toggleAllSelection} id="select-all" />
+               <label htmlFor="select-all" className="text-xs font-semibold text-slate-600 dark:text-slate-400 cursor-pointer whitespace-nowrap min-w-24">
+                 {selectedIds.size > 0 ? `${selectedIds.size} selected` : `${filteredQuestions.length} questions`}
+               </label>
+            </div>
+            
+            <div className="flex flex-wrap md:flex-nowrap items-center gap-2 w-full">
+               <Input 
+                 placeholder="Search text..." 
+                 value={filterText} 
+                 onChange={e => setFilterText(e.target.value)}
+                 className="h-8 text-xs w-full md:w-[150px] lg:w-[200px]"
+               />
+               <Select value={filterLanguage} onValueChange={setFilterLanguage}>
+                 <SelectTrigger className="w-full md:w-[100px] h-8 text-[11px]"><SelectValue placeholder="Language" /></SelectTrigger>
+                 <SelectContent>
+                   <SelectItem value="All">All Langs</SelectItem>
+                   <SelectItem value="Bangla">Bangla</SelectItem>
+                   <SelectItem value="English">English</SelectItem>
+                   <SelectItem value="Hindi">Hindi</SelectItem>
+                 </SelectContent>
+               </Select>
+               <Select value={filterDifficulty} onValueChange={setFilterDifficulty}>
+                 <SelectTrigger className="w-full md:w-[100px] h-8 text-[11px]"><SelectValue placeholder="Difficulty" /></SelectTrigger>
+                 <SelectContent>
+                   <SelectItem value="All">All Levels</SelectItem>
+                   <SelectItem value="Easy">Easy</SelectItem>
+                   <SelectItem value="Medium">Medium</SelectItem>
+                   <SelectItem value="Hard">Hard</SelectItem>
+                 </SelectContent>
+               </Select>
+               <Select value={filterStatus} onValueChange={setFilterStatus}>
+                 <SelectTrigger className="w-full md:w-[100px] h-8 text-[11px]"><SelectValue placeholder="Status" /></SelectTrigger>
+                 <SelectContent>
+                   <SelectItem value="All">All Status</SelectItem>
+                   <SelectItem value="Published">Published</SelectItem>
+                   <SelectItem value="Draft">Draft</SelectItem>
+                 </SelectContent>
+               </Select>
+
               {selectedIds.size > 0 && (
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1.5 border-l pl-2 border-slate-200 dark:border-slate-700 ml-auto">
+                  <Select onValueChange={(val) => handleBulkUpdateProperty('language', val)}>
+                    <SelectTrigger className="w-[80px] h-8 text-[11px] rounded-full"><SelectValue placeholder="Language" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Bangla">Bangla</SelectItem>
+                      <SelectItem value="English">English</SelectItem>
+                      <SelectItem value="Hindi">Hindi</SelectItem>
+                    </SelectContent>
+                  </Select>
                   <Select onValueChange={(val) => handleBulkUpdateProperty('status', val)}>
-                    <SelectTrigger className="w-[80px] h-7 text-[11px] rounded-full"><SelectValue placeholder="Status" /></SelectTrigger>
+                    <SelectTrigger className="w-[80px] h-8 text-[11px] rounded-full"><SelectValue placeholder="Status" /></SelectTrigger>
                     <SelectContent><SelectItem value="Published">Published</SelectItem><SelectItem value="Draft">Draft</SelectItem><SelectItem value="Archived">Archived</SelectItem></SelectContent>
                   </Select>
                   <Select onValueChange={(val) => handleBulkUpdateProperty('difficulty', val)}>
-                    <SelectTrigger className="w-[80px] h-7 text-[11px] rounded-full"><SelectValue placeholder="Level" /></SelectTrigger>
+                    <SelectTrigger className="w-[80px] h-8 text-[11px] rounded-full"><SelectValue placeholder="Level" /></SelectTrigger>
                     <SelectContent><SelectItem value="Easy">Easy</SelectItem><SelectItem value="Medium">Medium</SelectItem><SelectItem value="Hard">Hard</SelectItem></SelectContent>
                   </Select>
-                  <button onClick={handleBulkDeleteUI} className="w-7 h-7 flex items-center justify-center rounded-full bg-red-500 text-white">
-                    <Trash2 className="w-3.5 h-3.5" />
+                  <button onClick={handleBulkDeleteUI} className="w-8 h-8 flex items-center justify-center rounded-full bg-red-500 hover:bg-red-600 text-white transition-colors">
+                    <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
               )}
             </div>
-          )}
+          </div>
 
           {/* Empty state */}
           {questions.length === 0 && (
@@ -482,14 +556,15 @@ ${aiPrompt}`;
                   </div>
 
                   {/* Question text */}
-                  <div className="text-sm font-medium text-slate-800 dark:text-slate-100 leading-snug line-clamp-3" dangerouslySetInnerHTML={{__html: q.questionText}} />
+                  <div className="text-sm font-medium text-slate-800 dark:text-slate-100 leading-snug line-clamp-3" dangerouslySetInnerHTML={{__html: renderMathInHtml(q.questionText)}} />
 
                   {/* MCQ options */}
                   {q.questionType === 'MCQ' && q.options && (
                     <div className="grid grid-cols-2 gap-1 mt-2">
                       {(['a','b','c','d'] as const).map(key => (
-                        <div key={key} className={`text-[11px] px-2 py-1 rounded-lg border leading-tight ${ q.correctAnswer === key ? 'bg-emerald-50 dark:bg-emerald-900/30 border-emerald-300 dark:border-emerald-800 font-semibold text-emerald-800 dark:text-emerald-300' : 'bg-slate-50 dark:bg-slate-800 border-slate-100 dark:border-slate-700 text-slate-600 dark:text-slate-400' }`}>
-                          <span className="font-bold uppercase mr-1">{key}.</span>{q.options?.[key]}
+                        <div key={key} className={`text-[11px] px-2 py-1 rounded-lg border leading-tight flex items-start gap-1 ${ q.correctAnswer === key ? 'bg-emerald-50 dark:bg-emerald-900/30 border-emerald-300 dark:border-emerald-800 font-semibold text-emerald-800 dark:text-emerald-300' : 'bg-slate-50 dark:bg-slate-800 border-slate-100 dark:border-slate-700 text-slate-600 dark:text-slate-400' }`}>
+                          <span className="font-bold uppercase shrink-0 mt-0.5">{key}.</span>
+                          <div dangerouslySetInnerHTML={{__html: renderMathInHtml(q.options?.[key] || '')}} className="inline" />
                         </div>
                       ))}
                     </div>
@@ -503,8 +578,8 @@ ${aiPrompt}`;
                         <div className="font-bold text-slate-500">Column B</div>
                         {q.matchingPairs.map((pair: any, idx: number) => (
                           <React.Fragment key={idx}>
-                            <div className="text-slate-700 dark:text-slate-300">{idx+1}. {pair.left}</div>
-                            <div className="text-slate-700 dark:text-slate-300">{String.fromCharCode(65+idx)}. {pair.right}</div>
+                            <div className="text-slate-700 dark:text-slate-300 flex gap-1"><span className="shrink-0">{idx+1}.</span> <div dangerouslySetInnerHTML={{__html: renderMathInHtml(pair.left)}} className="inline" /></div>
+                            <div className="text-slate-700 dark:text-slate-300 flex gap-1"><span className="shrink-0">{String.fromCharCode(65+idx)}.</span> <div dangerouslySetInnerHTML={{__html: renderMathInHtml(pair.right)}} className="inline" /></div>
                           </React.Fragment>
                         ))}
                       </div>
@@ -514,8 +589,8 @@ ${aiPrompt}`;
                   {/* Short/Long/Creative answer */}
                   {!['MCQ','Match'].includes(q.questionType || '') && q.correctAnswer && (
                     <div className="mt-2 text-[11px] p-2 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg">
-                      <span className="font-bold text-emerald-700 dark:text-emerald-400">Answer: </span>
-                      <span className="text-slate-700 dark:text-slate-300" dangerouslySetInnerHTML={{__html: q.correctAnswer}} />
+                      <span className="font-bold text-emerald-700 dark:text-emerald-400 mr-1">Answer: </span>
+                      <span className="text-slate-700 dark:text-slate-300" dangerouslySetInnerHTML={{__html: renderMathInHtml(q.correctAnswer)}} />
                     </div>
                   )}
                 </div>

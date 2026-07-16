@@ -19,6 +19,19 @@ import { AuthModal } from '@/components/auth/AuthModal';
 import InteractiveMatching from './InteractiveMatching';
 import InteractiveFillInTheBlank from './InteractiveFillInTheBlank';
 import { Input } from '@/components/ui/input';
+import katex from 'katex';
+import 'katex/dist/katex.min.css';
+
+const renderMathInHtml = (htmlString: string) => {
+    if (!htmlString) return '';
+    try {
+        return htmlString.replace(/\$([^\$]+)\$/g, (match, math) => {
+            return katex.renderToString(math, { throwOnError: false });
+        });
+    } catch(e) {
+        return htmlString;
+    }
+};
 
 interface QuestionCardProps {
     question: QuestionBankEntry;
@@ -400,7 +413,11 @@ export default function QuestionCard({ question, index, testMode = false, isList
         setSelectedOption(key);
 
         if (user) {
-            const isCorrectAnswer = question.correctAnswer?.toLowerCase() === key.toLowerCase();
+            const correctLower = question.correctAnswer?.toLowerCase();
+            const keyLower = key.toLowerCase();
+            const isCorrectAnswer = correctLower === keyLower || 
+                                    (key === 'True' && correctLower === 'a') || 
+                                    (key === 'False' && correctLower === 'b');
             try {
                 await recordQuestionAttempt(user.uid, question.id, key, isCorrectAnswer);
             } catch (error) {
@@ -409,9 +426,9 @@ export default function QuestionCard({ question, index, testMode = false, isList
         }
     };
 
-    const isMatching = question.questionType?.toLowerCase() === 'matching';
-    const isTrueFalse = question.questionType?.toLowerCase() === 'true/false';
-    const isFillInTheBlank = question.questionType?.toLowerCase() === 'fill in the blank';
+    const isMatching = question.questionType?.toLowerCase() === 'match' || question.questionType?.toLowerCase() === 'matching';
+    const isTrueFalse = question.questionType?.toLowerCase() === 't/f' || question.questionType?.toLowerCase() === 'true/false';
+    const isFillInTheBlank = question.questionType?.toLowerCase() === 'fib' || question.questionType?.toLowerCase() === 'fill in the blank';
     let displayMatchingPairs = question.matchingPairs || [];
     
     // Fallback for legacy/imported matching questions
@@ -481,16 +498,7 @@ export default function QuestionCard({ question, index, testMode = false, isList
                         <span key={`tag-${idx}`} className="bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium rounded-md px-2.5 py-0.5 text-[11px] uppercase tracking-wide">{tag}</span>
                     ))}
 
-                    {/* Fallback example tags if none exist in the database for UI preview */}
-                    {!question.sourceYear && !(question as any).taxonomyTags?.length && !question.tags?.length && (
-                        <>
-                            <span className="bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium rounded-md px-2.5 py-0.5 text-[11px] uppercase tracking-wide">WBBSE</span>
-                            <span className="bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium rounded-md px-2.5 py-0.5 text-[11px] uppercase tracking-wide">CLASS 10</span>
-                            <span className="bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium rounded-md px-2.5 py-0.5 text-[11px] uppercase tracking-wide">বাংলা</span>
-                            <span className="bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium rounded-md px-2.5 py-0.5 text-[11px] uppercase tracking-wide">MCQ</span>
-                            <span className="bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium rounded-md px-2.5 py-0.5 text-[11px] uppercase tracking-wide">2022</span>
-                        </>
-                    )}
+
                     
                     {question.isVerified && (
                         <div className="flex items-center gap-1 text-[10px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-100 dark:border-indigo-500/20 uppercase tracking-wide">
@@ -545,14 +553,10 @@ export default function QuestionCard({ question, index, testMode = false, isList
                         </div>
                     ) : (
                         isDetailView ? (
-                            <h1 className="text-[1.3rem] md:text-[1.5rem] font-extrabold text-slate-800 dark:text-slate-200 leading-snug whitespace-pre-wrap mb-1 mt-0">
-                                {question.questionText}
-                            </h1>
+                            <h1 className="text-[1.3rem] md:text-[1.5rem] font-extrabold text-slate-800 dark:text-slate-200 leading-snug whitespace-pre-wrap mb-1 mt-0" dangerouslySetInnerHTML={{__html: renderMathInHtml(question.questionText)}} />
                         ) : (
                             <div className="text-[1rem] font-bold text-slate-800 dark:text-slate-200 leading-snug whitespace-pre-wrap">
-                                <Link href={`/question/${question.slug || question.id}`} className="hover:text-blue-600 transition-colors">
-                                    {question.questionText}
-                                </Link>
+                                <Link href={`/question/${question.slug || question.id}`} className="hover:text-blue-600 transition-colors" dangerouslySetInnerHTML={{__html: renderMathInHtml(question.questionText)}} />
                             </div>
                         )
                     )}
@@ -617,9 +621,7 @@ export default function QuestionCard({ question, index, testMode = false, isList
                                 )}>
                                     {Icon ? <Icon className="h-4 w-4" /> : getOptionLabel(key, question.language)}
                                 </div>
-                                <span className="text-[13px] flex-grow font-medium">
-                                    {value}
-                                </span>
+                                <span className="text-[13px] flex-grow font-medium" dangerouslySetInnerHTML={{__html: renderMathInHtml(value)}} />
                             </div>
                         )
                     })}
@@ -630,7 +632,11 @@ export default function QuestionCard({ question, index, testMode = false, isList
             {isTrueFalse && (
                 <div className="flex gap-4 mb-6">
                     {['True', 'False'].map(opt => {
-                        const isCorrectAnswer = question.correctAnswer?.toLowerCase() === opt.toLowerCase();
+                        const correctLower = question.correctAnswer?.toLowerCase();
+                        const optLower = opt.toLowerCase();
+                        const isCorrectAnswer = correctLower === optLower || 
+                                                (opt === 'True' && correctLower === 'a') || 
+                                                (opt === 'False' && correctLower === 'b');
                         let containerClasses = "bg-white border-slate-200 text-slate-700 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-300";
                         let Icon = null;
 
@@ -754,7 +760,7 @@ export default function QuestionCard({ question, index, testMode = false, isList
                         <CheckCircle2 className="w-4 h-4 text-green-600" />
                         {isDetailView ? <h2 className="text-base m-0">Answer</h2> : "Answer"}
                     </div>
-                    <div className="prose dark:prose-invert max-w-none opacity-90 !text-[0.85rem] prose-p:!text-[0.85rem] prose-p:!my-1 prose-headings:!text-[0.95rem] prose-headings:!my-1.5 prose-li:!text-[0.85rem] prose-li:!my-0.5" dangerouslySetInnerHTML={{ __html: getFormattedAnswer() }} />
+                    <div className="prose dark:prose-invert max-w-none opacity-90 !text-[0.85rem] prose-p:!text-[0.85rem] prose-p:!my-1 prose-headings:!text-[0.95rem] prose-headings:!my-1.5 prose-li:!text-[0.85rem] prose-li:!my-0.5" dangerouslySetInnerHTML={{ __html: renderMathInHtml(getFormattedAnswer()) }} />
                 </div>
             )}
 
@@ -767,7 +773,7 @@ export default function QuestionCard({ question, index, testMode = false, isList
                     </div>
                     
                     {question.explanation && (
-                        <div className="prose dark:prose-invert max-w-none opacity-90 !text-[0.8rem] prose-p:!text-[0.8rem] prose-p:!my-0.5 prose-headings:!text-[0.85rem] prose-headings:!my-1 prose-li:!text-[0.8rem] prose-li:!my-0 mb-3" dangerouslySetInnerHTML={{ __html: question.explanation }} />
+                        <div className="prose dark:prose-invert max-w-none opacity-90 !text-[0.8rem] prose-p:!text-[0.8rem] prose-p:!my-0.5 prose-headings:!text-[0.85rem] prose-headings:!my-1 prose-li:!text-[0.8rem] prose-li:!my-0 mb-3" dangerouslySetInnerHTML={{ __html: renderMathInHtml(question.explanation) }} />
                     )}
 
                     {question.optionExplanations && Object.keys(question.optionExplanations).length > 0 && (
@@ -783,12 +789,10 @@ export default function QuestionCard({ question, index, testMode = false, isList
                                             <span className="uppercase text-[11px] bg-slate-200 dark:bg-slate-700 w-5 h-5 flex items-center justify-center rounded text-slate-700 dark:text-slate-300">
                                                 {getOptionLabel(key, question.language)}
                                             </span>
-                                            <span className="line-clamp-1">{opt}</span>
+                                            <span className="line-clamp-1" dangerouslySetInnerHTML={{__html: renderMathInHtml(opt)}} />
                                             {isCorrect ? <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" /> : <XCircle className="w-4 h-4 text-red-500 shrink-0" />}
                                         </div>
-                                        <div className="pl-7 opacity-90 text-slate-700 dark:text-slate-300">
-                                            {exp}
-                                        </div>
+                                        <div className="pl-7 opacity-90 text-slate-700 dark:text-slate-300" dangerouslySetInnerHTML={{__html: renderMathInHtml(exp)}} />
                                     </div>
                                 );
                             })}

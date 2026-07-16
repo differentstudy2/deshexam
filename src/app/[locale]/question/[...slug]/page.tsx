@@ -142,6 +142,19 @@ export default async function DynamicQuestionPage({ params }: Props) {
           });
           
           relatedQuestions = Array.from(uniqueMap.values()).slice(0, 5);
+
+          // Hydrate tags for related questions
+          await Promise.all(relatedQuestions.map(async (rq) => {
+              let rTags: string[] = [];
+              if (rq.boardId) { const t = await tryFetchTitle(rq.boardId, 'guide_boards', 'question_boards'); if (t && t !== 'Board') rTags.push(t); }
+              if (rq.classId) { const t = await tryFetchTitle(rq.classId, 'guide_classes', 'question_classes'); if (t && t !== 'Class') rTags.push(t); }
+              if (rq.subjectId) { const t = await tryFetchTitle(rq.subjectId, 'guide_subjects', 'question_subjects'); if (t && t !== 'Subject') rTags.push(t); }
+              if (rq.textbookId) { const t = await tryFetchTitle(rq.textbookId, 'guide_textbooks', 'question_textbooks'); if (t && t !== 'Textbook') rTags.push(t); }
+              if (rq.chapterId) { const t = await tryFetchTitle(rq.chapterId, 'guide_chapters', 'question_chapters'); if (t && t !== 'Chapter') rTags.push(t); }
+              if (rq.topicId) { const t = await tryFetchTitle(rq.topicId, 'guide_topics', 'question_topics'); if (t && t !== 'Topic') rTags.push(t); }
+              if (rq.yearId) { const t = await tryFetchTitle(rq.yearId, 'question_years', 'question_years'); if (t) rTags.push(t); }
+              rq.taxonomyTags = Array.from(new Set(rTags));
+          }));
       } catch(e) {}
   }
 
