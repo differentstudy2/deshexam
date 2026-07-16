@@ -368,7 +368,11 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                   sourceExam: editData.examIds && editData.examIds.length > 0 ? exams.filter(ex => editData.examIds?.includes(ex.id)).map(ex => ex.name).join(', ') : q.sourceExam,
                   status: q.status || 'Published',
                   difficulty: q.difficulty || editData.difficulty || 'Medium',
-                  slug: q.slug || slugify(q.title || (q.questionText || '').replace(/<[^>]*>?/gm, '').substring(0, 50))
+                  slug: q.slug || slugify((q.title || q.questionText || '')
+                    .replace(/<[^>]*>?/gm, '')
+                    .replace(/\[?cite[\s:\d]*\]?/gi, '')
+                    .replace(/\[\d+\]/g, '')
+                    .substring(0, 50))
               };
           });
 
@@ -431,8 +435,9 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
       }
       setIsSaving(true);
       try {
-          const cleanText = (editData.questionText || '').replace(/<[^>]*>?/gm, '');
-          const generatedSlug = editData.slug || slugify(editData.title || cleanText.substring(0, 50));
+          const cleanText = (editData.questionText || '').replace(/<[^>]*>?/gm, '').replace(/\[?cite[\s:\d]*\]?/gi, '').replace(/\[\d+\]/g, '');
+          const titleForSlug = (editData.title || '').replace(/\[?cite[\s:\d]*\]?/gi, '').replace(/\[\d+\]/g, '');
+          const generatedSlug = editData.slug || slugify(titleForSlug || cleanText.substring(0, 50));
           const dataToSave = {
               contentType: defaultContentType || 'general',
               ...editData,
