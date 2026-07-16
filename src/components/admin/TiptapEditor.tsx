@@ -530,8 +530,14 @@ export function TiptapEditor({ content, onChange, maxHeight }: { content: string
       if (!response.ok) throw new Error('AI Generation failed');
       const data = await response.json();
 
+      let resultText = data.result || '';
+      // Strip markdown code block wrappers if the AI ignored instructions
+      if (resultText.trim().startsWith('```')) {
+        resultText = resultText.trim().replace(/^```(html|markdown|json)?\n/i, '').replace(/\n```$/i, '');
+      }
+
       if (editor) {
-        editor.commands.insertContent(data.result);
+        editor.commands.insertContent(resultText);
       }
       setAiDialogOpen(false);
       setAiPrompt('');
