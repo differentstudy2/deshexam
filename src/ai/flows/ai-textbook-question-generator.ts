@@ -47,6 +47,7 @@ export async function generateTextbookQuestions(input: AITextbookQuestionGenerat
 
 const prompt = ai.definePrompt({
   name: 'aiTextbookQuestionGeneratorPrompt',
+  model: 'googleai/gemini-2.5-flash',
   input: { schema: AITextbookQuestionGeneratorInputSchema },
   output: { schema: AITextbookQuestionGeneratorOutputSchema },
   prompt: `You are an expert at creating educational questions from a given text. Your task is to generate a set of questions based on the provided textbook content.

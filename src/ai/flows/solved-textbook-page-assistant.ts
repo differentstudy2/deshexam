@@ -10,7 +10,6 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import wav from 'wav';
 
 const SolvedTextbookPageAssistantInputSchema = z.object({
   pageDataUri: z
@@ -32,6 +31,7 @@ export async function solvedTextbookPageAssistant(input: SolvedTextbookPageAssis
 
 const prompt = ai.definePrompt({
   name: 'solvedTextbookPageAssistantPrompt',
+  model: 'googleai/gemini-2.5-flash',
   input: {schema: SolvedTextbookPageAssistantInputSchema},
   output: {schema: SolvedTextbookPageAssistantOutputSchema},
   prompt: `You are an expert at extracting and styling text content from images of textbook pages. Your task is to transcribe the text and then format it into clear, stylish, and engaging Markdown.

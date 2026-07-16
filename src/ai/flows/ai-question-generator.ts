@@ -42,6 +42,7 @@ export async function generateQuestions(input: AIQuestionGeneratorInput): Promis
 
 const prompt = ai.definePrompt({
   name: 'aiQuestionGeneratorPrompt',
+  model: 'googleai/gemini-2.5-flash',
   input: { schema: AIQuestionGeneratorInputSchema },
   output: { schema: AIQuestionGeneratorOutputSchema },
   prompt: `You are an expert at creating educational questions. Your task is to generate a set of questions based on the provided source.

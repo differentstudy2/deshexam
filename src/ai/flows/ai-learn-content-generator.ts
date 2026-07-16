@@ -1,4 +1,3 @@
-
 'use server';
 /**
  * @fileOverview Generates educational articles (Learn content) using an AI model.
@@ -29,6 +28,7 @@ export async function generateLearnContent(input: AILearnContentGeneratorInput):
 
 const prompt = ai.definePrompt({
   name: 'aiLearnContentGeneratorPrompt',
+  model: 'googleai/gemini-2.5-flash',
   input: { schema: AILearnContentGeneratorInputSchema },
   output: { schema: AILearnContentGeneratorOutputSchema },
   prompt: `You are an expert content writer specializing in creating stylish and engaging educational articles.
@@ -69,7 +69,3 @@ const generateLearnContentFlow = ai.defineFlow(
     return output!;
   }
 );
-
-    
-
-    

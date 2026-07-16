@@ -31,6 +31,7 @@ export async function generateLearningPath(input: LearningPathInput): Promise<Le
 
 const prompt = ai.definePrompt({
   name: 'learningPathPrompt',
+  model: 'googleai/gemini-2.5-flash',
   input: {schema: LearningPathInputSchema},
   output: {schema: LearningPathOutputSchema},
   prompt: `You are an AI learning path generator that helps students to improve their understanding of the subjects.

@@ -27,6 +27,7 @@ export async function generateTitle(input: AITitleGeneratorInput): Promise<AITit
 
 const prompt = ai.definePrompt({
   name: 'aiTitleGeneratorPrompt',
+  model: 'googleai/gemini-2.5-flash',
   input: { schema: AITitleGeneratorInputSchema },
   output: { schema: AITitleGeneratorOutputSchema },
   prompt: `You are an expert at writing compelling and SEO-friendly titles for online content. 

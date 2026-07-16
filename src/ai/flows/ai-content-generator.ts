@@ -54,6 +54,7 @@ export async function generateContent(input: AIContentGeneratorInput): Promise<A
 
 const prompt = ai.definePrompt({
   name: 'aiContentGeneratorPrompt',
+  model: 'googleai/gemini-2.5-flash',
   input: { schema: AIContentGeneratorInputSchema },
   output: { schema: AIContentGeneratorOutputSchema },
   prompt: `You are an expert at creating educational content. Your task is to generate a {{contentType}} based on the provided source.

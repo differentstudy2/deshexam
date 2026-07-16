@@ -6,7 +6,7 @@ import {
   ArrowLeft, Save, BookOpen, FileText, Type, Target, Info, User,
   Lightbulb, PenTool, HelpCircle, Brain, CheckSquare, FileArchive,
   FileImage, Video, Headphones, Plus, Trash2, ClipboardList, StickyNote,
-  Key, Timer, Award, Bookmark, ChevronRight, LayoutDashboard, Globe
+  Key, Timer, Award, Bookmark, ChevronRight, LayoutDashboard, Globe, Sparkles, Loader2
 } from 'lucide-react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
@@ -93,6 +93,7 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
   const [nodeDbId, setNodeDbId] = useState<string>('');
   const [contentLang, setContentLang] = useState<'bn' | 'en'>('bn');
   const [isTranslating, setIsTranslating] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
     const loadContent = async () => {
@@ -275,6 +276,39 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
     }
   };
 
+  const handleAIGenerate = async () => {
+    if (!nodeTitle) {
+      toast({ title: 'No Topic Title', description: 'Please ensure the topic has a title.', variant: 'destructive' });
+      return;
+    }
+    
+    setIsGenerating(true);
+    try {
+      const { generateLearnContent } = await import('@/ai/flows/ai-learn-content-generator');
+      const topicToGenerate = `${nodeTitle} - ${activeSection?.label || activeTab}`;
+      const res = await generateLearnContent({ topic: topicToGenerate });
+      
+      if (res && res.body) {
+        let cleanBody = res.body.trim();
+        if (cleanBody.startsWith('```')) {
+          cleanBody = cleanBody.replace(/^```(markdown|html)?\n/i, '').replace(/\n```$/i, '');
+        }
+        
+        const { marked } = await import('marked');
+        const html = await marked.parse(cleanBody);
+
+        const key = contentLang === 'en' ? `${activeTab}_en` : activeTab;
+        setContentMap(prev => ({ ...prev, [key]: html }));
+        toast({ title: 'Generated Successfully', description: 'AI content has been populated.' });
+      }
+    } catch (error: any) {
+      console.error(error);
+      toast({ title: 'Generation Failed', description: error.message, variant: 'destructive' });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   // ── Sidebar nav content (shared between desktop sidebar + mobile drawer) ──
   const sidebarNavContent = (
     <div className="flex flex-col h-full overflow-y-auto">
@@ -392,13 +426,24 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
       ) : activeTab === 'pdf' ? (
         <TopicDocumentManager topicId={topicId} />
       ) : ['lesson','guide_content','objective','introduction','author','explanation','exercise','notes','solutions','bookmark','word_meaning'].includes(activeTab) ? (
-        <div className="bg-white dark:bg-[#1a1d27] rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm relative">
+        <div className="bg-white dark:bg-[#1a1d27] rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm relative flex flex-col h-full">
+          <div className="flex justify-between items-center p-3 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
+             <span className="text-sm font-semibold flex items-center gap-2">
+               {activeSection && React.createElement(activeSection.icon, { className: "w-4 h-4 text-[#107c41]" })}
+               {activeSection?.label} Editor
+             </span>
+             <Button type="button" variant="outline" size="sm" onClick={handleAIGenerate} disabled={isGenerating}>
+               {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4 text-amber-500" />} Generate with AI
+             </Button>
+          </div>
           {contentLang === 'en' && (
-            <div className="absolute top-0 right-0 m-2 px-2 py-1 bg-blue-100 text-blue-800 text-xs font-bold rounded z-10 flex items-center gap-1 shadow-sm">
+            <div className="absolute top-14 right-0 m-2 px-2 py-1 bg-blue-100 text-blue-800 text-xs font-bold rounded z-10 flex items-center gap-1 shadow-sm">
               <Globe className="w-3 h-3" /> English Variant
             </div>
           )}
-          <TiptapEditor key={`${activeTab}_${contentLang}`} content={contentMap[contentLang === 'en' ? `${activeTab}_en` : activeTab] || ''} onChange={handleRichTextChange} />
+          <div className="flex-1 overflow-auto p-2">
+            <TiptapEditor key={`${activeTab}_${contentLang}`} content={contentMap[contentLang === 'en' ? `${activeTab}_en` : activeTab] || ''} onChange={handleRichTextChange} />
+          </div>
         </div>
       ) : activeTab === 'audio' ? (
         <div className="space-y-3">

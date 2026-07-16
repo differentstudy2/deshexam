@@ -26,6 +26,7 @@ export async function generateSummary(input: AISummaryGeneratorInput): Promise<A
 
 const prompt = ai.definePrompt({
   name: 'aiSummaryGeneratorPrompt',
+  model: 'googleai/gemini-2.5-flash',
   input: { schema: AISummaryGeneratorInputSchema },
   output: { schema: AISummaryGeneratorOutputSchema },
   prompt: `You are an expert at simplifying complex educational content. Your task is to analyze the following text and generate a clear, easy-to-understand summary and a list of key takeaways.
