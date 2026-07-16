@@ -22,11 +22,14 @@ import 'katex/dist/katex.min.css';
 const renderMathInHtml = (htmlString: string) => {
   if (!htmlString) return '';
   try {
+    if (!htmlString.includes('$')) return htmlString;
     return htmlString.replace(/\$([^\$]+)\$/g, (match, math) => {
-      return katex.renderToString(math, { throwOnError: false });
+      // Decode HTML entities and remove tags that Tiptap might inject
+      let decodedMath = math.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&nbsp;/g, ' ').replace(/<[^>]+>/g, '');
+      return katex.renderToString(decodedMath, { throwOnError: false, displayMode: false });
     });
-  } catch(e) {
-    return htmlString;
+  } catch(e: any) {
+    return htmlString + ` <span class="text-red-500 text-xs">[KaTeX Error: ${e?.message || 'Unknown'}]</span>`;
   }
 };
 
