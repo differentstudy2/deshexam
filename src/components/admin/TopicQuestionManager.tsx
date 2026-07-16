@@ -556,6 +556,7 @@ ${aiPrompt}`;
                     <span className="text-[10px] font-semibold text-slate-400 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-full">{q.questionType}</span>
                     {q.difficulty && <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${ q.difficulty === 'Easy' ? 'text-emerald-700 bg-emerald-50' : q.difficulty === 'Hard' ? 'text-red-600 bg-red-50' : 'text-amber-600 bg-amber-50' }`}>{q.difficulty}</span>}
                     <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${ q.status === 'Published' ? 'text-emerald-700 bg-emerald-50' : 'text-slate-500 bg-slate-100' }`}>{q.status}</span>
+                    {q.language && <span className="text-[10px] font-semibold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded-full dark:text-blue-400 dark:bg-blue-900/30">{q.language}</span>}
                   </div>
 
                   {/* Question text */}
