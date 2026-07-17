@@ -34,6 +34,7 @@ import { LessonToolsPanel } from '@/components/feature/textbook/LessonToolsPanel
 import { CustomMarkdownRenderers } from '@/components/feature/textbook/CustomMarkdownRenderers';
 import { useTheme } from 'next-themes';
 import { Progress } from '@/components/ui/progress';
+import { useProgress } from '@/hooks/use-progress';
 
 export default function ChapterClientPage() {
     const params = useParams();
@@ -62,6 +63,12 @@ export default function ChapterClientPage() {
     const currentIndex = useMemo(() => {
         return chapters.findIndex(c => c.id === chapterId);
     }, [chapters, chapterId]);
+
+    const { 
+        progressPercentage, 
+        toggleChapterComplete, 
+        isChapterComplete 
+    } = useProgress(textbookId, chapters.length);
 
     const fetchInitialData = useCallback(async () => {
         setLoading(true);
@@ -224,9 +231,9 @@ export default function ChapterClientPage() {
                     <div className="relative w-12 h-12 flex items-center justify-center shrink-0">
                         <svg className="w-full h-full -rotate-90 transform" viewBox="0 0 100 100">
                             <circle className="text-muted/30 stroke-current" strokeWidth="8" cx="50" cy="50" r="40" fill="transparent" />
-                            <circle className="text-green-500 stroke-current" strokeWidth="8" strokeLinecap="round" cx="50" cy="50" r="40" fill="transparent" strokeDasharray="164 251.2" />
+                            <circle className="text-green-500 stroke-current" strokeWidth="8" strokeLinecap="round" cx="50" cy="50" r="40" fill="transparent" strokeDasharray={`${(progressPercentage / 100) * 251.2} 251.2`} />
                         </svg>
-                        <span className="absolute text-xs font-bold text-foreground">65%</span>
+                        <span className="absolute text-xs font-bold text-foreground">{progressPercentage}%</span>
                     </div>
                     <Link href={`/textbook-solutions/${textbookId}/chapter/${activeChapter?.id}`} className="text-sm font-semibold line-clamp-2 pr-2 hover:text-primary transition-colors">
                         {activeChapter?.title}
@@ -246,7 +253,11 @@ export default function ChapterClientPage() {
                     <AccordionItem value={chapter.id} key={chapter.id}>
                       <AccordionTrigger className="hover:no-underline [&[data-state=open]]:bg-accent/50 px-4 py-3 text-sm font-medium">
                          <div className="flex items-center gap-2 text-left w-full">
-                            <BookOpen className="w-4 h-4 shrink-0 text-muted-foreground" />
+                            {isChapterComplete(chapter.id) ? (
+                                <svg className="w-4 h-4 shrink-0 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                            ) : (
+                                <BookOpen className="w-4 h-4 shrink-0 text-muted-foreground" />
+                            )}
                             <span className="flex-1 line-clamp-2">
                                 <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}`} className="hover:text-primary transition-colors hover:underline" onClick={(e) => e.stopPropagation()}>
                                     {chapter.title}
@@ -387,8 +398,8 @@ export default function ChapterClientPage() {
                                         Medium
                                     </div>
                                     <div className="flex-1 min-w-[200px] flex items-center gap-3">
-                                        <Progress value={0} className="h-2 flex-1" />
-                                        <span className="text-xs font-semibold">0%</span>
+                                        <Progress value={progressPercentage} className="h-2 flex-1" />
+                                        <span className="text-xs font-semibold">{progressPercentage}%</span>
                                     </div>
                                 </div>
                                 <Button className="mt-4 bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-500/20 px-8 py-5 text-lg rounded-xl transition-transform hover:scale-105">
@@ -451,9 +462,12 @@ export default function ChapterClientPage() {
                             <div className="flex sm:hidden flex-col gap-4 w-full">
                                 {/* Mark & Practice */}
                                 <div className="flex flex-col gap-3 w-full">
-                                    <Button className="rounded-full px-6 bg-green-600 hover:bg-green-700 w-full shadow-md">
+                                    <Button 
+                                        className={cn("rounded-full px-6 w-full shadow-md", isChapterComplete(chapterId) ? "bg-muted text-foreground hover:bg-muted/80" : "bg-green-600 hover:bg-green-700")}
+                                        onClick={() => toggleChapterComplete(chapterId)}
+                                    >
                                         <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
-                                        Mark Complete
+                                        {isChapterComplete(chapterId) ? "Completed" : "Mark Complete"}
                                     </Button>
                                     <Button variant="outline" className="rounded-full px-6 w-full bg-background">Practice</Button>
                                 </div>
@@ -501,9 +515,12 @@ export default function ChapterClientPage() {
                                 )}
 
                                 <div className="flex gap-3">
-                                    <Button className="rounded-full px-6 bg-green-600 hover:bg-green-700 shadow-md">
+                                    <Button 
+                                        className={cn("rounded-full px-6 shadow-md", isChapterComplete(chapterId) ? "bg-muted text-foreground hover:bg-muted/80" : "bg-green-600 hover:bg-green-700")}
+                                        onClick={() => toggleChapterComplete(chapterId)}
+                                    >
                                         <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
-                                        Mark Complete
+                                        {isChapterComplete(chapterId) ? "Completed" : "Mark Complete"}
                                     </Button>
                                     <Button variant="outline" className="rounded-full px-6 bg-background">Practice</Button>
                                     {currentIndex < chapters.length - 1 && currentIndex !== -1 ? (
