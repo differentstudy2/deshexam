@@ -302,15 +302,19 @@ export default function ChapterClientPage() {
                  <Button variant="ghost" size="icon"><Bookmark className="w-5 h-5" /></Button>
             </div>
 
-            <div className="flex-1 max-w-[1536px] mx-auto w-full grid grid-cols-1 md:grid-cols-[280px_1fr] lg:grid-cols-[280px_1fr_320px]">
+            <div className={cn(
+                "flex-1 mx-auto w-full grid grid-cols-1 transition-all duration-300",
+                !focusMode 
+                    ? "max-w-[1536px] md:grid-cols-[280px_1fr] lg:grid-cols-[280px_1fr_320px]" 
+                    : "max-w-[1024px] md:grid-cols-1"
+            )}>
                 
                 {/* Left Sidebar - Desktop */}
-                <aside className={cn(
-                    "hidden md:block h-[calc(100vh-64px)] sticky top-16 border-r overflow-y-auto transition-all duration-300",
-                    focusMode ? "-ml-[280px] opacity-0 pointer-events-none" : "ml-0 opacity-100"
-                )}>
-                    {leftSidebar}
-                </aside>
+                {!focusMode && (
+                    <aside className="hidden md:block h-[calc(100vh-64px)] sticky top-16 border-r transition-all duration-300">
+                        {leftSidebar}
+                    </aside>
+                )}
 
                 {/* Main Content Column */}
                 <main className={cn(
@@ -318,18 +322,18 @@ export default function ChapterClientPage() {
                     "mx-auto w-full max-w-[920px]"
                 )}>
                     {/* Top Utility Bar */}
-                    <div className="sticky top-0 md:top-16 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b px-6 py-3 flex items-center justify-between">
-                        <nav className="hidden sm:flex text-sm overflow-hidden">
-                            <ol className="flex items-center gap-1.5 whitespace-nowrap text-muted-foreground">
+                    <div className="sticky top-0 md:top-16 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
+                        <nav className="hidden sm:flex text-sm overflow-hidden min-w-0 flex-1 mr-4">
+                            <ol className="flex items-center gap-1.5 whitespace-nowrap text-muted-foreground w-full">
                                 {breadcrumbs.map((crumb, index) => (
-                                   <li key={index} className="flex items-center gap-1.5">
-                                       <Link href={crumb.href} className="hover:text-foreground">{crumb.name}</Link>
-                                       {index < breadcrumbs.length - 1 && <ChevronRight className="w-4 h-4"/>}
+                                   <li key={index} className="flex items-center gap-1.5 min-w-0 shrink">
+                                       <Link href={crumb.href} className="hover:text-foreground truncate block max-w-[100px] md:max-w-[150px]">{crumb.name}</Link>
+                                       {index < breadcrumbs.length - 1 && <ChevronRight className="w-4 h-4 shrink-0"/>}
                                    </li>
                                 ))}
                             </ol>
                         </nav>
-                        <div className="flex items-center gap-2 ml-auto">
+                        <div className="flex items-center gap-2 shrink-0 ml-auto">
                             <div className="flex items-center border rounded-md">
                                 <Button variant="ghost" size="sm" onClick={() => setFontSize('normal')} className={cn("px-2 text-xs", fontSize === 'normal' && "bg-muted")}>A-</Button>
                                 <div className="w-px h-4 bg-border" />
@@ -338,10 +342,17 @@ export default function ChapterClientPage() {
                             <Button variant="ghost" size="icon" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
                                 {theme === 'dark' ? <Sun className="w-4 h-4"/> : <Moon className="w-4 h-4"/>}
                             </Button>
-                            <Button variant="ghost" size="icon"><Share2 className="w-4 h-4"/></Button>
-                            <Button variant="ghost" size="icon"><Bookmark className="w-4 h-4"/></Button>
+                            <Button variant="ghost" size="icon" onClick={() => {
+                                navigator.clipboard.writeText(window.location.href);
+                                toast({ title: "Link copied to clipboard" });
+                            }}>
+                                <Share2 className="w-4 h-4"/>
+                            </Button>
+                            <Button variant="ghost" size="icon" onClick={() => toast({ title: "Lesson Bookmarked!" })}>
+                                <Bookmark className="w-4 h-4"/>
+                            </Button>
                             <div className="flex items-center gap-2 ml-2 pl-4 border-l">
-                                <span className="text-sm text-muted-foreground">Focus Mode</span>
+                                <span className="text-sm text-muted-foreground hidden lg:inline">Focus Mode</span>
                                 <Switch checked={focusMode} onCheckedChange={setFocusMode} />
                             </div>
                         </div>
@@ -397,6 +408,15 @@ export default function ChapterClientPage() {
                                 <ReactMarkdown 
                                     components={{
                                         ...CustomMarkdownRenderers,
+                                        img: ({node, ...props}) => (
+                                            <span className="flex justify-center my-8">
+                                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                <img className="rounded-lg shadow-md max-h-[60vh] object-contain" {...props} alt={props.alt || "image"} />
+                                            </span>
+                                        ),
+                                        blockquote: ({node, ...props}) => (
+                                            <blockquote className="border-l-4 border-green-500 bg-yellow-50 dark:bg-yellow-500/10 p-4 rounded-r-lg my-6 not-prose text-slate-900 dark:text-yellow-50" {...props} />
+                                        ),
                                         h1: ({node, ...props}: any) => {
                                             const id = props.children?.toString().toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
                                             return <h1 id={id} className="text-3xl font-bold mt-12 mb-6" {...props} />
@@ -425,54 +445,98 @@ export default function ChapterClientPage() {
                         )}
 
                         {/* Bottom Navigation */}
-                        <div className="mt-16 pt-8 border-t flex flex-col sm:flex-row items-center justify-between gap-4">
-                            {currentIndex > 0 ? (
-                                <Button variant="outline" className="rounded-full px-6 w-full sm:w-auto" asChild>
-                                    <Link href={`/textbook-solutions/${textbookId}/chapter/${chapters[currentIndex - 1].id}`}>
-                                        <ChevronRight className="w-4 h-4 mr-2 rotate-180" /> Previous Lesson
-                                    </Link>
-                                </Button>
-                            ) : (
-                                <Button variant="outline" className="rounded-full px-6 w-full sm:w-auto" disabled>
-                                    <ChevronRight className="w-4 h-4 mr-2 rotate-180" /> Previous Lesson
-                                </Button>
-                            )}
-                            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                                <Button className="rounded-full px-6 bg-green-600 hover:bg-green-700 w-full sm:w-auto">
-                                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
-                                    Mark Complete
-                                </Button>
-                                <Button variant="outline" className="rounded-full px-6 w-full sm:w-auto">Practice</Button>
-                                {currentIndex < chapters.length - 1 && currentIndex !== -1 ? (
-                                    <Button className="rounded-full px-6 w-full sm:w-auto" asChild>
-                                        <Link href={`/textbook-solutions/${textbookId}/chapter/${chapters[currentIndex + 1].id}`}>
-                                            Next Lesson <ChevronRight className="w-4 h-4 ml-2" />
+                        <div className="mt-16 pt-8 border-t flex flex-col gap-4">
+                            
+                            {/* Mobile-only Layout */}
+                            <div className="flex sm:hidden flex-col gap-4 w-full">
+                                {/* Mark & Practice */}
+                                <div className="flex flex-col gap-3 w-full">
+                                    <Button className="rounded-full px-6 bg-green-600 hover:bg-green-700 w-full shadow-md">
+                                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                                        Mark Complete
+                                    </Button>
+                                    <Button variant="outline" className="rounded-full px-6 w-full bg-background">Practice</Button>
+                                </div>
+                                
+                                {/* Prev and Next side-by-side */}
+                                <div className="flex items-center justify-between gap-3 w-full pt-2">
+                                    {currentIndex > 0 ? (
+                                        <Button variant="secondary" className="rounded-full px-4 flex-1" asChild>
+                                            <Link href={`/textbook-solutions/${textbookId}/chapter/${chapters[currentIndex - 1].id}`}>
+                                                <ChevronRight className="w-4 h-4 mr-1 rotate-180" /> Prev
+                                            </Link>
+                                        </Button>
+                                    ) : (
+                                        <Button variant="secondary" className="rounded-full px-4 flex-1 opacity-50" disabled>
+                                            <ChevronRight className="w-4 h-4 mr-1 rotate-180" /> Prev
+                                        </Button>
+                                    )}
+
+                                    {currentIndex < chapters.length - 1 && currentIndex !== -1 ? (
+                                        <Button variant="secondary" className="rounded-full px-4 flex-1" asChild>
+                                            <Link href={`/textbook-solutions/${textbookId}/chapter/${chapters[currentIndex + 1].id}`}>
+                                                Next <ChevronRight className="w-4 h-4 ml-1" />
+                                            </Link>
+                                        </Button>
+                                    ) : (
+                                        <Button variant="secondary" className="rounded-full px-4 flex-1 opacity-50" disabled>
+                                            Next <ChevronRight className="w-4 h-4 ml-1" />
+                                        </Button>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Desktop Layout */}
+                            <div className="hidden sm:flex items-center justify-between w-full">
+                                {currentIndex > 0 ? (
+                                    <Button variant="outline" className="rounded-full px-6 bg-background" asChild>
+                                        <Link href={`/textbook-solutions/${textbookId}/chapter/${chapters[currentIndex - 1].id}`}>
+                                            <ChevronRight className="w-4 h-4 mr-2 rotate-180" /> Previous Lesson
                                         </Link>
                                     </Button>
                                 ) : (
-                                    <Button className="rounded-full px-6 w-full sm:w-auto" disabled>
-                                        Next Lesson <ChevronRight className="w-4 h-4 ml-2" />
+                                    <Button variant="outline" className="rounded-full px-6 bg-background opacity-50" disabled>
+                                        <ChevronRight className="w-4 h-4 mr-2 rotate-180" /> Previous Lesson
                                     </Button>
                                 )}
+
+                                <div className="flex gap-3">
+                                    <Button className="rounded-full px-6 bg-green-600 hover:bg-green-700 shadow-md">
+                                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                                        Mark Complete
+                                    </Button>
+                                    <Button variant="outline" className="rounded-full px-6 bg-background">Practice</Button>
+                                    {currentIndex < chapters.length - 1 && currentIndex !== -1 ? (
+                                        <Button className="rounded-full px-6" asChild>
+                                            <Link href={`/textbook-solutions/${textbookId}/chapter/${chapters[currentIndex + 1].id}`}>
+                                                Next Lesson <ChevronRight className="w-4 h-4 ml-2" />
+                                            </Link>
+                                        </Button>
+                                    ) : (
+                                        <Button className="rounded-full px-6 opacity-50" disabled>
+                                            Next Lesson <ChevronRight className="w-4 h-4 ml-2" />
+                                        </Button>
+                                    )}
+                                </div>
                             </div>
+
                         </div>
 
                     </div>
                 </main>
 
                 {/* Right Sidebar - Sticky Tools Panel */}
-                <aside className={cn(
-                    "hidden lg:block h-[calc(100vh-64px)] sticky top-16 border-l p-6 overflow-y-auto bg-muted/10 transition-all duration-300",
-                    focusMode ? "-mr-[320px] opacity-0 pointer-events-none" : "mr-0 opacity-100"
-                )}>
-                    <LessonToolsPanel 
-                        progress={0} 
-                        sectionsFinished={0} 
-                        totalSections={headings.length}
-                        textbookId={textbookId}
-                        chapterId={chapterId}
-                    />
-                </aside>
+                {!focusMode && (
+                    <aside className="hidden lg:block h-[calc(100vh-64px)] sticky top-16 border-l p-6 overflow-y-auto bg-muted/10 transition-all duration-300">
+                        <LessonToolsPanel 
+                            progress={0} 
+                            sectionsFinished={0} 
+                            totalSections={headings.length}
+                            textbookId={textbookId}
+                            chapterId={chapterId}
+                        />
+                    </aside>
+                )}
 
             </div>
         </div>
