@@ -1,5 +1,6 @@
 import React from 'react';
 import { getAssessmentBySlug, getAssessments } from '@/lib/firebase/assessment';
+import { getTaxonomyNodeById } from '@/lib/firebase/taxonomy';
 import { notFound } from 'next/navigation';
 import { MockTest } from '@/lib/assessment-types';
 import { Metadata, ResolvingMetadata } from 'next';
@@ -113,6 +114,18 @@ export default async function QuizLandingPage({ params }: Props) {
 
   const allTests = await getAssessments('quizzes') as MockTest[];
   const related = allTests.filter(a => a.id !== test.id && a.status === 'Published').slice(0, 3);
+
+  let boardName = '';
+  let className = '';
+  let subjectName = '';
+  let textbookName = '';
+  let chapterName = '';
+
+  if (test.boardId) { const node = await getTaxonomyNodeById(test.boardId); if (node) boardName = node.acronym || node.title; }
+  if (test.classId) { const node = await getTaxonomyNodeById(test.classId); if (node) className = node.title; }
+  if (test.subjectId) { const node = await getTaxonomyNodeById(test.subjectId); if (node) subjectName = node.title; }
+  if (test.textbookId) { const node = await getTaxonomyNodeById(test.textbookId); if (node) textbookName = node.title; }
+  if (test.chapterId) { const node = await getTaxonomyNodeById(test.chapterId); if (node) chapterName = node.title; }
 
   const jsonLdBreadcrumb = {
     "@context": "https://schema.org",
@@ -277,9 +290,41 @@ export default async function QuizLandingPage({ params }: Props) {
                 </h1>
 
                 {test.description && (
-                  <p className="text-slate-400 text-base lg:text-lg max-w-xl leading-relaxed">
+                  <p className="text-slate-400 text-base lg:text-lg max-w-xl leading-relaxed mt-4">
                     {test.description}
                   </p>
+                )}
+
+                {/* Academic Details */}
+                {(boardName || className || subjectName || textbookName || chapterName) && (
+                  <div className="flex flex-wrap items-center gap-2 text-sm text-slate-300 bg-white/5 p-3 rounded-xl border border-white/10 mt-6 shadow-sm">
+                     <BookOpen className="w-4 h-4 text-emerald-400 mr-1" />
+                     {boardName && <span className="bg-white/10 hover:bg-white/20 transition-colors px-2.5 py-1 rounded-md text-xs font-medium">{boardName}</span>}
+                     {className && (
+                        <>
+                           <ChevronRight className="w-3 h-3 text-slate-500" />
+                           <span className="bg-white/10 hover:bg-white/20 transition-colors px-2.5 py-1 rounded-md text-xs font-medium">{className}</span>
+                        </>
+                     )}
+                     {subjectName && (
+                        <>
+                           <ChevronRight className="w-3 h-3 text-slate-500" />
+                           <span className="bg-white/10 hover:bg-white/20 transition-colors px-2.5 py-1 rounded-md text-xs font-medium">{subjectName}</span>
+                        </>
+                     )}
+                     {textbookName && (
+                        <>
+                           <ChevronRight className="w-3 h-3 text-slate-500" />
+                           <span className="bg-white/10 hover:bg-white/20 transition-colors px-2.5 py-1 rounded-md text-xs font-medium">{textbookName}</span>
+                        </>
+                     )}
+                     {chapterName && (
+                        <>
+                           <ChevronRight className="w-3 h-3 text-slate-500" />
+                           <span className="bg-white/10 hover:bg-white/20 transition-colors px-2.5 py-1 rounded-md text-xs font-medium">{chapterName}</span>
+                        </>
+                     )}
+                  </div>
                 )}
 
                 {/* Stats strip */}
