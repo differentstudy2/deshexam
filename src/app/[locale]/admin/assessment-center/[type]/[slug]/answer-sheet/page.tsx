@@ -90,7 +90,11 @@ export default async function AnswerSheetPage({
 
     return (
         <div className="min-h-screen bg-white text-black p-8 font-sans print:p-0 print:bg-white print:text-black print:min-h-0 print:block">
-            
+            <style dangerouslySetInnerHTML={{__html: `
+                @media print {
+                    @page { margin: 0; }
+                }
+            `}} />
             {/* Watermark for Print */}
             <div className="fixed inset-0 pointer-events-none z-0 hidden print:flex items-center justify-center opacity-10 print:opacity-10">
                 <div className="text-7xl font-bold text-gray-400 -rotate-45 whitespace-nowrap">
@@ -99,7 +103,7 @@ export default async function AnswerSheetPage({
             </div>
 
             {/* Header - Print Friendly */}
-            <div className="mb-8">
+            <div className="mb-8 print:pt-12 print:px-12">
                 {/* Top Row: QR, Title, Set Info */}
                 <div className="flex justify-between items-start mb-4">
                     {/* Left: QR and Marks */}
@@ -174,12 +178,22 @@ export default async function AnswerSheetPage({
             </div>
 
             {/* Questions List */}
-            <div className="space-y-12 print:space-y-6">
+            <div className="space-y-12 print:space-y-0">
                 {sortedQuestions.length === 0 ? (
                     <p className="text-center italic text-gray-500">No questions found for this assessment.</p>
                 ) : (
-                    sortedQuestions.map((q, index) => (
-                        <div key={q.id} className={`border border-gray-200 p-6 rounded-lg print:border-none print:p-0 print:border-b-0 print:pb-0 print:break-after-page ${index > 0 ? 'break-inside-avoid print:break-inside-avoid' : ''}`}>
+                    sortedQuestions.map((q, index) => {
+                        const premiumColors = [
+                            'bg-blue-50/50 print:bg-[#f0f7ff]',
+                            'bg-emerald-50/50 print:bg-[#f0fdf4]',
+                            'bg-purple-50/50 print:bg-[#faf5ff]',
+                            'bg-rose-50/50 print:bg-[#fff1f2]',
+                            'bg-amber-50/50 print:bg-[#fffbeb]',
+                        ];
+                        const bgColor = premiumColors[index % premiumColors.length];
+                        
+                        return (
+                        <div key={q.id} className={`${bgColor} border border-gray-200 p-6 rounded-lg print:border-none print:p-12 print:pt-16 print:border-b-0 print:pb-12 print:break-after-page print:min-h-screen print:[print-color-adjust:exact] ${index > 0 ? 'break-inside-avoid print:break-inside-avoid' : ''}`}>
                             
                             {/* Question Header */}
                             <div className="flex justify-between items-start mb-4">
@@ -209,16 +223,22 @@ export default async function AnswerSheetPage({
                                     return (
                                         <div 
                                             key={opt.key} 
-                                            className={`flex items-center gap-3 p-3 rounded-full border ${
+                                            className={`flex items-center gap-3 p-3 rounded-full border print:[print-color-adjust:exact] ${
                                                 isCorrect 
-                                                ? 'border-emerald-400 bg-emerald-50/50 print:border-black print:bg-gray-100 print:font-bold' 
-                                                : 'border-gray-200 print:border-gray-300'
+                                                ? 'border-emerald-400 bg-emerald-50/50 print:border-emerald-500 print:bg-emerald-50 print:font-bold' 
+                                                : [
+                                                    'border-blue-100 bg-blue-50/30 print:border-blue-200 print:bg-[#f0f7ff]',
+                                                    'border-teal-100 bg-teal-50/30 print:border-teal-200 print:bg-[#f0fdfa]',
+                                                    'border-purple-100 bg-purple-50/30 print:border-purple-200 print:bg-[#faf5ff]',
+                                                    'border-orange-100 bg-orange-50/30 print:border-orange-200 print:bg-[#fff7ed]',
+                                                    'border-rose-100 bg-rose-50/30 print:border-rose-200 print:bg-[#fff1f2]'
+                                                  ][oIdx % 5]
                                             }`}
                                         >
-                                            <div className={`shrink-0 w-8 h-8 flex items-center justify-center rounded-full text-sm font-medium border ${
-                                                isCorrect ? 'bg-emerald-500 border-emerald-500 text-white print:bg-black' : 'bg-gray-50 border-gray-200 text-gray-600'
+                                            <div className={`shrink-0 w-8 h-8 flex items-center justify-center rounded-full text-sm font-medium border print:[print-color-adjust:exact] ${
+                                                isCorrect ? 'bg-emerald-500 border-emerald-500 text-white print:bg-emerald-500 print:border-emerald-500' : 'bg-gray-50 border-gray-200 text-gray-600 print:bg-white'
                                             }`}>
-                                                {isCorrect ? <Check className="w-5 h-5" /> : optLetter}
+                                                {isCorrect ? <Check className="w-5 h-5 print:text-white" /> : optLetter}
                                             </div>
                                             <div className="prose prose-sm max-w-none text-gray-700 [&>p]:m-0 w-full">
                                                 <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeRaw]}>
@@ -232,7 +252,7 @@ export default async function AnswerSheetPage({
 
                             {/* Explanation */}
                             {(q.explanation || q.optionExplanations) && (
-                                <div className="ml-8 mt-4 bg-[#f8fbff] border border-blue-100 p-5 rounded-lg print:bg-gray-50 print:border-gray-400">
+                                <div className="ml-8 mt-4 bg-white/60 border border-black/5 p-5 rounded-lg print:bg-white/80 print:border-gray-200">
                                     <div className="flex items-center gap-2 mb-3">
                                         <Lightbulb className="w-5 h-5 text-yellow-500 print:text-black" />
                                         <h4 className="font-bold text-blue-900 print:text-black m-0">Explanation</h4>
@@ -260,7 +280,15 @@ export default async function AnswerSheetPage({
                                                 const optLetter = q.language === 'Bangla' || !q.language ? bnOptionsMap[opt.key] : opt.key.toUpperCase();
                                                 
                                                 return (
-                                                    <div key={opt.key} className="bg-white border border-gray-100 rounded-md p-3 print:border-gray-300 print:bg-transparent">
+                                                    <div key={opt.key} className={`border rounded-md p-3 print:[print-color-adjust:exact] ${
+                                                        [
+                                                            'border-blue-100 bg-blue-50/30 print:border-blue-200 print:bg-[#f0f7ff]',
+                                                            'border-teal-100 bg-teal-50/30 print:border-teal-200 print:bg-[#f0fdfa]',
+                                                            'border-purple-100 bg-purple-50/30 print:border-purple-200 print:bg-[#faf5ff]',
+                                                            'border-orange-100 bg-orange-50/30 print:border-orange-200 print:bg-[#fff7ed]',
+                                                            'border-rose-100 bg-rose-50/30 print:border-rose-200 print:bg-[#fff1f2]'
+                                                        ][oIdx % 5]
+                                                    }`}>
                                                         <div className="flex items-start gap-2 mb-1">
                                                             <span className="bg-gray-100 text-gray-700 rounded px-2 py-0.5 text-sm font-medium shrink-0 print:border print:border-gray-300">
                                                                 {optLetter}
@@ -292,7 +320,7 @@ export default async function AnswerSheetPage({
                             )}
 
                         </div>
-                    ))
+                    )})
                 )}
             </div>
             
