@@ -602,9 +602,17 @@ export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock 
                                         <label className="text-sm font-medium">Pass Marks</label>
                                         <Input type="number" value={editData.passingMarks || ''} onChange={e => setEditData({...editData, passingMarks: e.target.value === '' ? undefined : parseInt(e.target.value)})} disabled={autoCalc} />
                                     </div>
-                                    <div>
-                                        <label className="text-sm font-medium">Negative Mark</label>
-                                        <Input type="number" step="0.01" value={editData.negativeMarking ?? ''} onChange={e => setEditData({...editData, negativeMarking: e.target.value === '' ? undefined : parseFloat(e.target.value)})} />
+                                    <div className="flex flex-col gap-2">
+                                        <div className="flex items-center justify-between">
+                                            <label className="text-sm font-medium">Negative Marking</label>
+                                            <Switch 
+                                                checked={editData.negativeMarking !== undefined && editData.negativeMarking > 0} 
+                                                onCheckedChange={c => setEditData({...editData, negativeMarking: c ? 0.25 : 0})} 
+                                            />
+                                        </div>
+                                        {editData.negativeMarking !== undefined && editData.negativeMarking > 0 && (
+                                            <Input type="number" step="0.01" value={editData.negativeMarking ?? ''} onChange={e => setEditData({...editData, negativeMarking: e.target.value === '' ? 0 : parseFloat(e.target.value)})} placeholder="e.g. 0.25" />
+                                        )}
                                     </div>
                                 </div>
                                 <div>

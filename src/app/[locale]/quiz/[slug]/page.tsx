@@ -330,11 +330,11 @@ export default async function QuizLandingPage({ params }: Props) {
                 {/* Stats strip */}
                 <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-3">
                   {[
-                    { icon: HelpCircle, label: `${test.questionIds?.length ?? 0} Questions`, color: 'text-blue-400', borderHover: 'hover:border-blue-500/30', bgHover: 'hover:bg-blue-500/10' },
-                    { icon: Clock, label: `${test.durationMin ?? 0} Minutes`, color: 'text-violet-400', borderHover: 'hover:border-violet-500/30', bgHover: 'hover:bg-violet-500/10' },
-                    { icon: FileText, label: `${test.totalMarks ?? 0} Marks`, color: 'text-amber-400', borderHover: 'hover:border-amber-500/30', bgHover: 'hover:bg-amber-500/10' },
-                    { icon: AlertTriangle, label: `${test.negativeMarking ?? 0} Negative`, color: 'text-red-400', borderHover: 'hover:border-red-500/30', bgHover: 'hover:bg-red-500/10' },
-                  ].map(({ icon: Icon, label, color, borderHover, bgHover }) => (
+                    { icon: HelpCircle, label: `${test.questionIds?.length ?? 0} Questions`, color: 'text-blue-400', borderHover: 'hover:border-blue-500/30', bgHover: 'hover:bg-blue-500/10', show: true },
+                    { icon: Clock, label: `${test.durationMin ?? 0} Minutes`, color: 'text-violet-400', borderHover: 'hover:border-violet-500/30', bgHover: 'hover:bg-violet-500/10', show: true },
+                    { icon: FileText, label: `${test.totalMarks ?? 0} Marks`, color: 'text-amber-400', borderHover: 'hover:border-amber-500/30', bgHover: 'hover:bg-amber-500/10', show: true },
+                    { icon: AlertTriangle, label: `${test.negativeMarking ?? 0} Negative`, color: 'text-red-400', borderHover: 'hover:border-red-500/30', bgHover: 'hover:bg-red-500/10', show: !!test.negativeMarking && test.negativeMarking > 0 },
+                  ].filter(item => item.show).map(({ icon: Icon, label, color, borderHover, bgHover }) => (
                     <div key={label} className={`flex items-center justify-center sm:justify-start gap-2 bg-white/5 border border-white/10 rounded-xl px-2 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold text-white backdrop-blur-md shadow-lg transition-all duration-300 ${borderHover} ${bgHover} cursor-default`}>
                       <Icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 ${color}`} />
                       <span className="truncate">{label}</span>
@@ -369,12 +369,12 @@ export default async function QuizLandingPage({ params }: Props) {
                   {/* Card body */}
                   <div className="p-5 space-y-3">
                     {[
-                      { icon: HelpCircle, label: 'Questions', value: `${test.questionIds?.length ?? 0}` },
-                      { icon: Clock, label: 'Duration', value: `${test.durationMin ?? 0} min` },
-                      { icon: Target, label: 'Total Marks', value: `${test.totalMarks ?? 0}` },
-                      { icon: CheckCircle2, label: 'Passing Marks', value: `${test.passingMarks ?? 0}` },
-                      { icon: AlertTriangle, label: 'Negative Marks', value: `${test.negativeMarking ?? 0}` },
-                    ].map(({ icon: Icon, label, value }) => (
+                      { icon: HelpCircle, label: 'Questions', value: `${test.questionIds?.length ?? 0}`, show: true },
+                      { icon: Clock, label: 'Duration', value: `${test.durationMin ?? 0} min`, show: true },
+                      { icon: Target, label: 'Total Marks', value: `${test.totalMarks ?? 0}`, show: true },
+                      { icon: CheckCircle2, label: 'Passing Marks', value: `${test.passingMarks ?? 0}`, show: true },
+                      { icon: AlertTriangle, label: 'Negative Marks', value: `${test.negativeMarking ?? 0}`, show: !!test.negativeMarking && test.negativeMarking > 0 },
+                    ].filter(item => item.show).map(({ icon: Icon, label, value }) => (
                       <div key={label} className="flex items-center justify-between text-sm">
                         <span className="flex items-center gap-2 text-slate-500 dark:text-slate-400 font-medium">
                           <Icon className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
