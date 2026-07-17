@@ -259,7 +259,7 @@ export default function ChapterClientPage() {
                                 <BookOpen className="w-4 h-4 shrink-0 text-muted-foreground" />
                             )}
                             <span className="flex-1 line-clamp-2">
-                                <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}`} className="hover:text-primary transition-colors hover:underline" onClick={(e) => e.stopPropagation()}>
+                                <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}`} className="hover:text-primary transition-colors hover:underline">
                                     {chapter.title}
                                 </Link>
                             </span>

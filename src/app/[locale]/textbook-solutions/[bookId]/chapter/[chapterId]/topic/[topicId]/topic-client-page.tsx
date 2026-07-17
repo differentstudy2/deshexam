@@ -87,7 +87,7 @@ const SidebarNav = ({
                  <div className="flex items-center gap-3 text-left w-full">
                     <ChapterIcon />
                     <span className="flex-1 line-clamp-2">
-                        <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}`} className="hover:text-primary transition-colors hover:underline" onClick={(e) => e.stopPropagation()}>
+                        <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}`} className="hover:text-primary transition-colors hover:underline">
                             {chapter.title}
                         </Link>
                     </span>

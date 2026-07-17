@@ -11,8 +11,9 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { cn } from '@/lib/utils';
 import { getTaxonomyNodesByType, getTaxonomyNodeById, TaxonomyNode } from '@/lib/firebase/taxonomy';
 import { useAuth } from "@/hooks/use-auth";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { collection, query, where, getDocs, getCountFromServer } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
+import { getTextbookProgress } from '@/lib/firebase/progress';
 
 type SubjectTopic = {
   id: string;
@@ -139,6 +140,39 @@ function AcademyCard({ subject, index }: { subject: Subject, index: number }) {
   const [isLoading, setIsLoading] = useState(false);
   const [chapters, setChapters] = useState<SubjectTopic[]>([]);
   const [hasFetched, setHasFetched] = useState(false);
+  const { user } = useAuth();
+  const [progressValue, setProgressValue] = useState(subject.progressValue);
+  const [progressTextFormatted, setProgressTextFormatted] = useState(subject.progressText.replace(' | ', ' || '));
+
+  useEffect(() => {
+    async function loadRealProgress() {
+        if (!user || !subject.id) return;
+        try {
+            const progress = await getTextbookProgress(user.uid, subject.id);
+            const completedCount = progress?.completedChapters?.length || 0;
+            
+            const chQ = query(
+              collection(db, 'taxonomy_nodes'), 
+              where('type', '==', 'chapter'), 
+              where('parentId', '==', subject.id)
+            );
+            const chSnap = await getCountFromServer(chQ);
+            const totalCount = chSnap.data().count;
+
+            if (totalCount > 0) {
+                const percentage = Math.round((completedCount / totalCount) * 100);
+                setProgressValue(percentage);
+                setProgressTextFormatted(`Progress: ${percentage}% || ${completedCount}/${totalCount} Chapters`);
+            } else {
+                setProgressValue(0);
+                setProgressTextFormatted(`Progress: 0% || 0 Chapters`);
+            }
+        } catch (error) {
+            console.error("Error loading real progress for card:", error);
+        }
+    }
+    loadRealProgress();
+  }, [user, subject.id]);
 
   const colorThemes = [
     { text: 'text-emerald-600 dark:text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400', hoverBg: 'hover:bg-emerald-100 dark:hover:bg-emerald-900/50' },
@@ -179,7 +213,7 @@ function AcademyCard({ subject, index }: { subject: Subject, index: number }) {
   };
 
   // Parse progress text to use || instead of |
-  const progressTextFormatted = subject.progressText.replace(' | ', ' || ');
+  // Now using state: progressTextFormatted
 
   return (
     <Card className={cn(
@@ -266,8 +300,8 @@ function AcademyCard({ subject, index }: { subject: Subject, index: number }) {
                 {isBottomExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
               </button>
           </div>
-          {subject.progressValue > 0 ? (
-                <Progress value={subject.progressValue} className="h-1.5 bg-slate-100 dark:bg-slate-800" indicatorClassName="bg-[#00a651]" />
+          {progressValue > 0 ? (
+                <Progress value={progressValue} className="h-1.5 bg-slate-100 dark:bg-slate-800" indicatorClassName="bg-[#00a651]" />
           ) : (
                 <Progress value={0} className="h-1.5 bg-slate-100 dark:bg-slate-800" />
           )}
