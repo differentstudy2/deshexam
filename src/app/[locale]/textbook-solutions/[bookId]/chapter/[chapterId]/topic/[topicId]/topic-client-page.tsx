@@ -82,11 +82,15 @@ const SidebarNav = ({
           {chapters.map((chapter, index) => (
             <AccordionItem value={chapter.id} key={chapter.id}>
               <AccordionTrigger
-                className="hover:no-underline [&[data-state=open]]:bg-accent/50 px-3 rounded-md"
+                className="hover:no-underline [&[data-state=open]]:bg-accent/50 px-3 py-3 rounded-md"
               >
-                 <div className="flex items-center gap-3">
+                 <div className="flex items-center gap-3 text-left w-full">
                     <ChapterIcon />
-                    <span>{chapter.title}</span>
+                    <span className="flex-1 line-clamp-2">
+                        <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}`} className="hover:text-primary transition-colors hover:underline" onClick={(e) => e.stopPropagation()}>
+                            {chapter.title}
+                        </Link>
+                    </span>
                 </div>
               </AccordionTrigger>
               <AccordionContent className="pt-2 pb-0">

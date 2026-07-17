@@ -220,15 +220,17 @@ export default function ChapterClientPage() {
                 <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">{textbook?.subject}</p>
                 <h3 className="font-bold text-lg leading-tight mt-1 px-2 line-clamp-3 text-balance">{textbook?.title}</h3>
                 
-                <div className="mt-3 flex items-center justify-start gap-3 w-full border rounded-2xl p-2 bg-muted/10 text-left">
-                    <div className="relative w-10 h-10 flex items-center justify-center shrink-0">
+                <div className="mt-4 flex items-center justify-start gap-4 w-full border rounded-2xl p-3 bg-muted/10 text-left">
+                    <div className="relative w-12 h-12 flex items-center justify-center shrink-0">
                         <svg className="w-full h-full -rotate-90 transform" viewBox="0 0 100 100">
-                            <circle className="text-muted stroke-current" strokeWidth="10" cx="50" cy="50" r="40" fill="transparent" />
-                            <circle className="text-primary stroke-current" strokeWidth="10" strokeLinecap="round" cx="50" cy="50" r="40" fill="transparent" strokeDasharray="160 251.2" />
+                            <circle className="text-muted/30 stroke-current" strokeWidth="8" cx="50" cy="50" r="40" fill="transparent" />
+                            <circle className="text-green-500 stroke-current" strokeWidth="8" strokeLinecap="round" cx="50" cy="50" r="40" fill="transparent" strokeDasharray="164 251.2" />
                         </svg>
-                        <span className="absolute text-[10px] font-bold">65%</span>
+                        <span className="absolute text-xs font-bold text-foreground">65%</span>
                     </div>
-                    <span className="text-xs font-semibold line-clamp-2 pr-2">{activeChapter?.title}</span>
+                    <Link href={`/textbook-solutions/${textbookId}/chapter/${activeChapter?.id}`} className="text-sm font-semibold line-clamp-2 pr-2 hover:text-primary transition-colors">
+                        {activeChapter?.title}
+                    </Link>
                 </div>
             </div>
 
@@ -243,9 +245,13 @@ export default function ChapterClientPage() {
                   {chapters.map((chapter) => (
                     <AccordionItem value={chapter.id} key={chapter.id}>
                       <AccordionTrigger className="hover:no-underline [&[data-state=open]]:bg-accent/50 px-4 py-3 text-sm font-medium">
-                         <div className="flex items-center gap-2 text-left">
-                            <BookOpen className="w-4 h-4 shrink-0" />
-                            <span className="line-clamp-2">{chapter.title}</span>
+                         <div className="flex items-center gap-2 text-left w-full">
+                            <BookOpen className="w-4 h-4 shrink-0 text-muted-foreground" />
+                            <span className="flex-1 line-clamp-2">
+                                <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}`} className="hover:text-primary transition-colors hover:underline" onClick={(e) => e.stopPropagation()}>
+                                    {chapter.title}
+                                </Link>
+                            </span>
                         </div>
                       </AccordionTrigger>
                       <AccordionContent className="pt-1 pb-2">
