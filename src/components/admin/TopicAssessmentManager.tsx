@@ -29,7 +29,7 @@ export function TopicAssessmentManager({ topicId, tabType, nodeLevel = 'topic' }
 
   const getFrontendUrl = (tab: string, slug: string) => {
     if (tab === 'practice_sets') return `/practice/${slug}`;
-    if (tab === 'quizzes') return `/quizzes/${slug}`;
+    if (tab === 'quizzes') return `/quiz/${slug}`;
     if (tab === 'mock_tests' || tab === 'model_test') return `/mock-tests/${slug}`;
     if (tab === 'exams_papers') return `/previous-year-papers/${slug}`;
     return `/practice/${slug}`;
