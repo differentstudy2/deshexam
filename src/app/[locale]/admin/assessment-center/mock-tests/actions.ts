@@ -12,7 +12,9 @@ export const generateMockTestMetadata = async (topic: string) => {
       - title: A catchy, SEO-friendly title (e.g., "WBCS Prelims Full Length Mock Test 1").
       - slug: A URL-friendly slug based on the title (e.g., "wbcs-prelims-mock-test-1").
       - description: A compelling, 2-3 sentence meta description to attract students and rank well on Google.
-      - instructions: A helpful list of instructions for taking the exam (e.g., mentioning negative marking, time limits, or general tips). Return this as an array of strings, where each string is a single instruction point.`,
+      - instructions: A helpful list of instructions for taking the exam (e.g., mentioning negative marking, time limits, or general tips). Return this as an array of strings, where each string is a single instruction point.
+      
+      IMPORTANT: If the topic is related to West Bengal exams (like WBCS, TET, PSC), or the topic implies a Bengali audience, you MUST generate the title, description, and instructions in Bengali.`,
       output: {
         schema: z.object({
           title: z.string(),
@@ -27,7 +29,7 @@ export const generateMockTestMetadata = async (topic: string) => {
     const data = response.output;
     const finalData = {
       ...data,
-      instructions: Array.isArray(data?.instructions) ? data.instructions.join('\n') : data?.instructions
+      instructions: Array.isArray(data?.instructions) ? data.instructions.map(i => `* ${i}`).join('\n') : data?.instructions
     };
 
     return { success: true, data: finalData };

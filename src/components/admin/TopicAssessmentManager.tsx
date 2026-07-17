@@ -118,6 +118,7 @@ export function TopicAssessmentManager({ topicId, tabType, nodeLevel = 'topic' }
         <AssessmentEditor
           initialData={editData}
           title={tabType.replace(/_/g, ' ')}
+          collectionPath={tabType.replace(/_/g, '-')}
           onCancel={() => setView('list')}
           onSave={async (data) => {
             const id = data.id || `${collectionName}_${Date.now()}`;

@@ -274,6 +274,7 @@ export default function QuizzesPage() {
             <AssessmentEditor
                 initialData={editData}
                 title="Quiz"
+                collectionPath="quizzes"
                 onCancel={() => setView('list')}
                 onSave={async (data) => {
                     const id = data.id || `mt_${Date.now()}`;
@@ -465,8 +466,8 @@ export default function QuizzesPage() {
                                             )}
                                         </TableCell>
                                         <TableCell className="font-medium">{test.title}</TableCell>
-                                        <TableCell>{test.durationMin} min</TableCell>
-                                        <TableCell>{test.totalMarks}</TableCell>
+                                        <TableCell>{(test as any).durationMin || '-'} min</TableCell>
+                                        <TableCell>{(test as any).totalMarks || '-'}</TableCell>
                                         <TableCell>{test.questionIds?.length || 0}</TableCell>
                                         <TableCell>
                                             <span className={`px-2 py-1 text-xs font-medium rounded-full ${test.status === 'Published' ? 'bg-emerald-100 text-emerald-700' : test.status === 'Archived' ? 'bg-slate-100 text-slate-700' : 'bg-amber-100 text-amber-700'}`}>
@@ -573,8 +574,8 @@ export default function QuizzesPage() {
                                                 
                                                 {/* Meta Info */}
                                                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-500 dark:text-slate-400 mb-4 mt-auto">
-                                                    <div><span className="font-medium text-slate-700 dark:text-slate-300">{test.durationMin}</span> min</div>
-                                                    <div><span className="font-medium text-slate-700 dark:text-slate-300">{test.totalMarks}</span> marks</div>
+                                                    <div><span className="font-medium text-slate-700 dark:text-slate-300">{(test as any).durationMin || '-'}</span> min</div>
+                                                    <div><span className="font-medium text-slate-700 dark:text-slate-300">{(test as any).totalMarks || '-'}</span> marks</div>
                                                     <div><span className="font-medium text-slate-700 dark:text-slate-300">{test.questionIds?.length || 0}</span> Qs</div>
                                                 </div>
 

@@ -274,6 +274,7 @@ export default function MockTestsPage() {
             <AssessmentEditor
                 initialData={editData}
                 title="Mock Test"
+                collectionPath="mock-tests"
                 onCancel={() => setView('list')}
                 onSave={async (data) => {
                     const id = data.id || `mt_${Date.now()}`;

@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { PlusCircle, Pencil, Trash2, ArrowLeft, Loader2, ListPlus, Copy, GripVertical, Sparkles, Upload, Link as LinkIcon, Image as ImageIcon, Wand2, Check, ChevronDown, Search, CheckCircle2 } from 'lucide-react';
+import { PlusCircle, Pencil, Trash2, ArrowLeft, Loader2, ListPlus, Copy, GripVertical, Sparkles, Upload, Link as LinkIcon, Image as ImageIcon, Wand2, Check, ChevronDown, Search, CheckCircle2, Printer } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { useToast } from '@/hooks/use-toast';
@@ -44,22 +44,22 @@ const MD3SelectField = ({ label, value, placeholder, onClick, required }: { labe
 );
 
 export interface AssessmentEditorProps {
-    initialData: Partial<MockTest>;
-    onSave: (data: Partial<MockTest>) => Promise<void>;
+    initialData: any;
+    onSave: (data: any) => Promise<void>;
     onCancel: () => void;
     title?: string;
+    collectionPath?: string;
 }
 
-export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock Test' }: AssessmentEditorProps) {
+export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock Test', collectionPath }: AssessmentEditorProps) {
     const { toast } = useToast();
     const [isSaving, setIsSaving] = useState(false);
     const [isGeneratingAI, setIsGeneratingAI] = useState(false);
     const [showAIDialog, setShowAIDialog] = useState(false);
     const [aiTopic, setAiTopic] = useState('');
-    
-    const [editData, setEditData] = useState<Partial<MockTest>>({
+    const [editData, setEditData] = useState<Partial<MockTest> & Record<string, any>>({
         status: 'Draft',
-        difficulty: 'Hard',
+        difficulty: 'Medium',
         durationMin: 60,
         totalMarks: 100,
         negativeMarking: 0.25,
@@ -501,6 +501,11 @@ export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock 
                             <CardHeader className="flex flex-row items-center justify-between pb-4">
                                 <CardTitle>Questions ({editData.questionIds?.length || 0})</CardTitle>
                                 <div className="flex gap-2">
+                                    {editData.id && editData.questionIds && editData.questionIds.length > 0 && collectionPath && (
+                                        <Button size="sm" variant="outline" className="text-emerald-600 border-emerald-200 hover:bg-emerald-50 dark:hover:bg-emerald-950" onClick={() => window.open(`/admin/assessment-center/${collectionPath}/${editData.id}/answer-sheet`, '_blank')}>
+                                            <Printer className="h-4 w-4 mr-2" /> Print Answer Sheet
+                                        </Button>
+                                    )}
                                     <Button size="sm" variant="outline" onClick={() => setShowImport(true)}>
                                         <Upload className="h-4 w-4 mr-2" /> Import Questions
                                     </Button>
