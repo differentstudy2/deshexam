@@ -204,6 +204,17 @@ export default async function AnswerSheetPage({
                                         <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeRaw]}>
                                             {q.questionText}
                                         </ReactMarkdown>
+                                        
+                                        {/* Exam and Year Tags */}
+                                        {(q.sourceExam || q.sourceYear || (q.tags && q.tags.length > 0)) && (
+                                            <div className="flex flex-wrap gap-2 mt-3 mb-1 font-normal print:mt-2">
+                                                {q.sourceExam && <span className="bg-blue-50 text-blue-700 text-[11px] px-2 py-0.5 rounded border border-blue-200 print:border-gray-400 print:text-gray-800 print:bg-white print:[print-color-adjust:exact]">{q.sourceExam}</span>}
+                                                {q.sourceYear && <span className="bg-purple-50 text-purple-700 text-[11px] px-2 py-0.5 rounded border border-purple-200 print:border-gray-400 print:text-gray-800 print:bg-white print:[print-color-adjust:exact]">{q.sourceYear}</span>}
+                                                {q.tags && q.tags.map((tag: string, i: number) => (
+                                                    <span key={i} className="bg-gray-100 text-gray-700 text-[11px] px-2 py-0.5 rounded border border-gray-200 print:border-gray-400 print:text-gray-800 print:bg-white print:[print-color-adjust:exact]">{tag}</span>
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2 print:hidden">
