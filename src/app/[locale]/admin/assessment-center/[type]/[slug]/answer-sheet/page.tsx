@@ -2,6 +2,8 @@ import React from 'react';
 import { notFound } from 'next/navigation';
 import { getAssessment } from '@/lib/firebase/assessment';
 import { getQuestionsByIds } from '@/lib/firebase/question-bank';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase/client';
 import { AssessmentCollectionType } from '@/lib/firebase/assessment';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -11,6 +13,7 @@ import rehypeRaw from 'rehype-raw';
 import 'katex/dist/katex.min.css';
 import { Lightbulb, CheckCircle2, XCircle, Check } from 'lucide-react';
 import PrintButton from './PrintButton';
+import { QRCodeSVG } from 'qrcode.react';
 
 const bnOptionsMap: Record<string, string> = {
     a: 'ক',
@@ -58,37 +61,123 @@ export default async function AnswerSheetPage({
         return aIdx - bIdx;
     });
 
+    // Fetch Taxonomy Nodes
+    const getTaxonomyNode = async (id: string | undefined) => {
+        if (!id) return null;
+        try {
+            const d = await getDoc(doc(db, 'taxonomy_nodes', id));
+            return d.exists() ? d.data() : null;
+        } catch(e) { return null; }
+    }
+
+    const boardNode = await getTaxonomyNode(test.boardId);
+    const classNode = await getTaxonomyNode(test.classId);
+    const subjectNode = await getTaxonomyNode(test.subjectId);
+    const chapterNode = await getTaxonomyNode(test.chapterId);
+    const topicNode = await getTaxonomyNode(test.topicId);
+
+    const boardName = boardNode?.acronym || boardNode?.title;
+    const className = classNode?.title;
+    const subjectName = subjectNode?.title;
+    const chapterName = chapterNode?.title;
+    const topicName = topicNode?.title;
+
+    const currentYear = new Date().getFullYear();
+    let classLine = test.title;
+    if (boardName || className) {
+        classLine = `${[boardName, className].filter(Boolean).join(' | ')} - ${currentYear}`;
+    }
+
     return (
         <div className="min-h-screen bg-white text-black p-8 font-sans print:p-0 print:bg-white print:text-black print:min-h-0 print:block">
             
+            {/* Watermark for Print */}
+            <div className="fixed inset-0 pointer-events-none z-0 hidden print:flex items-center justify-center opacity-10 print:opacity-10">
+                <div className="text-7xl font-bold text-gray-400 -rotate-45 whitespace-nowrap">
+                    DeshExam
+                </div>
+            </div>
+
             {/* Header - Print Friendly */}
-            <div className="border-b-2 border-black pb-6 mb-8">
-                <h1 className="text-3xl font-bold mb-2 text-center">{test.title}</h1>
-                <h2 className="text-xl text-center mb-6">Answer Key & Explanations</h2>
+            <div className="mb-8">
+                {/* Top Row: QR, Title, Set Info */}
+                <div className="flex justify-between items-start mb-4">
+                    {/* Left: QR and Marks */}
+                    <div className="flex flex-col gap-2">
+                        <div className="border border-gray-300 p-1 w-fit bg-white">
+                            <QRCodeSVG value={`https://deshexam.com/${params.type}/${params.slug}`} size={64} />
+                        </div>
+                        <div className="flex border border-black w-fit h-6">
+                            <div className="bg-black text-white text-xs px-2 py-1 font-bold flex items-center">Marks</div>
+                            <div className="w-12 bg-white"></div>
+                        </div>
+                    </div>
+
+                    {/* Center: Title & Address */}
+                    <div className="flex flex-col items-center text-center flex-1 px-4">
+                        <h1 className="text-3xl font-bold text-gray-900 tracking-tight">DeshExam Academy</h1>
+                        <p className="text-[13px] text-gray-600 mb-2">Dwarikamari, Petla, Dinhata, Cooch Behar, WB, 736135</p>
+                        
+                        <h2 className="text-[15px] font-bold text-gray-900">{classLine}</h2>
+                        
+                        {subjectName ? <h3 className="text-[15px] font-bold text-gray-900">Subject: {subjectName}</h3> : (test.subject && <h3 className="text-[15px] font-bold text-gray-900">Subject: {test.subject}</h3>)}
+                        
+                        {chapterName && <p className="text-sm text-gray-700 font-semibold mt-1">Chapter: {chapterName}</p>}
+                        {topicName && <p className="text-sm text-gray-600">Topic: {topicName}</p>}
+                        {!chapterName && !topicName && <p className="text-sm text-gray-600 mt-1">Answer Key & Explanations</p>}
+                    </div>
+
+                    {/* Right: Set and Sub Code */}
+                    <div className="flex flex-col items-end gap-2">
+                        <div className="flex border border-black h-7">
+                            <div className="px-3 flex items-center justify-center font-bold border-r border-black text-sm">Set</div>
+                            <div className="px-4 flex items-center justify-center font-bold text-sm">A</div>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm font-semibold mt-1">
+                            <span className="text-gray-700">Sub. Code :</span>
+                            <div className="flex border border-black">
+                                <div className="w-5 h-5 border-r border-black flex items-center justify-center text-[10px] font-medium">o</div>
+                                <div className="w-5 h-5 border-r border-black flex items-center justify-center text-[10px] font-medium">o</div>
+                                <div className="w-5 h-5 flex items-center justify-center text-[10px] font-medium">o</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Time and Marks row */}
+                <div className="flex justify-between items-center font-bold text-[15px] border-t-2 border-black pt-2 pb-2">
+                    <div>Time— {test.durationMin || 0} Mins</div>
+                    <div>Total Marks— {test.totalMarks || 0}</div>
+                </div>
                 
-                <div className="flex justify-between items-center text-sm font-semibold border border-black p-4 bg-gray-50 print:bg-transparent">
-                    <div>
-                        <span>Test ID: </span><span className="font-normal">{test.id}</span>
+                <div className="border-b-2 border-black mb-3"></div>
+
+                {/* Instructions */}
+                <div className="text-center text-[13px] mb-4 space-y-1 px-8 text-gray-800">
+                    <p>Note: Fully darken the circle ⬤ corresponding to the correct answer with a ballpoint pen on the provided OMR sheet. Each question carries 1 mark.</p>
+                    <p className="font-bold">Do not make any marks on the question paper.</p>
+                </div>
+
+                {/* Student Info */}
+                <div className="flex justify-between items-end text-sm font-bold mt-8 mb-2">
+                    <div className="flex items-end gap-2 flex-1">
+                        <span className="text-gray-700">Student Name:</span>
+                        <div className="flex-1 border-b border-dashed border-gray-400 mr-8"></div>
                     </div>
-                    <div>
-                        <span>Total Questions: </span><span className="font-normal">{test.questionIds?.length || 0}</span>
-                    </div>
-                    <div>
-                        <span>Marks: </span><span className="font-normal">{test.totalMarks || 0}</span>
-                    </div>
-                    <div>
-                        <span>Duration: </span><span className="font-normal">{test.durationMin || 0} mins</span>
+                    <div className="flex items-end gap-2 w-1/3">
+                        <span className="text-gray-700">Roll:</span>
+                        <div className="flex-1 border-b border-dashed border-gray-400"></div>
                     </div>
                 </div>
             </div>
 
             {/* Questions List */}
-            <div className="space-y-12">
+            <div className="space-y-12 print:space-y-6">
                 {sortedQuestions.length === 0 ? (
                     <p className="text-center italic text-gray-500">No questions found for this assessment.</p>
                 ) : (
                     sortedQuestions.map((q, index) => (
-                        <div key={q.id} className={`border border-gray-200 p-6 rounded-lg print:border-none print:p-0 print:border-b print:border-dashed print:pb-8 ${index > 0 ? 'break-inside-avoid print:break-inside-avoid' : ''}`}>
+                        <div key={q.id} className={`border border-gray-200 p-6 rounded-lg print:border-none print:p-0 print:border-b-0 print:pb-0 print:break-after-page ${index > 0 ? 'break-inside-avoid print:break-inside-avoid' : ''}`}>
                             
                             {/* Question Header */}
                             <div className="flex justify-between items-start mb-4">
