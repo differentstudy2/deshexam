@@ -7,8 +7,18 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
+import rehypeRaw from 'rehype-raw';
 import 'katex/dist/katex.min.css';
+import { Lightbulb, CheckCircle2, XCircle, Check } from 'lucide-react';
 import PrintButton from './PrintButton';
+
+const bnOptionsMap: Record<string, string> = {
+    a: 'ক',
+    b: 'খ',
+    c: 'গ',
+    d: 'ঘ',
+    e: 'ঙ'
+};
 
 export default async function AnswerSheetPage({
     params
@@ -85,7 +95,7 @@ export default async function AnswerSheetPage({
                                 <h3 className="font-bold text-lg flex gap-2 w-full">
                                     <span className="shrink-0 text-black">Q{index + 1}.</span> 
                                     <div className="prose prose-sm prose-black max-w-none flex-1">
-                                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
+                                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeRaw]}>
                                             {q.questionText}
                                         </ReactMarkdown>
                                     </div>
@@ -93,8 +103,8 @@ export default async function AnswerSheetPage({
                                 <span className="text-xs font-mono bg-gray-100 px-2 py-1 rounded text-gray-600 print:hidden">{q.id}</span>
                             </div>
 
-                            {/* Options */}
-                            <div className="ml-8 space-y-3 mt-4 mb-6">
+                            {/* Options Grid */}
+                            <div className="ml-8 space-y-3 md:space-y-0 md:grid md:grid-cols-2 gap-4 mt-4 mb-6">
                                 {q.options && [
                                     { key: 'a', text: q.options.a },
                                     { key: 'b', text: q.options.b },
@@ -103,48 +113,90 @@ export default async function AnswerSheetPage({
                                     ...(q.options.e ? [{ key: 'e', text: q.options.e }] : [])
                                 ].map((opt, oIdx) => {
                                     const isCorrect = q.correctAnswer && q.correctAnswer.toLowerCase().includes(opt.key);
+                                    const optLetter = q.language === 'Bangla' || !q.language ? bnOptionsMap[opt.key] : opt.key.toUpperCase();
 
                                     return (
                                         <div 
                                             key={opt.key} 
-                                            className={`flex gap-3 p-3 rounded-md border ${
+                                            className={`flex items-center gap-3 p-3 rounded-full border ${
                                                 isCorrect 
-                                                ? 'bg-emerald-50 border-emerald-300 print:bg-gray-100 print:border-black print:font-bold' 
+                                                ? 'border-emerald-400 bg-emerald-50/50 print:border-black print:bg-gray-100 print:font-bold' 
                                                 : 'border-gray-200 print:border-gray-300'
                                             }`}
                                         >
-                                            <div className={`shrink-0 w-6 h-6 flex items-center justify-center rounded-full text-sm font-medium border uppercase ${
-                                                isCorrect ? 'bg-emerald-200 border-emerald-400 text-emerald-900 print:bg-black print:text-white' : 'border-gray-300 text-gray-500'
+                                            <div className={`shrink-0 w-8 h-8 flex items-center justify-center rounded-full text-sm font-medium border ${
+                                                isCorrect ? 'bg-emerald-500 border-emerald-500 text-white print:bg-black' : 'bg-gray-50 border-gray-200 text-gray-600'
                                             }`}>
-                                                {opt.key}
+                                                {isCorrect ? <Check className="w-5 h-5" /> : optLetter}
                                             </div>
-                                            <div className="prose prose-sm max-w-none">
-                                                <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
+                                            <div className="prose prose-sm max-w-none text-gray-700 [&>p]:m-0 w-full">
+                                                <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeRaw]}>
                                                     {opt.text}
                                                 </ReactMarkdown>
                                             </div>
-                                            {isCorrect && (
-                                                <div className="ml-auto flex items-center text-emerald-600 font-bold print:text-black">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                                    </svg>
-                                                    <span className="sr-only">Correct</span>
-                                                </div>
-                                            )}
                                         </div>
                                     );
                                 })}
                             </div>
 
                             {/* Explanation */}
-                            {q.explanation && (
-                                <div className="ml-8 mt-4 bg-blue-50 border-l-4 border-blue-400 p-4 print:bg-gray-50 print:border-gray-400">
-                                    <h4 className="font-bold text-blue-900 mb-2 print:text-black">Explanation:</h4>
-                                    <div className="prose prose-sm max-w-none text-blue-800 print:text-black">
-                                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
-                                            {q.explanation}
-                                        </ReactMarkdown>
+                            {(q.explanation || q.optionExplanations) && (
+                                <div className="ml-8 mt-4 bg-[#f8fbff] border border-blue-100 p-5 rounded-lg print:bg-gray-50 print:border-gray-400">
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <Lightbulb className="w-5 h-5 text-yellow-500 print:text-black" />
+                                        <h4 className="font-bold text-blue-900 print:text-black m-0">Explanation</h4>
                                     </div>
+                                    
+                                    {q.explanation && (
+                                        <div className="prose prose-sm max-w-none text-gray-700 mb-5 print:text-black">
+                                            <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeRaw]}>
+                                                {q.explanation}
+                                            </ReactMarkdown>
+                                        </div>
+                                    )}
+
+                                    {/* Option Explanations inside main Explanation block */}
+                                    {q.optionExplanations && Object.keys(q.optionExplanations).length > 0 && (
+                                        <div className="space-y-3">
+                                            {q.options && [
+                                                { key: 'a', text: q.options.a },
+                                                { key: 'b', text: q.options.b },
+                                                { key: 'c', text: q.options.c },
+                                                { key: 'd', text: q.options.d },
+                                                ...(q.options.e ? [{ key: 'e', text: q.options.e }] : [])
+                                            ].map((opt, oIdx) => {
+                                                const isCorrect = q.correctAnswer && q.correctAnswer.toLowerCase().includes(opt.key);
+                                                const optLetter = q.language === 'Bangla' || !q.language ? bnOptionsMap[opt.key] : opt.key.toUpperCase();
+                                                
+                                                return (
+                                                    <div key={opt.key} className="bg-white border border-gray-100 rounded-md p-3 print:border-gray-300 print:bg-transparent">
+                                                        <div className="flex items-start gap-2 mb-1">
+                                                            <span className="bg-gray-100 text-gray-700 rounded px-2 py-0.5 text-sm font-medium shrink-0 print:border print:border-gray-300">
+                                                                {optLetter}
+                                                            </span>
+                                                            <div className="font-semibold text-gray-800 prose prose-sm max-w-none [&>p]:m-0">
+                                                                <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeRaw]}>
+                                                                    {opt.text}
+                                                                </ReactMarkdown>
+                                                            </div>
+                                                            {isCorrect ? (
+                                                                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5 ml-auto" />
+                                                            ) : (
+                                                                <XCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5 ml-auto" />
+                                                            )}
+                                                        </div>
+                                                        {q.optionExplanations && (q.optionExplanations as any)[opt.key] && (
+                                                            <div className="text-gray-600 text-sm ml-8 prose prose-sm max-w-none [&>p]:m-0 print:text-black">
+                                                                <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeRaw]}>
+                                                                    {(q.optionExplanations as any)[opt.key]}
+                                                                </ReactMarkdown>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
                                 </div>
                             )}
 

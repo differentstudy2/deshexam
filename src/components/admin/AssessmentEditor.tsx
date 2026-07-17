@@ -502,15 +502,15 @@ export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock 
                                 <CardTitle>Questions ({editData.questionIds?.length || 0})</CardTitle>
                                 <div className="flex gap-2">
                                     {editData.id && editData.questionIds && editData.questionIds.length > 0 && collectionPath && (
-                                        <Button size="sm" variant="outline" className="text-emerald-600 border-emerald-200 hover:bg-emerald-50 dark:hover:bg-emerald-950" onClick={() => window.open(`/admin/assessment-center/${collectionPath}/${editData.id}/answer-sheet`, '_blank')}>
-                                            <Printer className="h-4 w-4 mr-2" /> Print Answer Sheet
+                                        <Button size="icon" variant="outline" title="Print Answer Sheet" className="h-9 w-9 text-emerald-600 border-emerald-200 hover:bg-emerald-50 dark:hover:bg-emerald-950" onClick={() => window.open(`/admin/assessment-center/${collectionPath}/${editData.id}/answer-sheet`, '_blank')}>
+                                            <Printer className="h-4 w-4" />
                                         </Button>
                                     )}
-                                    <Button size="sm" variant="outline" onClick={() => setShowImport(true)}>
-                                        <Upload className="h-4 w-4 mr-2" /> Import Questions
+                                    <Button size="icon" variant="outline" title="Import Questions" className="h-9 w-9" onClick={() => setShowImport(true)}>
+                                        <Upload className="h-4 w-4" />
                                     </Button>
-                                    <Button size="sm" onClick={() => setShowPicker(true)}>
-                                        <ListPlus className="h-4 w-4 mr-2" /> Add Questions
+                                    <Button size="icon" title="Add Questions" className="h-9 w-9" onClick={() => setShowPicker(true)}>
+                                        <ListPlus className="h-4 w-4" />
                                     </Button>
                                 </div>
                             </CardHeader>
