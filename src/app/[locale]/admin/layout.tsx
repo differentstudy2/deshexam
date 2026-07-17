@@ -103,12 +103,14 @@ export default function AdminLayout({
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-[100dvh] w-full bg-slate-50 dark:bg-slate-900">
-        <Sidebar className="hidden md:flex">
-          <AdminSidebarWrapper logOut={logOut} />
-        </Sidebar>
-        <div className="flex flex-col flex-1 w-full relative">
-          <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-4 border-b border-slate-200 dark:border-slate-800 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:bg-slate-950/95 dark:supports-[backdrop-filter]:bg-slate-950/60 px-4 md:px-6 shadow-sm">
+      <div className="flex min-h-[100dvh] w-full bg-slate-50 dark:bg-slate-900 print:block print:min-h-0 print:bg-white">
+        <div className="print:hidden">
+          <Sidebar className="hidden md:flex">
+            <AdminSidebarWrapper logOut={logOut} />
+          </Sidebar>
+        </div>
+        <div className="flex flex-col flex-1 w-full relative print:block">
+          <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-4 border-b border-slate-200 dark:border-slate-800 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:bg-slate-950/95 dark:supports-[backdrop-filter]:bg-slate-950/60 px-4 md:px-6 shadow-sm print:hidden">
                     <SidebarTrigger className="-ml-1 text-slate-500 dark:text-slate-400" />
                     <div className="flex-1 font-semibold text-slate-800 dark:text-slate-100 tracking-tight text-lg md:text-xl truncate">
                         {getPageName()}
@@ -150,13 +152,15 @@ export default function AdminLayout({
                     </div>
                 </header>
                 
-                <SidebarInset className="bg-transparent">
-                    <main className="flex-grow p-4 md:p-6 lg:p-8 pb-20 md:pb-8">
+                <SidebarInset className="bg-transparent print:block">
+                    <main className="flex-grow p-4 md:p-6 lg:p-8 pb-20 md:pb-8 print:p-0 print:block">
                         {children}
                     </main>
                 </SidebarInset>
             </div>
-            <AdminMobileBottomNav />
+            <div className="print:hidden">
+                <AdminMobileBottomNav />
+            </div>
         </div>
     </SidebarProvider>
   );
