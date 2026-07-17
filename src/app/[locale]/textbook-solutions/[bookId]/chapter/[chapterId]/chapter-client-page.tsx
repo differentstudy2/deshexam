@@ -211,9 +211,9 @@ export default function ChapterClientPage() {
     ];
 
     const leftSidebar = (
-         <div className="flex flex-col h-full bg-card">
+         <div className="flex flex-col h-full bg-card overflow-y-auto pb-20">
             {/* Textbook Info Header */}
-            <div className="p-4 pt-5 border-b text-center flex flex-col items-center">
+            <div className="p-4 pt-5 border-b text-center flex flex-col items-center shrink-0">
                 <div className="w-24 h-32 relative mb-3 shadow-md rounded overflow-hidden">
                     <Image src={textbook?.featureImage || '/image/logo.png'} alt="Cover" fill className="object-cover" />
                 </div>
@@ -232,25 +232,13 @@ export default function ChapterClientPage() {
                 </div>
             </div>
 
-            {/* Scroll Spy Nav Header */}
-            <div className="px-4 py-3 mt-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b">
-                Sections in this lesson
-            </div>
-            
-            {/* Scroll Spy Nav List */}
-            <div className="pb-4 pt-2">
-                <ScrollSpyNav 
-                    headings={headings} 
-                    activeHeadingId={activeHeadingId} 
-                    onHeadingClick={handleHeadingClick} 
-                />
-            </div>
+            {/* Removed Scroll Spy Nav as per user request */}
             
             {/* Chapters & Topics */}
-            <div className="px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider border-y bg-muted/30">
+            <div className="px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b bg-muted/30 shrink-0">
                 Chapters & Topics
             </div>
-            <div className="flex-1 overflow-y-auto pb-20">
+            <div className="flex-1">
                 <Accordion type="single" collapsible defaultValue={chapterId} className="w-full" onValueChange={fetchChapterTopics}>
                   {chapters.map((chapter) => (
                     <AccordionItem value={chapter.id} key={chapter.id}>
