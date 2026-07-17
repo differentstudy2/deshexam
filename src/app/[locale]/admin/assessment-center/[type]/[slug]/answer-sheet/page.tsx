@@ -11,7 +11,8 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
 import 'katex/dist/katex.min.css';
-import { Lightbulb, CheckCircle2, XCircle, Check } from 'lucide-react';
+import { Lightbulb, CheckCircle2, XCircle, Check, Edit, Eye } from 'lucide-react';
+import Link from 'next/link';
 import PrintButton from './PrintButton';
 import { QRCodeSVG } from 'qrcode.react';
 
@@ -26,7 +27,7 @@ const bnOptionsMap: Record<string, string> = {
 export default async function AnswerSheetPage({
     params
 }: {
-    params: { type: string, slug: string }
+    params: { locale: string, type: string, slug: string }
 }) {
     // 1. Map route type to collection name
     const typeToCollection: Record<string, AssessmentCollectionType> = {
@@ -197,15 +198,23 @@ export default async function AnswerSheetPage({
                             
                             {/* Question Header */}
                             <div className="flex justify-between items-start mb-4">
-                                <h3 className="font-bold text-lg flex gap-2 w-full">
-                                    <span className="shrink-0 text-black">Q{index + 1}.</span> 
-                                    <div className="prose prose-sm prose-black max-w-none flex-1">
+                                <div className="flex gap-2 w-full">
+                                    <span className="shrink-0 text-black font-bold text-[16px]">Q{index + 1}.</span> 
+                                    <div className="prose prose-black max-w-none flex-1 prose-p:font-bold prose-p:text-[16px] prose-p:my-0 prose-li:text-[16px]">
                                         <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeRaw]}>
                                             {q.questionText}
                                         </ReactMarkdown>
                                     </div>
-                                </h3>
-                                <span className="text-xs font-mono bg-gray-100 px-2 py-1 rounded text-gray-600 print:hidden">{q.id}</span>
+                                </div>
+                                <div className="flex items-center gap-2 print:hidden">
+                                    <Link href={`/${params.locale}/question/${q.slug || q.id}`} target="_blank" className="text-gray-400 hover:text-blue-500 transition-colors" title="View Question">
+                                        <Eye className="w-4 h-4" />
+                                    </Link>
+                                    <Link href={`/${params.locale}/admin/question-bank/academic-questions/${q.id}`} target="_blank" className="text-gray-400 hover:text-emerald-500 transition-colors" title="Edit Question">
+                                        <Edit className="w-4 h-4" />
+                                    </Link>
+                                    <span className="text-xs font-mono bg-gray-100 px-2 py-1 rounded text-gray-600">{q.id}</span>
+                                </div>
                             </div>
 
                             {/* Options Grid */}
