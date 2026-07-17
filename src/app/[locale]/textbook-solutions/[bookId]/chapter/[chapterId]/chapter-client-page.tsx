@@ -3,10 +3,16 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
 import { db } from '@/lib/firebase/client';
 import type { Chapter, Topic, Textbook, Resource, PracticeSet, Question, Exam } from '@/lib/types';
 import { collection, doc, getDoc, getDocs, query, orderBy } from 'firebase/firestore';
-import { ArrowLeft, BookOpen, Loader2, Menu, ChevronRight, FileDown, Bookmark, Search, Share2, Sun, Moon } from 'lucide-react';
+import { ArrowLeft, BookOpen, Loader2, Menu, ChevronRight, FileDown, Bookmark, Search, Share2, Sun, Moon, FileText } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
@@ -52,6 +58,10 @@ export default function ChapterClientPage() {
     const [activeHeadingId, setActiveHeadingId] = useState<string | null>(null);
     const [focusMode, setFocusMode] = useState(false);
     const [fontSize, setFontSize] = useState<'normal' | 'large'>('normal');
+
+    const currentIndex = useMemo(() => {
+        return chapters.findIndex(c => c.id === chapterId);
+    }, [chapters, chapterId]);
 
     const fetchInitialData = useCallback(async () => {
         setLoading(true);
@@ -228,12 +238,56 @@ export default function ChapterClientPage() {
             </div>
             
             {/* Scroll Spy Nav List */}
-            <div className="pb-6 pt-2">
+            <div className="pb-4 pt-2">
                 <ScrollSpyNav 
                     headings={headings} 
                     activeHeadingId={activeHeadingId} 
                     onHeadingClick={handleHeadingClick} 
                 />
+            </div>
+            
+            {/* Chapters & Topics */}
+            <div className="px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider border-y bg-muted/30">
+                Chapters & Topics
+            </div>
+            <div className="flex-1 overflow-y-auto pb-20">
+                <Accordion type="single" collapsible defaultValue={chapterId} className="w-full" onValueChange={fetchChapterTopics}>
+                  {chapters.map((chapter) => (
+                    <AccordionItem value={chapter.id} key={chapter.id}>
+                      <AccordionTrigger className="hover:no-underline [&[data-state=open]]:bg-accent/50 px-4 py-3 text-sm font-medium">
+                         <div className="flex items-center gap-2 text-left">
+                            <BookOpen className="w-4 h-4 shrink-0" />
+                            <span className="line-clamp-2">{chapter.title}</span>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent className="pt-1 pb-2">
+                        {loadingTopics === chapter.id ? (
+                            <div className="flex justify-center py-2"><Loader2 className="w-4 h-4 animate-spin text-muted-foreground"/></div>
+                        ) : (
+                            <ul className="space-y-0.5 px-2">
+                             {(topicsByChapter[chapter.id] || []).map(topic => (
+                               <li key={topic.id}>
+                                 <Button
+                                   variant="ghost"
+                                   asChild
+                                   className="w-full justify-start text-left h-auto py-2 px-3 text-sm font-normal text-muted-foreground hover:text-foreground"
+                                 >
+                                   <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}/topic/${topic.id}`} className="flex items-start gap-2">
+                                     <FileText className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+                                     <span className="line-clamp-2">{topic.title}</span>
+                                   </Link>
+                                 </Button>
+                               </li>
+                             ))}
+                             {(!topicsByChapter[chapter.id] || topicsByChapter[chapter.id].length === 0) && (
+                                <p className="px-3 py-2 text-xs text-muted-foreground">No topics yet.</p>
+                             )}
+                           </ul>
+                        )}
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
             </div>
         </div>
     );
@@ -377,19 +431,35 @@ export default function ChapterClientPage() {
                         )}
 
                         {/* Bottom Navigation */}
-                        <div className="mt-16 pt-8 border-t flex flex-wrap items-center justify-between gap-4">
-                            <Button variant="outline" className="rounded-full px-6">
-                                <ChevronRight className="w-4 h-4 mr-2 rotate-180" /> Previous Lesson
-                            </Button>
-                            <div className="flex gap-3">
-                                <Button className="rounded-full px-6 bg-green-600 hover:bg-green-700">
+                        <div className="mt-16 pt-8 border-t flex flex-col sm:flex-row items-center justify-between gap-4">
+                            {currentIndex > 0 ? (
+                                <Button variant="outline" className="rounded-full px-6 w-full sm:w-auto" asChild>
+                                    <Link href={`/textbook-solutions/${textbookId}/chapter/${chapters[currentIndex - 1].id}`}>
+                                        <ChevronRight className="w-4 h-4 mr-2 rotate-180" /> Previous Lesson
+                                    </Link>
+                                </Button>
+                            ) : (
+                                <Button variant="outline" className="rounded-full px-6 w-full sm:w-auto" disabled>
+                                    <ChevronRight className="w-4 h-4 mr-2 rotate-180" /> Previous Lesson
+                                </Button>
+                            )}
+                            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                                <Button className="rounded-full px-6 bg-green-600 hover:bg-green-700 w-full sm:w-auto">
                                     <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
                                     Mark Complete
                                 </Button>
-                                <Button variant="outline" className="rounded-full px-6">Practice</Button>
-                                <Button className="rounded-full px-6">
-                                    Next Lesson <ChevronRight className="w-4 h-4 ml-2" />
-                                </Button>
+                                <Button variant="outline" className="rounded-full px-6 w-full sm:w-auto">Practice</Button>
+                                {currentIndex < chapters.length - 1 && currentIndex !== -1 ? (
+                                    <Button className="rounded-full px-6 w-full sm:w-auto" asChild>
+                                        <Link href={`/textbook-solutions/${textbookId}/chapter/${chapters[currentIndex + 1].id}`}>
+                                            Next Lesson <ChevronRight className="w-4 h-4 ml-2" />
+                                        </Link>
+                                    </Button>
+                                ) : (
+                                    <Button className="rounded-full px-6 w-full sm:w-auto" disabled>
+                                        Next Lesson <ChevronRight className="w-4 h-4 ml-2" />
+                                    </Button>
+                                )}
                             </div>
                         </div>
 
