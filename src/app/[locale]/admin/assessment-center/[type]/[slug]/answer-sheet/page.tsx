@@ -136,9 +136,11 @@ export default async function AnswerSheetPage({
                         <div className="flex items-center gap-2 text-sm font-semibold mt-1">
                             <span className="text-gray-700">Sub. Code :</span>
                             <div className="flex border border-black">
-                                <div className="w-5 h-5 border-r border-black flex items-center justify-center text-[10px] font-medium">o</div>
-                                <div className="w-5 h-5 border-r border-black flex items-center justify-center text-[10px] font-medium">o</div>
-                                <div className="w-5 h-5 flex items-center justify-center text-[10px] font-medium">o</div>
+                                {((subjectNode as any)?.subjectCode || "ooo").split('').map((char: string, idx: number, arr: string[]) => (
+                                    <div key={idx} className={`w-5 h-5 flex items-center justify-center text-[11px] font-bold uppercase ${idx !== arr.length - 1 ? 'border-r border-black' : ''}`}>
+                                        {char}
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     </div>

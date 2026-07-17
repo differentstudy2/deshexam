@@ -71,12 +71,12 @@ export function TaxonomyDataTable({ type, title }: Props) {
 
   // Add Modal State
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [addForm, setAddForm] = useState({ title: '', slug: '' });
+  const [addForm, setAddForm] = useState({ title: '', slug: '', subjectCode: '' });
 
   // Edit Modal State
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingNode, setEditingNode] = useState<TaxonomyNode | null>(null);
-  const [editForm, setEditForm] = useState({ title: '', slug: '' });
+  const [editForm, setEditForm] = useState({ title: '', slug: '', subjectCode: '' });
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
@@ -185,7 +185,8 @@ export function TaxonomyDataTable({ type, title }: Props) {
     setEditingNode(node);
     setEditForm({ 
       title: node.title, 
-      slug: node.slug || generateSlug(node.title) 
+      slug: node.slug || generateSlug(node.title),
+      subjectCode: (node as any).subjectCode || ''
     });
     setIsEditModalOpen(true);
   };
@@ -196,7 +197,8 @@ export function TaxonomyDataTable({ type, title }: Props) {
     try {
       await updateTaxonomyNode(editingNode.id, { 
         title: editForm.title, 
-        slug: editForm.slug 
+        slug: editForm.slug,
+        ...(type === 'subject' && { subjectCode: editForm.subjectCode })
       });
       
       // If the slug or title has changed, rebuild the SEO fullSlugs for this node and its descendants
@@ -335,10 +337,11 @@ export function TaxonomyDataTable({ type, title }: Props) {
         type: type,
         track: 'academic',
         parentId: parentId,
-        status: 'draft'
+        status: 'draft',
+        ...(type === 'subject' && { subjectCode: addForm.subjectCode })
       });
       setIsAddModalOpen(false);
-      setAddForm({ title: '', slug: '' });
+      setAddForm({ title: '', slug: '', subjectCode: '' });
       fetchData();
     } catch (error) {
       console.error("Failed to add node", error);
@@ -1032,6 +1035,17 @@ export function TaxonomyDataTable({ type, title }: Props) {
               />
               <p className="text-xs text-gray-500 dark:text-slate-400">Updating the slug might break existing links. Use carefully.</p>
             </div>
+            {type === 'subject' && (
+              <div className="grid gap-2">
+                <Label className="text-slate-700 dark:text-slate-300">Subject Code</Label>
+                <Input
+                  value={editForm.subjectCode}
+                  onChange={(e) => setEditForm({ ...editForm, subjectCode: e.target.value })}
+                  placeholder="e.g. 101"
+                  className="bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-600 text-slate-900 dark:text-slate-100"
+                />
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsEditModalOpen(false)} className="border-gray-200 dark:border-slate-600 dark:text-slate-300">Cancel</Button>
@@ -1074,6 +1088,17 @@ export function TaxonomyDataTable({ type, title }: Props) {
                 className="bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 font-mono text-sm"
               />
             </div>
+            {type === 'subject' && (
+              <div className="grid gap-2">
+                <Label className="text-slate-700 dark:text-slate-300">Subject Code</Label>
+                <Input
+                  value={addForm.subjectCode}
+                  onChange={(e) => setAddForm({ ...addForm, subjectCode: e.target.value })}
+                  placeholder="e.g. 101"
+                  className="bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-600 text-slate-900 dark:text-slate-100"
+                />
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsAddModalOpen(false)} className="border-gray-200 dark:border-slate-600 dark:text-slate-300">Cancel</Button>

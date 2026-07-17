@@ -58,6 +58,8 @@ export interface TaxonomyNode {
     id?: string;
   };
   
+  // Subject specific field
+  subjectCode?: string;
   // Board / Institution specific optional fields
   acronym?: string;
   boardType?: 'Central Board' | 'State Board' | 'Public School' | 'Private School' | 'College' | 'University' | 'Coaching Institute' | 'Other';
