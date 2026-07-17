@@ -443,8 +443,7 @@ export default async function QuizLandingPage({ params }: Props) {
                     >
                       {test.instructions || `* এই পরীক্ষায় মোট প্রশ্ন সংখ্যা এবং তার জন্য বরাদ্দ সময় নির্দিষ্ট করা থাকবে।
 * প্রতিটি সঠিক উত্তরের জন্য 1 নম্বর পাবেন।
-* প্রতিটি ভুল উত্তরের জন্য 0.25 নম্বর কাটা যাবে (নেগেটিভ মার্কিং)।
-* সমস্ত প্রশ্নের উত্তর দেওয়া বাধ্যতামূলক নয়, তবে চেষ্টা করুন যতটা সম্ভব সঠিক উত্তর দিতে।
+${test.negativeMarking && test.negativeMarking > 0 ? `* প্রতিটি ভুল উত্তরের জন্য ${test.negativeMarking} নম্বর কাটা যাবে (নেগেটিভ মার্কিং)।\n` : ''}* সমস্ত প্রশ্নের উত্তর দেওয়া বাধ্যতামূলক নয়, তবে চেষ্টা করুন যতটা সম্ভব সঠিক উত্তর দিতে।
 * প্রশ্নগুলি মনোযোগ সহকারে পড়ুন এবং তারপর উত্তর নির্বাচন করুন।
 * পরীক্ষা শেষ হওয়ার পর আপনার স্কোর এবং সঠিক উত্তরগুলি দেখতে পাবেন।
 * কোনো ইলেকট্রনিক ডিভাইস বা বই ব্যবহার করা যাবে না।
@@ -473,19 +472,19 @@ export default async function QuizLandingPage({ params }: Props) {
                 </div>
                 <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {[
-                    { icon: Trophy, title: 'National Level Ranking', desc: 'Compare your score against thousands of aspirants and see exactly where you stand.' },
-                    { icon: MonitorPlay, title: 'Exam-Simulated Interface', desc: 'Experience the exact look and pressure of the real exam to conquer test-day anxiety.' },
-                    { icon: BookCheck, title: '100% Latest Syllabus', desc: 'Every question is strictly mapped to the latest exam pattern and official guidelines.' },
-                    { icon: History, title: 'Previous Year Questions', desc: 'Includes handpicked questions from past years to give you an authentic experience.' },
-                    { icon: LineChart, title: 'In-Depth AI Analytics', desc: 'Discover your weak areas with deep, section-wise performance and speed insights.' },
-                    { icon: PieChart, title: 'Strengths & Weaknesses', desc: 'Automatically categorizes topics so you know exactly what to study next.' },
-                    { icon: Sparkles, title: 'Expert-Crafted Solutions', desc: 'Access comprehensive, step-by-step explanations designed by top educators.' },
-                    { icon: Smartphone, title: 'Mobile-Optimized Testing', desc: 'Take the test anywhere, anytime with a flawlessly optimized mobile interface.' },
-                    { icon: Clock, title: 'Strict Time Management', desc: 'Master your speed with a relentless countdown timer that keeps you on your toes.' },
-                    { icon: ShieldAlert, title: 'Anti-Cheat Fullscreen', desc: 'A strict, lock-down fullscreen environment ensures a fair and distraction-free test.' },
-                    { icon: AlertTriangle, title: 'Negative Marking', desc: `Incorrect answers deduct ${test.negativeMarking ?? 0} marks — forcing you to choose wisely.` },
-                    { icon: Zap, title: 'Instant Results', desc: 'No waiting around. Review your accuracy and detailed report the second you hit submit.' },
-                  ].map(({ icon: Icon, title, desc }) => (
+                    { icon: Trophy, title: 'National Level Ranking', desc: 'Compare your score against thousands of aspirants and see exactly where you stand.', show: true },
+                    { icon: MonitorPlay, title: 'Exam-Simulated Interface', desc: 'Experience the exact look and pressure of the real exam to conquer test-day anxiety.', show: true },
+                    { icon: BookCheck, title: '100% Latest Syllabus', desc: 'Every question is strictly mapped to the latest exam pattern and official guidelines.', show: true },
+                    { icon: History, title: 'Previous Year Questions', desc: 'Includes handpicked questions from past years to give you an authentic experience.', show: true },
+                    { icon: LineChart, title: 'In-Depth AI Analytics', desc: 'Discover your weak areas with deep, section-wise performance and speed insights.', show: true },
+                    { icon: PieChart, title: 'Strengths & Weaknesses', desc: 'Automatically categorizes topics so you know exactly what to study next.', show: true },
+                    { icon: Sparkles, title: 'Expert-Crafted Solutions', desc: 'Access comprehensive, step-by-step explanations designed by top educators.', show: true },
+                    { icon: Smartphone, title: 'Mobile-Optimized Testing', desc: 'Take the test anywhere, anytime with a flawlessly optimized mobile interface.', show: true },
+                    { icon: Clock, title: 'Strict Time Management', desc: 'Master your speed with a relentless countdown timer that keeps you on your toes.', show: true },
+                    { icon: ShieldAlert, title: 'Anti-Cheat Fullscreen', desc: 'A strict, lock-down fullscreen environment ensures a fair and distraction-free test.', show: true },
+                    { icon: AlertTriangle, title: 'Negative Marking', desc: `Incorrect answers deduct ${test.negativeMarking ?? 0} marks — forcing you to choose wisely.`, show: !!test.negativeMarking && test.negativeMarking > 0 },
+                    { icon: Zap, title: 'Instant Results', desc: 'No waiting around. Review your accuracy and detailed report the second you hit submit.', show: true },
+                  ].filter(item => item.show !== false).map(({ icon: Icon, title, desc }) => (
                     <div key={title} className="flex items-start gap-3">
                       <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
                         <Icon className="w-4.5 h-4.5 text-slate-600 dark:text-slate-400" />
@@ -518,8 +517,8 @@ export default async function QuizLandingPage({ params }: Props) {
                       { label: 'Duration', value: `${test.durationMin ?? 0} minutes` },
                       { label: 'Total Marks', value: `${test.totalMarks ?? 0}` },
                       { label: 'Pass Marks', value: `${test.passingMarks ?? 0}` },
-                      { label: 'Negative', value: `${test.negativeMarking ?? 0} per wrong answer` },
-                    ].map(({ label, value }) => (
+                      { label: 'Negative', value: `${test.negativeMarking ?? 0} per wrong answer`, show: !!test.negativeMarking && test.negativeMarking > 0 },
+                    ].filter(item => item.show !== false).map(({ label, value }) => (
                       <div key={label} className="flex justify-between text-sm border-b border-slate-50 dark:border-slate-800/50 pb-1.5 last:border-0 last:pb-0">
                         <span className="text-slate-500 dark:text-slate-400 font-medium">{label}</span>
                         <span className="font-bold text-slate-800 dark:text-slate-200 text-right">{value}</span>

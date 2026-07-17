@@ -1,5 +1,6 @@
 import React from 'react';
 import { getAssessmentBySlug, getAssessments } from '@/lib/firebase/assessment';
+import { getTaxonomyNodeById } from '@/lib/firebase/taxonomy';
 import { notFound } from 'next/navigation';
 import { MockTest } from '@/lib/assessment-types';
 import { Metadata, ResolvingMetadata } from 'next';
@@ -55,6 +56,18 @@ export default async function MockTestLandingPage({ params }: Props) {
 
   const allTests = await getAssessments('mockTests') as MockTest[];
   const related = allTests.filter(a => a.id !== test.id && a.status === 'Published').slice(0, 3);
+
+  let boardName = '';
+  let className = '';
+  let subjectName = '';
+  let textbookName = '';
+  let chapterName = '';
+
+  if (test.boardId) { const node = await getTaxonomyNodeById(test.boardId); if (node) boardName = node.acronym || node.title; }
+  if (test.classId) { const node = await getTaxonomyNodeById(test.classId); if (node) className = node.title; }
+  if (test.subjectId) { const node = await getTaxonomyNodeById(test.subjectId); if (node) subjectName = node.title; }
+  if (test.textbookId) { const node = await getTaxonomyNodeById(test.textbookId); if (node) textbookName = node.title; }
+  if (test.chapterId) { const node = await getTaxonomyNodeById(test.chapterId); if (node) chapterName = node.title; }
 
   const jsonLdBreadcrumb = {
     "@context": "https://schema.org",
@@ -219,19 +232,51 @@ export default async function MockTestLandingPage({ params }: Props) {
                 </h1>
 
                 {test.description && (
-                  <p className="text-slate-400 text-base lg:text-lg max-w-xl leading-relaxed">
+                  <p className="text-slate-400 text-base lg:text-lg max-w-xl leading-relaxed mt-4">
                     {test.description}
                   </p>
+                )}
+
+                {/* Academic Details */}
+                {(boardName || className || subjectName || textbookName || chapterName) && (
+                  <div className="flex flex-wrap items-center gap-2 text-sm text-slate-300 bg-white/5 p-3 rounded-xl border border-white/10 mt-6 shadow-sm">
+                     <BookOpen className="w-4 h-4 text-emerald-400 mr-1" />
+                     {boardName && <span className="bg-white/10 hover:bg-white/20 transition-colors px-2.5 py-1 rounded-md text-xs font-medium">{boardName}</span>}
+                     {className && (
+                        <>
+                           <ChevronRight className="w-3 h-3 text-slate-500" />
+                           <span className="bg-white/10 hover:bg-white/20 transition-colors px-2.5 py-1 rounded-md text-xs font-medium">{className}</span>
+                        </>
+                     )}
+                     {subjectName && (
+                        <>
+                           <ChevronRight className="w-3 h-3 text-slate-500" />
+                           <span className="bg-white/10 hover:bg-white/20 transition-colors px-2.5 py-1 rounded-md text-xs font-medium">{subjectName}</span>
+                        </>
+                     )}
+                     {textbookName && (
+                        <>
+                           <ChevronRight className="w-3 h-3 text-slate-500" />
+                           <span className="bg-white/10 hover:bg-white/20 transition-colors px-2.5 py-1 rounded-md text-xs font-medium">{textbookName}</span>
+                        </>
+                     )}
+                     {chapterName && (
+                        <>
+                           <ChevronRight className="w-3 h-3 text-slate-500" />
+                           <span className="bg-white/10 hover:bg-white/20 transition-colors px-2.5 py-1 rounded-md text-xs font-medium">{chapterName}</span>
+                        </>
+                     )}
+                  </div>
                 )}
 
                 {/* Stats strip */}
                 <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-3">
                   {[
-                    { icon: HelpCircle, label: `${test.questionIds?.length ?? 0} Questions`, color: 'text-blue-400', borderHover: 'hover:border-blue-500/30', bgHover: 'hover:bg-blue-500/10' },
-                    { icon: Clock, label: `${test.durationMin ?? 0} Minutes`, color: 'text-violet-400', borderHover: 'hover:border-violet-500/30', bgHover: 'hover:bg-violet-500/10' },
-                    { icon: FileText, label: `${test.totalMarks ?? 0} Marks`, color: 'text-amber-400', borderHover: 'hover:border-amber-500/30', bgHover: 'hover:bg-amber-500/10' },
-                    { icon: AlertTriangle, label: `${test.negativeMarking ?? 0} Negative`, color: 'text-red-400', borderHover: 'hover:border-red-500/30', bgHover: 'hover:bg-red-500/10' },
-                  ].map(({ icon: Icon, label, color, borderHover, bgHover }) => (
+                    { icon: HelpCircle, label: `${test.questionIds?.length ?? 0} Questions`, color: 'text-blue-400', borderHover: 'hover:border-blue-500/30', bgHover: 'hover:bg-blue-500/10', show: true },
+                    { icon: Clock, label: `${test.durationMin ?? 0} Minutes`, color: 'text-violet-400', borderHover: 'hover:border-violet-500/30', bgHover: 'hover:bg-violet-500/10', show: true },
+                    { icon: FileText, label: `${test.totalMarks ?? 0} Marks`, color: 'text-amber-400', borderHover: 'hover:border-amber-500/30', bgHover: 'hover:bg-amber-500/10', show: true },
+                    { icon: AlertTriangle, label: `${test.negativeMarking ?? 0} Negative`, color: 'text-red-400', borderHover: 'hover:border-red-500/30', bgHover: 'hover:bg-red-500/10', show: !!test.negativeMarking && test.negativeMarking > 0 },
+                  ].filter(item => item.show !== false).map(({ icon: Icon, label, color, borderHover, bgHover }) => (
                     <div key={label} className={`flex items-center justify-center sm:justify-start gap-2 bg-white/5 border border-white/10 rounded-xl px-2 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold text-white backdrop-blur-md shadow-lg transition-all duration-300 ${borderHover} ${bgHover} cursor-default`}>
                       <Icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 ${color}`} />
                       <span className="truncate">{label}</span>
@@ -266,12 +311,12 @@ export default async function MockTestLandingPage({ params }: Props) {
                   {/* Card body */}
                   <div className="p-5 space-y-3">
                     {[
-                      { icon: HelpCircle, label: 'Questions', value: `${test.questionIds?.length ?? 0}` },
-                      { icon: Clock, label: 'Duration', value: `${test.durationMin ?? 0} min` },
-                      { icon: Target, label: 'Total Marks', value: `${test.totalMarks ?? 0}` },
-                      { icon: CheckCircle2, label: 'Passing Marks', value: `${test.passingMarks ?? 0}` },
-                      { icon: AlertTriangle, label: 'Negative Marks', value: `${test.negativeMarking ?? 0}` },
-                    ].map(({ icon: Icon, label, value }) => (
+                      { icon: HelpCircle, label: 'Questions', value: `${test.questionIds?.length ?? 0}`, show: true },
+                      { icon: Clock, label: 'Duration', value: `${test.durationMin ?? 0} min`, show: true },
+                      { icon: Target, label: 'Total Marks', value: `${test.totalMarks ?? 0}`, show: true },
+                      { icon: CheckCircle2, label: 'Passing Marks', value: `${test.passingMarks ?? 0}`, show: true },
+                      { icon: AlertTriangle, label: 'Negative Marks', value: `${test.negativeMarking ?? 0}`, show: !!test.negativeMarking && test.negativeMarking > 0 },
+                    ].filter(item => item.show !== false).map(({ icon: Icon, label, value }) => (
                       <div key={label} className="flex items-center justify-between text-sm">
                         <span className="flex items-center gap-2 text-slate-500 dark:text-slate-400 font-medium">
                           <Icon className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
@@ -340,8 +385,7 @@ export default async function MockTestLandingPage({ params }: Props) {
                     >
                       {test.instructions || `* এই পরীক্ষায় মোট প্রশ্ন সংখ্যা এবং তার জন্য বরাদ্দ সময় নির্দিষ্ট করা থাকবে।
 * প্রতিটি সঠিক উত্তরের জন্য 1 নম্বর পাবেন।
-* প্রতিটি ভুল উত্তরের জন্য 0.25 নম্বর কাটা যাবে (নেগেটিভ মার্কিং)।
-* সমস্ত প্রশ্নের উত্তর দেওয়া বাধ্যতামূলক নয়, তবে চেষ্টা করুন যতটা সম্ভব সঠিক উত্তর দিতে।
+${test.negativeMarking && test.negativeMarking > 0 ? `* প্রতিটি ভুল উত্তরের জন্য ${test.negativeMarking} নম্বর কাটা যাবে (নেগেটিভ মার্কিং)।\n` : ''}* সমস্ত প্রশ্নের উত্তর দেওয়া বাধ্যতামূলক নয়, তবে চেষ্টা করুন যতটা সম্ভব সঠিক উত্তর দিতে।
 * প্রশ্নগুলি মনোযোগ সহকারে পড়ুন এবং তারপর উত্তর নির্বাচন করুন।
 * পরীক্ষা শেষ হওয়ার পর আপনার স্কোর এবং সঠিক উত্তরগুলি দেখতে পাবেন।
 * কোনো ইলেকট্রনিক ডিভাইস বা বই ব্যবহার করা যাবে না।
@@ -370,19 +414,21 @@ export default async function MockTestLandingPage({ params }: Props) {
                 </div>
                 <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {[
-                    { icon: Trophy, title: 'National Level Ranking', desc: 'Compare your score against thousands of aspirants and see exactly where you stand.' },
-                    { icon: MonitorPlay, title: 'Exam-Simulated Interface', desc: 'Experience the exact look and pressure of the real exam to conquer test-day anxiety.' },
-                    { icon: BookCheck, title: '100% Latest Syllabus', desc: 'Every question is strictly mapped to the latest exam pattern and official guidelines.' },
-                    { icon: History, title: 'Previous Year Questions', desc: 'Includes handpicked questions from past years to give you an authentic experience.' },
-                    { icon: LineChart, title: 'In-Depth AI Analytics', desc: 'Discover your weak areas with deep, section-wise performance and speed insights.' },
-                    { icon: PieChart, title: 'Strengths & Weaknesses', desc: 'Automatically categorizes topics so you know exactly what to study next.' },
-                    { icon: Sparkles, title: 'Expert-Crafted Solutions', desc: 'Access comprehensive, step-by-step explanations designed by top educators.' },
-                    { icon: Smartphone, title: 'Mobile-Optimized Testing', desc: 'Take the test anywhere, anytime with a flawlessly optimized mobile interface.' },
-                    { icon: Clock, title: 'Strict Time Management', desc: 'Master your speed with a relentless countdown timer that keeps you on your toes.' },
-                    { icon: ShieldAlert, title: 'Anti-Cheat Fullscreen', desc: 'A strict, lock-down fullscreen environment ensures a fair and distraction-free test.' },
-                    { icon: AlertTriangle, title: 'Negative Marking', desc: `Incorrect answers deduct ${test.negativeMarking ?? 0} marks — forcing you to choose wisely.` },
-                    { icon: Zap, title: 'Instant Results', desc: 'No waiting around. Review your accuracy and detailed report the second you hit submit.' },
-                  ].map(({ icon: Icon, title, desc }) => (
+                    { icon: Trophy, title: 'National Level Ranking', desc: 'Compare your score against thousands of aspirants and see exactly where you stand.', show: true },
+                    { icon: MonitorPlay, title: 'Exam-Simulated Interface', desc: 'Experience the exact look and pressure of the real exam to conquer test-day anxiety.', show: true },
+                    { icon: BookCheck, title: '100% Latest Syllabus', desc: 'Every question is strictly mapped to the latest exam pattern and official guidelines.', show: true },
+                    { icon: History, title: 'Previous Year Questions', desc: 'Includes handpicked questions from past years to give you an authentic experience.', show: true },
+                    { icon: LineChart, title: 'In-Depth AI Analytics', desc: 'Discover your weak areas with deep, section-wise performance and speed insights.', show: true },
+                    { icon: PieChart, title: 'Strengths & Weaknesses', desc: 'Automatically categorizes topics so you know exactly what to study next.', show: true },
+                    { icon: Sparkles, title: 'Expert-Crafted Solutions', desc: 'Access comprehensive, step-by-step explanations designed by top educators.', show: true },
+                    { icon: Smartphone, title: 'Mobile-Optimized Testing', desc: 'Take the test anywhere, anytime with a flawlessly optimized mobile interface.', show: true },
+                    { icon: Clock, title: 'Strict Time Management', desc: 'Master your speed with a relentless countdown timer that keeps you on your toes.', show: true },
+                    { icon: ShieldAlert, title: 'Anti-Cheat Fullscreen', desc: 'A strict, lock-down fullscreen environment ensures a fair and distraction-free test.', show: true },
+                    { icon: AlertTriangle, title: 'Negative Marking', desc: `Incorrect answers deduct ${test.negativeMarking ?? 0} marks — forcing you to choose wisely.`, show: !!test.negativeMarking && test.negativeMarking > 0 },
+                    { icon: Zap, title: 'Instant Results', desc: 'No waiting around. Review your accuracy and detailed report the second you hit submit.', show: true },
+                  ].filter(item => item.show !== false).map(({ icon: IconComponent, title, desc }) => {
+                    const Icon = IconComponent as any;
+                    return (
                     <div key={title} className="flex items-start gap-3">
                       <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
                         <Icon className="w-4.5 h-4.5 text-slate-600 dark:text-slate-400" />
@@ -392,7 +438,7 @@ export default async function MockTestLandingPage({ params }: Props) {
                         <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">{desc}</p>
                       </div>
                     </div>
-                  ))}
+                  )})}
                 </div>
               </div>
 
@@ -415,8 +461,8 @@ export default async function MockTestLandingPage({ params }: Props) {
                       { label: 'Duration', value: `${test.durationMin ?? 0} minutes` },
                       { label: 'Total Marks', value: `${test.totalMarks ?? 0}` },
                       { label: 'Pass Marks', value: `${test.passingMarks ?? 0}` },
-                      { label: 'Negative', value: `${test.negativeMarking ?? 0} per wrong answer` },
-                    ].map(({ label, value }) => (
+                      { label: 'Negative', value: `${test.negativeMarking ?? 0} per wrong answer`, show: !!test.negativeMarking && test.negativeMarking > 0 },
+                    ].filter(item => item.show !== false).map(({ label, value }) => (
                       <div key={label} className="flex justify-between text-sm border-b border-slate-50 dark:border-slate-800/50 pb-1.5 last:border-0 last:pb-0">
                         <span className="text-slate-500 dark:text-slate-400 font-medium">{label}</span>
                         <span className="font-bold text-slate-800 dark:text-slate-200 text-right">{value}</span>
