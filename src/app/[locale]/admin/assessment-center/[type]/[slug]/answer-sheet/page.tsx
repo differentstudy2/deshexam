@@ -59,7 +59,7 @@ export default async function AnswerSheetPage({
     });
 
     return (
-        <div className="min-h-screen bg-white text-black p-8 font-sans print:p-0 print:bg-white print:text-black">
+        <div className="min-h-screen bg-white text-black p-8 font-sans print:p-0 print:bg-white print:text-black print:min-h-0 print:block">
             
             {/* Header - Print Friendly */}
             <div className="border-b-2 border-black pb-6 mb-8">
@@ -88,7 +88,7 @@ export default async function AnswerSheetPage({
                     <p className="text-center italic text-gray-500">No questions found for this assessment.</p>
                 ) : (
                     sortedQuestions.map((q, index) => (
-                        <div key={q.id} className="break-inside-avoid border border-gray-200 p-6 rounded-lg print:border-none print:p-0 print:border-b print:border-dashed print:pb-8">
+                        <div key={q.id} className={`border border-gray-200 p-6 rounded-lg print:border-none print:p-0 print:border-b print:border-dashed print:pb-8 ${index > 0 ? 'break-inside-avoid print:break-inside-avoid' : ''}`}>
                             
                             {/* Question Header */}
                             <div className="flex justify-between items-start mb-4">
@@ -104,7 +104,7 @@ export default async function AnswerSheetPage({
                             </div>
 
                             {/* Options Grid */}
-                            <div className="ml-8 space-y-3 md:space-y-0 md:grid md:grid-cols-2 gap-4 mt-4 mb-6">
+                            <div className="ml-8 space-y-3 md:space-y-0 md:grid md:grid-cols-2 print:space-y-0 print:grid print:grid-cols-2 gap-4 mt-4 mb-6">
                                 {q.options && [
                                     { key: 'a', text: q.options.a },
                                     { key: 'b', text: q.options.b },
