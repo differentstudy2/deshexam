@@ -286,8 +286,8 @@ export default async function AnswerSheetPage({
                         height: 100% !important;
                     }
                     html[data-layout="presentation"] .group\/question {
-                        height: 210mm !important;
-                        min-height: 210mm !important;
+                        height: 100vh !important;
+                        min-height: 100vh !important;
                         padding-top: 10rem !important;
                         padding-bottom: 6rem !important;
                         padding-left: 8rem !important;
@@ -298,11 +298,15 @@ export default async function AnswerSheetPage({
                         position: relative !important;
                     }
                     html[data-layout="presentation"] .presentation-footer {
-                        position: absolute !important;
-                        bottom: 2rem !important;
-                        left: 10rem !important;
-                        right: 10rem !important;
+                        position: fixed !important;
+                        bottom: 0 !important;
+                        left: 0 !important;
+                        right: 0 !important;
                         margin-top: 0 !important;
+                        z-index: 9999 !important;
+                    }
+                    html[data-layout="presentation"] .group\/question:not(:first-child) .presentation-footer {
+                        display: none !important;
                     }
                 }
                 
@@ -761,10 +765,10 @@ export default async function AnswerSheetPage({
                                                         )}
 
                                                         {/* Presentation Footer */}
-                                                        <div className="presentation-footer hidden w-full justify-between items-center text-gray-700 font-semibold text-[14px] mt-auto pt-8 [html[data-layout='presentation']_&]:flex">
-                                                            <div>© DeshExam</div>
-                                                            <div>www.deshexam.in</div>
-                                                            <div>MdjMiah</div>
+                                                        <div className="presentation-footer hidden absolute bottom-0 left-0 right-0 bg-[#eef6ff] border-t border-blue-200 text-[#1e4b85] py-2.5 px-12 justify-between items-center w-full print:[print-color-adjust:exact] [html[data-layout='presentation']_&]:flex">
+                                                            <div className="font-semibold text-[14px]">&copy; DeshExam</div>
+                                                            <div className="font-bold text-[15px] hidden md:block">India's Smart Learning Platform</div>
+                                                            <div className="font-semibold text-[14px]">www.deshexam.in</div>
                                                         </div>
                                                     </div>
                                                 )
