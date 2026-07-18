@@ -575,7 +575,7 @@ export default async function AnswerSheetPage({
                                                     <div key={q.id} className={`group/question ${bgColor} ${isLast ? 'flex-1 print:flex-none' : ''} border border-gray-200 p-6 rounded-lg print:border-none print:p-6 print:pt-8 print:pb-6 print:break-after-page print:[print-color-adjust:exact] break-inside-avoid print:break-inside-avoid flex flex-col relative [html[data-layout='presentation']_&]:pt-[8rem] [html[data-layout='presentation']_&]:pb-[6rem] [html[data-layout='presentation']_&]:px-[4rem] print:[html[data-layout='presentation']_&]:pt-[10rem] print:[html[data-layout='presentation']_&]:px-[4rem]`}>
 
                                                         {/* Presentation Header */}
-                                                        <div className="presentation-header hidden absolute top-0 left-0 right-0 bg-[#eef6ff] py-3 px-10 justify-between items-center w-full print:[print-color-adjust:exact] [html[data-layout='presentation']_&]:flex">
+                                                        <div className="presentation-header hidden absolute top-0 left-0 right-0 bg-transparent py-3 px-10 justify-between items-center w-full print:[print-color-adjust:exact] [html[data-layout='presentation']_&]:flex">
                                                             <div className="flex items-center gap-3">
                                                                 <img src="/image/logo.png" alt="DeshExam" className="h-6 w-auto object-contain" />
                                                                 <div className="font-bold text-[18px] text-[#1e4b85] tracking-tight">DeshExam</div>
