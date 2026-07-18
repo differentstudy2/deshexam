@@ -298,8 +298,7 @@ export default async function AnswerSheetPage({
                     display: flex !important;
                     flex-direction: column;
                     justify-content: center;
-                    padding-left: 10rem !important;
-                    padding-right: 10rem !important;
+                    padding: 8rem 10rem !important;
                     border: none !important;
                     page: presentation-page;
                     background: #f8fbff !important;
@@ -320,6 +319,7 @@ export default async function AnswerSheetPage({
                     font-size: 32px !important;
                     font-weight: 800 !important;
                     color: #111827 !important;
+                    background-color: transparent !important;
                 }
                 html[data-layout="presentation"] .print-q-num {
                     display: none !important;
@@ -350,6 +350,18 @@ export default async function AnswerSheetPage({
                 html[data-layout="presentation"] .options-container > div:nth-child(4) { border-color: #ef4444 !important; }
                 html[data-layout="presentation"] .options-container > div:nth-child(4) .relative.shrink-0 { background: #fef2f2 !important; color: #ef4444 !important; border: none !important; width: 3.5rem !important; height: 3.5rem !important; border-radius: 0.5rem !important; font-size: 1.5rem !important; font-weight: 900 !important; }
                 
+                html[data-layout="presentation"] .options-container > div:nth-child(5) { border-color: #8b5cf6 !important; }
+                html[data-layout="presentation"] .options-container > div:nth-child(5) .relative.shrink-0 { background: #f5f3ff !important; color: #8b5cf6 !important; border: none !important; width: 3.5rem !important; height: 3.5rem !important; border-radius: 0.5rem !important; font-size: 1.5rem !important; font-weight: 900 !important; }
+
+                html[data-layout="presentation"] .group\\/question:has(.toggle-tick-local:checked) .options-container > div.is-correct-option {
+                    border-color: #10b981 !important;
+                    background-color: #ecfdf5 !important;
+                }
+                html[data-layout="presentation"] .group\\/question:has(.toggle-tick-local:checked) .options-container > div.is-correct-option .relative.shrink-0 {
+                    background: #10b981 !important;
+                    color: white !important;
+                }
+
                 html[data-layout="presentation"] .print-opt-text p {
                     font-size: 26px !important;
                     font-weight: 700 !important;
@@ -359,7 +371,7 @@ export default async function AnswerSheetPage({
             `}} />
 
             {/* Native Print Table for Repeating Header/Footer without Overlap */}
-            <table className="w-full border-collapse h-full flex-1 flex flex-col print:table print:h-auto">
+            <table className="w-full border-collapse h-full flex-1 flex flex-col print:table print:h-auto [html[data-layout='presentation']_&]:print:block [html[data-layout='presentation']_&]:block">
                 <thead className="hidden print:table-header-group w-full z-50 group-has-[:not(:checked).toggle-header]/settings:print:!hidden [html[data-layout='presentation']_&]:!hidden">
                     <tr>
                         <td className="p-0 border-b border-blue-200">
@@ -391,9 +403,9 @@ export default async function AnswerSheetPage({
                         </td>
                     </tr>
                 </tfoot>
-                <tbody className="w-full h-full flex-1 flex flex-col print:table-row-group">
-                    <tr className="h-full flex-1 flex flex-col print:table-row">
-                        <td className="p-0 align-top w-full h-full flex-1 flex flex-col print:table-cell">
+                <tbody className="w-full h-full flex-1 flex flex-col print:table-row-group [html[data-layout='presentation']_&]:print:block [html[data-layout='presentation']_&]:block">
+                    <tr className="h-full flex-1 flex flex-col print:table-row [html[data-layout='presentation']_&]:print:block [html[data-layout='presentation']_&]:block">
+                        <td className="p-0 align-top w-full h-full flex-1 flex flex-col print:table-cell [html[data-layout='presentation']_&]:print:block [html[data-layout='presentation']_&]:block">
                 {/* Watermark for Print */}
             <div className="fixed inset-0 pointer-events-none z-0 hidden print:flex items-center justify-center opacity-10 print:opacity-10">
                 <div className="text-7xl font-bold text-gray-400 -rotate-45 whitespace-nowrap">
@@ -529,7 +541,7 @@ export default async function AnswerSheetPage({
                                 </div>
 
                                 {/* Presentation Top Badges */}
-                                <div className="presentation-badges hidden absolute top-32 right-12 gap-3 z-10">
+                                <div className="presentation-badges hidden w-full justify-end gap-3 z-10 mb-6">
                                     {(q.sourceExam || (q.tags && q.tags.length > 0)) && (
                                         <div className="bg-blue-50 text-blue-700 px-4 py-1.5 rounded border border-blue-200 font-medium flex items-center gap-2 shadow-sm text-sm">
                                             <span className="w-3 h-4 bg-blue-500 inline-block rounded-sm"></span>
@@ -571,7 +583,7 @@ export default async function AnswerSheetPage({
                                     <div className="flex items-baseline gap-3 w-full">
                                         <div className="flex flex-col shrink-0">
                                             <span className="text-black font-bold text-[22px] print-q-num">Q{index + 1}.</span>
-                                            <div className="flex flex-col gap-2 mt-4 print:hidden opacity-60 hover:opacity-100 transition-opacity">
+                                            <div className="flex flex-col gap-2 mt-4 print:hidden opacity-60 hover:opacity-100 transition-opacity [html[data-layout='presentation']_&]:hidden">
                                                 <label className="flex items-center gap-1.5 cursor-pointer text-[10px] font-semibold text-gray-600 hover:text-gray-900" title="Show Main Explanation">
                                                     <input type="checkbox" defaultChecked className="toggle-exp-local w-3 h-3 text-blue-600 rounded border-gray-300 focus:ring-blue-500" />
                                                     <span>Exp</span>
@@ -628,7 +640,7 @@ export default async function AnswerSheetPage({
                                         return (
                                             <div
                                                 key={opt.key}
-                                                className={`flex items-center gap-3 p-3 rounded-full border transition-colors duration-300 print:[print-color-adjust:exact] ${!isCorrect
+                                                className={`flex items-center gap-3 p-3 rounded-full border transition-colors duration-300 print:[print-color-adjust:exact] ${isCorrect ? 'is-correct-option' : ''} ${!isCorrect
                                                         ? [
                                                             'border-blue-100 bg-blue-50/30 print:border-blue-200 print:bg-[#f0f7ff]',
                                                             'border-teal-100 bg-teal-50/30 print:border-teal-200 print:bg-[#f0fdfa]',
