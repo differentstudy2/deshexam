@@ -277,6 +277,10 @@ export default async function AnswerSheetPage({
                 }
                 
                 /* Presentation Layout Overrides */
+                html[data-layout="presentation"] {
+                    scroll-snap-type: y mandatory;
+                    scroll-behavior: smooth;
+                }
                 html[data-layout="presentation"] body {
                     background-color: #f8fbff !important;
                     margin: 0 !important;
@@ -318,6 +322,8 @@ export default async function AnswerSheetPage({
                     border-radius: 0 !important;
                     page: presentation-page;
                     background: #f8fbff !important;
+                    scroll-snap-align: start;
+                    scroll-snap-stop: always;
                 }
                 @page presentation-page {
                     size: landscape;
