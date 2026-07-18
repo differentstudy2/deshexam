@@ -547,25 +547,7 @@ export default async function AnswerSheetPage({
                                     <div className="flex flex-col items-center gap-4 w-1/3">
                                         <div className="bg-blue-600 text-white px-8 py-2.5 rounded-full font-bold text-lg shadow-sm">MOCK TEST</div>
                                         
-                                        {/* Badges */}
-                                        <div className="flex justify-center gap-3 w-full">
-                                            <div className="bg-amber-50 text-amber-700 px-4 py-1.5 rounded border border-amber-200 font-medium flex items-center gap-2 shadow-sm text-sm">
-                                                <div className="flex items-end gap-0.5 h-4">
-                                                    <span className="w-1.5 h-2 bg-amber-300 inline-block rounded-sm"></span>
-                                                    <span className="w-1.5 h-3 bg-amber-400 inline-block rounded-sm"></span>
-                                                    <span className="w-1.5 h-4 bg-amber-500 inline-block rounded-sm"></span>
-                                                </div>
-                                                {q.difficulty || 'Easy'}
-                                            </div>
-                                            <div className="bg-gray-50 text-gray-700 px-4 py-1.5 rounded border border-gray-200 font-medium flex items-center gap-2 shadow-sm text-sm">
-                                                <span className="w-4 h-3 bg-gray-400 inline-block rounded-sm relative"><span className="absolute w-2 h-4 bg-gray-500 left-1 -top-0.5 rounded-sm"></span></span>
-                                                Module 1
-                                            </div>
-                                            <div className="bg-gray-100 text-gray-800 px-4 py-1.5 rounded-full border border-gray-300 font-bold flex items-center gap-2 shadow-sm text-sm">
-                                                <span className="w-4 h-4 rounded-full bg-gray-400 text-white flex items-center justify-center text-[10px]">?</span>
-                                                Question {String(index + 1).padStart(2, '0')} / {sortedQuestions.length}
-                                            </div>
-                                        </div>
+                                        {/* Badges removed from header */}
                                     </div>
 
                                     {/* Right: Page Number */}
