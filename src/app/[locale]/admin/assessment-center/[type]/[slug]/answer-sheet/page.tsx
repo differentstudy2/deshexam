@@ -279,6 +279,15 @@ export default async function AnswerSheetPage({
                 /* Presentation Layout Overrides */
                 html[data-layout="presentation"] body {
                     background-color: #f8fbff !important;
+                    margin: 0 !important;
+                    padding: 0 !important;
+                }
+                html[data-layout="presentation"] .group\/settings {
+                    padding: 0 !important;
+                    margin: 0 !important;
+                }
+                html[data-layout="presentation"] .questions-list-container {
+                    gap: 0 !important;
                 }
                 html[data-layout="presentation"] .flex-1.w-full.max-w-\\[1000px\\] {
                     max-width: none !important;
@@ -292,7 +301,7 @@ export default async function AnswerSheetPage({
                 html[data-layout="presentation"] .presentation-footer {
                     display: flex !important;
                 }
-                html[data-layout="presentation"] .group\\/question {
+                html[data-layout="presentation"] .group\/question {
                     height: 100vh;
                     display: flex !important;
                     flex-direction: column;
@@ -302,6 +311,7 @@ export default async function AnswerSheetPage({
                     padding-left: 10rem !important;
                     padding-right: 10rem !important;
                     border: none !important;
+                    border-radius: 0 !important;
                     page: presentation-page;
                     background: #f8fbff !important;
                 }
@@ -501,7 +511,7 @@ export default async function AnswerSheetPage({
             </div>
 
             {/* Questions List */}
-            <div className="flex flex-col gap-12 flex-1 print:block print:gap-0 print:break-before-page">
+            <div className="questions-list-container flex flex-col gap-12 flex-1 print:block print:gap-0 print:break-before-page">
                 {sortedQuestions.length === 0 ? (
                     <p className="text-center italic text-gray-500">No questions found for this assessment.</p>
                 ) : (
