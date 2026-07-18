@@ -144,12 +144,15 @@ export default async function AnswerSheetPage({
 
             {/* Native Print Table for Repeating Header/Footer without Overlap */}
             <table className="w-full border-collapse">
-                <thead className="hidden print:table-header-group w-full bg-white z-50">
+                <thead className="hidden print:table-header-group w-full z-50">
                     <tr>
-                        <td className="pb-2 pt-6 px-12 border-b border-gray-300 bg-white">
-                            <div className="flex justify-between items-end w-full">
-                                <div className="font-bold text-xl text-gray-900 tracking-tight">DeshExam</div>
-                                <div className="font-semibold text-sm text-gray-600">{classLine}</div>
+                        <td className="p-0 border-b border-blue-200">
+                            <div className="bg-[#eef6ff] py-3 px-12 flex justify-between items-center w-full print:[print-color-adjust:exact]">
+                                <div className="flex items-center gap-3">
+                                    <img src="/image/logo.png" alt="DeshExam" className="h-6 w-auto object-contain" />
+                                    <div className="font-bold text-[18px] text-[#1e4b85] tracking-tight">DeshExam</div>
+                                </div>
+                                <div className="font-semibold text-[14px] text-[#1e4b85]">{classLine}</div>
                             </div>
                         </td>
                     </tr>
@@ -291,7 +294,7 @@ export default async function AnswerSheetPage({
                         const bgColor = premiumColors[index % premiumColors.length];
 
                         return (
-                            <div key={q.id} className={`${bgColor} border border-gray-200 p-6 rounded-lg print:border-none print:p-6 print:pt-8 print:pb-6 print:break-after-page print:min-h-screen print:[print-color-adjust:exact] break-inside-avoid print:break-inside-avoid`}>
+                            <div key={q.id} className={`${bgColor} border border-gray-200 p-6 rounded-lg print:border-none print:p-6 print:pt-8 print:pb-6 print:[print-color-adjust:exact] break-inside-avoid print:break-inside-avoid`}>
 
                                 {/* Question Header */}
                                 <div className="flex justify-between items-start mb-4">
