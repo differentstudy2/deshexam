@@ -294,7 +294,7 @@ export default async function AnswerSheetPage({
                         const bgColor = premiumColors[index % premiumColors.length];
 
                         return (
-                            <div key={q.id} className={`${bgColor} border border-gray-200 p-6 rounded-lg print:border-none print:p-6 print:pt-8 print:pb-6 print:[print-color-adjust:exact] break-inside-avoid print:break-inside-avoid`}>
+                            <div key={q.id} className={`${bgColor} border border-gray-200 p-6 rounded-lg print:border-none print:p-6 print:pt-8 print:pb-6 print:break-after-page print:[print-color-adjust:exact] break-inside-avoid print:break-inside-avoid`}>
 
                                 {/* Question Header */}
                                 <div className="flex justify-between items-start mb-4">
