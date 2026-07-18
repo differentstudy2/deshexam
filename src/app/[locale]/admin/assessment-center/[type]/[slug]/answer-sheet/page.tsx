@@ -264,16 +264,22 @@ export default async function AnswerSheetPage({
                 }
             `}} />
             <script dangerouslySetInnerHTML={{__html: `
-                if (typeof window !== 'undefined') {
-                    window.addEventListener('change', function(e) {
+                if (typeof document !== 'undefined') {
+                    document.addEventListener('change', function(e) {
                         if (e.target.classList.contains('toggle-exp')) {
-                            document.querySelectorAll('.toggle-exp-local').forEach(cb => cb.checked = e.target.checked);
+                            document.querySelectorAll('.toggle-exp-local').forEach(cb => {
+                                if (cb.checked !== e.target.checked) cb.click();
+                            });
                         }
                         if (e.target.classList.contains('toggle-optexp')) {
-                            document.querySelectorAll('.toggle-optexp-local').forEach(cb => cb.checked = e.target.checked);
+                            document.querySelectorAll('.toggle-optexp-local').forEach(cb => {
+                                if (cb.checked !== e.target.checked) cb.click();
+                            });
                         }
                         if (e.target.classList.contains('toggle-tick')) {
-                            document.querySelectorAll('.toggle-tick-local').forEach(cb => cb.checked = e.target.checked);
+                            document.querySelectorAll('.toggle-tick-local').forEach(cb => {
+                                if (cb.checked !== e.target.checked) cb.click();
+                            });
                         }
                         if (e.target.classList.contains('input-font-q')) {
                             document.documentElement.style.setProperty('--font-q', e.target.value || 'inherit');
