@@ -356,7 +356,7 @@ export default async function AnswerSheetPage({
                 html[data-layout="presentation"] .options-container > div {
                     background: white !important;
                     border-width: 4px !important;
-                    padding: 1rem 1.5rem !important;
+                    padding: 0.5rem 1.25rem !important;
                     border-radius: 1rem !important;
                     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
                 }
