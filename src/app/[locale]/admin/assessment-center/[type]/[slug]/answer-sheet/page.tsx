@@ -91,6 +91,7 @@ export default async function AnswerSheetPage({
 
     return (
         <div className="min-h-screen bg-white text-black p-8 font-sans print:p-0 print:bg-white print:text-black print:min-h-0 print:block">
+            <title>{test.title} - Answer Sheet</title>
             <style dangerouslySetInnerHTML={{
                 __html: `
                 @media print {
