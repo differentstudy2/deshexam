@@ -318,7 +318,7 @@ export default async function AnswerSheetPage({
                 html[data-layout="presentation"] .explanation-block {
                     display: none !important;
                 }
-                html[data-layout="presentation"] .group\\/settings {
+                html[data-layout="presentation"] .group\/settings {
                     padding: 0 !important;
                     margin: 0 !important;
                 }
@@ -337,7 +337,7 @@ export default async function AnswerSheetPage({
                 html[data-layout="presentation"] .presentation-footer {
                     display: flex !important;
                 }
-                html[data-layout="presentation"] .group\\/question {
+                html[data-layout="presentation"] .group\/question {
                     height: 100vh;
                     display: flex !important;
                     flex-direction: column;
@@ -567,7 +567,7 @@ export default async function AnswerSheetPage({
                                                 const isLast = index === sortedQuestions.length - 1;
 
                                                 return (
-                                                    <div key={q.id} className={`group/question ${bgColor} ${isLast ? 'flex-1 print:flex-none' : ''} border border-gray-200 p-6 rounded-lg print:border-none print:p-6 print:pt-8 print:pb-6 print:break-after-page print:[print-color-adjust:exact] break-inside-avoid print:break-inside-avoid flex flex-col relative`}>
+                                                    <div key={q.id} className={`group/question ${bgColor} ${isLast ? 'flex-1 print:flex-none' : ''} border border-gray-200 p-6 rounded-lg print:border-none print:p-6 print:pt-8 print:pb-6 print:break-after-page print:[print-color-adjust:exact] break-inside-avoid print:break-inside-avoid flex flex-col relative [html[data-layout='presentation']_&]:pt-[8rem] [html[data-layout='presentation']_&]:pb-[6rem] [html[data-layout='presentation']_&]:px-[8rem] print:[html[data-layout='presentation']_&]:pt-[10rem] print:[html[data-layout='presentation']_&]:px-[8rem]`}>
 
                                                         {/* Presentation Header */}
                                                         <div className="presentation-header hidden absolute top-0 left-0 right-0 bg-[#eef6ff] py-3 px-10 justify-between items-center w-full print:[print-color-adjust:exact] [html[data-layout='presentation']_&]:flex">
