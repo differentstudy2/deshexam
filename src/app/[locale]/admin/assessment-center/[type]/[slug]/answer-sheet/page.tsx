@@ -263,47 +263,6 @@ export default async function AnswerSheetPage({
                     @page { margin: 0; }
                 }
             `}} />
-            <script dangerouslySetInnerHTML={{__html: `
-                if (typeof document !== 'undefined') {
-                    document.addEventListener('change', function(e) {
-                        if (e.target.classList.contains('toggle-exp')) {
-                            document.querySelectorAll('.toggle-exp-local').forEach(cb => {
-                                if (cb.checked !== e.target.checked) cb.click();
-                            });
-                        }
-                        if (e.target.classList.contains('toggle-optexp')) {
-                            document.querySelectorAll('.toggle-optexp-local').forEach(cb => {
-                                if (cb.checked !== e.target.checked) cb.click();
-                            });
-                        }
-                        if (e.target.classList.contains('toggle-tick')) {
-                            document.querySelectorAll('.toggle-tick-local').forEach(cb => {
-                                if (cb.checked !== e.target.checked) cb.click();
-                            });
-                        }
-                        if (e.target.classList.contains('input-font-q')) {
-                            document.documentElement.style.setProperty('--font-q', e.target.value || 'inherit');
-                        }
-                        if (e.target.classList.contains('input-font-opt')) {
-                            document.documentElement.style.setProperty('--font-opt', e.target.value || 'inherit');
-                        }
-                        if (e.target.classList.contains('input-font-exp')) {
-                            document.documentElement.style.setProperty('--font-exp', e.target.value || 'inherit');
-                        }
-                    });
-                    window.addEventListener('input', function(e) {
-                        if (e.target.classList.contains('input-fs-q')) {
-                            document.documentElement.style.setProperty('--fs-q', e.target.value + 'px');
-                        }
-                        if (e.target.classList.contains('input-fs-opt')) {
-                            document.documentElement.style.setProperty('--fs-opt', e.target.value + 'px');
-                        }
-                        if (e.target.classList.contains('input-fs-exp')) {
-                            document.documentElement.style.setProperty('--fs-exp', e.target.value + 'px');
-                        }
-                    });
-                }
-            `}} />
 
             {/* Native Print Table for Repeating Header/Footer without Overlap */}
             <table className="w-full border-collapse h-full flex-1 flex flex-col print:table print:h-auto">
