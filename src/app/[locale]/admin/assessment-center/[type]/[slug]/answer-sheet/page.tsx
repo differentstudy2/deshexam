@@ -525,35 +525,10 @@ export default async function AnswerSheetPage({
                                         <img src="/image/logo.png" alt="DeshExam" className="h-10 w-auto object-contain" />
                                         <div className="font-bold text-[24px] text-[#1e4b85] tracking-tight">DeshExam</div>
                                     </div>
-                                    <div className="bg-blue-600 text-white px-8 py-2.5 rounded-full font-bold text-lg shadow-sm">MOCK TEST</div>
                                     <div className="text-2xl font-bold text-gray-800">Page {String(index + 1).padStart(2, '0')}</div>
                                 </div>
 
-                                {/* Presentation Top Badges */}
-                                <div className="presentation-badges hidden absolute top-28 right-12 gap-3 z-10">
-                                    {(q.sourceExam || (q.tags && q.tags.length > 0)) && (
-                                        <div className="bg-blue-50 text-blue-700 px-4 py-1.5 rounded border border-blue-200 font-medium flex items-center gap-2 shadow-sm text-sm">
-                                            <span className="w-3 h-4 bg-blue-500 inline-block rounded-sm"></span>
-                                            {q.sourceExam || (q.tags && q.tags[0]) || 'History'}
-                                        </div>
-                                    )}
-                                    <div className="bg-amber-50 text-amber-700 px-4 py-1.5 rounded border border-amber-200 font-medium flex items-center gap-2 shadow-sm text-sm">
-                                        <div className="flex items-end gap-0.5 h-4">
-                                            <span className="w-1.5 h-2 bg-amber-300 inline-block rounded-sm"></span>
-                                            <span className="w-1.5 h-3 bg-amber-400 inline-block rounded-sm"></span>
-                                            <span className="w-1.5 h-4 bg-amber-500 inline-block rounded-sm"></span>
-                                        </div>
-                                        {q.difficulty || 'Hard'}
-                                    </div>
-                                    <div className="bg-gray-50 text-gray-700 px-4 py-1.5 rounded border border-gray-200 font-medium flex items-center gap-2 shadow-sm text-sm">
-                                        <span className="w-4 h-3 bg-gray-400 inline-block rounded-sm relative"><span className="absolute w-2 h-4 bg-gray-500 left-1 -top-0.5 rounded-sm"></span></span>
-                                        {test.subject || 'Module 1'}
-                                    </div>
-                                    <div className="bg-gray-100 text-gray-800 px-4 py-1.5 rounded-full border border-gray-300 font-bold flex items-center gap-2 shadow-sm text-sm">
-                                        <span className="w-4 h-4 rounded-full bg-gray-400 text-white flex items-center justify-center text-[10px]">?</span>
-                                        Question {String(index + 1).padStart(2, '0')} / {sortedQuestions.length}
-                                    </div>
-                                </div>
+                                {/* Presentation Top Badges (Removed as requested) */}
 
                                 {/* Presentation Footer */}
                                 <div className="presentation-footer hidden absolute bottom-0 left-0 right-0 w-full justify-between items-center px-12 pb-8 text-gray-700 font-semibold text-lg z-10">
