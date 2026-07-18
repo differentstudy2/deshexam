@@ -179,7 +179,7 @@ export default async function AnswerSheetPage({
             </div>
 
             {/* Questions List */}
-            <div className="space-y-12 print:space-y-0">
+            <div className="space-y-12 print:space-y-0 print:break-before-page">
                 {sortedQuestions.length === 0 ? (
                     <p className="text-center italic text-gray-500">No questions found for this assessment.</p>
                 ) : (
