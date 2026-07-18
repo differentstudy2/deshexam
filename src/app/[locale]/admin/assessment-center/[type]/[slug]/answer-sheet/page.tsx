@@ -299,8 +299,8 @@ export default async function AnswerSheetPage({
                                 {/* Question Header */}
                                 <div className="flex justify-between items-start mb-4">
                                     <div className="flex gap-2 w-full">
-                                        <span className="shrink-0 text-black font-bold text-[22px]">Q{index + 1}.</span>
-                                        <div className="prose prose-black max-w-none flex-1 prose-p:font-bold prose-p:text-[22px] prose-p:my-0 prose-li:text-[18px]">
+                                        <span className="shrink-0 text-black font-bold text-[22px] print:text-[16px] print:mt-1">Q{index + 1}.</span>
+                                        <div className="prose prose-black max-w-none flex-1 prose-p:font-bold prose-p:text-[22px] print:prose-p:text-[16px] print:leading-snug prose-p:my-0 prose-li:text-[18px] print:prose-li:text-[15px]">
                                             <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeRaw]}>
                                                 {q.questionText}
                                             </ReactMarkdown>
@@ -329,7 +329,7 @@ export default async function AnswerSheetPage({
                                 </div>
 
                                 {/* Options Grid */}
-                                <div className="ml-8 space-y-3 md:space-y-0 md:grid md:grid-cols-2 print:space-y-0 print:grid print:grid-cols-2 gap-4 mt-4 mb-6">
+                                <div className="ml-8 space-y-3 md:space-y-0 md:grid md:grid-cols-2 print:space-y-0 print:grid print:grid-cols-2 gap-4 mt-4 mb-6 print:mt-2 print:mb-3">
                                     {q.options && [
                                         { key: 'a', text: q.options.a },
                                         { key: 'b', text: q.options.b },
@@ -368,7 +368,7 @@ export default async function AnswerSheetPage({
                                                         </>
                                                     ) : optLetter}
                                                 </div>
-                                                <div className="prose prose-sm max-w-none text-gray-700 [&>p]:m-0 w-full">
+                                                <div className="prose prose-sm max-w-none text-gray-700 [&>p]:m-0 w-full print:prose-p:text-[14px] print:text-[14px]">
                                                     <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeRaw]}>
                                                         {opt.text}
                                                     </ReactMarkdown>
@@ -387,7 +387,7 @@ export default async function AnswerSheetPage({
                                         </div>
 
                                         {q.explanation && (
-                                            <div className="prose prose-sm max-w-none text-gray-700 mb-5 print:text-black print:prose-p:text-[13px] print:prose-li:text-[13px]">
+                                            <div className="prose prose-sm max-w-none text-gray-700 mb-5 print:text-black print:prose-p:text-[12px] print:prose-li:text-[12px] print:leading-tight">
                                                 <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeRaw]}>
                                                     {q.explanation}
                                                 </ReactMarkdown>
@@ -420,7 +420,7 @@ export default async function AnswerSheetPage({
                                                                 <span className="bg-gray-100 text-gray-700 rounded px-2 py-0.5 text-sm font-medium shrink-0 print:border print:border-gray-300">
                                                                     {optLetter}
                                                                 </span>
-                                                                <div className="font-semibold text-gray-800 prose prose-sm max-w-none [&>p]:m-0 print:prose-p:text-[13px] print:text-[13px]">
+                                                                <div className="font-semibold text-gray-800 prose prose-sm max-w-none [&>p]:m-0 print:prose-p:text-[12px] print:text-[12px] print:leading-tight">
                                                                     <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeRaw]}>
                                                                         {opt.text}
                                                                     </ReactMarkdown>
@@ -432,7 +432,7 @@ export default async function AnswerSheetPage({
                                                                 )}
                                                             </div>
                                                             {q.optionExplanations && (q.optionExplanations as any)[opt.key] && (
-                                                                <div className="text-gray-600 text-sm ml-8 prose prose-sm max-w-none [&>p]:m-0 print:text-black">
+                                                                <div className="text-gray-600 text-sm ml-8 prose prose-sm max-w-none [&>p]:m-0 print:text-black print:prose-p:text-[12px] print:leading-tight">
                                                                     <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeRaw]}>
                                                                         {(q.optionExplanations as any)[opt.key]}
                                                                     </ReactMarkdown>
