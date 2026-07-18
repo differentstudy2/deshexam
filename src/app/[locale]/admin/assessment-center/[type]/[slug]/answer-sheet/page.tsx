@@ -120,35 +120,78 @@ export default async function AnswerSheetPage({
                         <Settings className="w-5 h-5" />
                         <span className="text-lg">Display Settings</span>
                     </div>
-                    <div className="space-y-4">
-                        <label className="flex items-center gap-3 cursor-pointer select-none text-gray-700 font-medium hover:text-blue-600 transition-colors">
-                            <input type="checkbox" defaultChecked className="toggle-exp w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500" />
-                            <span>Main Explanations</span>
-                        </label>
-                        <label className="flex items-center gap-3 cursor-pointer select-none text-gray-700 font-medium hover:text-blue-600 transition-colors">
-                            <input type="checkbox" defaultChecked className="toggle-optexp w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500" />
-                            <span>Option Explanations</span>
-                        </label>
-                        <label className="flex items-center gap-3 cursor-pointer select-none text-gray-700 font-medium hover:text-blue-600 transition-colors">
-                            <input type="checkbox" defaultChecked className="toggle-tick w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500" />
-                            <span>Correct Answer Highlight</span>
-                        </label>
-                        
-                        <div className="pt-6 mt-4 border-t border-gray-100">
-                            <span className="text-gray-900 font-bold block mb-4">Print Font Size</span>
-                            <div className="space-y-3">
-                                <label className="flex items-center gap-3 cursor-pointer text-gray-700 hover:text-blue-600 transition-colors">
-                                    <input type="radio" name="font-size" value="small" defaultChecked className="toggle-fs-small w-4 h-4 text-blue-600 focus:ring-blue-500" />
-                                    <span>Small (Compact)</span>
+                    <div className="space-y-6">
+                        {/* Print Elements */}
+                        <div>
+                            <span className="text-gray-900 font-bold block mb-3 text-sm">Print Options</span>
+                            <div className="space-y-2.5">
+                                <label className="flex items-center gap-3 cursor-pointer select-none text-gray-700 text-sm hover:text-blue-600 transition-colors">
+                                    <input type="checkbox" defaultChecked className="toggle-header w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500" />
+                                    <span>Show Header</span>
                                 </label>
-                                <label className="flex items-center gap-3 cursor-pointer text-gray-700 hover:text-blue-600 transition-colors">
-                                    <input type="radio" name="font-size" value="medium" className="toggle-fs-medium w-4 h-4 text-blue-600 focus:ring-blue-500" />
-                                    <span>Medium (Standard)</span>
+                                <label className="flex items-center gap-3 cursor-pointer select-none text-gray-700 text-sm hover:text-blue-600 transition-colors">
+                                    <input type="checkbox" defaultChecked className="toggle-footer w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500" />
+                                    <span>Show Footer</span>
                                 </label>
-                                <label className="flex items-center gap-3 cursor-pointer text-gray-700 hover:text-blue-600 transition-colors">
-                                    <input type="radio" name="font-size" value="large" className="toggle-fs-large w-4 h-4 text-blue-600 focus:ring-blue-500" />
-                                    <span>Large (Accessible)</span>
+                            </div>
+                        </div>
+
+                        {/* Visibility Settings */}
+                        <div className="pt-5 border-t border-gray-100">
+                            <span className="text-gray-900 font-bold block mb-3 text-sm">Visibility (All)</span>
+                            <div className="space-y-2.5">
+                                <label className="flex items-center gap-3 cursor-pointer select-none text-gray-700 text-sm hover:text-blue-600 transition-colors">
+                                    <input type="checkbox" defaultChecked className="toggle-exp w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500" />
+                                    <span>Main Explanations</span>
                                 </label>
+                                <label className="flex items-center gap-3 cursor-pointer select-none text-gray-700 text-sm hover:text-blue-600 transition-colors">
+                                    <input type="checkbox" defaultChecked className="toggle-optexp w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500" />
+                                    <span>Option Explanations</span>
+                                </label>
+                                <label className="flex items-center gap-3 cursor-pointer select-none text-gray-700 text-sm hover:text-blue-600 transition-colors">
+                                    <input type="checkbox" defaultChecked className="toggle-tick w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500" />
+                                    <span>Correct Answer Highlight</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        {/* Question Styling */}
+                        <div className="pt-5 border-t border-gray-100">
+                            <span className="text-gray-900 font-bold block mb-3 text-sm">Question Style</span>
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="text-xs text-gray-500 mb-1 block">Font Size</label>
+                                    <input type="range" min="14" max="32" defaultValue="22" className="input-fs-q w-full accent-blue-600" />
+                                </div>
+                                <div>
+                                    <label className="text-xs text-gray-500 mb-1 block">Font Family</label>
+                                    <select defaultValue="" className="input-font-q w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                                        <option value="">Default (System)</option>
+                                        <option value="'Kalpurush', sans-serif">Kalpurush</option>
+                                        <option value="'SolaimanLipi', sans-serif">SolaimanLipi</option>
+                                        <option value="Arial, sans-serif">Arial</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Options Styling */}
+                        <div className="pt-5 border-t border-gray-100">
+                            <span className="text-gray-900 font-bold block mb-3 text-sm">Options & Explanations Style</span>
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="text-xs text-gray-500 mb-1 block">Font Size</label>
+                                    <input type="range" min="12" max="28" defaultValue="16" className="input-fs-opt w-full accent-blue-600" />
+                                </div>
+                                <div>
+                                    <label className="text-xs text-gray-500 mb-1 block">Font Family</label>
+                                    <select defaultValue="" className="input-font-opt w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                                        <option value="">Default (System)</option>
+                                        <option value="'Kalpurush', sans-serif">Kalpurush</option>
+                                        <option value="'SolaimanLipi', sans-serif">SolaimanLipi</option>
+                                        <option value="Arial, sans-serif">Arial</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -159,31 +202,24 @@ export default async function AnswerSheetPage({
 
                 <style dangerouslySetInnerHTML={{
                 __html: `
+                :root {
+                    --font-q: inherit;
+                    --fs-q: 22px;
+                    --font-opt: inherit;
+                    --fs-opt: 16px;
+                }
+                .print-q-text p, .print-q-text li, .print-q-num {
+                    font-family: var(--font-q) !important;
+                    font-size: var(--fs-q) !important;
+                    line-height: 1.5 !important;
+                }
+                .print-opt-text p, .print-opt-text li, .print-exp-text p, .print-exp-text li, .print-exp-text span {
+                    font-family: var(--font-opt) !important;
+                    font-size: var(--fs-opt) !important;
+                    line-height: 1.5 !important;
+                }
                 @media print {
                     @page { margin: 0; }
-                    .group\\/settings:has(.toggle-fs-small:checked) {
-                        --fs-q: 16px;
-                        --fs-q-li: 15px;
-                        --fs-opt: 14px;
-                        --fs-exp: 12px;
-                    }
-                    .group\\/settings:has(.toggle-fs-medium:checked) {
-                        --fs-q: 18px;
-                        --fs-q-li: 16px;
-                        --fs-opt: 16px;
-                        --fs-exp: 14px;
-                    }
-                    .group\\/settings:has(.toggle-fs-large:checked) {
-                        --fs-q: 22px;
-                        --fs-q-li: 18px;
-                        --fs-opt: 18px;
-                        --fs-exp: 16px;
-                    }
-                    .print-q-text p { font-size: var(--fs-q) !important; }
-                    .print-q-text li { font-size: var(--fs-q-li) !important; }
-                    .print-q-num { font-size: var(--fs-q) !important; }
-                    .print-opt-text p { font-size: var(--fs-opt) !important; }
-                    .print-exp-text p, .print-exp-text li { font-size: var(--fs-exp) !important; }
                 }
             `}} />
             <script dangerouslySetInnerHTML={{__html: `
@@ -198,13 +234,27 @@ export default async function AnswerSheetPage({
                         if (e.target.classList.contains('toggle-tick')) {
                             document.querySelectorAll('.toggle-tick-local').forEach(cb => cb.checked = e.target.checked);
                         }
+                        if (e.target.classList.contains('input-font-q')) {
+                            document.documentElement.style.setProperty('--font-q', e.target.value || 'inherit');
+                        }
+                        if (e.target.classList.contains('input-font-opt')) {
+                            document.documentElement.style.setProperty('--font-opt', e.target.value || 'inherit');
+                        }
+                    });
+                    window.addEventListener('input', function(e) {
+                        if (e.target.classList.contains('input-fs-q')) {
+                            document.documentElement.style.setProperty('--fs-q', e.target.value + 'px');
+                        }
+                        if (e.target.classList.contains('input-fs-opt')) {
+                            document.documentElement.style.setProperty('--fs-opt', e.target.value + 'px');
+                        }
                     });
                 }
             `}} />
 
             {/* Native Print Table for Repeating Header/Footer without Overlap */}
             <table className="w-full border-collapse h-full flex-1 flex flex-col print:table print:h-auto">
-                <thead className="hidden print:table-header-group w-full z-50">
+                <thead className="hidden print:table-header-group w-full z-50 group-has-[:not(:checked).toggle-header]/settings:print:!hidden">
                     <tr>
                         <td className="p-0 border-b border-blue-200">
                             <div className="bg-[#eef6ff] py-3 px-12 flex justify-between items-center w-full print:[print-color-adjust:exact]">
@@ -224,7 +274,7 @@ export default async function AnswerSheetPage({
                         </td>
                     </tr>
                 </thead>
-                <tfoot className="hidden print:table-footer-group w-full bg-white z-50">
+                <tfoot className="hidden print:table-footer-group w-full bg-white z-50 group-has-[:not(:checked).toggle-footer]/settings:print:!hidden">
                     <tr>
                         <td className="border-t border-blue-200 p-0 bg-white">
                             <div className="bg-[#eef6ff] text-[#1e4b85] py-2.5 px-12 flex justify-between items-center w-full print:[print-color-adjust:exact]">
@@ -364,8 +414,24 @@ export default async function AnswerSheetPage({
 
                                 {/* Question Header */}
                                 <div className="flex justify-between items-start mb-4">
-                                    <div className="flex items-baseline gap-2 w-full">
-                                        <span className="shrink-0 text-black font-bold text-[22px] print-q-num">Q{index + 1}.</span>
+                                    <div className="flex items-baseline gap-3 w-full">
+                                        <div className="flex flex-col shrink-0">
+                                            <span className="text-black font-bold text-[22px] print-q-num">Q{index + 1}.</span>
+                                            <div className="flex flex-col gap-2 mt-4 print:hidden opacity-60 hover:opacity-100 transition-opacity">
+                                                <label className="flex items-center gap-1.5 cursor-pointer text-[10px] font-semibold text-gray-600 hover:text-gray-900" title="Show Main Explanation">
+                                                    <input type="checkbox" defaultChecked className="toggle-exp-local w-3 h-3 text-blue-600 rounded border-gray-300 focus:ring-blue-500" />
+                                                    <span>Exp</span>
+                                                </label>
+                                                <label className="flex items-center gap-1.5 cursor-pointer text-[10px] font-semibold text-gray-600 hover:text-gray-900" title="Show Option Explanations">
+                                                    <input type="checkbox" defaultChecked className="toggle-optexp-local w-3 h-3 text-blue-600 rounded border-gray-300 focus:ring-blue-500" />
+                                                    <span>Opt Exp</span>
+                                                </label>
+                                                <label className="flex items-center gap-1.5 cursor-pointer text-[10px] font-semibold text-gray-600 hover:text-gray-900" title="Highlight Correct Answer">
+                                                    <input type="checkbox" defaultChecked className="toggle-tick-local w-3 h-3 text-blue-600 rounded border-gray-300 focus:ring-blue-500" />
+                                                    <span>Ans</span>
+                                                </label>
+                                            </div>
+                                        </div>
                                         <div className="prose prose-black max-w-none flex-1 prose-p:font-bold prose-p:text-[22px] print-q-text print:leading-snug prose-p:my-0 prose-li:text-[18px]">
                                             <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeRaw]}>
                                                 {q.questionText}
@@ -384,20 +450,6 @@ export default async function AnswerSheetPage({
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-2 print:hidden">
-                                        <div className="flex items-center gap-2 border-r border-gray-300 pr-2 mr-1">
-                                            <label className="flex items-center gap-1 cursor-pointer text-[11px] text-gray-500 hover:text-gray-800" title="Show Main Explanation">
-                                                <input type="checkbox" defaultChecked className="toggle-exp-local w-3 h-3 text-blue-600 rounded border-gray-300 focus:ring-blue-500" />
-                                                <span>Exp</span>
-                                            </label>
-                                            <label className="flex items-center gap-1 cursor-pointer text-[11px] text-gray-500 hover:text-gray-800" title="Show Option Explanations">
-                                                <input type="checkbox" defaultChecked className="toggle-optexp-local w-3 h-3 text-blue-600 rounded border-gray-300 focus:ring-blue-500" />
-                                                <span>Opt Exp</span>
-                                            </label>
-                                            <label className="flex items-center gap-1 cursor-pointer text-[11px] text-gray-500 hover:text-gray-800" title="Highlight Correct Answer">
-                                                <input type="checkbox" defaultChecked className="toggle-tick-local w-3 h-3 text-blue-600 rounded border-gray-300 focus:ring-blue-500" />
-                                                <span>Ans</span>
-                                            </label>
-                                        </div>
                                         <Link href={`/${params.locale}/question/${q.slug || q.id}`} target="_blank" className="text-gray-400 hover:text-blue-500 transition-colors" title="View Question">
                                             <Eye className="w-4 h-4" />
                                         </Link>
@@ -422,7 +474,7 @@ export default async function AnswerSheetPage({
                                         return (
                                             <div
                                                 key={opt.key}
-                                                className={`flex items-center gap-3 p-3 rounded-full border print:[print-color-adjust:exact] ${!isCorrect
+                                                className={`flex items-center gap-3 p-3 rounded-full border transition-colors duration-300 print:[print-color-adjust:exact] ${!isCorrect
                                                         ? [
                                                             'border-blue-100 bg-blue-50/30 print:border-blue-200 print:bg-[#f0f7ff]',
                                                             'border-teal-100 bg-teal-50/30 print:border-teal-200 print:bg-[#f0fdfa]',
@@ -434,7 +486,7 @@ export default async function AnswerSheetPage({
                                                           'group-has-[:not(:checked).toggle-tick-local]/question:border-gray-200 group-has-[:not(:checked).toggle-tick-local]/question:bg-gray-50/30 group-has-[:not(:checked).toggle-tick-local]/question:print:border-gray-300 group-has-[:not(:checked).toggle-tick-local]/question:print:bg-white'
                                                     }`}
                                             >
-                                                <div className={`shrink-0 w-8 h-8 flex items-center justify-center rounded-full text-sm font-medium border print:[print-color-adjust:exact] ${
+                                                <div className={`relative shrink-0 w-8 h-8 flex items-center justify-center rounded-full text-sm font-medium border transition-colors duration-300 print:[print-color-adjust:exact] ${
                                                     !isCorrect 
                                                     ? 'bg-gray-50 border-gray-200 text-gray-600 print:bg-white' 
                                                     : 'group-has-[:checked.toggle-tick-local]/question:bg-emerald-500 group-has-[:checked.toggle-tick-local]/question:border-emerald-500 group-has-[:checked.toggle-tick-local]/question:text-white group-has-[:checked.toggle-tick-local]/question:print:bg-emerald-500 ' +
@@ -442,8 +494,8 @@ export default async function AnswerSheetPage({
                                                     }`}>
                                                     {isCorrect ? (
                                                         <>
-                                                            <Check className="w-5 h-5 print:text-white hidden group-has-[:checked.toggle-tick-local]/question:block" />
-                                                            <span className="group-has-[:not(:checked).toggle-tick-local]/question:block hidden">{optLetter}</span>
+                                                            <Check className="w-5 h-5 print:text-white absolute transition-transform duration-300 scale-0 group-has-[:checked.toggle-tick-local]/question:scale-100" />
+                                                            <span className="absolute transition-transform duration-300 scale-100 group-has-[:checked.toggle-tick-local]/question:scale-0">{optLetter}</span>
                                                         </>
                                                     ) : optLetter}
                                                 </div>
@@ -459,7 +511,9 @@ export default async function AnswerSheetPage({
 
                                 {/* Explanation */}
                                 {(q.explanation || q.optionExplanations) && (
-                                    <div className="ml-8 mt-4 bg-white/60 border border-black/5 p-5 rounded-lg print:bg-white/80 print:border-gray-200 print:p-4 print:text-[13px] print:break-inside-avoid group-has-[:not(:checked).toggle-exp-local]/question:hidden">
+                                    <div className="grid transition-all duration-300 ease-in-out group-has-[:not(:checked).toggle-exp-local]/question:grid-rows-[0fr] group-has-[:not(:checked).toggle-exp-local]/question:opacity-0 group-has-[:checked.toggle-exp-local]/question:grid-rows-[1fr] group-has-[:checked.toggle-exp-local]/question:opacity-100">
+                                        <div className="overflow-hidden">
+                                            <div className="ml-8 mt-4 bg-white/60 border border-black/5 p-5 rounded-lg print:bg-white/80 print:border-gray-200 print:p-4 print:text-[13px] print:break-inside-avoid">
                                         <div className="flex items-center gap-2 mb-3">
                                             <Lightbulb className="w-5 h-5 text-yellow-500 print:text-black" />
                                             <h4 className="font-bold text-blue-900 print:text-black m-0">Explanation</h4>
@@ -475,7 +529,9 @@ export default async function AnswerSheetPage({
 
                                         {/* Option Explanations inside main Explanation block */}
                                         {q.optionExplanations && Object.keys(q.optionExplanations).length > 0 && (
-                                            <div className="space-y-3 group-has-[:not(:checked).toggle-optexp-local]/question:hidden">
+                                            <div className="mt-5 grid transition-all duration-300 ease-in-out group-has-[:not(:checked).toggle-optexp-local]/question:grid-rows-[0fr] group-has-[:not(:checked).toggle-optexp-local]/question:opacity-0 group-has-[:checked.toggle-optexp-local]/question:grid-rows-[1fr] group-has-[:checked.toggle-optexp-local]/question:opacity-100">
+                                                <div className="overflow-hidden">
+                                                    <div className="space-y-3">
                                                 {q.options && [
                                                     { key: 'a', text: q.options.a },
                                                     { key: 'b', text: q.options.b },
@@ -520,8 +576,12 @@ export default async function AnswerSheetPage({
                                                         </div>
                                                     );
                                                 })}
+                                                    </div>
+                                                </div>
                                             </div>
                                         )}
+                                            </div>
+                                        </div>
                                     </div>
                                 )}
 
