@@ -115,7 +115,7 @@ export default async function AnswerSheetPage({
         <div className="-mt-4 -mx-4 -mb-20 md:-mt-6 md:-mx-6 md:-mb-8 lg:-mt-8 lg:-mx-8 min-h-[calc(100vh-64px)] bg-gray-100 text-black py-10 px-4 md:px-8 font-sans print:p-0 print:m-0 print:bg-white print:text-black print:min-h-0 print:block group/settings">
             <div className="max-w-[1300px] mx-auto flex flex-col lg:flex-row gap-6 items-start print:block">
                 {/* Settings Sidebar */}
-                <div className="w-full lg:w-72 shrink-0 print:hidden lg:sticky lg:top-8 bg-white border border-gray-200 p-6 rounded-xl shadow-sm">
+                <div className="w-full lg:w-72 shrink-0 print:hidden lg:sticky lg:top-8 lg:max-h-[calc(100vh-8rem)] overflow-y-auto bg-white border border-gray-200 p-6 rounded-xl shadow-sm custom-scrollbar">
                     <div className="flex items-center gap-2 text-blue-800 font-bold mb-6 pb-4 border-b border-gray-100">
                         <Settings className="w-5 h-5" />
                         <span className="text-lg">Display Settings</span>
