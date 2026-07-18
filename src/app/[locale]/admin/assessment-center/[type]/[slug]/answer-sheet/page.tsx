@@ -531,16 +531,7 @@ export default async function AnswerSheetPage({
                                                 const isLast = index === sortedQuestions.length - 1;
 
                                                 return (
-                                                    <div key={q.id} className={`group/question ${bgColor} ${isLast ? 'flex-1 print:flex-none' : ''} border border-gray-200 p-6 rounded-lg print:border-none print:p-6 print:pt-8 print:pb-6 print:break-after-page print:[print-color-adjust:exact] break-inside-avoid print:break-inside-avoid relative`}>
-
-                                                        {/* Presentation Header (Removed as requested) */}
-
-                                                        {/* Presentation Footer */}
-                                                        <div className="presentation-footer hidden absolute bottom-0 left-0 right-0 w-full justify-between items-center px-12 pb-8 text-gray-700 font-semibold text-lg z-10">
-                                                            <div>© DeshExam</div>
-                                                            <div className="text-gray-500 font-medium">www.deshexam.in</div>
-                                                            <div>{test.subject || 'Bangladesh History Series'}</div>
-                                                        </div>
+                                                    <div key={q.id} className={`group/question ${bgColor} ${isLast ? 'flex-1 print:flex-none' : ''} border border-gray-200 p-6 rounded-lg print:border-none print:p-6 print:pt-8 print:pb-6 print:break-after-page print:[print-color-adjust:exact] break-inside-avoid print:break-inside-avoid flex flex-col`}>
 
                                                         {/* Question Header */}
                                                         <div className="flex justify-between items-start mb-4">
@@ -591,7 +582,7 @@ export default async function AnswerSheetPage({
                                                         </div>
 
                                                         {/* Options Grid */}
-                                                        <div className="options-container ml-8 space-y-3 md:space-y-0 md:grid md:grid-cols-2 print:space-y-0 print:grid print:grid-cols-2 gap-4 mt-4 mb-6 print:mt-2 print:mb-3">
+                                                        <div className="options-container space-y-3 md:space-y-0 md:grid md:grid-cols-2 print:space-y-0 print:grid print:grid-cols-2 gap-4 mt-4 mb-6 print:mt-2 print:mb-3">
                                                             {q.options && [
                                                                 { key: 'a', text: q.options.a },
                                                                 { key: 'b', text: q.options.b },
@@ -643,7 +634,7 @@ export default async function AnswerSheetPage({
                                                         {(q.explanation || q.optionExplanations) && (
                                                             <div className="explanation-block grid transition-all duration-300 ease-in-out group-has-[:not(:checked).toggle-exp-local]/question:grid-rows-[0fr] group-has-[:not(:checked).toggle-exp-local]/question:opacity-0 group-has-[:checked.toggle-exp-local]/question:grid-rows-[1fr] group-has-[:checked.toggle-exp-local]/question:opacity-100">
                                                                 <div className="overflow-hidden">
-                                                                    <div className="ml-8 mt-4 bg-white/60 border border-black/5 p-5 rounded-lg print:bg-white/80 print:border-gray-200 print:p-4 print:text-[13px] print:break-inside-avoid">
+                                                                    <div className="mt-4 bg-white/60 border border-black/5 p-5 rounded-lg print:bg-white/80 print:border-gray-200 print:p-4 print:text-[13px] print:break-inside-avoid">
                                                                         <div className="flex items-center gap-2 mb-3">
                                                                             <Lightbulb className="w-5 h-5 text-yellow-500 print:text-black" />
                                                                             <h4 className="font-bold text-blue-900 print:text-black m-0">Explanation</h4>
@@ -697,8 +688,8 @@ export default async function AnswerSheetPage({
                                                                                                         )}
                                                                                                     </div>
                                                                                                     {q.optionExplanations && (q.optionExplanations as any)[opt.key] && (
-                                                                                                        <div className="text-gray-600 text-sm ml-8 prose prose-sm max-w-none [&>p]:m-0 print:text-black print-exp-text print:leading-tight">
-                                                                                                            <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeRaw]}>
+                                                                        <div className="text-gray-600 text-sm prose prose-sm max-w-none [&>p]:m-0 print:text-black print-exp-text print:leading-tight">
+                                                                            <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeRaw]}>
                                                                                                                 {(q.optionExplanations as any)[opt.key]}
                                                                                                             </ReactMarkdown>
                                                                                                         </div>
@@ -714,7 +705,13 @@ export default async function AnswerSheetPage({
                                                                 </div>
                                                             </div>
                                                         )}
-
+                                                        
+                                                        {/* Presentation Footer */}
+                                                        <div className="presentation-footer hidden w-full justify-between items-center text-gray-700 font-semibold text-[14px] mt-auto pt-8 [html[data-layout='presentation']_&]:flex">
+                                                            <div>© DeshExam</div>
+                                                            <div>www.deshexam.in</div>
+                                                            <div>{test.subject || 'Bangladesh History Series'}</div>
+                                                        </div>
                                                     </div>
                                                 )
                                             })
