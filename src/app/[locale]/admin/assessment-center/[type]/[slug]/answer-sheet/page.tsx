@@ -1,4 +1,5 @@
 import React from 'react';
+import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getAssessment } from '@/lib/firebase/assessment';
 import { getQuestionsByIds } from '@/lib/firebase/question-bank';
@@ -23,6 +24,27 @@ const bnOptionsMap: Record<string, string> = {
     d: 'ঘ',
     e: 'ঙ'
 };
+
+export async function generateMetadata({ params }: { params: { locale: string, type: string, slug: string } }): Promise<Metadata> {
+    const typeToCollection: Record<string, AssessmentCollectionType> = {
+        'mock-tests': 'mockTests',
+        'quizzes': 'quizzes',
+        'practice-sets': 'practiceSets',
+        'daily-challenges': 'dailyChallenges',
+        'exams': 'examPapers',
+    };
+
+    const collectionName = typeToCollection[params.type];
+    if (!collectionName) return { title: 'Answer Sheet' };
+
+    const testDoc = await getAssessment(collectionName, params.slug);
+    if (!testDoc) return { title: 'Answer Sheet' };
+
+    const test = testDoc as any;
+    return {
+        title: `${test.title || 'Assessment'} - Answer Sheet`
+    };
+}
 
 export default async function AnswerSheetPage({
     params
@@ -91,7 +113,6 @@ export default async function AnswerSheetPage({
 
     return (
         <div className="min-h-screen bg-white text-black p-8 font-sans print:p-0 print:bg-white print:text-black print:min-h-0 print:block">
-            <title>{test.title} - Answer Sheet</title>
             <style dangerouslySetInnerHTML={{
                 __html: `
                 @media print {
