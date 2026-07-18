@@ -107,12 +107,12 @@ export default async function AnswerSheetPage({
 
     const currentYear = new Date().getFullYear();
     let classLine = test.title;
-    if (boardName || className) {
-        classLine = `${[boardName, className].filter(Boolean).join(' | ')} - ${currentYear}`;
+    if (boardName || className || subjectName || test.subject) {
+        classLine = `${[boardName, className, subjectName || test.subject].filter(Boolean).join(' | ')} - ${currentYear}`;
     }
 
     return (
-        <div className="min-h-screen bg-gray-100 text-black py-8 px-4 md:px-8 font-sans print:p-0 print:bg-white print:text-black print:min-h-0 print:block group/settings">
+        <div className="-mt-4 -mx-4 -mb-20 md:-mt-6 md:-mx-6 md:-mb-8 lg:-mt-8 lg:-mx-8 min-h-[calc(100vh-64px)] bg-gray-100 text-black py-10 px-4 md:px-8 font-sans print:p-0 print:m-0 print:bg-white print:text-black print:min-h-0 print:block group/settings">
             <div className="max-w-[1300px] mx-auto flex flex-col lg:flex-row gap-6 items-start print:block">
                 {/* Settings Sidebar */}
                 <div className="w-full lg:w-72 shrink-0 print:hidden lg:sticky lg:top-8 bg-white border border-gray-200 p-6 rounded-xl shadow-sm">
@@ -155,7 +155,7 @@ export default async function AnswerSheetPage({
                 </div>
 
                 {/* Main Document */}
-                <div className="flex-1 w-full max-w-[1000px] mx-auto bg-white p-6 md:p-12 pb-32 md:pb-32 shadow-xl rounded-sm print:max-w-none print:mx-0 print:p-0 print:pb-32 print:shadow-none print:rounded-none relative min-h-[1056px]">
+                <div className="flex-1 w-full max-w-[1000px] mx-auto bg-white p-6 md:p-12 pb-32 md:pb-32 shadow-xl rounded-sm print:max-w-none print:mx-0 print:p-0 print:pb-32 print:shadow-none print:rounded-none relative min-h-[1056px] flex flex-col">
 
                 <style dangerouslySetInnerHTML={{
                 __html: `
@@ -188,7 +188,7 @@ export default async function AnswerSheetPage({
             `}} />
 
             {/* Native Print Table for Repeating Header/Footer without Overlap */}
-            <table className="w-full border-collapse">
+            <table className="w-full border-collapse h-full flex-1 flex flex-col print:table print:h-auto">
                 <thead className="hidden print:table-header-group w-full z-50">
                     <tr>
                         <td className="p-0 border-b border-blue-200">
@@ -197,7 +197,14 @@ export default async function AnswerSheetPage({
                                     <img src="/image/logo.png" alt="DeshExam" className="h-6 w-auto object-contain" />
                                     <div className="font-bold text-[18px] text-[#1e4b85] tracking-tight">DeshExam</div>
                                 </div>
-                                <div className="font-semibold text-[14px] text-[#1e4b85]">{classLine}</div>
+                                <div className="text-right">
+                                    <div className="font-semibold text-[14px] text-[#1e4b85]">{classLine}</div>
+                                    {[chapterName, topicName].some(Boolean) && (
+                                        <div className="text-[12px] text-[#1e4b85]/90 mt-0.5">
+                                            {[chapterName, topicName].filter(Boolean).join(' | ')}
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </td>
                     </tr>
@@ -213,9 +220,9 @@ export default async function AnswerSheetPage({
                         </td>
                     </tr>
                 </tfoot>
-                <tbody className="w-full">
-                    <tr>
-                        <td className="p-0 align-top w-full">
+                <tbody className="w-full h-full flex-1 flex flex-col print:table-row-group">
+                    <tr className="h-full flex-1 flex flex-col print:table-row">
+                        <td className="p-0 align-top w-full h-full flex-1 flex flex-col print:table-cell">
                 {/* Watermark for Print */}
             <div className="fixed inset-0 pointer-events-none z-0 hidden print:flex items-center justify-center opacity-10 print:opacity-10">
                 <div className="text-7xl font-bold text-gray-400 -rotate-45 whitespace-nowrap">
@@ -244,8 +251,6 @@ export default async function AnswerSheetPage({
                         <p className="text-[13px] text-gray-600 mb-2">Dwarikamari, Petla, Dinhata, Cooch Behar, WB, 736135</p>
 
                         <h2 className="text-[15px] font-bold text-gray-900">{classLine}</h2>
-
-                        {subjectName ? <h3 className="text-[15px] font-bold text-gray-900">Subject: {subjectName}</h3> : (test.subject && <h3 className="text-[15px] font-bold text-gray-900">Subject: {test.subject}</h3>)}
 
                         {chapterName && <p className="text-sm text-gray-700 font-semibold mt-1">Chapter: {chapterName}</p>}
                         {topicName && <p className="text-sm text-gray-600">Topic: {topicName}</p>}
@@ -324,7 +329,7 @@ export default async function AnswerSheetPage({
             </div>
 
             {/* Questions List */}
-            <div className="space-y-12 print:space-y-0 print:break-before-page">
+            <div className="flex flex-col gap-12 flex-1 print:block print:gap-0 print:break-before-page">
                 {sortedQuestions.length === 0 ? (
                     <p className="text-center italic text-gray-500">No questions found for this assessment.</p>
                 ) : (
@@ -337,14 +342,15 @@ export default async function AnswerSheetPage({
                             'bg-amber-50/50 print:bg-[#fffbeb]',
                         ];
                         const bgColor = premiumColors[index % premiumColors.length];
+                        const isLast = index === sortedQuestions.length - 1;
 
                         return (
-                            <div key={q.id} className={`${bgColor} border border-gray-200 p-6 rounded-lg print:border-none print:p-6 print:pt-8 print:pb-6 print:break-after-page print:[print-color-adjust:exact] break-inside-avoid print:break-inside-avoid`}>
+                            <div key={q.id} className={`${bgColor} ${isLast ? 'flex-1 print:flex-none' : ''} border border-gray-200 p-6 rounded-lg print:border-none print:p-6 print:pt-8 print:pb-6 print:break-after-page print:[print-color-adjust:exact] break-inside-avoid print:break-inside-avoid`}>
 
                                 {/* Question Header */}
                                 <div className="flex justify-between items-start mb-4">
-                                    <div className="flex gap-2 w-full">
-                                        <span className="shrink-0 text-black font-bold text-[22px] print-q-num print:mt-1">Q{index + 1}.</span>
+                                    <div className="flex items-baseline gap-2 w-full">
+                                        <span className="shrink-0 text-black font-bold text-[22px] print-q-num">Q{index + 1}.</span>
                                         <div className="prose prose-black max-w-none flex-1 prose-p:font-bold prose-p:text-[22px] print-q-text print:leading-snug prose-p:my-0 prose-li:text-[18px]">
                                             <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeRaw]}>
                                                 {q.questionText}
