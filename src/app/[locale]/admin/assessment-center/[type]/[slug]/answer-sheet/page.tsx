@@ -423,14 +423,11 @@ export default async function AnswerSheetPage({
             </div>
 
             {/* Footer */}
-            <div className="w-full mt-12 pt-4 border-t border-gray-300 print:fixed print:bottom-0 print:left-0 print:w-full print:bg-white print:z-50 print:[print-color-adjust:exact] print:mt-0 print:pt-2">
-                <div className="flex justify-between items-center text-[14px] font-semibold text-gray-800 px-8 md:px-12 print:px-12 mb-2">
-                    <div>&copy; DeshExam</div>
-                    <div>www.deshexam.in</div>
-                    <div className="print:hidden">Page 01</div>
-                </div>
-                <div className="bg-[#eef6ff] text-[#1e4b85] text-center py-2.5 font-bold text-[15px] w-full">
-                    India's Smart Learning Platform
+            <div className="w-full mt-12 print:fixed print:bottom-0 print:left-0 print:w-full print:bg-white print:z-50 print:[print-color-adjust:exact] print:mt-0">
+                <div className="bg-[#eef6ff] text-[#1e4b85] py-2.5 px-6 md:px-12 print:px-12 flex justify-between items-center w-full border-t border-blue-200">
+                    <div className="font-semibold text-[13px] md:text-[14px]">&copy; DeshExam</div>
+                    <div className="font-bold text-[14px] md:text-[15px]">India's Smart Learning Platform</div>
+                    <div className="font-semibold text-[13px] md:text-[14px]">www.deshexam.in</div>
                 </div>
             </div>
             
