@@ -112,33 +112,78 @@ export default async function AnswerSheetPage({
     }
 
     return (
-        <div className="min-h-screen bg-gray-100 text-black py-8 font-sans print:p-0 print:bg-white print:text-black print:min-h-0 print:block">
-            <div className="max-w-[1000px] mx-auto bg-white p-8 md:p-12 pb-32 md:pb-32 shadow-xl rounded-sm print:max-w-none print:mx-0 print:p-0 print:pb-32 print:shadow-none print:rounded-none group/settings relative min-h-[1056px]">
-                
-                {/* Settings Controls (Screen Only) */}
-                <div className="print:hidden mb-8 bg-blue-50/30 border border-blue-100 p-4 rounded-lg shadow-sm flex flex-wrap gap-x-8 gap-y-3 items-center">
-                    <div className="flex items-center gap-2 text-blue-800 font-bold">
+        <div className="min-h-screen bg-gray-100 text-black py-8 px-4 md:px-8 font-sans print:p-0 print:bg-white print:text-black print:min-h-0 print:block group/settings">
+            <div className="max-w-[1300px] mx-auto flex flex-col lg:flex-row gap-6 items-start print:block">
+                {/* Settings Sidebar */}
+                <div className="w-full lg:w-72 shrink-0 print:hidden lg:sticky lg:top-8 bg-white border border-gray-200 p-6 rounded-xl shadow-sm">
+                    <div className="flex items-center gap-2 text-blue-800 font-bold mb-6 pb-4 border-b border-gray-100">
                         <Settings className="w-5 h-5" />
-                        <span>Display Settings</span>
+                        <span className="text-lg">Display Settings</span>
                     </div>
-                    <label className="flex items-center gap-2 cursor-pointer select-none text-gray-700 font-medium">
-                        <input type="checkbox" defaultChecked className="toggle-exp w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500" />
-                        <span>Main Explanations</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer select-none text-gray-700 font-medium">
-                        <input type="checkbox" defaultChecked className="toggle-optexp w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500" />
-                        <span>Option Explanations</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer select-none text-gray-700 font-medium">
-                        <input type="checkbox" defaultChecked className="toggle-tick w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500" />
-                        <span>Correct Answer Highlight</span>
-                    </label>
+                    <div className="space-y-4">
+                        <label className="flex items-center gap-3 cursor-pointer select-none text-gray-700 font-medium hover:text-blue-600 transition-colors">
+                            <input type="checkbox" defaultChecked className="toggle-exp w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500" />
+                            <span>Main Explanations</span>
+                        </label>
+                        <label className="flex items-center gap-3 cursor-pointer select-none text-gray-700 font-medium hover:text-blue-600 transition-colors">
+                            <input type="checkbox" defaultChecked className="toggle-optexp w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500" />
+                            <span>Option Explanations</span>
+                        </label>
+                        <label className="flex items-center gap-3 cursor-pointer select-none text-gray-700 font-medium hover:text-blue-600 transition-colors">
+                            <input type="checkbox" defaultChecked className="toggle-tick w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500" />
+                            <span>Correct Answer Highlight</span>
+                        </label>
+                        
+                        <div className="pt-6 mt-4 border-t border-gray-100">
+                            <span className="text-gray-900 font-bold block mb-4">Print Font Size</span>
+                            <div className="space-y-3">
+                                <label className="flex items-center gap-3 cursor-pointer text-gray-700 hover:text-blue-600 transition-colors">
+                                    <input type="radio" name="font-size" value="small" defaultChecked className="toggle-fs-small w-4 h-4 text-blue-600 focus:ring-blue-500" />
+                                    <span>Small (Compact)</span>
+                                </label>
+                                <label className="flex items-center gap-3 cursor-pointer text-gray-700 hover:text-blue-600 transition-colors">
+                                    <input type="radio" name="font-size" value="medium" className="toggle-fs-medium w-4 h-4 text-blue-600 focus:ring-blue-500" />
+                                    <span>Medium (Standard)</span>
+                                </label>
+                                <label className="flex items-center gap-3 cursor-pointer text-gray-700 hover:text-blue-600 transition-colors">
+                                    <input type="radio" name="font-size" value="large" className="toggle-fs-large w-4 h-4 text-blue-600 focus:ring-blue-500" />
+                                    <span>Large (Accessible)</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
+                {/* Main Document */}
+                <div className="flex-1 w-full max-w-[1000px] mx-auto bg-white p-6 md:p-12 pb-32 md:pb-32 shadow-xl rounded-sm print:max-w-none print:mx-0 print:p-0 print:pb-32 print:shadow-none print:rounded-none relative min-h-[1056px]">
 
                 <style dangerouslySetInnerHTML={{
                 __html: `
                 @media print {
                     @page { margin: 0; }
+                    .group\\/settings:has(.toggle-fs-small:checked) {
+                        --fs-q: 16px;
+                        --fs-q-li: 15px;
+                        --fs-opt: 14px;
+                        --fs-exp: 12px;
+                    }
+                    .group\\/settings:has(.toggle-fs-medium:checked) {
+                        --fs-q: 18px;
+                        --fs-q-li: 16px;
+                        --fs-opt: 16px;
+                        --fs-exp: 14px;
+                    }
+                    .group\\/settings:has(.toggle-fs-large:checked) {
+                        --fs-q: 22px;
+                        --fs-q-li: 18px;
+                        --fs-opt: 18px;
+                        --fs-exp: 16px;
+                    }
+                    .print-q-text p { font-size: var(--fs-q) !important; }
+                    .print-q-text li { font-size: var(--fs-q-li) !important; }
+                    .print-q-num { font-size: var(--fs-q) !important; }
+                    .print-opt-text p { font-size: var(--fs-opt) !important; }
+                    .print-exp-text p, .print-exp-text li { font-size: var(--fs-exp) !important; }
                 }
             `}} />
 
@@ -299,8 +344,8 @@ export default async function AnswerSheetPage({
                                 {/* Question Header */}
                                 <div className="flex justify-between items-start mb-4">
                                     <div className="flex gap-2 w-full">
-                                        <span className="shrink-0 text-black font-bold text-[22px] print:text-[16px] print:mt-1">Q{index + 1}.</span>
-                                        <div className="prose prose-black max-w-none flex-1 prose-p:font-bold prose-p:text-[22px] print:prose-p:text-[16px] print:leading-snug prose-p:my-0 prose-li:text-[18px] print:prose-li:text-[15px]">
+                                        <span className="shrink-0 text-black font-bold text-[22px] print-q-num print:mt-1">Q{index + 1}.</span>
+                                        <div className="prose prose-black max-w-none flex-1 prose-p:font-bold prose-p:text-[22px] print-q-text print:leading-snug prose-p:my-0 prose-li:text-[18px]">
                                             <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeRaw]}>
                                                 {q.questionText}
                                             </ReactMarkdown>
@@ -368,7 +413,7 @@ export default async function AnswerSheetPage({
                                                         </>
                                                     ) : optLetter}
                                                 </div>
-                                                <div className="prose prose-sm max-w-none text-gray-700 [&>p]:m-0 w-full print:prose-p:text-[14px] print:text-[14px]">
+                                                <div className="prose prose-sm max-w-none text-gray-700 [&>p]:m-0 w-full print-opt-text">
                                                     <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeRaw]}>
                                                         {opt.text}
                                                     </ReactMarkdown>
@@ -387,7 +432,7 @@ export default async function AnswerSheetPage({
                                         </div>
 
                                         {q.explanation && (
-                                            <div className="prose prose-sm max-w-none text-gray-700 mb-5 print:text-black print:prose-p:text-[12px] print:prose-li:text-[12px] print:leading-tight">
+                                            <div className="prose prose-sm max-w-none text-gray-700 mb-5 print:text-black print-exp-text print:leading-tight">
                                                 <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeRaw]}>
                                                     {q.explanation}
                                                 </ReactMarkdown>
@@ -420,7 +465,7 @@ export default async function AnswerSheetPage({
                                                                 <span className="bg-gray-100 text-gray-700 rounded px-2 py-0.5 text-sm font-medium shrink-0 print:border print:border-gray-300">
                                                                     {optLetter}
                                                                 </span>
-                                                                <div className="font-semibold text-gray-800 prose prose-sm max-w-none [&>p]:m-0 print:prose-p:text-[12px] print:text-[12px] print:leading-tight">
+                                                                <div className="font-semibold text-gray-800 prose prose-sm max-w-none [&>p]:m-0 print-exp-text print:leading-tight">
                                                                     <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeRaw]}>
                                                                         {opt.text}
                                                                     </ReactMarkdown>
@@ -432,7 +477,7 @@ export default async function AnswerSheetPage({
                                                                 )}
                                                             </div>
                                                             {q.optionExplanations && (q.optionExplanations as any)[opt.key] && (
-                                                                <div className="text-gray-600 text-sm ml-8 prose prose-sm max-w-none [&>p]:m-0 print:text-black print:prose-p:text-[12px] print:leading-tight">
+                                                                <div className="text-gray-600 text-sm ml-8 prose prose-sm max-w-none [&>p]:m-0 print:text-black print-exp-text print:leading-tight">
                                                                     <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeRaw]}>
                                                                         {(q.optionExplanations as any)[opt.key]}
                                                                     </ReactMarkdown>
@@ -466,6 +511,7 @@ export default async function AnswerSheetPage({
                 </div>
             </div>
             
+            </div>
             </div>
 
             {/* Print Button Header for Screen only */}
