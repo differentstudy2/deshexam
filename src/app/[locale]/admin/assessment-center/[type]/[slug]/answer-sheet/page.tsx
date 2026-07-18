@@ -298,7 +298,7 @@ export default async function AnswerSheetPage({
                     display: flex !important;
                     flex-direction: column;
                     justify-content: center;
-                    padding: 8rem 10rem !important;
+                    padding: 4rem 5rem !important;
                     border: none !important;
                     page: presentation-page;
                     background: #f8fbff !important;
@@ -327,8 +327,8 @@ export default async function AnswerSheetPage({
                 html[data-layout="presentation"] .options-container {
                     display: grid !important;
                     grid-template-columns: 1fr 1fr !important;
-                    gap: 1.5rem 3rem !important;
-                    padding: 0 4rem;
+                    gap: 1.5rem 2rem !important;
+                    padding: 0 2rem;
                     z-index: 10;
                 }
                 html[data-layout="presentation"] .options-container > div {
@@ -337,6 +337,7 @@ export default async function AnswerSheetPage({
                     padding: 1rem 1.5rem !important;
                     border-radius: 1rem !important;
                     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+                    align-items: flex-start !important;
                 }
                 html[data-layout="presentation"] .options-container > div:nth-child(1) { border-color: #3b82f6 !important; }
                 html[data-layout="presentation"] .options-container > div:nth-child(1) .relative.shrink-0 { background: #eff6ff !important; color: #3b82f6 !important; border: none !important; width: 3.5rem !important; height: 3.5rem !important; border-radius: 0.5rem !important; font-size: 1.5rem !important; font-weight: 900 !important; }
@@ -640,7 +641,7 @@ export default async function AnswerSheetPage({
                                         return (
                                             <div
                                                 key={opt.key}
-                                                className={`flex items-center gap-3 p-3 rounded-full border transition-colors duration-300 print:[print-color-adjust:exact] ${isCorrect ? 'is-correct-option' : ''} ${!isCorrect
+                                                className={`flex items-center gap-3 p-3 rounded-xl border transition-colors duration-300 print:[print-color-adjust:exact] [html[data-layout='presentation']_&]:items-start ${isCorrect ? 'is-correct-option' : ''} ${!isCorrect
                                                         ? [
                                                             'border-blue-100 bg-blue-50/30 print:border-blue-200 print:bg-[#f0f7ff]',
                                                             'border-teal-100 bg-teal-50/30 print:border-teal-200 print:bg-[#f0fdfa]',
@@ -665,7 +666,7 @@ export default async function AnswerSheetPage({
                                                         </>
                                                     ) : optLetter}
                                                 </div>
-                                                <div className="prose prose-sm max-w-none text-gray-700 [&>p]:m-0 w-full print-opt-text">
+                                                <div className="prose prose-sm max-w-none text-gray-700 [&>p]:m-0 flex-1 print-opt-text [html[data-layout='presentation']_&]:mt-1.5">
                                                     <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeRaw]}>
                                                         {opt.text}
                                                     </ReactMarkdown>
