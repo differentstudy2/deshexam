@@ -289,8 +289,7 @@ export default async function AnswerSheetPage({
                 }
                 html[data-layout="presentation"] .presentation-header,
                 html[data-layout="presentation"] .presentation-badges,
-                html[data-layout="presentation"] .presentation-footer,
-                html[data-layout="presentation"] .presentation-watermark {
+                html[data-layout="presentation"] .presentation-footer {
                     display: flex !important;
                 }
                 html[data-layout="presentation"] .group\\/question {
@@ -298,6 +297,8 @@ export default async function AnswerSheetPage({
                     display: flex !important;
                     flex-direction: column;
                     justify-content: center;
+                    padding-top: 12rem !important;
+                    padding-bottom: 8rem !important;
                     padding-left: 10rem !important;
                     padding-right: 10rem !important;
                     border: none !important;
@@ -529,7 +530,7 @@ export default async function AnswerSheetPage({
                                 </div>
 
                                 {/* Presentation Top Badges */}
-                                <div className="presentation-badges hidden absolute top-32 right-12 gap-3 z-10">
+                                <div className="presentation-badges hidden absolute top-28 right-12 gap-3 z-10">
                                     {(q.sourceExam || (q.tags && q.tags.length > 0)) && (
                                         <div className="bg-blue-50 text-blue-700 px-4 py-1.5 rounded border border-blue-200 font-medium flex items-center gap-2 shadow-sm text-sm">
                                             <span className="w-3 h-4 bg-blue-500 inline-block rounded-sm"></span>
@@ -559,11 +560,6 @@ export default async function AnswerSheetPage({
                                     <div>© DeshExam</div>
                                     <div className="text-gray-500 font-medium">www.deshexam.in</div>
                                     <div>{test.subject || 'Bangladesh History Series'}</div>
-                                </div>
-
-                                {/* Watermark */}
-                                <div className="presentation-watermark hidden absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-90 text-[60px] font-black text-gray-200/40 whitespace-nowrap z-0 pointer-events-none tracking-widest uppercase">
-                                    {test.subject || 'HISTORICAL EVENT'} Q{index + 1} - {sortedQuestions.length}
                                 </div>
 
                                 {/* Question Header */}
