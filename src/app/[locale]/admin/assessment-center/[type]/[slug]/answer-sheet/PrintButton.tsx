@@ -41,6 +41,9 @@ export default function PrintButton() {
             if (target.classList.contains('input-fs-exp')) {
                 document.documentElement.style.setProperty('--fs-exp', (target as HTMLInputElement).value + 'px');
             }
+            if (target.classList.contains('input-layout')) {
+                document.documentElement.setAttribute('data-layout', (target as HTMLSelectElement).value);
+            }
         };
 
         document.addEventListener('change', handler);

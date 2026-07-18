@@ -435,7 +435,55 @@ export default async function AnswerSheetPage({
                         const isLast = index === sortedQuestions.length - 1;
 
                         return (
-                            <div key={q.id} className={`group/question ${bgColor} ${isLast ? 'flex-1 print:flex-none' : ''} border border-gray-200 p-6 rounded-lg print:border-none print:p-6 print:pt-8 print:pb-6 print:break-after-page print:[print-color-adjust:exact] break-inside-avoid print:break-inside-avoid`}>
+                            <div key={q.id} className={`group/question ${bgColor} ${isLast ? 'flex-1 print:flex-none' : ''} border border-gray-200 p-6 rounded-lg print:border-none print:p-6 print:pt-8 print:pb-6 print:break-after-page print:[print-color-adjust:exact] break-inside-avoid print:break-inside-avoid relative`}>
+
+                                {/* Presentation Header (Hidden by default) */}
+                                <div className="presentation-header hidden w-full absolute top-0 left-0 right-0 justify-between items-center px-12 pt-10 z-10">
+                                    <div className="flex items-center gap-3">
+                                        <img src="/image/logo.png" alt="DeshExam" className="h-10 w-auto object-contain" />
+                                        <div className="font-bold text-[24px] text-[#1e4b85] tracking-tight">DeshExam</div>
+                                    </div>
+                                    <div className="bg-blue-600 text-white px-8 py-2.5 rounded-full font-bold text-lg shadow-sm">MOCK TEST</div>
+                                    <div className="text-2xl font-bold text-gray-800">Page {String(index + 1).padStart(2, '0')}</div>
+                                </div>
+
+                                {/* Presentation Top Badges */}
+                                <div className="presentation-badges hidden absolute top-32 right-12 gap-3 z-10">
+                                    {(q.sourceExam || (q.tags && q.tags.length > 0)) && (
+                                        <div className="bg-blue-50 text-blue-700 px-4 py-1.5 rounded border border-blue-200 font-medium flex items-center gap-2 shadow-sm text-sm">
+                                            <span className="w-3 h-4 bg-blue-500 inline-block rounded-sm"></span>
+                                            {q.sourceExam || (q.tags && q.tags[0]) || 'History'}
+                                        </div>
+                                    )}
+                                    <div className="bg-amber-50 text-amber-700 px-4 py-1.5 rounded border border-amber-200 font-medium flex items-center gap-2 shadow-sm text-sm">
+                                        <div className="flex items-end gap-0.5 h-4">
+                                            <span className="w-1.5 h-2 bg-amber-300 inline-block rounded-sm"></span>
+                                            <span className="w-1.5 h-3 bg-amber-400 inline-block rounded-sm"></span>
+                                            <span className="w-1.5 h-4 bg-amber-500 inline-block rounded-sm"></span>
+                                        </div>
+                                        {q.difficulty || 'Hard'}
+                                    </div>
+                                    <div className="bg-gray-50 text-gray-700 px-4 py-1.5 rounded border border-gray-200 font-medium flex items-center gap-2 shadow-sm text-sm">
+                                        <span className="w-4 h-3 bg-gray-400 inline-block rounded-sm relative"><span className="absolute w-2 h-4 bg-gray-500 left-1 -top-0.5 rounded-sm"></span></span>
+                                        {test.subject || 'Module 1'}
+                                    </div>
+                                    <div className="bg-gray-100 text-gray-800 px-4 py-1.5 rounded-full border border-gray-300 font-bold flex items-center gap-2 shadow-sm text-sm">
+                                        <span className="w-4 h-4 rounded-full bg-gray-400 text-white flex items-center justify-center text-[10px]">?</span>
+                                        Question {String(index + 1).padStart(2, '0')} / {sortedQuestions.length}
+                                    </div>
+                                </div>
+
+                                {/* Presentation Footer */}
+                                <div className="presentation-footer hidden absolute bottom-0 left-0 right-0 w-full justify-between items-center px-12 pb-8 text-gray-700 font-semibold text-lg z-10">
+                                    <div>© DeshExam</div>
+                                    <div className="text-gray-500 font-medium">www.deshexam.in</div>
+                                    <div>{test.subject || 'Bangladesh History Series'}</div>
+                                </div>
+
+                                {/* Watermark */}
+                                <div className="presentation-watermark hidden absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-90 text-[60px] font-black text-gray-200/40 whitespace-nowrap z-0 pointer-events-none tracking-widest uppercase">
+                                    {test.subject || 'HISTORICAL EVENT'} Q{index + 1} - {sortedQuestions.length}
+                                </div>
 
                                 {/* Question Header */}
                                 <div className="flex justify-between items-start mb-4">
