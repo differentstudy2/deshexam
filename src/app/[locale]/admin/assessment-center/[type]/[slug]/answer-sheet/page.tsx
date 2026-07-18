@@ -296,6 +296,17 @@ export default async function AnswerSheetPage({
                         page-break-after: always !important;
                         break-after: page !important;
                         position: relative !important;
+                        z-index: 1 !important;
+                    }
+                    html[data-layout="presentation"] .group\/question::before {
+                        content: '' !important;
+                        position: absolute !important;
+                        top: 0 !important;
+                        left: 0 !important;
+                        right: 0 !important;
+                        bottom: -200vh !important;
+                        background-color: inherit !important;
+                        z-index: -1 !important;
                     }
                     html[data-layout="presentation"] .presentation-footer {
                         position: fixed !important;
