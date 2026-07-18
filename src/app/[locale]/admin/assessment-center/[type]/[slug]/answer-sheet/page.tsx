@@ -277,6 +277,28 @@ export default async function AnswerSheetPage({
                 }
                 
                 /* Presentation Layout Overrides */
+                @media print {
+                    html[data-layout="presentation"] table,
+                    html[data-layout="presentation"] tbody,
+                    html[data-layout="presentation"] tr,
+                    html[data-layout="presentation"] td {
+                        display: block !important;
+                        height: 100% !important;
+                    }
+                    html[data-layout="presentation"] .group\/question {
+                        height: 100vh !important;
+                        page-break-after: always !important;
+                        break-after: page !important;
+                    }
+                    html[data-layout="presentation"] .presentation-footer {
+                        position: absolute !important;
+                        bottom: 2rem !important;
+                        left: 0 !important;
+                        right: 0 !important;
+                        margin-top: 0 !important;
+                    }
+                }
+                
                 html[data-layout="presentation"] {
                     scroll-snap-type: y mandatory;
                     scroll-behavior: smooth;
@@ -418,7 +440,7 @@ export default async function AnswerSheetPage({
                             <tr className="h-full flex-1 flex flex-col print:table-row">
                                 <td className="p-0 align-top w-full h-full flex-1 flex flex-col print:table-cell">
                                     {/* Watermark for Print */}
-                                    <div className="fixed inset-0 pointer-events-none z-0 hidden print:flex items-center justify-center opacity-10 print:opacity-10">
+                                    <div className="fixed inset-0 pointer-events-none z-0 hidden print:flex items-center justify-center opacity-10 print:opacity-10 [html[data-layout='presentation']_&]:!hidden">
                                         <div className="text-7xl font-bold text-gray-400 -rotate-45 whitespace-nowrap">
                                             DeshExam
                                         </div>
