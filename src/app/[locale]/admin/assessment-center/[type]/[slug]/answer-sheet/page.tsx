@@ -121,8 +121,21 @@ export default async function AnswerSheetPage({
                         <span className="text-lg">Display Settings</span>
                     </div>
                     <div className="space-y-6">
-                        {/* Print Elements */}
+                        {/* Print Layout */}
                         <div>
+                            <span className="text-gray-900 font-bold block mb-3 text-sm">Print Layout</span>
+                            <div className="space-y-4">
+                                <div>
+                                    <select defaultValue="default" className="input-layout w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                                        <option value="default">Default Layout</option>
+                                        <option value="presentation">Presentation (Slide)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Print Elements */}
+                        <div className="pt-5 border-t border-gray-100">
                             <span className="text-gray-900 font-bold block mb-3 text-sm">Print Options</span>
                             <div className="space-y-2.5">
                                 <label className="flex items-center gap-3 cursor-pointer select-none text-gray-700 text-sm hover:text-blue-600 transition-colors">
