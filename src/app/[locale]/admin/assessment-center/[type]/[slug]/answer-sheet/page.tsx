@@ -275,11 +275,92 @@ export default async function AnswerSheetPage({
                 @media print {
                     @page { margin: 0; }
                 }
+                
+                /* Presentation Layout Overrides */
+                html[data-layout="presentation"] body {
+                    background-color: #f8fbff !important;
+                }
+                html[data-layout="presentation"] .flex-1.w-full.max-w-\\[1000px\\] {
+                    max-width: none !important;
+                    width: 100% !important;
+                    padding: 0 !important;
+                    background: transparent !important;
+                    box-shadow: none !important;
+                }
+                html[data-layout="presentation"] .presentation-header,
+                html[data-layout="presentation"] .presentation-badges,
+                html[data-layout="presentation"] .presentation-footer,
+                html[data-layout="presentation"] .presentation-watermark {
+                    display: flex !important;
+                }
+                html[data-layout="presentation"] .group\\/question {
+                    height: 100vh;
+                    display: flex !important;
+                    flex-direction: column;
+                    justify-content: center;
+                    padding-left: 10rem !important;
+                    padding-right: 10rem !important;
+                    border: none !important;
+                    page: presentation-page;
+                    background: #f8fbff !important;
+                }
+                @page presentation-page {
+                    size: landscape;
+                    margin: 0;
+                }
+                html[data-layout="presentation"] .print-q-text {
+                    font-size: 32px !important;
+                    line-height: 1.5 !important;
+                    margin-bottom: 2.5rem !important;
+                    text-align: left;
+                    z-index: 10;
+                }
+                html[data-layout="presentation"] .print-q-text p,
+                html[data-layout="presentation"] .print-q-text span {
+                    font-size: 32px !important;
+                    font-weight: 800 !important;
+                    color: #111827 !important;
+                }
+                html[data-layout="presentation"] .print-q-num {
+                    display: none !important;
+                }
+                html[data-layout="presentation"] .options-container {
+                    display: grid !important;
+                    grid-template-columns: 1fr 1fr !important;
+                    gap: 1.5rem 3rem !important;
+                    padding: 0 4rem;
+                    z-index: 10;
+                }
+                html[data-layout="presentation"] .options-container > div {
+                    background: white !important;
+                    border-width: 4px !important;
+                    padding: 1rem 1.5rem !important;
+                    border-radius: 1rem !important;
+                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+                }
+                html[data-layout="presentation"] .options-container > div:nth-child(1) { border-color: #3b82f6 !important; }
+                html[data-layout="presentation"] .options-container > div:nth-child(1) .relative.shrink-0 { background: #eff6ff !important; color: #3b82f6 !important; border: none !important; width: 3.5rem !important; height: 3.5rem !important; border-radius: 0.5rem !important; font-size: 1.5rem !important; font-weight: 900 !important; }
+                
+                html[data-layout="presentation"] .options-container > div:nth-child(2) { border-color: #22c55e !important; }
+                html[data-layout="presentation"] .options-container > div:nth-child(2) .relative.shrink-0 { background: #f0fdf4 !important; color: #22c55e !important; border: none !important; width: 3.5rem !important; height: 3.5rem !important; border-radius: 0.5rem !important; font-size: 1.5rem !important; font-weight: 900 !important; }
+                
+                html[data-layout="presentation"] .options-container > div:nth-child(3) { border-color: #f59e0b !important; }
+                html[data-layout="presentation"] .options-container > div:nth-child(3) .relative.shrink-0 { background: #fffbeb !important; color: #f59e0b !important; border: none !important; width: 3.5rem !important; height: 3.5rem !important; border-radius: 0.5rem !important; font-size: 1.5rem !important; font-weight: 900 !important; }
+                
+                html[data-layout="presentation"] .options-container > div:nth-child(4) { border-color: #ef4444 !important; }
+                html[data-layout="presentation"] .options-container > div:nth-child(4) .relative.shrink-0 { background: #fef2f2 !important; color: #ef4444 !important; border: none !important; width: 3.5rem !important; height: 3.5rem !important; border-radius: 0.5rem !important; font-size: 1.5rem !important; font-weight: 900 !important; }
+                
+                html[data-layout="presentation"] .print-opt-text p {
+                    font-size: 26px !important;
+                    font-weight: 700 !important;
+                    color: #000 !important;
+                    margin: 0 !important;
+                }
             `}} />
 
             {/* Native Print Table for Repeating Header/Footer without Overlap */}
             <table className="w-full border-collapse h-full flex-1 flex flex-col print:table print:h-auto">
-                <thead className="hidden print:table-header-group w-full z-50 group-has-[:not(:checked).toggle-header]/settings:print:!hidden">
+                <thead className="hidden print:table-header-group w-full z-50 group-has-[:not(:checked).toggle-header]/settings:print:!hidden [html[data-layout='presentation']_&]:!hidden">
                     <tr>
                         <td className="p-0 border-b border-blue-200">
                             <div className="bg-[#eef6ff] py-3 px-12 flex justify-between items-center w-full print:[print-color-adjust:exact]">
@@ -299,7 +380,7 @@ export default async function AnswerSheetPage({
                         </td>
                     </tr>
                 </thead>
-                <tfoot className="hidden print:table-footer-group w-full bg-white z-50 group-has-[:not(:checked).toggle-footer]/settings:print:!hidden">
+                <tfoot className="hidden print:table-footer-group w-full bg-white z-50 group-has-[:not(:checked).toggle-footer]/settings:print:!hidden [html[data-layout='presentation']_&]:!hidden">
                     <tr>
                         <td className="border-t border-blue-200 p-0 bg-white">
                             <div className="bg-[#eef6ff] text-[#1e4b85] py-2.5 px-12 flex justify-between items-center w-full print:[print-color-adjust:exact]">
@@ -321,7 +402,7 @@ export default async function AnswerSheetPage({
             </div>
 
             {/* Header - Print Friendly */}
-            <div className="mb-8 print:pt-12 print:px-12">
+            <div className="mb-8 print:pt-12 print:px-12 [html[data-layout='presentation']_&]:hidden">
                 {/* Top Row: QR, Title, Set Info */}
                 <div className="flex justify-between items-start mb-4">
                     {/* Left: QR and Marks */}
@@ -533,7 +614,7 @@ export default async function AnswerSheetPage({
                                 </div>
 
                                 {/* Options Grid */}
-                                <div className="ml-8 space-y-3 md:space-y-0 md:grid md:grid-cols-2 print:space-y-0 print:grid print:grid-cols-2 gap-4 mt-4 mb-6 print:mt-2 print:mb-3">
+                                <div className="options-container ml-8 space-y-3 md:space-y-0 md:grid md:grid-cols-2 print:space-y-0 print:grid print:grid-cols-2 gap-4 mt-4 mb-6 print:mt-2 print:mb-3">
                                     {q.options && [
                                         { key: 'a', text: q.options.a },
                                         { key: 'b', text: q.options.b },
