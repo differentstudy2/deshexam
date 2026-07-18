@@ -298,7 +298,8 @@ export default async function AnswerSheetPage({
                     display: flex !important;
                     flex-direction: column;
                     justify-content: center;
-                    padding: 4rem 5rem !important;
+                    padding-left: 10rem !important;
+                    padding-right: 10rem !important;
                     border: none !important;
                     page: presentation-page;
                     background: #f8fbff !important;
@@ -319,20 +320,15 @@ export default async function AnswerSheetPage({
                     font-size: 32px !important;
                     font-weight: 800 !important;
                     color: #111827 !important;
-                    background-color: transparent !important;
                 }
                 html[data-layout="presentation"] .print-q-num {
                     display: none !important;
                 }
-                html[data-layout="presentation"] .presentation-header,
-                html[data-layout="presentation"] .presentation-footer {
-                    display: flex !important;
-                }
                 html[data-layout="presentation"] .options-container {
                     display: grid !important;
                     grid-template-columns: 1fr 1fr !important;
-                    gap: 1.5rem 2rem !important;
-                    padding: 0 2rem;
+                    gap: 1.5rem 3rem !important;
+                    padding: 0 4rem;
                     z-index: 10;
                 }
                 html[data-layout="presentation"] .options-container > div {
@@ -341,7 +337,6 @@ export default async function AnswerSheetPage({
                     padding: 1rem 1.5rem !important;
                     border-radius: 1rem !important;
                     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-                    align-items: flex-start !important;
                 }
                 html[data-layout="presentation"] .options-container > div:nth-child(1) { border-color: #3b82f6 !important; }
                 html[data-layout="presentation"] .options-container > div:nth-child(1) .relative.shrink-0 { background: #eff6ff !important; color: #3b82f6 !important; border: none !important; width: 3.5rem !important; height: 3.5rem !important; border-radius: 0.5rem !important; font-size: 1.5rem !important; font-weight: 900 !important; }
@@ -355,18 +350,6 @@ export default async function AnswerSheetPage({
                 html[data-layout="presentation"] .options-container > div:nth-child(4) { border-color: #ef4444 !important; }
                 html[data-layout="presentation"] .options-container > div:nth-child(4) .relative.shrink-0 { background: #fef2f2 !important; color: #ef4444 !important; border: none !important; width: 3.5rem !important; height: 3.5rem !important; border-radius: 0.5rem !important; font-size: 1.5rem !important; font-weight: 900 !important; }
                 
-                html[data-layout="presentation"] .options-container > div:nth-child(5) { border-color: #8b5cf6 !important; }
-                html[data-layout="presentation"] .options-container > div:nth-child(5) .relative.shrink-0 { background: #f5f3ff !important; color: #8b5cf6 !important; border: none !important; width: 3.5rem !important; height: 3.5rem !important; border-radius: 0.5rem !important; font-size: 1.5rem !important; font-weight: 900 !important; }
-
-                html[data-layout="presentation"] .group\\/question:has(.toggle-tick-local:checked) .options-container > div.is-correct-option {
-                    border-color: #10b981 !important;
-                    background-color: #ecfdf5 !important;
-                }
-                html[data-layout="presentation"] .group\\/question:has(.toggle-tick-local:checked) .options-container > div.is-correct-option .relative.shrink-0 {
-                    background: #10b981 !important;
-                    color: white !important;
-                }
-
                 html[data-layout="presentation"] .print-opt-text p {
                     font-size: 26px !important;
                     font-weight: 700 !important;
@@ -376,7 +359,7 @@ export default async function AnswerSheetPage({
             `}} />
 
             {/* Native Print Table for Repeating Header/Footer without Overlap */}
-            <table className="w-full border-collapse h-full flex-1 flex flex-col print:table print:h-auto [html[data-layout='presentation']_&]:print:block [html[data-layout='presentation']_&]:block">
+            <table className="w-full border-collapse h-full flex-1 flex flex-col print:table print:h-auto">
                 <thead className="hidden print:table-header-group w-full z-50 group-has-[:not(:checked).toggle-header]/settings:print:!hidden [html[data-layout='presentation']_&]:!hidden">
                     <tr>
                         <td className="p-0 border-b border-blue-200">
@@ -397,20 +380,20 @@ export default async function AnswerSheetPage({
                         </td>
                     </tr>
                 </thead>
-                <tfoot className="hidden print:table-footer-group w-full bg-white z-50 group-has-[:not(:checked).toggle-footer]/settings:print:!hidden [html[data-layout='presentation']_&]:!block [html[data-layout='presentation']_&]:fixed [html[data-layout='presentation']_&]:bottom-0 [html[data-layout='presentation']_&]:left-0 [html[data-layout='presentation']_&]:right-0 [html[data-layout='presentation']_&]:bg-[#eef6ff]">
-                    <tr className="[html[data-layout='presentation']_&]:block">
-                        <td className="border-t border-blue-200 p-0 bg-white [html[data-layout='presentation']_&]:block [html[data-layout='presentation']_&]:bg-[#eef6ff]">
-                            <div className="bg-[#eef6ff] text-[#1e4b85] py-2.5 px-12 flex justify-between items-center w-full print:[print-color-adjust:exact] [html[data-layout='presentation']_&]:py-4 [html[data-layout='presentation']_&]:px-8">
-                                <div className="font-semibold text-[14px] [html[data-layout='presentation']_&]:text-[20px]">&copy; DeshExam</div>
-                                <div className="font-bold text-[15px] [html[data-layout='presentation']_&]:text-[20px]">India's Smart Learning Platform</div>
-                                <div className="font-semibold text-[14px] [html[data-layout='presentation']_&]:text-[20px]">www.deshexam.in</div>
+                <tfoot className="hidden print:table-footer-group w-full bg-white z-50 group-has-[:not(:checked).toggle-footer]/settings:print:!hidden [html[data-layout='presentation']_&]:!hidden">
+                    <tr>
+                        <td className="border-t border-blue-200 p-0 bg-white">
+                            <div className="bg-[#eef6ff] text-[#1e4b85] py-2.5 px-12 flex justify-between items-center w-full print:[print-color-adjust:exact]">
+                                <div className="font-semibold text-[14px]">&copy; DeshExam</div>
+                                <div className="font-bold text-[15px]">India's Smart Learning Platform</div>
+                                <div className="font-semibold text-[14px]">www.deshexam.in</div>
                             </div>
                         </td>
                     </tr>
                 </tfoot>
-                <tbody className="w-full h-full flex-1 flex flex-col print:table-row-group [html[data-layout='presentation']_&]:print:block [html[data-layout='presentation']_&]:block">
-                    <tr className="h-full flex-1 flex flex-col print:table-row [html[data-layout='presentation']_&]:print:block [html[data-layout='presentation']_&]:block">
-                        <td className="p-0 align-top w-full h-full flex-1 flex flex-col print:table-cell [html[data-layout='presentation']_&]:print:block [html[data-layout='presentation']_&]:block">
+                <tbody className="w-full h-full flex-1 flex flex-col print:table-row-group">
+                    <tr className="h-full flex-1 flex flex-col print:table-row">
+                        <td className="p-0 align-top w-full h-full flex-1 flex flex-col print:table-cell">
                 {/* Watermark for Print */}
             <div className="fixed inset-0 pointer-events-none z-0 hidden print:flex items-center justify-center opacity-10 print:opacity-10">
                 <div className="text-7xl font-bold text-gray-400 -rotate-45 whitespace-nowrap">
@@ -535,23 +518,40 @@ export default async function AnswerSheetPage({
                         return (
                             <div key={q.id} className={`group/question ${bgColor} ${isLast ? 'flex-1 print:flex-none' : ''} border border-gray-200 p-6 rounded-lg print:border-none print:p-6 print:pt-8 print:pb-6 print:break-after-page print:[print-color-adjust:exact] break-inside-avoid print:break-inside-avoid relative`}>
 
-                                {/* Presentation Header (Hidden by default, shown via CSS in presentation mode) */}
-                                <div className="presentation-header hidden w-full absolute top-0 left-0 right-0 justify-between items-start px-12 pt-10 z-10">
-                                    {/* Left: Logo */}
-                                    <div className="flex items-center gap-3 w-1/3">
+                                {/* Presentation Header (Hidden by default) */}
+                                <div className="presentation-header hidden w-full absolute top-0 left-0 right-0 justify-between items-center px-12 pt-10 z-10">
+                                    <div className="flex items-center gap-3">
                                         <img src="/image/logo.png" alt="DeshExam" className="h-10 w-auto object-contain" />
                                         <div className="font-bold text-[24px] text-[#1e4b85] tracking-tight">DeshExam</div>
                                     </div>
+                                    <div className="bg-blue-600 text-white px-8 py-2.5 rounded-full font-bold text-lg shadow-sm">MOCK TEST</div>
+                                    <div className="text-2xl font-bold text-gray-800">Page {String(index + 1).padStart(2, '0')}</div>
+                                </div>
 
-                                    {/* Center: Mock Test & Badges */}
-                                    <div className="flex flex-col items-center gap-4 w-1/3">
-                                        <div className="bg-blue-600 text-white px-8 py-2.5 rounded-full font-bold text-lg shadow-sm">MOCK TEST</div>
-                                        
-                                        {/* Badges removed from header */}
+                                {/* Presentation Top Badges */}
+                                <div className="presentation-badges hidden absolute top-32 right-12 gap-3 z-10">
+                                    {(q.sourceExam || (q.tags && q.tags.length > 0)) && (
+                                        <div className="bg-blue-50 text-blue-700 px-4 py-1.5 rounded border border-blue-200 font-medium flex items-center gap-2 shadow-sm text-sm">
+                                            <span className="w-3 h-4 bg-blue-500 inline-block rounded-sm"></span>
+                                            {q.sourceExam || (q.tags && q.tags[0]) || 'History'}
+                                        </div>
+                                    )}
+                                    <div className="bg-amber-50 text-amber-700 px-4 py-1.5 rounded border border-amber-200 font-medium flex items-center gap-2 shadow-sm text-sm">
+                                        <div className="flex items-end gap-0.5 h-4">
+                                            <span className="w-1.5 h-2 bg-amber-300 inline-block rounded-sm"></span>
+                                            <span className="w-1.5 h-3 bg-amber-400 inline-block rounded-sm"></span>
+                                            <span className="w-1.5 h-4 bg-amber-500 inline-block rounded-sm"></span>
+                                        </div>
+                                        {q.difficulty || 'Hard'}
                                     </div>
-
-                                    {/* Right: Page Number */}
-                                    <div className="text-3xl font-black text-gray-800 w-1/3 text-right pt-2">Page {String(index + 1).padStart(2, '0')}</div>
+                                    <div className="bg-gray-50 text-gray-700 px-4 py-1.5 rounded border border-gray-200 font-medium flex items-center gap-2 shadow-sm text-sm">
+                                        <span className="w-4 h-3 bg-gray-400 inline-block rounded-sm relative"><span className="absolute w-2 h-4 bg-gray-500 left-1 -top-0.5 rounded-sm"></span></span>
+                                        {test.subject || 'Module 1'}
+                                    </div>
+                                    <div className="bg-gray-100 text-gray-800 px-4 py-1.5 rounded-full border border-gray-300 font-bold flex items-center gap-2 shadow-sm text-sm">
+                                        <span className="w-4 h-4 rounded-full bg-gray-400 text-white flex items-center justify-center text-[10px]">?</span>
+                                        Question {String(index + 1).padStart(2, '0')} / {sortedQuestions.length}
+                                    </div>
                                 </div>
 
                                 {/* Presentation Footer */}
@@ -571,7 +571,7 @@ export default async function AnswerSheetPage({
                                     <div className="flex items-baseline gap-3 w-full">
                                         <div className="flex flex-col shrink-0">
                                             <span className="text-black font-bold text-[22px] print-q-num">Q{index + 1}.</span>
-                                            <div className="flex flex-col gap-2 mt-4 print:hidden opacity-60 hover:opacity-100 transition-opacity [html[data-layout='presentation']_&]:hidden">
+                                            <div className="flex flex-col gap-2 mt-4 print:hidden opacity-60 hover:opacity-100 transition-opacity">
                                                 <label className="flex items-center gap-1.5 cursor-pointer text-[10px] font-semibold text-gray-600 hover:text-gray-900" title="Show Main Explanation">
                                                     <input type="checkbox" defaultChecked className="toggle-exp-local w-3 h-3 text-blue-600 rounded border-gray-300 focus:ring-blue-500" />
                                                     <span>Exp</span>
@@ -628,7 +628,7 @@ export default async function AnswerSheetPage({
                                         return (
                                             <div
                                                 key={opt.key}
-                                                className={`flex items-center gap-3 p-3 rounded-xl border transition-colors duration-300 print:[print-color-adjust:exact] [html[data-layout='presentation']_&]:items-start ${isCorrect ? 'is-correct-option' : ''} ${!isCorrect
+                                                className={`flex items-center gap-3 p-3 rounded-full border transition-colors duration-300 print:[print-color-adjust:exact] ${!isCorrect
                                                         ? [
                                                             'border-blue-100 bg-blue-50/30 print:border-blue-200 print:bg-[#f0f7ff]',
                                                             'border-teal-100 bg-teal-50/30 print:border-teal-200 print:bg-[#f0fdfa]',
@@ -653,7 +653,7 @@ export default async function AnswerSheetPage({
                                                         </>
                                                     ) : optLetter}
                                                 </div>
-                                                <div className="prose prose-sm max-w-none text-gray-700 [&>p]:m-0 flex-1 print-opt-text [html[data-layout='presentation']_&]:mt-1.5">
+                                                <div className="prose prose-sm max-w-none text-gray-700 [&>p]:m-0 w-full print-opt-text">
                                                     <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeRaw]}>
                                                         {opt.text}
                                                     </ReactMarkdown>
