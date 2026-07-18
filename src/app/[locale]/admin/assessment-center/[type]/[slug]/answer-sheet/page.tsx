@@ -297,16 +297,11 @@ export default async function AnswerSheetPage({
                         break-after: page !important;
                         position: relative !important;
                         z-index: 1 !important;
-                    }
-                    html[data-layout="presentation"] .group\/question::before {
-                        content: '' !important;
-                        position: absolute !important;
-                        top: 0 !important;
-                        left: 0 !important;
-                        right: 0 !important;
-                        bottom: -200vh !important;
-                        background-color: inherit !important;
-                        z-index: -1 !important;
+                        /* Border Hack to extend background to bottom of physical page */
+                        border-bottom-width: 200vh !important;
+                        border-bottom-style: solid !important;
+                        margin-bottom: -200vh !important;
+                        box-sizing: content-box !important;
                     }
                     html[data-layout="presentation"] .presentation-footer {
                         position: fixed !important;
@@ -573,17 +568,17 @@ export default async function AnswerSheetPage({
                                         ) : (
                                             sortedQuestions.map((q, index) => {
                                                 const premiumColors = [
-                                                    'bg-blue-50/50 print:bg-[#f0f7ff]',
-                                                    'bg-emerald-50/50 print:bg-[#f0fdf4]',
-                                                    'bg-purple-50/50 print:bg-[#faf5ff]',
-                                                    'bg-rose-50/50 print:bg-[#fff1f2]',
-                                                    'bg-amber-50/50 print:bg-[#fffbeb]',
+                                                    'bg-blue-50/50 print:bg-[#f0f7ff] print:border-b-[#f0f7ff]',
+                                                    'bg-emerald-50/50 print:bg-[#f0fdf4] print:border-b-[#f0fdf4]',
+                                                    'bg-purple-50/50 print:bg-[#faf5ff] print:border-b-[#faf5ff]',
+                                                    'bg-rose-50/50 print:bg-[#fff1f2] print:border-b-[#fff1f2]',
+                                                    'bg-amber-50/50 print:bg-[#fffbeb] print:border-b-[#fffbeb]',
                                                 ];
                                                 const bgColor = premiumColors[index % premiumColors.length];
                                                 const isLast = index === sortedQuestions.length - 1;
 
                                                 return (
-                                                    <div key={q.id} className={`group/question ${bgColor} ${isLast ? 'flex-1 print:flex-none' : ''} border border-gray-200 p-6 rounded-lg print:border-none print:p-6 print:pt-8 print:pb-6 print:break-after-page print:[print-color-adjust:exact] break-inside-avoid print:break-inside-avoid flex flex-col relative [html[data-layout='presentation']_&]:pt-[8rem] [html[data-layout='presentation']_&]:pb-[6rem] [html[data-layout='presentation']_&]:px-[4rem] print:[html[data-layout='presentation']_&]:pt-[10rem] print:[html[data-layout='presentation']_&]:px-[4rem]`}>
+                                                    <div key={q.id} className={`group/question ${bgColor} ${isLast ? 'flex-1 print:flex-none' : ''} border border-gray-200 p-6 rounded-lg print:border-t-transparent print:border-l-transparent print:border-r-transparent print:p-6 print:pt-8 print:pb-6 print:break-after-page print:[print-color-adjust:exact] break-inside-avoid print:break-inside-avoid flex flex-col relative [html[data-layout='presentation']_&]:pt-[8rem] [html[data-layout='presentation']_&]:pb-[6rem] [html[data-layout='presentation']_&]:px-[4rem] print:[html[data-layout='presentation']_&]:pt-[10rem] print:[html[data-layout='presentation']_&]:px-[4rem]`}>
 
                                                         {/* Presentation Header */}
                                                         <div className="presentation-header hidden absolute top-0 left-0 right-0 bg-transparent py-3 px-10 justify-between items-center w-full print:[print-color-adjust:exact] [html[data-layout='presentation']_&]:flex">
