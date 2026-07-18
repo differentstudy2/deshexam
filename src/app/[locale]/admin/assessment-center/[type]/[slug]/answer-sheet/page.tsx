@@ -286,15 +286,16 @@ export default async function AnswerSheetPage({
                         height: 100% !important;
                     }
                     html[data-layout="presentation"] .group\/question {
-                        height: 100vh !important;
-                        min-height: 100vh !important;
-                        padding-top: 12rem !important;
-                        padding-bottom: 8rem !important;
-                        padding-left: 10rem !important;
-                        padding-right: 10rem !important;
-                        justify-content: center !important;
+                        height: 210mm !important;
+                        min-height: 210mm !important;
+                        padding-top: 10rem !important;
+                        padding-bottom: 6rem !important;
+                        padding-left: 8rem !important;
+                        padding-right: 8rem !important;
+                        justify-content: flex-start !important;
                         page-break-after: always !important;
                         break-after: page !important;
+                        position: relative !important;
                     }
                     html[data-layout="presentation"] .presentation-footer {
                         position: absolute !important;
