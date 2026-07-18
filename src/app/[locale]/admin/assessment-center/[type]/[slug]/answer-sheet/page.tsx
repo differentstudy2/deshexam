@@ -141,7 +141,34 @@ export default async function AnswerSheetPage({
                     @page { margin: 0; }
                 }
             `}} />
-            {/* Watermark for Print */}
+
+            {/* Native Print Table for Repeating Header/Footer without Overlap */}
+            <table className="w-full border-collapse">
+                <thead className="hidden print:table-header-group w-full bg-white z-50">
+                    <tr>
+                        <td className="pb-2 pt-6 px-12 border-b border-gray-300 bg-white">
+                            <div className="flex justify-between items-end w-full">
+                                <div className="font-bold text-xl text-gray-900 tracking-tight">DeshExam</div>
+                                <div className="font-semibold text-sm text-gray-600">{classLine}</div>
+                            </div>
+                        </td>
+                    </tr>
+                </thead>
+                <tfoot className="hidden print:table-footer-group w-full bg-white z-50">
+                    <tr>
+                        <td className="border-t border-blue-200 p-0 bg-white">
+                            <div className="bg-[#eef6ff] text-[#1e4b85] py-2.5 px-12 flex justify-between items-center w-full print:[print-color-adjust:exact]">
+                                <div className="font-semibold text-[14px]">&copy; DeshExam</div>
+                                <div className="font-bold text-[15px]">India's Smart Learning Platform</div>
+                                <div className="font-semibold text-[14px]">www.deshexam.in</div>
+                            </div>
+                        </td>
+                    </tr>
+                </tfoot>
+                <tbody className="w-full">
+                    <tr>
+                        <td className="p-0 align-top w-full">
+                {/* Watermark for Print */}
             <div className="fixed inset-0 pointer-events-none z-0 hidden print:flex items-center justify-center opacity-10 print:opacity-10">
                 <div className="text-7xl font-bold text-gray-400 -rotate-45 whitespace-nowrap">
                     DeshExam
@@ -422,9 +449,14 @@ export default async function AnswerSheetPage({
                 )}
             </div>
 
-            {/* Footer */}
-            <div className="w-full mt-12 print:fixed print:bottom-0 print:left-0 print:w-full print:bg-white print:z-50 print:[print-color-adjust:exact] print:mt-0">
-                <div className="bg-[#eef6ff] text-[#1e4b85] py-2.5 px-6 md:px-12 print:px-12 flex justify-between items-center w-full border-t border-blue-200">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            {/* Screen-only Footer (Since print uses tfoot) */}
+            <div className="w-full mt-12 print:hidden">
+                <div className="bg-[#eef6ff] text-[#1e4b85] py-2.5 px-6 md:px-12 flex justify-between items-center w-full border-t border-blue-200">
                     <div className="font-semibold text-[13px] md:text-[14px]">&copy; DeshExam</div>
                     <div className="font-bold text-[14px] md:text-[15px]">India's Smart Learning Platform</div>
                     <div className="font-semibold text-[13px] md:text-[14px]">www.deshexam.in</div>
