@@ -384,22 +384,22 @@ export default async function AnswerSheetPage({
                 }
                 html[data-layout="presentation"] .options-container > div {
                     background: white !important;
-                    border-width: 4px !important;
-                    padding: 0.5rem 1.25rem !important;
-                    border-radius: 1rem !important;
+                    border-width: 3px !important;
+                    padding: 0.25rem 1rem !important;
+                    border-radius: 0.75rem !important;
                     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
                 }
                 html[data-layout="presentation"] .options-container > div:nth-child(1) { border-color: #3b82f6 !important; }
-                html[data-layout="presentation"] .options-container > div:nth-child(1) .relative.shrink-0 { background: #eff6ff !important; color: #3b82f6 !important; border: none !important; width: 3.5rem !important; height: 3.5rem !important; border-radius: 0.5rem !important; font-size: 1.5rem !important; font-weight: 900 !important; }
+                html[data-layout="presentation"] .options-container > div:nth-child(1) .relative.shrink-0 { background: #eff6ff !important; color: #3b82f6 !important; border: none !important; width: 2.5rem !important; height: 2.5rem !important; border-radius: 0.5rem !important; font-size: 1.25rem !important; font-weight: 900 !important; }
                 
                 html[data-layout="presentation"] .options-container > div:nth-child(2) { border-color: #22c55e !important; }
-                html[data-layout="presentation"] .options-container > div:nth-child(2) .relative.shrink-0 { background: #f0fdf4 !important; color: #22c55e !important; border: none !important; width: 3.5rem !important; height: 3.5rem !important; border-radius: 0.5rem !important; font-size: 1.5rem !important; font-weight: 900 !important; }
+                html[data-layout="presentation"] .options-container > div:nth-child(2) .relative.shrink-0 { background: #f0fdf4 !important; color: #22c55e !important; border: none !important; width: 2.5rem !important; height: 2.5rem !important; border-radius: 0.5rem !important; font-size: 1.25rem !important; font-weight: 900 !important; }
                 
                 html[data-layout="presentation"] .options-container > div:nth-child(3) { border-color: #f59e0b !important; }
-                html[data-layout="presentation"] .options-container > div:nth-child(3) .relative.shrink-0 { background: #fffbeb !important; color: #f59e0b !important; border: none !important; width: 3.5rem !important; height: 3.5rem !important; border-radius: 0.5rem !important; font-size: 1.5rem !important; font-weight: 900 !important; }
+                html[data-layout="presentation"] .options-container > div:nth-child(3) .relative.shrink-0 { background: #fffbeb !important; color: #f59e0b !important; border: none !important; width: 2.5rem !important; height: 2.5rem !important; border-radius: 0.5rem !important; font-size: 1.25rem !important; font-weight: 900 !important; }
                 
                 html[data-layout="presentation"] .options-container > div:nth-child(4) { border-color: #ef4444 !important; }
-                html[data-layout="presentation"] .options-container > div:nth-child(4) .relative.shrink-0 { background: #fef2f2 !important; color: #ef4444 !important; border: none !important; width: 3.5rem !important; height: 3.5rem !important; border-radius: 0.5rem !important; font-size: 1.5rem !important; font-weight: 900 !important; }
+                html[data-layout="presentation"] .options-container > div:nth-child(4) .relative.shrink-0 { background: #fef2f2 !important; color: #ef4444 !important; border: none !important; width: 2.5rem !important; height: 2.5rem !important; border-radius: 0.5rem !important; font-size: 1.25rem !important; font-weight: 900 !important; }
                 
                 html[data-layout="presentation"] .print-opt-text p,
                 html[data-layout="presentation"] .print-opt-text li {
@@ -568,7 +568,7 @@ export default async function AnswerSheetPage({
                                                 const isLast = index === sortedQuestions.length - 1;
 
                                                 return (
-                                                    <div key={q.id} className={`group/question ${bgColor} ${isLast ? 'flex-1 print:flex-none' : ''} border border-gray-200 p-6 rounded-lg print:border-none print:p-6 print:pt-8 print:pb-6 print:break-after-page print:[print-color-adjust:exact] break-inside-avoid print:break-inside-avoid flex flex-col relative [html[data-layout='presentation']_&]:pt-[8rem] [html[data-layout='presentation']_&]:pb-[6rem] [html[data-layout='presentation']_&]:px-[8rem] print:[html[data-layout='presentation']_&]:pt-[10rem] print:[html[data-layout='presentation']_&]:px-[8rem]`}>
+                                                    <div key={q.id} className={`group/question ${bgColor} ${isLast ? 'flex-1 print:flex-none' : ''} border border-gray-200 p-6 rounded-lg print:border-none print:p-6 print:pt-8 print:pb-6 print:break-after-page print:[print-color-adjust:exact] break-inside-avoid print:break-inside-avoid flex flex-col relative [html[data-layout='presentation']_&]:pt-[8rem] [html[data-layout='presentation']_&]:pb-[6rem] [html[data-layout='presentation']_&]:px-[4rem] print:[html[data-layout='presentation']_&]:pt-[10rem] print:[html[data-layout='presentation']_&]:px-[4rem]`}>
 
                                                         {/* Presentation Header */}
                                                         <div className="presentation-header hidden absolute top-0 left-0 right-0 bg-[#eef6ff] py-3 px-10 justify-between items-center w-full print:[print-color-adjust:exact] [html[data-layout='presentation']_&]:flex">
