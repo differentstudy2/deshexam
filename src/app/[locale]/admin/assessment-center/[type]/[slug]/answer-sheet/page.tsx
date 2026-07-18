@@ -51,7 +51,7 @@ export default async function AnswerSheetPage({
     const test = testDoc as any;
 
     // 3. Fetch all questions
-    const questions = test.questionIds && test.questionIds.length > 0 
+    const questions = test.questionIds && test.questionIds.length > 0
         ? await getQuestionsByIds(test.questionIds)
         : [];
 
@@ -68,7 +68,7 @@ export default async function AnswerSheetPage({
         try {
             const d = await getDoc(doc(db, 'taxonomy_nodes', id));
             return d.exists() ? d.data() : null;
-        } catch(e) { return null; }
+        } catch (e) { return null; }
     }
 
     const boardNode = await getTaxonomyNode(test.boardId);
@@ -91,7 +91,8 @@ export default async function AnswerSheetPage({
 
     return (
         <div className="min-h-screen bg-white text-black p-8 font-sans print:p-0 print:bg-white print:text-black print:min-h-0 print:block">
-            <style dangerouslySetInnerHTML={{__html: `
+            <style dangerouslySetInnerHTML={{
+                __html: `
                 @media print {
                     @page { margin: 0; }
                 }
@@ -122,11 +123,11 @@ export default async function AnswerSheetPage({
                     <div className="flex flex-col items-center text-center flex-1 px-4">
                         <h1 className="text-3xl font-bold text-gray-900 tracking-tight">DeshExam Academy</h1>
                         <p className="text-[13px] text-gray-600 mb-2">Dwarikamari, Petla, Dinhata, Cooch Behar, WB, 736135</p>
-                        
+
                         <h2 className="text-[15px] font-bold text-gray-900">{classLine}</h2>
-                        
+
                         {subjectName ? <h3 className="text-[15px] font-bold text-gray-900">Subject: {subjectName}</h3> : (test.subject && <h3 className="text-[15px] font-bold text-gray-900">Subject: {test.subject}</h3>)}
-                        
+
                         {chapterName && <p className="text-sm text-gray-700 font-semibold mt-1">Chapter: {chapterName}</p>}
                         {topicName && <p className="text-sm text-gray-600">Topic: {topicName}</p>}
                         {!chapterName && !topicName && <p className="text-sm text-gray-600 mt-1">Answer Key & Explanations</p>}
@@ -156,7 +157,7 @@ export default async function AnswerSheetPage({
                     <div>Time— {test.durationMin || 0} Mins</div>
                     <div>Total Marks— {test.totalMarks || 0}</div>
                 </div>
-                
+
                 <div className="border-b-2 border-black mb-3"></div>
 
                 {/* Instructions */}
@@ -192,158 +193,156 @@ export default async function AnswerSheetPage({
                             'bg-amber-50/50 print:bg-[#fffbeb]',
                         ];
                         const bgColor = premiumColors[index % premiumColors.length];
-                        
+
                         return (
-                        <div key={q.id} className={`${bgColor} border border-gray-200 p-6 rounded-lg print:border-none print:p-12 print:pt-16 print:border-b-0 print:pb-12 print:break-after-page print:min-h-screen print:[print-color-adjust:exact] ${index > 0 ? 'break-inside-avoid print:break-inside-avoid' : ''}`}>
-                            
-                            {/* Question Header */}
-                            <div className="flex justify-between items-start mb-4">
-                                <div className="flex gap-2 w-full">
-                                    <span className="shrink-0 text-black font-bold text-[16px]">Q{index + 1}.</span> 
-                                    <div className="prose prose-black max-w-none flex-1 prose-p:font-bold prose-p:text-[16px] prose-p:my-0 prose-li:text-[16px]">
-                                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeRaw]}>
-                                            {q.questionText}
-                                        </ReactMarkdown>
-                                        
-                                        {/* Exam and Year Tags */}
-                                        {(q.sourceExam || q.sourceYear || (q.tags && q.tags.length > 0)) && (
-                                            <div className="flex flex-wrap gap-2 mt-3 mb-1 font-normal print:mt-2">
-                                                {q.sourceExam && <span className="bg-blue-50 text-blue-700 text-[11px] px-2 py-0.5 rounded border border-blue-200 print:border-gray-400 print:text-gray-800 print:bg-white print:[print-color-adjust:exact]">{q.sourceExam}</span>}
-                                                {q.sourceYear && <span className="bg-purple-50 text-purple-700 text-[11px] px-2 py-0.5 rounded border border-purple-200 print:border-gray-400 print:text-gray-800 print:bg-white print:[print-color-adjust:exact]">{q.sourceYear}</span>}
-                                                {q.tags && q.tags.map((tag: string, i: number) => (
-                                                    <span key={i} className="bg-gray-100 text-gray-700 text-[11px] px-2 py-0.5 rounded border border-gray-200 print:border-gray-400 print:text-gray-800 print:bg-white print:[print-color-adjust:exact]">{tag}</span>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-2 print:hidden">
-                                    <Link href={`/${params.locale}/question/${q.slug || q.id}`} target="_blank" className="text-gray-400 hover:text-blue-500 transition-colors" title="View Question">
-                                        <Eye className="w-4 h-4" />
-                                    </Link>
-                                    <Link href={`/${params.locale}/admin/question-bank/academic-questions/${q.id}`} target="_blank" className="text-gray-400 hover:text-emerald-500 transition-colors" title="Edit Question">
-                                        <Edit className="w-4 h-4" />
-                                    </Link>
-                                    <span className="text-xs font-mono bg-gray-100 px-2 py-1 rounded text-gray-600">{q.id}</span>
-                                </div>
-                            </div>
+                            <div key={q.id} className={`${bgColor} border border-gray-200 p-6 rounded-lg print:border-none print:p-6 print:pt-8 print:pb-6 print:break-after-page print:min-h-screen print:[print-color-adjust:exact] break-inside-avoid print:break-inside-avoid`}>
 
-                            {/* Options Grid */}
-                            <div className="ml-8 space-y-3 md:space-y-0 md:grid md:grid-cols-2 print:space-y-0 print:grid print:grid-cols-2 gap-4 mt-4 mb-6">
-                                {q.options && [
-                                    { key: 'a', text: q.options.a },
-                                    { key: 'b', text: q.options.b },
-                                    { key: 'c', text: q.options.c },
-                                    { key: 'd', text: q.options.d },
-                                    ...(q.options.e ? [{ key: 'e', text: q.options.e }] : [])
-                                ].map((opt, oIdx) => {
-                                    const isCorrect = q.correctAnswer && q.correctAnswer.toLowerCase().includes(opt.key);
-                                    const optLetter = q.language === 'Bangla' || !q.language ? bnOptionsMap[opt.key] : opt.key.toUpperCase();
-
-                                    return (
-                                        <div 
-                                            key={opt.key} 
-                                            className={`flex items-center gap-3 p-3 rounded-full border print:[print-color-adjust:exact] ${
-                                                isCorrect 
-                                                ? 'border-emerald-400 bg-emerald-50/50 print:border-emerald-500 print:bg-emerald-50 print:font-bold' 
-                                                : [
-                                                    'border-blue-100 bg-blue-50/30 print:border-blue-200 print:bg-[#f0f7ff]',
-                                                    'border-teal-100 bg-teal-50/30 print:border-teal-200 print:bg-[#f0fdfa]',
-                                                    'border-purple-100 bg-purple-50/30 print:border-purple-200 print:bg-[#faf5ff]',
-                                                    'border-orange-100 bg-orange-50/30 print:border-orange-200 print:bg-[#fff7ed]',
-                                                    'border-rose-100 bg-rose-50/30 print:border-rose-200 print:bg-[#fff1f2]'
-                                                  ][oIdx % 5]
-                                            }`}
-                                        >
-                                            <div className={`shrink-0 w-8 h-8 flex items-center justify-center rounded-full text-sm font-medium border print:[print-color-adjust:exact] ${
-                                                isCorrect ? 'bg-emerald-500 border-emerald-500 text-white print:bg-emerald-500 print:border-emerald-500' : 'bg-gray-50 border-gray-200 text-gray-600 print:bg-white'
-                                            }`}>
-                                                {isCorrect ? <Check className="w-5 h-5 print:text-white" /> : optLetter}
-                                            </div>
-                                            <div className="prose prose-sm max-w-none text-gray-700 [&>p]:m-0 w-full">
-                                                <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeRaw]}>
-                                                    {opt.text}
-                                                </ReactMarkdown>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-
-                            {/* Explanation */}
-                            {(q.explanation || q.optionExplanations) && (
-                                <div className="ml-8 mt-4 bg-white/60 border border-black/5 p-5 rounded-lg print:bg-white/80 print:border-gray-200">
-                                    <div className="flex items-center gap-2 mb-3">
-                                        <Lightbulb className="w-5 h-5 text-yellow-500 print:text-black" />
-                                        <h4 className="font-bold text-blue-900 print:text-black m-0">Explanation</h4>
-                                    </div>
-                                    
-                                    {q.explanation && (
-                                        <div className="prose prose-sm max-w-none text-gray-700 mb-5 print:text-black">
+                                {/* Question Header */}
+                                <div className="flex justify-between items-start mb-4">
+                                    <div className="flex gap-2 w-full">
+                                        <span className="shrink-0 text-black font-bold text-[22px]">Q{index + 1}.</span>
+                                        <div className="prose prose-black max-w-none flex-1 prose-p:font-bold prose-p:text-[22px] prose-p:my-0 prose-li:text-[18px]">
                                             <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeRaw]}>
-                                                {q.explanation}
+                                                {q.questionText}
                                             </ReactMarkdown>
-                                        </div>
-                                    )}
 
-                                    {/* Option Explanations inside main Explanation block */}
-                                    {q.optionExplanations && Object.keys(q.optionExplanations).length > 0 && (
-                                        <div className="space-y-3">
-                                            {q.options && [
-                                                { key: 'a', text: q.options.a },
-                                                { key: 'b', text: q.options.b },
-                                                { key: 'c', text: q.options.c },
-                                                { key: 'd', text: q.options.d },
-                                                ...(q.options.e ? [{ key: 'e', text: q.options.e }] : [])
-                                            ].map((opt, oIdx) => {
-                                                const isCorrect = q.correctAnswer && q.correctAnswer.toLowerCase().includes(opt.key);
-                                                const optLetter = q.language === 'Bangla' || !q.language ? bnOptionsMap[opt.key] : opt.key.toUpperCase();
-                                                
-                                                return (
-                                                    <div key={opt.key} className={`border rounded-md p-3 print:[print-color-adjust:exact] ${
-                                                        [
+                                            {/* Exam and Year Tags */}
+                                            {(q.sourceExam || q.sourceYear || (q.tags && q.tags.length > 0)) && (
+                                                <div className="flex flex-wrap gap-2 mt-3 mb-1 font-normal print:mt-2">
+                                                    {q.sourceExam && <span className="bg-blue-50 text-blue-700 text-[11px] px-2 py-0.5 rounded border border-blue-200 print:border-gray-400 print:text-gray-800 print:bg-white print:[print-color-adjust:exact]">{q.sourceExam}</span>}
+                                                    {q.sourceYear && <span className="bg-purple-50 text-purple-700 text-[11px] px-2 py-0.5 rounded border border-purple-200 print:border-gray-400 print:text-gray-800 print:bg-white print:[print-color-adjust:exact]">{q.sourceYear}</span>}
+                                                    {q.tags && q.tags.map((tag: string, i: number) => (
+                                                        <span key={i} className="bg-gray-100 text-gray-700 text-[11px] px-2 py-0.5 rounded border border-gray-200 print:border-gray-400 print:text-gray-800 print:bg-white print:[print-color-adjust:exact]">{tag}</span>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-2 print:hidden">
+                                        <Link href={`/${params.locale}/question/${q.slug || q.id}`} target="_blank" className="text-gray-400 hover:text-blue-500 transition-colors" title="View Question">
+                                            <Eye className="w-4 h-4" />
+                                        </Link>
+                                        <Link href={`/${params.locale}/admin/question-bank/academic-questions/${q.id}`} target="_blank" className="text-gray-400 hover:text-emerald-500 transition-colors" title="Edit Question">
+                                            <Edit className="w-4 h-4" />
+                                        </Link>
+                                        <span className="text-xs font-mono bg-gray-100 px-2 py-1 rounded text-gray-600">{q.id}</span>
+                                    </div>
+                                </div>
+
+                                {/* Options Grid */}
+                                <div className="ml-8 space-y-3 md:space-y-0 md:grid md:grid-cols-2 print:space-y-0 print:grid print:grid-cols-2 gap-4 mt-4 mb-6">
+                                    {q.options && [
+                                        { key: 'a', text: q.options.a },
+                                        { key: 'b', text: q.options.b },
+                                        { key: 'c', text: q.options.c },
+                                        { key: 'd', text: q.options.d },
+                                        ...(q.options.e ? [{ key: 'e', text: q.options.e }] : [])
+                                    ].map((opt, oIdx) => {
+                                        const isCorrect = q.correctAnswer && q.correctAnswer.toLowerCase().includes(opt.key);
+                                        const optLetter = q.language === 'Bangla' || !q.language ? bnOptionsMap[opt.key] : opt.key.toUpperCase();
+
+                                        return (
+                                            <div
+                                                key={opt.key}
+                                                className={`flex items-center gap-3 p-3 rounded-full border print:[print-color-adjust:exact] ${isCorrect
+                                                        ? 'border-emerald-400 bg-emerald-50/50 print:border-emerald-500 print:bg-emerald-50 print:font-bold'
+                                                        : [
                                                             'border-blue-100 bg-blue-50/30 print:border-blue-200 print:bg-[#f0f7ff]',
                                                             'border-teal-100 bg-teal-50/30 print:border-teal-200 print:bg-[#f0fdfa]',
                                                             'border-purple-100 bg-purple-50/30 print:border-purple-200 print:bg-[#faf5ff]',
                                                             'border-orange-100 bg-orange-50/30 print:border-orange-200 print:bg-[#fff7ed]',
                                                             'border-rose-100 bg-rose-50/30 print:border-rose-200 print:bg-[#fff1f2]'
                                                         ][oIdx % 5]
+                                                    }`}
+                                            >
+                                                <div className={`shrink-0 w-8 h-8 flex items-center justify-center rounded-full text-sm font-medium border print:[print-color-adjust:exact] ${isCorrect ? 'bg-emerald-500 border-emerald-500 text-white print:bg-emerald-500 print:border-emerald-500' : 'bg-gray-50 border-gray-200 text-gray-600 print:bg-white'
                                                     }`}>
-                                                        <div className="flex items-start gap-2 mb-1">
-                                                            <span className="bg-gray-100 text-gray-700 rounded px-2 py-0.5 text-sm font-medium shrink-0 print:border print:border-gray-300">
-                                                                {optLetter}
-                                                            </span>
-                                                            <div className="font-semibold text-gray-800 prose prose-sm max-w-none [&>p]:m-0">
-                                                                <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeRaw]}>
-                                                                    {opt.text}
-                                                                </ReactMarkdown>
+                                                    {isCorrect ? <Check className="w-5 h-5 print:text-white" /> : optLetter}
+                                                </div>
+                                                <div className="prose prose-sm max-w-none text-gray-700 [&>p]:m-0 w-full">
+                                                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeRaw]}>
+                                                        {opt.text}
+                                                    </ReactMarkdown>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+
+                                {/* Explanation */}
+                                {(q.explanation || q.optionExplanations) && (
+                                    <div className="ml-8 mt-4 bg-white/60 border border-black/5 p-5 rounded-lg print:bg-white/80 print:border-gray-200 print:p-4 print:text-[13px] print:break-inside-avoid">
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <Lightbulb className="w-5 h-5 text-yellow-500 print:text-black" />
+                                            <h4 className="font-bold text-blue-900 print:text-black m-0">Explanation</h4>
+                                        </div>
+
+                                        {q.explanation && (
+                                            <div className="prose prose-sm max-w-none text-gray-700 mb-5 print:text-black print:prose-p:text-[13px] print:prose-li:text-[13px]">
+                                                <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeRaw]}>
+                                                    {q.explanation}
+                                                </ReactMarkdown>
+                                            </div>
+                                        )}
+
+                                        {/* Option Explanations inside main Explanation block */}
+                                        {q.optionExplanations && Object.keys(q.optionExplanations).length > 0 && (
+                                            <div className="space-y-3">
+                                                {q.options && [
+                                                    { key: 'a', text: q.options.a },
+                                                    { key: 'b', text: q.options.b },
+                                                    { key: 'c', text: q.options.c },
+                                                    { key: 'd', text: q.options.d },
+                                                    ...(q.options.e ? [{ key: 'e', text: q.options.e }] : [])
+                                                ].map((opt, oIdx) => {
+                                                    const isCorrect = q.correctAnswer && q.correctAnswer.toLowerCase().includes(opt.key);
+                                                    const optLetter = q.language === 'Bangla' || !q.language ? bnOptionsMap[opt.key] : opt.key.toUpperCase();
+
+                                                    return (
+                                                        <div key={opt.key} className={`border rounded-md p-3 print:[print-color-adjust:exact] print:break-inside-avoid print:p-2 ${[
+                                                                'border-blue-100 bg-blue-50/30 print:border-blue-200 print:bg-[#f0f7ff]',
+                                                                'border-teal-100 bg-teal-50/30 print:border-teal-200 print:bg-[#f0fdfa]',
+                                                                'border-purple-100 bg-purple-50/30 print:border-purple-200 print:bg-[#faf5ff]',
+                                                                'border-orange-100 bg-orange-50/30 print:border-orange-200 print:bg-[#fff7ed]',
+                                                                'border-rose-100 bg-rose-50/30 print:border-rose-200 print:bg-[#fff1f2]'
+                                                            ][oIdx % 5]
+                                                            }`}>
+                                                            <div className="flex items-start gap-2 mb-1">
+                                                                <span className="bg-gray-100 text-gray-700 rounded px-2 py-0.5 text-sm font-medium shrink-0 print:border print:border-gray-300">
+                                                                    {optLetter}
+                                                                </span>
+                                                                <div className="font-semibold text-gray-800 prose prose-sm max-w-none [&>p]:m-0 print:prose-p:text-[13px] print:text-[13px]">
+                                                                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeRaw]}>
+                                                                        {opt.text}
+                                                                    </ReactMarkdown>
+                                                                </div>
+                                                                {isCorrect ? (
+                                                                    <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5 ml-auto" />
+                                                                ) : (
+                                                                    <XCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5 ml-auto" />
+                                                                )}
                                                             </div>
-                                                            {isCorrect ? (
-                                                                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5 ml-auto" />
-                                                            ) : (
-                                                                <XCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5 ml-auto" />
+                                                            {q.optionExplanations && (q.optionExplanations as any)[opt.key] && (
+                                                                <div className="text-gray-600 text-sm ml-8 prose prose-sm max-w-none [&>p]:m-0 print:text-black">
+                                                                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeRaw]}>
+                                                                        {(q.optionExplanations as any)[opt.key]}
+                                                                    </ReactMarkdown>
+                                                                </div>
                                                             )}
                                                         </div>
-                                                        {q.optionExplanations && (q.optionExplanations as any)[opt.key] && (
-                                                            <div className="text-gray-600 text-sm ml-8 prose prose-sm max-w-none [&>p]:m-0 print:text-black">
-                                                                <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeRaw]}>
-                                                                    {(q.optionExplanations as any)[opt.key]}
-                                                                </ReactMarkdown>
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-                                    )}
-                                </div>
-                            )}
+                                                    );
+                                                })}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
 
-                        </div>
-                    )})
+                            </div>
+                        )
+                    })
                 )}
             </div>
-            
+
             {/* Print Button Header for Screen only */}
             <PrintButton />
         </div>
