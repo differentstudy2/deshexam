@@ -286,9 +286,6 @@ export default async function AnswerSheetPage({
                 html[data-layout="presentation"] .explanation-block {
                     display: none !important;
                 }
-                html[data-layout="presentation"] .print-q-text > p:first-child {
-                    display: inline !important;
-                }
                 html[data-layout="presentation"] .group\/settings {
                     padding: 0 !important;
                     margin: 0 !important;
@@ -566,7 +563,7 @@ export default async function AnswerSheetPage({
                                                                     </div>
                                                                 </div>
                                                                 <div className="prose prose-black max-w-none flex-1 prose-p:font-bold prose-p:text-[22px] print-q-text print:leading-snug prose-p:my-0 prose-li:text-[18px]">
-                                                                    <span className="hidden [html[data-layout='presentation']_&]:inline font-bold text-black mr-2">Q{index + 1}.</span>
+                                                                    <span className="hidden [html[data-layout='presentation']_&]:block float-left font-bold text-black mr-2">Q{index + 1}.</span>
                                                                     <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeRaw]}>
                                                                         {q.questionText}
                                                                     </ReactMarkdown>
