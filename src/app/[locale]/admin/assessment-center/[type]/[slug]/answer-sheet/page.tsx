@@ -331,8 +331,9 @@ export default async function AnswerSheetPage({
                     z-index: 10;
                 }
                 html[data-layout="presentation"] .print-q-text p,
+                html[data-layout="presentation"] .print-q-text li,
                 html[data-layout="presentation"] .print-q-text span {
-                    font-size: 32px !important;
+                    font-size: calc(var(--fs-q) * 1.45) !important;
                     font-weight: 800 !important;
                     color: #111827 !important;
                 }
@@ -365,8 +366,9 @@ export default async function AnswerSheetPage({
                 html[data-layout="presentation"] .options-container > div:nth-child(4) { border-color: #ef4444 !important; }
                 html[data-layout="presentation"] .options-container > div:nth-child(4) .relative.shrink-0 { background: #fef2f2 !important; color: #ef4444 !important; border: none !important; width: 3.5rem !important; height: 3.5rem !important; border-radius: 0.5rem !important; font-size: 1.5rem !important; font-weight: 900 !important; }
                 
-                html[data-layout="presentation"] .print-opt-text p {
-                    font-size: 26px !important;
+                html[data-layout="presentation"] .print-opt-text p,
+                html[data-layout="presentation"] .print-opt-text li {
+                    font-size: calc(var(--fs-opt) * 1.6) !important;
                     font-weight: 700 !important;
                     color: #000 !important;
                     margin: 0 !important;
@@ -609,9 +611,9 @@ export default async function AnswerSheetPage({
                                                                             }`}
                                                                     >
                                                                         <div className={`relative shrink-0 w-8 h-8 flex items-center justify-center rounded-full text-sm font-medium border transition-colors duration-300 print:[print-color-adjust:exact] ${!isCorrect
-                                                                                ? 'bg-gray-50 border-gray-200 text-gray-600 print:bg-white'
-                                                                                : 'group-has-[:checked.toggle-tick-local]/question:bg-emerald-500 group-has-[:checked.toggle-tick-local]/question:border-emerald-500 group-has-[:checked.toggle-tick-local]/question:text-white group-has-[:checked.toggle-tick-local]/question:print:bg-emerald-500 ' +
-                                                                                'group-has-[:not(:checked).toggle-tick-local]/question:bg-gray-50 group-has-[:not(:checked).toggle-tick-local]/question:border-gray-200 group-has-[:not(:checked).toggle-tick-local]/question:text-gray-600 group-has-[:not(:checked).toggle-tick-local]/question:print:bg-white'
+                                                                            ? 'bg-gray-50 border-gray-200 text-gray-600 print:bg-white'
+                                                                            : 'group-has-[:checked.toggle-tick-local]/question:bg-emerald-500 group-has-[:checked.toggle-tick-local]/question:border-emerald-500 group-has-[:checked.toggle-tick-local]/question:text-white group-has-[:checked.toggle-tick-local]/question:print:bg-emerald-500 ' +
+                                                                            'group-has-[:not(:checked).toggle-tick-local]/question:bg-gray-50 group-has-[:not(:checked).toggle-tick-local]/question:border-gray-200 group-has-[:not(:checked).toggle-tick-local]/question:text-gray-600 group-has-[:not(:checked).toggle-tick-local]/question:print:bg-white'
                                                                             }`}>
                                                                             {isCorrect ? (
                                                                                 <>
@@ -688,8 +690,8 @@ export default async function AnswerSheetPage({
                                                                                                         )}
                                                                                                     </div>
                                                                                                     {q.optionExplanations && (q.optionExplanations as any)[opt.key] && (
-                                                                        <div className="text-gray-600 text-sm prose prose-sm max-w-none [&>p]:m-0 print:text-black print-exp-text print:leading-tight">
-                                                                            <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeRaw]}>
+                                                                                                        <div className="text-gray-600 text-sm prose prose-sm max-w-none [&>p]:m-0 print:text-black print-exp-text print:leading-tight">
+                                                                                                            <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeRaw]}>
                                                                                                                 {(q.optionExplanations as any)[opt.key]}
                                                                                                             </ReactMarkdown>
                                                                                                         </div>
@@ -705,12 +707,12 @@ export default async function AnswerSheetPage({
                                                                 </div>
                                                             </div>
                                                         )}
-                                                        
+
                                                         {/* Presentation Footer */}
                                                         <div className="presentation-footer hidden w-full justify-between items-center text-gray-700 font-semibold text-[14px] mt-auto pt-8 [html[data-layout='presentation']_&]:flex">
                                                             <div>© DeshExam</div>
                                                             <div>www.deshexam.in</div>
-                                                            <div>{test.subject || 'Bangladesh History Series'}</div>
+                                                            <div>MdjMiah</div>
                                                         </div>
                                                     </div>
                                                 )
