@@ -186,6 +186,21 @@ export default async function AnswerSheetPage({
                     .print-exp-text p, .print-exp-text li { font-size: var(--fs-exp) !important; }
                 }
             `}} />
+            <script dangerouslySetInnerHTML={{__html: `
+                if (typeof window !== 'undefined') {
+                    window.addEventListener('change', function(e) {
+                        if (e.target.classList.contains('toggle-exp')) {
+                            document.querySelectorAll('.toggle-exp-local').forEach(cb => cb.checked = e.target.checked);
+                        }
+                        if (e.target.classList.contains('toggle-optexp')) {
+                            document.querySelectorAll('.toggle-optexp-local').forEach(cb => cb.checked = e.target.checked);
+                        }
+                        if (e.target.classList.contains('toggle-tick')) {
+                            document.querySelectorAll('.toggle-tick-local').forEach(cb => cb.checked = e.target.checked);
+                        }
+                    });
+                }
+            `}} />
 
             {/* Native Print Table for Repeating Header/Footer without Overlap */}
             <table className="w-full border-collapse h-full flex-1 flex flex-col print:table print:h-auto">
@@ -345,7 +360,7 @@ export default async function AnswerSheetPage({
                         const isLast = index === sortedQuestions.length - 1;
 
                         return (
-                            <div key={q.id} className={`${bgColor} ${isLast ? 'flex-1 print:flex-none' : ''} border border-gray-200 p-6 rounded-lg print:border-none print:p-6 print:pt-8 print:pb-6 print:break-after-page print:[print-color-adjust:exact] break-inside-avoid print:break-inside-avoid`}>
+                            <div key={q.id} className={`group/question ${bgColor} ${isLast ? 'flex-1 print:flex-none' : ''} border border-gray-200 p-6 rounded-lg print:border-none print:p-6 print:pt-8 print:pb-6 print:break-after-page print:[print-color-adjust:exact] break-inside-avoid print:break-inside-avoid`}>
 
                                 {/* Question Header */}
                                 <div className="flex justify-between items-start mb-4">
@@ -369,13 +384,26 @@ export default async function AnswerSheetPage({
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-2 print:hidden">
+                                        <div className="flex items-center gap-2 border-r border-gray-300 pr-2 mr-1">
+                                            <label className="flex items-center gap-1 cursor-pointer text-[11px] text-gray-500 hover:text-gray-800" title="Show Main Explanation">
+                                                <input type="checkbox" defaultChecked className="toggle-exp-local w-3 h-3 text-blue-600 rounded border-gray-300 focus:ring-blue-500" />
+                                                <span>Exp</span>
+                                            </label>
+                                            <label className="flex items-center gap-1 cursor-pointer text-[11px] text-gray-500 hover:text-gray-800" title="Show Option Explanations">
+                                                <input type="checkbox" defaultChecked className="toggle-optexp-local w-3 h-3 text-blue-600 rounded border-gray-300 focus:ring-blue-500" />
+                                                <span>Opt Exp</span>
+                                            </label>
+                                            <label className="flex items-center gap-1 cursor-pointer text-[11px] text-gray-500 hover:text-gray-800" title="Highlight Correct Answer">
+                                                <input type="checkbox" defaultChecked className="toggle-tick-local w-3 h-3 text-blue-600 rounded border-gray-300 focus:ring-blue-500" />
+                                                <span>Ans</span>
+                                            </label>
+                                        </div>
                                         <Link href={`/${params.locale}/question/${q.slug || q.id}`} target="_blank" className="text-gray-400 hover:text-blue-500 transition-colors" title="View Question">
                                             <Eye className="w-4 h-4" />
                                         </Link>
                                         <Link href={`/${params.locale}/admin/question-bank/academic-questions/${q.id}`} target="_blank" className="text-gray-400 hover:text-emerald-500 transition-colors" title="Edit Question">
                                             <Edit className="w-4 h-4" />
                                         </Link>
-                                        <span className="text-xs font-mono bg-gray-100 px-2 py-1 rounded text-gray-600">{q.id}</span>
                                     </div>
                                 </div>
 
@@ -402,20 +430,20 @@ export default async function AnswerSheetPage({
                                                             'border-orange-100 bg-orange-50/30 print:border-orange-200 print:bg-[#fff7ed]',
                                                             'border-rose-100 bg-rose-50/30 print:border-rose-200 print:bg-[#fff1f2]'
                                                           ][oIdx % 5]
-                                                        : 'group-has-[:checked.toggle-tick]/settings:border-emerald-400 group-has-[:checked.toggle-tick]/settings:bg-emerald-50/50 group-has-[:checked.toggle-tick]/settings:print:border-emerald-500 group-has-[:checked.toggle-tick]/settings:print:bg-emerald-50 group-has-[:checked.toggle-tick]/settings:print:font-bold ' +
-                                                          'group-has-[:not(:checked).toggle-tick]/settings:border-gray-200 group-has-[:not(:checked).toggle-tick]/settings:bg-gray-50/30 group-has-[:not(:checked).toggle-tick]/settings:print:border-gray-300 group-has-[:not(:checked).toggle-tick]/settings:print:bg-white'
+                                                        : 'group-has-[:checked.toggle-tick-local]/question:border-emerald-400 group-has-[:checked.toggle-tick-local]/question:bg-emerald-50/50 group-has-[:checked.toggle-tick-local]/question:print:border-emerald-500 group-has-[:checked.toggle-tick-local]/question:print:bg-emerald-50 group-has-[:checked.toggle-tick-local]/question:print:font-bold ' +
+                                                          'group-has-[:not(:checked).toggle-tick-local]/question:border-gray-200 group-has-[:not(:checked).toggle-tick-local]/question:bg-gray-50/30 group-has-[:not(:checked).toggle-tick-local]/question:print:border-gray-300 group-has-[:not(:checked).toggle-tick-local]/question:print:bg-white'
                                                     }`}
                                             >
                                                 <div className={`shrink-0 w-8 h-8 flex items-center justify-center rounded-full text-sm font-medium border print:[print-color-adjust:exact] ${
                                                     !isCorrect 
                                                     ? 'bg-gray-50 border-gray-200 text-gray-600 print:bg-white' 
-                                                    : 'group-has-[:checked.toggle-tick]/settings:bg-emerald-500 group-has-[:checked.toggle-tick]/settings:border-emerald-500 group-has-[:checked.toggle-tick]/settings:text-white group-has-[:checked.toggle-tick]/settings:print:bg-emerald-500 ' +
-                                                      'group-has-[:not(:checked).toggle-tick]/settings:bg-gray-50 group-has-[:not(:checked).toggle-tick]/settings:border-gray-200 group-has-[:not(:checked).toggle-tick]/settings:text-gray-600 group-has-[:not(:checked).toggle-tick]/settings:print:bg-white'
+                                                    : 'group-has-[:checked.toggle-tick-local]/question:bg-emerald-500 group-has-[:checked.toggle-tick-local]/question:border-emerald-500 group-has-[:checked.toggle-tick-local]/question:text-white group-has-[:checked.toggle-tick-local]/question:print:bg-emerald-500 ' +
+                                                      'group-has-[:not(:checked).toggle-tick-local]/question:bg-gray-50 group-has-[:not(:checked).toggle-tick-local]/question:border-gray-200 group-has-[:not(:checked).toggle-tick-local]/question:text-gray-600 group-has-[:not(:checked).toggle-tick-local]/question:print:bg-white'
                                                     }`}>
                                                     {isCorrect ? (
                                                         <>
-                                                            <Check className="w-5 h-5 print:text-white hidden group-has-[:checked.toggle-tick]/settings:block" />
-                                                            <span className="group-has-[:not(:checked).toggle-tick]/settings:block hidden">{optLetter}</span>
+                                                            <Check className="w-5 h-5 print:text-white hidden group-has-[:checked.toggle-tick-local]/question:block" />
+                                                            <span className="group-has-[:not(:checked).toggle-tick-local]/question:block hidden">{optLetter}</span>
                                                         </>
                                                     ) : optLetter}
                                                 </div>
@@ -431,7 +459,7 @@ export default async function AnswerSheetPage({
 
                                 {/* Explanation */}
                                 {(q.explanation || q.optionExplanations) && (
-                                    <div className="ml-8 mt-4 bg-white/60 border border-black/5 p-5 rounded-lg print:bg-white/80 print:border-gray-200 print:p-4 print:text-[13px] print:break-inside-avoid group-has-[:not(:checked).toggle-exp]/settings:hidden">
+                                    <div className="ml-8 mt-4 bg-white/60 border border-black/5 p-5 rounded-lg print:bg-white/80 print:border-gray-200 print:p-4 print:text-[13px] print:break-inside-avoid group-has-[:not(:checked).toggle-exp-local]/question:hidden">
                                         <div className="flex items-center gap-2 mb-3">
                                             <Lightbulb className="w-5 h-5 text-yellow-500 print:text-black" />
                                             <h4 className="font-bold text-blue-900 print:text-black m-0">Explanation</h4>
@@ -447,7 +475,7 @@ export default async function AnswerSheetPage({
 
                                         {/* Option Explanations inside main Explanation block */}
                                         {q.optionExplanations && Object.keys(q.optionExplanations).length > 0 && (
-                                            <div className="space-y-3 group-has-[:not(:checked).toggle-optexp]/settings:hidden">
+                                            <div className="space-y-3 group-has-[:not(:checked).toggle-optexp-local]/question:hidden">
                                                 {q.options && [
                                                     { key: 'a', text: q.options.a },
                                                     { key: 'b', text: q.options.b },
