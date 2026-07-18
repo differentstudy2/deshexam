@@ -112,7 +112,8 @@ export default async function AnswerSheetPage({
     }
 
     return (
-        <div className="min-h-screen bg-white text-black p-8 font-sans print:p-0 print:bg-white print:text-black print:min-h-0 print:block">
+        <div className="min-h-screen bg-gray-100 text-black py-8 font-sans print:p-0 print:bg-white print:text-black print:min-h-0 print:block">
+            <div className="max-w-[1000px] mx-auto bg-white p-8 md:p-12 shadow-xl rounded-sm print:max-w-none print:mx-0 print:p-0 print:shadow-none print:rounded-none">
             <style dangerouslySetInnerHTML={{
                 __html: `
                 @media print {
@@ -197,6 +198,31 @@ export default async function AnswerSheetPage({
                     <div className="flex items-end gap-2 w-1/3">
                         <span className="text-gray-700">Roll:</span>
                         <div className="flex-1 border-b border-dashed border-gray-400"></div>
+                    </div>
+                </div>
+
+                {/* General Instructions Box */}
+                <div className="mt-12 border border-gray-400 p-6 rounded-lg text-sm bg-gray-50/50 print:bg-white print:border-gray-500">
+                    <h3 className="font-bold text-center text-lg mb-4 underline uppercase tracking-wider">General Instructions</h3>
+                    <ol className="list-decimal pl-6 space-y-3 text-gray-800">
+                        <li><strong>Read carefully:</strong> Before starting the examination, read all the instructions given on this page and the OMR answer sheet.</li>
+                        <li><strong>OMR Sheet:</strong> Use only a Black/Blue ballpoint pen to darken the circles. Do not use pencil.</li>
+                        <li><strong>Filling the OMR:</strong> Darken the circle completely and properly. A lightly or faintly darkened circle may not be evaluated.</li>
+                        <li><strong>No changes:</strong> Once an answer is marked, it cannot be changed. Do not use white fluid, eraser, or blade on the OMR sheet.</li>
+                        <li><strong>Negative Marking:</strong> There is no negative marking for incorrect answers (unless specified otherwise). Attempting all questions is recommended.</li>
+                        <li><strong>Rough Work:</strong> Do all rough work only in the space provided at the end of this booklet. Do not write anything on the OMR sheet other than the required details.</li>
+                        <li><strong>Electronic Devices:</strong> Use of calculators, smartwatches, and mobile phones is strictly prohibited inside the examination hall.</li>
+                        <li><strong>Submission:</strong> Hand over the OMR sheet to the invigilator before leaving the examination hall. You may retain the question paper.</li>
+                    </ol>
+                    <div className="mt-10 pt-4 border-t border-gray-300 flex justify-between items-end font-bold text-gray-700">
+                        <div className="text-center">
+                            <div className="border-b border-dashed border-gray-500 w-48 mb-1 h-8"></div>
+                            <span>Candidate's Signature</span>
+                        </div>
+                        <div className="text-center">
+                            <div className="border-b border-dashed border-gray-500 w-48 mb-1 h-8"></div>
+                            <span>Invigilator's Signature</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -363,6 +389,7 @@ export default async function AnswerSheetPage({
                         )
                     })
                 )}
+            </div>
             </div>
 
             {/* Print Button Header for Screen only */}
