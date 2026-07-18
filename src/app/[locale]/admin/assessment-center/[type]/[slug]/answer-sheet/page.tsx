@@ -287,14 +287,20 @@ export default async function AnswerSheetPage({
                     }
                     html[data-layout="presentation"] .group\/question {
                         height: 100vh !important;
+                        min-height: 100vh !important;
+                        padding-top: 12rem !important;
+                        padding-bottom: 8rem !important;
+                        padding-left: 10rem !important;
+                        padding-right: 10rem !important;
+                        justify-content: center !important;
                         page-break-after: always !important;
                         break-after: page !important;
                     }
                     html[data-layout="presentation"] .presentation-footer {
                         position: absolute !important;
                         bottom: 2rem !important;
-                        left: 0 !important;
-                        right: 0 !important;
+                        left: 10rem !important;
+                        right: 10rem !important;
                         margin-top: 0 !important;
                     }
                 }
@@ -312,7 +318,7 @@ export default async function AnswerSheetPage({
                 html[data-layout="presentation"] .explanation-block {
                     display: none !important;
                 }
-                html[data-layout="presentation"] .group\/settings {
+                html[data-layout="presentation"] .group\\/settings {
                     padding: 0 !important;
                     margin: 0 !important;
                 }
@@ -331,15 +337,15 @@ export default async function AnswerSheetPage({
                 html[data-layout="presentation"] .presentation-footer {
                     display: flex !important;
                 }
-                html[data-layout="presentation"] .group\/question {
+                html[data-layout="presentation"] .group\\/question {
                     height: 100vh;
                     display: flex !important;
                     flex-direction: column;
-                    justify-content: center;
-                    padding-top: 12rem !important;
-                    padding-bottom: 8rem !important;
-                    padding-left: 10rem !important;
-                    padding-right: 10rem !important;
+                    justify-content: flex-start;
+                    padding-top: 8rem !important;
+                    padding-bottom: 6rem !important;
+                    padding-left: 8rem !important;
+                    padding-right: 8rem !important;
                     border: none !important;
                     border-radius: 0 !important;
                     page: presentation-page;
@@ -561,7 +567,24 @@ export default async function AnswerSheetPage({
                                                 const isLast = index === sortedQuestions.length - 1;
 
                                                 return (
-                                                    <div key={q.id} className={`group/question ${bgColor} ${isLast ? 'flex-1 print:flex-none' : ''} border border-gray-200 p-6 rounded-lg print:border-none print:p-6 print:pt-8 print:pb-6 print:break-after-page print:[print-color-adjust:exact] break-inside-avoid print:break-inside-avoid flex flex-col`}>
+                                                    <div key={q.id} className={`group/question ${bgColor} ${isLast ? 'flex-1 print:flex-none' : ''} border border-gray-200 p-6 rounded-lg print:border-none print:p-6 print:pt-8 print:pb-6 print:break-after-page print:[print-color-adjust:exact] break-inside-avoid print:break-inside-avoid flex flex-col relative`}>
+
+                                                        {/* Presentation Header */}
+                                                        <div className="presentation-header hidden absolute top-0 left-0 right-0 bg-[#eef6ff] py-3 px-10 justify-between items-center w-full print:[print-color-adjust:exact] [html[data-layout='presentation']_&]:flex">
+                                                            <div className="flex items-center gap-3">
+                                                                <img src="/image/logo.png" alt="DeshExam" className="h-6 w-auto object-contain" />
+                                                                <div className="font-bold text-[18px] text-[#1e4b85] tracking-tight">DeshExam</div>
+                                                            </div>
+                                                            <div className="text-right">
+                                                                <div className="font-semibold text-[14px] text-[#1e4b85]">{classLine}</div>
+                                                                {[chapterName, topicName].some(Boolean) && (
+                                                                    <div className="text-[12px] text-[#1e4b85]/90 mt-0.5">
+                                                                        {[chapterName, topicName].filter(Boolean).join(' | ')}
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </div>
+
 
                                                         {/* Question Header */}
                                                         <div className="flex justify-between items-start mb-4">
