@@ -177,7 +177,7 @@ export default async function AnswerSheetPage({
 
                         {/* Options Styling */}
                         <div className="pt-5 border-t border-gray-100">
-                            <span className="text-gray-900 font-bold block mb-3 text-sm">Options & Explanations Style</span>
+                            <span className="text-gray-900 font-bold block mb-3 text-sm">Options Style</span>
                             <div className="space-y-4">
                                 <div>
                                     <label className="text-xs text-gray-500 mb-1 block">Font Size</label>
@@ -186,6 +186,26 @@ export default async function AnswerSheetPage({
                                 <div>
                                     <label className="text-xs text-gray-500 mb-1 block">Font Family</label>
                                     <select defaultValue="" className="input-font-opt w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                                        <option value="">Default (System)</option>
+                                        <option value="'Kalpurush', sans-serif">Kalpurush</option>
+                                        <option value="'SolaimanLipi', sans-serif">SolaimanLipi</option>
+                                        <option value="Arial, sans-serif">Arial</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Explanations Styling */}
+                        <div className="pt-5 border-t border-gray-100">
+                            <span className="text-gray-900 font-bold block mb-3 text-sm">Explanations Style</span>
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="text-xs text-gray-500 mb-1 block">Font Size</label>
+                                    <input type="range" min="12" max="28" defaultValue="14" className="input-fs-exp w-full accent-blue-600" />
+                                </div>
+                                <div>
+                                    <label className="text-xs text-gray-500 mb-1 block">Font Family</label>
+                                    <select defaultValue="" className="input-font-exp w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
                                         <option value="">Default (System)</option>
                                         <option value="'Kalpurush', sans-serif">Kalpurush</option>
                                         <option value="'SolaimanLipi', sans-serif">SolaimanLipi</option>
@@ -207,16 +227,37 @@ export default async function AnswerSheetPage({
                     --fs-q: 22px;
                     --font-opt: inherit;
                     --fs-opt: 16px;
+                    --font-exp: inherit;
+                    --fs-exp: 14px;
                 }
                 .print-q-text p, .print-q-text li, .print-q-num {
                     font-family: var(--font-q) !important;
                     font-size: var(--fs-q) !important;
                     line-height: 1.5 !important;
                 }
-                .print-opt-text p, .print-opt-text li, .print-exp-text p, .print-exp-text li, .print-exp-text span {
+                .print-opt-text p, .print-opt-text li {
                     font-family: var(--font-opt) !important;
                     font-size: var(--fs-opt) !important;
                     line-height: 1.5 !important;
+                }
+                .print-exp-text p, .print-exp-text li, .print-exp-text span {
+                    font-family: var(--font-exp) !important;
+                    font-size: var(--fs-exp) !important;
+                    line-height: 1.5 !important;
+                }
+                .custom-scrollbar::-webkit-scrollbar {
+                    width: 6px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-track {
+                    background: #f1f1f1;
+                    border-radius: 4px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-thumb {
+                    background: #c1c1c1;
+                    border-radius: 4px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                    background: #a8a8a8;
                 }
                 @media print {
                     @page { margin: 0; }
@@ -240,6 +281,9 @@ export default async function AnswerSheetPage({
                         if (e.target.classList.contains('input-font-opt')) {
                             document.documentElement.style.setProperty('--font-opt', e.target.value || 'inherit');
                         }
+                        if (e.target.classList.contains('input-font-exp')) {
+                            document.documentElement.style.setProperty('--font-exp', e.target.value || 'inherit');
+                        }
                     });
                     window.addEventListener('input', function(e) {
                         if (e.target.classList.contains('input-fs-q')) {
@@ -247,6 +291,9 @@ export default async function AnswerSheetPage({
                         }
                         if (e.target.classList.contains('input-fs-opt')) {
                             document.documentElement.style.setProperty('--fs-opt', e.target.value + 'px');
+                        }
+                        if (e.target.classList.contains('input-fs-exp')) {
+                            document.documentElement.style.setProperty('--fs-exp', e.target.value + 'px');
                         }
                     });
                 }
