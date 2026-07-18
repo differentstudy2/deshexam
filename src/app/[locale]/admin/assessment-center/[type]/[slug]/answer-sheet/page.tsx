@@ -324,6 +324,10 @@ export default async function AnswerSheetPage({
                 html[data-layout="presentation"] .print-q-num {
                     display: none !important;
                 }
+                html[data-layout="presentation"] .presentation-header,
+                html[data-layout="presentation"] .presentation-footer {
+                    display: flex !important;
+                }
                 html[data-layout="presentation"] .options-container {
                     display: grid !important;
                     grid-template-columns: 1fr 1fr !important;
@@ -393,13 +397,13 @@ export default async function AnswerSheetPage({
                         </td>
                     </tr>
                 </thead>
-                <tfoot className="hidden print:table-footer-group w-full bg-white z-50 group-has-[:not(:checked).toggle-footer]/settings:print:!hidden [html[data-layout='presentation']_&]:!hidden">
-                    <tr>
-                        <td className="border-t border-blue-200 p-0 bg-white">
-                            <div className="bg-[#eef6ff] text-[#1e4b85] py-2.5 px-12 flex justify-between items-center w-full print:[print-color-adjust:exact]">
-                                <div className="font-semibold text-[14px]">&copy; DeshExam</div>
-                                <div className="font-bold text-[15px]">India's Smart Learning Platform</div>
-                                <div className="font-semibold text-[14px]">www.deshexam.in</div>
+                <tfoot className="hidden print:table-footer-group w-full bg-white z-50 group-has-[:not(:checked).toggle-footer]/settings:print:!hidden [html[data-layout='presentation']_&]:!block [html[data-layout='presentation']_&]:fixed [html[data-layout='presentation']_&]:bottom-0 [html[data-layout='presentation']_&]:left-0 [html[data-layout='presentation']_&]:right-0 [html[data-layout='presentation']_&]:bg-[#eef6ff]">
+                    <tr className="[html[data-layout='presentation']_&]:block">
+                        <td className="border-t border-blue-200 p-0 bg-white [html[data-layout='presentation']_&]:block [html[data-layout='presentation']_&]:bg-[#eef6ff]">
+                            <div className="bg-[#eef6ff] text-[#1e4b85] py-2.5 px-12 flex justify-between items-center w-full print:[print-color-adjust:exact] [html[data-layout='presentation']_&]:py-4 [html[data-layout='presentation']_&]:px-8">
+                                <div className="font-semibold text-[14px] [html[data-layout='presentation']_&]:text-[20px]">&copy; DeshExam</div>
+                                <div className="font-bold text-[15px] [html[data-layout='presentation']_&]:text-[20px]">India's Smart Learning Platform</div>
+                                <div className="font-semibold text-[14px] [html[data-layout='presentation']_&]:text-[20px]">www.deshexam.in</div>
                             </div>
                         </td>
                     </tr>
@@ -531,40 +535,41 @@ export default async function AnswerSheetPage({
                         return (
                             <div key={q.id} className={`group/question ${bgColor} ${isLast ? 'flex-1 print:flex-none' : ''} border border-gray-200 p-6 rounded-lg print:border-none print:p-6 print:pt-8 print:pb-6 print:break-after-page print:[print-color-adjust:exact] break-inside-avoid print:break-inside-avoid relative`}>
 
-                                {/* Presentation Header (Hidden by default) */}
-                                <div className="presentation-header hidden w-full absolute top-0 left-0 right-0 justify-between items-center px-12 pt-10 z-10">
-                                    <div className="flex items-center gap-3">
+                                {/* Presentation Header (Hidden by default, shown via CSS in presentation mode) */}
+                                <div className="presentation-header hidden w-full absolute top-0 left-0 right-0 justify-between items-start px-12 pt-10 z-10">
+                                    {/* Left: Logo */}
+                                    <div className="flex items-center gap-3 w-1/3">
                                         <img src="/image/logo.png" alt="DeshExam" className="h-10 w-auto object-contain" />
                                         <div className="font-bold text-[24px] text-[#1e4b85] tracking-tight">DeshExam</div>
                                     </div>
-                                    <div className="bg-blue-600 text-white px-8 py-2.5 rounded-full font-bold text-lg shadow-sm">MOCK TEST</div>
-                                    <div className="text-2xl font-bold text-gray-800">Page {String(index + 1).padStart(2, '0')}</div>
-                                </div>
 
-                                {/* Presentation Top Badges */}
-                                <div className="presentation-badges hidden w-full justify-end gap-3 z-10 mb-6">
-                                    {(q.sourceExam || (q.tags && q.tags.length > 0)) && (
-                                        <div className="bg-blue-50 text-blue-700 px-4 py-1.5 rounded border border-blue-200 font-medium flex items-center gap-2 shadow-sm text-sm">
-                                            <span className="w-3 h-4 bg-blue-500 inline-block rounded-sm"></span>
-                                            {q.sourceExam || (q.tags && q.tags[0]) || 'History'}
+                                    {/* Center: Mock Test & Badges */}
+                                    <div className="flex flex-col items-center gap-4 w-1/3">
+                                        <div className="bg-blue-600 text-white px-8 py-2.5 rounded-full font-bold text-lg shadow-sm">MOCK TEST</div>
+                                        
+                                        {/* Badges */}
+                                        <div className="flex justify-center gap-3 w-full">
+                                            <div className="bg-amber-50 text-amber-700 px-4 py-1.5 rounded border border-amber-200 font-medium flex items-center gap-2 shadow-sm text-sm">
+                                                <div className="flex items-end gap-0.5 h-4">
+                                                    <span className="w-1.5 h-2 bg-amber-300 inline-block rounded-sm"></span>
+                                                    <span className="w-1.5 h-3 bg-amber-400 inline-block rounded-sm"></span>
+                                                    <span className="w-1.5 h-4 bg-amber-500 inline-block rounded-sm"></span>
+                                                </div>
+                                                {q.difficulty || 'Easy'}
+                                            </div>
+                                            <div className="bg-gray-50 text-gray-700 px-4 py-1.5 rounded border border-gray-200 font-medium flex items-center gap-2 shadow-sm text-sm">
+                                                <span className="w-4 h-3 bg-gray-400 inline-block rounded-sm relative"><span className="absolute w-2 h-4 bg-gray-500 left-1 -top-0.5 rounded-sm"></span></span>
+                                                Module 1
+                                            </div>
+                                            <div className="bg-gray-100 text-gray-800 px-4 py-1.5 rounded-full border border-gray-300 font-bold flex items-center gap-2 shadow-sm text-sm">
+                                                <span className="w-4 h-4 rounded-full bg-gray-400 text-white flex items-center justify-center text-[10px]">?</span>
+                                                Question {String(index + 1).padStart(2, '0')} / {sortedQuestions.length}
+                                            </div>
                                         </div>
-                                    )}
-                                    <div className="bg-amber-50 text-amber-700 px-4 py-1.5 rounded border border-amber-200 font-medium flex items-center gap-2 shadow-sm text-sm">
-                                        <div className="flex items-end gap-0.5 h-4">
-                                            <span className="w-1.5 h-2 bg-amber-300 inline-block rounded-sm"></span>
-                                            <span className="w-1.5 h-3 bg-amber-400 inline-block rounded-sm"></span>
-                                            <span className="w-1.5 h-4 bg-amber-500 inline-block rounded-sm"></span>
-                                        </div>
-                                        {q.difficulty || 'Hard'}
                                     </div>
-                                    <div className="bg-gray-50 text-gray-700 px-4 py-1.5 rounded border border-gray-200 font-medium flex items-center gap-2 shadow-sm text-sm">
-                                        <span className="w-4 h-3 bg-gray-400 inline-block rounded-sm relative"><span className="absolute w-2 h-4 bg-gray-500 left-1 -top-0.5 rounded-sm"></span></span>
-                                        {test.subject || 'Module 1'}
-                                    </div>
-                                    <div className="bg-gray-100 text-gray-800 px-4 py-1.5 rounded-full border border-gray-300 font-bold flex items-center gap-2 shadow-sm text-sm">
-                                        <span className="w-4 h-4 rounded-full bg-gray-400 text-white flex items-center justify-center text-[10px]">?</span>
-                                        Question {String(index + 1).padStart(2, '0')} / {sortedQuestions.length}
-                                    </div>
+
+                                    {/* Right: Page Number */}
+                                    <div className="text-3xl font-black text-gray-800 w-1/3 text-right pt-2">Page {String(index + 1).padStart(2, '0')}</div>
                                 </div>
 
                                 {/* Presentation Footer */}
