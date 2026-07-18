@@ -12,7 +12,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
 import 'katex/dist/katex.min.css';
-import { Lightbulb, CheckCircle2, XCircle, Check, Edit, Eye } from 'lucide-react';
+import { Lightbulb, CheckCircle2, XCircle, Check, Edit, Eye, Settings } from 'lucide-react';
 import Link from 'next/link';
 import PrintButton from './PrintButton';
 import { QRCodeSVG } from 'qrcode.react';
@@ -113,8 +113,29 @@ export default async function AnswerSheetPage({
 
     return (
         <div className="min-h-screen bg-gray-100 text-black py-8 font-sans print:p-0 print:bg-white print:text-black print:min-h-0 print:block">
-            <div className="max-w-[1000px] mx-auto bg-white p-8 md:p-12 shadow-xl rounded-sm print:max-w-none print:mx-0 print:p-0 print:shadow-none print:rounded-none">
-            <style dangerouslySetInnerHTML={{
+            <div className="max-w-[1000px] mx-auto bg-white p-8 md:p-12 pb-32 md:pb-32 shadow-xl rounded-sm print:max-w-none print:mx-0 print:p-0 print:pb-32 print:shadow-none print:rounded-none group/settings relative min-h-[1056px]">
+                
+                {/* Settings Controls (Screen Only) */}
+                <div className="print:hidden mb-8 bg-blue-50/30 border border-blue-100 p-4 rounded-lg shadow-sm flex flex-wrap gap-x-8 gap-y-3 items-center">
+                    <div className="flex items-center gap-2 text-blue-800 font-bold">
+                        <Settings className="w-5 h-5" />
+                        <span>Display Settings</span>
+                    </div>
+                    <label className="flex items-center gap-2 cursor-pointer select-none text-gray-700 font-medium">
+                        <input type="checkbox" defaultChecked className="toggle-exp w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500" />
+                        <span>Main Explanations</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer select-none text-gray-700 font-medium">
+                        <input type="checkbox" defaultChecked className="toggle-optexp w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500" />
+                        <span>Option Explanations</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer select-none text-gray-700 font-medium">
+                        <input type="checkbox" defaultChecked className="toggle-tick w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500" />
+                        <span>Correct Answer Highlight</span>
+                    </label>
+                </div>
+
+                <style dangerouslySetInnerHTML={{
                 __html: `
                 @media print {
                     @page { margin: 0; }
@@ -292,20 +313,30 @@ export default async function AnswerSheetPage({
                                         return (
                                             <div
                                                 key={opt.key}
-                                                className={`flex items-center gap-3 p-3 rounded-full border print:[print-color-adjust:exact] ${isCorrect
-                                                        ? 'border-emerald-400 bg-emerald-50/50 print:border-emerald-500 print:bg-emerald-50 print:font-bold'
-                                                        : [
+                                                className={`flex items-center gap-3 p-3 rounded-full border print:[print-color-adjust:exact] ${!isCorrect
+                                                        ? [
                                                             'border-blue-100 bg-blue-50/30 print:border-blue-200 print:bg-[#f0f7ff]',
                                                             'border-teal-100 bg-teal-50/30 print:border-teal-200 print:bg-[#f0fdfa]',
                                                             'border-purple-100 bg-purple-50/30 print:border-purple-200 print:bg-[#faf5ff]',
                                                             'border-orange-100 bg-orange-50/30 print:border-orange-200 print:bg-[#fff7ed]',
                                                             'border-rose-100 bg-rose-50/30 print:border-rose-200 print:bg-[#fff1f2]'
-                                                        ][oIdx % 5]
+                                                          ][oIdx % 5]
+                                                        : 'group-has-[:checked.toggle-tick]/settings:border-emerald-400 group-has-[:checked.toggle-tick]/settings:bg-emerald-50/50 group-has-[:checked.toggle-tick]/settings:print:border-emerald-500 group-has-[:checked.toggle-tick]/settings:print:bg-emerald-50 group-has-[:checked.toggle-tick]/settings:print:font-bold ' +
+                                                          'group-has-[:not(:checked).toggle-tick]/settings:border-gray-200 group-has-[:not(:checked).toggle-tick]/settings:bg-gray-50/30 group-has-[:not(:checked).toggle-tick]/settings:print:border-gray-300 group-has-[:not(:checked).toggle-tick]/settings:print:bg-white'
                                                     }`}
                                             >
-                                                <div className={`shrink-0 w-8 h-8 flex items-center justify-center rounded-full text-sm font-medium border print:[print-color-adjust:exact] ${isCorrect ? 'bg-emerald-500 border-emerald-500 text-white print:bg-emerald-500 print:border-emerald-500' : 'bg-gray-50 border-gray-200 text-gray-600 print:bg-white'
+                                                <div className={`shrink-0 w-8 h-8 flex items-center justify-center rounded-full text-sm font-medium border print:[print-color-adjust:exact] ${
+                                                    !isCorrect 
+                                                    ? 'bg-gray-50 border-gray-200 text-gray-600 print:bg-white' 
+                                                    : 'group-has-[:checked.toggle-tick]/settings:bg-emerald-500 group-has-[:checked.toggle-tick]/settings:border-emerald-500 group-has-[:checked.toggle-tick]/settings:text-white group-has-[:checked.toggle-tick]/settings:print:bg-emerald-500 ' +
+                                                      'group-has-[:not(:checked).toggle-tick]/settings:bg-gray-50 group-has-[:not(:checked).toggle-tick]/settings:border-gray-200 group-has-[:not(:checked).toggle-tick]/settings:text-gray-600 group-has-[:not(:checked).toggle-tick]/settings:print:bg-white'
                                                     }`}>
-                                                    {isCorrect ? <Check className="w-5 h-5 print:text-white" /> : optLetter}
+                                                    {isCorrect ? (
+                                                        <>
+                                                            <Check className="w-5 h-5 print:text-white hidden group-has-[:checked.toggle-tick]/settings:block" />
+                                                            <span className="group-has-[:not(:checked).toggle-tick]/settings:block hidden">{optLetter}</span>
+                                                        </>
+                                                    ) : optLetter}
                                                 </div>
                                                 <div className="prose prose-sm max-w-none text-gray-700 [&>p]:m-0 w-full">
                                                     <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeRaw]}>
@@ -319,7 +350,7 @@ export default async function AnswerSheetPage({
 
                                 {/* Explanation */}
                                 {(q.explanation || q.optionExplanations) && (
-                                    <div className="ml-8 mt-4 bg-white/60 border border-black/5 p-5 rounded-lg print:bg-white/80 print:border-gray-200 print:p-4 print:text-[13px] print:break-inside-avoid">
+                                    <div className="ml-8 mt-4 bg-white/60 border border-black/5 p-5 rounded-lg print:bg-white/80 print:border-gray-200 print:p-4 print:text-[13px] print:break-inside-avoid group-has-[:not(:checked).toggle-exp]/settings:hidden">
                                         <div className="flex items-center gap-2 mb-3">
                                             <Lightbulb className="w-5 h-5 text-yellow-500 print:text-black" />
                                             <h4 className="font-bold text-blue-900 print:text-black m-0">Explanation</h4>
@@ -335,7 +366,7 @@ export default async function AnswerSheetPage({
 
                                         {/* Option Explanations inside main Explanation block */}
                                         {q.optionExplanations && Object.keys(q.optionExplanations).length > 0 && (
-                                            <div className="space-y-3">
+                                            <div className="space-y-3 group-has-[:not(:checked).toggle-optexp]/settings:hidden">
                                                 {q.options && [
                                                     { key: 'a', text: q.options.a },
                                                     { key: 'b', text: q.options.b },
@@ -390,6 +421,19 @@ export default async function AnswerSheetPage({
                     })
                 )}
             </div>
+
+            {/* Footer */}
+            <div className="w-full mt-12 pt-4 border-t border-gray-300 print:fixed print:bottom-0 print:left-0 print:w-full print:bg-white print:z-50 print:[print-color-adjust:exact] print:mt-0 print:pt-2">
+                <div className="flex justify-between items-center text-[14px] font-semibold text-gray-800 px-8 md:px-12 print:px-12 mb-2">
+                    <div>&copy; DeshExam</div>
+                    <div>www.deshexam.in</div>
+                    <div className="print:hidden">Page 01</div>
+                </div>
+                <div className="bg-[#eef6ff] text-[#1e4b85] text-center py-2.5 font-bold text-[15px] w-full">
+                    India's Smart Learning Platform
+                </div>
+            </div>
+            
             </div>
 
             {/* Print Button Header for Screen only */}
