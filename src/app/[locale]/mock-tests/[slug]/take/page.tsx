@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   }
 
   const title = `${formatTitleForBrowser(test.title)} | Live Exam | DeshExam`;
-  const description = test.shortDescription || `Take the ${test.title} mock test live on DeshExam Academy.`;
+  const description = test.seoDescription || `Take the ${test.title} mock test live on DeshExam Academy.`;
   const imageUrl = test.thumbnail || "https://deshexam.com/og/mock-tests.jpg";
 
   return {
