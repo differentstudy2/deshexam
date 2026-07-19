@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
 import { QuestionBankEntry } from '@/lib/question-bank-types';
 import { useAuth } from '@/hooks/use-auth';
+import { useAuthDialog } from '@/hooks/use-auth-dialog';
 import { getUserProfile } from '@/lib/firebase/firestore';
 import { saveExamAttempt, getUserExamAttemptsCount } from '@/lib/firebase/student-analytics';
 
@@ -47,6 +48,7 @@ const shuffleArray = <T,>(array: T[]): T[] => {
 export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
+  const { openAuthDialog } = useAuthDialog();
 
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
@@ -461,7 +463,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
           <p className="text-slate-500 dark:text-slate-400 mb-8 leading-relaxed transition-colors">
             You must be logged in to your account to take this mock test.
           </p>
-          <Button onClick={() => router.replace(`/auth`)} className="w-full h-12 text-[15px] font-semibold rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-colors">
+          <Button onClick={() => openAuthDialog()} className="w-full h-12 text-[15px] font-semibold rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-colors">
             Log In or Sign Up
           </Button>
         </div>
