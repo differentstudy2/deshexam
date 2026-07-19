@@ -424,7 +424,7 @@ export function TaxonomyDataTable({ type, title }: Props) {
     }
   };
 
-  const getParentContext = (node: TaxonomyNode) => {
+  function getParentContext(node: TaxonomyNode) {
     if (!node.parentId) return null;
     let current = node;
     const path: TaxonomyNode[] = [];
@@ -436,7 +436,7 @@ export function TaxonomyDataTable({ type, title }: Props) {
     }
     
     return path.map(p => p.type === 'board' && p.acronym ? p.acronym : p.title).join(' > ');
-  };
+  }
 
   return (
     <div className="max-w-6xl mx-auto p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6">
