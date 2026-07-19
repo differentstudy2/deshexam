@@ -17,7 +17,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { updateTaxonomyNode, generateSlug, deleteTaxonomyNode } from '@/lib/firebase/taxonomy';
+import { updateTaxonomyNode, generateSlug, deleteTaxonomyNode, getTaxonomyNodesByParent, getTaxonomyNodesByTrack } from '@/lib/firebase/taxonomy';
 
 const INSTITUTION_TYPES = [
   'Public School', 'Private School', 'Government School', 'Govt. Aided School',
@@ -79,6 +79,55 @@ export function TaxonomyDataTable({ type, title }: Props) {
   const [editForm, setEditForm] = useState({ title: '', slug: '', subjectCode: '' });
   const [isSaving, setIsSaving] = useState(false);
 
+  // Merge Duplicates State
+  const [isMergeModalOpen, setIsMergeModalOpen] = useState(false);
+  const [duplicateGroups, setDuplicateGroups] = useState<{title: string, parentId: string|null, nodes: TaxonomyNode[]}[]>([]);
+  const [mergingGroupId, setMergingGroupId] = useState<string | null>(null);
+
+  const findDuplicates = () => {
+    const groups: Record<string, TaxonomyNode[]> = {};
+    nodes.forEach(node => {
+      const key = `${node.title.trim().toLowerCase()}_${node.parentId || 'root'}`;
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(node);
+    });
+    
+    const duplicates = Object.values(groups).filter(group => group.length > 1).map(group => ({
+      title: group[0].title,
+      parentId: group[0].parentId,
+      nodes: group
+    }));
+    
+    setDuplicateGroups(duplicates);
+    setIsMergeModalOpen(true);
+  };
+
+  const handleMergeGroup = async (group: {title: string, parentId: string|null, nodes: TaxonomyNode[]}) => {
+    const key = `${group.title}_${group.parentId}`;
+    setMergingGroupId(key);
+    try {
+      const primaryNode = group.nodes[0];
+      const duplicateNodes = group.nodes.slice(1);
+      
+      for (const dup of duplicateNodes) {
+        const children = await getTaxonomyNodesByParent(dup.id);
+        for (const child of children) {
+          await updateTaxonomyNode(child.id, { parentId: primaryNode.id });
+        }
+        await deleteTaxonomyNode(dup.id);
+      }
+      
+      setDuplicateGroups(prev => prev.filter(g => g !== group));
+      fetchData();
+      
+    } catch(e) {
+      console.error(e);
+      alert("Failed to merge");
+    } finally {
+      setMergingGroupId(null);
+    }
+  };
+
   useEffect(() => {
     fetchData();
   }, [type]);
@@ -87,7 +136,6 @@ export function TaxonomyDataTable({ type, title }: Props) {
     setLoading(true);
     try {
       // Fetch all to resolve parent hierarchies easily
-      const { getTaxonomyNodesByTrack } = await import('@/lib/firebase/taxonomy');
       const data = await getTaxonomyNodesByTrack('academic');
       setAllNodes(data);
       setNodes(data.filter(n => n.type === type));
@@ -416,6 +464,9 @@ export function TaxonomyDataTable({ type, title }: Props) {
                 <PlusCircle className="w-4 h-4 mr-2" /> Add New
               </Button>
             )}
+            <Button onClick={findDuplicates} variant="outline" className="h-10 px-4 border-indigo-200 text-indigo-700 hover:bg-indigo-50 transition-all rounded-lg">
+              <RefreshCw className="w-4 h-4 mr-2" /> Merge Duplicates
+            </Button>
           </div>
         </div>
       </div>
@@ -1105,6 +1156,42 @@ export function TaxonomyDataTable({ type, title }: Props) {
             <Button onClick={handleSaveAdd} disabled={!addForm.title || isSaving} className="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 text-white">
               {isSaving ? 'Adding...' : 'Add Item'}
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Merge Duplicates Modal */}
+      <Dialog open={isMergeModalOpen} onOpenChange={setIsMergeModalOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Merge Duplicates</DialogTitle>
+          </DialogHeader>
+          <div className="py-4 space-y-4">
+            {duplicateGroups.length === 0 ? (
+              <div className="text-center py-8 text-slate-500">No duplicates found! All good.</div>
+            ) : (
+              duplicateGroups.map((group, index) => {
+                const key = `${group.title}_${group.parentId}`;
+                const isMerging = mergingGroupId === key;
+                return (
+                  <div key={index} className="border border-slate-200 rounded-lg p-4 flex justify-between items-center bg-slate-50">
+                    <div>
+                      <h4 className="font-bold text-slate-800">{group.title}</h4>
+                      <p className="text-xs text-slate-500 mt-1">Found {group.nodes.length} duplicates.</p>
+                      {group.parentId && (
+                        <p className="text-xs text-indigo-600 mt-1">Parent: {allNodes.find(n => n.id === group.parentId)?.title || group.parentId}</p>
+                      )}
+                    </div>
+                    <Button onClick={() => handleMergeGroup(group)} disabled={isMerging} variant={isMerging ? "secondary" : "default"}>
+                      {isMerging ? 'Merging...' : 'Merge Group'}
+                    </Button>
+                  </div>
+                );
+              })
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsMergeModalOpen(false)}>Close</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

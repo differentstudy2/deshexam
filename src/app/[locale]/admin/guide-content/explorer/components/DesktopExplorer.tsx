@@ -407,6 +407,8 @@ export function DesktopExplorer({ className }: { className?: string }) {
     }
   }, [classes, activeBoardId]);
 
+  const [activeParentIds, setActiveParentIds] = useState<Set<string>>(new Set());
+
   const fetchRootAndStats = async () => {
     setLoading(true);
     try {
@@ -414,6 +416,9 @@ export function DesktopExplorer({ className }: { className?: string }) {
       
       const boards = allNodes.filter(n => n.type === 'board');
       setClasses(boards);
+      
+      const parents = new Set(allNodes.map(n => n.parentId).filter(Boolean) as string[]);
+      setActiveParentIds(parents);
 
       setStats({
         boards: boards.length,
@@ -650,7 +655,14 @@ export function DesktopExplorer({ className }: { className?: string }) {
     }
   };
 
-  const filteredClasses = classes.filter(c => (c.title || c.name || '').toLowerCase().includes(searchQuery.toLowerCase()));
+  const [hideEmpty, setHideEmpty] = useState(false);
+
+  const filteredClasses = classes.filter(c => {
+    const matchesSearch = (c.title || c.name || '').toLowerCase().includes(searchQuery.toLowerCase());
+    const isNotEmpty = activeParentIds.has(c.id);
+    if (hideEmpty && !isNotEmpty) return false;
+    return matchesSearch;
+  });
 
   return (
     <div className={`space-y-6 max-w-7xl mx-auto p-4 md:p-6 ${className || ''}`}>
@@ -680,8 +692,8 @@ export function DesktopExplorer({ className }: { className?: string }) {
         <div className="lg:col-span-3 space-y-4">
           
           <div className="flex-1 max-w-5xl mx-auto w-full flex flex-col gap-4 mt-6 pb-20">
-            <div className="flex items-center gap-2">
-              <div className="relative flex-1">
+            <div className="flex flex-col sm:flex-row items-center gap-3">
+              <div className="relative flex-1 w-full">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <Input 
                   placeholder="Search Boards..." 
@@ -690,23 +702,29 @@ export function DesktopExplorer({ className }: { className?: string }) {
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
-              <div className="flex bg-white rounded-xl shadow-sm border border-gray-200 p-1">
-                <Button 
-                  variant={viewMode === 'grid' ? 'secondary' : 'ghost'} 
-                  size="icon" 
-                  onClick={() => setViewMode('grid')}
-                  className={viewMode === 'grid' ? 'bg-slate-100' : ''}
-                >
-                  <LayoutGrid className="w-5 h-5 text-slate-600" />
-                </Button>
-                <Button 
-                  variant={viewMode === 'list' ? 'secondary' : 'ghost'} 
-                  size="icon" 
-                  onClick={() => setViewMode('list')}
-                  className={viewMode === 'list' ? 'bg-slate-100' : ''}
-                >
-                  <List className="w-5 h-5 text-slate-600" />
-                </Button>
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <div className="flex items-center gap-2 bg-white px-3 h-12 rounded-xl shadow-sm border border-gray-200 cursor-pointer" onClick={() => setHideEmpty(!hideEmpty)}>
+                  <Checkbox checked={hideEmpty} onCheckedChange={(c) => setHideEmpty(!!c)} />
+                  <Label className="text-sm font-medium text-slate-600 cursor-pointer">Hide Empty</Label>
+                </div>
+                <div className="flex bg-white rounded-xl shadow-sm border border-gray-200 p-1 h-12 items-center">
+                  <Button 
+                    variant={viewMode === 'grid' ? 'secondary' : 'ghost'} 
+                    size="icon" 
+                    onClick={() => setViewMode('grid')}
+                    className={viewMode === 'grid' ? 'bg-slate-100' : ''}
+                  >
+                    <LayoutGrid className="w-5 h-5 text-slate-600" />
+                  </Button>
+                  <Button 
+                    variant={viewMode === 'list' ? 'secondary' : 'ghost'} 
+                    size="icon" 
+                    onClick={() => setViewMode('list')}
+                    className={viewMode === 'list' ? 'bg-slate-100' : ''}
+                  >
+                    <List className="w-5 h-5 text-slate-600" />
+                  </Button>
+                </div>
               </div>
             </div>
 
