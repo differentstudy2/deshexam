@@ -8,7 +8,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
 import 'katex/dist/katex.min.css';
-import { X, ChevronLeft, ChevronRight, Play, Settings } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Play, Settings, Check, Clock } from 'lucide-react';
 
 const bnOptionsMap: Record<string, string> = {
     a: 'ক',
@@ -37,6 +37,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [mode, setMode] = useState<'test' | 'read'>('test');
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
+    const [isTimerEnabled, setIsTimerEnabled] = useState(false);
+    const [timerSeconds, setTimerSeconds] = useState(0);
 
     const openPresentation = () => {
         setIsOpen(true);
@@ -94,6 +96,20 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
             setStep(0);
         }
     }, [mode]);
+
+    useEffect(() => {
+        setTimerSeconds(0);
+    }, [currentSlide]);
+
+    useEffect(() => {
+        if (!isOpen || !isTimerEnabled || step >= 1) return;
+        
+        const interval = setInterval(() => {
+            setTimerSeconds(s => s + 1);
+        }, 1000);
+        
+        return () => clearInterval(interval);
+    }, [isOpen, isTimerEnabled, step, currentSlide]);
 
     useEffect(() => {
         if (!isOpen) return;
@@ -175,8 +191,18 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 </div>
 
                 {/* Main Content Area */}
-                <div className="flex-1 w-full flex flex-col items-center px-24 py-12 z-10 overflow-y-auto custom-scrollbar gap-8">
+                <div className="flex-1 w-full relative flex flex-col items-center px-24 py-12 z-10 overflow-y-auto custom-scrollbar gap-8">
                         
+                    {/* Timer */}
+                    {isTimerEnabled && (
+                        <div className="absolute top-6 right-10 bg-white border border-gray-200 shadow-sm rounded-xl px-4 py-2 flex items-center gap-2 text-gray-700 font-bold font-mono text-2xl animate-in fade-in zoom-in duration-300">
+                            <Clock className="w-6 h-6 text-blue-500" />
+                            <span className={step >= 1 ? "text-gray-400" : "text-gray-800"}>
+                                {String(Math.floor(timerSeconds / 60)).padStart(2, '0')}:{String(timerSeconds % 60).padStart(2, '0')}
+                            </span>
+                        </div>
+                    )}
+
                     {/* Question */}
                     <div className="flex items-start gap-4 w-full max-w-5xl mt-4" style={{ '--q-size': `${38 * qFontScale}px` } as React.CSSProperties}>
                         <span className="text-black font-extrabold leading-tight shrink-0" style={{ fontSize: 'var(--q-size)' }}>Q{currentSlide + 1}.</span>
@@ -252,11 +278,22 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     <div className={letterClasses}>
                                         {optLetter}
                                     </div>
-                                    <div className="prose max-w-none text-black [&>p]:m-0 [&>p]:text-[length:var(--opt-size)] [&>p]:font-semibold [&>p]:leading-snug">
+                                    <div className="prose max-w-none text-black [&>p]:m-0 [&>p]:text-[length:var(--opt-size)] [&>p]:font-semibold [&>p]:leading-snug flex-1">
                                         <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
                                             {opt.text}
                                         </ReactMarkdown>
                                     </div>
+                                    
+                                    {step >= 1 && showCorrect && (
+                                        <div className="shrink-0 text-white bg-[#34A853] rounded-full p-1 shadow-sm">
+                                            <Check className="w-5 h-5 stroke-[3]" />
+                                        </div>
+                                    )}
+                                    {step >= 1 && showWrong && isSelected && (
+                                        <div className="shrink-0 text-white bg-[#EA4335] rounded-full p-1 shadow-sm">
+                                            <X className="w-5 h-5 stroke-[3]" />
+                                        </div>
+                                    )}
                                 </div>
                             );
                         })}
@@ -335,6 +372,21 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                         
                                         <hr className="border-gray-100" />
                                         
+                                        <div className="flex items-center justify-between">
+                                            <div className="text-sm font-bold text-gray-600 flex items-center gap-2">
+                                                <Clock className="w-4 h-4 text-blue-500" /> 
+                                                Question Timer
+                                            </div>
+                                            <button 
+                                                onClick={() => setIsTimerEnabled(!isTimerEnabled)}
+                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isTimerEnabled ? 'bg-blue-600' : 'bg-gray-300'}`}
+                                            >
+                                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isTimerEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
+                                            </button>
+                                        </div>
+
+                                        <hr className="border-gray-100" />
+
                                         <div>
                                             <div className="text-sm font-bold text-gray-600 mb-2 flex justify-between">
                                                 <span>Question Font Size</span>
