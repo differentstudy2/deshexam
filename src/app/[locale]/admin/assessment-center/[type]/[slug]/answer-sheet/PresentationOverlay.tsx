@@ -531,16 +531,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                  <div className="absolute bottom-[10%] right-[-10%] w-56 h-56 rounded-full bg-blue-400/10 blur-[50px]"></div>
                  
                  {/* Top Content */}
-                 <div className="flex flex-col items-center justify-center w-full px-4 pt-8 xl:pt-10 z-10">
-                      {/* Logo */}
-                      <div className="flex flex-col items-center mb-6 xl:mb-8 opacity-90">
-                          <img src="/image/logo.png" alt="DeshExam Logo" className="w-14 xl:w-16 h-auto brightness-0 invert drop-shadow-lg mb-2" />
-                          <div className="text-white font-extrabold text-xl xl:text-2xl tracking-wide">Desh Exam Academy</div>
-                          <div className="text-white/70 text-[10px] xl:text-xs font-semibold tracking-[0.15em] uppercase mt-0.5">Learn • Practice • Succeed</div>
-                      </div>
-
+                 <div className="flex flex-col items-center justify-center w-full px-4 pt-12 xl:pt-16 z-10">
                       {/* Target Icon */}
-                      <div className="text-[4.5rem] xl:text-[5.5rem] leading-none mb-5 xl:mb-6 drop-shadow-[0_10px_25px_rgba(0,0,0,0.6)]">
+                      <div className="text-[5rem] xl:text-[6.5rem] leading-none mb-6 drop-shadow-[0_10px_25px_rgba(0,0,0,0.6)]">
                           🎯
                       </div>
                       
