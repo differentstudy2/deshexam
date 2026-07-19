@@ -290,13 +290,13 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     </div>
                                     
                                     {step >= 1 && showCorrect && (
-                                        <div className="shrink-0 text-white bg-[#34A853] rounded-full p-1 shadow-sm">
-                                            <Check className="w-5 h-5 stroke-[3]" />
+                                        <div className="shrink-0 text-white bg-[#34A853] rounded-full p-1.5 shadow-sm">
+                                            <Check className="w-7 h-7 stroke-[3]" />
                                         </div>
                                     )}
                                     {step >= 1 && showWrong && isSelected && (
-                                        <div className="shrink-0 text-white bg-[#EA4335] rounded-full p-1 shadow-sm">
-                                            <X className="w-5 h-5 stroke-[3]" />
+                                        <div className="shrink-0 text-white bg-[#EA4335] rounded-full p-1.5 shadow-sm">
+                                            <X className="w-7 h-7 stroke-[3]" />
                                         </div>
                                     )}
                                 </div>
