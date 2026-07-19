@@ -242,7 +242,12 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     key={opt.key} 
                                     className={containerClasses} 
                                     style={{ '--opt-size': `${32 * optFontScale}px` } as React.CSSProperties}
-                                    onClick={() => step === 0 && setSelectedOption(opt.key)}
+                                    onClick={() => {
+                                        if (step === 0) {
+                                            setSelectedOption(opt.key);
+                                            setStep(1);
+                                        }
+                                    }}
                                 >
                                     <div className={letterClasses}>
                                         {optLetter}
