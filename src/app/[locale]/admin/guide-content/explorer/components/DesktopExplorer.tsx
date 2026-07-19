@@ -210,10 +210,10 @@ const TreeNode = ({ node, level = 0, onAddClick, onBulkAddClick, onEditClick, on
   const finalSubName = (level === 0 && displayAcronym && displayAcronym !== displayName) ? displayName : '';
 
   return (
-    <div className={`mt-2`}>
+    <div className={`mt-2 min-w-0`}>
       <div className={`group flex items-center justify-between p-3 rounded-xl transition-all ${conf.bg} ${conf.border} ${level === 0 ? 'shadow-sm hover:shadow-md mb-3 border-gray-200' : 'mb-1.5'}`}>
         
-        <div className="flex items-center gap-3 cursor-pointer flex-1" onClick={() => hasChildren && handleToggle()}>
+        <div className="flex items-center gap-3 cursor-pointer flex-1 min-w-0" onClick={() => hasChildren && handleToggle()}>
           
           {dragListeners && (
             <div {...dragListeners} {...dragAttributes} className="cursor-grab p-1 -ml-2 rounded text-slate-300 hover:text-slate-600 hover:bg-slate-200" onClick={(e) => e.stopPropagation()}>
@@ -230,8 +230,8 @@ const TreeNode = ({ node, level = 0, onAddClick, onBulkAddClick, onEditClick, on
             <Icon className={`w-4 h-4 ${conf.color}`} />
           </div>
           
-          <div className="flex flex-col flex-1">
-            <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
+            <div className="flex items-center gap-2 flex-wrap min-w-0">
               <span className={`font-semibold text-gray-800 ${level === 0 ? 'text-lg tracking-tight' : ''}`}>
                 {finalMainName}
               </span>
@@ -314,7 +314,7 @@ const TreeNode = ({ node, level = 0, onAddClick, onBulkAddClick, onEditClick, on
           {/* Tree Guide Line */}
           <div className="absolute left-6 top-0 bottom-3 w-[1.5px] bg-slate-200" />
           
-          <div className="pl-10 grid grid-cols-1 xl:grid-cols-2 gap-x-4">
+          <div className={`pl-10 ${node.type === 'class' ? 'grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-1' : ''}`}>
             {children.length === 0 ? (
               <div className="text-xs text-slate-400 italic py-3">No items found.</div>
             ) : (
