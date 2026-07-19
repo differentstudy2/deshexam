@@ -204,12 +204,68 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
             `}</style>
             
             {/* Left Banner Area */}
-            <div className="hidden lg:flex flex-1 h-full items-center justify-center bg-gradient-to-br from-blue-50/50 to-white/50 border-r border-gray-100 shadow-[inset_-10px_0_20px_rgba(0,0,0,0.01)] relative z-0 overflow-hidden">
-                 <div className="flex flex-col items-center justify-center h-full p-4 xl:p-8 opacity-60 hover:opacity-100 transition-opacity duration-500">
-                      <img src="/image/logo.png" alt="DeshExam" className="w-16 xl:w-24 h-auto grayscale opacity-80 mb-8" />
-                      <div className="text-center rotate-180 flex flex-col items-center" style={{ writingMode: 'vertical-rl' }}>
-                          <h3 className="font-black text-3xl xl:text-5xl text-gray-800 tracking-widest uppercase mb-4 whitespace-nowrap">Desh Exam</h3>
-                          <p className="text-sm xl:text-base font-bold text-gray-500 tracking-[0.2em] uppercase whitespace-nowrap">Academy</p>
+            <div className="hidden lg:flex flex-1 h-full flex-col items-center justify-between bg-gradient-to-b from-[#0a192f] via-[#0b2244] to-[#041128] relative z-0 overflow-hidden font-sans shadow-[inset_-10px_0_20px_rgba(0,0,0,0.3)] border-r border-[#1a3f7c]">
+                 
+                 {/* Floating Elements Background */}
+                 <div className="absolute top-[5%] left-[25%] w-20 h-20 rounded-full border border-blue-400/20 bg-blue-500/10 blur-[8px]"></div>
+                 <div className="absolute top-[20%] right-[15%] w-10 h-10 rounded-full border border-yellow-300/30 bg-transparent blur-[2px]"></div>
+                 <div className="absolute top-[45%] left-[-10%] w-40 h-40 rounded-full bg-blue-600/10 blur-[50px]"></div>
+                 <div className="absolute bottom-[30%] right-[-5%] w-32 h-32 rounded-full bg-blue-400/10 blur-[40px]"></div>
+                 
+                 {/* Top Logo */}
+                 <div className="flex flex-col items-center justify-center w-full px-4 pt-10 xl:pt-12 z-10">
+                      <div className="flex items-center gap-3 mb-8">
+                          <span className="text-[2.5rem] drop-shadow-md">🎓</span>
+                          <div className="flex flex-col text-white">
+                              <span className="font-extrabold text-[22px] leading-none tracking-wide mb-1">DeshExam</span>
+                              <span className="font-bold text-[18px] leading-none">Academy</span>
+                          </div>
+                      </div>
+                      
+                      {/* Text Section */}
+                      <div className="text-center font-bold tracking-wide mt-2">
+                          <h3 className="text-[1.65rem] xl:text-[2rem] text-white mb-3 leading-tight drop-shadow-md">সঠিক প্রস্তুতি,</h3>
+                          <h3 className="text-[1.65rem] xl:text-[2rem] text-white leading-tight drop-shadow-md">
+                              <span className="text-[#FFB800]">সফলতা</span> চাবিকাঠি!
+                          </h3>
+                      </div>
+                 </div>
+
+                 {/* Middle Illustration Placeholder */}
+                 <div className="flex items-center justify-center text-[3.5rem] xl:text-[4.5rem] gap-3 xl:gap-5 z-10 w-full drop-shadow-2xl opacity-95 my-6 relative">
+                     <div className="absolute inset-0 bg-blue-400/10 blur-[40px] rounded-full"></div>
+                     🏆 📚 🎓 📜
+                 </div>
+
+                 {/* Features List Box */}
+                 <div className="flex flex-col z-10 w-full px-6 xl:px-10 mb-4">
+                      <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-5 xl:p-6 shadow-[0_8px_32px_rgba(0,0,0,0.2)]">
+                          <div className="flex flex-col space-y-3.5 xl:space-y-4">
+                              {[
+                                  'Mock Tests',
+                                  'Chapter-wise Practice',
+                                  'Previous Year Questions',
+                                  'Smart Analytics',
+                                  'AI Performance Report'
+                              ].map((feature, idx) => (
+                                  <div key={idx} className="flex items-center gap-3">
+                                      <svg className="w-5 h-5 xl:w-[22px] xl:h-[22px] text-[#FFB800] shrink-0 drop-shadow-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                          <polyline points="20 6 9 17 4 12"></polyline>
+                                      </svg>
+                                      <span className="text-gray-100 text-[14px] xl:text-[16px] font-semibold tracking-wide drop-shadow-sm">{feature}</span>
+                                  </div>
+                              ))}
+                          </div>
+                      </div>
+                 </div>
+
+                 {/* Join Button */}
+                 <div className="w-full px-8 xl:px-12 pb-10 xl:pb-14 z-10">
+                      <button className="w-full flex flex-col items-center justify-center py-3 xl:py-3.5 bg-gradient-to-b from-[#2178ff] to-[#0a4bb8] border border-blue-400/50 rounded-full shadow-[0_8px_20px_rgba(10,75,184,0.4)] hover:from-[#2e82ff] hover:to-[#1155c9] transition-all duration-300 group">
+                          <span className="text-white font-bold text-lg xl:text-[20px] mb-0.5 drop-shadow-md group-hover:scale-105 transition-transform duration-300">Practice Today</span>
+                      </button>
+                      <div className="text-center mt-3">
+                          <span className="text-gray-300/80 text-xs xl:text-[13px] font-medium tracking-wide">Success Starts Here</span>
                       </div>
                  </div>
             </div>
