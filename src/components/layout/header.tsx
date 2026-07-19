@@ -481,13 +481,8 @@ export const AdminSidebar = ({ onLinkClick, logOut }: { onLinkClick?: () => void
     return (
         <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-900/95 text-slate-800 dark:text-slate-300 border-r border-slate-200/60 dark:border-slate-800/60 overflow-hidden">
             <div className="p-4 flex items-center h-16 shrink-0 border-b border-slate-200/60 dark:border-slate-800/60 bg-white dark:bg-slate-950">
-                <Link href="/admin" onClick={onLinkClick} className="flex items-center gap-3 w-full group-data-[collapsible=icon]:justify-center">
-                    <img src="/icons/icon-192x192.png" alt="DeshExam Logo" className="h-8 w-8 object-contain shrink-0" />
-                    <div className="font-extrabold text-xl tracking-tighter flex items-baseline group-data-[collapsible=icon]:hidden whitespace-nowrap">
-                        <span className="bg-gradient-to-r from-[#00a651] to-teal-400 bg-clip-text text-transparent drop-shadow-sm">DESH</span>
-                        <span className="text-inherit">EXAM</span>
-                        <span className="ml-1.5 text-xs font-semibold text-slate-500 uppercase tracking-widest">Admin</span>
-                    </div>
+                <Link href="/admin" onClick={onLinkClick} className="flex items-center w-full group-data-[collapsible=icon]:justify-center">
+                    <img src="/image/logo.png" alt="DeshExam Logo" className="h-10 w-auto object-contain transition-all duration-300 group-data-[collapsible=icon]:h-8" />
                 </Link>
             </div>
             <ScrollArea className="flex-1 bg-slate-50 dark:bg-slate-900">
