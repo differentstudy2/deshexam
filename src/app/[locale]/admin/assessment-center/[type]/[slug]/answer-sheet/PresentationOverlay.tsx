@@ -115,20 +115,47 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         if (!isOpen) return;
 
         const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') closePresentation();
-            if (e.key === 'ArrowRight' || e.key === ' ') {
-                e.preventDefault();
-                nextStep();
+            if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+
+            if (e.key === 'Escape') {
+                if (isSettingsOpen) {
+                    setIsSettingsOpen(false);
+                } else {
+                    closePresentation();
+                }
+                return;
             }
-            if (e.key === 'ArrowLeft') {
-                e.preventDefault();
-                prevStep();
+
+            if (e.key.toLowerCase() === 's') {
+                setIsSettingsOpen(prev => !prev);
+                return;
+            }
+
+            if (e.key.toLowerCase() === 't') {
+                setIsTimerEnabled(prev => !prev);
+                return;
+            }
+
+            if (e.key.toLowerCase() === 'm') {
+                setMode(prev => prev === 'test' ? 'read' : 'test');
+                return;
+            }
+
+            if (!isSettingsOpen) {
+                if (e.key === 'ArrowRight' || e.key === ' ') {
+                    e.preventDefault();
+                    nextStep();
+                }
+                if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    prevStep();
+                }
             }
         };
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [isOpen, closePresentation, nextStep, prevStep]);
+    }, [isOpen, closePresentation, nextStep, prevStep, isSettingsOpen]);
 
     if (!isOpen) {
         return (
