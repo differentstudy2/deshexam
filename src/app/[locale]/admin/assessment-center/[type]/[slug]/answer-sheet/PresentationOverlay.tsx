@@ -163,7 +163,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 </div>
 
                 {/* Foreground Watermarks */}
-                <div className="absolute top-[75%] left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-[8deg] text-[100px] font-black text-gray-200/50 tracking-widest uppercase z-30 pointer-events-none select-none">
+                <div className="absolute top-[75%] left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-[8deg] text-[70px] font-black text-gray-200/50 tracking-widest uppercase z-30 pointer-events-none select-none">
                     DESHEXAM
                 </div>
                 <div className="absolute top-[25%] right-[10%] -translate-y-1/2 -rotate-[8deg] text-[80px] font-black text-gray-200/40 tracking-widest uppercase z-30 pointer-events-none select-none">
