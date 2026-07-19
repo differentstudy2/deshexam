@@ -35,11 +35,12 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [qFontScale, setQFontScale] = useState(1);
     const [optFontScale, setOptFontScale] = useState(1);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+    const [mode, setMode] = useState<'test' | 'read'>('test');
 
     const openPresentation = () => {
         setIsOpen(true);
         setCurrentSlide(0);
-        setStep(0);
+        setStep(mode === 'read' ? 2 : 0);
         document.body.style.overflow = 'hidden';
     };
 
@@ -49,22 +50,44 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     }, []);
 
     const nextStep = useCallback(() => {
-        if (step < 2) {
-            setStep(step + 1);
-        } else if (currentSlide < questions.length - 1) {
-            setCurrentSlide(currentSlide + 1);
-            setStep(0);
+        if (mode === 'read') {
+            if (currentSlide < questions.length - 1) {
+                setCurrentSlide(currentSlide + 1);
+                setStep(2);
+            }
+        } else {
+            if (step < 2) {
+                setStep(step + 1);
+            } else if (currentSlide < questions.length - 1) {
+                setCurrentSlide(currentSlide + 1);
+                setStep(0);
+            }
         }
-    }, [step, currentSlide, questions.length]);
+    }, [step, currentSlide, questions.length, mode]);
 
     const prevStep = useCallback(() => {
-        if (step > 0) {
-            setStep(step - 1);
-        } else if (currentSlide > 0) {
-            setCurrentSlide(currentSlide - 1);
-            setStep(2);
+        if (mode === 'read') {
+            if (currentSlide > 0) {
+                setCurrentSlide(currentSlide - 1);
+                setStep(2);
+            }
+        } else {
+            if (step > 0) {
+                setStep(step - 1);
+            } else if (currentSlide > 0) {
+                setCurrentSlide(currentSlide - 1);
+                setStep(2);
+            }
         }
-    }, [step, currentSlide]);
+    }, [step, currentSlide, mode]);
+
+    useEffect(() => {
+        if (mode === 'read') {
+            setStep(2);
+        } else {
+            setStep(0);
+        }
+    }, [mode]);
 
     useEffect(() => {
         if (!isOpen) return;
@@ -263,6 +286,26 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     </div>
                                     
                                     <div className="space-y-5">
+                                        <div>
+                                            <div className="text-sm font-bold text-gray-600 mb-2">Presentation Mode</div>
+                                            <div className="flex bg-gray-100 p-1 rounded-xl">
+                                                <button 
+                                                    onClick={() => setMode('test')} 
+                                                    className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-colors ${mode === 'test' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                                >
+                                                    Test Mode
+                                                </button>
+                                                <button 
+                                                    onClick={() => setMode('read')} 
+                                                    className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-colors ${mode === 'read' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                                >
+                                                    Read Mode
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <hr className="border-gray-100" />
+                                        
                                         <div>
                                             <div className="text-sm font-bold text-gray-600 mb-2 flex justify-between">
                                                 <span>Question Font Size</span>
