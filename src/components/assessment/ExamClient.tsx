@@ -454,18 +454,32 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
 
   if (requiresLogin) {
     return (
-      <div className="fixed inset-0 z-[100] bg-[#F8FAFC] dark:bg-[#0f172a] flex flex-col items-center justify-center p-6 text-slate-900 font-inter transition-colors duration-300">
-        <div className="max-w-md w-full bg-white dark:bg-[#1e293b] rounded-3xl p-8 text-center shadow-xl border border-slate-200 dark:border-slate-700 transition-colors duration-300">
-          <div className="w-16 h-16 bg-blue-50 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-6 transition-colors">
-            <Lock className="w-8 h-8 text-blue-600 dark:text-blue-500" />
+      <div className="fixed inset-0 z-40 bg-[#f8fbff] dark:bg-[#041128] flex flex-col items-center justify-center p-6 text-slate-900 font-sans transition-colors duration-300 overflow-hidden">
+        {/* Decorative Background */}
+        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-blue-400/20 blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-indigo-400/20 blur-[120px] pointer-events-none" />
+
+        <div className="max-w-[420px] w-full relative z-10">
+          <div className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-2xl rounded-[2.5rem] p-10 text-center shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] border border-white/60 dark:border-slate-700/50 transition-all duration-300 group">
+            
+            <div className="w-24 h-24 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-inner border border-white/80 dark:border-white/5 transform group-hover:scale-105 transition-transform duration-500 ease-out rotate-3 group-hover:rotate-0">
+              <Lock className="w-10 h-10 text-blue-600 dark:text-blue-400 drop-shadow-sm" strokeWidth={1.5} />
+            </div>
+            
+            <h2 className="text-[1.75rem] font-extrabold mb-4 text-slate-900 dark:text-slate-50 tracking-tight transition-colors">
+              Authentication Required
+            </h2>
+            <p className="text-[15px] text-slate-500 dark:text-slate-400 mb-10 leading-relaxed transition-colors px-2">
+              You need to be logged in to your DeshExam Academy account to take this mock test.
+            </p>
+            
+            <Button 
+              onClick={() => openAuthDialog('sign-in')} 
+              className="w-full h-14 text-[16px] font-bold rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-[0_8px_20px_-6px_rgba(37,99,235,0.4)] hover:shadow-[0_12px_25px_-6px_rgba(37,99,235,0.5)] transition-all duration-300 transform hover:-translate-y-0.5"
+            >
+              Log In or Sign Up
+            </Button>
           </div>
-          <h2 className="text-2xl font-bold mb-3 dark:text-slate-50 transition-colors">Authentication Required</h2>
-          <p className="text-slate-500 dark:text-slate-400 mb-8 leading-relaxed transition-colors">
-            You must be logged in to your account to take this mock test.
-          </p>
-          <Button onClick={() => openAuthDialog('sign-in')} className="w-full h-12 text-[15px] font-semibold rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-colors">
-            Log In or Sign Up
-          </Button>
         </div>
       </div>
     );
@@ -473,18 +487,32 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
 
   if (!hasAccess) {
     return (
-      <div className="fixed inset-0 z-[100] bg-[#F8FAFC] dark:bg-[#0f172a] flex flex-col items-center justify-center p-6 text-slate-900 font-inter transition-colors duration-300">
-        <div className="max-w-md w-full bg-white dark:bg-[#1e293b] rounded-3xl p-8 text-center shadow-xl border border-slate-200 dark:border-slate-700 transition-colors duration-300">
-          <div className="w-16 h-16 bg-amber-50 dark:bg-amber-900/30 rounded-full flex items-center justify-center mx-auto mb-6 transition-colors">
-            <Lock className="w-8 h-8 text-amber-600 dark:text-amber-500" />
+      <div className="fixed inset-0 z-40 bg-[#f8fbff] dark:bg-[#041128] flex flex-col items-center justify-center p-6 text-slate-900 font-sans transition-colors duration-300 overflow-hidden">
+        {/* Decorative Background */}
+        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-amber-400/15 blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-orange-400/15 blur-[120px] pointer-events-none" />
+
+        <div className="max-w-[420px] w-full relative z-10">
+          <div className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-2xl rounded-[2.5rem] p-10 text-center shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] border border-white/60 dark:border-slate-700/50 transition-all duration-300 group">
+            
+            <div className="w-24 h-24 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/30 dark:to-orange-900/30 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-inner border border-white/80 dark:border-white/5 transform group-hover:scale-105 transition-transform duration-500 ease-out -rotate-3 group-hover:rotate-0">
+              <Lock className="w-10 h-10 text-amber-500 dark:text-amber-400 drop-shadow-sm" strokeWidth={1.5} />
+            </div>
+            
+            <h2 className="text-[1.75rem] font-extrabold mb-4 text-slate-900 dark:text-slate-50 tracking-tight transition-colors">
+              Access Denied
+            </h2>
+            <p className="text-[15px] text-slate-500 dark:text-slate-400 mb-10 leading-relaxed transition-colors px-2">
+              You do not have access to this mock test. Please upgrade your subscription or purchase this test to proceed.
+            </p>
+            
+            <Button 
+              onClick={() => router.replace(`/mock-tests/${mockTest.slug}`)} 
+              className="w-full h-14 text-[16px] font-bold rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-[0_8px_20px_-6px_rgba(245,158,11,0.4)] hover:shadow-[0_12px_25px_-6px_rgba(245,158,11,0.5)] transition-all duration-300 transform hover:-translate-y-0.5"
+            >
+              View Access Options
+            </Button>
           </div>
-          <h2 className="text-2xl font-bold mb-3 dark:text-slate-50 transition-colors">Access Denied</h2>
-          <p className="text-slate-500 dark:text-slate-400 mb-8 leading-relaxed transition-colors">
-            You do not have access to this mock test. Please upgrade your subscription or purchase this test to proceed.
-          </p>
-          <Button onClick={() => router.replace(`/mock-tests/${mockTest.slug}`)} className="w-full h-12 text-[15px] font-semibold rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-colors">
-            View Access Options
-          </Button>
         </div>
       </div>
     );
@@ -492,18 +520,32 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
 
   if (attemptsExceeded) {
     return (
-      <div className="fixed inset-0 z-[100] bg-[#F8FAFC] dark:bg-[#0f172a] flex flex-col items-center justify-center p-6 text-slate-900 font-inter transition-colors duration-300">
-        <div className="max-w-md w-full bg-white dark:bg-[#1e293b] rounded-3xl p-8 text-center shadow-xl border border-slate-200 dark:border-slate-700 transition-colors duration-300">
-          <div className="w-16 h-16 bg-red-50 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-6 transition-colors">
-            <AlertCircle className="w-8 h-8 text-red-600 dark:text-red-500" />
+      <div className="fixed inset-0 z-40 bg-[#f8fbff] dark:bg-[#041128] flex flex-col items-center justify-center p-6 text-slate-900 font-sans transition-colors duration-300 overflow-hidden">
+        {/* Decorative Background */}
+        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-red-400/15 blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-rose-400/15 blur-[120px] pointer-events-none" />
+
+        <div className="max-w-[420px] w-full relative z-10">
+          <div className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-2xl rounded-[2.5rem] p-10 text-center shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] border border-white/60 dark:border-slate-700/50 transition-all duration-300 group">
+            
+            <div className="w-24 h-24 bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-900/30 dark:to-rose-900/30 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-inner border border-white/80 dark:border-white/5 transform group-hover:scale-105 transition-transform duration-500 ease-out rotate-3 group-hover:rotate-0">
+              <AlertCircle className="w-10 h-10 text-red-500 drop-shadow-sm" strokeWidth={1.5} />
+            </div>
+            
+            <h2 className="text-[1.75rem] font-extrabold mb-4 text-slate-900 dark:text-slate-50 tracking-tight transition-colors">
+              Attempts Exceeded
+            </h2>
+            <p className="text-[15px] text-slate-500 dark:text-slate-400 mb-10 leading-relaxed transition-colors px-2">
+              You have reached the maximum allowed attempts ({userAttemptCount}/{mockTest.attemptsAllowed}) for this mock test.
+            </p>
+            
+            <Button 
+              onClick={() => router.replace(`/mock-tests`)} 
+              className="w-full h-14 text-[16px] font-bold rounded-2xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 text-white shadow-[0_8px_20px_-6px_rgba(15,23,42,0.4)] dark:shadow-[0_8px_20px_-6px_rgba(255,255,255,0.4)] transition-all duration-300 transform hover:-translate-y-0.5"
+            >
+              Back to Dashboard
+            </Button>
           </div>
-          <h2 className="text-2xl font-bold mb-3 dark:text-slate-50 transition-colors">Attempts Exceeded</h2>
-          <p className="text-slate-500 dark:text-slate-400 mb-8 leading-relaxed transition-colors">
-            You have already reached the maximum allowed attempts ({userAttemptCount}/{mockTest.attemptsAllowed}) for this mock test. You can no longer start a new session.
-          </p>
-          <Button onClick={() => router.replace(`/mock-tests`)} className="w-full h-12 text-[15px] font-semibold rounded-full bg-slate-800 hover:bg-slate-900 text-white shadow-sm transition-colors">
-            Back to Dashboard
-          </Button>
         </div>
       </div>
     );
@@ -523,7 +565,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
       : 0;
 
     return (
-      <div className="fixed inset-0 z-[100] bg-[#F8FAFC] dark:bg-[#0f172a] flex flex-col items-center justify-center p-6 font-inter overflow-y-auto transition-colors duration-300">
+      <div className="fixed inset-0 z-40 bg-[#F8FAFC] dark:bg-[#0f172a] flex flex-col items-center justify-center p-6 font-inter overflow-y-auto transition-colors duration-300">
         <div className="bg-white dark:bg-[#1e293b] rounded-3xl p-10 shadow-xl border border-slate-200 dark:border-slate-700 max-w-2xl w-full text-center relative overflow-hidden transition-colors duration-300">
           <div className="absolute top-0 left-0 w-full h-2 bg-[#16A34A] dark:bg-emerald-600"></div>
 
