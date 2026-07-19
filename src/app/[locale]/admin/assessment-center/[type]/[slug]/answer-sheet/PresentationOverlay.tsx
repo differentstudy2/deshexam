@@ -191,7 +191,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     if (typeof window === 'undefined') return null;
 
     return createPortal(
-        <div className="fixed inset-0 z-[99999] bg-[#f8fbff] flex items-center justify-center select-none font-sans">
+        <div className="fixed inset-0 z-[99999] bg-[#f8fbff] flex items-center justify-center select-none font-sans overflow-hidden">
             <style>{`
                 @keyframes popIn {
                     0% { transform: scale(1); box-shadow: 0 0 0 rgba(52,168,83,0); }
@@ -202,7 +202,20 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
                 }
             `}</style>
-            <div className="relative w-full h-full max-w-[177.78vh] max-h-[56.25vw] bg-[#f8f9fc] flex flex-col shadow-2xl overflow-hidden">
+            
+            {/* Left Banner Area */}
+            <div className="hidden lg:flex flex-1 h-full items-center justify-center bg-gradient-to-br from-blue-50/50 to-white/50 border-r border-gray-100 shadow-[inset_-10px_0_20px_rgba(0,0,0,0.01)] relative z-0 overflow-hidden">
+                 <div className="flex flex-col items-center justify-center h-full p-4 xl:p-8 opacity-60 hover:opacity-100 transition-opacity duration-500">
+                      <img src="/image/logo.png" alt="DeshExam" className="w-16 xl:w-24 h-auto grayscale opacity-80 mb-8" />
+                      <div className="text-center rotate-180 flex flex-col items-center" style={{ writingMode: 'vertical-rl' }}>
+                          <h3 className="font-black text-3xl xl:text-5xl text-gray-800 tracking-widest uppercase mb-4 whitespace-nowrap">Desh Exam</h3>
+                          <p className="text-sm xl:text-base font-bold text-gray-500 tracking-[0.2em] uppercase whitespace-nowrap">Academy</p>
+                      </div>
+                 </div>
+            </div>
+
+            {/* Main Presentation Area */}
+            <div className="relative w-full h-full max-w-[177.78vh] max-h-[56.25vw] bg-[#f8f9fc] flex flex-col shadow-2xl overflow-hidden shrink-0 z-10">
 
                 {/* Background Decorations */}
                 <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
@@ -505,6 +518,24 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     <X className="w-6 h-6" />
                 </button>
 
+            </div>
+
+            {/* Right Banner Area */}
+            <div className="hidden lg:flex flex-1 h-full items-center justify-center bg-gradient-to-bl from-blue-50/50 to-white/50 border-l border-gray-100 shadow-[inset_10px_0_20px_rgba(0,0,0,0.01)] relative z-0 overflow-hidden">
+                 <div className="flex flex-col items-center justify-center h-full p-4 xl:p-8 opacity-60 hover:opacity-100 transition-opacity duration-500 space-y-8 xl:space-y-12">
+                      <div className="flex flex-col items-center">
+                          <div className="w-12 h-12 xl:w-16 xl:h-16 bg-white rounded-2xl shadow-sm border border-gray-100 flex items-center justify-center text-2xl xl:text-3xl mb-3 grayscale opacity-80">🎯</div>
+                          <span className="font-bold text-[10px] xl:text-xs uppercase tracking-[0.2em] text-center text-gray-500">Mock<br/>Tests</span>
+                      </div>
+                      <div className="flex flex-col items-center">
+                          <div className="w-12 h-12 xl:w-16 xl:h-16 bg-white rounded-2xl shadow-sm border border-gray-100 flex items-center justify-center text-2xl xl:text-3xl mb-3 grayscale opacity-80">📚</div>
+                          <span className="font-bold text-[10px] xl:text-xs uppercase tracking-[0.2em] text-center text-gray-500">Study<br/>Materials</span>
+                      </div>
+                      <div className="flex flex-col items-center">
+                          <div className="w-12 h-12 xl:w-16 xl:h-16 bg-white rounded-2xl shadow-sm border border-gray-100 flex items-center justify-center text-2xl xl:text-3xl mb-3 grayscale opacity-80">🏆</div>
+                          <span className="font-bold text-[10px] xl:text-xs uppercase tracking-[0.2em] text-center text-gray-500">Live<br/>Ranks</span>
+                      </div>
+                 </div>
             </div>
         </div>,
         document.body
