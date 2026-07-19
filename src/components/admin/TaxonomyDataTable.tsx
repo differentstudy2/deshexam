@@ -865,7 +865,9 @@ export function TaxonomyDataTable({ type, title }: Props) {
             <div className="p-12 text-center text-gray-500 dark:text-slate-400">No records found.</div>
           ) : viewMode === 'grid' ? (
             <div className="p-4 sm:p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 bg-slate-50/30 dark:bg-slate-900/30">
-              {paginatedNodes.map((node) => (
+              {paginatedNodes.map((node) => {
+                const nodeAcronym = (node as any).acronym || indianBoards.find(ib => ib.slug === node.slug || ib.id === node.id)?.acronym;
+                return (
                 <div key={node.id} className={`group relative flex flex-col bg-white dark:bg-slate-800 rounded-2xl border transition-all hover:shadow-lg hover:-translate-y-1 ${selectedIds.includes(node.id) ? 'border-indigo-500 ring-1 ring-indigo-500 shadow-sm' : 'border-slate-200 dark:border-slate-700'}`}>
                   
                   {/* Card Header (Checkbox + Status) */}
@@ -892,8 +894,8 @@ export function TaxonomyDataTable({ type, title }: Props) {
                   <div className="p-4 flex-1 flex flex-col cursor-pointer" onClick={() => handleToggleSelect(node.id, !selectedIds.includes(node.id))}>
                     <h3 className="font-semibold text-slate-800 dark:text-slate-200 text-lg leading-tight line-clamp-2 mb-1.5 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                       {node.title}
-                      {node.acronym && (
-                        <span className="ml-2 text-xs font-semibold px-2 py-0.5 bg-indigo-50 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-300 rounded-md border border-indigo-200 dark:border-indigo-500/30 align-middle inline-block">{node.acronym}</span>
+                      {nodeAcronym && (
+                        <span className="ml-2 text-xs font-semibold px-2 py-0.5 bg-indigo-50 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-300 rounded-md border border-indigo-200 dark:border-indigo-500/30 align-middle inline-block">{nodeAcronym}</span>
                       )}
                     </h3>
                     <p className="text-xs text-slate-500 dark:text-slate-400 font-mono mb-2 line-clamp-1 truncate bg-slate-50 dark:bg-slate-900 px-2 py-0.5 rounded w-fit">{node.slug}</p>
@@ -944,7 +946,7 @@ export function TaxonomyDataTable({ type, title }: Props) {
                   </div>
 
                 </div>
-              ))}
+              )})}
             </div>
           ) : viewMode === 'list' && groupByName ? (
             <div className="overflow-x-auto">
@@ -1027,7 +1029,9 @@ export function TaxonomyDataTable({ type, title }: Props) {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {paginatedNodes.map((node) => (
+                  {paginatedNodes.map((node) => {
+                    const nodeAcronym = (node as any).acronym || indianBoards.find(ib => ib.slug === node.slug || ib.id === node.id)?.acronym;
+                    return (
                     <TableRow key={node.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/50 border-b border-gray-100 dark:border-slate-700/50">
                       <TableCell className="text-center py-2 pl-3 pr-1">
                         <Checkbox
@@ -1038,8 +1042,8 @@ export function TaxonomyDataTable({ type, title }: Props) {
                       <TableCell className="py-2 pr-2">
                         <div className="font-medium text-sm text-gray-900 dark:text-slate-200 line-clamp-2 inline-flex items-center gap-2">
                           {node.title}
-                          {node.acronym && (
-                            <span className="text-[10px] font-bold px-1.5 py-0.5 bg-indigo-50 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-300 rounded border border-indigo-200 dark:border-indigo-500/30 whitespace-nowrap">{node.acronym}</span>
+                          {nodeAcronym && (
+                            <span className="text-[10px] font-bold px-1.5 py-0.5 bg-indigo-50 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-300 rounded border border-indigo-200 dark:border-indigo-500/30 whitespace-nowrap">{nodeAcronym}</span>
                           )}
                         </div>
                         {node.icon && <span className="text-xs text-gray-400 dark:text-slate-500 bg-gray-100 dark:bg-slate-700 px-1.5 py-0.5 rounded mt-0.5 inline-block">Icon: {node.icon}</span>}
@@ -1073,41 +1077,38 @@ export function TaxonomyDataTable({ type, title }: Props) {
                       <TableCell className="py-2 hidden lg:table-cell">
                         <span className="text-xs text-gray-400 dark:text-slate-500 font-mono">#{node.orderIndex || 0}</span>
                       </TableCell>
-                      <TableCell className="py-2 text-right pr-3">
-                        <div className="flex justify-end items-center gap-0.5">
+                      <TableCell className="py-2 text-right">
+                        <div className="flex items-center justify-end gap-1">
                           {type === 'textbook' && (
-                            <Button asChild variant="ghost" size="icon" className="h-8 w-8 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20" title="View Details">
-                              <Link href={`/admin/textbook/${node.id}`}><Eye className="w-4 h-4" /></Link>
+                            <Button asChild variant="ghost" size="icon" className="h-7 w-7 text-blue-500 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/30">
+                              <Link href={`/admin/textbook/${node.id}`}><Eye className="w-3.5 h-3.5" /></Link>
                             </Button>
                           )}
                           {type === 'institution' && node.slug && (
-                            <Button asChild variant="ghost" size="icon" className="h-8 w-8 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20" title="View Public Page">
-                              <Link href={`/institutions/${node.slug}`} target="_blank"><Eye className="w-4 h-4" /></Link>
+                            <Button asChild variant="ghost" size="icon" className="h-7 w-7 text-blue-500 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/30">
+                              <Link href={`/institutions/${node.slug}`} target="_blank"><Eye className="w-3.5 h-3.5" /></Link>
                             </Button>
                           )}
-                          <Button variant="ghost" size="icon" onClick={() => handleToggleStatus(node)} className="h-8 w-8 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20" title="Toggle Status">
-                            {node.status === 'active' || node.status === 'published' ? <CheckSquare className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                          </Button>
                           {type === 'board' ? (
-                            <Button asChild variant="ghost" size="icon" className="h-8 w-8 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20" title="Edit">
-                              <Link href={`/admin/board/${node.id}`}><Edit2 className="w-4 h-4" /></Link>
+                            <Button asChild variant="ghost" size="icon" className="h-7 w-7 text-indigo-500 hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-900/30" title="Edit">
+                              <Link href={`/admin/board/${node.id}`}><Edit2 className="w-3.5 h-3.5" /></Link>
                             </Button>
                           ) : type === 'institution' ? (
-                            <Button asChild variant="ghost" size="icon" className="h-8 w-8 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20" title="Edit">
-                              <Link href={`/admin/institution/${node.id}`}><Edit2 className="w-4 h-4" /></Link>
+                            <Button asChild variant="ghost" size="icon" className="h-7 w-7 text-indigo-500 hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-900/30" title="Edit">
+                              <Link href={`/admin/institution/${node.id}`}><Edit2 className="w-3.5 h-3.5" /></Link>
                             </Button>
                           ) : (
-                            <Button variant="ghost" size="icon" onClick={() => handleEditClick(node)} className="h-8 w-8 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20" title="Edit">
-                              <Edit2 className="w-4 h-4" />
+                            <Button variant="ghost" size="icon" onClick={() => handleEditClick(node)} className="h-7 w-7 text-indigo-500 hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-900/30">
+                              <Edit2 className="w-3.5 h-3.5" />
                             </Button>
                           )}
-                          <Button variant="ghost" size="icon" onClick={() => handleDelete(node)} className="h-8 w-8 text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20" title="Delete">
-                            <Trash2 className="w-4 h-4" />
+                          <Button variant="ghost" size="icon" onClick={() => handleDelete(node)} className="h-7 w-7 text-rose-500 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-900/30">
+                            <Trash2 className="w-3.5 h-3.5" />
                           </Button>
                         </div>
                       </TableCell>
                     </TableRow>
-                  ))}
+                  )})}
                 </TableBody>
               </Table>
               </div>
