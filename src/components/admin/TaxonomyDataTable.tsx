@@ -54,6 +54,7 @@ export function TaxonomyDataTable({ type, title }: Props) {
   const [filterChapterId, setFilterChapterId] = useState('all');
   // New filters
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('grid');
+  const [groupByName, setGroupByName] = useState(false);
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'title-asc' | 'title-desc'>('newest');
   const [filterHasImage, setFilterHasImage] = useState<'all' | 'yes' | 'no'>('all');
   const [filterInstitutionType, setFilterInstitutionType] = useState('all');
@@ -460,11 +461,22 @@ export function TaxonomyDataTable({ type, title }: Props) {
               <Button 
                 variant="ghost" 
                 size="sm"
-                onClick={() => setViewMode('list')}
-                className={`px-3 py-1.5 h-8 rounded-md transition-all ${viewMode === 'list' ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                onClick={() => { setViewMode('list'); setGroupByName(false); }}
+                className={`px-3 py-1.5 h-8 rounded-md transition-all ${viewMode === 'list' && !groupByName ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
               >
                 <LayoutList className="w-4 h-4 mr-1.5" /> List
               </Button>
+              {['class', 'subject', 'textbook', 'chapter', 'topic'].includes(type) && (
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => { setViewMode('list'); setGroupByName(true); }}
+                  className={`px-3 py-1.5 h-8 rounded-md transition-all ${viewMode === 'list' && groupByName ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                  title="Group items with the exact same name together"
+                >
+                  <Layers className="w-4 h-4 mr-1.5" /> Grouped
+                </Button>
+              )}
             </div>
             {type === 'textbook' ? (
               <Button asChild className="h-10 px-4 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 text-white shadow-sm shadow-indigo-500/20 transition-all rounded-lg">
@@ -922,6 +934,64 @@ export function TaxonomyDataTable({ type, title }: Props) {
 
                 </div>
               ))}
+            </div>
+          ) : viewMode === 'list' && groupByName ? (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader className="bg-gray-50/50 dark:bg-slate-800/50">
+                  <TableRow>
+                    <TableHead className="w-12 text-center"></TableHead>
+                    <TableHead>TITLE</TableHead>
+                    <TableHead>COUNT</TableHead>
+                    <TableHead>AVAILABLE IN (CONTEXTS)</TableHead>
+                    <TableHead className="text-right pr-4">ACTIONS</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {Object.values(
+                    filteredNodes.reduce((acc, node) => {
+                      const title = node.title.trim();
+                      if (!acc[title]) acc[title] = { title, nodes: [] };
+                      acc[title].nodes.push(node);
+                      return acc;
+                    }, {} as Record<string, { title: string, nodes: TaxonomyNode[] }>)
+                  )
+                  .sort((a, b) => a.title.localeCompare(b.title))
+                  .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+                  .map((group, idx) => (
+                    <TableRow key={idx} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/50 border-b border-gray-100 dark:border-slate-700/50">
+                      <TableCell className="text-center py-2 text-slate-400 text-xs">{idx + 1}</TableCell>
+                      <TableCell className="py-3 font-semibold text-gray-900 dark:text-slate-200">
+                        {group.title}
+                      </TableCell>
+                      <TableCell className="py-3 text-indigo-600 dark:text-indigo-400 font-bold">
+                        {group.nodes.length}
+                      </TableCell>
+                      <TableCell className="py-3 text-xs text-gray-500 dark:text-slate-400 max-w-[400px]">
+                        <div className="flex flex-wrap gap-1">
+                          {group.nodes.map(n => getParentContext(n)).filter(Boolean).slice(0, 5).map((ctx, i) => (
+                            <span key={i} className="bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-600 truncate max-w-[150px]" title={ctx || ''}>{ctx}</span>
+                          ))}
+                          {group.nodes.length > 5 && <span className="bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-600">+{group.nodes.length - 5} more</span>}
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-3 text-right pr-4">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="h-7 text-xs border-indigo-200 text-indigo-700 hover:bg-indigo-50"
+                          onClick={() => {
+                            setSearchQuery(group.title);
+                            setGroupByName(false);
+                          }}
+                        >
+                          View All
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </div>
           ) : (
             <div className="flex flex-col">
