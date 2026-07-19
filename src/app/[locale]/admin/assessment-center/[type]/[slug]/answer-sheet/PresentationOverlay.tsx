@@ -521,20 +521,60 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
             </div>
 
             {/* Right Banner Area */}
-            <div className="hidden lg:flex flex-1 h-full items-center justify-center bg-gradient-to-bl from-blue-50/50 to-white/50 border-l border-gray-100 shadow-[inset_10px_0_20px_rgba(0,0,0,0.01)] relative z-0 overflow-hidden">
-                 <div className="flex flex-col items-center justify-center h-full p-4 xl:p-8 opacity-60 hover:opacity-100 transition-opacity duration-500 space-y-8 xl:space-y-12">
-                      <div className="flex flex-col items-center">
-                          <div className="w-12 h-12 xl:w-16 xl:h-16 bg-white rounded-2xl shadow-sm border border-gray-100 flex items-center justify-center text-2xl xl:text-3xl mb-3 grayscale opacity-80">🎯</div>
-                          <span className="font-bold text-[10px] xl:text-xs uppercase tracking-[0.2em] text-center text-gray-500">Mock<br/>Tests</span>
+            <div className="hidden lg:flex flex-1 h-full flex-col items-center justify-between bg-gradient-to-b from-[#0a2f6c] via-[#07214f] to-[#041334] relative z-0 overflow-hidden font-sans shadow-[inset_10px_0_20px_rgba(0,0,0,0.3)] border-l border-[#1a3f7c]">
+                 
+                 {/* Floating Bubbles/Orbs Background */}
+                 <div className="absolute top-[10%] left-[15%] w-24 h-24 rounded-full border border-blue-400/20 bg-blue-400/5 blur-[2px]"></div>
+                 <div className="absolute top-[8%] left-[65%] w-8 h-8 rounded-full border border-blue-300/30 bg-transparent blur-[1px]"></div>
+                 <div className="absolute top-[30%] right-[10%] w-32 h-32 rounded-full border border-blue-400/10 bg-blue-400/5 blur-[4px]"></div>
+                 <div className="absolute bottom-[25%] left-[-15%] w-48 h-48 rounded-full bg-blue-500/10 blur-[40px]"></div>
+                 <div className="absolute bottom-[10%] right-[-10%] w-56 h-56 rounded-full bg-blue-400/10 blur-[50px]"></div>
+                 
+                 {/* Top Content */}
+                 <div className="flex flex-col items-center justify-center w-full px-4 pt-12 xl:pt-16 z-10">
+                      {/* Target Icon */}
+                      <div className="text-[5rem] xl:text-[6.5rem] leading-none mb-6 drop-shadow-[0_10px_25px_rgba(0,0,0,0.6)]">
+                          🎯
                       </div>
-                      <div className="flex flex-col items-center">
-                          <div className="w-12 h-12 xl:w-16 xl:h-16 bg-white rounded-2xl shadow-sm border border-gray-100 flex items-center justify-center text-2xl xl:text-3xl mb-3 grayscale opacity-80">📚</div>
-                          <span className="font-bold text-[10px] xl:text-xs uppercase tracking-[0.2em] text-center text-gray-500">Study<br/>Materials</span>
+                      
+                      {/* Text Section */}
+                      <div className="text-center font-bold tracking-wide">
+                          <h3 className="text-2xl xl:text-[1.75rem] text-white mb-2 leading-tight">লক্ষ্য তোমার,</h3>
+                          <h3 className="text-2xl xl:text-[1.75rem] text-white leading-tight">
+                              <span className="text-[#FFD700]">সাফল্য</span> আমাদের সাথে!
+                          </h3>
                       </div>
-                      <div className="flex flex-col items-center">
-                          <div className="w-12 h-12 xl:w-16 xl:h-16 bg-white rounded-2xl shadow-sm border border-gray-100 flex items-center justify-center text-2xl xl:text-3xl mb-3 grayscale opacity-80">🏆</div>
-                          <span className="font-bold text-[10px] xl:text-xs uppercase tracking-[0.2em] text-center text-gray-500">Live<br/>Ranks</span>
-                      </div>
+                 </div>
+
+                 {/* Middle Illustration Placeholder */}
+                 <div className="flex items-center justify-center text-[3.5rem] xl:text-[4.5rem] gap-3 xl:gap-5 z-10 w-full drop-shadow-2xl opacity-90 my-4">
+                     📚 💡 🚀 💻
+                 </div>
+
+                 {/* Features List */}
+                 <div className="flex flex-col space-y-3 z-10 w-full px-12 xl:px-16 mb-4">
+                      {[
+                          'Daily Mock Tests',
+                          'Unlimited Practice',
+                          'Instant Result',
+                          'Detailed Explanation',
+                          'Performance Tracking'
+                      ].map((feature, idx) => (
+                          <div key={idx} className="flex items-center gap-3">
+                              <svg className="w-5 h-5 xl:w-[22px] xl:h-[22px] text-white shrink-0 drop-shadow-md" viewBox="0 0 24 24" fill="currentColor">
+                                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                              </svg>
+                              <span className="text-white text-[15px] xl:text-[17px] font-semibold tracking-wide drop-shadow-sm">{feature}</span>
+                          </div>
+                      ))}
+                 </div>
+
+                 {/* Join Button */}
+                 <div className="w-full px-8 xl:px-12 pb-12 xl:pb-16 z-10">
+                      <button className="w-full flex flex-col items-center justify-center py-3.5 xl:py-4 bg-gradient-to-b from-white/20 to-white/5 backdrop-blur-md border border-white/30 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:from-white/30 hover:to-white/10 transition-all duration-300 group">
+                          <span className="text-white font-bold text-xl xl:text-[22px] mb-0.5 drop-shadow-md group-hover:scale-105 transition-transform duration-300">Join DeshExam</span>
+                          <span className="text-gray-300 text-xs xl:text-[13px] font-medium tracking-wide">Start Your Success Journey</span>
+                      </button>
                  </div>
             </div>
         </div>,
