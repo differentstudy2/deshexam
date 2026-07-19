@@ -148,7 +148,16 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
     return createPortal(
         <div className="fixed inset-0 z-[99999] bg-[#f8fbff] flex items-center justify-center select-none font-sans">
-            {/* Aspect Ratio Container for 16:9 */}
+            <style>{`
+                @keyframes popIn {
+                    0% { transform: scale(1); box-shadow: 0 0 0 rgba(52,168,83,0); }
+                    50% { transform: scale(1.05); box-shadow: 0 0 40px rgba(52,168,83,0.6); }
+                    100% { transform: scale(1.03); box-shadow: 0 0 30px rgba(52,168,83,0.5); }
+                }
+                .animate-pop-in {
+                    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+                }
+            `}</style>
             <div className="relative w-full h-full max-w-[177.78vh] max-h-[56.25vw] bg-[#f8f9fc] flex flex-col shadow-2xl overflow-hidden">
                 
                 {/* Background Decorations */}
@@ -257,7 +266,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 }
                             } else {
                                 if (showCorrect) {
-                                    containerClasses = `flex items-center gap-4 py-2 px-3 rounded-2xl border-2 transition-all duration-300 shadow-[0_0_30px_rgba(52,168,83,0.5)] ring-4 ring-[#34A853]/30 bg-[#f0fdf4] border-[#34A853] transform scale-[1.03] z-10 relative`;
+                                    containerClasses = `flex items-center gap-4 py-2 px-3 rounded-2xl border-2 ring-4 ring-[#34A853]/30 bg-[#f0fdf4] border-[#34A853] z-10 relative animate-pop-in`;
                                     letterClasses = `shrink-0 w-12 h-12 flex items-center justify-center rounded-full text-xl font-black transition-colors duration-300 bg-[#34A853] text-white`;
                                 } else if (showWrong && isSelected) {
                                     containerClasses = `flex items-center gap-4 py-2 px-3 rounded-2xl border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(234,67,53,0.15)] bg-[#fce8e6] border-[#EA4335] transform scale-[1.02]`;
