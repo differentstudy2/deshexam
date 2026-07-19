@@ -463,7 +463,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
           <p className="text-slate-500 dark:text-slate-400 mb-8 leading-relaxed transition-colors">
             You must be logged in to your account to take this mock test.
           </p>
-          <Button onClick={() => openAuthDialog()} className="w-full h-12 text-[15px] font-semibold rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-colors">
+          <Button onClick={() => openAuthDialog('sign-in')} className="w-full h-12 text-[15px] font-semibold rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-colors">
             Log In or Sign Up
           </Button>
         </div>
