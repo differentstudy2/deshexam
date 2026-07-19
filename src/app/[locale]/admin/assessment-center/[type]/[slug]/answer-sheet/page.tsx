@@ -15,6 +15,7 @@ import 'katex/dist/katex.min.css';
 import { Lightbulb, CheckCircle2, XCircle, Check, Edit, Eye, Settings } from 'lucide-react';
 import Link from 'next/link';
 import PrintButton from './PrintButton';
+import PresentationOverlay from './PresentationOverlay';
 import { QRCodeSVG } from 'qrcode.react';
 
 const bnOptionsMap: Record<string, string> = {
@@ -131,6 +132,19 @@ export default async function AnswerSheetPage({
                                         <option value="presentation">Presentation (Slide)</option>
                                     </select>
                                 </div>
+                                <PresentationOverlay 
+                                    questions={sortedQuestions.map((q: any) => ({
+                                        id: q.id,
+                                        questionText: q.questionText || '',
+                                        options: q.options || null,
+                                        correctAnswer: q.correctAnswer || null,
+                                        language: q.language || null,
+                                        explanation: q.explanation || null
+                                    }))} 
+                                    classLine={classLine}
+                                    chapterName={chapterName}
+                                    topicName={topicName}
+                                />
                             </div>
                         </div>
 
@@ -278,6 +292,11 @@ export default async function AnswerSheetPage({
                 
                 /* Presentation Layout Overrides */
                 @media print {
+                    html[data-layout="presentation"],
+                    html[data-layout="presentation"] body,
+                    html[data-layout="presentation"] .questions-list-container {
+                        height: 100% !important;
+                    }
                     html[data-layout="presentation"] table,
                     html[data-layout="presentation"] tbody,
                     html[data-layout="presentation"] tr,
@@ -286,22 +305,18 @@ export default async function AnswerSheetPage({
                         height: 100% !important;
                     }
                     html[data-layout="presentation"] .group\/question {
-                        height: 210mm !important;
-                        min-height: 210mm !important;
-                        padding-top: 10rem !important;
-                        padding-bottom: 6rem !important;
-                        padding-left: 8rem !important;
-                        padding-right: 8rem !important;
-                        justify-content: flex-start !important;
+                        height: 100% !important;
+                        min-height: 100% !important;
+                        padding-top: 4rem !important;
+                        padding-bottom: 4rem !important;
+                        padding-left: 4rem !important;
+                        padding-right: 4rem !important;
+                        justify-content: center !important;
+                        gap: 3rem !important;
                         page-break-after: always !important;
                         break-after: page !important;
                         position: relative !important;
                         z-index: 1 !important;
-                        /* Border Hack to extend background to bottom of physical page */
-                        border-bottom-width: 200vh !important;
-                        border-bottom-style: solid !important;
-                        margin-bottom: -200vh !important;
-                        box-sizing: content-box !important;
                     }
                     html[data-layout="presentation"] .presentation-footer {
                         position: fixed !important;
@@ -353,8 +368,8 @@ export default async function AnswerSheetPage({
                     display: flex !important;
                     flex-direction: column;
                     justify-content: flex-start;
-                    padding-top: 8rem !important;
-                    padding-bottom: 6rem !important;
+                    padding-top: 4rem !important;
+                    padding-bottom: 4rem !important;
                     padding-left: 8rem !important;
                     padding-right: 8rem !important;
                     border: none !important;
@@ -371,7 +386,7 @@ export default async function AnswerSheetPage({
                 html[data-layout="presentation"] .print-q-text {
                     font-size: 32px !important;
                     line-height: 1.5 !important;
-                    margin-bottom: 2.5rem !important;
+                    margin-bottom: 1.5rem !important;
                     text-align: left;
                     z-index: 10;
                 }
@@ -568,17 +583,17 @@ export default async function AnswerSheetPage({
                                         ) : (
                                             sortedQuestions.map((q, index) => {
                                                 const premiumColors = [
-                                                    'bg-blue-50/50 print:bg-[#f0f7ff] print:border-b-[#f0f7ff]',
-                                                    'bg-emerald-50/50 print:bg-[#f0fdf4] print:border-b-[#f0fdf4]',
-                                                    'bg-purple-50/50 print:bg-[#faf5ff] print:border-b-[#faf5ff]',
-                                                    'bg-rose-50/50 print:bg-[#fff1f2] print:border-b-[#fff1f2]',
-                                                    'bg-amber-50/50 print:bg-[#fffbeb] print:border-b-[#fffbeb]',
+                                                    'bg-blue-50/50 print:bg-[#f0f7ff] print:shadow-[0_100vh_0_0_#f0f7ff]',
+                                                    'bg-emerald-50/50 print:bg-[#f0fdf4] print:shadow-[0_100vh_0_0_#f0fdf4]',
+                                                    'bg-purple-50/50 print:bg-[#faf5ff] print:shadow-[0_100vh_0_0_#faf5ff]',
+                                                    'bg-rose-50/50 print:bg-[#fff1f2] print:shadow-[0_100vh_0_0_#fff1f2]',
+                                                    'bg-amber-50/50 print:bg-[#fffbeb] print:shadow-[0_100vh_0_0_#fffbeb]',
                                                 ];
                                                 const bgColor = premiumColors[index % premiumColors.length];
                                                 const isLast = index === sortedQuestions.length - 1;
 
                                                 return (
-                                                    <div key={q.id} className={`group/question ${bgColor} ${isLast ? 'flex-1 print:flex-none' : ''} border border-gray-200 p-6 rounded-lg print:border-t-transparent print:border-l-transparent print:border-r-transparent print:p-6 print:pt-8 print:pb-6 print:break-after-page print:[print-color-adjust:exact] break-inside-avoid print:break-inside-avoid flex flex-col relative [html[data-layout='presentation']_&]:pt-[8rem] [html[data-layout='presentation']_&]:pb-[6rem] [html[data-layout='presentation']_&]:px-[4rem] print:[html[data-layout='presentation']_&]:pt-[10rem] print:[html[data-layout='presentation']_&]:px-[4rem]`}>
+                                                    <div key={q.id} className={`group/question ${bgColor} ${isLast ? 'flex-1 print:flex-none' : ''} border border-gray-200 p-6 rounded-lg print:border-none print:p-6 print:pt-8 print:pb-6 print:break-after-page print:[print-color-adjust:exact] break-inside-avoid print:break-inside-avoid flex flex-col relative [html[data-layout='presentation']_&]:pt-[8rem] [html[data-layout='presentation']_&]:pb-[6rem] [html[data-layout='presentation']_&]:px-[4rem] print:[html[data-layout='presentation']_&]:pt-[10rem] print:[html[data-layout='presentation']_&]:px-[4rem]`}>
 
                                                         {/* Presentation Header */}
                                                         <div className="presentation-header hidden absolute top-0 left-0 right-0 bg-transparent py-3 px-10 justify-between items-center w-full print:[print-color-adjust:exact] [html[data-layout='presentation']_&]:flex">
@@ -646,7 +661,7 @@ export default async function AnswerSheetPage({
                                                         </div>
 
                                                         {/* Options Grid */}
-                                                        <div className="options-container space-y-3 md:space-y-0 md:grid md:grid-cols-2 print:space-y-0 print:grid print:grid-cols-2 gap-4 mt-4 mb-6 print:mt-2 print:mb-3">
+                                                        <div className="options-container space-y-3 md:space-y-0 md:grid md:grid-cols-2 print:space-y-0 print:grid print:grid-cols-2 gap-4 mt-4 mb-6 print:mt-2 print:mb-3 [html[data-layout='presentation']_&]:mt-10 print:[html[data-layout='presentation']_&]:mt-24">
                                                             {q.options && [
                                                                 { key: 'a', text: q.options.a },
                                                                 { key: 'b', text: q.options.b },
