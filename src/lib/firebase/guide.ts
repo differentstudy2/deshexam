@@ -155,8 +155,8 @@ export const getReadingContent = async (contentId: string): Promise<ReadingConte
         subtitle: taxNode.description || '',
         featureImage: taxNode.featureImage || '',
         author: {
-          name: taxNode.contentAuthor?.name || taxNode.author || 'DeshExam Team',
-          avatarUrl: taxNode.contentAuthor?.avatarUrl || 'https://deshexam.com/image/logo.png'
+          name: taxNode.contentAuthor?.name || taxNode.author || '',
+          avatarUrl: taxNode.contentAuthor?.avatarUrl || ''
         },
         createdAt: taxNode.createdAt,
         updatedAt: taxNode.updatedAt,
@@ -295,8 +295,8 @@ export const getReadingContent = async (contentId: string): Promise<ReadingConte
       }
 
       // Try to extract author information from taxonomy node or section data
-      const authorName = data.contentAuthor?.name || taxNode?.contentAuthor?.name || taxNode?.author || 'DeshExam Team';
-      const authorAvatar = data.contentAuthor?.avatarUrl || taxNode?.contentAuthor?.avatarUrl || 'https://deshexam.com/image/logo.png';
+      const authorName = data.contentAuthor?.name || taxNode?.contentAuthor?.name || taxNode?.author || '';
+      const authorAvatar = data.contentAuthor?.avatarUrl || taxNode?.contentAuthor?.avatarUrl || '';
 
       sections.push({
         id: d.id, // keep id for sorting
