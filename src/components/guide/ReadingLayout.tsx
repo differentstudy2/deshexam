@@ -119,7 +119,7 @@ export function ReadingLayout({
       </div>
 
       {/* Main Reading Layout Area */}
-      <div className="max-w-[1400px] mx-auto flex items-stretch mt-[10px]">
+      <div className="max-w-[1400px] mx-auto flex items-stretch mt-[10px] px-4 sm:px-6 gap-6 xl:gap-8">
 
         {/* Left Navigation Sidebar */}
         <div className="w-[280px] shrink-0 hidden lg:flex flex-col gap-5 sticky top-6 self-start max-h-[calc(100vh-3rem)] overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-slate-300 dark:[&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full pr-1">
