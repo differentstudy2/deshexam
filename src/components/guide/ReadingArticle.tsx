@@ -43,26 +43,26 @@ interface ReadingArticleProps {
 }
 
 function SectionFooter({ author }: { author?: ContentAuthor }) {
-  if (!author) return null;
+  if (!author || !author.name) return null;
   return (
     <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800">
       <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-3 tracking-wider">
-        CONTENT MANAGER
+        {(author as any).role || 'CONTENT MANAGER'}
       </p>
       <div className="flex items-center gap-3">
         {author?.avatarUrl ? (
           <img 
             src={author.avatarUrl} 
-            alt="DeshExam Team"
+            alt={author.name}
             className="w-8 h-8 rounded-full border border-slate-200 dark:border-slate-700"
           />
         ) : (
           <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-500 font-bold text-xs border border-slate-300 dark:border-slate-600">
-            D
+            {author.name.charAt(0).toUpperCase()}
           </div>
         )}
         <span className="text-[13px] text-slate-600 dark:text-slate-400 font-medium">
-          DeshExam Team
+          {author.name}
         </span>
       </div>
     </div>

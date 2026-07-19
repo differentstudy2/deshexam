@@ -10,6 +10,7 @@ import { BoardDashboard } from '@/components/guide/BoardDashboard';
 import AcademyClient from '@/app/[locale]/academy/AcademyClient';
 import { Metadata } from 'next';
 import { getCourseSchema } from '@/lib/seo/json-ld';
+import { indianBoards } from '@/lib/data/indian-boards';
 
 export const dynamic = 'force-dynamic';
 
@@ -122,6 +123,11 @@ export default async function GuidePage({ params }: { params: Promise<{ segments
   }
 
   const getAncestorTitle = (type: string) => node.ancestors?.find(a => a.type === type)?.title;
+  const getShortName = (item: any) => {
+    if (!item) return '';
+    if (item.type !== 'board') return item.title;
+    return item.acronym || indianBoards.find((ib) => ib.slug === item.slug || ib.id === item.id)?.acronym || item.title;
+  };
   
   const uiBreadcrumbs: { name: string, url: string }[] = [
     { name: 'Home', url: '/' },
@@ -130,17 +136,18 @@ export default async function GuidePage({ params }: { params: Promise<{ segments
   let currentRelUrl = '/guide';
   node.ancestors?.forEach((anc: any) => {
     currentRelUrl += `/${anc.slug || anc.id}`;
-    uiBreadcrumbs.push({ name: anc.title, url: currentRelUrl });
+    uiBreadcrumbs.push({ name: getShortName(anc), url: currentRelUrl });
   });
   
   if (contentType) {
-    uiBreadcrumbs.push({ name: node.title, url: `/guide/${node.fullSlug || node.id}` });
+    uiBreadcrumbs.push({ name: getShortName(node), url: `/guide/${node.fullSlug || node.id}` });
     uiBreadcrumbs.push({ name: contentType.toUpperCase(), url: `/guide/${node.fullSlug || node.id}/${contentType}` });
   } else {
-    uiBreadcrumbs.push({ name: node.title, url: `/guide/${node.fullSlug || node.id}` });
+    uiBreadcrumbs.push({ name: getShortName(node), url: `/guide/${node.fullSlug || node.id}` });
   }
   
-  const boardTitle = node.type === 'board' ? node.title : getAncestorTitle('board');
+  const boardNode = node.type === 'board' ? node : node.ancestors?.find(a => a.type === 'board');
+  const boardTitle = getShortName(boardNode) || getAncestorTitle('board');
   const classTitle = node.type === 'class' ? node.title : getAncestorTitle('class');
   const subjectTitle = node.type === 'subject' ? node.title : getAncestorTitle('subject');
   const textbookTitle = node.type === 'textbook' ? node.title : getAncestorTitle('textbook');
