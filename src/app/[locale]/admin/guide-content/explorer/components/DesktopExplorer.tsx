@@ -695,7 +695,7 @@ export function DesktopExplorer({ className }: { className?: string }) {
               </div>
             </div>
 
-            <div className={viewMode === 'grid' ? "grid grid-cols-1 md:grid-cols-2 gap-4 items-start" : "space-y-2"}>
+            <div className={viewMode === 'grid' ? `grid grid-cols-1 ${activeBoardId ? '' : 'md:grid-cols-2'} gap-4 items-start` : "space-y-2"}>
               {loading ? (
                 <div className="p-8 text-center text-gray-500 animate-pulse col-span-full">Loading Tree...</div>
               ) : filteredClasses.length === 0 ? (
