@@ -9,8 +9,45 @@ import { Metadata } from 'next';
 import { cn } from '@/lib/utils';
 
 export const metadata: Metadata = {
-  title: 'Assessment Center | DeshExam',
-  description: 'Practice, Quizzes, Mock Tests, and Previous Year Papers to help you ace your exams.',
+  title: 'Assessment Center | Practice, Quizzes, Mock Tests | DeshExam',
+  description: 'Boost your exam preparation with our comprehensive Assessment Center. Access thousands of verified practice sets, interactive quizzes, full-length mock tests, and official previous year papers.',
+  keywords: ['exam preparation', 'mock tests', 'practice questions', 'previous year papers', 'online quizzes', 'DeshExam', 'competitive exams', 'assessment center', 'test series'],
+  openGraph: {
+    title: 'Assessment Center | Master Your Exams | DeshExam',
+    description: 'Boost your exam preparation with our comprehensive Assessment Center. Access thousands of verified practice sets, interactive quizzes, full-length mock tests, and official previous year papers.',
+    url: 'https://deshexam.com/assessment',
+    siteName: 'DeshExam',
+    images: [
+      {
+        url: 'https://deshexam.com/og-assessment.png',
+        width: 1200,
+        height: 630,
+        alt: 'DeshExam Assessment Center',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Assessment Center | Master Your Exams | DeshExam',
+    description: 'Access thousands of verified practice sets, interactive quizzes, full-length mock tests, and official previous year papers.',
+    images: ['https://deshexam.com/og-assessment.png'],
+  },
+  alternates: {
+    canonical: 'https://deshexam.com/assessment',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
 };
 
 export default async function AssessmentHubPage() {
