@@ -477,7 +477,11 @@ export function TiptapEditor({ content, onChange, maxHeight }: { content: string
       }
 
       if (viewMode === 'visual') {
-        editor.commands.setContent(parsedHTML);
+        setTimeout(() => {
+          if (!editor.isDestroyed) {
+            editor.commands.setContent(parsedHTML);
+          }
+        }, 0);
       }
     }
 
