@@ -215,7 +215,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                  {/* Top Logo */}
                  <div className="flex flex-col items-center justify-center w-full px-4 pt-10 xl:pt-12 z-10">
                       <div className="flex items-center justify-center mb-8">
-                          <img src="/image/logo.png" alt="DeshExam Academy" className="h-12 xl:h-[3.5rem] w-auto brightness-0 invert drop-shadow-md" />
+                          <div className="bg-white p-2 xl:p-2.5 rounded-xl xl:rounded-2xl shadow-lg">
+                              <img src="/image/logo.png" alt="DeshExam Academy" className="h-10 xl:h-[3rem] w-auto object-contain" />
+                          </div>
                       </div>
                       
                       {/* Text Section */}
