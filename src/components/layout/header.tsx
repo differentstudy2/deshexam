@@ -482,10 +482,12 @@ export const AdminSidebar = ({ onLinkClick, logOut }: { onLinkClick?: () => void
         <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-900/95 text-slate-800 dark:text-slate-300 border-r border-slate-200/60 dark:border-slate-800/60 overflow-hidden">
             <div className="p-4 flex items-center h-16 shrink-0 border-b border-slate-200/60 dark:border-slate-800/60 bg-white dark:bg-slate-950">
                 <Link href="/admin" onClick={onLinkClick} className="flex items-center gap-3 w-full group-data-[collapsible=icon]:justify-center">
-                    <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center shadow-sm shrink-0">
-                        <GraduationCap className="w-5 h-5 text-white" />
+                    <img src="/icons/icon-192x192.png" alt="DeshExam Logo" className="h-8 w-8 object-contain shrink-0" />
+                    <div className="font-extrabold text-xl tracking-tighter flex items-baseline group-data-[collapsible=icon]:hidden whitespace-nowrap">
+                        <span className="bg-gradient-to-r from-[#00a651] to-teal-400 bg-clip-text text-transparent drop-shadow-sm">DESH</span>
+                        <span className="text-inherit">EXAM</span>
+                        <span className="ml-1.5 text-xs font-semibold text-slate-500 uppercase tracking-widest">Admin</span>
                     </div>
-                    <div className="text-slate-900 dark:text-white font-medium text-lg tracking-tight group-data-[collapsible=icon]:hidden whitespace-nowrap">DeshExam Admin</div>
                 </Link>
             </div>
             <ScrollArea className="flex-1 bg-slate-50 dark:bg-slate-900">
