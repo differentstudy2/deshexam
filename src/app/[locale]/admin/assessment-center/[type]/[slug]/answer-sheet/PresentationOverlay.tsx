@@ -386,6 +386,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     <div className="flex justify-between items-center mb-4 pb-3 border-b border-gray-100">
                                         <h3 className="font-bold text-gray-800 text-lg flex items-center gap-2">
                                             <Settings className="w-5 h-5 text-gray-500" /> Settings
+                                            <kbd className="ml-1 text-[10px] bg-gray-100 border border-gray-200 px-1.5 py-0.5 rounded text-gray-500 font-mono shadow-sm">S</kbd>
                                         </h3>
                                         <button onClick={() => setIsSettingsOpen(false)} className="p-1 text-gray-400 hover:bg-gray-100 rounded-full hover:text-gray-700 transition-colors">
                                             <X className="w-5 h-5" />
@@ -394,7 +395,10 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     
                                     <div className="space-y-5">
                                         <div>
-                                            <div className="text-sm font-bold text-gray-600 mb-2">Presentation Mode</div>
+                                            <div className="text-sm font-bold text-gray-600 mb-2 flex justify-between items-center">
+                                                Presentation Mode
+                                                <kbd className="text-[10px] bg-gray-100 border border-gray-200 px-1.5 py-0.5 rounded text-gray-500 font-mono shadow-sm">M</kbd>
+                                            </div>
                                             <div className="flex bg-gray-100 p-1 rounded-xl">
                                                 <button 
                                                     onClick={() => setMode('test')} 
@@ -417,6 +421,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                             <div className="text-sm font-bold text-gray-600 flex items-center gap-2">
                                                 <Clock className="w-4 h-4 text-blue-500" /> 
                                                 Question Timer
+                                                <kbd className="ml-auto text-[10px] bg-gray-100 border border-gray-200 px-1.5 py-0.5 rounded text-gray-500 font-mono shadow-sm">T</kbd>
                                             </div>
                                             <button 
                                                 onClick={() => setIsTimerEnabled(!isTimerEnabled)}
