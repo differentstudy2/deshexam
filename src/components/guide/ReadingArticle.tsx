@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Share2, MoreVertical, Eye, ChevronLeft, ChevronRight, Play, CheckCircle2, Printer, FileQuestion, Target, Trophy, HelpCircle, FileText } from 'lucide-react';
+import { Share2, MoreVertical, Eye, ChevronLeft, ChevronRight, Play, CheckCircle2, Printer, FileQuestion, Target, Trophy, HelpCircle, FileText, Edit } from 'lucide-react';
 import { ReadingContentData, ContentSection, ContentAuthor } from '@/app/[locale]/guide/guide-data';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -412,26 +412,31 @@ export function ReadingArticle({ data, hierarchy, navigation, node }: ReadingArt
             {/* Quick Action Badges */}
             {node && (
               <div className="bg-slate-50 dark:bg-slate-900/40 px-4 sm:px-6 py-3 border-b border-slate-200/60 dark:border-slate-800">
-                <div className="flex flex-wrap items-center justify-center gap-3 w-full">
-                  <Link href={`/guide/${node.fullSlug || node.id}/mcq`} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-800 border border-emerald-100 dark:border-slate-700 rounded-md text-[11px] font-bold text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-slate-700 transition-colors shadow-sm">
-                    <FileQuestion className="w-3.5 h-3.5" />
-                    MCQ
-                  </Link>
-                  <Link href={`/guide/${node.fullSlug || node.id}/mock-test`} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-800 border border-indigo-100 dark:border-slate-700 rounded-md text-[11px] font-bold text-indigo-700 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-700 transition-colors shadow-sm">
-                    <Target className="w-3.5 h-3.5" />
-                    Mock
-                  </Link>
-                  <Link href={`/guide/${node.fullSlug || node.id}/practice-set`} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-800 border border-amber-100 dark:border-slate-700 rounded-md text-[11px] font-bold text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-slate-700 transition-colors shadow-sm">
-                    <FileText className="w-3.5 h-3.5" />
-                    Prac
-                  </Link>
-                  <Link href={`/guide/${node.fullSlug || node.id}/quiz`} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-800 border border-rose-100 dark:border-slate-700 rounded-md text-[11px] font-bold text-rose-700 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-slate-700 transition-colors shadow-sm">
-                    <Trophy className="w-3.5 h-3.5" />
-                    Quiz
-                  </Link>
-                  <Link href={`/guide/${node.fullSlug || node.id}/cq`} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-800 border border-cyan-100 dark:border-slate-700 rounded-md text-[11px] font-bold text-cyan-700 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-slate-700 transition-colors shadow-sm">
-                    <HelpCircle className="w-3.5 h-3.5" />
-                    Q/A
+                <div className="flex flex-wrap items-center relative w-full">
+                  <div className="flex flex-wrap items-center justify-center gap-3 flex-1">
+                    <Link href={`/guide/${node.fullSlug || node.id}/mcq`} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-800 border border-emerald-100 dark:border-slate-700 rounded-md text-[11px] font-bold text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-slate-700 transition-colors shadow-sm">
+                      <FileQuestion className="w-3.5 h-3.5" />
+                      MCQ
+                    </Link>
+                    <Link href={`/guide/${node.fullSlug || node.id}/mock-test`} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-800 border border-indigo-100 dark:border-slate-700 rounded-md text-[11px] font-bold text-indigo-700 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-700 transition-colors shadow-sm">
+                      <Target className="w-3.5 h-3.5" />
+                      Mock
+                    </Link>
+                    <Link href={`/guide/${node.fullSlug || node.id}/practice-set`} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-800 border border-amber-100 dark:border-slate-700 rounded-md text-[11px] font-bold text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-slate-700 transition-colors shadow-sm">
+                      <FileText className="w-3.5 h-3.5" />
+                      Prac
+                    </Link>
+                    <Link href={`/guide/${node.fullSlug || node.id}/quiz`} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-800 border border-rose-100 dark:border-slate-700 rounded-md text-[11px] font-bold text-rose-700 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-slate-700 transition-colors shadow-sm">
+                      <Trophy className="w-3.5 h-3.5" />
+                      Quiz
+                    </Link>
+                    <Link href={`/guide/${node.fullSlug || node.id}/cq`} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-800 border border-cyan-100 dark:border-slate-700 rounded-md text-[11px] font-bold text-cyan-700 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-slate-700 transition-colors shadow-sm">
+                      <HelpCircle className="w-3.5 h-3.5" />
+                      Q/A
+                    </Link>
+                  </div>
+                  <Link href={`/admin/guide-content/topic/${node.id}`} title="Edit Content" className="absolute right-0 top-1/2 -translate-y-1/2 text-slate-400 hover:text-emerald-600 transition-colors p-1.5 rounded-md hover:bg-emerald-50 dark:hover:bg-slate-800">
+                    <Edit className="w-4 h-4" />
                   </Link>
                 </div>
               </div>
