@@ -452,9 +452,11 @@ export function DesktopExplorer({ className }: { className?: string }) {
     setLoadingOptions(true);
     setExistingOptions([]);
     try {
-      const allNodes = await getTaxonomyNodesByType('academic', typeName);
-      const uniqueTitles = Array.from(new Set(allNodes.map(n => n.title).filter(Boolean)));
-      setExistingOptions(uniqueTitles.sort());
+      // Fetching by track and filtering locally avoids potential missing composite index errors in Firestore
+      const allNodes = await getTaxonomyNodesByTrack('academic');
+      const filtered = allNodes.filter((n: any) => n.type === typeName);
+      const uniqueTitles = Array.from(new Set(filtered.map((n: any) => n.title).filter(Boolean)));
+      setExistingOptions(uniqueTitles.sort() as string[]);
     } catch(e) {
       console.error("Failed to load options");
     } finally {
