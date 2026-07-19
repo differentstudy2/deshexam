@@ -36,11 +36,13 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [optFontScale, setOptFontScale] = useState(1);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [mode, setMode] = useState<'test' | 'read'>('test');
+    const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
     const openPresentation = () => {
         setIsOpen(true);
         setCurrentSlide(0);
         setStep(mode === 'read' ? 2 : 0);
+        setSelectedOption(null);
         document.body.style.overflow = 'hidden';
     };
 
@@ -54,6 +56,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
             if (currentSlide < questions.length - 1) {
                 setCurrentSlide(currentSlide + 1);
                 setStep(2);
+                setSelectedOption(null);
             }
         } else {
             if (step < 2) {
@@ -61,6 +64,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
             } else if (currentSlide < questions.length - 1) {
                 setCurrentSlide(currentSlide + 1);
                 setStep(0);
+                setSelectedOption(null);
             }
         }
     }, [step, currentSlide, questions.length, mode]);
@@ -70,6 +74,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
             if (currentSlide > 0) {
                 setCurrentSlide(currentSlide - 1);
                 setStep(2);
+                setSelectedOption(null);
             }
         } else {
             if (step > 0) {
@@ -77,6 +82,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
             } else if (currentSlide > 0) {
                 setCurrentSlide(currentSlide - 1);
                 setStep(2);
+                setSelectedOption(null);
             }
         }
     }, [step, currentSlide, mode]);
@@ -195,6 +201,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             
                             const showCorrect = step >= 1 && isCorrect;
                             const showWrong = step >= 1 && !isCorrect;
+                            const isSelected = selectedOption === opt.key;
 
                             // Colors closely matching the image
                             const colorThemes = [
@@ -210,16 +217,33 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             let containerClasses = `flex items-center gap-4 py-2 px-3 rounded-2xl border-2 transition-all duration-300 shadow-[0_4px_12px_rgba(0,0,0,0.04)] ${theme.bg} ${theme.border}`;
                             let letterClasses = `shrink-0 w-12 h-12 flex items-center justify-center rounded-xl text-xl font-black transition-colors duration-300 ${theme.letterBg} ${theme.letterText}`;
                             
-                            if (showCorrect) {
-                                containerClasses = `flex items-center gap-4 py-2 px-3 rounded-2xl border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(52,168,83,0.15)] bg-[#f0fdf4] border-[#34A853] transform scale-[1.02]`;
-                                letterClasses = `shrink-0 w-12 h-12 flex items-center justify-center rounded-xl text-xl font-black transition-colors duration-300 bg-[#34A853] text-white`;
-                            } else if (showWrong) {
-                                containerClasses = `flex items-center gap-4 py-2 px-3 rounded-2xl border-2 transition-all duration-300 shadow-sm bg-white border-gray-200 opacity-50 grayscale`;
-                                letterClasses = `shrink-0 w-12 h-12 flex items-center justify-center rounded-xl text-xl font-black transition-colors duration-300 bg-gray-100 text-gray-400`;
+                            if (step === 0) {
+                                if (isSelected) {
+                                    containerClasses = `flex items-center gap-4 py-2 px-3 rounded-2xl border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(66,133,244,0.15)] bg-[#e8f0fe] border-[#4285F4] transform scale-[1.02] cursor-pointer ring-2 ring-[#4285F4]/30`;
+                                    letterClasses = `shrink-0 w-12 h-12 flex items-center justify-center rounded-xl text-xl font-black transition-colors duration-300 bg-[#4285F4] text-white`;
+                                } else {
+                                    containerClasses += ` hover:scale-[1.01] hover:shadow-md cursor-pointer hover:border-gray-300`;
+                                }
+                            } else {
+                                if (showCorrect) {
+                                    containerClasses = `flex items-center gap-4 py-2 px-3 rounded-2xl border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(52,168,83,0.15)] bg-[#f0fdf4] border-[#34A853] transform scale-[1.02]`;
+                                    letterClasses = `shrink-0 w-12 h-12 flex items-center justify-center rounded-xl text-xl font-black transition-colors duration-300 bg-[#34A853] text-white`;
+                                } else if (showWrong && isSelected) {
+                                    containerClasses = `flex items-center gap-4 py-2 px-3 rounded-2xl border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(234,67,53,0.15)] bg-[#fce8e6] border-[#EA4335] transform scale-[1.02]`;
+                                    letterClasses = `shrink-0 w-12 h-12 flex items-center justify-center rounded-xl text-xl font-black transition-colors duration-300 bg-[#EA4335] text-white`;
+                                } else if (showWrong) {
+                                    containerClasses = `flex items-center gap-4 py-2 px-3 rounded-2xl border-2 transition-all duration-300 shadow-sm bg-white border-gray-200 opacity-50 grayscale`;
+                                    letterClasses = `shrink-0 w-12 h-12 flex items-center justify-center rounded-xl text-xl font-black transition-colors duration-300 bg-gray-100 text-gray-400`;
+                                }
                             }
 
                             return (
-                                <div key={opt.key} className={containerClasses} style={{ '--opt-size': `${32 * optFontScale}px` } as React.CSSProperties}>
+                                <div 
+                                    key={opt.key} 
+                                    className={containerClasses} 
+                                    style={{ '--opt-size': `${32 * optFontScale}px` } as React.CSSProperties}
+                                    onClick={() => step === 0 && setSelectedOption(opt.key)}
+                                >
                                     <div className={letterClasses}>
                                         {optLetter}
                                     </div>
