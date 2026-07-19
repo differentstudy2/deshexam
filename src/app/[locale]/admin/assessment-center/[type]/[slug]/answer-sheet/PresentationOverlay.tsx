@@ -18,6 +18,9 @@ const bnOptionsMap: Record<string, string> = {
     e: 'ঙ'
 };
 
+const remarkPluginsList = [remarkGfm, remarkMath];
+const rehypePluginsList = [rehypeKatex, rehypeRaw];
+
 interface PresentationOverlayProps {
     questions: any[];
     classLine: string;
@@ -29,7 +32,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [isOpen, setIsOpen] = useState(false);
     const [currentSlide, setCurrentSlide] = useState(0);
     const [step, setStep] = useState(0); // 0: Question, 1: Show Answer, 2: Show Explanation
-    const [fontScale, setFontScale] = useState(1);
+    const [qFontScale, setQFontScale] = useState(1);
+    const [optFontScale, setOptFontScale] = useState(1);
 
     const openPresentation = () => {
         setIsOpen(true);
@@ -144,10 +148,10 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 <div className="flex-1 w-full flex flex-col items-center px-24 py-12 z-10 overflow-y-auto custom-scrollbar gap-8">
                         
                     {/* Question */}
-                    <div className="flex items-start gap-4 w-full max-w-5xl mt-4" style={{ '--q-size': `${38 * fontScale}px` } as React.CSSProperties}>
+                    <div className="flex items-start gap-4 w-full max-w-5xl mt-4" style={{ '--q-size': `${38 * qFontScale}px` } as React.CSSProperties}>
                         <span className="text-black font-extrabold leading-tight shrink-0" style={{ fontSize: 'var(--q-size)' }}>Q{currentSlide + 1}.</span>
                         <div className="prose prose-black max-w-none prose-p:font-extrabold prose-p:text-[length:var(--q-size)] leading-snug prose-p:my-0 prose-li:text-2xl text-left text-black">
-                            <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeRaw]}>
+                            <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
                                 {q.questionText}
                             </ReactMarkdown>
                         </div>
@@ -191,12 +195,12 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             }
 
                             return (
-                                <div key={opt.key} className={containerClasses} style={{ '--opt-size': `${32 * fontScale}px` } as React.CSSProperties}>
+                                <div key={opt.key} className={containerClasses} style={{ '--opt-size': `${32 * optFontScale}px` } as React.CSSProperties}>
                                     <div className={letterClasses}>
                                         {optLetter}
                                     </div>
                                     <div className="prose max-w-none text-black [&>p]:m-0 [&>p]:text-[length:var(--opt-size)] [&>p]:font-semibold [&>p]:leading-snug">
-                                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeRaw]}>
+                                        <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
                                             {opt.text}
                                         </ReactMarkdown>
                                     </div>
@@ -217,7 +221,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     Explanation
                                 </div>
                                 <div className="prose prose-xl max-w-none text-gray-800 pl-4 font-medium">
-                                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeRaw]}>
+                                    <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
                                         {q.explanation}
                                     </ReactMarkdown>
                                 </div>
@@ -237,10 +241,20 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     
                     <div className="flex items-center gap-8">
                         {/* Font Settings */}
-                        <div className="flex items-center bg-gray-100/80 rounded-lg border border-gray-200">
-                            <button onClick={() => setFontScale(s => Math.max(0.6, s - 0.1))} className="px-3 py-1 text-gray-700 hover:bg-gray-200 rounded-l-lg font-bold border-r border-gray-200 transition-colors" title="Decrease Font Size">A-</button>
-                            <div className="px-3 py-1 text-gray-600 font-bold text-sm min-w-[3.5rem] text-center">{Math.round(fontScale * 100)}%</div>
-                            <button onClick={() => setFontScale(s => Math.min(1.5, s + 0.1))} className="px-3 py-1 text-gray-700 hover:bg-gray-200 rounded-r-lg font-bold border-l border-gray-200 transition-colors" title="Increase Font Size">A+</button>
+                        <div className="flex items-center gap-4">
+                            <div className="flex items-center bg-gray-100/80 rounded-lg border border-gray-200">
+                                <div className="px-2 py-1 text-gray-500 font-bold text-xs border-r border-gray-200">Q</div>
+                                <button onClick={() => setQFontScale(s => Math.max(0.6, s - 0.1))} className="px-2 py-1 text-gray-700 hover:bg-gray-200 font-bold border-r border-gray-200 transition-colors" title="Decrease Question Font Size">A-</button>
+                                <div className="px-2 py-1 text-gray-600 font-bold text-sm min-w-[3.5rem] text-center">{Math.round(qFontScale * 100)}%</div>
+                                <button onClick={() => setQFontScale(s => Math.min(2.0, s + 0.1))} className="px-2 py-1 text-gray-700 hover:bg-gray-200 rounded-r-lg font-bold transition-colors" title="Increase Question Font Size">A+</button>
+                            </div>
+                            
+                            <div className="flex items-center bg-gray-100/80 rounded-lg border border-gray-200">
+                                <div className="px-2 py-1 text-gray-500 font-bold text-xs border-r border-gray-200">Opt</div>
+                                <button onClick={() => setOptFontScale(s => Math.max(0.6, s - 0.1))} className="px-2 py-1 text-gray-700 hover:bg-gray-200 font-bold border-r border-gray-200 transition-colors" title="Decrease Options Font Size">A-</button>
+                                <div className="px-2 py-1 text-gray-600 font-bold text-sm min-w-[3.5rem] text-center">{Math.round(optFontScale * 100)}%</div>
+                                <button onClick={() => setOptFontScale(s => Math.min(2.0, s + 0.1))} className="px-2 py-1 text-gray-700 hover:bg-gray-200 rounded-r-lg font-bold transition-colors" title="Increase Options Font Size">A+</button>
+                            </div>
                         </div>
                         
                         <div className="text-gray-700 font-semibold text-lg">
