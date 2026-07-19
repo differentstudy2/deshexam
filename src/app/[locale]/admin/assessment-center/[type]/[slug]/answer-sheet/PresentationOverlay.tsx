@@ -141,6 +141,23 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 return;
             }
 
+            if (e.key.toLowerCase() === 'q') {
+                setQFontScale(s => Math.max(0.6, s - 0.1));
+                return;
+            }
+            if (e.key.toLowerCase() === 'w') {
+                setQFontScale(s => Math.min(2.0, s + 0.1));
+                return;
+            }
+            if (e.key.toLowerCase() === 'o') {
+                setOptFontScale(s => Math.max(0.6, s - 0.1));
+                return;
+            }
+            if (e.key.toLowerCase() === 'p') {
+                setOptFontScale(s => Math.min(2.0, s + 0.1));
+                return;
+            }
+
             if (!isSettingsOpen) {
                 if (e.key === 'ArrowRight' || e.key === ' ') {
                     e.preventDefault();
@@ -439,8 +456,12 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                 <span className="text-blue-600 bg-blue-50 px-2 rounded text-xs py-0.5">{Math.round(qFontScale * 100)}%</span>
                                             </div>
                                             <div className="flex items-center bg-gray-50 rounded-xl border border-gray-200 w-full overflow-hidden shadow-inner">
-                                                <button onClick={() => setQFontScale(s => Math.max(0.6, s - 0.1))} className="flex-1 py-2 text-gray-700 hover:bg-gray-200 font-bold border-r border-gray-200 transition-colors">A-</button>
-                                                <button onClick={() => setQFontScale(s => Math.min(2.0, s + 0.1))} className="flex-1 py-2 text-gray-700 hover:bg-gray-200 font-bold transition-colors">A+</button>
+                                                <button onClick={() => setQFontScale(s => Math.max(0.6, s - 0.1))} className="flex-1 py-2 flex justify-center items-center gap-2 text-gray-700 hover:bg-gray-200 font-bold border-r border-gray-200 transition-colors">
+                                                    A- <kbd className="text-[10px] bg-white border border-gray-300 px-1.5 py-0.5 rounded text-gray-500 font-mono shadow-sm">Q</kbd>
+                                                </button>
+                                                <button onClick={() => setQFontScale(s => Math.min(2.0, s + 0.1))} className="flex-1 py-2 flex justify-center items-center gap-2 text-gray-700 hover:bg-gray-200 font-bold transition-colors">
+                                                    A+ <kbd className="text-[10px] bg-white border border-gray-300 px-1.5 py-0.5 rounded text-gray-500 font-mono shadow-sm">W</kbd>
+                                                </button>
                                             </div>
                                         </div>
                                         
@@ -450,8 +471,12 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                 <span className="text-green-600 bg-green-50 px-2 rounded text-xs py-0.5">{Math.round(optFontScale * 100)}%</span>
                                             </div>
                                             <div className="flex items-center bg-gray-50 rounded-xl border border-gray-200 w-full overflow-hidden shadow-inner">
-                                                <button onClick={() => setOptFontScale(s => Math.max(0.6, s - 0.1))} className="flex-1 py-2 text-gray-700 hover:bg-gray-200 font-bold border-r border-gray-200 transition-colors">A-</button>
-                                                <button onClick={() => setOptFontScale(s => Math.min(2.0, s + 0.1))} className="flex-1 py-2 text-gray-700 hover:bg-gray-200 font-bold transition-colors">A+</button>
+                                                <button onClick={() => setOptFontScale(s => Math.max(0.6, s - 0.1))} className="flex-1 py-2 flex justify-center items-center gap-2 text-gray-700 hover:bg-gray-200 font-bold border-r border-gray-200 transition-colors">
+                                                    A- <kbd className="text-[10px] bg-white border border-gray-300 px-1.5 py-0.5 rounded text-gray-500 font-mono shadow-sm">O</kbd>
+                                                </button>
+                                                <button onClick={() => setOptFontScale(s => Math.min(2.0, s + 0.1))} className="flex-1 py-2 flex justify-center items-center gap-2 text-gray-700 hover:bg-gray-200 font-bold transition-colors">
+                                                    A+ <kbd className="text-[10px] bg-white border border-gray-300 px-1.5 py-0.5 rounded text-gray-500 font-mono shadow-sm">P</kbd>
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
