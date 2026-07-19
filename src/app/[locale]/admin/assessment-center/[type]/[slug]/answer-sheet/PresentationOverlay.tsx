@@ -159,10 +159,12 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     <div className="absolute top-1/4 -right-16 w-64 h-64 rounded-full border-[1.5px] border-gray-200 opacity-50"></div>
                     <div className="absolute bottom-1/4 right-32 w-48 h-48 rounded-full border-[1.5px] border-gray-200 opacity-50"></div>
                     <div className="absolute top-1/3 left-1/4 w-32 h-32 rounded-full border-[1.5px] border-gray-200 opacity-50"></div>
-                    {/* Watermark Center */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-12 text-[120px] font-black text-gray-200/50 tracking-widest uppercase">
-                        DESHEXAM
-                    </div>
+                    {/* Watermark removed from here, moved to foreground */}
+                </div>
+
+                {/* Foreground Watermark */}
+                <div className="absolute top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-12 text-[120px] font-black text-gray-200/50 tracking-widest uppercase z-30 pointer-events-none select-none">
+                    DESHEXAM
                 </div>
 
                 {/* Header */}
@@ -258,8 +260,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     containerClasses = `flex items-center gap-4 py-2 px-3 rounded-2xl border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(234,67,53,0.15)] bg-[#fce8e6] border-[#EA4335] transform scale-[1.02]`;
                                     letterClasses = `shrink-0 w-12 h-12 flex items-center justify-center rounded-xl text-xl font-black transition-colors duration-300 bg-[#EA4335] text-white`;
                                 } else if (showWrong) {
-                                    containerClasses = `flex items-center gap-4 py-2 px-3 rounded-2xl border-2 transition-all duration-300 shadow-sm bg-white border-gray-200 opacity-50 grayscale`;
-                                    letterClasses = `shrink-0 w-12 h-12 flex items-center justify-center rounded-xl text-xl font-black transition-colors duration-300 bg-gray-100 text-gray-400`;
+                                    containerClasses = `flex items-center gap-4 py-2 px-3 rounded-2xl border-2 transition-all duration-300 shadow-sm bg-white border-gray-200 opacity-60`;
+                                    // letterClasses keeps its default theme color
                                 }
                             }
 
