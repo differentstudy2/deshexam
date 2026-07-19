@@ -8,7 +8,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
 import 'katex/dist/katex.min.css';
-import { X, ChevronLeft, ChevronRight, Play } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Play, Settings } from 'lucide-react';
 
 const bnOptionsMap: Record<string, string> = {
     a: 'ক',
@@ -34,6 +34,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [step, setStep] = useState(0); // 0: Question, 1: Show Answer, 2: Show Explanation
     const [qFontScale, setQFontScale] = useState(1);
     const [optFontScale, setOptFontScale] = useState(1);
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
     const openPresentation = () => {
         setIsOpen(true);
@@ -240,21 +241,52 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     </div>
                     
                     <div className="flex items-center gap-8">
-                        {/* Font Settings */}
-                        <div className="flex items-center gap-4">
-                            <div className="flex items-center bg-gray-100/80 rounded-lg border border-gray-200">
-                                <div className="px-2 py-1 text-gray-500 font-bold text-xs border-r border-gray-200">Q</div>
-                                <button onClick={() => setQFontScale(s => Math.max(0.6, s - 0.1))} className="px-2 py-1 text-gray-700 hover:bg-gray-200 font-bold border-r border-gray-200 transition-colors" title="Decrease Question Font Size">A-</button>
-                                <div className="px-2 py-1 text-gray-600 font-bold text-sm min-w-[3.5rem] text-center">{Math.round(qFontScale * 100)}%</div>
-                                <button onClick={() => setQFontScale(s => Math.min(2.0, s + 0.1))} className="px-2 py-1 text-gray-700 hover:bg-gray-200 rounded-r-lg font-bold transition-colors" title="Increase Question Font Size">A+</button>
-                            </div>
+                        {/* Settings Dropdown */}
+                        <div className="relative">
+                            <button 
+                                onClick={() => setIsSettingsOpen(!isSettingsOpen)} 
+                                className={`p-3 rounded-full transition-all shadow-sm ${isSettingsOpen ? 'bg-blue-100 text-blue-700 ring-2 ring-blue-500/50' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}
+                                title="Display Settings"
+                            >
+                                <Settings className={`w-6 h-6 transition-transform duration-300 ${isSettingsOpen ? 'rotate-90' : ''}`} />
+                            </button>
                             
-                            <div className="flex items-center bg-gray-100/80 rounded-lg border border-gray-200">
-                                <div className="px-2 py-1 text-gray-500 font-bold text-xs border-r border-gray-200">Opt</div>
-                                <button onClick={() => setOptFontScale(s => Math.max(0.6, s - 0.1))} className="px-2 py-1 text-gray-700 hover:bg-gray-200 font-bold border-r border-gray-200 transition-colors" title="Decrease Options Font Size">A-</button>
-                                <div className="px-2 py-1 text-gray-600 font-bold text-sm min-w-[3.5rem] text-center">{Math.round(optFontScale * 100)}%</div>
-                                <button onClick={() => setOptFontScale(s => Math.min(2.0, s + 0.1))} className="px-2 py-1 text-gray-700 hover:bg-gray-200 rounded-r-lg font-bold transition-colors" title="Increase Options Font Size">A+</button>
-                            </div>
+                            {isSettingsOpen && (
+                                <div className="absolute bottom-full mb-4 right-0 bg-white border border-gray-200 rounded-2xl shadow-2xl p-5 w-72 z-50 animate-in fade-in zoom-in-95 duration-200">
+                                    <div className="flex justify-between items-center mb-4 pb-3 border-b border-gray-100">
+                                        <h3 className="font-bold text-gray-800 text-lg flex items-center gap-2">
+                                            <Settings className="w-5 h-5 text-gray-500" /> Settings
+                                        </h3>
+                                        <button onClick={() => setIsSettingsOpen(false)} className="p-1 text-gray-400 hover:bg-gray-100 rounded-full hover:text-gray-700 transition-colors">
+                                            <X className="w-5 h-5" />
+                                        </button>
+                                    </div>
+                                    
+                                    <div className="space-y-5">
+                                        <div>
+                                            <div className="text-sm font-bold text-gray-600 mb-2 flex justify-between">
+                                                <span>Question Font Size</span>
+                                                <span className="text-blue-600 bg-blue-50 px-2 rounded text-xs py-0.5">{Math.round(qFontScale * 100)}%</span>
+                                            </div>
+                                            <div className="flex items-center bg-gray-50 rounded-xl border border-gray-200 w-full overflow-hidden shadow-inner">
+                                                <button onClick={() => setQFontScale(s => Math.max(0.6, s - 0.1))} className="flex-1 py-2 text-gray-700 hover:bg-gray-200 font-bold border-r border-gray-200 transition-colors">A-</button>
+                                                <button onClick={() => setQFontScale(s => Math.min(2.0, s + 0.1))} className="flex-1 py-2 text-gray-700 hover:bg-gray-200 font-bold transition-colors">A+</button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div>
+                                            <div className="text-sm font-bold text-gray-600 mb-2 flex justify-between">
+                                                <span>Options Font Size</span>
+                                                <span className="text-green-600 bg-green-50 px-2 rounded text-xs py-0.5">{Math.round(optFontScale * 100)}%</span>
+                                            </div>
+                                            <div className="flex items-center bg-gray-50 rounded-xl border border-gray-200 w-full overflow-hidden shadow-inner">
+                                                <button onClick={() => setOptFontScale(s => Math.max(0.6, s - 0.1))} className="flex-1 py-2 text-gray-700 hover:bg-gray-200 font-bold border-r border-gray-200 transition-colors">A-</button>
+                                                <button onClick={() => setOptFontScale(s => Math.min(2.0, s + 0.1))} className="flex-1 py-2 text-gray-700 hover:bg-gray-200 font-bold transition-colors">A+</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                         
                         <div className="text-gray-700 font-semibold text-lg">
