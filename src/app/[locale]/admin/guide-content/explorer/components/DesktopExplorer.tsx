@@ -30,7 +30,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, rectSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { 
   getTaxonomyNodesByTrack, getTaxonomyNodesByType, getTaxonomyNodesByParent,
@@ -314,12 +314,12 @@ const TreeNode = ({ node, level = 0, onAddClick, onBulkAddClick, onEditClick, on
           {/* Tree Guide Line */}
           <div className="absolute left-6 top-0 bottom-3 w-[1.5px] bg-slate-200" />
           
-          <div className="pl-10">
+          <div className="pl-10 grid grid-cols-1 xl:grid-cols-2 gap-x-4">
             {children.length === 0 ? (
               <div className="text-xs text-slate-400 italic py-3">No items found.</div>
             ) : (
               <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                <SortableContext items={children.filter(c => activeChildId ? c.id === activeChildId : true).map(c => c.id)} strategy={verticalListSortingStrategy}>
+                <SortableContext items={children.filter(c => activeChildId ? c.id === activeChildId : true).map(c => c.id)} strategy={rectSortingStrategy}>
                   {children
                     .filter(c => activeChildId ? c.id === activeChildId : true)
                     .map((child, index) => {
