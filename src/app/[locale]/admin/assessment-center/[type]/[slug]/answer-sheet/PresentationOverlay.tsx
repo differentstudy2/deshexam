@@ -231,11 +231,11 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                             // Colors closely matching the image
                             const colorThemes = [
-                                { border: 'border-[#4285F4]', bg: 'bg-white', letterBg: 'bg-[#e8f0fe]', letterText: 'text-[#4285F4]' }, // Blue
-                                { border: 'border-[#34A853]', bg: 'bg-white', letterBg: 'bg-[#e6f4ea]', letterText: 'text-[#34A853]' }, // Green
-                                { border: 'border-[#F9AB00]', bg: 'bg-white', letterBg: 'bg-[#fef7e0]', letterText: 'text-[#F9AB00]' }, // Yellow/Orange
-                                { border: 'border-[#34A853]', bg: 'bg-white', letterBg: 'bg-[#e6f4ea]', letterText: 'text-[#34A853]' }, // Green (from image)
-                                { border: 'border-[#EA4335]', bg: 'bg-white', letterBg: 'bg-[#fce8e6]', letterText: 'text-[#EA4335]' }, // Red
+                                { border: 'border-[#4285F4]', bg: 'bg-white', letterBg: 'bg-[#4285F4]', letterText: 'text-white' }, // Blue
+                                { border: 'border-[#34A853]', bg: 'bg-white', letterBg: 'bg-[#34A853]', letterText: 'text-white' }, // Green
+                                { border: 'border-[#F9AB00]', bg: 'bg-white', letterBg: 'bg-[#F9AB00]', letterText: 'text-white' }, // Yellow/Orange
+                                { border: 'border-[#EA4335]', bg: 'bg-white', letterBg: 'bg-[#EA4335]', letterText: 'text-white' }, // Red
+                                { border: 'border-[#9C27B0]', bg: 'bg-white', letterBg: 'bg-[#9C27B0]', letterText: 'text-white' }, // Purple
                             ];
 
                             const theme = colorThemes[oIdx % colorThemes.length];
