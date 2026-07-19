@@ -15,6 +15,7 @@ import { Chapter } from '@/app/[locale]/guide/guide-data';
 export function ReadingLayout({
   id,
   data,
+  node,
   subjects,
   curriculum,
   boardTitle,
@@ -26,6 +27,7 @@ export function ReadingLayout({
 }: {
   id: string;
   data: any;
+  node?: any;
   subjects: any[];
   curriculum: Chapter[];
   boardTitle?: string;
@@ -128,6 +130,7 @@ export function ReadingLayout({
         <div className="flex-1 min-w-0">
           <ReadingArticle 
             data={data} 
+            node={node}
             hierarchy={{
               boardTitle,
               classTitle,
