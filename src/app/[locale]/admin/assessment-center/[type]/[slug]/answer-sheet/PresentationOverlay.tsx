@@ -37,7 +37,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [mode, setMode] = useState<'test' | 'read'>('test');
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
-    const [isTimerEnabled, setIsTimerEnabled] = useState(false);
+    const [isTimerEnabled, setIsTimerEnabled] = useState(true);
     const [timerSeconds, setTimerSeconds] = useState(0);
 
     const openPresentation = () => {
