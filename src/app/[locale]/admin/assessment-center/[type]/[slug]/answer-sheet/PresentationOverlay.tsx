@@ -162,8 +162,11 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     {/* Watermark removed from here, moved to foreground */}
                 </div>
 
-                {/* Foreground Watermark */}
+                {/* Foreground Watermarks */}
                 <div className="absolute top-[75%] left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-[8deg] text-[100px] font-black text-gray-200/50 tracking-widest uppercase z-30 pointer-events-none select-none">
+                    DESHEXAM
+                </div>
+                <div className="absolute top-[25%] right-[10%] -translate-y-1/2 -rotate-[8deg] text-[80px] font-black text-gray-200/40 tracking-widest uppercase z-30 pointer-events-none select-none">
                     DESHEXAM
                 </div>
 
@@ -243,22 +246,22 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             const theme = colorThemes[oIdx % colorThemes.length];
                             
                             let containerClasses = `flex items-center gap-4 py-2 px-3 rounded-2xl border-2 transition-all duration-300 shadow-[0_4px_12px_rgba(0,0,0,0.04)] ${theme.bg} ${theme.border}`;
-                            let letterClasses = `shrink-0 w-12 h-12 flex items-center justify-center rounded-xl text-xl font-black transition-colors duration-300 ${theme.letterBg} ${theme.letterText}`;
+                            let letterClasses = `shrink-0 w-12 h-12 flex items-center justify-center rounded-full text-xl font-black transition-colors duration-300 ${theme.letterBg} ${theme.letterText}`;
                             
                             if (step === 0) {
                                 if (isSelected) {
                                     containerClasses = `flex items-center gap-4 py-2 px-3 rounded-2xl border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(66,133,244,0.15)] bg-[#e8f0fe] border-[#4285F4] transform scale-[1.02] cursor-pointer ring-2 ring-[#4285F4]/30`;
-                                    letterClasses = `shrink-0 w-12 h-12 flex items-center justify-center rounded-xl text-xl font-black transition-colors duration-300 bg-[#4285F4] text-white`;
+                                    letterClasses = `shrink-0 w-12 h-12 flex items-center justify-center rounded-full text-xl font-black transition-colors duration-300 bg-[#4285F4] text-white`;
                                 } else {
                                     containerClasses += ` hover:scale-[1.01] hover:shadow-md cursor-pointer hover:border-gray-300`;
                                 }
                             } else {
                                 if (showCorrect) {
                                     containerClasses = `flex items-center gap-4 py-2 px-3 rounded-2xl border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(52,168,83,0.15)] bg-[#f0fdf4] border-[#34A853] transform scale-[1.02]`;
-                                    letterClasses = `shrink-0 w-12 h-12 flex items-center justify-center rounded-xl text-xl font-black transition-colors duration-300 bg-[#34A853] text-white`;
+                                    letterClasses = `shrink-0 w-12 h-12 flex items-center justify-center rounded-full text-xl font-black transition-colors duration-300 bg-[#34A853] text-white`;
                                 } else if (showWrong && isSelected) {
                                     containerClasses = `flex items-center gap-4 py-2 px-3 rounded-2xl border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(234,67,53,0.15)] bg-[#fce8e6] border-[#EA4335] transform scale-[1.02]`;
-                                    letterClasses = `shrink-0 w-12 h-12 flex items-center justify-center rounded-xl text-xl font-black transition-colors duration-300 bg-[#EA4335] text-white`;
+                                    letterClasses = `shrink-0 w-12 h-12 flex items-center justify-center rounded-full text-xl font-black transition-colors duration-300 bg-[#EA4335] text-white`;
                                 } else if (showWrong) {
                                     containerClasses = `flex items-center gap-4 py-2 px-3 rounded-2xl border-2 transition-all duration-300 shadow-sm bg-white border-gray-200 opacity-60`;
                                     // letterClasses keeps its default theme color
