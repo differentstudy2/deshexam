@@ -105,7 +105,7 @@ export default function AdminLayout({
     <SidebarProvider>
       <div className="flex min-h-[100dvh] w-full bg-slate-50 dark:bg-slate-900 print:block print:min-h-0 print:bg-white">
         <div className="print:hidden">
-          <Sidebar className="hidden md:flex">
+          <Sidebar className="hidden md:flex" collapsible="icon">
             <AdminSidebarWrapper logOut={logOut} />
           </Sidebar>
         </div>
