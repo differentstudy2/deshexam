@@ -30,7 +30,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, rectSortingStrategy, useSortable } from '@dnd-kit/sortable';
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { 
   getTaxonomyNodesByTrack, getTaxonomyNodesByType, getTaxonomyNodesByParent,
@@ -210,10 +210,10 @@ const TreeNode = ({ node, level = 0, onAddClick, onBulkAddClick, onEditClick, on
   const finalSubName = (level === 0 && displayAcronym && displayAcronym !== displayName) ? displayName : '';
 
   return (
-    <div className={`mt-2 min-w-0`}>
+    <div className={`mt-2`}>
       <div className={`group flex items-center justify-between p-3 rounded-xl transition-all ${conf.bg} ${conf.border} ${level === 0 ? 'shadow-sm hover:shadow-md mb-3 border-gray-200' : 'mb-1.5'}`}>
         
-        <div className="flex items-center gap-3 cursor-pointer flex-1 min-w-0" onClick={() => hasChildren && handleToggle()}>
+        <div className="flex items-center gap-3 cursor-pointer flex-1" onClick={() => hasChildren && handleToggle()}>
           
           {dragListeners && (
             <div {...dragListeners} {...dragAttributes} className="cursor-grab p-1 -ml-2 rounded text-slate-300 hover:text-slate-600 hover:bg-slate-200" onClick={(e) => e.stopPropagation()}>
@@ -230,8 +230,8 @@ const TreeNode = ({ node, level = 0, onAddClick, onBulkAddClick, onEditClick, on
             <Icon className={`w-4 h-4 ${conf.color}`} />
           </div>
           
-          <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
-            <div className="flex items-center gap-2 flex-wrap min-w-0">
+          <div className="flex flex-col flex-1">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className={`font-semibold text-gray-800 ${level === 0 ? 'text-lg tracking-tight' : ''}`}>
                 {finalMainName}
               </span>
@@ -314,12 +314,12 @@ const TreeNode = ({ node, level = 0, onAddClick, onBulkAddClick, onEditClick, on
           {/* Tree Guide Line */}
           <div className="absolute left-6 top-0 bottom-3 w-[1.5px] bg-slate-200" />
           
-          <div className={`pl-10 ${node.type === 'class' ? 'grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-1' : ''}`}>
+          <div className="pl-10">
             {children.length === 0 ? (
               <div className="text-xs text-slate-400 italic py-3">No items found.</div>
             ) : (
               <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                <SortableContext items={children.filter(c => activeChildId ? c.id === activeChildId : true).map(c => c.id)} strategy={rectSortingStrategy}>
+                <SortableContext items={children.filter(c => activeChildId ? c.id === activeChildId : true).map(c => c.id)} strategy={verticalListSortingStrategy}>
                   {children
                     .filter(c => activeChildId ? c.id === activeChildId : true)
                     .map((child, index) => {
@@ -369,6 +369,8 @@ export function DesktopExplorer({ className }: { className?: string }) {
   const [titleInput, setTitleInput] = useState('');
   const [authorInput, setAuthorInput] = useState('');
   const [saving, setSaving] = useState(false);
+  const [existingOptions, setExistingOptions] = useState<string[]>([]);
+  const [loadingOptions, setLoadingOptions] = useState(false);
 
   const [bulkAddDialog, setBulkAddDialog] = useState({ isOpen: false, parentId: '', typeName: '' as NodeType, onSuccess: () => {} });
   const [bulkTextInput, setBulkTextInput] = useState('');
@@ -445,8 +447,19 @@ export function DesktopExplorer({ className }: { className?: string }) {
     try { await updateTaxonomyNodeOrders(newClasses.map(c => ({ id: c.id, orderIndex: c.orderIndex }))); } catch (e) { console.error(e); }
   };
 
-  const handleOpenDialog = (parentId: string, typeName: NodeType, onSuccess: () => void) => {
+  const handleOpenDialog = async (parentId: string, typeName: NodeType, onSuccess: () => void) => {
     setTitleInput(''); setAuthorInput(''); setDialogState({ isOpen: true, parentId, typeName, onSuccess });
+    setLoadingOptions(true);
+    setExistingOptions([]);
+    try {
+      const allNodes = await getTaxonomyNodesByType('academic', typeName);
+      const uniqueTitles = Array.from(new Set(allNodes.map(n => n.title).filter(Boolean)));
+      setExistingOptions(uniqueTitles.sort());
+    } catch(e) {
+      console.error("Failed to load options");
+    } finally {
+      setLoadingOptions(false);
+    }
   };
 
   const handleOpenBulkAdd = (parentId: string, typeName: NodeType, onSuccess: () => void) => {
@@ -790,11 +803,33 @@ export function DesktopExplorer({ className }: { className?: string }) {
 
       {/* Add Dialog */}
       <Dialog open={dialogState.isOpen} onOpenChange={(open) => !open && setDialogState(prev => ({ ...prev, isOpen: false }))}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[450px]">
           <DialogHeader><DialogTitle>Add New {dialogState.typeName}</DialogTitle></DialogHeader>
           <div className="py-4 space-y-4">
             <Input value={titleInput} onChange={(e) => setTitleInput(e.target.value)} placeholder={`Enter ${dialogState.typeName} title`} autoFocus />
             {['textbook', 'chapter', 'topic'].includes(dialogState.typeName) && <Input value={authorInput} onChange={(e) => setAuthorInput(e.target.value)} placeholder="Author (Optional)" />}
+            
+            {loadingOptions ? (
+               <div className="text-xs text-slate-400 animate-pulse mt-2">Loading existing options...</div>
+            ) : existingOptions.length > 0 ? (
+               <div className="space-y-2 pt-2 border-t border-slate-100">
+                 <Label className="text-xs text-slate-500 font-normal">Or select an existing one to reuse:</Label>
+                 <div className="flex flex-wrap gap-1.5 max-h-[160px] overflow-y-auto p-1">
+                   {existingOptions
+                     .filter(opt => opt.toLowerCase().includes(titleInput.toLowerCase()))
+                     .slice(0, 40)
+                     .map((opt, i) => (
+                     <span 
+                       key={i} 
+                       onClick={() => setTitleInput(opt)}
+                       className="text-xs px-2.5 py-1.5 bg-slate-50 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 rounded-md cursor-pointer border border-slate-200 hover:border-emerald-200 transition-colors"
+                     >
+                       {opt}
+                     </span>
+                   ))}
+                 </div>
+               </div>
+            ) : null}
           </div>
           <DialogFooter><Button onClick={handleSaveDialog} disabled={saving || !titleInput.trim()}>Create</Button></DialogFooter>
         </DialogContent>
