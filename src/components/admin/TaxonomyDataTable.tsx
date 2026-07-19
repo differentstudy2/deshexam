@@ -84,10 +84,23 @@ export function TaxonomyDataTable({ type, title }: Props) {
   const [duplicateGroups, setDuplicateGroups] = useState<{title: string, parentId: string|null, nodes: TaxonomyNode[]}[]>([]);
   const [mergingGroupId, setMergingGroupId] = useState<string | null>(null);
 
+  const getContextForMerge = (node: TaxonomyNode) => {
+    let current = node;
+    const path: string[] = [];
+    while (current.parentId) {
+      const parent = allNodes.find(n => n.id === current.parentId);
+      if (!parent) break;
+      path.unshift(parent.title);
+      current = parent;
+    }
+    return path.join('>');
+  };
+
   const findDuplicates = () => {
     const groups: Record<string, TaxonomyNode[]> = {};
     nodes.forEach(node => {
-      const key = `${node.title.trim().toLowerCase()}_${node.parentId || 'root'}`;
+      const context = getContextForMerge(node) || 'root';
+      const key = `${node.title.trim().toLowerCase()}_${context}`;
       if (!groups[key]) groups[key] = [];
       groups[key].push(node);
     });
@@ -95,10 +108,11 @@ export function TaxonomyDataTable({ type, title }: Props) {
     const duplicates = Object.values(groups).filter(group => group.length > 1).map(group => ({
       title: group[0].title,
       parentId: group[0].parentId,
+      context: getContextForMerge(group[0]),
       nodes: group
     }));
     
-    setDuplicateGroups(duplicates);
+    setDuplicateGroups(duplicates as any);
     setIsMergeModalOpen(true);
   };
 
@@ -1178,8 +1192,8 @@ export function TaxonomyDataTable({ type, title }: Props) {
                     <div>
                       <h4 className="font-bold text-slate-800">{group.title}</h4>
                       <p className="text-xs text-slate-500 mt-1">Found {group.nodes.length} duplicates.</p>
-                      {group.parentId && (
-                        <p className="text-xs text-indigo-600 mt-1">Parent: {allNodes.find(n => n.id === group.parentId)?.title || group.parentId}</p>
+                      {(group as any).context && (
+                        <p className="text-xs text-indigo-600 mt-1">Context: {(group as any).context}</p>
                       )}
                     </div>
                     <Button onClick={() => handleMergeGroup(group)} disabled={isMerging} variant={isMerging ? "secondary" : "default"}>
