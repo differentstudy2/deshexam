@@ -55,7 +55,9 @@ export function TaxonomyDataTable({ type, title }: Props) {
   // New filters
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('grid');
   const [groupByName, setGroupByName] = useState(false);
-  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'title-asc' | 'title-desc'>('newest');
+  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'title-asc' | 'title-desc' | 'context'>(
+    ['class', 'subject', 'textbook', 'chapter', 'topic'].includes(type) ? 'context' : 'newest'
+  );
   const [filterHasImage, setFilterHasImage] = useState<'all' | 'yes' | 'no'>('all');
   const [filterInstitutionType, setFilterInstitutionType] = useState('all');
   const [filterState, setFilterState] = useState('all');
@@ -214,6 +216,13 @@ export function TaxonomyDataTable({ type, title }: Props) {
 
   // Sorting
   const sortedNodes = [...filteredNodes].sort((a, b) => {
+    if (sortBy === 'context') {
+      const ctxA = getParentContext(a) || '';
+      const ctxB = getParentContext(b) || '';
+      const cmp = ctxA.localeCompare(ctxB);
+      if (cmp !== 0) return cmp;
+      return a.title.localeCompare(b.title);
+    }
     if (sortBy === 'title-asc') return a.title.localeCompare(b.title);
     if (sortBy === 'title-desc') return b.title.localeCompare(a.title);
     const aTime = (a as any).createdAt?.toDate ? (a as any).createdAt.toDate().getTime() : 0;
@@ -237,7 +246,8 @@ export function TaxonomyDataTable({ type, title }: Props) {
     filterInstitutionType !== 'all', filterState !== 'all', filterDateRange !== 'all'].filter(Boolean).length;
 
   const resetAllFilters = () => {
-    setSearchQuery(''); setStatusFilter('all'); setSortBy('newest');
+    setSearchQuery(''); setStatusFilter('all'); 
+    setSortBy(['class', 'subject', 'textbook', 'chapter', 'topic'].includes(type) ? 'context' : 'newest');
     setFilterHasImage('all'); setFilterHasWebsite('all');
     setFilterInstitutionType('all'); setFilterState('all'); setFilterDateRange('all');
     setFilterBoardId('all'); setFilterClassId('all'); setFilterSubjectId('all');
@@ -522,6 +532,7 @@ export function TaxonomyDataTable({ type, title }: Props) {
                   <option value="oldest">Oldest</option>
                   <option value="title-asc">A → Z</option>
                   <option value="title-desc">Z → A</option>
+                  {type !== 'board' && <option value="context">Board & Class</option>}
                 </select>
                 <ArrowUpDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 dark:text-slate-500 pointer-events-none" />
               </div>
