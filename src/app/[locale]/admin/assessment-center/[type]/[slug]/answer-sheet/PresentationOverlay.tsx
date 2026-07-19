@@ -257,7 +257,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 }
                             } else {
                                 if (showCorrect) {
-                                    containerClasses = `flex items-center gap-4 py-2 px-3 rounded-2xl border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(52,168,83,0.15)] bg-[#f0fdf4] border-[#34A853] transform scale-[1.02]`;
+                                    containerClasses = `flex items-center gap-4 py-2 px-3 rounded-2xl border-2 transition-all duration-300 shadow-[0_0_30px_rgba(52,168,83,0.5)] ring-4 ring-[#34A853]/30 bg-[#f0fdf4] border-[#34A853] transform scale-[1.03] z-10 relative`;
                                     letterClasses = `shrink-0 w-12 h-12 flex items-center justify-center rounded-full text-xl font-black transition-colors duration-300 bg-[#34A853] text-white`;
                                 } else if (showWrong && isSelected) {
                                     containerClasses = `flex items-center gap-4 py-2 px-3 rounded-2xl border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(234,67,53,0.15)] bg-[#fce8e6] border-[#EA4335] transform scale-[1.02]`;
