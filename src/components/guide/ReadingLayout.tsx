@@ -11,6 +11,7 @@ import { AssessmentTabs } from '@/components/guide/AssessmentTabs';
 import { TopicSectionsSidebar } from '@/components/guide/TopicSectionsSidebar';
 import { GuideSidebar } from '@/components/guide/GuideSidebar';
 import { Chapter } from '@/app/[locale]/guide/guide-data';
+import { NodeQuestionsPage } from '@/components/guide/NodeQuestionsPage';
 
 export function ReadingLayout({
   id,
@@ -23,7 +24,8 @@ export function ReadingLayout({
   subjectTitle,
   textbookTitle,
   chapterTitle,
-  breadcrumbs
+  breadcrumbs,
+  contentType
 }: {
   id: string;
   data: any;
@@ -36,6 +38,7 @@ export function ReadingLayout({
   textbookTitle?: string;
   chapterTitle?: string;
   breadcrumbs?: { name: string, url: string }[];
+  contentType?: string | null;
 }) {
   const router = useRouter();
 
@@ -128,21 +131,27 @@ export function ReadingLayout({
 
         {/* Main Content Area */}
         <div className="flex-1 min-w-0">
-          <ReadingArticle 
-            data={data} 
-            node={node}
-            hierarchy={{
-              boardTitle,
-              classTitle,
-              subjectTitle,
-              textbookTitle,
-              chapterTitle
-            }}
-            navigation={{
-              prev: prevNode,
-              next: nextNode
-            }}
-          />
+          {contentType === 'questions' || contentType === 'mcq' || contentType === 'cq' ? (
+            <div className="pt-6 px-4 sm:px-6 xl:px-10 pb-12 min-h-[600px]">
+              <NodeQuestionsPage node={node} contentType={contentType} breadcrumbs={breadcrumbs || []} />
+            </div>
+          ) : (
+            <ReadingArticle 
+              data={data} 
+              node={node}
+              hierarchy={{
+                boardTitle,
+                classTitle,
+                subjectTitle,
+                textbookTitle,
+                chapterTitle
+              }}
+              navigation={{
+                prev: prevNode,
+                next: nextNode
+              }}
+            />
+          )}
           
           <div className="px-4 sm:px-6 xl:px-12 pb-12">
             <AssessmentTabs chapterId={id} />

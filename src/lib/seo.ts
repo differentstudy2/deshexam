@@ -32,7 +32,14 @@ export function generateHybridSeo({ node, contentType, siteName = 'DeshExam', bo
     baseTitle = customTitle;
   } else {
     if (contentType) {
-      baseTitle = `${node.title} ${contentType.toUpperCase()} - ${className || 'Guide'}`;
+      let contentTypeName = contentType.toUpperCase();
+      if (contentType === 'questions') contentTypeName = 'Important Questions & Answers';
+      if (contentType === 'mcq') contentTypeName = 'MCQ Questions and Answers';
+      if (contentType === 'cq') contentTypeName = 'Creative Questions (CQ)';
+      
+      const parentName = getAncestorTitle('textbook') || subjectName;
+      const classPrefix = className ? `Class ${className.replace(/class\s+/i, '')} ` : '';
+      baseTitle = `${classPrefix}${node.title} ${contentTypeName} | ${parentName || 'Guide'}`;
     } else if (node.type === 'board') {
       baseTitle = `${boardName} Study Materials, Notes & Questions`;
     } else if (node.type === 'class') {
@@ -78,7 +85,12 @@ export function generateHybridSeo({ node, contentType, siteName = 'DeshExam', bo
     description = seo.customDescription;
   } else {
     if (contentType) {
-      description = `Practice ${contentType.toUpperCase()} for ${node.title}. Comprehensive guide, questions, and solutions to boost your exam prep for ${className || 'your class'}.`;
+      let contentTypeName = contentType.toUpperCase();
+      if (contentType === 'questions') contentTypeName = 'important questions, MCQ, and CQ';
+      if (contentType === 'mcq') contentTypeName = 'multiple choice questions (MCQ)';
+      if (contentType === 'cq') contentTypeName = 'creative questions (CQ)';
+
+      description = `Practice top ${contentTypeName} on ${node.title} for ${className || 'your class'}. Verify your knowledge, read solutions, and prepare for your exams effectively with DeshExam.`;
     } else if (node.type === 'board') {
       description = `Get the best study materials, syllabus, notes, and mock tests for ${node.title}. Prepare effectively for your board exams with our comprehensive resources.`;
     } else if (node.type === 'class') {
@@ -105,7 +117,16 @@ export function generateHybridSeo({ node, contentType, siteName = 'DeshExam', bo
 
   let dynamicKeywords = seo.keywords || [];
   if (dynamicKeywords.length === 0) {
-    if (node.type === 'textbook') {
+    if (contentType) {
+      const typeName = contentType.toUpperCase();
+      dynamicKeywords = [
+        `${node.title} ${typeName}`,
+        `${node.title} ${typeName} questions`,
+        `${className} ${node.title} ${typeName}`,
+        `important questions for ${node.title}`,
+        `${node.title} question bank`
+      ].filter(Boolean);
+    } else if (node.type === 'textbook') {
       dynamicKeywords = [
         `${boardName} ${className} ${node.title}`,
         `${boardName} ${className} ${subjectName} guide`,
