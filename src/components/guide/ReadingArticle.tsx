@@ -48,22 +48,14 @@ function SectionFooter({ author }: { author?: ContentAuthor }) {
   return (
     <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800">
       <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-3 tracking-wider">
-        {(author as any).role || 'CONTENT MANAGER'}
+        PUBLISHED BY
       </p>
       <div className="flex items-center gap-3">
-        {author?.avatarUrl ? (
-          <img 
-            src={author.avatarUrl} 
-            alt={author.name}
-            className="w-8 h-8 rounded-full border border-slate-200 dark:border-slate-700"
-          />
-        ) : (
-          <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-500 font-bold text-xs border border-slate-300 dark:border-slate-600">
-            {author.name.charAt(0).toUpperCase()}
-          </div>
-        )}
-        <span className="text-[13px] text-slate-600 dark:text-slate-400 font-medium">
-          {author.name}
+        <div className="w-9 h-9 rounded-full bg-white dark:bg-slate-900 flex items-center justify-center border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden p-1.5">
+          <img src="/icons/icon-192x192.png" alt="DeshExam" className="w-full h-full object-contain" />
+        </div>
+        <span className="text-[15px] text-slate-800 dark:text-slate-200 font-extrabold tracking-tight">
+          DeshExam
         </span>
       </div>
     </div>
