@@ -44,8 +44,7 @@ interface ReadingArticleProps {
   contentType?: string | null;
 }
 
-function SectionFooter({ author }: { author?: ContentAuthor }) {
-  if (!author || !author.name) return null;
+function SectionFooter() {
   return (
     <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800">
       <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-3 tracking-wider">
@@ -120,7 +119,7 @@ export function ReadingArticle({ data, node, hierarchy, navigation, contentType 
             ))}
           </div>
         )}
-        {data.author && <SectionFooter author={data.author} />}
+        <SectionFooter />
       </div>
     </div>
   );
@@ -308,7 +307,7 @@ export function ReadingArticle({ data, node, hierarchy, navigation, contentType 
             </div>
           )}
 
-          {sec.author && <SectionFooter author={sec.author} />}
+          <SectionFooter />
         </div>
       </div>
     );
@@ -443,11 +442,13 @@ export function ReadingArticle({ data, node, hierarchy, navigation, contentType 
               const sectionQuery = searchParams ? searchParams.get('section') : null;
               const contentSectionId = contentType ? contentType.replace(/-/g, '_') : null;
               
-              const activeId = contentSectionId || sectionQuery || (data.sections.length > 0 ? data.sections[0].id : '');
+              if (contentSectionId || sectionQuery) {
+                const activeId = contentSectionId || sectionQuery;
+                const sectionToRender = data.sections.find(s => s.id === activeId) || data.sections[0];
+                return sectionToRender ? renderSection(sectionToRender, 0) : null;
+              }
               
-              const sectionToRender = data.sections.find(s => s.id === activeId) || data.sections[0];
-              
-              return sectionToRender ? renderSection(sectionToRender, 0) : null;
+              return data.sections.map((sec, idx) => renderSection(sec, idx));
             })()}
 
             {/* Tags and Pagination */}
