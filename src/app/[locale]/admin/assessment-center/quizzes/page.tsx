@@ -503,7 +503,7 @@ export default function QuizzesPage() {
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end" className="w-48">
                                                     <DropdownMenuItem asChild>
-                                                        <Link href={`/quizzes/${test.slug}`} target="_blank" className="cursor-pointer">
+                                                        <Link href={`/quiz/${test.slug}`} target="_blank" className="cursor-pointer">
                                                             <Eye className="mr-2 h-4 w-4" /> View on Site
                                                         </Link>
                                                     </DropdownMenuItem>
@@ -607,7 +607,7 @@ export default function QuizzesPage() {
                                                         </DropdownMenuTrigger>
                                                         <DropdownMenuContent align="end" className="w-48">
                                                             <DropdownMenuItem asChild>
-                                                                <Link href={`/quizzes/${test.slug}`} target="_blank" className="cursor-pointer">
+                                                                <Link href={`/quiz/${test.slug}`} target="_blank" className="cursor-pointer">
                                                                     <Eye className="mr-2 h-4 w-4" /> View on Site
                                                                 </Link>
                                                             </DropdownMenuItem>

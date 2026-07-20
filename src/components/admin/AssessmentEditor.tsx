@@ -762,6 +762,10 @@ export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock 
                         <div className="flex-1 overflow-y-auto p-2">
                             <div className="space-y-1">
                                 {taxonomySheet.items
+                                    .filter(item => {
+                                        const displayName = (item as any).acronym || item.name;
+                                        return displayName && String(displayName).trim() !== '';
+                                    })
                                     .filter(item => item.name.toLowerCase().includes(sheetSearch.toLowerCase()) || (item as any).acronym?.toLowerCase().includes(sheetSearch.toLowerCase()))
                                     .map(item => (
                                     <button 
@@ -781,7 +785,12 @@ export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock 
                                         {taxonomySheet.value === item.id && <CheckCircle2 className="w-4 h-4 text-slate-700 dark:text-slate-300" />}
                                     </button>
                                 ))}
-                                {taxonomySheet.items.filter(item => item.name.toLowerCase().includes(sheetSearch.toLowerCase()) || (item as any).acronym?.toLowerCase().includes(sheetSearch.toLowerCase())).length === 0 && (
+                                {taxonomySheet.items
+                                    .filter(item => {
+                                        const displayName = (item as any).acronym || item.name;
+                                        return displayName && String(displayName).trim() !== '';
+                                    })
+                                    .filter(item => item.name.toLowerCase().includes(sheetSearch.toLowerCase()) || (item as any).acronym?.toLowerCase().includes(sheetSearch.toLowerCase())).length === 0 && (
                                     <div className="text-center p-4 text-slate-500 dark:text-slate-400 text-sm">No items found matching "{sheetSearch}".</div>
                                 )}
                             </div>
