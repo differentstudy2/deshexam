@@ -17,6 +17,7 @@ interface NodeQuestionsPageProps {
 export function NodeQuestionsPage({ node, contentType, breadcrumbs }: NodeQuestionsPageProps) {
   const [questions, setQuestions] = useState<QuestionBankEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isTestMode, setIsTestMode] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [lastDoc, setLastDoc] = useState<any>(null);
   const [hasMore, setHasMore] = useState(true);
@@ -109,10 +110,24 @@ export function NodeQuestionsPage({ node, contentType, breadcrumbs }: NodeQuesti
         </div>
       ) : (
         <div className="space-y-6">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
             <span className="text-sm font-medium text-slate-500 dark:text-slate-400">
               Showing {questions.length} question{questions.length !== 1 ? 's' : ''}
             </span>
+            <div className="flex bg-slate-200/60 dark:bg-slate-800 p-1 rounded-lg">
+              <button
+                onClick={() => setIsTestMode(false)}
+                className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${!isTestMode ? 'bg-white dark:bg-slate-700 text-emerald-700 dark:text-emerald-400 shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}
+              >
+                Reading Mode
+              </button>
+              <button
+                onClick={() => setIsTestMode(true)}
+                className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${isTestMode ? 'bg-white dark:bg-slate-700 text-emerald-700 dark:text-emerald-400 shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}
+              >
+                Practice Mode
+              </button>
+            </div>
           </div>
           {questions.map((question, index) => (
             <QuestionCard 
@@ -120,6 +135,8 @@ export function NodeQuestionsPage({ node, contentType, breadcrumbs }: NodeQuesti
               question={question} 
               index={index}
               isListView={true}
+              testMode={isTestMode}
+              isDetailView={!isTestMode}
             />
           ))}
 
