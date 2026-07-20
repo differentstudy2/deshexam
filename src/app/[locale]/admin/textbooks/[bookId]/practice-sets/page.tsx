@@ -226,6 +226,7 @@ export default function ManageTextbookPracticeSetsPage() {
                                         fieldName="featureImage"
                                         onUrlChange={(url) => setItemData(p => ({ ...p, featureImage: url }))}
                                         value={itemData.featureImage}
+                                        defaultAiPrompt={`A beautifully designed, premium e-learning thumbnail banner for a Practice Set. The central text is NOT needed, but the visual theme should match: Subject: ${textbook?.subject || 'General Knowledge'}, Title: ${itemData.title || 'Practice Set'}. The design should feature a cinematic 3D composition with relevant educational items (like books, science elements, global icons) on a dark blue background with glassy UI elements. High quality, 4k, hyper-detailed.`}
                                     />
                                 </div>
                                 <div className="space-y-2">

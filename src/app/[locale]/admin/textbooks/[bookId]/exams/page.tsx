@@ -225,6 +225,7 @@ export default function ManageTextbookExamsPage() {
                                         fieldName="featureImage"
                                         onUrlChange={(url) => setExamData(p => ({ ...p, featureImage: url }))}
                                         value={examData.featureImage}
+                                        defaultAiPrompt={`A beautifully designed, premium e-learning thumbnail banner for an Exam. The central text is NOT needed, but the visual theme should match: Subject: ${textbook?.subject || 'General Knowledge'}, Title: ${examData.title || 'Exam'}. The design should feature a cinematic 3D composition with relevant educational items (like books, science elements, global icons) on a dark blue background with glassy UI elements. High quality, 4k, hyper-detailed.`}
                                     />
                                 </div>
                                 <div className="space-y-2">

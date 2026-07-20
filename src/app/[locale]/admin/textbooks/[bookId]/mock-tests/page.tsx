@@ -235,6 +235,7 @@ export default function ManageTextbookMockTestsPage() {
                                         fieldName="featureImage"
                                         onUrlChange={(url) => setTestData(p => ({ ...p, featureImage: url }))}
                                         value={testData.featureImage}
+                                        defaultAiPrompt={`A beautifully designed, premium e-learning thumbnail banner for a Mock Test. The central text is NOT needed, but the visual theme should match: Subject: ${textbook?.subject || 'General Knowledge'}, Title: ${testData.title || 'Mock Test'}. The design should feature a cinematic 3D composition with relevant educational items (like books, science elements, global icons) on a dark blue background with glassy UI elements. High quality, 4k, hyper-detailed.`}
                                     />
                                 </div>
                                 <div className="space-y-2">

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -17,13 +17,19 @@ import { uploadFile } from '@/lib/firebase/firestore';
 import { generateImage } from '@/ai/flows/ai-image-generator';
 import Image from 'next/image';
 
-export const ImageUploader = ({ fieldName, onUrlChange, value }: { fieldName: string, onUrlChange: (url: string) => void, value?: string }) => {
+export const ImageUploader = ({ fieldName, onUrlChange, value, defaultAiPrompt }: { fieldName: string, onUrlChange: (url: string) => void, value?: string, defaultAiPrompt?: string }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [url, setUrl] = useState('');
     const [isUploading, setIsUploading] = useState(false);
     const [isGenerating, setIsGenerating] = useState(false);
-    const [prompt, setPrompt] = useState('');
+    const [prompt, setPrompt] = useState(defaultAiPrompt || '');
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        if (defaultAiPrompt) {
+            setPrompt(defaultAiPrompt);
+        }
+    }, [defaultAiPrompt]);
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
