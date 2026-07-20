@@ -83,22 +83,87 @@ export function ReadingArticle({ data, node, hierarchy, navigation, contentType 
 
   const renderLegacyContent = () => (
     <div className="bg-white dark:bg-slate-900 shadow-sm border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden">
-      <div className="bg-[#f3f9f5] dark:bg-emerald-900/10 px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex justify-between items-start">
-        <div>
-          <h1 className="text-[22px] font-bold text-slate-800 dark:text-slate-100 mb-1">
-            {data.title}
-          </h1>
-          <p className="text-[13px] text-slate-400 dark:text-slate-500 uppercase tracking-wide">
-            {data.subtitle}
-          </p>
-        </div>
-        <div className="flex items-center gap-3 text-slate-400 dark:text-slate-500">
-          <div className="flex items-center gap-1.5 text-[13px] font-medium mr-2">
-            <Eye className="w-4 h-4 mr-1.5" />
-            {viewCount}
+      <div className="bg-[#f2f9f6] dark:bg-emerald-900/10 px-6 py-4 sm:py-5 border-b border-emerald-100/50 dark:border-slate-800">
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+          <div className="flex-1 w-full">
+            <div className="flex flex-wrap items-baseline gap-2 mb-1">
+              <h1 className="text-[26px] sm:text-[28px] font-bold text-[#143d30] dark:text-slate-100 tracking-tight">
+                {data.title}
+              </h1>
+              {data.author?.name && (
+                <span className="text-[14px] font-normal text-slate-400 dark:text-slate-500">
+                  ({data.author.name})
+                </span>
+              )}
+            </div>
+            {hierarchy ? (
+              <div className="flex flex-wrap items-center gap-1.5 text-[13px] text-[#789e90] dark:text-slate-400 font-normal">
+                {[
+                  hierarchy.boardTitle && hierarchy.boardTitle !== 'Board' ? hierarchy.boardTitle : null,
+                  hierarchy.classTitle && hierarchy.classTitle !== 'Class' ? hierarchy.classTitle : null,
+                  hierarchy.subjectTitle && hierarchy.subjectTitle !== 'Subject' ? hierarchy.subjectTitle : null,
+                  hierarchy.textbookTitle && hierarchy.textbookTitle !== 'Textbook' ? hierarchy.textbookTitle : null
+                ].filter(Boolean).map((text, i, arr) => (
+                  <React.Fragment key={text as string}>
+                    <span>{text}</span>
+                    {i < arr.length - 1 && <span className="opacity-60">-</span>}
+                  </React.Fragment>
+                ))}
+              </div>
+            ) : (
+              <p className="text-[13px] text-[#789e90] dark:text-slate-500 uppercase tracking-wide m-0">
+                {data.subtitle}
+              </p>
+            )}
           </div>
-          <button className="hover:text-[#00a651] transition-colors"><Share2 className="w-4 h-4" /></button>
-          <button className="hover:text-[#00a651] transition-colors p-1"><MoreVertical className="w-4 h-4" /></button>
+          <div className="flex items-center gap-4 text-[#6b8c80] print:hidden shrink-0">
+            <div className="flex items-center gap-1.5 text-[15px] font-medium mr-1">
+              <Eye className="w-[18px] h-[18px]" />
+              {viewCount}
+            </div>
+            <button
+              onClick={() => window.print()}
+              className="hover:text-[#1b3d36] transition-colors p-1.5"
+              title="Print"
+            >
+              <Printer className="w-[20px] h-[20px] stroke-[1.5]" />
+            </button>
+            <button
+              onClick={() => {
+                if (navigator.share) {
+                  navigator.share({ title: data.title, url: window.location.href });
+                } else {
+                  navigator.clipboard.writeText(window.location.href);
+                  alert('Link copied to clipboard!');
+                }
+              }}
+              className="hover:text-[#1b3d36] transition-colors p-1.5"
+              title="Share"
+            >
+              <Share2 className="w-[20px] h-[20px] stroke-[1.5]" />
+            </button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="bg-white dark:bg-slate-800 rounded-md p-1.5 hover:text-[#1b3d36] hover:bg-slate-50 shadow-sm border border-slate-200/80 dark:border-slate-700 transition-colors ml-2">
+                  <MoreVertical className="w-5 h-5 stroke-[1.5]" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48 bg-white dark:bg-slate-900">
+                <DropdownMenuItem className="cursor-pointer">Test Yourself</DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer">Favorite</DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer">Bookmark</DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="cursor-pointer">View MCQ(129)</DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer">View Written(115)</DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="cursor-pointer">প্রশ্ন তৈরি করুন</DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer">Show Video</DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="cursor-pointer">Add MCQ</DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer">Add Written</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </div>
       <div className="p-6 sm:p-10 flex flex-col gap-8">
@@ -132,20 +197,24 @@ export function ReadingArticle({ data, node, hierarchy, navigation, contentType 
 
         {/* Section Header */}
         {!isLesson && (
-          <div className="flex justify-between items-center p-2">
+          <div className="bg-[#f2f9f6] dark:bg-emerald-900/10 px-6 py-4 border-b border-emerald-100/50 dark:border-slate-800 flex justify-between items-center">
             <div className="flex items-center gap-3">
-              <h2 className="text-[18px] font-bold text-emerald-700 dark:text-emerald-400">
+              <h2 className="text-[20px] font-bold text-[#143d30] dark:text-slate-100 tracking-tight">
                 {sec.title}
               </h2>
               {sec.type !== 'article' && (
-                <span className="px-2 py-0.5 bg-[#00a651] text-white text-[11px] font-bold rounded">
+                <span className="px-2 py-0.5 bg-emerald-600/10 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300 text-[11px] font-bold rounded uppercase tracking-wider">
                   Reading
                 </span>
               )}
             </div>
-            <div className="flex items-center gap-2 text-slate-400">
-              <button className="hover:text-emerald-600 transition-colors p-1"><Share2 className="w-4 h-4" /></button>
-              <button className="hover:text-emerald-600 transition-colors p-1"><MoreVertical className="w-4 h-4" /></button>
+            <div className="flex items-center gap-2 text-[#6b8c80] print:hidden">
+              <button className="hover:text-[#1b3d36] transition-colors p-1.5 rounded-md hover:bg-emerald-50 dark:hover:bg-slate-800">
+                <Share2 className="w-[18px] h-[18px] stroke-[1.5]" />
+              </button>
+              <button className="bg-white dark:bg-slate-800 rounded-md p-1.5 hover:text-[#1b3d36] hover:bg-emerald-50 shadow-sm border border-slate-200/80 dark:border-slate-700 transition-colors">
+                <MoreVertical className="w-5 h-5 stroke-[1.5]" />
+              </button>
             </div>
           </div>
         )}
