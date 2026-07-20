@@ -2,7 +2,7 @@
 import React, { useCallback } from 'react';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage } from '@/lib/firebase/client';
-import { useEditor, EditorContent } from '@tiptap/react';
+import { useEditor, EditorContent, BubbleMenu } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Heading from '@tiptap/extension-heading';
 import Underline from '@tiptap/extension-underline';
@@ -32,7 +32,8 @@ import {
   Bold, Italic, Underline as UnderlineIcon, Strikethrough,
   Heading1, Heading2, Heading3, Heading4,
   List, ListOrdered, CheckSquare, Quote, Code, Image as ImageIcon, Video, FileText, Music, Table as TableIcon,
-  AlignLeft, AlignCenter, AlignRight, AlignJustify, Type, Info, Sigma, HelpCircle
+  AlignLeft, AlignCenter, AlignRight, AlignJustify, Type, Info, Sigma, HelpCircle,
+  BookOpen, Languages, Maximize, MoreHorizontal, CornerUpLeft, CornerUpRight, RemoveFormatting, Smile, Subscript, Superscript, Search, Printer
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Toggle } from '@/components/ui/toggle';
