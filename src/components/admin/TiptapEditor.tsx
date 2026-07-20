@@ -398,8 +398,8 @@ export function TiptapEditor({ content, onChange, maxHeight }: { content: string
       }) as any,
       Markdown.configure({
         html: true,
-        transformPastedText: true,
-        transformCopiedText: true,
+        transformPastedText: false,
+        transformCopiedText: false,
       }),
       Underline,
       Strike,

@@ -178,6 +178,11 @@
     @apply px-4 py-2 border border-border;
   }
 
+  .prose th p,
+  .prose td p {
+    @apply m-0;
+  }
+
   .prose tr:nth-child(even) {
     @apply bg-transparent;
   }
