@@ -5,7 +5,7 @@ import { Share2, MoreVertical, Eye, ChevronLeft, ChevronRight, Play, CheckCircle
 import { ReadingContentData, ContentSection, ContentAuthor } from '@/app/[locale]/guide/guide-data';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { CustomVideoPlayer } from '@/components/ui/CustomVideoPlayer';
 import ReactMarkdown from 'react-markdown';
@@ -434,16 +434,21 @@ export function ReadingArticle({ data, hierarchy, navigation, node }: ReadingArt
               </div>
             )}
 
-            {data.sections.map(renderSection)}
+            {(() => {
+              const searchParams = useSearchParams();
+              const sectionQuery = searchParams ? searchParams.get('section') : null;
+              const activeId = sectionQuery || (data.sections.length > 0 ? data.sections[0].id : '');
+              
+              const sectionToRender = data.sections.find(s => s.id === activeId) || data.sections[0];
+              
+              return sectionToRender ? renderSection(sectionToRender, 0) : null;
+            })()}
 
             {/* Tags and Pagination */}
             <div className="px-6 py-6 sm:px-8 mt-4">
 
               {data.tags && (
                 <div className="mb-8">
-                  <h4 className="text-[14px] font-bold text-slate-800 dark:text-slate-200 mb-4">
-                    Tags
-                  </h4>
                   <div className="flex flex-wrap gap-2">
                     {data.tags.map((tag) => (
                       <span

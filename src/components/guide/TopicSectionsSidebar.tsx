@@ -1,9 +1,11 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { BookOpen, FileText, Type, Target, Info, User, Lightbulb, PenTool, HelpCircle, Brain, CheckSquare, FileArchive, FileImage, Video, ClipboardList, StickyNote, Key, Timer, Award } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ContentSection } from '@/app/[locale]/guide/guide-data';
+import Link from 'next/link';
+import { usePathname, useSearchParams } from 'next/navigation';
 
 const SECTION_ICONS: Record<string, any> = {
   'lesson': BookOpen,
@@ -32,39 +34,17 @@ const SECTION_ICONS: Record<string, any> = {
   'exams_papers': Award
 };
 
-export function TopicSectionsSidebar({ sections }: { sections: ContentSection[] }) {
-  const [activeId, setActiveId] = useState<string>(sections[0]?.id || '');
+export function TopicSectionsSidebar({ sections, node, currentContentType }: { sections: ContentSection[], node?: any, currentContentType?: string | null }) {
+  const pathname = usePathname();
+  
+  // Convert DB section ID to URL-friendly format (e.g. word_meaning -> word-meaning)
+  const getUrlSegment = (id: string) => id.replace(/_/g, '-');
+  
+  // Default to first section if no query param is set and no content type
+  const activeId = currentContentType ? currentContentType.replace(/-/g, '_') : (sections.length > 0 ? sections[0].id : '');
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const sectionElements = sections.map(s => document.getElementById(s.id || ''));
-      let currentActive = activeId;
-      for (const el of sectionElements) {
-        if (el) {
-          const rect = el.getBoundingClientRect();
-          if (rect.top <= 150 && rect.bottom >= 150) {
-            currentActive = el.id;
-            break;
-          }
-        }
-      }
-      if (currentActive !== activeId) {
-        setActiveId(currentActive);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [sections, activeId]);
-
-  const scrollToSection = (id: string) => {
-    setActiveId(id);
-    const element = document.getElementById(id);
-    if (element) {
-      const y = element.getBoundingClientRect().top + window.scrollY - 100;
-      window.scrollTo({ top: y, behavior: 'smooth' });
-    }
-  };
+  // Base URL for the topic
+  const baseUrl = node ? `/guide/${node.fullSlug || node.id}` : pathname.replace(/\/[^\/]+$/, '');
 
   return (
     <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col h-fit p-3">
@@ -73,10 +53,15 @@ export function TopicSectionsSidebar({ sections }: { sections: ContentSection[] 
           const secId = sec.id || '';
           const isActive = activeId === secId;
           const Icon = SECTION_ICONS[secId] || FileText;
+          
+          const urlSegment = getUrlSegment(secId);
+          const href = `${baseUrl}/${urlSegment}`;
+
           return (
-            <button
+            <Link
               key={secId}
-              onClick={() => scrollToSection(secId)}
+              href={href}
+              scroll={true}
               className={cn(
                 "w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-[14px] font-medium transition-colors",
                 isActive 
@@ -84,9 +69,9 @@ export function TopicSectionsSidebar({ sections }: { sections: ContentSection[] 
                   : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
               )}
             >
-              <Icon className={cn("w-4 h-4", isActive ? "text-[#107c41] dark:text-emerald-400" : "text-slate-400")} />
-              {sec.title}
-            </button>
+              <Icon className={cn("w-4 h-4 shrink-0", isActive ? "text-[#107c41] dark:text-emerald-400" : "text-slate-400")} />
+              <span className="truncate">{sec.title}</span>
+            </Link>
           );
         })}
       </div>
