@@ -6,7 +6,7 @@ export type AcademicNodeType = 'board' | 'institution' | 'class' | 'subject' | '
 export type CompetitiveNodeType = 'category' | 'subcategory' | 'exam' | 'subject' | 'chapter' | 'topic';
 export type NodeType = AcademicNodeType | CompetitiveNodeType;
 
-export const VALID_CONTENT_TYPES = ['mcq', 'cq', 'notes', 'summary', 'practice', 'practice-set', 'practice-sets', 'mock-test', 'mock-tests', 'model-test', 'quiz', 'quizzes', 'exam-papers', 'video', 'pdf'] as const;
+export const VALID_CONTENT_TYPES = ['mcq', 'cq', 'questions', 'notes', 'summary', 'practice', 'practice-set', 'practice-sets', 'mock-test', 'mock-tests', 'model-test', 'quiz', 'quizzes', 'exam-papers', 'video', 'pdf'] as const;
 export type ContentType = typeof VALID_CONTENT_TYPES[number];
 
 export interface TaxonomyNode {
