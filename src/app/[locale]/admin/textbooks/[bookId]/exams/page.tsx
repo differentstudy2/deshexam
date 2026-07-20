@@ -226,7 +226,422 @@ export default function ManageTextbookExamsPage() {
                                         fieldName="featureImage"
                                         onUrlChange={(url) => setExamData(p => ({ ...p, featureImage: url }))}
                                         value={examData.featureImage}
-                                        defaultAiPrompt={`A beautifully designed, premium e-learning thumbnail banner for an Exam. The central text is NOT needed, but the visual theme should match: Subject: ${textbook?.subject || 'General Knowledge'}, Title: ${examData.title || 'Exam'}. The design should feature a cinematic 3D composition with relevant educational items (like books, science elements, global icons) on a dark blue background with glassy UI elements. High quality, 4k, hyper-detailed.`}
+                                        defaultAiPrompt={`You are an award-winning Creative Director and UI Designer for DeshExam.
+
+Generate a premium educational feature image using the provided metadata.
+
+IMPORTANT:
+Use the supplied metadata to decide every visual element.
+
+DO NOT create a generic banner.
+
+The image must look like a premium SaaS feature card for an EdTech platform.
+
+Maintain the exact same layout, spacing, typography hierarchy, information cards, CTA placement, and premium visual language across every generated image.
+
+Only change the content and illustrations based on the supplied metadata.
+
+====================================================
+
+INPUT METADATA
+
+Board
+${(textbook as any)?.board || ''}
+
+Class
+${(textbook as any)?.class || ''}
+
+Subject
+${(textbook as any)?.subject || ''}
+
+Textbook
+${textbook?.title || ''}
+
+Chapter
+${examData.title || ''}
+
+Topic
+${examData.title || ''}
+
+Competitive Exam
+${(textbook as any)?.exam || ''}
+
+Difficulty
+${examData.difficulty?.join(', ') || ''}
+
+Duration
+${(examData as any)?.durationMinutes || ''}
+
+Questions
+${(examData as any)?.questions?.length || 0}
+
+Total Marks
+${(examData as any)?.totalMarks || ''}
+
+Pass Marks
+${(examData as any)?.passMarks || ''}
+
+Negative Marking
+${(examData as any)?.negativeMarking ? 'Yes' : 'No'}
+
+Attempts
+1000+
+
+Rating
+4.8/5
+
+Language
+${(textbook as any)?.language || 'Bengali'}
+
+Price
+${examData.access === 'free' ? 'FREE' : 'Premium'}
+
+Content Type
+Exam
+
+====================================================
+
+STYLE
+
+Premium Educational SaaS
+
+Modern Dashboard
+
+Apple Quality
+
+Stripe
+
+Linear
+
+Coursera
+
+Canva
+
+Professional
+
+Luxury
+
+Ultra Detailed
+
+8K
+
+====================================================
+
+BACKGROUND
+
+Generate a cinematic background based on the Subject and Chapter.
+
+Examples
+
+Science
+
+Deep blue laboratory
+
+Space
+
+DNA
+
+Microscope
+
+Biology sketches
+
+History
+
+Ancient map
+
+Temple
+
+Old manuscript
+
+Sword
+
+Mathematics
+
+Geometry
+
+Graphs
+
+Compass
+
+Numbers
+
+Geography
+
+Mountains
+
+Earth
+
+Compass
+
+Map
+
+Current Affairs
+
+World map
+
+Newspaper
+
+Microphone
+
+Politics
+
+Computer
+
+AI
+
+Programming
+
+Cloud
+
+Circuit
+
+Background should contain subtle blueprint illustrations related to the chapter.
+
+====================================================
+
+LEFT HERO OBJECT
+
+Automatically choose ONE dominant object.
+
+Examples
+
+Rocket
+
+DNA
+
+Microscope
+
+Satellite
+
+Temple
+
+Calculator
+
+Robot
+
+Plant
+
+Human Anatomy
+
+Earth
+
+Choose according to Subject + Chapter + Topic.
+
+====================================================
+
+RIGHT HERO SCENE
+
+Generate a realistic composition directly related to the Topic.
+
+The scene should visually explain the lesson.
+
+Examples
+
+Biology
+
+Animal locomotion
+
+Skeleton
+
+Muscles
+
+Cells
+
+Science
+
+Steam Engine
+
+Satellite
+
+Bulb
+
+Physics
+
+Mirror
+
+Electric Circuit
+
+Magnet
+
+History
+
+Freedom Fighters
+
+Ancient Civilization
+
+Battlefield
+
+Everything must look premium and educational.
+
+====================================================
+
+TOP LEFT
+
+DeshExam Logo
+
+====================================================
+
+TOP RIGHT
+
+Rounded Action Badge
+
+Automatically display EXAM.
+
+====================================================
+
+CATEGORY BADGES
+
+Subject Badge
+
+Difficulty Badge
+
+====================================================
+
+MAIN TITLE
+
+Use Topic as the primary title.
+
+Large bold typography.
+
+If Topic is long,
+
+Automatically wrap into two lines.
+
+====================================================
+
+SUBTITLE
+
+Generate one short academic subtitle using Subject, Chapter, Competitive Exam.
+
+====================================================
+
+FEATURE INFO CARD
+
+Display
+
+Questions
+
+Duration
+
+Attempts
+
+Rating
+
+====================================================
+
+DETAILS BAR
+
+Board
+
+Class
+
+Subject
+
+Language
+
+====================================================
+
+EXAM CONFIGURATION CARD
+
+Show small premium badges
+
+Difficulty
+
+Medium
+
+Duration
+
+50 Min
+
+Marks
+
+50
+
+Pass Marks
+
+30
+
+Negative Marking
+
+Yes / No
+
+====================================================
+
+BOTTOM LEFT
+
+Pricing Card
+
+FREE
+
+₹1 ONLY
+
+Premium
+
+according to metadata.
+
+====================================================
+
+BOTTOM RIGHT
+
+Large Green CTA
+
+Automatically choose Start Exam.
+
+====================================================
+
+LIGHTING
+
+Blue ambient lighting
+
+Golden rim light
+
+Soft reflections
+
+Premium shadows
+
+Glassmorphism
+
+====================================================
+
+TYPOGRAPHY
+
+Huge title
+
+Clean hierarchy
+
+Modern sans-serif
+
+Excellent readability
+
+====================================================
+
+IMPORTANT
+
+Do NOT change the layout.
+
+Do NOT change the UI structure.
+
+Keep every card position identical.
+
+Only change
+
+Title
+
+Illustrations
+
+Icons
+
+Background
+
+Colors
+
+Topic visuals
+
+Statistics
+
+according to the supplied metadata.
+
+The final image should feel like it belongs to the same premium DeshExam design system.`}
                                     />
                                 </div>
                                 <div className="space-y-2">
