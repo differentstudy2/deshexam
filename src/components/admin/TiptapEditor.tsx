@@ -394,7 +394,8 @@ export function TiptapEditor({ content, onChange, maxHeight }: { content: string
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
-        heading: { levels: [1, 2, 3, 4] }
+        heading: { levels: [1, 2, 3, 4] },
+        codeBlock: false,
       }) as any,
       Markdown.configure({
         html: true,

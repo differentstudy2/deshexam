@@ -28,7 +28,7 @@ export async function POST(req: Request) {
 
     Generate a JSON object with the following structure:
     {
-      "explanation": "A 2-3 paragraph main explanation detailing why the correct answer is right. Do not repeat the question or start with 'The correct answer is'.",
+      "explanation": "Provide the explanation in HTML format. Start with a <p> tag giving a direct answer, followed by '<h3>🎯 Key Points:</h3>' and an <ul> list of 2-4 concise key points explaining the core concept. Do not use markdown formatting like **.",
       "optionExplanations": {
         "a": "Explanation of why option A is right or wrong",
         "b": "Explanation of why option B is right or wrong",
