@@ -414,7 +414,7 @@ export function ReadingArticle({ data, hierarchy, navigation, node }: ReadingArt
               <div className="bg-slate-50 dark:bg-slate-900/40 px-4 sm:px-6 py-3 border-b border-slate-200/60 dark:border-slate-800">
                 <div className="flex flex-wrap items-center relative w-full">
                   <div className="flex flex-wrap items-center justify-center gap-3 flex-1">
-                    <Link href={`/guide/${node.fullSlug || node.id}/mcq`} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-800 border border-emerald-100 dark:border-slate-700 rounded-md text-[11px] font-bold text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-slate-700 transition-colors shadow-sm">
+                    <Link href={`/guide/${node.fullSlug || node.id}/questions`} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-800 border border-emerald-100 dark:border-slate-700 rounded-md text-[11px] font-bold text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-slate-700 transition-colors shadow-sm">
                       <FileQuestion className="w-3.5 h-3.5" />
                       Questions
                     </Link>
