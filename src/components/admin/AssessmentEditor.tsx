@@ -22,6 +22,7 @@ import { getQuestionsByIds } from '@/lib/firebase/question-bank';
 import { getTaxonomyNodesByTrack } from '@/lib/firebase/taxonomy';
 import { cn } from '@/lib/utils';
 import { generateMockTestMetadata, generateImagePrompt, generateImageWithGemini } from '@/app/[locale]/admin/assessment-center/mock-tests/actions';
+import { ImageUploader } from '@/components/feature/image-uploader';
 import {
   Dialog,
   DialogContent,
@@ -360,86 +361,12 @@ export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock 
                             </CardContent>
                         </Card>
 
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2"><ImageIcon className="w-5 h-5 text-slate-500" /> Feature Image</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                {editData.thumbnail && (
-                                    <div className="relative w-full h-48 bg-slate-100 dark:bg-slate-800 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700">
-                                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                                        <img src={editData.thumbnail} alt="Thumbnail Preview" className="w-full h-full object-cover" />
-                                        <Button variant="destructive" size="sm" className="absolute top-2 right-2" onClick={() => setEditData({...editData, thumbnail: ''})}>
-                                            <Trash2 className="w-4 h-4" />
-                                        </Button>
-                                    </div>
-                                )}
-                                
-                                <Tabs defaultValue="upload" className="w-full">
-                                    <TabsList className="grid w-full grid-cols-3">
-                                        <TabsTrigger value="upload" className="flex items-center gap-2"><Upload className="w-4 h-4"/> Upload</TabsTrigger>
-                                        <TabsTrigger value="url" className="flex items-center gap-2"><LinkIcon className="w-4 h-4"/> URL</TabsTrigger>
-                                        <TabsTrigger value="ai" className="flex items-center gap-2 text-purple-600"><Wand2 className="w-4 h-4"/> AI Generate</TabsTrigger>
-                                    </TabsList>
-                                    <TabsContent value="upload" className="pt-4 space-y-4">
-                                        <div className="flex items-center gap-4">
-                                            <Input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileUpload} disabled={isUploading} className="flex-1" />
-                                            {isUploading && <Loader2 className="w-5 h-5 animate-spin text-blue-600" />}
-                                        </div>
-                                        {isUploading && (
-                                            <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2">
-                                                <div className="bg-blue-600 h-2 rounded-full transition-all duration-300" style={{ width: `${uploadProgress}%` }}></div>
-                                            </div>
-                                        )}
-                                    </TabsContent>
-                                    <TabsContent value="url" className="pt-4">
-                                        <Input 
-                                            placeholder="Paste image URL here..." 
-                                            value={editData.thumbnail || ''} 
-                                            onChange={(e) => setEditData({...editData, thumbnail: e.target.value})}
-                                        />
-                                    </TabsContent>
-                                    <TabsContent value="ai" className="pt-4 space-y-4 bg-purple-50/50 dark:bg-purple-900/20 p-4 rounded-xl border border-purple-100 dark:border-purple-800">
-                                        <p className="text-sm text-slate-600 dark:text-slate-300 mb-2">Let Gemini generate a stunning feature image prompt based on your test title and description.</p>
-                                        
-                                        {!aiImagePrompt ? (
-                                            <Button onClick={handleGenerateImagePrompt} disabled={isGeneratingImagePrompt || !editData.title} className="w-full bg-purple-600 hover:bg-purple-700">
-                                                {isGeneratingImagePrompt ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Wand2 className="w-4 h-4 mr-2" />}
-                                                Generate Prompt Idea
-                                            </Button>
-                                        ) : (
-                                            <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
-                                                <div className="space-y-2">
-                                                    <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Image Prompt</label>
-                                                    <Textarea 
-                                                        value={aiImagePrompt} 
-                                                        onChange={(e) => setAiImagePrompt(e.target.value)} 
-                                                        rows={4} 
-                                                        className="text-sm leading-relaxed"
-                                                    />
-                                                </div>
-                                                <div className="flex gap-3">
-                                                    <Button variant="outline" className="flex-1" onClick={() => {
-                                                        navigator.clipboard.writeText(aiImagePrompt);
-                                                        toast({ title: "Prompt copied to clipboard!" });
-                                                    }}>
-                                                        <Copy className="w-4 h-4 mr-2" /> Copy Prompt
-                                                    </Button>
-                                                    <Button 
-                                                        className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700" 
-                                                        onClick={handleGenerateImage} 
-                                                        disabled={isGeneratingImage}
-                                                    >
-                                                        {isGeneratingImage ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
-                                                        Generate & Apply
-                                                    </Button>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </TabsContent>
-                                </Tabs>
-                            </CardContent>
-                        </Card>
+                        <ImageUploader 
+                            value={editData.thumbnail}
+                            onUrlChange={(url) => setEditData({...editData, thumbnail: url})}
+                            multiple={true}
+                            defaultAiPrompt={editData.title || ''}
+                        />
 
                         <Card>
                             <CardHeader>

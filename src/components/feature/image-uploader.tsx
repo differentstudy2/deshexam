@@ -129,9 +129,9 @@ export const ImageUploader = ({
             {images.length > 0 && (
                 <div className="grid gap-4 mt-4">
                     {images.map((img, i) => (
-                        <div key={i} className="relative w-full aspect-video md:aspect-[21/9] rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 group shadow-inner">
+                        <div key={i} className="relative w-full rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 group shadow-inner">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={img} alt="Preview" className="w-full h-full object-cover" />
+                            <img src={img} alt="Preview" className="w-full h-auto object-contain" />
                             <Button 
                                 variant="destructive" 
                                 size="icon" 
