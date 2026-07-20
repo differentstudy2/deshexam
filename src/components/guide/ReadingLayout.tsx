@@ -145,6 +145,7 @@ export function ReadingLayout({
             <ReadingArticle 
               data={data} 
               node={node}
+              contentType={contentType}
               hierarchy={{
                 boardTitle,
                 classTitle,
@@ -166,7 +167,7 @@ export function ReadingLayout({
 
         {/* Right Sections Sidebar */}
         <div className="w-[300px] shrink-0 hidden lg:flex flex-col gap-6 sticky top-6 self-start max-h-[calc(100vh-3rem)] overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-slate-300 dark:[&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full pr-1 print:hidden">
-          <TopicSectionsSidebar sections={data.sections} />
+          <TopicSectionsSidebar sections={data.sections} node={node} currentContentType={contentType} />
           <GuideSidebar subjects={subjects} activeId={id} classTitle={classTitle} />
         </div>
 

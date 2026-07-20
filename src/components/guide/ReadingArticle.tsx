@@ -41,6 +41,7 @@ interface ReadingArticleProps {
     prev?: { id: string; title: string };
     next?: { id: string; title: string };
   };
+  contentType?: string | null;
 }
 
 function SectionFooter({ author }: { author?: ContentAuthor }) {
@@ -64,12 +65,14 @@ function SectionFooter({ author }: { author?: ContentAuthor }) {
 
 import { incrementGuideNodeViews } from '@/lib/firebase/guide';
 
-export function ReadingArticle({ data, hierarchy, navigation, node }: ReadingArticleProps) {
+export function ReadingArticle({ data, node, hierarchy, navigation, contentType }: ReadingArticleProps) {
+  const [mounted, setMounted] = useState(false);
   const params = useParams();
   const locale = params?.locale as string || 'bn';
   const [viewCount, setViewCount] = React.useState(data.views || 0);
 
   React.useEffect(() => {
+    setMounted(true);
     if (!data.id) return;
     const timer = setTimeout(() => {
       incrementGuideNodeViews(data.id).then(() => {
@@ -436,8 +439,11 @@ export function ReadingArticle({ data, hierarchy, navigation, node }: ReadingArt
 
             {(() => {
               const searchParams = useSearchParams();
+              // Support both standard URL contentType and legacy ?section= params
               const sectionQuery = searchParams ? searchParams.get('section') : null;
-              const activeId = sectionQuery || (data.sections.length > 0 ? data.sections[0].id : '');
+              const contentSectionId = contentType ? contentType.replace(/-/g, '_') : null;
+              
+              const activeId = contentSectionId || sectionQuery || (data.sections.length > 0 ? data.sections[0].id : '');
               
               const sectionToRender = data.sections.find(s => s.id === activeId) || data.sections[0];
               
