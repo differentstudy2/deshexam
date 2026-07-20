@@ -119,6 +119,14 @@ export function ReadingLayout({
         </div>
       </div>
 
+      {/* Print Watermark */}
+      <div className="hidden print:flex fixed inset-0 z-0 pointer-events-none items-center justify-center opacity-[0.04]">
+        <div className="flex flex-col items-center rotate-[-35deg] scale-150">
+          <img src="/icons/icon-192x192.png" alt="" className="w-48 h-48 grayscale" />
+          <span className="text-8xl font-black mt-4 whitespace-nowrap">DESHEXAM</span>
+        </div>
+      </div>
+
       {/* Main Reading Layout Area */}
       <div className="max-w-[1400px] mx-auto flex items-stretch mt-[10px] px-4 sm:px-6 gap-6 xl:gap-8 print:block print:m-0 print:p-0">
 
