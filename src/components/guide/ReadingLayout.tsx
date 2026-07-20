@@ -65,18 +65,16 @@ export function ReadingLayout({
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#020817] text-slate-800 dark:text-slate-200 font-sans pb-20">
 
-      {/* Top Header Bar (White) */}
-      <div className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            <h1 className="font-bold text-[17px] text-slate-900 dark:text-white">Academy</h1>
-
-            <div className="hidden sm:flex flex-wrap items-center text-[13px] text-slate-500 dark:text-slate-400 font-medium border-l border-slate-200 dark:border-slate-800 pl-6">
-              {breadcrumbs ? (
-                breadcrumbs.map((crumb, idx) => (
-                  <React.Fragment key={idx}>
-                    {idx > 0 && <ChevronRight className="w-3.5 h-3.5 mx-2" />}
-                    {idx === breadcrumbs.length - 1 ? (
+      {/* Top Breadcrumb Navigation */}
+      <div className="border-b border-emerald-100/50 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-40 shadow-sm print:hidden">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 h-[48px] flex items-center justify-between">
+          <div className="flex-1 overflow-hidden">
+            <div className="flex items-center text-xs font-medium text-slate-500 dark:text-slate-400 whitespace-nowrap overflow-x-auto [&::-webkit-scrollbar]:hidden">
+              {breadcrumbs && breadcrumbs.length > 0 ? (
+                breadcrumbs.map((crumb, i) => (
+                  <React.Fragment key={i}>
+                    {i > 0 && <ChevronRight className="w-3.5 h-3.5 mx-2 shrink-0" />}
+                    {i === breadcrumbs.length - 1 ? (
                       <span className="text-slate-800 dark:text-slate-200">{crumb.name}</span>
                     ) : (
                       <Link href={crumb.url} className="hover:text-emerald-600 transition-colors">
@@ -122,17 +120,17 @@ export function ReadingLayout({
       </div>
 
       {/* Main Reading Layout Area */}
-      <div className="max-w-[1400px] mx-auto flex items-stretch mt-[10px] px-4 sm:px-6 gap-6 xl:gap-8">
+      <div className="max-w-[1400px] mx-auto flex items-stretch mt-[10px] px-4 sm:px-6 gap-6 xl:gap-8 print:block print:m-0 print:p-0">
 
         {/* Left Navigation Sidebar */}
-        <div className="w-[280px] shrink-0 hidden lg:flex flex-col gap-5 sticky top-6 self-start max-h-[calc(100vh-3rem)] overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-slate-300 dark:[&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full pr-1">
+        <div className="w-[280px] shrink-0 hidden lg:flex flex-col gap-5 sticky top-6 self-start max-h-[calc(100vh-3rem)] overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-slate-300 dark:[&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full pr-1 print:hidden">
           <ContentNavigationSidebar curriculum={curriculum} activeId={id} subjectTitle={textbookTitle || ''} />
         </div>
 
         {/* Main Content Area */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 print:w-full print:block">
           {contentType === 'questions' || contentType === 'mcq' || contentType === 'cq' ? (
-            <div className="pt-6 px-4 sm:px-6 xl:px-10 pb-12 min-h-[600px]">
+            <div className="pt-6 px-4 sm:px-6 xl:px-10 pb-12 min-h-[600px] print:p-0">
               <NodeQuestionsPage node={node} contentType={contentType} breadcrumbs={breadcrumbs || []} />
             </div>
           ) : (
@@ -153,13 +151,13 @@ export function ReadingLayout({
             />
           )}
           
-          <div className="px-4 sm:px-6 xl:px-12 pb-12">
+          <div className="px-4 sm:px-6 xl:px-12 pb-12 print:hidden">
             <AssessmentTabs chapterId={id} />
           </div>
         </div>
 
         {/* Right Sections Sidebar */}
-        <div className="w-[300px] shrink-0 hidden lg:flex flex-col gap-6 sticky top-6 self-start max-h-[calc(100vh-3rem)] overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-slate-300 dark:[&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full pr-1">
+        <div className="w-[300px] shrink-0 hidden lg:flex flex-col gap-6 sticky top-6 self-start max-h-[calc(100vh-3rem)] overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-slate-300 dark:[&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full pr-1 print:hidden">
           <TopicSectionsSidebar sections={data.sections} />
           <GuideSidebar subjects={subjects} activeId={id} classTitle={classTitle} />
         </div>
