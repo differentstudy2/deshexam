@@ -234,6 +234,20 @@ export default async function GuidePage({ params }: { params: Promise<{ segments
       );
     }
 
+    if (contentType === 'questions' || contentType === 'mcq' || contentType === 'cq') {
+      const { NodeQuestionsPage } = await import('@/components/guide/NodeQuestionsPage');
+      return (
+        <>
+          <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }} />
+          <NodeQuestionsPage 
+            node={JSON.parse(JSON.stringify(node))} 
+            contentType={contentType} 
+            breadcrumbs={uiBreadcrumbs} 
+          />
+        </>
+      );
+    }
+
     return (
       <>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }} />
