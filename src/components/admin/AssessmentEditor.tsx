@@ -776,8 +776,7 @@ export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock 
                                         )}
                                     >
                                         <span>
-                                            {item.name}
-                                            {(item as any).acronym && <span className="ml-2 text-xs font-semibold text-slate-500">({(item as any).acronym})</span>}
+                                            {(item as any).acronym || item.name}
                                         </span>
                                         {taxonomySheet.value === item.id && <CheckCircle2 className="w-4 h-4 text-slate-700 dark:text-slate-300" />}
                                     </button>
