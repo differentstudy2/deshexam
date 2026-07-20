@@ -52,13 +52,23 @@ export function NodeQuestionsPage({ node, contentType, breadcrumbs }: NodeQuesti
 
   return (
     <div className="max-w-[800px] mx-auto pb-10">
-      <div className="mb-8 text-center">
-        <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-3">
-          Questions: {node.title}
-        </h2>
-        <p className="text-slate-500 dark:text-slate-400 max-w-xl mx-auto">
-          Test your knowledge with these questions specifically curated for {node.title}.
-        </p>
+      <div className="relative overflow-hidden bg-gradient-to-br from-emerald-500 to-teal-700 rounded-2xl p-6 sm:p-10 mb-8 shadow-sm text-white border border-emerald-400/20">
+        <div className="absolute -top-12 -right-12 text-emerald-900/10 pointer-events-none">
+          <HelpCircle className="w-64 h-64" strokeWidth={1} />
+        </div>
+        <div className="absolute top-0 right-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 pointer-events-none mix-blend-overlay"></div>
+        <div className="relative z-10">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm text-sm font-semibold mb-4 shadow-sm border border-white/20">
+            <HelpCircle className="w-4 h-4" />
+            {contentType === 'mcq' ? 'MCQ Practice' : contentType === 'cq' ? 'Creative Questions' : 'Question Bank'}
+          </div>
+          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-3 drop-shadow-md">
+            {node.title}
+          </h2>
+          <p className="text-emerald-50 max-w-2xl text-[15px] sm:text-lg leading-relaxed">
+            Test your knowledge with these questions specifically curated for this topic. Prepare effectively by practicing them.
+          </p>
+        </div>
       </div>
 
       {loading ? (
