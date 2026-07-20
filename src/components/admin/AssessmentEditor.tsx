@@ -287,7 +287,7 @@ export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock 
 
         setIsGeneratingAI(true);
         try {
-            const res = await generateMockTestMetadata(topicContext);
+            const res = await generateMockTestMetadata(topicContext, title);
             if (res.success && res.data) {
                 setEditData(prev => ({
                     ...prev,

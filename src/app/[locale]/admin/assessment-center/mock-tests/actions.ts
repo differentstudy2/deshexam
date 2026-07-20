@@ -3,16 +3,16 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 
-export const generateMockTestMetadata = async (topic: string) => {
+export const generateMockTestMetadata = async (topic: string, testType: string = "Mock Test") => {
   try {
     const response = await ai.generate({
-      prompt: `You are an expert SEO copywriter and educator for a mock test platform. 
-      The admin wants to create a mock test about: "${topic}".
-      Please generate the following fields for this mock test:
-      - title: A catchy, SEO-friendly title (e.g., "WBCS Prelims Full Length Mock Test 1").
-      - slug: A URL-friendly slug based on the title (e.g., "wbcs-prelims-mock-test-1").
+      prompt: `You are an expert SEO copywriter and educator for a learning platform. 
+      The admin wants to create a "${testType}" about: "${topic}".
+      Please generate the following fields for this ${testType}:
+      - title: A catchy, SEO-friendly title that MUST explicitly include the phrase "${testType}".
+      - slug: A URL-friendly slug based on the title.
       - description: A compelling, 2-3 sentence meta description to attract students and rank well on Google.
-      - instructions: A helpful list of instructions for taking the exam (e.g., mentioning negative marking, time limits, or general tips). Return this as an array of strings, where each string is a single instruction point.
+      - instructions: A comprehensive and highly detailed list of instructions for taking the exam. Generate at least 5-8 detailed instruction points covering negative marking, time management, cheating policies, submission guidelines, and general tips. Return this as an array of strings, where each string is a single instruction point.
       
       IMPORTANT: If the topic is related to West Bengal exams (like WBCS, TET, PSC), or the topic implies a Bengali audience, you MUST generate the title, description, and instructions in Bengali.`,
       output: {
