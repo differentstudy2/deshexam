@@ -450,7 +450,7 @@ export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock 
                                     <MD3SelectField 
                                         label="Board" 
                                         placeholder="Board" 
-                                        value={boards.find(b => b.id === editData.boardId)?.name || ''} 
+                                        value={(boards.find(b => b.id === editData.boardId) as any)?.acronym || (boards.find(b => b.id === editData.boardId) as any)?.name || ''} 
                                         onClick={() => openTaxonomySheet('board', 'Select Board', boards, editData.boardId || '', (v) => setEditData(prev => ({...prev, boardId: v, classId: '', subjectId: '', textbookId: '', chapterId: '', topicId: ''})))} 
                                     />
                                     <MD3SelectField 
@@ -762,7 +762,7 @@ export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock 
                         <div className="flex-1 overflow-y-auto p-2">
                             <div className="space-y-1">
                                 {taxonomySheet.items
-                                    .filter(item => item.name.toLowerCase().includes(sheetSearch.toLowerCase()))
+                                    .filter(item => item.name.toLowerCase().includes(sheetSearch.toLowerCase()) || (item as any).acronym?.toLowerCase().includes(sheetSearch.toLowerCase()))
                                     .map(item => (
                                     <button 
                                         key={item.id} 
@@ -775,11 +775,14 @@ export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock 
                                             taxonomySheet.value === item.id ? "bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-100 font-semibold" : "hover:bg-slate-50 text-slate-600 dark:hover:bg-slate-800 dark:text-slate-400"
                                         )}
                                     >
-                                        {item.name}
+                                        <span>
+                                            {item.name}
+                                            {(item as any).acronym && <span className="ml-2 text-xs font-semibold text-slate-500">({(item as any).acronym})</span>}
+                                        </span>
                                         {taxonomySheet.value === item.id && <CheckCircle2 className="w-4 h-4 text-slate-700 dark:text-slate-300" />}
                                     </button>
                                 ))}
-                                {taxonomySheet.items.filter(item => item.name.toLowerCase().includes(sheetSearch.toLowerCase())).length === 0 && (
+                                {taxonomySheet.items.filter(item => item.name.toLowerCase().includes(sheetSearch.toLowerCase()) || (item as any).acronym?.toLowerCase().includes(sheetSearch.toLowerCase())).length === 0 && (
                                     <div className="text-center p-4 text-slate-500 dark:text-slate-400 text-sm">No items found matching "{sheetSearch}".</div>
                                 )}
                             </div>
