@@ -61,6 +61,7 @@ type Exam = {
     access: 'free' | 'premium' | 'pro';
     createdAt: string;
     textbookId?: string;
+    chapterId?: string;
     difficulty?: ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[];
     questionSource?: ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise' | 'Solved Examples' | 'Previous Year Questions')[];
     questions?: any[];
