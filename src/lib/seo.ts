@@ -32,7 +32,7 @@ export function generateHybridSeo({ node, contentType, siteName = 'DeshExam', bo
     baseTitle = customTitle;
   } else {
     if (contentType) {
-      let contentTypeName = contentType.toUpperCase();
+      let contentTypeName = contentType.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
       if (contentType === 'questions') contentTypeName = 'Important Questions & Answers';
       if (contentType === 'mcq') contentTypeName = 'MCQ Questions and Answers';
       if (contentType === 'cq') contentTypeName = 'Creative Questions (CQ)';
