@@ -99,7 +99,13 @@ export const ImageUploader = ({ fieldName, onUrlChange, value, defaultAiPrompt }
                             </TabsContent>
                             <TabsContent value="ai" className="pt-4 space-y-2">
                                 <Label htmlFor="aiPrompt">Image Prompt</Label>
-                                <Input id="aiPrompt" value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="e.g., A majestic dragon soaring" />
+                                <textarea 
+                                    id="aiPrompt" 
+                                    value={prompt} 
+                                    onChange={(e) => setPrompt(e.target.value)} 
+                                    placeholder="e.g., A majestic dragon soaring" 
+                                    className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 min-h-[200px]"
+                                />
                                 <Button type="button" onClick={handleGenerate} disabled={isGenerating}>
                                     {isGenerating ? <><Loader2 className="animate-spin" /> Generating...</> : <><Sparkles /> Generate</>}
                                 </Button>

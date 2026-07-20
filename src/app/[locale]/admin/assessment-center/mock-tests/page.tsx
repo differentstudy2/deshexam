@@ -13,7 +13,7 @@ import { getTaxonomyNodesByTrack, TaxonomyNode } from '@/lib/firebase/taxonomy';
 import { AssessmentEditor } from '@/components/admin/AssessmentEditor';
 import Link from 'next/link';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
-import { Star, MessageSquare, Wand2, Copy as CopyIcon, CheckSquare, MoreVertical, Unlock, Lock, ImageIcon, LayoutGrid, List, Search } from 'lucide-react';
+import { Star, MessageSquare, Wand2, Copy as CopyIcon, CheckSquare, MoreVertical, Unlock, Lock, ImageIcon, LayoutGrid, List, Search, Printer } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
@@ -513,6 +513,9 @@ export default function MockTestsPage() {
                                                     <DropdownMenuItem onClick={() => handleClone(test)} className="cursor-pointer">
                                                         <Copy className="mr-2 h-4 w-4" /> Clone
                                                     </DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => window.open(`/admin/assessment-center/mock-tests/${test.id}/answer-sheet`, '_blank')} className="cursor-pointer">
+                                                        <Printer className="mr-2 h-4 w-4" /> Print Answer Sheet
+                                                    </DropdownMenuItem>
                                                     <DropdownMenuSeparator />
                                                     <DropdownMenuItem onClick={() => setReviewTest(test)} className="cursor-pointer">
                                                         <MessageSquare className="mr-2 h-4 w-4 text-indigo-500" /> Add Review
@@ -613,6 +616,9 @@ export default function MockTestsPage() {
                                                             </DropdownMenuItem>
                                                             <DropdownMenuItem onClick={() => handleClone(test)} className="cursor-pointer">
                                                                 <Copy className="mr-2 h-4 w-4" /> Clone
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuItem onClick={() => window.open(`/admin/assessment-center/mock-tests/${test.id}/answer-sheet`, '_blank')} className="cursor-pointer">
+                                                                <Printer className="mr-2 h-4 w-4" /> Print Answer Sheet
                                                             </DropdownMenuItem>
                                                             <DropdownMenuSeparator />
                                                             <DropdownMenuItem onClick={() => setReviewTest(test)} className="cursor-pointer">
