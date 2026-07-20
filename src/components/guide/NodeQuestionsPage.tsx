@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { ChevronRight, Loader2, ArrowLeft, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { QuestionBankEntry } from '@/lib/question-bank-types';
-import { getQuestions } from '@/lib/firebase/question-bank';
+import { getQuestionsPaginated } from '@/lib/firebase/question-bank';
 import QuestionCard from '@/components/question-bank/QuestionCard';
 
 interface NodeQuestionsPageProps {
@@ -17,30 +17,36 @@ interface NodeQuestionsPageProps {
 export function NodeQuestionsPage({ node, contentType, breadcrumbs }: NodeQuestionsPageProps) {
   const [questions, setQuestions] = useState<QuestionBankEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [lastDoc, setLastDoc] = useState<any>(null);
+  const [hasMore, setHasMore] = useState(true);
+
+  const getFilters = () => {
+    const filters: Record<string, any> = {};
+    if (node.type === 'topic') filters.topicId = node.id;
+    else if (node.type === 'chapter') filters.chapterId = node.id;
+    else if (node.type === 'subject') filters.subjectId = node.id;
+    else if (node.type === 'class') filters.classId = node.id;
+    else if (node.type === 'board') filters.boardId = node.id;
+    else if (node.type === 'textbook') filters.textbookId = node.id;
+
+    if (contentType === 'mcq') {
+      filters.type = 'mcq';
+    } else if (contentType === 'cq') {
+      filters.type = 'descriptive';
+    }
+    return filters;
+  };
 
   useEffect(() => {
     async function loadData() {
       setLoading(true);
       try {
-        const filters: Record<string, any> = {};
-        
-        // Add filter based on node type
-        if (node.type === 'topic') filters.topicId = node.id;
-        else if (node.type === 'chapter') filters.chapterId = node.id;
-        else if (node.type === 'subject') filters.subjectId = node.id;
-        else if (node.type === 'class') filters.classId = node.id;
-        else if (node.type === 'board') filters.boardId = node.id;
-        else if (node.type === 'textbook') filters.textbookId = node.id;
-
-        if (contentType === 'mcq') {
-          filters.type = 'mcq';
-        } else if (contentType === 'cq') {
-          filters.type = 'descriptive'; // or 'cq' depending on your question bank structure
-        }
-
-        // Fetch questions, limit to 50 for now
-        const data = await getQuestions(filters, 50);
-        setQuestions(data);
+        const filters = getFilters();
+        const data = await getQuestionsPaginated(filters, 20);
+        setQuestions(data.questions);
+        setLastDoc(data.lastDoc);
+        setHasMore(data.questions.length === 20);
       } catch (e) {
         console.error("Error fetching node questions", e);
       } finally {
@@ -48,7 +54,23 @@ export function NodeQuestionsPage({ node, contentType, breadcrumbs }: NodeQuesti
       }
     }
     loadData();
-  }, [node.id, node.type]);
+  }, [node.id, node.type, contentType]);
+
+  const handleLoadMore = async () => {
+    if (!lastDoc || loadingMore) return;
+    setLoadingMore(true);
+    try {
+      const filters = getFilters();
+      const data = await getQuestionsPaginated(filters, 20, lastDoc);
+      setQuestions(prev => [...prev, ...data.questions]);
+      setLastDoc(data.lastDoc);
+      setHasMore(data.questions.length === 20);
+    } catch (e) {
+      console.error("Error loading more questions", e);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   return (
     <div className="max-w-[800px] mx-auto pb-10">
@@ -100,6 +122,26 @@ export function NodeQuestionsPage({ node, contentType, breadcrumbs }: NodeQuesti
               isListView={true}
             />
           ))}
+
+          {hasMore && (
+            <div className="pt-6 pb-2 text-center">
+              <Button 
+                variant="outline" 
+                onClick={handleLoadMore}
+                disabled={loadingMore}
+                className="px-8 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800"
+              >
+                {loadingMore ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Loading...
+                  </>
+                ) : (
+                  'Load More Questions'
+                )}
+              </Button>
+            </div>
+          )}
         </div>
       )}
     </div>
