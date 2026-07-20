@@ -321,11 +321,11 @@ export function ReadingArticle({ data, node, hierarchy, navigation, contentType 
           <div className="flex flex-col">
 
             {/* Master Banner */}
-            <div className="bg-[#f0f7f4] dark:bg-emerald-900/10 px-4 sm:px-6 py-2 sm:py-3 border-b border-emerald-100/50 dark:border-slate-800">
-              <div className="flex flex-col sm:flex-row justify-between items-start gap-3 sm:gap-4">
+            <div className="bg-[#f2f9f6] dark:bg-emerald-900/10 px-6 py-4 sm:py-5 border-b border-emerald-100/50 dark:border-slate-800">
+              <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div className="flex-1 w-full">
-                  <div className="flex flex-wrap items-baseline gap-2 mb-0">
-                    <h1 className="text-[24px] font-bold text-[#2d4a41] dark:text-slate-100">
+                  <div className="flex flex-wrap items-baseline gap-2 mb-1">
+                    <h1 className="text-[26px] sm:text-[28px] font-bold text-[#143d30] dark:text-slate-100 tracking-tight">
                       {data.title}
                     </h1>
                     {data.author?.name && (
@@ -335,7 +335,7 @@ export function ReadingArticle({ data, node, hierarchy, navigation, contentType 
                     )}
                   </div>
                   {hierarchy && (
-                    <div className="flex flex-wrap items-center gap-1 text-[12px] text-[#7d9e8e] dark:text-slate-400 mt-0 font-normal">
+                    <div className="flex flex-wrap items-center gap-1.5 text-[13px] text-[#789e90] dark:text-slate-400 font-normal">
                       {[
                         hierarchy.boardTitle && hierarchy.boardTitle !== 'Board' ? hierarchy.boardTitle : null,
                         hierarchy.classTitle && hierarchy.classTitle !== 'Class' ? hierarchy.classTitle : null,
@@ -344,7 +344,7 @@ export function ReadingArticle({ data, node, hierarchy, navigation, contentType 
                       ].filter(Boolean).map((text, i, arr) => (
                         <React.Fragment key={text as string}>
                           <span>{text}</span>
-                          {i < arr.length - 1 && <span className="opacity-70">-</span>}
+                          {i < arr.length - 1 && <span className="opacity-60">-</span>}
                         </React.Fragment>
                       ))}
                     </div>
@@ -352,17 +352,17 @@ export function ReadingArticle({ data, node, hierarchy, navigation, contentType 
 
                 </div>
 
-                <div className="flex items-center gap-4 text-[#759388] mt-1 print:hidden">
-                  <div className="flex items-center gap-1.5 text-[15px] font-medium mr-2">
-                    <Eye className="w-4 h-4" />
+                <div className="flex items-center gap-4 text-[#6b8c80] print:hidden shrink-0">
+                  <div className="flex items-center gap-1.5 text-[15px] font-medium mr-1">
+                    <Eye className="w-[18px] h-[18px]" />
                     {viewCount}
                   </div>
                   <button
                     onClick={() => window.print()}
-                    className="hover:text-[#2d4a41] transition-colors p-1"
+                    className="hover:text-[#1b3d36] transition-colors p-1.5"
                     title="Print"
                   >
-                    <Printer className="w-5 h-5" />
+                    <Printer className="w-[20px] h-[20px] stroke-[1.5]" />
                   </button>
                   <button
                     onClick={() => {
@@ -373,15 +373,15 @@ export function ReadingArticle({ data, node, hierarchy, navigation, contentType 
                         alert('Link copied to clipboard!');
                       }
                     }}
-                    className="hover:text-[#2d4a41] transition-colors p-1"
+                    className="hover:text-[#1b3d36] transition-colors p-1.5"
                     title="Share"
                   >
-                    <Share2 className="w-5 h-5" />
+                    <Share2 className="w-[20px] h-[20px] stroke-[1.5]" />
                   </button>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <button className="bg-white dark:bg-slate-800 rounded px-1.5 py-1.5 hover:text-[#2d4a41] shadow-sm border border-slate-200 dark:border-slate-700 transition-colors ml-1">
-                        <MoreVertical className="w-5 h-5" />
+                      <button className="bg-white dark:bg-slate-800 rounded-md p-1.5 hover:text-[#1b3d36] hover:bg-slate-50 shadow-sm border border-slate-200/80 dark:border-slate-700 transition-colors ml-2">
+                        <MoreVertical className="w-5 h-5 stroke-[1.5]" />
                       </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-48 bg-white dark:bg-slate-900">
