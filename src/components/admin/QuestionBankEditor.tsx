@@ -1044,9 +1044,8 @@ If the Question Type is not MCQ, you can omit the options and optionExplanations
                       <Card className="rounded-lg border-[#d3e3d3] dark:border-emerald-900/50 shadow-sm bg-[#fdfefd] dark:bg-slate-900 overflow-hidden">
                           <CardHeader className="flex flex-row items-center justify-between pb-2 border-b border-[#eef2ec] dark:border-slate-800 bg-[#f8faf8] dark:bg-slate-900">
                               <CardTitle className="text-[#2d3b2d] dark:text-emerald-200ase text-[#4a634a] dark:text-emerald-400">Explanation</CardTitle>
-                              <Button variant="outline" size="sm" onClick={handleGenerateAI} disabled={isGeneratingAI} className="h-7 text-xs rounded-lg text-[#4a634a] dark:text-emerald-400 border-[#c4d6c4] dark:border-emerald-800/50 bg-[#fdfefd] dark:bg-slate-900 hover:bg-[#f4f8f4] dark:bg-emerald-900/20">
-                                  {isGeneratingAI ? <Loader2 className="h-3 w-3 mr-1.5 animate-spin" /> : <Sparkles className="h-3 w-3 mr-1.5" />}
-                                  Generate with AI
+                              <Button variant="outline" size="icon" onClick={handleGenerateAI} disabled={isGeneratingAI} className="h-7 w-7 rounded-lg text-[#4a634a] dark:text-emerald-400 border-[#c4d6c4] dark:border-emerald-800/50 bg-[#fdfefd] dark:bg-slate-900 hover:bg-[#f4f8f4] dark:bg-emerald-900/20" title="Generate with AI">
+                                  {isGeneratingAI ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
                               </Button>
                           </CardHeader>
                           <CardContent className="pt-3">

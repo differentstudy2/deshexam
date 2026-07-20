@@ -568,9 +568,8 @@ export function TiptapEditor({ content, onChange, maxHeight }: { content: string
               }
             }}>
               <DialogTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-8 gap-1 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 hover:text-indigo-700">
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 hover:text-indigo-700" title="AI Generate">
                   <Sparkles className="w-4 h-4" />
-                  <span className="hidden sm:inline">AI Generate</span>
                 </Button>
               </DialogTrigger>
               <DialogContent>

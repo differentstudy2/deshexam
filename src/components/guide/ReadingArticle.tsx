@@ -131,7 +131,7 @@ export function ReadingArticle({ data, node, hierarchy, navigation, contentType 
             <button
               onClick={() => {
                 if (navigator.share) {
-                  navigator.share({ title: data.title, url: window.location.href });
+                  navigator.share({ title: data.title, url: window.location.href }).catch(console.error);
                 } else {
                   navigator.clipboard.writeText(window.location.href);
                   alert('Link copied to clipboard!');
@@ -436,7 +436,7 @@ export function ReadingArticle({ data, node, hierarchy, navigation, contentType 
                   <button
                     onClick={() => {
                       if (navigator.share) {
-                        navigator.share({ title: data.title, url: window.location.href });
+                        navigator.share({ title: data.title, url: window.location.href }).catch(console.error);
                       } else {
                         navigator.clipboard.writeText(window.location.href);
                         alert('Link copied to clipboard!');
