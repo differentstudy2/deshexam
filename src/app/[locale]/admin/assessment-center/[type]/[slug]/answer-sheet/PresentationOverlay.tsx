@@ -204,12 +204,16 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
             `}</style>
             
             {/* Left Banner Area */}
-            <div className="hidden lg:flex flex-1 h-full items-center justify-center bg-gradient-to-br from-blue-50/50 to-white/50 border-r border-gray-100 shadow-[inset_-10px_0_20px_rgba(0,0,0,0.01)] relative z-0 overflow-hidden">
-                 <div className="flex flex-col items-center justify-center h-full p-4 xl:p-8 opacity-60 hover:opacity-100 transition-opacity duration-500">
-                      <img src="/image/logo.png" alt="DeshExam" className="w-16 xl:w-24 h-auto grayscale opacity-80 mb-8" />
+            <div className="hidden lg:flex flex-1 h-full items-center justify-center bg-gradient-to-b from-[#0a1128] via-[#101b3b] to-[#0a1128] border-r border-[#1a2f5c]/50 shadow-[inset_-10px_0_30px_rgba(0,0,0,0.5)] relative z-0 overflow-hidden">
+                 {/* Premium Background Effects */}
+                 <div className="absolute top-[20%] left-[-20%] w-64 h-64 bg-blue-500/10 rounded-full blur-[80px]"></div>
+                 <div className="absolute bottom-[20%] right-[-20%] w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px]"></div>
+
+                 <div className="flex flex-col items-center justify-center h-full p-4 xl:p-8 opacity-90 hover:opacity-100 transition-opacity duration-500 z-10">
+                      <img src="/image/logo.png" alt="DeshExam" className="w-16 xl:w-24 h-auto grayscale invert mix-blend-screen opacity-90 mb-10" />
                       <div className="text-center rotate-180 flex flex-col items-center" style={{ writingMode: 'vertical-rl' }}>
-                          <h3 className="font-black text-3xl xl:text-5xl text-gray-800 tracking-widest uppercase mb-4 whitespace-nowrap">Desh Exam</h3>
-                          <p className="text-sm xl:text-base font-bold text-gray-500 tracking-[0.2em] uppercase whitespace-nowrap">Academy</p>
+                          <h3 className="font-black text-3xl xl:text-5xl text-white tracking-widest uppercase mb-4 whitespace-nowrap drop-shadow-md">Desh Exam</h3>
+                          <p className="text-sm xl:text-base font-bold text-transparent bg-clip-text bg-gradient-to-b from-[#FFD700] to-[#FDB931] tracking-[0.3em] uppercase whitespace-nowrap drop-shadow-sm">Academy</p>
                       </div>
                  </div>
             </div>
@@ -534,7 +538,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                  <div className="flex flex-col items-center justify-center w-full px-4 pt-4 xl:pt-6 z-10">
                       {/* Logo */}
                       <div className="flex flex-col items-center mb-4 xl:mb-6 opacity-90">
-                          <img src="/image/logo.png" alt="DeshExam Logo" className="w-10 xl:w-12 h-auto brightness-0 invert drop-shadow-lg mb-1" />
+                          <img src="/image/logo.png" alt="DeshExam Logo" className="w-10 xl:w-12 h-auto grayscale invert mix-blend-screen mb-1" />
                           <div className="text-white font-extrabold text-base xl:text-lg tracking-wide">Desh Exam Academy</div>
                           <div className="text-white/70 text-[8px] xl:text-[10px] font-semibold tracking-[0.15em] uppercase mt-0.5">Learn • Practice • Succeed</div>
                       </div>
