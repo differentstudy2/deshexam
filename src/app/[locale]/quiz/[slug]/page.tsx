@@ -9,7 +9,7 @@ import {
   Clock, HelpCircle, ShieldCheck, FileText, CheckCircle2,
   AlertTriangle, BookOpen, Target, Award, ChevronRight, ArrowRight,
   Zap, Users, BarChart3, Brain, Star, Maximize, LayoutGrid, ShieldAlert, MonitorPlay,
-  Trophy, Sparkles, LineChart, BookCheck, History, Smartphone, PieChart
+  Trophy, Sparkles, LineChart, BookCheck, History, Smartphone, PieChart, RotateCcw
 } from 'lucide-react';
 import Link from 'next/link';
 import { AssessmentCard } from '@/components/assessment/AssessmentCard';
@@ -489,6 +489,7 @@ ${test.negativeMarking && test.negativeMarking > 0 ? `* প্রতিটি �
                     { icon: ShieldAlert, title: 'Anti-Cheat Fullscreen', desc: 'A strict, lock-down fullscreen environment ensures a fair and distraction-free test.', show: true },
                     { icon: AlertTriangle, title: 'Negative Marking', desc: `Incorrect answers deduct ${test.negativeMarking ?? 0} marks — forcing you to choose wisely.`, show: !!test.negativeMarking && test.negativeMarking > 0 },
                     { icon: Zap, title: 'Instant Results', desc: 'No waiting around. Review your accuracy and detailed report the second you hit submit.', show: true },
+                    { icon: RotateCcw, title: 'Multiple Attempts', desc: 'Retake the test as many times as you need to improve your score and learn from your mistakes.', show: true },
                   ].filter(item => item.show !== false).map(({ icon: Icon, title, desc }) => (
                     <div key={title} className="flex items-start gap-3">
                       <div className="w-9 h-9 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
