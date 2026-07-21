@@ -844,20 +844,20 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                             if (step === 0) {
                                 if (isSelected) {
-                                    containerClasses = `flex items-center gap-3 md:gap-4 py-2 px-3 rounded-lg border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(66,133,244,0.15)] bg-[#e8f0fe] border-[#4285F4] transform scale-[1.02] cursor-pointer ring-2 ring-[#4285F4]/30`;
+                                    containerClasses = `flex items-center gap-3 md:gap-4 py-2 px-3 rounded-lg border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(66,133,244,0.15)] bg-[#e8f0fe] dark:bg-[#4285F4]/20 border-[#4285F4] transform scale-[1.02] cursor-pointer ring-2 ring-[#4285F4]/30`;
                                     letterClasses = `shrink-0 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full text-lg md:text-xl font-black transition-colors duration-300 bg-[#4285F4] text-white`;
                                 } else {
                                     containerClasses += ` hover:scale-[1.01] hover:shadow-md cursor-pointer hover:border-gray-300`;
                                 }
                             } else {
                                 if (showCorrect) {
-                                    containerClasses = `flex items-center gap-3 md:gap-4 py-2 px-3 rounded-lg border-2 ring-4 ring-[#34A853]/30 bg-[#f0fdf4] border-[#34A853] z-10 relative animate-pop-in`;
+                                    containerClasses = `flex items-center gap-3 md:gap-4 py-2 px-3 rounded-lg border-2 ring-4 ring-[#34A853]/30 bg-[#f0fdf4] dark:bg-[#34A853]/20 border-[#34A853] z-10 relative animate-pop-in`;
                                     letterClasses = `shrink-0 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full text-lg md:text-xl font-black transition-colors duration-300 bg-[#34A853] text-white`;
                                 } else if (showWrong && isSelected) {
-                                    containerClasses = `flex items-center gap-3 md:gap-4 py-2 px-3 rounded-lg border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(234,67,53,0.15)] bg-[#fce8e6] border-[#EA4335] transform scale-[1.02]`;
+                                    containerClasses = `flex items-center gap-3 md:gap-4 py-2 px-3 rounded-lg border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(234,67,53,0.15)] bg-[#fce8e6] dark:bg-[#EA4335]/20 border-[#EA4335] transform scale-[1.02]`;
                                     letterClasses = `shrink-0 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full text-lg md:text-xl font-black transition-colors duration-300 bg-[#EA4335] text-white`;
                                 } else if (showWrong) {
-                                    containerClasses = `flex items-center gap-3 md:gap-4 py-2 px-3 rounded-lg border-2 transition-all duration-300 shadow-sm bg-white border-gray-200 opacity-60`;
+                                    containerClasses = `flex items-center gap-3 md:gap-4 py-2 px-3 rounded-lg border-2 transition-all duration-300 shadow-sm bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 opacity-60`;
                                     // letterClasses keeps its default theme color
                                 }
                             }
