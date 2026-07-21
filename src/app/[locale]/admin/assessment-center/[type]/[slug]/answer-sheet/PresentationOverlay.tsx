@@ -309,41 +309,41 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 )}
 
                 {/* Header */}
-                <div className="shrink-0 bg-white border-b border-gray-200 py-3 px-4 md:pl-8 md:pr-12 flex flex-col md:flex-row justify-between items-center w-full z-10 shadow-sm gap-2 md:gap-0 relative">
+                <div className="shrink-0 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 border-b border-indigo-100 py-3 px-4 md:pl-6 md:pr-8 flex flex-col md:flex-row justify-between items-center w-full z-10 shadow-sm gap-3 md:gap-0 relative">
                     {/* Logo Area */}
                     <div className="flex items-center gap-2 md:gap-3 w-full md:w-auto justify-between md:justify-start">
-                        <div className="flex items-center gap-2 md:gap-3">
-                            <img src="/image/logo.png" alt="DeshExam" className="h-8 md:h-10 w-auto object-contain" />
+                        <div className="flex items-center gap-2 md:gap-3 px-1">
+                            <img src="/image/logo.png" alt="DeshExam" className="h-8 md:h-9 w-auto object-contain drop-shadow-sm" />
                             <div className="flex flex-col">
-                                <span className="font-extrabold text-sm md:text-xl text-gray-900 leading-none">Desh Exam Academy</span>
-                                <span className="text-[10px] md:text-[11px] text-gray-500 font-medium tracking-wide mt-1">Learn • Practice • Succeed</span>
+                                <span className="font-extrabold text-sm md:text-lg text-indigo-950 leading-none">Desh Exam Academy</span>
+                                <span className="text-[9px] md:text-[10px] text-indigo-800/70 font-bold tracking-wide mt-1 uppercase">Learn • Practice • Succeed</span>
                             </div>
                         </div>
                         {/* Mobile Close Button & Badge */}
                         <div className="flex items-center gap-2 md:hidden">
-                            <div className="bg-blue-600 text-white px-3 py-1 rounded-full font-bold text-xs tracking-wider shadow-md">
+                            <div className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-3 py-1 rounded-full font-bold text-xs tracking-wider shadow-md">
                                 MOCK TEST
                             </div>
-                            <button onClick={closePresentation} className="p-1.5 bg-gray-100 rounded-full text-gray-500">
-                                <X className="w-4 h-4" />
+                            <button onClick={closePresentation} className="p-1.5 bg-white/60 hover:bg-white rounded-full text-indigo-600 shadow-sm transition-colors">
+                                <X className="w-5 h-5" />
                             </button>
                         </div>
                     </div>
                     {/* Title Area */}
-                    <div className="flex-1 text-center w-full mt-2 md:mt-0">
-                        <h1 className="text-base md:text-3xl font-extrabold text-black tracking-tight line-clamp-1 md:line-clamp-none">{classLine}</h1>
+                    <div className="flex-1 text-center w-full mt-1 md:mt-0 px-2 md:px-6">
+                        <h1 className="text-base md:text-2xl font-extrabold text-indigo-950 tracking-tight line-clamp-1 md:line-clamp-none">{classLine}</h1>
                         {(chapterName || topicName) && (
-                            <div className="text-xs md:text-sm text-gray-500 font-medium mt-0.5">
+                            <div className="text-xs md:text-sm text-indigo-800 font-semibold mt-1.5 tracking-wide uppercase">
                                 {[chapterName, topicName].filter(Boolean).join(' | ')}
                             </div>
                         )}
                     </div>
                     {/* Badge Area (Desktop) */}
                     <div className="hidden md:flex items-center gap-4">
-                        <div className="bg-blue-600 text-white px-6 py-2 rounded-full font-bold text-lg tracking-wider shadow-md">
+                        <div className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-6 py-2 rounded-full font-bold text-lg tracking-wider shadow-md">
                             MOCK TEST
                         </div>
-                        <button onClick={closePresentation} className="p-2 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-500 transition-colors" title="Close Presentation">
+                        <button onClick={closePresentation} className="p-2.5 bg-white/60 hover:bg-white rounded-full text-indigo-600 shadow-sm transition-all" title="Close Presentation">
                             <X className="w-6 h-6" />
                         </button>
                     </div>
@@ -480,11 +480,11 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 </div>
 
                 {/* Footer */}
-                <div className="shrink-0 bg-white border-t border-gray-200 py-4 px-4 md:pl-12 md:pr-8 flex justify-between items-center w-full z-20 shadow-[0_-2px_10px_rgba(0,0,0,0.02)]">
-                    <div className="flex items-center text-gray-600 font-semibold text-sm md:text-lg">
+                <div className="shrink-0 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 border-t border-indigo-100 py-4 px-4 md:pl-12 md:pr-8 flex justify-between items-center w-full z-20 shadow-[0_-2px_10px_rgba(0,0,0,0.02)] relative">
+                    <div className="flex items-center text-indigo-900/70 font-semibold text-sm md:text-lg">
                         © DeshExam
                     </div>
-                    <div className="hidden md:flex items-center text-gray-600 font-semibold text-lg tracking-wide">
+                    <div className="hidden md:flex items-center text-indigo-900/70 font-semibold text-lg tracking-wide">
                         www.deshexam.com
                     </div>
 
@@ -493,7 +493,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                         <div className="relative">
                             <button
                                 onClick={() => setIsSettingsOpen(!isSettingsOpen)}
-                                className={`p-3 rounded-full transition-all shadow-sm ${isSettingsOpen ? 'bg-blue-100 text-blue-700 ring-2 ring-blue-500/50' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}
+                                className={`p-3 rounded-full transition-all shadow-sm ${isSettingsOpen ? 'bg-indigo-600 text-white ring-2 ring-indigo-300' : 'bg-white/60 hover:bg-white text-indigo-600'}`}
                                 title="Display Settings"
                             >
                                 <Settings className={`w-6 h-6 transition-transform duration-300 ${isSettingsOpen ? 'rotate-90' : ''}`} />
