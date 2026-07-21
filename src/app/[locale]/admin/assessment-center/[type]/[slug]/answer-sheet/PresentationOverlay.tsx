@@ -8,7 +8,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
 import 'katex/dist/katex.min.css';
-import { X, ChevronLeft, ChevronRight, Play, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Play, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize, LayoutGrid } from 'lucide-react';
 
 const bnOptionsMap: Record<string, string> = {
     a: 'ক',
@@ -35,6 +35,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [qFontScale, setQFontScale] = useState(1);
     const [optFontScale, setOptFontScale] = useState(1);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+    const [isNavigatorOpen, setIsNavigatorOpen] = useState(false);
     const [mode, setMode] = useState<'test' | 'read'>('test');
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
     const [isTimerEnabled, setIsTimerEnabled] = useState(true);
@@ -411,6 +412,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
             if (e.key === 'Escape') {
                 if (isSettingsOpen) {
                     setIsSettingsOpen(false);
+                } else if (isNavigatorOpen) {
+                    setIsNavigatorOpen(false);
                 } else {
                     closePresentation();
                 }
@@ -1249,8 +1252,47 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             )}
                         </div>
 
-                        <div className="text-gray-700 font-semibold text-lg">
-                            Page {String(currentSlide + 1).padStart(2, '0')}
+                        <div className="relative flex items-center justify-center">
+                            <button
+                                onClick={() => setIsNavigatorOpen(!isNavigatorOpen)}
+                                className={`flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-xl transition-all shadow-sm font-semibold text-sm md:text-lg ${isNavigatorOpen ? 'bg-indigo-600 text-white ring-2 ring-indigo-300' : 'bg-white/60 hover:bg-white text-indigo-700'}`}
+                                title="Slide Navigator"
+                            >
+                                <LayoutGrid className="w-4 h-4 md:w-5 md:h-5" />
+                                Page {String(currentSlide + 1).padStart(2, '0')} <span className="text-xs md:text-sm opacity-70">/ {questions.length}</span>
+                            </button>
+
+                            {isNavigatorOpen && (
+                                <div className="absolute bottom-[calc(100%+10px)] right-0 md:left-1/2 md:-translate-x-1/2 bg-white border border-gray-200 rounded-2xl shadow-2xl p-4 md:p-5 w-[280px] sm:w-[320px] z-50 animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[50vh]">
+                                    <div className="flex justify-between items-center mb-3 pb-3 border-b border-gray-100 shrink-0">
+                                        <h3 className="font-bold text-gray-800 text-sm md:text-base flex items-center gap-2">
+                                            <LayoutGrid className="w-4 h-4 md:w-5 md:h-5 text-gray-500" /> Slide Navigator
+                                        </h3>
+                                        <button onClick={() => setIsNavigatorOpen(false)} className="p-1 text-gray-400 hover:bg-gray-100 rounded-full hover:text-gray-700 transition-colors">
+                                            <X className="w-4 h-4 md:w-5 md:h-5" />
+                                        </button>
+                                    </div>
+                                    <div className="overflow-y-auto custom-scrollbar pr-2 pb-2">
+                                        <div className="grid grid-cols-5 gap-2">
+                                            {questions.map((_, idx) => (
+                                                <button
+                                                    key={idx}
+                                                    onClick={() => {
+                                                        setCurrentSlide(idx);
+                                                        setStep(mode === 'read' ? 2 : 0);
+                                                        setSelectedOption(null);
+                                                        setTimerSeconds(0);
+                                                        setIsNavigatorOpen(false);
+                                                    }}
+                                                    className={`w-full aspect-square rounded-lg flex items-center justify-center text-xs md:text-sm font-bold transition-all ${currentSlide === idx ? 'bg-blue-600 text-white shadow-md scale-105' : 'bg-gray-100 text-gray-600 hover:bg-blue-100 hover:text-blue-600'}`}
+                                                >
+                                                    {idx + 1}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         {/* Controls */}
