@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -43,6 +43,29 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [wmSize, setWmSize] = useState(70);
     const [wmVisible, setWmVisible] = useState(true);
     const [optionsLayout, setOptionsLayout] = useState<'grid' | 'list'>('grid');
+
+    const [timerPos, setTimerPos] = useState({ x: 0, y: 0 });
+    const [isDraggingTimer, setIsDraggingTimer] = useState(false);
+    const dragStartPos = useRef({ x: 0, y: 0 });
+
+    const handleTimerPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+        setIsDraggingTimer(true);
+        dragStartPos.current = { x: e.clientX - timerPos.x, y: e.clientY - timerPos.y };
+        (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    };
+
+    const handleTimerPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+        if (!isDraggingTimer) return;
+        setTimerPos({
+            x: e.clientX - dragStartPos.current.x,
+            y: e.clientY - dragStartPos.current.y
+        });
+    };
+
+    const handleTimerPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+        setIsDraggingTimer(false);
+        (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+    };
     const openPresentation = () => {
         setIsOpen(true);
         setCurrentSlide(0);
@@ -292,16 +315,22 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
             </div>
 
             {/* Main Presentation Area */}
-            <div className="relative w-full h-full md:max-w-[177.78vh] md:max-h-[56.25vw] bg-[#f8f9fc] flex flex-col shadow-2xl overflow-hidden shrink-0 z-10">
+            <div className="relative w-full h-full md:max-w-[177.78vh] md:max-h-[56.25vw] bg-gradient-to-br from-[#f8fafc] via-[#f1f5f9] to-[#f8fafc] flex flex-col shadow-2xl overflow-hidden shrink-0 z-10">
 
                 {/* Background Decorations */}
                 <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-                    {/* Dot Pattern Left */}
-                    <div className="absolute top-20 left-0 w-64 h-full" style={{ backgroundImage: 'radial-gradient(#e5e7eb 2px, transparent 2px)', backgroundSize: '24px 24px', opacity: 0.5 }}></div>
-                    {/* Circles Right */}
-                    <div className="absolute top-1/4 -right-16 w-64 h-64 rounded-full border-[1.5px] border-gray-200 opacity-50"></div>
-                    <div className="absolute bottom-1/4 right-32 w-48 h-48 rounded-full border-[1.5px] border-gray-200 opacity-50"></div>
-                    <div className="absolute top-1/3 left-1/4 w-32 h-32 rounded-full border-[1.5px] border-gray-200 opacity-50"></div>
+                    {/* Soft glowing mesh gradients */}
+                    <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-200/30 blur-[100px]"></div>
+                    <div className="absolute bottom-[-10%] right-[-5%] w-[50%] h-[50%] rounded-full bg-pink-200/30 blur-[100px]"></div>
+                    <div className="absolute top-[20%] right-[10%] w-[30%] h-[30%] rounded-full bg-purple-200/30 blur-[80px]"></div>
+                    
+                    {/* Dot Pattern */}
+                    <div className="absolute top-0 left-0 w-full h-full" style={{ backgroundImage: 'radial-gradient(rgba(99, 102, 241, 0.06) 2px, transparent 2px)', backgroundSize: '32px 32px', opacity: 0.8 }}></div>
+                    
+                    {/* Clean geometric lines */}
+                    <div className="absolute top-[15%] right-[-5%] w-72 h-72 rounded-full border-[1px] border-indigo-200/40 opacity-60"></div>
+                    <div className="absolute top-[18%] right-[-2%] w-56 h-56 rounded-full border-[1px] border-purple-200/40 opacity-60"></div>
+                    <div className="absolute bottom-[20%] left-[5%] w-48 h-48 rounded-full border-[1px] border-pink-200/40 opacity-60"></div>
                     {/* Watermark removed from here, moved to foreground */}
                 </div>
 
@@ -375,9 +404,16 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                     {/* Timer */}
                     {isTimerEnabled && (
-                        <div className="absolute top-6 right-10 bg-white border border-gray-200 shadow-sm rounded-xl px-4 py-2 flex items-center gap-2 text-gray-700 font-bold font-mono text-2xl animate-in fade-in zoom-in duration-300">
-                            <Clock className="w-6 h-6 text-blue-500" />
-                            <span className={step >= 1 ? "text-gray-400" : "text-gray-800"}>
+                        <div 
+                            className={`absolute top-6 right-10 bg-white border border-gray-200 shadow-sm rounded-xl px-4 py-2 flex items-center gap-2 text-gray-700 font-bold font-mono text-2xl animate-in fade-in zoom-in duration-300 z-50 select-none ${isDraggingTimer ? 'cursor-grabbing scale-105 shadow-md' : 'cursor-grab'}`}
+                            style={{ transform: `translate(${timerPos.x}px, ${timerPos.y}px)` }}
+                            onPointerDown={handleTimerPointerDown}
+                            onPointerMove={handleTimerPointerMove}
+                            onPointerUp={handleTimerPointerUp}
+                            onPointerCancel={handleTimerPointerUp}
+                        >
+                            <Clock className="w-6 h-6 text-blue-500 pointer-events-none" />
+                            <span className={`pointer-events-none ${step >= 1 ? "text-gray-400" : "text-gray-800"}`}>
                                 {String(Math.floor(timerSeconds / 60)).padStart(2, '0')}:{String(timerSeconds % 60).padStart(2, '0')}
                             </span>
                         </div>
