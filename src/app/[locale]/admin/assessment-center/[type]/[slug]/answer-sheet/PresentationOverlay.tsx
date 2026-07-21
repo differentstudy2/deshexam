@@ -647,34 +647,34 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                             // Colors closely matching the image
                             const colorThemes = [
-                                { border: 'border-[#4285F4]', bg: 'bg-white', letterBg: 'bg-[#4285F4]', letterText: 'text-white' }, // Blue
-                                { border: 'border-[#34A853]', bg: 'bg-white', letterBg: 'bg-[#34A853]', letterText: 'text-white' }, // Green
-                                { border: 'border-[#F9AB00]', bg: 'bg-white', letterBg: 'bg-[#F9AB00]', letterText: 'text-white' }, // Yellow/Orange
-                                { border: 'border-[#EA4335]', bg: 'bg-white', letterBg: 'bg-[#EA4335]', letterText: 'text-white' }, // Red
-                                { border: 'border-[#9C27B0]', bg: 'bg-white', letterBg: 'bg-[#9C27B0]', letterText: 'text-white' }, // Purple
+                                { border: 'border-[#4285F4]/50', bg: 'bg-white', letterBg: 'bg-[#4285F4]/75', letterText: 'text-white' }, // Blue
+                                { border: 'border-[#34A853]/50', bg: 'bg-white', letterBg: 'bg-[#34A853]/75', letterText: 'text-white' }, // Green
+                                { border: 'border-[#F9AB00]/50', bg: 'bg-white', letterBg: 'bg-[#F9AB00]/75', letterText: 'text-white' }, // Yellow/Orange
+                                { border: 'border-[#EA4335]/50', bg: 'bg-white', letterBg: 'bg-[#EA4335]/75', letterText: 'text-white' }, // Red
+                                { border: 'border-[#9C27B0]/50', bg: 'bg-white', letterBg: 'bg-[#9C27B0]/75', letterText: 'text-white' }, // Purple
                             ];
 
                             const theme = colorThemes[oIdx % colorThemes.length];
 
-                            let containerClasses = `flex items-center gap-3 md:gap-4 py-2 px-3 rounded-2xl border-2 transition-all duration-300 shadow-[0_4px_12px_rgba(0,0,0,0.04)] ${theme.bg} ${theme.border}`;
+                            let containerClasses = `flex items-center gap-3 md:gap-4 py-2 px-3 rounded-lg border-2 transition-all duration-300 shadow-[0_4px_12px_rgba(0,0,0,0.04)] ${theme.bg} ${theme.border}`;
                             let letterClasses = `shrink-0 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full text-lg md:text-xl font-black transition-colors duration-300 ${theme.letterBg} ${theme.letterText}`;
 
                             if (step === 0) {
                                 if (isSelected) {
-                                    containerClasses = `flex items-center gap-3 md:gap-4 py-2 px-3 rounded-2xl border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(66,133,244,0.15)] bg-[#e8f0fe] border-[#4285F4] transform scale-[1.02] cursor-pointer ring-2 ring-[#4285F4]/30`;
+                                    containerClasses = `flex items-center gap-3 md:gap-4 py-2 px-3 rounded-lg border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(66,133,244,0.15)] bg-[#e8f0fe] border-[#4285F4] transform scale-[1.02] cursor-pointer ring-2 ring-[#4285F4]/30`;
                                     letterClasses = `shrink-0 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full text-lg md:text-xl font-black transition-colors duration-300 bg-[#4285F4] text-white`;
                                 } else {
                                     containerClasses += ` hover:scale-[1.01] hover:shadow-md cursor-pointer hover:border-gray-300`;
                                 }
                             } else {
                                 if (showCorrect) {
-                                    containerClasses = `flex items-center gap-3 md:gap-4 py-2 px-3 rounded-2xl border-2 ring-4 ring-[#34A853]/30 bg-[#f0fdf4] border-[#34A853] z-10 relative animate-pop-in`;
+                                    containerClasses = `flex items-center gap-3 md:gap-4 py-2 px-3 rounded-lg border-2 ring-4 ring-[#34A853]/30 bg-[#f0fdf4] border-[#34A853] z-10 relative animate-pop-in`;
                                     letterClasses = `shrink-0 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full text-lg md:text-xl font-black transition-colors duration-300 bg-[#34A853] text-white`;
                                 } else if (showWrong && isSelected) {
-                                    containerClasses = `flex items-center gap-3 md:gap-4 py-2 px-3 rounded-2xl border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(234,67,53,0.15)] bg-[#fce8e6] border-[#EA4335] transform scale-[1.02]`;
+                                    containerClasses = `flex items-center gap-3 md:gap-4 py-2 px-3 rounded-lg border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(234,67,53,0.15)] bg-[#fce8e6] border-[#EA4335] transform scale-[1.02]`;
                                     letterClasses = `shrink-0 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full text-lg md:text-xl font-black transition-colors duration-300 bg-[#EA4335] text-white`;
                                 } else if (showWrong) {
-                                    containerClasses = `flex items-center gap-3 md:gap-4 py-2 px-3 rounded-2xl border-2 transition-all duration-300 shadow-sm bg-white border-gray-200 opacity-60`;
+                                    containerClasses = `flex items-center gap-3 md:gap-4 py-2 px-3 rounded-lg border-2 transition-all duration-300 shadow-sm bg-white border-gray-200 opacity-60`;
                                     // letterClasses keeps its default theme color
                                 }
                             }
