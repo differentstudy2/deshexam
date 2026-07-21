@@ -374,10 +374,10 @@ export default async function MockTestLandingPage({ params }: Props) {
                   { icon: LayoutGrid, label: 'Question Type', value: test.questionType || 'MCQ', color: 'bg-cyan-50 dark:bg-cyan-900/20 border-cyan-200 dark:border-cyan-800 text-cyan-700 dark:text-cyan-400' },
                   { icon: BookOpen, label: 'Subject', value: subjectName || 'Mixed', color: 'bg-rose-50 dark:bg-rose-900/20 border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-400' },
                 ].map(({ icon: Icon, label, value, color }) => (
-                  <div key={label} className={`flex flex-col items-center justify-center p-4 rounded-lg border text-center transition-colors duration-300 ${color}`}>
-                    <Icon className="w-5 h-5 mb-1 opacity-70" />
-                    <p className="text-2xl font-extrabold dark:text-slate-100">{value}</p>
-                    <p className="text-[11px] font-semibold uppercase tracking-wide opacity-70">{label}</p>
+                  <div key={label} className={`flex flex-col items-center justify-center py-2.5 px-3 rounded-lg border text-center transition-colors duration-300 ${color}`}>
+                    <Icon className="w-5 h-5 mb-0.5 opacity-70" />
+                    <p className="text-xl sm:text-2xl font-extrabold dark:text-slate-100">{value}</p>
+                    <p className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wide opacity-70">{label}</p>
                   </div>
                 ))}
               </div>
