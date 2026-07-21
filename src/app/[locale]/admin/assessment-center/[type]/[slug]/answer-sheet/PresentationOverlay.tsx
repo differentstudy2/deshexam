@@ -8,7 +8,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
 import 'katex/dist/katex.min.css';
-import { X, ChevronLeft, ChevronRight, Play, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize, LayoutGrid } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Play, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize, LayoutGrid, Sun, Moon } from 'lucide-react';
 
 const bnOptionsMap: Record<string, string> = {
     a: 'ক',
@@ -36,6 +36,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [optFontScale, setOptFontScale] = useState(1);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [isNavigatorOpen, setIsNavigatorOpen] = useState(false);
+    const [isDarkMode, setIsDarkMode] = useState(false);
     const [mode, setMode] = useState<'test' | 'read'>('test');
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
     const [isTimerEnabled, setIsTimerEnabled] = useState(true);
@@ -526,7 +527,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     if (typeof window === 'undefined') return null;
 
     return createPortal(
-        <div className="fixed inset-0 z-[99999] bg-[#f8fbff] flex items-center justify-center select-none font-sans overflow-hidden">
+        <div className={`fixed inset-0 z-[99999] flex items-center justify-center select-none font-sans overflow-hidden ${isDarkMode ? 'dark bg-gray-900' : 'bg-[#f8fbff]'}`}>
             <style>{`
                 @keyframes popIn {
                     0% { transform: scale(1); box-shadow: 0 0 0 rgba(52,168,83,0); }
@@ -627,7 +628,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
             ` }} />
 
             {/* Main Presentation Area */}
-            <div className="responsive-fonts relative w-full h-full lg:max-w-[177.78vh] lg:max-h-[56.25vw] bg-gradient-to-br from-[#f8fafc] via-[#f1f5f9] to-[#f8fafc] flex flex-col shadow-2xl overflow-hidden shrink-0 z-10">
+            <div className="responsive-fonts relative w-full h-full lg:max-w-[177.78vh] lg:max-h-[56.25vw] bg-gradient-to-br from-[#f8fafc] via-[#f1f5f9] to-[#f8fafc] dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex flex-col shadow-2xl overflow-hidden shrink-0 z-10">
 
                 {/* Main Drawing Canvas */}
                 <canvas
@@ -727,14 +728,14 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 )}
 
                 {/* Header */}
-                <div className="shrink-0 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 border-b border-indigo-100 py-3 px-4 md:pl-6 md:pr-8 flex flex-col md:flex-row justify-between items-center w-full z-30 shadow-sm gap-3 md:gap-0 relative">
+                <div className="shrink-0 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-800 dark:via-gray-800 dark:to-gray-800 border-b border-indigo-100 dark:border-gray-700 py-3 px-4 md:pl-6 md:pr-8 flex flex-col md:flex-row justify-between items-center w-full z-30 shadow-sm gap-3 md:gap-0 relative">
                     {/* Logo Area */}
                     <div className="flex items-center gap-2 md:gap-3 w-full md:w-auto justify-between md:justify-start">
                         <div className="flex items-center gap-2 md:gap-3 px-1">
                             <img src="/image/logo.png" alt="DeshExam" className="h-8 md:h-9 w-auto object-contain drop-shadow-sm" />
                             <div className="flex flex-col">
-                                <span className="font-extrabold text-sm md:text-lg text-indigo-950 leading-none">Desh Exam Academy</span>
-                                <span className="text-[9px] md:text-[10px] text-indigo-800/70 font-bold tracking-wide mt-1 uppercase">Learn • Practice • Succeed</span>
+                                <span className="font-extrabold text-sm md:text-lg text-indigo-950 dark:text-gray-100 leading-none">Desh Exam Academy</span>
+                                <span className="text-[9px] md:text-[10px] text-indigo-800/70 dark:text-gray-400 font-bold tracking-wide mt-1 uppercase">Learn • Practice • Succeed</span>
                             </div>
                         </div>
                         {/* Mobile Close Button & Badge */}
@@ -749,9 +750,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     </div>
                     {/* Title Area */}
                     <div className="flex-1 text-center w-full mt-1 md:mt-0 px-2 md:px-6">
-                        <h1 className="text-base md:text-2xl font-extrabold text-indigo-950 tracking-tight line-clamp-1 md:line-clamp-none">{classLine}</h1>
+                        <h1 className="text-base md:text-2xl font-extrabold text-indigo-950 dark:text-gray-100 tracking-tight line-clamp-1 md:line-clamp-none">{classLine}</h1>
                         {(chapterName || topicName) && (
-                            <div className="text-xs md:text-sm text-indigo-800 font-semibold mt-1.5 tracking-wide uppercase">
+                            <div className="text-xs md:text-sm text-indigo-800 dark:text-gray-300 font-semibold mt-1.5 tracking-wide uppercase">
                                 {[chapterName, topicName].filter(Boolean).join(' | ')}
                             </div>
                         )}
@@ -775,9 +776,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                         <div 
                             className={`absolute top-6 right-10 flex items-center gap-3 px-5 py-2.5 rounded-2xl backdrop-blur-xl border z-50 select-none transition-all duration-300 font-mono text-[26px] font-black tracking-widest ${
                                 step >= 1 
-                                    ? 'bg-gray-100/90 border-gray-200/50 text-gray-400 shadow-sm'
-                                    : 'bg-white/95 border-blue-200/60 text-[#1e3a8a] shadow-[0_8px_32px_rgba(59,130,246,0.15)] ring-1 ring-blue-100'
-                            } ${isDraggingTimer ? 'cursor-grabbing scale-105 shadow-[0_16px_48px_rgba(59,130,246,0.25)] ring-blue-300' : 'cursor-grab hover:shadow-[0_12px_40px_rgba(59,130,246,0.2)] hover:scale-[1.02]'}`}
+                                    ? 'bg-gray-100/90 dark:bg-gray-800/90 border-gray-200/50 dark:border-gray-700/50 text-gray-400 dark:text-gray-500 shadow-sm'
+                                    : 'bg-white/95 dark:bg-gray-800/95 border-blue-200/60 dark:border-blue-900/60 text-[#1e3a8a] dark:text-blue-100 shadow-[0_8px_32px_rgba(59,130,246,0.15)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.3)] ring-1 ring-blue-100 dark:ring-blue-900/50'
+                            } ${isDraggingTimer ? 'cursor-grabbing scale-105 shadow-[0_16px_48px_rgba(59,130,246,0.25)] ring-blue-300 dark:ring-blue-700' : 'cursor-grab hover:shadow-[0_12px_40px_rgba(59,130,246,0.2)] hover:scale-[1.02]'}`}
                             style={{ transform: `translate(${timerPos.x}px, ${timerPos.y}px)` }}
                             onPointerDown={handleTimerPointerDown}
                             onPointerMove={handleTimerPointerMove}
@@ -785,7 +786,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             onPointerCancel={handleTimerPointerUp}
                         >
                             <div className="relative flex items-center justify-center shrink-0">
-                                <Clock className={`w-7 h-7 transition-colors duration-300 ${step >= 1 ? 'text-gray-400' : 'text-blue-600'} pointer-events-none`} />
+                                <Clock className={`w-7 h-7 transition-colors duration-300 ${step >= 1 ? 'text-gray-400 dark:text-gray-500' : 'text-blue-600 dark:text-blue-400'} pointer-events-none`} />
                                 {step === 0 && (
                                     <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5 pointer-events-none">
                                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
@@ -803,8 +804,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                     {/* Question */}
                     <div className="flex items-start gap-3 md:gap-4 w-full max-w-5xl mt-8 md:mt-4">
-                        <span className="text-black font-extrabold leading-normal shrink-0" style={{ fontSize: 'var(--q-size)' }}>Q{currentSlide + 1}.</span>
-                        <div className="prose prose-black max-w-none prose-p:font-extrabold text-[length:var(--q-size)] leading-normal text-left text-black font-extrabold [&_*]:!text-[length:var(--q-size)] [&_*]:!leading-normal [&_*]:!m-0 capitalize">
+                        <span className="text-black dark:text-gray-100 font-extrabold leading-normal shrink-0" style={{ fontSize: 'var(--q-size)' }}>Q{currentSlide + 1}.</span>
+                        <div className="prose prose-black dark:prose-invert max-w-none prose-p:font-extrabold text-[length:var(--q-size)] leading-normal text-left text-black dark:text-gray-100 font-extrabold [&_*]:!text-[length:var(--q-size)] [&_*]:!leading-normal [&_*]:!m-0 capitalize">
                             <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
                                 {q.questionText}
                             </ReactMarkdown>
@@ -829,11 +830,11 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                             // Colors closely matching the image
                             const colorThemes = [
-                                { border: 'border-[#4285F4]/50', bg: 'bg-white', letterBg: 'bg-[#4285F4]/75', letterText: 'text-white' }, // Blue
-                                { border: 'border-[#34A853]/50', bg: 'bg-white', letterBg: 'bg-[#34A853]/75', letterText: 'text-white' }, // Green
-                                { border: 'border-[#F9AB00]/50', bg: 'bg-white', letterBg: 'bg-[#F9AB00]/75', letterText: 'text-white' }, // Yellow/Orange
-                                { border: 'border-[#EA4335]/50', bg: 'bg-white', letterBg: 'bg-[#EA4335]/75', letterText: 'text-white' }, // Red
-                                { border: 'border-[#9C27B0]/50', bg: 'bg-white', letterBg: 'bg-[#9C27B0]/75', letterText: 'text-white' }, // Purple
+                                { border: 'border-[#4285F4]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#4285F4]/75', letterText: 'text-white' }, // Blue
+                                { border: 'border-[#34A853]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#34A853]/75', letterText: 'text-white' }, // Green
+                                { border: 'border-[#F9AB00]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#F9AB00]/75', letterText: 'text-white' }, // Yellow/Orange
+                                { border: 'border-[#EA4335]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#EA4335]/75', letterText: 'text-white' }, // Red
+                                { border: 'border-[#9C27B0]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#9C27B0]/75', letterText: 'text-white' }, // Purple
                             ];
 
                             const theme = colorThemes[oIdx % colorThemes.length];
@@ -877,7 +878,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     <div className={letterClasses}>
                                         {optLetter}
                                     </div>
-                                    <div className="prose max-w-none text-black [&>p]:m-0 [&>p]:text-[length:var(--opt-size)] [&>p]:font-semibold [&>p]:leading-snug flex-1 capitalize">
+                                    <div className="prose dark:prose-invert max-w-none text-black dark:text-gray-100 [&>p]:m-0 [&>p]:text-[length:var(--opt-size)] [&>p]:font-semibold [&>p]:leading-snug flex-1 capitalize">
                                         <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
                                             {opt.text}
                                         </ReactMarkdown>
@@ -898,7 +899,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     {/* Option Explanation */}
                                     {step >= 2 && isOptionExpEnabled && q.optionExplanations?.[opt.key] && (
                                         <div 
-                                            className="ml-4 mt-2 pl-4 pr-4 py-2 text-gray-700 bg-gray-50/90 rounded-xl border-l-4 border-l-[#4285F4] shadow-sm animate-in fade-in duration-500 prose max-w-none [&>p]:m-0"
+                                            className="ml-4 mt-2 pl-4 pr-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-50/90 dark:bg-gray-800/90 rounded-xl border-l-4 border-l-[#4285F4] shadow-sm animate-in fade-in duration-500 prose dark:prose-invert max-w-none [&>p]:m-0"
                                             style={{ fontSize: 'var(--exp-size)' }}
                                         >
                                             <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
@@ -914,7 +915,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     {/* Explanation */}
                     {step >= 2 && q.explanation && isExpEnabled && (
                         <div className="w-full max-w-5xl mt-4 animate-in fade-in slide-in-from-bottom-8 duration-700">
-                            <div className="bg-white p-6 rounded-3xl border border-gray-200 shadow-xl relative overflow-hidden">
+                            <div className="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-200 dark:border-gray-700 shadow-xl relative overflow-hidden">
                                 {/* Small colored accent line on the left */}
                                 <div className="absolute left-0 top-0 bottom-0 w-2 bg-[#34A853]"></div>
 
@@ -923,7 +924,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     Explanation
                                 </div>
                                 <div 
-                                    className="prose prose-xl max-w-none text-gray-800 pl-4 font-medium"
+                                    className="prose prose-xl dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 pl-4 font-medium"
                                     style={{ fontSize: 'var(--exp-size)' }}
                                 >
                                     <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
@@ -936,15 +937,23 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 </div>
 
                 {/* Footer */}
-                <div className="shrink-0 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 border-t border-indigo-100 py-4 px-4 md:pl-12 md:pr-8 flex justify-between items-center w-full z-30 shadow-[0_-2px_10px_rgba(0,0,0,0.02)] relative">
-                    <div className="flex items-center text-indigo-900/70 font-semibold text-sm md:text-lg">
+                <div className="shrink-0 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-800 dark:via-gray-800 dark:to-gray-800 border-t border-indigo-100 dark:border-gray-700 py-4 px-4 md:pl-12 md:pr-8 flex justify-between items-center w-full z-30 shadow-[0_-2px_10px_rgba(0,0,0,0.02)] relative">
+                    <div className="flex items-center text-indigo-900/70 dark:text-gray-400 font-semibold text-sm md:text-lg">
                         © DeshExam
                     </div>
-                    <div className="hidden md:flex items-center text-indigo-900/70 font-semibold text-lg tracking-wide">
+                    <div className="hidden md:flex items-center text-indigo-900/70 dark:text-gray-400 font-semibold text-lg tracking-wide">
                         www.deshexam.com
                     </div>
 
                     <div className="flex items-center gap-4 md:gap-8">
+                        {/* Dark Mode Toggle Button */}
+                        <button
+                            onClick={() => setIsDarkMode(!isDarkMode)}
+                            className="p-3 rounded-full transition-all shadow-sm bg-white/60 hover:bg-white text-indigo-600 dark:bg-gray-700/60 dark:hover:bg-gray-700 dark:text-gray-300"
+                            title="Toggle Dark Mode"
+                        >
+                            {isDarkMode ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
+                        </button>
                         {/* Fullscreen Toggle Button */}
                         <button
                             onClick={toggleFullscreen}
