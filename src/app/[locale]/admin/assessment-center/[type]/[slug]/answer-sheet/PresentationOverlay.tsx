@@ -329,6 +329,11 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 return;
             }
 
+            if (e.key.toLowerCase() === 'd') {
+                setIsPenActive(prev => !prev);
+                return;
+            }
+
             if (e.key.toLowerCase() === 'q') {
                 setQFontScale(s => Math.max(0.6, s - 0.1));
                 return;
@@ -968,6 +973,59 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     A+
                                                 </button>
                                             </div>
+                                        </div>
+
+                                        <hr className="border-gray-100" />
+
+                                        <div>
+                                            <div className="text-sm font-bold text-gray-600 mb-3 flex items-center justify-between">
+                                                <span>Drawing Tool</span>
+                                                <div className="flex items-center gap-2">
+                                                    <kbd className="text-[10px] bg-gray-100 border border-gray-200 px-1.5 py-0.5 rounded text-gray-500 font-mono shadow-sm">D</kbd>
+                                                    <button onClick={() => setIsPenActive(!isPenActive)} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${isPenActive ? 'bg-blue-600' : 'bg-gray-300'}`}>
+                                                        <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${isPenActive ? 'translate-x-5' : 'translate-x-1'}`} />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            {isPenActive && (
+                                                <div className="space-y-4 bg-gray-50 p-3 rounded-xl border border-gray-100 shadow-inner mb-4">
+                                                    <div>
+                                                        <div className="flex justify-between text-xs font-semibold text-gray-500 mb-2">
+                                                            <span>Color</span>
+                                                        </div>
+                                                        <div className="flex gap-2 items-center flex-wrap">
+                                                            {['#ef4444', '#3b82f6', '#22c55e', '#facc15', '#000000'].map(c => (
+                                                                <button 
+                                                                    key={c}
+                                                                    onClick={() => setPenColor(c)}
+                                                                    className={`w-5 h-5 rounded-full border-2 ${penColor === c ? 'border-gray-900 scale-110' : 'border-transparent hover:scale-110'} transition-all`}
+                                                                    style={{ backgroundColor: c }}
+                                                                />
+                                                            ))}
+                                                            <input 
+                                                                type="color" 
+                                                                value={penColor}
+                                                                onChange={e => setPenColor(e.target.value)}
+                                                                className="w-6 h-6 ml-1 cursor-pointer border-0 rounded overflow-hidden" 
+                                                                title="Custom Color"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <div className="flex justify-between text-xs font-semibold text-gray-500 mb-2">
+                                                            <span>Size</span>
+                                                            <span className="text-blue-600">{penSize}px</span>
+                                                        </div>
+                                                        <input type="range" min="2" max="24" value={penSize} onChange={(e) => setPenSize(Number(e.target.value))} className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600" />
+                                                    </div>
+                                                    <button 
+                                                        onClick={clearCanvas}
+                                                        className="w-full py-2 text-red-500 bg-red-50 hover:bg-red-100 rounded-lg transition-colors flex items-center justify-center gap-1.5 text-xs font-bold"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" /> Clear Canvas
+                                                    </button>
+                                                </div>
+                                            )}
                                         </div>
 
                                         <hr className="border-gray-100" />
