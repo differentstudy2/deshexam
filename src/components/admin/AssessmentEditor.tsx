@@ -519,6 +519,17 @@ export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock 
                                         </SelectContent>
                                     </Select>
                                 </div>
+                                <div>
+                                    <label className="text-sm font-medium">Language</label>
+                                    <Select value={editData.language || 'English'} onValueChange={v => setEditData({...editData, language: v})}>
+                                        <SelectTrigger><SelectValue /></SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="English">English</SelectItem>
+                                            <SelectItem value="Bengali">Bengali</SelectItem>
+                                            <SelectItem value="Hindi">Hindi</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
                                         <label className="text-sm font-medium">Duration (Min)</label>

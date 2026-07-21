@@ -23,6 +23,7 @@ export interface AssessmentBase {
   yearId?: string;
   tags?: string[];
   verificationBadges?: string[];
+  language?: string;
 
   questionIds: string[]; // Link to QuestionBankEntry
   difficulty: AssessmentDifficulty;

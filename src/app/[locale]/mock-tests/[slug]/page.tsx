@@ -415,27 +415,94 @@ ${test.negativeMarking && test.negativeMarking > 0 ? `* প্রতিটি �
               <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-colors duration-300">
                 <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
                   <Star className="w-5 h-5 text-amber-500" />
-                  <h2 className="text-base font-bold text-slate-800 dark:text-slate-100">What to Expect</h2>
+                  <h2 className="text-base font-bold text-slate-800 dark:text-slate-100">
+                    {test.language === 'Bengali' ? 'কী আশা করবেন' : test.language === 'Hindi' ? 'क्या उम्मीद करें' : 'What to Expect'}
+                  </h2>
                 </div>
                 <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {[
-                    { icon: Trophy, title: 'National Level Ranking', desc: 'Compare your score against thousands of aspirants and see exactly where you stand.', show: true },
-                    { icon: MonitorPlay, title: 'Exam-Simulated Interface', desc: 'Experience the exact look and pressure of the real exam to conquer test-day anxiety.', show: true },
-                    { icon: BookCheck, title: '100% Latest Syllabus', desc: 'Every question is strictly mapped to the latest exam pattern and official guidelines.', show: true },
-                    { icon: History, title: 'Previous Year Questions', desc: 'Includes handpicked questions from past years to give you an authentic experience.', show: true },
-                    { icon: LineChart, title: 'In-Depth AI Analytics', desc: 'Discover your weak areas with deep, section-wise performance and speed insights.', show: true },
-                    { icon: PieChart, title: 'Strengths & Weaknesses', desc: 'Automatically categorizes topics so you know exactly what to study next.', show: true },
-                    { icon: Sparkles, title: 'Expert-Crafted Solutions', desc: 'Access comprehensive, step-by-step explanations designed by top educators.', show: true },
-                    { icon: Smartphone, title: 'Mobile-Optimized Testing', desc: 'Take the test anywhere, anytime with a flawlessly optimized mobile interface.', show: true },
-                    { icon: Clock, title: 'Strict Time Management', desc: 'Master your speed with a relentless countdown timer that keeps you on your toes.', show: true },
-                    { icon: ShieldAlert, title: 'Anti-Cheat Fullscreen', desc: 'A strict, lock-down fullscreen environment ensures a fair and distraction-free test.', show: true },
-                    { icon: AlertTriangle, title: 'Negative Marking', desc: `Incorrect answers deduct ${test.negativeMarking ?? 0} marks — forcing you to choose wisely.`, show: !!test.negativeMarking && test.negativeMarking > 0 },
-                    { icon: Zap, title: 'Instant Results', desc: 'No waiting around. Review your accuracy and detailed report the second you hit submit.', show: true },
-                    { icon: RotateCcw, title: 'Multiple Attempts', desc: 'Retake the test as many times as you need to improve your score and learn from your mistakes.', show: true },
-                  ].filter(item => item.show !== false).map(({ icon: IconComponent, title, desc }) => {
+                    {
+                      icon: Trophy,
+                      title: test.language === 'Bengali' ? 'জাতীয় স্তরের র‍্যাঙ্কিং' : test.language === 'Hindi' ? 'राष्ट्रीय स्तर की रैंकिंग' : 'National Level Ranking',
+                      desc: test.language === 'Bengali' ? 'হাজার হাজার প্রতিযোগীর সাথে আপনার স্কোর তুলনা করুন এবং নিজের অবস্থান যাচাই করুন।' : test.language === 'Hindi' ? 'हज़ारों उम्मीदवारों के साथ अपने स्कोर की तुलना करें और देखें कि आप कहाँ खड़े हैं।' : 'Compare your score against thousands of aspirants and see exactly where you stand.',
+                      show: true
+                    },
+                    {
+                      icon: MonitorPlay,
+                      title: test.language === 'Bengali' ? 'পরীক্ষার অনুরূপ ইন্টারফেস' : test.language === 'Hindi' ? 'परीक्षा-अनुकारित इंटरफ़ेस' : 'Exam-Simulated Interface',
+                      desc: test.language === 'Bengali' ? 'আসল পরীক্ষার মতো পরিবেশ ও চাপ অনুভব করে পরীক্ষার দিনের ভয় দূর করুন।' : test.language === 'Hindi' ? 'परीक्षा के दिन की चिंता को दूर करने के लिए वास्तविक परीक्षा के सटीक रूप और दबाव का अनुभव करें।' : 'Experience the exact look and pressure of the real exam to conquer test-day anxiety.',
+                      show: true
+                    },
+                    {
+                      icon: BookCheck,
+                      title: test.language === 'Bengali' ? '১০০% লেটেস্ট সিলেবাস' : test.language === 'Hindi' ? '100% नवीनतम पाठ्यक्रम' : '100% Latest Syllabus',
+                      desc: test.language === 'Bengali' ? 'প্রতিটি প্রশ্ন সাম্প্রতিক পরীক্ষার প্যাটার্ন এবং অফিসিয়াল নির্দেশিকা অনুসারে তৈরি করা হয়েছে।' : test.language === 'Hindi' ? 'प्रत्येक प्रश्न को नवीनतम परीक्षा पैटर्न और आधिकारिक दिशानिर्देशों के अनुसार तैयार किया गया है।' : 'Every question is strictly mapped to the latest exam pattern and official guidelines.',
+                      show: true
+                    },
+                    {
+                      icon: History,
+                      title: test.language === 'Bengali' ? 'বিগত বছরের প্রশ্ন' : test.language === 'Hindi' ? 'पिछले वर्ष के प्रश्न' : 'Previous Year Questions',
+                      desc: test.language === 'Bengali' ? 'বিগত বছরগুলোর বাছাই করা প্রশ্ন অন্তর্ভুক্ত করা হয়েছে, যা আপনাকে আসল পরীক্ষার ধারণা দেবে।' : test.language === 'Hindi' ? 'आपको एक प्रामाणिक अनुभव देने के लिए पिछले वर्षों के चुने हुए प्रश्न शामिल हैं।' : 'Includes handpicked questions from past years to give you an authentic experience.',
+                      show: true
+                    },
+                    {
+                      icon: LineChart,
+                      title: test.language === 'Bengali' ? 'গভীর এআই বিশ্লেষণ' : test.language === 'Hindi' ? 'गहन एआई एनालिटिक्स' : 'In-Depth AI Analytics',
+                      desc: test.language === 'Bengali' ? 'বিষয়ভিত্তিক পারফরম্যান্স এবং স্পিড ইনসাইট দিয়ে আপনার দুর্বল দিকগুলো চিহ্নিত করুন।' : test.language === 'Hindi' ? 'अनुभाग-वार प्रदर्शन और गति अंतर्दृष्टि के साथ अपने कमजोर क्षेत्रों की खोज करें।' : 'Discover your weak areas with deep, section-wise performance and speed insights.',
+                      show: true
+                    },
+                    {
+                      icon: PieChart,
+                      title: test.language === 'Bengali' ? 'দুর্বলতা এবং দক্ষতা' : test.language === 'Hindi' ? 'ताकत और कमजोरियां' : 'Strengths & Weaknesses',
+                      desc: test.language === 'Bengali' ? 'টপিকগুলো স্বয়ংক্রিয়ভাবে ভাগ হয়ে যায়, যাতে আপনি জানেন পরবর্তীতে কী পড়তে হবে।' : test.language === 'Hindi' ? 'विषयों को स्वचालित रूप से वर्गीकृत करता है ताकि आप जान सकें कि आगे क्या पढ़ना है।' : 'Automatically categorizes topics so you know exactly what to study next.',
+                      show: true
+                    },
+                    {
+                      icon: Sparkles,
+                      title: test.language === 'Bengali' ? 'বিশেষজ্ঞদের তৈরি সমাধান' : test.language === 'Hindi' ? 'विशेषज्ञों द्वारा तैयार किए गए समाधान' : 'Expert-Crafted Solutions',
+                      desc: test.language === 'Bengali' ? 'সেরা শিক্ষকদের তৈরি করা ধাপে ধাপে বিস্তৃত সমাধান এবং ব্যাখ্যা দেখুন।' : test.language === 'Hindi' ? 'शीर्ष शिक्षकों द्वारा डिज़ाइन किए गए व्यापक, चरण-दर-चरण स्पष्टीकरण तक पहुंचें।' : 'Access comprehensive, step-by-step explanations designed by top educators.',
+                      show: true
+                    },
+                    {
+                      icon: Smartphone,
+                      title: test.language === 'Bengali' ? 'মোবাইল-বান্ধব টেস্টিং' : test.language === 'Hindi' ? 'मोबाइल-अनुकूलित परीक्षण' : 'Mobile-Optimized Testing',
+                      desc: test.language === 'Bengali' ? 'সম্পূর্ণ মোবাইল-বান্ধব ইন্টারফেসের সাহায্যে যেকোনো স্থানে, যেকোনো সময় পরীক্ষা দিন।' : test.language === 'Hindi' ? 'पूरी तरह से मोबाइल-अनुकूलित इंटरफ़ेस के साथ कहीं भी, कभी भी परीक्षा दें।' : 'Take the test anywhere, anytime with a flawlessly optimized mobile interface.',
+                      show: true
+                    },
+                    {
+                      icon: Clock,
+                      title: test.language === 'Bengali' ? 'কঠোর সময় ব্যবস্থাপনা' : test.language === 'Hindi' ? 'सख्त समय प्रबंधन' : 'Strict Time Management',
+                      desc: test.language === 'Bengali' ? 'একটি কঠোর কাউন্টডাউন টাইমার দিয়ে আপনার সময় ব্যবস্থাপনার দক্ষতা বাড়ান।' : test.language === 'Hindi' ? 'एक सख्त उलटी गिनती टाइमर के साथ अपनी गति में महारत हासिल करें।' : 'Master your speed with a relentless countdown timer that keeps you on your toes.',
+                      show: true
+                    },
+                    {
+                      icon: ShieldAlert,
+                      title: test.language === 'Bengali' ? 'অ্যান্টি-চিট ফুলস্ক্রিন' : test.language === 'Hindi' ? 'एंटी-चीट फुलस्क्रीन' : 'Anti-Cheat Fullscreen',
+                      desc: test.language === 'Bengali' ? 'একটি কঠোর ফুলস্ক্রিন পরিবেশ নিশ্চিত করে একটি সুষ্ঠু ও মনোযোগ ব্যাহত না হওয়ার মতো পরীক্ষা।' : test.language === 'Hindi' ? 'एक सख्त, लॉक-डाउन फुलस्क्रीन वातावरण एक निष्पक्ष और व्याकुलता-मुक्त परीक्षण सुनिश्चित करता है।' : 'A strict, lock-down fullscreen environment ensures a fair and distraction-free test.',
+                      show: true
+                    },
+                    {
+                      icon: AlertTriangle,
+                      title: test.language === 'Bengali' ? 'নেগেটিভ মার্কিং' : test.language === 'Hindi' ? 'नेगेटिव मार्किंग' : 'Negative Marking',
+                      desc: test.language === 'Bengali' ? `ভুল উত্তরের জন্য ${test.negativeMarking ?? 0} নম্বর কাটা যাবে — তাই ভেবেচিন্তে উত্তর দিন।` : test.language === 'Hindi' ? `गलत उत्तरों पर ${test.negativeMarking ?? 0} अंक कटेंगे — इसलिए सोच-समझकर चुनें।` : `Incorrect answers deduct ${test.negativeMarking ?? 0} marks — forcing you to choose wisely.`,
+                      show: !!test.negativeMarking && test.negativeMarking > 0
+                    },
+                    {
+                      icon: Zap,
+                      title: test.language === 'Bengali' ? 'তাত্ক্ষণিক ফলাফল' : test.language === 'Hindi' ? 'तत्काल परिणाम' : 'Instant Results',
+                      desc: test.language === 'Bengali' ? 'কোনো অপেক্ষা নেই। সাবমিট করার সাথে সাথেই আপনার বিস্তারিত রিপোর্ট এবং সঠিকতা দেখে নিন।' : test.language === 'Hindi' ? 'कोई प्रतीक्षा नहीं। सबमिट करते ही अपनी सटीकता और विस्तृत रिपोर्ट देखें।' : 'No waiting around. Review your accuracy and detailed report the second you hit submit.',
+                      show: true
+                    },
+                    {
+                      icon: RotateCcw,
+                      title: test.language === 'Bengali' ? 'একাধিকবার পরীক্ষা দেওয়া' : test.language === 'Hindi' ? 'एकाधिक प्रयास' : 'Multiple Attempts',
+                      desc: test.language === 'Bengali' ? 'আপনার স্কোর উন্নত করতে এবং ভুল থেকে শিখতে যতবার খুশি পরীক্ষাটি পুনরায় দিন।' : test.language === 'Hindi' ? 'अपने स्कोर में सुधार करने और अपनी गलतियों से सीखने के लिए जितनी बार चाहें परीक्षा दोबारा दें।' : 'Retake the test as many times as you need to improve your score and learn from your mistakes.',
+                      show: true
+                    },
+                  ].filter(item => item.show !== false).map(({ icon: IconComponent, title, desc }, index) => {
                     const Icon = IconComponent as any;
                     return (
-                    <div key={title} className="flex items-start gap-3">
+                    <div key={index} className="flex items-start gap-3">
                       <div className="w-9 h-9 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
                         <Icon className="w-4.5 h-4.5 text-slate-600 dark:text-slate-400" />
                       </div>
@@ -462,7 +529,7 @@ ${test.negativeMarking && test.negativeMarking > 0 ? `* প্রতিটি �
                     {[
                       { label: 'Type', value: 'Mock Test' },
                       { label: 'Difficulty', value: test.difficulty || 'Mixed' },
-                      { label: 'Language', value: 'English' },
+                      { label: 'Language', value: test.language || 'English' },
                       { label: 'Questions', value: `${test.questionIds?.length ?? 0}` },
                       { label: 'Duration', value: `${test.durationMin ?? 0} minutes` },
                       { label: 'Total Marks', value: `${test.totalMarks ?? 0}` },
