@@ -59,7 +59,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     
     // Drawing Tool State
     const [drawingTool, setDrawingTool] = useState<'pen' | 'highlighter' | 'laser'>('pen');
-    const laserRef = useRef<HTMLDivElement>(null);
+    const cursorRef = useRef<HTMLDivElement>(null);
     
     // Spotlight State
     const [isSpotlightActive, setIsSpotlightActive] = useState(false);
@@ -165,12 +165,13 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const startDrawing = (e: any) => {
         if (!isPenActive) return;
         
+        const { x, y } = getCoordinates(e);
+        if (cursorRef.current) {
+            cursorRef.current.style.left = `${x}px`;
+            cursorRef.current.style.top = `${y}px`;
+        }
+        
         if (drawingTool === 'laser') {
-            const { x, y } = getCoordinates(e);
-            if (laserRef.current) {
-                laserRef.current.style.left = `${x}px`;
-                laserRef.current.style.top = `${y}px`;
-            }
             return;
         }
         
@@ -195,8 +196,6 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         try {
             (e.target as HTMLElement).setPointerCapture(e.pointerId);
         } catch (err) {}
-
-        const { x, y } = getCoordinates(e);
         currentStroke.current = [{x, y}];
         redrawActiveStroke();
     };
@@ -247,11 +246,12 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         
         const { x, y } = getCoordinates(e);
         
+        if (cursorRef.current) {
+            cursorRef.current.style.left = `${x}px`;
+            cursorRef.current.style.top = `${y}px`;
+        }
+        
         if (drawingTool === 'laser') {
-            if (laserRef.current) {
-                laserRef.current.style.left = `${x}px`;
-                laserRef.current.style.top = `${y}px`;
-            }
             return;
         }
 
@@ -603,7 +603,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 {/* Active Stroke Canvas (Top Layer) */}
                 <canvas
                     ref={activeCanvasRef}
-                    className={`absolute inset-0 w-full h-full z-30 touch-none ${isPenActive ? (drawingTool === 'laser' ? 'pointer-events-auto cursor-none' : 'pointer-events-auto cursor-crosshair') : 'pointer-events-none'}`}
+                    className={`absolute inset-0 w-full h-full z-30 touch-none ${isPenActive ? 'pointer-events-auto cursor-none' : 'pointer-events-none'}`}
                     onPointerDown={startDrawing}
                     onPointerMove={draw}
                     onPointerUp={stopDrawing}
@@ -615,16 +615,37 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     onTouchCancel={stopDrawing}
                 />
                 
-                {/* Laser Pointer Dot */}
-                {isPenActive && drawingTool === 'laser' && (
+                {/* Custom Mouse Cursor for Presentation Tools */}
+                {isPenActive && (
                     <div 
-                        ref={laserRef}
-                        className="absolute w-4 h-4 bg-red-500 rounded-full z-30 pointer-events-none shadow-[0_0_15px_5px_rgba(239,68,68,0.8)] border border-white/50"
+                        ref={cursorRef}
+                        className="absolute z-40 pointer-events-none"
                         style={{ 
                             left: -100, 
                             top: -100,
                             transform: 'translate(-50%, -50%)',
-                            willChange: 'left, top'
+                            willChange: 'left, top',
+                            ...(drawingTool === 'laser' ? {
+                                width: '16px',
+                                height: '16px',
+                                backgroundColor: '#ef4444',
+                                borderRadius: '50%',
+                                boxShadow: '0 0 15px 5px rgba(239,68,68,0.8)',
+                                border: '1px solid rgba(255,255,255,0.5)'
+                            } : drawingTool === 'highlighter' ? {
+                                width: `${penSize * 5}px`,
+                                height: `${penSize * 5}px`,
+                                backgroundColor: penColor,
+                                opacity: 0.5,
+                                borderRadius: '50%',
+                                mixBlendMode: 'multiply'
+                            } : {
+                                width: `${Math.max(penSize, 8)}px`,
+                                height: `${Math.max(penSize, 8)}px`,
+                                border: `2px solid ${penColor}`,
+                                borderRadius: '50%',
+                                backgroundColor: 'transparent'
+                            })
                         }}
                     />
                 )}
