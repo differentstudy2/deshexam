@@ -420,7 +420,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     )}
 
                     {/* Question */}
-                    <div className="flex items-center gap-3 md:gap-4 w-full max-w-5xl mt-8 md:mt-4" style={{ '--q-size': `max(18px, ${38 * qFontScale}px)` } as React.CSSProperties}>
+                    <div className="flex items-center gap-3 md:gap-4 w-full max-w-5xl mt-8 md:mt-4" style={{ '--q-size': `clamp(18px, ${5 * qFontScale}vw + 0.5rem, ${38 * qFontScale}px)` } as React.CSSProperties}>
                         <span className="text-black font-extrabold leading-normal shrink-0" style={{ fontSize: 'var(--q-size)' }}>Q{currentSlide + 1}.</span>
                         <div className="prose prose-black max-w-none prose-p:font-extrabold text-[length:var(--q-size)] leading-normal text-left text-black font-extrabold [&_*]:!text-[length:var(--q-size)] [&_*]:!leading-normal [&_*]:!m-0 flex items-center capitalize">
                             <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
@@ -456,25 +456,25 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                             const theme = colorThemes[oIdx % colorThemes.length];
 
-                            let containerClasses = `flex items-center gap-4 py-2 px-3 rounded-2xl border-2 transition-all duration-300 shadow-[0_4px_12px_rgba(0,0,0,0.04)] ${theme.bg} ${theme.border}`;
-                            let letterClasses = `shrink-0 w-12 h-12 flex items-center justify-center rounded-full text-xl font-black transition-colors duration-300 ${theme.letterBg} ${theme.letterText}`;
+                            let containerClasses = `flex items-center gap-3 md:gap-4 py-2 px-3 rounded-2xl border-2 transition-all duration-300 shadow-[0_4px_12px_rgba(0,0,0,0.04)] ${theme.bg} ${theme.border}`;
+                            let letterClasses = `shrink-0 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full text-lg md:text-xl font-black transition-colors duration-300 ${theme.letterBg} ${theme.letterText}`;
 
                             if (step === 0) {
                                 if (isSelected) {
-                                    containerClasses = `flex items-center gap-4 py-2 px-3 rounded-2xl border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(66,133,244,0.15)] bg-[#e8f0fe] border-[#4285F4] transform scale-[1.02] cursor-pointer ring-2 ring-[#4285F4]/30`;
-                                    letterClasses = `shrink-0 w-12 h-12 flex items-center justify-center rounded-full text-xl font-black transition-colors duration-300 bg-[#4285F4] text-white`;
+                                    containerClasses = `flex items-center gap-3 md:gap-4 py-2 px-3 rounded-2xl border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(66,133,244,0.15)] bg-[#e8f0fe] border-[#4285F4] transform scale-[1.02] cursor-pointer ring-2 ring-[#4285F4]/30`;
+                                    letterClasses = `shrink-0 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full text-lg md:text-xl font-black transition-colors duration-300 bg-[#4285F4] text-white`;
                                 } else {
                                     containerClasses += ` hover:scale-[1.01] hover:shadow-md cursor-pointer hover:border-gray-300`;
                                 }
                             } else {
                                 if (showCorrect) {
-                                    containerClasses = `flex items-center gap-4 py-2 px-3 rounded-2xl border-2 ring-4 ring-[#34A853]/30 bg-[#f0fdf4] border-[#34A853] z-10 relative animate-pop-in`;
-                                    letterClasses = `shrink-0 w-12 h-12 flex items-center justify-center rounded-full text-xl font-black transition-colors duration-300 bg-[#34A853] text-white`;
+                                    containerClasses = `flex items-center gap-3 md:gap-4 py-2 px-3 rounded-2xl border-2 ring-4 ring-[#34A853]/30 bg-[#f0fdf4] border-[#34A853] z-10 relative animate-pop-in`;
+                                    letterClasses = `shrink-0 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full text-lg md:text-xl font-black transition-colors duration-300 bg-[#34A853] text-white`;
                                 } else if (showWrong && isSelected) {
-                                    containerClasses = `flex items-center gap-4 py-2 px-3 rounded-2xl border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(234,67,53,0.15)] bg-[#fce8e6] border-[#EA4335] transform scale-[1.02]`;
-                                    letterClasses = `shrink-0 w-12 h-12 flex items-center justify-center rounded-full text-xl font-black transition-colors duration-300 bg-[#EA4335] text-white`;
+                                    containerClasses = `flex items-center gap-3 md:gap-4 py-2 px-3 rounded-2xl border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(234,67,53,0.15)] bg-[#fce8e6] border-[#EA4335] transform scale-[1.02]`;
+                                    letterClasses = `shrink-0 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full text-lg md:text-xl font-black transition-colors duration-300 bg-[#EA4335] text-white`;
                                 } else if (showWrong) {
-                                    containerClasses = `flex items-center gap-4 py-2 px-3 rounded-2xl border-2 transition-all duration-300 shadow-sm bg-white border-gray-200 opacity-60`;
+                                    containerClasses = `flex items-center gap-3 md:gap-4 py-2 px-3 rounded-2xl border-2 transition-all duration-300 shadow-sm bg-white border-gray-200 opacity-60`;
                                     // letterClasses keeps its default theme color
                                 }
                             }
@@ -483,7 +483,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 <div
                                     key={opt.key}
                                     className={containerClasses}
-                                    style={{ '--opt-size': `${32 * optFontScale}px` } as React.CSSProperties}
+                                    style={{ '--opt-size': `clamp(14px, ${4 * optFontScale}vw + 0.5rem, ${32 * optFontScale}px)` } as React.CSSProperties}
                                     onClick={() => {
                                         if (step === 0) {
                                             setSelectedOption(opt.key);
