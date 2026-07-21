@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Star, ThumbsUp, ThumbsDown, MessageSquare, Loader2, BadgeCheck } from 'lucide-react';
+import { Star, ThumbsUp, ThumbsDown, MessageSquare, Loader2, BadgeCheck, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/use-auth';
 import { getRecentReviews, getUserReview, submitReview, incrementReviewHelpful, incrementReviewUnhelpful, MockTestReview } from '@/lib/firebase/reviews';
@@ -36,6 +36,7 @@ export function MockTestReviews({ testId, slug, stats }: MockTestReviewsProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [likedReviews, setLikedReviews] = useState<Set<string>>(new Set());
   const [dislikedReviews, setDislikedReviews] = useState<Set<string>>(new Set());
+  const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
     async function loadData() {
@@ -141,6 +142,35 @@ export function MockTestReviews({ testId, slug, stats }: MockTestReviewsProps) {
     }
   };
 
+  const handleGenerateWithAI = async () => {
+    setIsGenerating(true);
+    try {
+      let prompt = `Write a short, realistic student review (1-3 sentences) for an online mock test platform. The student gave a rating of ${rating} out of 5 stars. Do not include quotes.`;
+      if (rating >= 4) {
+        prompt += 'The review should be very positive, highlighting good questions, clear explanations, or a smooth interface.';
+      } else if (rating === 3) {
+        prompt += 'The review should be mixed, mentioning some good points but also some areas for improvement.';
+      } else {
+        prompt += 'The review should be critical, mentioning issues like confusing questions, bad explanations, or technical glitches.';
+      }
+
+      const res = await fetch('/api/ai/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt })
+      });
+      const data = await res.json();
+      
+      if (data.result) {
+        setContent(data.result);
+      }
+    } catch (err) {
+      console.error("Failed to generate AI review:", err);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   return (
     <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden mt-8">
       <div className="flex items-center gap-3 px-6 py-4 border-b border-indigo-100/50 dark:border-indigo-900/20 bg-gradient-to-r from-indigo-50/50 to-violet-50/50 dark:from-indigo-900/10 dark:to-violet-900/10">
@@ -206,14 +236,27 @@ export function MockTestReviews({ testId, slug, stats }: MockTestReviewsProps) {
                         </button>
                       ))}
                     </div>
-                    <textarea
-                      value={content}
-                      onChange={(e) => setContent(e.target.value)}
-                      placeholder="What did you think of the test difficulty, explanations, etc.?"
-                      className="w-full min-h-[120px] p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-200 resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
-                      required
-                      minLength={10}
-                    />
+                    <div className="relative">
+                      <textarea
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
+                        placeholder="What did you think of the test difficulty, explanations, etc.?"
+                        className="w-full min-h-[120px] p-3 pb-12 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-200 resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                        required
+                        minLength={10}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleGenerateWithAI}
+                        disabled={isGenerating}
+                        className="absolute bottom-2 right-2 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 text-xs font-semibold h-8 px-2"
+                      >
+                        {isGenerating ? <Loader2 key="loading" className="w-3 h-3 mr-1.5 animate-spin" /> : <Sparkles key="sparkles" className="w-3 h-3 mr-1.5" />}
+                        <span>Write with AI</span>
+                      </Button>
+                    </div>
                     <div className="flex justify-end mt-6 gap-3">
                       <Button type="button" variant="ghost" onClick={() => setIsOpen(false)}>
                         Cancel
