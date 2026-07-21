@@ -716,10 +716,9 @@ export function Header() {
         <MainNav isScrolled={isScrolled} />
 
         <div className="flex flex-1 items-center justify-end space-x-2">
-          <Button asChild size="sm" variant="outline" className="hidden md:flex h-8 px-3 text-xs font-semibold bg-gradient-to-r from-amber-100 to-yellow-100 dark:from-amber-900/30 dark:to-yellow-900/30 text-amber-700 dark:text-amber-400 border-amber-300/50 dark:border-amber-700/50 hover:bg-amber-50">
+          <Button asChild size="icon" variant="outline" className="hidden md:flex h-9 w-9 rounded-full bg-gradient-to-r from-amber-100 to-yellow-100 dark:from-amber-900/30 dark:to-yellow-900/30 text-amber-700 dark:text-amber-400 border-amber-300/50 dark:border-amber-700/50 hover:bg-amber-50 shadow-sm" title="Premium Upgrade">
             <Link href="/pricing">
-              <Sparkles className="h-3 w-3 mr-1.5 text-amber-500" />
-              Premium Upgrade
+              <Sparkles className="h-4 w-4 text-amber-600 dark:text-amber-400" />
             </Link>
           </Button>
           <LanguageSwitcher />
