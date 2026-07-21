@@ -60,30 +60,41 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const contextRef = useRef<CanvasRenderingContext2D | null>(null);
     const isDrawing = useRef(false);
+    const lastPos = useRef({ x: 0, y: 0 });
 
     // Initialize Canvas
     useEffect(() => {
         if (!isOpen) return;
-        const canvas = canvasRef.current;
-        if (!canvas) return;
 
         const resizeCanvas = () => {
+            const canvas = canvasRef.current;
+            if (!canvas) return;
             const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width;
-            canvas.height = rect.height;
-            const context = canvas.getContext('2d');
-            if (context) {
-                context.lineCap = 'round';
-                context.lineJoin = 'round';
-                contextRef.current = context;
+            
+            // Only resize if dimensions changed to prevent accidental clearing
+            if (canvas.width !== rect.width || canvas.height !== rect.height) {
+                canvas.width = rect.width;
+                canvas.height = rect.height;
+                const context = canvas.getContext('2d');
+                if (context) {
+                    contextRef.current = context;
+                }
             }
         };
 
-        // Delay slightly to ensure layout is done
-        setTimeout(resizeCanvas, 100);
+        // Call multiple times to ensure we catch the final size after any CSS transitions
+        resizeCanvas();
+        const t1 = setTimeout(resizeCanvas, 100);
+        const t2 = setTimeout(resizeCanvas, 300);
+        const t3 = setTimeout(resizeCanvas, 600);
         
         window.addEventListener('resize', resizeCanvas);
-        return () => window.removeEventListener('resize', resizeCanvas);
+        return () => {
+            window.removeEventListener('resize', resizeCanvas);
+            clearTimeout(t1);
+            clearTimeout(t2);
+            clearTimeout(t3);
+        };
     }, [isOpen]);
 
     const clearCanvas = useCallback(() => {
@@ -106,18 +117,21 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         if (!canvas) return;
 
         const rect = canvas.getBoundingClientRect();
-        // Calculate coordinate relative to canvas bounding box
-        const offsetX = e.clientX - rect.left;
-        const offsetY = e.clientY - rect.top;
+        lastPos.current = {
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top
+        };
 
-        if (contextRef.current) {
-            contextRef.current.beginPath();
-            contextRef.current.moveTo(offsetX, offsetY);
-            contextRef.current.strokeStyle = penColor;
-            contextRef.current.lineWidth = penSize;
-            
-            isDrawing.current = true;
-            (e.target as HTMLElement).setPointerCapture(e.pointerId);
+        isDrawing.current = true;
+        (e.target as HTMLElement).setPointerCapture(e.pointerId);
+        
+        // Draw a dot on click
+        const ctx = contextRef.current;
+        if (ctx) {
+            ctx.beginPath();
+            ctx.arc(lastPos.current.x, lastPos.current.y, penSize / 2, 0, Math.PI * 2);
+            ctx.fillStyle = penColor;
+            ctx.fill();
         }
     };
 
@@ -125,16 +139,23 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         if (!isDrawing.current || !isPenActive) return;
         
         const canvas = canvasRef.current;
-        if (!canvas) return;
+        const ctx = contextRef.current;
+        if (!canvas || !ctx) return;
 
         const rect = canvas.getBoundingClientRect();
-        const offsetX = e.clientX - rect.left;
-        const offsetY = e.clientY - rect.top;
+        const currentX = e.clientX - rect.left;
+        const currentY = e.clientY - rect.top;
 
-        if (contextRef.current) {
-            contextRef.current.lineTo(offsetX, offsetY);
-            contextRef.current.stroke();
-        }
+        ctx.beginPath();
+        ctx.moveTo(lastPos.current.x, lastPos.current.y);
+        ctx.lineTo(currentX, currentY);
+        ctx.strokeStyle = penColor;
+        ctx.lineWidth = penSize;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.stroke();
+
+        lastPos.current = { x: currentX, y: currentY };
     };
 
     const stopDrawing = (e: React.PointerEvent<HTMLCanvasElement>) => {
