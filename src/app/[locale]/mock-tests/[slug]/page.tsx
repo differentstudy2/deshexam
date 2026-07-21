@@ -387,9 +387,11 @@ export default async function MockTestLandingPage({ params }: Props) {
 
               {/* Instructions */}
               <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-colors duration-300">
-                <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
-                  <BookOpen className="w-5 h-5 text-[#107c41] dark:text-[#22c55e]" />
-                  <h2 className="text-base font-bold text-slate-800 dark:text-slate-100">Instructions</h2>
+                <div className="flex items-center gap-3 px-6 py-4 border-b border-emerald-100/50 dark:border-emerald-900/20 bg-gradient-to-r from-emerald-50/50 to-teal-50/50 dark:from-emerald-900/10 dark:to-teal-900/10">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center shadow-md shadow-emerald-500/20">
+                    <BookOpen className="w-4 h-4 text-white" />
+                  </div>
+                  <h2 className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-400 dark:to-teal-400">Instructions</h2>
                 </div>
                 <div className="p-6">
                   <div className="prose prose-slate dark:prose-invert max-w-none !prose-p:my-0 !prose-p:text-[1rem] !prose-p:leading-relaxed prose-ol:list-decimal prose-strong:font-semibold">

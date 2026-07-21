@@ -143,9 +143,11 @@ export function MockTestReviews({ testId, slug, stats }: MockTestReviewsProps) {
 
   return (
     <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden mt-8">
-      <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
-        <MessageSquare className="w-5 h-5 text-indigo-500" />
-        <h2 className="text-base font-bold text-slate-800 dark:text-slate-100">Student Reviews & Ratings</h2>
+      <div className="flex items-center gap-3 px-6 py-4 border-b border-indigo-100/50 dark:border-indigo-900/20 bg-gradient-to-r from-indigo-50/50 to-violet-50/50 dark:from-indigo-900/10 dark:to-violet-900/10">
+        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-violet-500 flex items-center justify-center shadow-md shadow-indigo-500/20">
+          <MessageSquare className="w-4 h-4 text-white" />
+        </div>
+        <h2 className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-violet-600 dark:from-indigo-400 dark:to-violet-400">Student Reviews & Ratings</h2>
       </div>
 
       <div className="p-6">

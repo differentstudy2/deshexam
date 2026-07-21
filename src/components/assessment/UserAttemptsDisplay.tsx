@@ -48,10 +48,12 @@ export function UserAttemptsDisplay({ assessmentId }: UserAttemptsDisplayProps) 
 
   return (
     <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-colors duration-300">
-      <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
-        <History className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-        <h2 className="text-base font-bold text-slate-800 dark:text-slate-100">Your Previous Attempts</h2>
-        <span className="ml-auto bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 text-xs font-bold px-2.5 py-0.5 rounded-full">
+      <div className="flex items-center gap-3 px-6 py-4 border-b border-blue-100/50 dark:border-blue-900/20 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-blue-900/10 dark:to-indigo-900/10">
+        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center shadow-md shadow-blue-500/20">
+          <History className="w-4 h-4 text-white" />
+        </div>
+        <h2 className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400">Your Previous Attempts</h2>
+        <span className="ml-auto bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 text-xs font-bold px-2.5 py-1 rounded-full shadow-sm">
           {attempts.length} {attempts.length === 1 ? 'Attempt' : 'Attempts'}
         </span>
       </div>
