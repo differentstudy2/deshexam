@@ -18,11 +18,11 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { getUserMistakes } from '@/lib/firebase/student-analytics';
-import { getQuestionsByIds } from '@/lib/firebase/question-bank';
+import { getQuestionsByIds, getTaxonomyNodes } from '@/lib/firebase/question-bank';
 import Link from 'next/link';
 
 export default function MistakeVaultPage() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, userProfile, loading: authLoading } = useAuth();
   
   const [loading, setLoading] = useState(true);
   const [allMistakeData, setAllMistakeData] = useState<any[]>([]);
@@ -43,23 +43,18 @@ export default function MistakeVaultPage() {
       try {
         const mistakeDocs = await getUserMistakes(user!.uid);
         
-        if (mistakeDocs.length === 0) {
-          setLoading(false);
-          return;
-        }
-
-        const questionIds = mistakeDocs.map((d: any) => d.questionId);
-        // Firebase 'in' query supports max 10, so if there are many, we might need chunking,
-        // but for now let's chunk if > 30.
-        const chunkedIds = [];
-        for (let i = 0; i < questionIds.length; i += 30) {
-          chunkedIds.push(questionIds.slice(i, i + 30));
-        }
-
         let fetchedQuestions: any[] = [];
-        for (const chunk of chunkedIds) {
-           const qs = await getQuestionsByIds(chunk);
-           fetchedQuestions = [...fetchedQuestions, ...qs];
+        if (mistakeDocs.length > 0) {
+          const questionIds = mistakeDocs.map((d: any) => d.questionId);
+          const chunkedIds = [];
+          for (let i = 0; i < questionIds.length; i += 30) {
+            chunkedIds.push(questionIds.slice(i, i + 30));
+          }
+
+          for (const chunk of chunkedIds) {
+             const qs = await getQuestionsByIds(chunk);
+             fetchedQuestions = [...fetchedQuestions, ...qs];
+          }
         }
 
         let right = 0;
@@ -67,6 +62,27 @@ export default function MistakeVaultPage() {
         let skipped = 0;
         
         const subjectsMap: Record<string, any> = {};
+
+        if (userProfile?.classId) {
+          try {
+            const classSubjects = await getTaxonomyNodes('subject', 'classId', userProfile.classId);
+            classSubjects.forEach((sub: any) => {
+               const subjName = sub.title || sub.name;
+               if (subjName) {
+                 subjectsMap[subjName] = {
+                   name: subjName,
+                   progress: 0,
+                   mcq: { current: 0, total: 0 },
+                   cq: { current: 0, total: 0 },
+                   content: { current: 0, total: 0 },
+                   started: ''
+                 };
+               }
+            });
+          } catch (e) {
+            console.error("Failed to fetch class subjects", e);
+          }
+        }
 
         const combinedData = mistakeDocs.map((md: any) => {
           const q = fetchedQuestions.find(fq => fq.id === md.questionId);
@@ -106,6 +122,8 @@ export default function MistakeVaultPage() {
            return s;
         });
         
+        // Sort subjects by name or progress here if needed
+        
         setSubjects(subjArr);
         setAllMistakeData(combinedData);
       } catch (error) {
@@ -116,7 +134,7 @@ export default function MistakeVaultPage() {
     }
 
     fetchData();
-  }, [user, authLoading]);
+  }, [user, userProfile, authLoading]);
 
   const toggleSubject = (name: string) => {
     setOpenSubjects(prev => ({ ...prev, [name]: !prev[name] }));
