@@ -75,7 +75,7 @@ export default function MistakeVaultPage() {
                    mcq: { current: 0, total: 0 },
                    cq: { current: 0, total: 0 },
                    content: { current: 0, total: 0 },
-                   started: ''
+                   started: '5 days ago'
                  };
                }
             });
@@ -100,7 +100,7 @@ export default function MistakeVaultPage() {
                 mcq: { current: 0, total: 0 },
                 cq: { current: 0, total: 0 },
                 content: { current: 0, total: 0 },
-                started: '' 
+                started: '5 days ago' 
               };
             }
             subjectsMap[subjName].mcq.total += 1;
@@ -369,20 +369,20 @@ export default function MistakeVaultPage() {
                         
                         <div className="flex justify-between items-start mb-3 gap-2">
                           <div className="space-y-0.5">
-                            <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-700 dark:text-slate-300">
-                              <span className="w-1.5 h-1.5 rounded-full bg-green-500 shrink-0"></span> {sub.mcq.current}<span className="text-slate-400 font-medium whitespace-nowrap">/{sub.mcq.total}</span>
+                            <div className="flex items-center gap-1 text-[10px] font-bold text-slate-700 dark:text-slate-300">
+                              <span className="w-1.5 h-1.5 rounded-full bg-green-500 shrink-0"></span> {sub.mcq.current} <span className="text-slate-400 font-medium whitespace-nowrap">/{sub.mcq.total} {sub.mcq.total > 0 ? `(${(sub.mcq.current/sub.mcq.total * 100).toFixed(2)}%)` : ''}</span>
                             </div>
                             <div className="text-[9px] font-semibold text-slate-400 ml-3 uppercase">MCQ</div>
                           </div>
                           <div className="space-y-0.5">
-                            <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-700 dark:text-slate-300">
-                              <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0"></span> {sub.cq.current}<span className="text-slate-400 font-medium whitespace-nowrap">/{sub.cq.total}</span>
+                            <div className="flex items-center gap-1 text-[10px] font-bold text-slate-700 dark:text-slate-300">
+                              <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0"></span> {sub.cq.current} <span className="text-slate-400 font-medium whitespace-nowrap">/{sub.cq.total}</span>
                             </div>
                             <div className="text-[9px] font-semibold text-slate-400 ml-3 uppercase">CQ</div>
                           </div>
                           <div className="space-y-0.5">
-                            <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-700 dark:text-slate-300">
-                              <span className="w-1.5 h-1.5 rounded-full bg-purple-500 shrink-0"></span> {sub.content.current}<span className="text-slate-400 font-medium whitespace-nowrap">/{sub.content.total}</span>
+                            <div className="flex items-center gap-1 text-[10px] font-bold text-slate-700 dark:text-slate-300">
+                              <span className="w-1.5 h-1.5 rounded-full bg-purple-500 shrink-0"></span> {sub.content.current} <span className="text-slate-400 font-medium whitespace-nowrap">/{sub.content.total}</span>
                             </div>
                             <div className="text-[9px] font-semibold text-slate-400 ml-3 uppercase">Content</div>
                           </div>
@@ -392,6 +392,13 @@ export default function MistakeVaultPage() {
                           <div className="h-full bg-green-500" style={{ width: `${sub.progress}%` }}></div>
                           <div className="h-full bg-blue-500" style={{ width: '0%' }}></div>
                           <div className="h-full bg-purple-500" style={{ width: '0%' }}></div>
+                        </div>
+
+                        <div className="flex items-center justify-between mt-1 pt-4 border-t border-slate-100 dark:border-slate-800">
+                          <span className="text-[11px] text-slate-500 font-medium">Started: {sub.started}</span>
+                          <Link href="#" className="text-[11px] font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1">
+                            View Report <ArrowRight className="w-3 h-3" />
+                          </Link>
                         </div>
                       </div>
                     );

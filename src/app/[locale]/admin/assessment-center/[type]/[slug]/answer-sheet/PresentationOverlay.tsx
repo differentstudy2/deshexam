@@ -531,35 +531,35 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                  <div className="absolute bottom-[10%] right-[-10%] w-56 h-56 rounded-full bg-blue-400/10 blur-[50px]"></div>
                  
                  {/* Top Content */}
-                 <div className="flex flex-col items-center justify-center w-full px-4 pt-8 xl:pt-10 z-10">
+                 <div className="flex flex-col items-center justify-center w-full px-4 pt-4 xl:pt-6 z-10">
                       {/* Logo */}
-                      <div className="flex flex-col items-center mb-6 xl:mb-8 opacity-90">
-                          <img src="/image/logo.png" alt="DeshExam Logo" className="w-14 xl:w-16 h-auto brightness-0 invert drop-shadow-lg mb-2" />
-                          <div className="text-white font-extrabold text-xl xl:text-2xl tracking-wide">Desh Exam Academy</div>
-                          <div className="text-white/70 text-[10px] xl:text-xs font-semibold tracking-[0.15em] uppercase mt-0.5">Learn • Practice • Succeed</div>
+                      <div className="flex flex-col items-center mb-4 xl:mb-6 opacity-90">
+                          <img src="/image/logo.png" alt="DeshExam Logo" className="w-10 xl:w-12 h-auto brightness-0 invert drop-shadow-lg mb-1" />
+                          <div className="text-white font-extrabold text-base xl:text-lg tracking-wide">Desh Exam Academy</div>
+                          <div className="text-white/70 text-[8px] xl:text-[10px] font-semibold tracking-[0.15em] uppercase mt-0.5">Learn • Practice • Succeed</div>
                       </div>
 
                       {/* Target Icon */}
-                      <div className="text-[4.5rem] xl:text-[5.5rem] leading-none mb-5 xl:mb-6 drop-shadow-[0_10px_25px_rgba(0,0,0,0.6)]">
+                      <div className="text-[3rem] xl:text-[4rem] leading-none mb-3 xl:mb-4 drop-shadow-[0_10px_25px_rgba(0,0,0,0.6)]">
                           🎯
                       </div>
                       
                       {/* Text Section */}
                       <div className="text-center font-bold tracking-wide">
-                          <h3 className="text-2xl xl:text-[1.75rem] text-white mb-2 leading-tight">লক্ষ্য তোমার,</h3>
-                          <h3 className="text-2xl xl:text-[1.75rem] text-white leading-tight">
+                          <h3 className="text-lg xl:text-xl text-white mb-1 leading-tight">লক্ষ্য তোমার,</h3>
+                          <h3 className="text-lg xl:text-xl text-white leading-tight">
                               <span className="text-[#FFD700]">সাফল্য</span> আমাদের সাথে!
                           </h3>
                       </div>
                  </div>
 
                  {/* Middle Illustration Placeholder */}
-                 <div className="flex items-center justify-center text-[3.5rem] xl:text-[4.5rem] gap-3 xl:gap-5 z-10 w-full drop-shadow-2xl opacity-90 my-4">
+                 <div className="flex items-center justify-center text-[2rem] xl:text-[2.5rem] gap-3 xl:gap-5 z-10 w-full drop-shadow-2xl opacity-90 my-2">
                      📚 💡 🚀 💻
                  </div>
 
                  {/* Features List */}
-                 <div className="flex flex-col space-y-3 z-10 w-full px-12 xl:px-16 mb-4">
+                 <div className="flex flex-col space-y-2 z-10 w-full px-8 xl:px-12 mb-2">
                       {[
                           'Daily Mock Tests',
                           'Unlimited Practice',
@@ -568,19 +568,19 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                           'Performance Tracking'
                       ].map((feature, idx) => (
                           <div key={idx} className="flex items-center gap-3">
-                              <svg className="w-5 h-5 xl:w-[22px] xl:h-[22px] text-white shrink-0 drop-shadow-md" viewBox="0 0 24 24" fill="currentColor">
+                              <svg className="w-4 h-4 xl:w-5 xl:h-5 text-white shrink-0 drop-shadow-md" viewBox="0 0 24 24" fill="currentColor">
                                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                               </svg>
-                              <span className="text-white text-[15px] xl:text-[17px] font-semibold tracking-wide drop-shadow-sm">{feature}</span>
+                              <span className="text-white text-[13px] xl:text-[15px] font-semibold tracking-wide drop-shadow-sm">{feature}</span>
                           </div>
                       ))}
                  </div>
 
                  {/* Join Button */}
-                 <div className="w-full px-8 xl:px-12 pb-12 xl:pb-16 z-10">
-                      <button className="w-full flex flex-col items-center justify-center py-3.5 xl:py-4 bg-gradient-to-b from-white/20 to-white/5 backdrop-blur-md border border-white/30 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:from-white/30 hover:to-white/10 transition-all duration-300 group">
-                          <span className="text-white font-bold text-xl xl:text-[22px] mb-0.5 drop-shadow-md group-hover:scale-105 transition-transform duration-300">Join DeshExam</span>
-                          <span className="text-gray-300 text-xs xl:text-[13px] font-medium tracking-wide">Start Your Success Journey</span>
+                 <div className="w-full px-6 xl:px-10 pb-6 xl:pb-8 z-10">
+                      <button className="w-full flex flex-col items-center justify-center py-2.5 xl:py-3 bg-gradient-to-b from-white/20 to-white/5 backdrop-blur-md border border-white/30 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:from-white/30 hover:to-white/10 transition-all duration-300 group">
+                          <span className="text-white font-bold text-base xl:text-lg mb-0.5 drop-shadow-md group-hover:scale-105 transition-transform duration-300">Join DeshExam</span>
+                          <span className="text-gray-300 text-[10px] xl:text-xs font-medium tracking-wide">Start Your Success Journey</span>
                       </button>
                  </div>
             </div>
