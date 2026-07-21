@@ -227,7 +227,7 @@ export default async function PracticeLandingPage({ params }: Props) {
                   )}
                 </div>
 
-                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight">
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-[1.15]">
                   {test.title}
                 </h1>
 
