@@ -117,20 +117,46 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         clearCanvas();
     }, [currentSlide, clearCanvas]);
 
-    const getCoordinates = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    const getCoordinates = (e: any) => {
         const canvas = canvasRef.current;
         if (!canvas) return { x: 0, y: 0 };
         const rect = canvas.getBoundingClientRect();
+        
+        let clientX = e.clientX;
+        let clientY = e.clientY;
+        
+        if (clientX === undefined && e.touches && e.touches.length > 0) {
+            clientX = e.touches[0].clientX;
+            clientY = e.touches[0].clientY;
+        }
+        
         return {
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top
+            x: (clientX || 0) - rect.left,
+            y: (clientY || 0) - rect.top
         };
     };
 
     // Drawing Handlers
-    const startDrawing = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    const startDrawing = (e: any) => {
         if (!isPenActive) return;
         
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        // Force resize if incorrect right before drawing
+        const expectedWidth = canvas.offsetWidth;
+        const expectedHeight = canvas.offsetHeight;
+        if (expectedWidth > 0 && expectedHeight > 0 && (canvas.width !== expectedWidth || canvas.height !== expectedHeight)) {
+            canvas.width = expectedWidth;
+            canvas.height = expectedHeight;
+            const newCtx = canvas.getContext('2d');
+            if (newCtx) {
+                newCtx.lineCap = 'round';
+                newCtx.lineJoin = 'round';
+                contextRef.current = newCtx;
+            }
+        }
+
         isDrawing.current = true;
         try {
             (e.target as HTMLElement).setPointerCapture(e.pointerId);
@@ -150,7 +176,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         }
     };
 
-    const draw = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    const draw = (e: any) => {
         if (!isDrawing.current || !isPenActive) return;
         
         const ctx = contextRef.current;
@@ -170,14 +196,18 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         lastPos.current = { x, y };
     };
 
-    const stopDrawing = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    const stopDrawing = (e: any) => {
         if (!isDrawing.current) return;
         
         if (contextRef.current) {
             contextRef.current.closePath();
         }
         isDrawing.current = false;
-        (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+        try {
+            if (e.target && e.target.releasePointerCapture && e.pointerId !== undefined) {
+                (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+            }
+        } catch (err) {}
     };
 
     const handleTimerPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -481,6 +511,10 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     onPointerUp={stopDrawing}
                     onPointerCancel={stopDrawing}
                     onPointerOut={stopDrawing}
+                    onTouchStart={startDrawing}
+                    onTouchMove={draw}
+                    onTouchEnd={stopDrawing}
+                    onTouchCancel={stopDrawing}
                 />
 
                 {/* Background Decorations */}
