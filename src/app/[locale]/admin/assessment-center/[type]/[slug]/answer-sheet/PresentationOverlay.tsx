@@ -429,18 +429,18 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                       </div>
                       
                       {/* Text Section */}
-                      <div className="text-center font-bold tracking-wide mt-2">
-                          <h3 className="text-[1.65rem] xl:text-[2rem] text-white mb-3 leading-tight drop-shadow-md">সঠিক প্রস্তুতি,</h3>
-                          <h3 className="text-[1.65rem] xl:text-[2rem] text-white leading-tight drop-shadow-md">
-                              <span className="text-[#FFB800]">সফলতা</span> চাবিকাঠি!
+                      <div className="text-center tracking-wide mt-2 px-2">
+                          <h3 className="text-lg xl:text-xl text-blue-100 mb-1.5 leading-relaxed drop-shadow-sm font-medium">সঠিক প্রস্তুতি,</h3>
+                          <h3 className="text-2xl xl:text-[1.75rem] text-white leading-snug drop-shadow-md font-extrabold">
+                              <span className="text-[#FFD700]">সফলতার</span> চাবিকাঠি!
                           </h3>
                       </div>
                  </div>
 
                  {/* Middle Illustration Placeholder */}
-                 <div className="flex items-center justify-center text-[3.5rem] xl:text-[4.5rem] gap-3 xl:gap-5 z-10 w-full drop-shadow-2xl opacity-95 my-6 relative">
+                 <div className="flex items-center justify-center text-[4.5rem] xl:text-[5.5rem] z-10 w-full drop-shadow-2xl opacity-95 my-4 relative">
                      <div className="absolute inset-0 bg-blue-400/10 blur-[40px] rounded-full"></div>
-                     🏆 📚 🎓 📜
+                     🏆
                  </div>
 
                  {/* Features List Box */}
@@ -1044,18 +1044,16 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                       </div>
                       
                       {/* Text Section */}
-                      <div className="text-center font-bold tracking-wide">
-                          <h3 className="text-xl xl:text-[1.5rem] text-white mb-1.5 leading-tight">লক্ষ্য তোমার,</h3>
-                          <h3 className="text-xl xl:text-[1.5rem] text-white leading-tight">
+                      <div className="text-center tracking-wide mt-1 px-2">
+                          <h3 className="text-base xl:text-lg text-blue-100 mb-1 leading-relaxed drop-shadow-sm font-medium">লক্ষ্য তোমার,</h3>
+                          <h3 className="text-xl xl:text-[1.5rem] text-white leading-snug drop-shadow-md font-bold">
                               <span className="text-[#FFD700]">সাফল্য</span> আমাদের সাথে!
                           </h3>
                       </div>
                  </div>
 
-                 {/* Middle Illustration Placeholder */}
-                 <div className="flex items-center justify-center text-[2.5rem] xl:text-[3.5rem] gap-2 xl:gap-4 z-10 w-full drop-shadow-2xl opacity-90 my-2">
-                     📚 💡 🚀 💻
-                 </div>
+                 {/* Empty space filler instead of emojis to keep design clean */}
+                 <div className="flex-grow"></div>
 
                  {/* Features List */}
                  <div className="flex flex-col space-y-3 z-10 w-full px-12 xl:px-16 mb-4">
