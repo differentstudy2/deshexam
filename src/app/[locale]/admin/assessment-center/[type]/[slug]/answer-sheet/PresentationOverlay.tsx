@@ -8,7 +8,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
 import 'katex/dist/katex.min.css';
-import { X, ChevronLeft, ChevronRight, Play, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize, LayoutGrid, Sun, Moon } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Play, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize, LayoutGrid, Sun, Moon, Eraser, Square, Circle, ArrowUpRight, Type, Presentation } from 'lucide-react';
 
 const bnOptionsMap: Record<string, string> = {
     a: 'ক',
@@ -85,9 +85,42 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [penSize, setPenSize] = useState(4);
     
     // Drawing Tool State
-    const [drawingTool, setDrawingTool] = useState<'pen' | 'highlighter' | 'laser'>('pen');
+    const [drawingTool, setDrawingTool] = useState<'pen' | 'highlighter' | 'laser' | 'eraser' | 'rectangle' | 'circle' | 'arrow' | 'text'>('pen');
+    const [isWhiteboardMode, setIsWhiteboardMode] = useState(false);
+    const [textInput, setTextInput] = useState<{ x: number, y: number, text: string } | null>(null);
+    const textInputRef = useRef<HTMLTextAreaElement>(null);
     const cursorRef = useRef<HTMLDivElement>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (textInput && textInputRef.current) {
+            textInputRef.current.focus();
+        }
+    }, [textInput]);
+
+    const finalizeText = useCallback(() => {
+        if (!textInput || !textInput.text.trim()) {
+            setTextInput(null);
+            return;
+        }
+        const canvas = canvasRef.current;
+        const ctx = canvas?.getContext('2d');
+        if (ctx) {
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.globalAlpha = 1.0;
+            ctx.font = `bold ${Math.max(penSize * 3, 16)}px sans-serif`;
+            ctx.fillStyle = penColor;
+            ctx.textBaseline = 'top';
+            
+            const lines = textInput.text.split('\n');
+            const lineHeight = Math.max(penSize * 3, 16) * 1.2;
+            
+            lines.forEach((line, index) => {
+                ctx.fillText(line, textInput.x, textInput.y + (index * lineHeight));
+            });
+        }
+        setTextInput(null);
+    }, [textInput, penColor, penSize]);
 
     const handleCanvasWheel = (e: React.WheelEvent<HTMLCanvasElement>) => {
         if (scrollContainerRef.current) {
@@ -208,6 +241,15 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         if (drawingTool === 'laser') {
             return;
         }
+
+        if (drawingTool === 'text') {
+            if (textInput) {
+                finalizeText();
+            } else {
+                setTextInput({ x, y, text: '' });
+            }
+            return;
+        }
         
         const canvas = canvasRef.current;
         if (!canvas) return;
@@ -234,6 +276,20 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         redrawActiveStroke();
     };
 
+    const drawArrow = (ctx: CanvasRenderingContext2D, fromx: number, fromy: number, tox: number, toy: number) => {
+        const headlen = 15;
+        const dx = tox - fromx;
+        const dy = toy - fromy;
+        const angle = Math.atan2(dy, dx);
+        ctx.beginPath();
+        ctx.moveTo(fromx, fromy);
+        ctx.lineTo(tox, toy);
+        ctx.lineTo(tox - headlen * Math.cos(angle - Math.PI / 6), toy - headlen * Math.sin(angle - Math.PI / 6));
+        ctx.moveTo(tox, toy);
+        ctx.lineTo(tox - headlen * Math.cos(angle + Math.PI / 6), toy - headlen * Math.sin(angle + Math.PI / 6));
+        ctx.stroke();
+    };
+
     const redrawActiveStroke = () => {
         const canvas = activeCanvasRef.current;
         if (!canvas) return;
@@ -249,17 +305,44 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
         if (currentStroke.current.length === 0) return;
+        if (drawingTool === 'eraser') return;
         
         ctx.globalAlpha = drawingTool === 'highlighter' ? 0.3 : 1.0;
         ctx.globalCompositeOperation = drawingTool === 'highlighter' ? 'multiply' : 'source-over';
         const size = drawingTool === 'highlighter' ? penSize * 5 : penSize;
         
+        ctx.strokeStyle = penColor;
+        ctx.fillStyle = penColor;
+        ctx.lineWidth = size;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+
+        const start = currentStroke.current[0];
+        const current = currentStroke.current[currentStroke.current.length - 1];
+
+        if (drawingTool === 'rectangle') {
+            ctx.strokeRect(start.x, start.y, current.x - start.x, current.y - start.y);
+            return;
+        }
+
+        if (drawingTool === 'circle') {
+            const radius = Math.sqrt(Math.pow(current.x - start.x, 2) + Math.pow(current.y - start.y, 2));
+            ctx.beginPath();
+            ctx.arc(start.x, start.y, radius, 0, 2 * Math.PI);
+            ctx.stroke();
+            return;
+        }
+
+        if (drawingTool === 'arrow') {
+            drawArrow(ctx, start.x, start.y, current.x, current.y);
+            return;
+        }
+        
         ctx.beginPath();
-        ctx.moveTo(currentStroke.current[0].x, currentStroke.current[0].y);
+        ctx.moveTo(start.x, start.y);
         
         if (currentStroke.current.length === 1) {
-            ctx.arc(currentStroke.current[0].x, currentStroke.current[0].y, size / 2, 0, Math.PI * 2);
-            ctx.fillStyle = penColor;
+            ctx.arc(start.x, start.y, size / 2, 0, Math.PI * 2);
             ctx.fill();
             return;
         }
@@ -268,10 +351,6 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
             ctx.lineTo(currentStroke.current[i].x, currentStroke.current[i].y);
         }
         
-        ctx.strokeStyle = penColor;
-        ctx.lineWidth = size;
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
         ctx.stroke();
     };
 
@@ -285,14 +364,33 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
             cursorRef.current.style.top = `${y}px`;
         }
         
-        if (drawingTool === 'laser') {
+        if (drawingTool === 'laser' || drawingTool === 'text') {
             return;
         }
 
         if (!isDrawing.current) return;
         
         currentStroke.current.push({x, y});
-        redrawActiveStroke();
+
+        if (drawingTool === 'eraser') {
+            const canvas = canvasRef.current;
+            const ctx = canvas?.getContext('2d');
+            if (ctx && currentStroke.current.length >= 2) {
+                const prev = currentStroke.current[currentStroke.current.length - 2];
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.beginPath();
+                ctx.moveTo(prev.x, prev.y);
+                ctx.lineTo(x, y);
+                ctx.strokeStyle = 'rgba(0,0,0,1)';
+                ctx.lineWidth = penSize * 5;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.stroke();
+                ctx.globalCompositeOperation = 'source-over';
+            }
+        } else {
+            redrawActiveStroke();
+        }
     };
 
     const stopDrawing = (e: any) => {
@@ -307,7 +405,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
         const mainCanvas = canvasRef.current;
         const activeCanvas = activeCanvasRef.current;
-        if (mainCanvas && activeCanvas) {
+        if (mainCanvas && activeCanvas && drawingTool !== 'eraser') {
             const ctx = mainCanvas.getContext('2d');
             if (ctx) {
                 ctx.drawImage(activeCanvas, 0, 0);
@@ -614,27 +712,36 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                      {/* Features List */}
                      <div className="flex flex-col z-10 w-full space-y-2 mb-2">
                          <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-lg p-2.5">
-                             <div className="flex flex-col space-y-2">
+                             <div className="flex flex-col space-y-1.5">
                                  {[
                                      'Mock Test',
-                                     'Practice',
+                                     'Topic Test',
+                                     'Live Exam',
                                      'PYQ',
-                                     'AI Report'
+                                     'AI Report',
+                                     'Merit List'
                                  ].map((feature, idx) => (
                                      <div key={idx} className="flex items-center gap-1.5">
-                                         <Check className="w-5 h-5 text-[#FFB800] shrink-0" />
-                                         <span className="text-gray-100 text-[16px] font-semibold tracking-wide leading-tight">{feature}</span>
+                                         <Check className="w-4 h-4 text-[#FFB800] shrink-0" />
+                                         <span className="text-gray-100 text-[14px] font-semibold tracking-wide leading-tight">{feature}</span>
                                      </div>
                                  ))}
                              </div>
                          </div>
                      </div>
 
+                     {/* Discount Badge */}
+                     <div className="w-full z-10 flex justify-center mb-2">
+                         <div className="bg-red-500/90 text-white text-[11px] font-bold px-3 py-1 rounded-full animate-pulse border border-red-400 shadow-[0_0_10px_rgba(239,68,68,0.5)]">
+                             ⭐ GET 50% OFF ⭐
+                         </div>
+                     </div>
+
                      {/* CTA Button */}
                      <div className="w-full z-10 pb-2">
                           <button className="w-full flex flex-col items-center justify-center py-2 bg-gradient-to-b from-[#2178ff] to-[#0a4bb8] border border-blue-400/50 rounded-lg shadow-[0_4px_10px_rgba(10,75,184,0.4)] hover:scale-105 transition-transform duration-300">
-                              <span className="text-white font-bold text-[18px] drop-shadow-md leading-none mb-1">Practice</span>
-                              <span className="text-white font-bold text-[18px] drop-shadow-md leading-none">Today</span>
+                              <span className="text-white font-bold text-[16px] drop-shadow-md leading-none mb-1">Subscribe</span>
+                              <span className="text-white font-bold text-[16px] drop-shadow-md leading-none">Today</span>
                           </button>
                      </div>
                 </div>
@@ -735,6 +842,35 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             </div>
                         ))}
                     </div>
+                )}
+
+                {/* Whiteboard Layer */}
+                {isWhiteboardMode && (
+                    <div className={`absolute inset-0 z-10 ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`} />
+                )}
+
+                {/* Text Input Overlay */}
+                {textInput && (
+                    <textarea
+                        ref={textInputRef}
+                        value={textInput.text}
+                        onChange={(e) => setTextInput({ ...textInput, text: e.target.value })}
+                        onBlur={finalizeText}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' && !e.shiftKey) {
+                                e.preventDefault();
+                                finalizeText();
+                            }
+                        }}
+                        style={{
+                            left: textInput.x,
+                            top: textInput.y,
+                            color: penColor,
+                            fontSize: `${Math.max(penSize * 3, 16)}px`,
+                            fontWeight: 'bold',
+                        }}
+                        className="absolute z-[60] bg-transparent outline-none border-2 border-blue-400 border-dashed resize-none min-w-[200px] min-h-[40px] overflow-hidden leading-tight p-1"
+                    />
                 )}
 
                 {/* Header */}
@@ -982,6 +1118,15 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             <Focus className="w-6 h-6" />
                         </button>
                         
+                        {/* Whiteboard Toggle Button */}
+                        <button
+                            onClick={() => setIsWhiteboardMode(!isWhiteboardMode)}
+                            className={`p-3 rounded-full transition-all shadow-sm ${isWhiteboardMode ? 'bg-indigo-600 text-white ring-2 ring-indigo-300' : 'bg-white/60 hover:bg-white text-indigo-600'}`}
+                            title="Toggle Whiteboard Mode"
+                        >
+                            <Presentation className="w-6 h-6" />
+                        </button>
+
                         {/* Pen Toggle Button */}
                         <button
                             onClick={() => setIsPenActive(!isPenActive)}
@@ -1176,7 +1321,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                 <div className="space-y-4 bg-gray-50 p-3 rounded-xl border border-gray-100 shadow-inner mb-4">
                                                     
                                                     {/* Tool Selector */}
-                                                    <div className="flex gap-2 p-1.5 bg-gray-200/50 rounded-lg">
+                                                    <div className="flex gap-2 p-1.5 bg-gray-200/50 rounded-lg flex-wrap">
                                                         <button 
                                                             onClick={() => setDrawingTool('pen')} 
                                                             className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'pen' ? 'bg-white text-blue-600 shadow-sm border border-gray-200/50' : 'text-gray-500 hover:text-gray-700'}`}
@@ -1195,9 +1340,41 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                         >
                                                             <MousePointer2 className="w-3.5 h-3.5" /> Laser
                                                         </button>
+                                                        <button 
+                                                            onClick={() => setDrawingTool('eraser')} 
+                                                            className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'eraser' ? 'bg-white text-gray-800 shadow-sm border border-gray-200/50' : 'text-gray-500 hover:text-gray-700'}`}
+                                                        >
+                                                            <Eraser className="w-3.5 h-3.5" /> Eraser
+                                                        </button>
+                                                    </div>
+                                                    <div className="flex gap-2 p-1.5 bg-gray-200/50 rounded-lg flex-wrap mt-2">
+                                                        <button 
+                                                            onClick={() => setDrawingTool('rectangle')} 
+                                                            className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'rectangle' ? 'bg-white text-indigo-600 shadow-sm border border-gray-200/50' : 'text-gray-500 hover:text-gray-700'}`}
+                                                        >
+                                                            <Square className="w-3.5 h-3.5" /> Rect
+                                                        </button>
+                                                        <button 
+                                                            onClick={() => setDrawingTool('circle')} 
+                                                            className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'circle' ? 'bg-white text-indigo-600 shadow-sm border border-gray-200/50' : 'text-gray-500 hover:text-gray-700'}`}
+                                                        >
+                                                            <Circle className="w-3.5 h-3.5" /> Circle
+                                                        </button>
+                                                        <button 
+                                                            onClick={() => setDrawingTool('arrow')} 
+                                                            className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'arrow' ? 'bg-white text-indigo-600 shadow-sm border border-gray-200/50' : 'text-gray-500 hover:text-gray-700'}`}
+                                                        >
+                                                            <ArrowUpRight className="w-3.5 h-3.5" /> Arrow
+                                                        </button>
+                                                        <button 
+                                                            onClick={() => setDrawingTool('text')} 
+                                                            className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'text' ? 'bg-white text-indigo-600 shadow-sm border border-gray-200/50' : 'text-gray-500 hover:text-gray-700'}`}
+                                                        >
+                                                            <Type className="w-3.5 h-3.5" /> Text
+                                                        </button>
                                                     </div>
 
-                                                    <div className={drawingTool === 'laser' ? 'opacity-50 pointer-events-none transition-opacity flex flex-col gap-4' : 'transition-opacity flex flex-col gap-4'}>
+                                                    <div className={drawingTool === 'laser' || drawingTool === 'text' ? 'opacity-50 pointer-events-none transition-opacity flex flex-col gap-4 mt-2' : 'transition-opacity flex flex-col gap-4 mt-2'}>
                                                         <div>
                                                             <div className="flex justify-between text-xs font-semibold text-gray-500 mb-2">
                                                                 <span>Color</span>
