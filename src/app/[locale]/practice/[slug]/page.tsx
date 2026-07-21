@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: Props, parent: ResolvingMetad
   const { slug } = await params;
   const test = await getAssessmentBySlug('practiceSets', slug) as MockTest | null;
   if (!test) return { title: 'Practice Set Not Found' };
-  const imageUrl = test.thumbnail || "https://deshexam.com/og/practice.jpg";
+  const imageUrl = (Array.isArray(test.thumbnail) ? test.thumbnail[0] : test.thumbnail) || "https://deshexam.com/og/practice.jpg";
   const title = `${formatTitleForBrowser(test.title)} | Practice Set | DeshExam`;
   const description = test.description || `Take the practice set: ${test.title}.`;
 
@@ -111,7 +111,7 @@ export default async function PracticeLandingPage({ params }: Props) {
     "@type": "Product",
     "name": test.title,
     "description": test.description || `Take the ${test.title} practice set on DeshExam.`,
-    "image": test.thumbnail || "https://deshexam.com/og/practice.jpg",
+    "image": (Array.isArray(test.thumbnail) ? test.thumbnail[0] : test.thumbnail) || "https://deshexam.com/og/practice.jpg",
     "brand": {
       "@type": "Brand",
       "name": "DeshExam"

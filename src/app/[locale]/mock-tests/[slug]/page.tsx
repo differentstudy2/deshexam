@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: Props, parent: ResolvingMetad
   const { slug } = await params;
   const test = await getAssessmentBySlug('mockTests', slug) as MockTest | null;
   if (!test) return { title: 'Mock Test Not Found' };
-  const imageUrl = test.thumbnail || "https://deshexam.com/og/mock-tests.jpg";
+  const imageUrl = (Array.isArray(test.thumbnail) ? test.thumbnail[0] : test.thumbnail) || "https://deshexam.com/og/mock-tests.jpg";
   const title = `${formatTitleForBrowser(test.title)} | Mock Test | DeshExam`;
   const description = test.description || `Take the mock test: ${test.title}.`;
 
@@ -111,7 +111,7 @@ export default async function MockTestLandingPage({ params }: Props) {
     "@type": "Product",
     "name": test.title,
     "description": test.description || `Take the ${test.title} mock test on DeshExam.`,
-    "image": test.thumbnail || "https://deshexam.com/og/mock-tests.jpg",
+    "image": (Array.isArray(test.thumbnail) ? test.thumbnail[0] : test.thumbnail) || "https://deshexam.com/og/mock-tests.jpg",
     "brand": {
       "@type": "Brand",
       "name": "DeshExam"

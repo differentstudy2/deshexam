@@ -457,8 +457,8 @@ export default function MockTestsPage() {
                                             />
                                         </TableCell>
                                         <TableCell>
-                                            {test.thumbnail ? (
-                                                <img src={test.thumbnail} alt={test.title} className="w-10 h-10 object-cover rounded-md border border-slate-200 dark:border-slate-700" />
+                                            {test.thumbnail && (!Array.isArray(test.thumbnail) || test.thumbnail.length > 0) ? (
+                                                <img src={Array.isArray(test.thumbnail) ? test.thumbnail[0] : test.thumbnail} alt={test.title} className="w-10 h-10 object-cover rounded-md border border-slate-200 dark:border-slate-700" />
                                             ) : (
                                                 <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-md border border-slate-200 dark:border-slate-700 flex items-center justify-center">
                                                     <ImageIcon className="w-5 h-5 text-slate-400 dark:text-slate-500" />
@@ -549,8 +549,8 @@ export default function MockTestsPage() {
                                         <div key={test.id} className={`group relative flex flex-col bg-white dark:bg-slate-900 border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow ${selectedIds.includes(test.id) ? 'ring-2 ring-indigo-500 border-transparent' : 'border-slate-200 dark:border-slate-800'}`}>
                                             {/* Top Image Area */}
                                             <div className="relative h-40 bg-slate-100 dark:bg-slate-800 flex items-center justify-center border-b border-slate-100 dark:border-slate-800">
-                                                {test.thumbnail ? (
-                                                    <img src={test.thumbnail} alt={test.title} className="w-full h-full object-cover" />
+                                                {test.thumbnail && (!Array.isArray(test.thumbnail) || test.thumbnail.length > 0) ? (
+                                                    <img src={Array.isArray(test.thumbnail) ? test.thumbnail[0] : test.thumbnail} alt={test.title} className="w-full h-full object-cover" />
                                                 ) : (
                                                     <ImageIcon className="w-8 h-8 text-slate-300 dark:text-slate-600" />
                                                 )}

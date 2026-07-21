@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: Props, parent: ResolvingMetad
   
   if (!test) return { title: 'Quiz Not Found' };
   
-  const imageUrl = test.thumbnail || "https://deshexam.com/og/quiz.jpg";
+  const imageUrl = (Array.isArray(test.thumbnail) ? test.thumbnail[0] : test.thumbnail) || "https://deshexam.com/og/quiz.jpg";
   const title = `${formatTitleForBrowser(test.title)} | Quiz | DeshExam`;
   const description = test.description || `Take the ${test.title} quiz to test your preparation for ${test.boardId || 'competitive'} exams.`;
   
@@ -169,7 +169,7 @@ export default async function QuizLandingPage({ params }: Props) {
     "@type": "Product",
     "name": test.title,
     "description": test.description || `Take the ${test.title} quiz on DeshExam.`,
-    "image": test.thumbnail || "https://deshexam.com/og/quiz.jpg",
+    "image": (Array.isArray(test.thumbnail) ? test.thumbnail[0] : test.thumbnail) || "https://deshexam.com/og/quiz.jpg",
     "brand": {
       "@type": "Brand",
       "name": "DeshExam"
