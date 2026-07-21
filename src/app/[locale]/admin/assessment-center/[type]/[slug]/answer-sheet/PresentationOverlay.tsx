@@ -669,7 +669,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     if (typeof window === 'undefined') return null;
 
     return createPortal(
-        <div className={`fixed inset-0 w-full h-full z-[99999] flex items-center justify-between xl:gap-[0.1rem] xl:p-[0.1rem] select-none font-sans overflow-hidden ${isDarkMode ? 'dark bg-gray-900' : 'bg-[#f8fbff]'}`}>
+        <div className={`fixed inset-0 w-full h-full z-[99999] flex items-center justify-between xl:gap-[0.1rem] xl:p-[0.1rem] select-none font-sans overflow-hidden transition-colors duration-500 ${isDarkMode ? 'dark bg-gray-900' : 'bg-[#f8fbff]'}`}>
             <style>{`
                 @keyframes popIn {
                     0% { transform: scale(1); box-shadow: 0 0 0 rgba(52,168,83,0); }
@@ -747,7 +747,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 </div>
                  
                 {/* Main Presentation Area */}
-                <div className="responsive-fonts flex-1 min-w-0 relative w-full h-full bg-gradient-to-br from-[#f8fafc] via-[#f1f5f9] to-[#f8fafc] dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex flex-col shadow-2xl overflow-hidden shrink-0 z-10 xl:rounded-xl xl:border xl:border-gray-200 dark:border-gray-800">
+                <div className="responsive-fonts flex-1 min-w-0 relative w-full h-full bg-gradient-to-br from-[#f8fafc] via-[#f1f5f9] to-[#f8fafc] dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex flex-col shadow-2xl overflow-hidden shrink-0 z-10 xl:rounded-xl xl:border xl:border-gray-200 dark:border-gray-800 transition-colors duration-500">
 
                 {/* Main Drawing Canvas */}
                 <canvas
@@ -846,7 +846,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                 {/* Whiteboard Layer */}
                 {isWhiteboardMode && (
-                    <div className={`absolute inset-0 z-10 ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`} />
+                    <div className={`absolute inset-0 z-[15] transition-colors duration-500 ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`} />
                 )}
 
                 {/* Text Input Overlay */}
@@ -874,7 +874,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 )}
 
                 {/* Header */}
-                <div className="shrink-0 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-800 dark:via-gray-800 dark:to-gray-800 border-b border-indigo-100 dark:border-gray-700 py-[0.1rem] px-4 md:pl-6 md:pr-8 flex flex-col md:flex-row justify-between items-center w-full z-30 shadow-sm gap-3 md:gap-0 relative">
+                <div className="shrink-0 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-800 dark:via-gray-800 dark:to-gray-800 border-b border-indigo-100 dark:border-gray-700 py-[0.1rem] px-4 md:pl-6 md:pr-8 flex flex-col md:flex-row justify-between items-center w-full z-30 shadow-sm gap-3 md:gap-0 relative transition-colors duration-500">
                     {/* Logo Area */}
                     <div className="flex items-center gap-2 md:gap-3 w-full md:w-auto justify-between md:justify-start">
                         <div className="flex items-center gap-2 md:gap-3 px-1">
@@ -1061,7 +1061,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     {/* Explanation */}
                     {step >= 2 && q.explanation && isExpEnabled && (
                         <div className="w-full max-w-5xl mt-4 animate-in fade-in slide-in-from-bottom-8 duration-700">
-                            <div className="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-200 dark:border-gray-700 shadow-xl relative overflow-hidden">
+                            <div className="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-200 dark:border-gray-700 shadow-xl relative overflow-hidden transition-colors duration-500">
                                 {/* Small colored accent line on the left */}
                                 <div className="absolute left-0 top-0 bottom-0 w-2 bg-[#34A853]"></div>
 
@@ -1083,7 +1083,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 </div>
 
                 {/* Footer */}
-                <div className="shrink-0 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-800 dark:via-gray-800 dark:to-gray-800 border-t border-indigo-100 dark:border-gray-700 py-[0.1rem] px-4 md:pl-12 md:pr-8 flex justify-between items-center w-full z-30 shadow-[0_-2px_10px_rgba(0,0,0,0.02)] relative">
+                <div className="shrink-0 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-800 dark:via-gray-800 dark:to-gray-800 border-t border-indigo-100 dark:border-gray-700 py-[0.1rem] px-4 md:pl-12 md:pr-8 flex justify-between items-center w-full z-30 shadow-[0_-2px_10px_rgba(0,0,0,0.02)] relative transition-colors duration-500">
                     <div className="flex items-center text-indigo-900/70 dark:text-gray-400 font-semibold text-sm md:text-lg">
                         © DeshExam
                     </div>
@@ -1533,10 +1533,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                         }
                     ` }} />
 
-                    {/* Close Button */}
-                    <button onClick={closePresentation} className="absolute top-4 right-6 z-50 p-2.5 bg-gray-100/80 hover:bg-gray-200 rounded-full text-gray-600 backdrop-blur-sm transition-all hover:scale-110">
-                        <X className="w-6 h-6" />
-                    </button>
+
                 </div>
 
                 {/* Right Ad Banner (160x600) */}
