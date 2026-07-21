@@ -233,6 +233,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         setCurrentSlide(0);
         setStep(mode === 'read' ? 2 : 0);
         setSelectedOption(null);
+        setTimerSeconds(0);
         document.body.style.overflow = 'hidden';
     };
 
@@ -247,6 +248,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 setCurrentSlide(currentSlide + 1);
                 setStep(2);
                 setSelectedOption(null);
+                setTimerSeconds(0);
             }
         } else {
             if (step < 2) {
@@ -255,6 +257,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 setCurrentSlide(currentSlide + 1);
                 setStep(0);
                 setSelectedOption(null);
+                setTimerSeconds(0);
             }
         }
     }, [step, currentSlide, questions.length, mode]);
@@ -265,6 +268,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 setCurrentSlide(currentSlide - 1);
                 setStep(2);
                 setSelectedOption(null);
+                setTimerSeconds(0);
             }
         } else {
             if (step > 0) {
@@ -273,6 +277,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 setCurrentSlide(currentSlide - 1);
                 setStep(2);
                 setSelectedOption(null);
+                setTimerSeconds(0);
             }
         }
     }, [step, currentSlide, mode]);
@@ -284,10 +289,6 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
             setStep(0);
         }
     }, [mode]);
-
-    useEffect(() => {
-        setTimerSeconds(0);
-    }, [currentSlide]);
 
     useEffect(() => {
         if (!isOpen || !isTimerEnabled || step >= 1) return;
@@ -773,6 +774,14 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     </div>
 
                     <div className="flex items-center gap-4 md:gap-8">
+                        {/* Pen Toggle Button */}
+                        <button
+                            onClick={() => setIsPenActive(!isPenActive)}
+                            className={`p-3 rounded-full transition-all shadow-sm ${isPenActive ? 'bg-red-500 text-white ring-2 ring-red-300' : 'bg-white/60 hover:bg-white text-indigo-600'}`}
+                            title="Toggle Pen Tool (Shift+D)"
+                        >
+                            <Pen className="w-6 h-6" />
+                        </button>
 
                         {/* Settings Dropdown */}
                         <div className="relative">
