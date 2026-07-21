@@ -20,19 +20,24 @@ export function AssessmentCard({ assessment, type, href }: AssessmentCardProps) 
   // Determine Type Colors & Icons
   let typeColor = 'bg-green-100 text-green-700';
   let Icon = HelpCircle;
+  let btnColor = 'from-blue-600 to-violet-600 hover:from-blue-700 hover:to-violet-700 shadow-blue-600/25';
 
   if (type === 'Practice') {
     typeColor = 'bg-[#00a651]/10 text-[#00a651] border-[#00a651]/20 dark:bg-[#00a651]/20 dark:border-[#00a651]/30';
     Icon = FileText;
+    btnColor = 'from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 shadow-emerald-500/25';
   } else if (type === 'Quiz') {
     typeColor = 'bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-800';
     Icon = Trophy;
+    btnColor = 'from-purple-500 to-fuchsia-600 hover:from-purple-600 hover:to-fuchsia-700 shadow-purple-500/25';
   } else if (type === 'Mock Test') {
     typeColor = 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800';
     Icon = FileText;
+    btnColor = 'from-blue-600 to-violet-600 hover:from-blue-700 hover:to-violet-700 shadow-blue-600/25';
   } else if (type === 'Exam') {
     typeColor = 'bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-900/30 dark:text-orange-400 dark:border-orange-800';
     Icon = Trophy;
+    btnColor = 'from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 shadow-orange-500/25';
   }
 
   // Difficulty Colors
@@ -122,7 +127,7 @@ export function AssessmentCard({ assessment, type, href }: AssessmentCardProps) 
       </CardContent>
 
       <CardFooter className="pt-0 flex-none">
-        <Button asChild className="w-full bg-gradient-to-r from-slate-800 to-slate-900 dark:from-slate-700 dark:to-slate-800 text-white transition-all duration-500 group-hover:from-blue-600 group-hover:to-violet-600 group-hover:shadow-lg group-hover:shadow-blue-600/25 border border-slate-700 dark:border-slate-600 group-hover:border-transparent font-bold">
+        <Button asChild className={`w-full bg-gradient-to-r text-white transition-all duration-500 hover:shadow-lg border-transparent font-bold ${btnColor}`}>
           <Link href={href}>
             Start {type} <ArrowRight className="w-4 h-4 ml-2" />
           </Link>

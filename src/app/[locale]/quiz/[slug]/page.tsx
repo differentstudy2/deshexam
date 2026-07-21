@@ -115,7 +115,7 @@ export default async function QuizLandingPage({ params }: Props) {
   if (!test || test.status !== 'Published') notFound();
 
   const allTests = await getAssessments('quizzes') as MockTest[];
-  const related = allTests.filter(a => a.id !== test.id && a.status === 'Published').slice(0, 3);
+  const related = allTests.filter(a => a.id !== test.id && a.status === 'Published').slice(0, 4);
 
   let boardName = '';
   let className = '';
@@ -556,7 +556,7 @@ ${test.negativeMarking && test.negativeMarking > 0 ? `* প্রতিটি �
                   View All <ChevronRight className="w-4 h-4" />
                 </Link>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
                 {related.map(r => (
                   <AssessmentCard key={r.id} assessment={r} type="Quiz" href={`/quiz/${r.slug}`} />
                 ))}
