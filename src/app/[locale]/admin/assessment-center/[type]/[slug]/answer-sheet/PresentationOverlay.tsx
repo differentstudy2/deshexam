@@ -1066,7 +1066,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     </div>
 
                     {/* Options */}
-                    <div className={optionsLayout === 'grid' ? "grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 w-full max-w-6xl mt-8 md:mt-12" : "flex flex-col gap-y-6 w-[90%] md:w-fit md:min-w-[500px] max-w-5xl mt-8 md:mt-12 mx-auto"}>
+                    <div className={optionsLayout === 'grid' ? "grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 w-full max-w-6xl mt-12 md:mt-16" : "flex flex-col gap-y-6 w-[90%] md:w-fit md:min-w-[500px] max-w-5xl mt-12 md:mt-16 mx-auto"}>
                         {q.options && [
                             { key: 'a', text: q.options.a },
                             { key: 'b', text: q.options.b },
