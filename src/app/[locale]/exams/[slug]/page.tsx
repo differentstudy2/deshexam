@@ -9,6 +9,7 @@ import { HelpCircle, ShieldCheck, PlayCircle, FileDown, BookOpen, ExternalLink, 
 import Link from 'next/link';
 import { AssessmentCard } from '@/components/assessment/AssessmentCard';
 import { UserAttemptsDisplay } from '@/components/assessment/UserAttemptsDisplay';
+import { TopScorersWidget } from '@/components/assessment/TopScorersWidget';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -141,6 +142,10 @@ export default async function ExamPaperLandingPage({ params }: Props) {
                     Online interactive version coming soon. Download PDFs above.
                   </div>
                 )}
+
+                <div className="mt-6">
+                  <TopScorersWidget assessmentId={test.id} />
+                </div>
               </div>
             </div>
           </div>

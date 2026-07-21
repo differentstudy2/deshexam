@@ -16,6 +16,7 @@ import { AssessmentCard } from '@/components/assessment/AssessmentCard';
 import { StartTestButton } from '@/components/assessment/StartTestButton';
 import { MockTestReviews } from '@/components/assessment/MockTestReviews';
 import { UserAttemptsDisplay } from '@/components/assessment/UserAttemptsDisplay';
+import { TopScorersWidget } from '@/components/assessment/TopScorersWidget';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -536,6 +537,10 @@ ${test.negativeMarking && test.negativeMarking > 0 ? `* প্রতিটি �
                 {test.accessType !== 'subscription' && test.accessType !== 'both' && test.accessType !== 'one_time' && (
                   <p className="text-center text-[11px] text-slate-400">Free · No sign-up required to start</p>
                 )}
+                
+                <div className="mt-6">
+                  <TopScorersWidget assessmentId={test.id} />
+                </div>
               </div>
             </div>
           </div>

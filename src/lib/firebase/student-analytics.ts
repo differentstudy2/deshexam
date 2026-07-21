@@ -134,6 +134,32 @@ export async function getUserExamAttempts(userId: string, assessmentId: string) 
   return results.sort((a: any, b: any) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
 }
 
+export async function getTopScorersForAssessment(assessmentId: string, limitCount = 5) {
+  const q = query(
+    collection(db, EXAM_ATTEMPTS_COLLECTION),
+    where('assessmentId', '==', assessmentId)
+  );
+  const snap = await getDocs(q);
+  const results = snap.docs.map(doc => doc.data() as any);
+  
+  // Group by unique user and find their max score
+  const topScoresMap = new Map<string, any>();
+  results.forEach(attempt => {
+    const uid = attempt.userId;
+    if (!uid) return;
+    const currentScore = attempt.scoreData?.score || 0;
+    const existing = topScoresMap.get(uid);
+    if (!existing || currentScore > (existing.scoreData?.score || 0)) {
+      topScoresMap.set(uid, attempt);
+    }
+  });
+
+  const uniqueTopAttempts = Array.from(topScoresMap.values());
+  uniqueTopAttempts.sort((a, b) => (b.scoreData?.score || 0) - (a.scoreData?.score || 0));
+  
+  return uniqueTopAttempts.slice(0, limitCount);
+}
+
 // ----------------------------------------------------
 // Leaderboard & Daily Challenges
 // ----------------------------------------------------

@@ -46,3 +46,14 @@ export const serializeTimestamps = (data: any): any => {
   }
   return data;
 };
+
+export function getGrade(percentage: number): { grade: string; color: string } {
+  if (percentage >= 90) return { grade: 'A+', color: 'text-emerald-500 dark:text-emerald-400' };
+  if (percentage >= 80) return { grade: 'A', color: 'text-emerald-500 dark:text-emerald-400' };
+  if (percentage >= 70) return { grade: 'B+', color: 'text-blue-500 dark:text-blue-400' };
+  if (percentage >= 60) return { grade: 'B', color: 'text-blue-500 dark:text-blue-400' };
+  if (percentage >= 50) return { grade: 'C+', color: 'text-amber-500 dark:text-amber-400' };
+  if (percentage >= 40) return { grade: 'C', color: 'text-amber-500 dark:text-amber-400' };
+  if (percentage >= 33) return { grade: 'D', color: 'text-orange-500 dark:text-orange-400' };
+  return { grade: 'F', color: 'text-red-500 dark:text-red-400' };
+}
