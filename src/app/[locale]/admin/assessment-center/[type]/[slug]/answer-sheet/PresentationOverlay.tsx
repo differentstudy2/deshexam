@@ -318,8 +318,31 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                  </div>
             </div>
 
+            {/* Dynamic Responsive Font Styles */}
+            <style dangerouslySetInnerHTML={{ __html: `
+                .responsive-fonts {
+                    --q-size: ${20 * qFontScale}px;
+                    --opt-size: ${16 * optFontScale}px;
+                    --exp-size: ${15 * expFontScale}px;
+                }
+                @media (min-width: 768px) {
+                    .responsive-fonts {
+                        --q-size: ${28 * qFontScale}px;
+                        --opt-size: ${20 * optFontScale}px;
+                        --exp-size: ${18 * expFontScale}px;
+                    }
+                }
+                @media (min-width: 1024px) {
+                    .responsive-fonts {
+                        --q-size: ${38 * qFontScale}px;
+                        --opt-size: ${30 * optFontScale}px;
+                        --exp-size: ${24 * expFontScale}px;
+                    }
+                }
+            ` }} />
+
             {/* Main Presentation Area */}
-            <div className="relative w-full h-full md:max-w-[177.78vh] md:max-h-[56.25vw] bg-gradient-to-br from-[#f8fafc] via-[#f1f5f9] to-[#f8fafc] flex flex-col shadow-2xl overflow-hidden shrink-0 z-10">
+            <div className="responsive-fonts relative w-full h-full lg:max-w-[177.78vh] lg:max-h-[56.25vw] bg-gradient-to-br from-[#f8fafc] via-[#f1f5f9] to-[#f8fafc] flex flex-col shadow-2xl overflow-hidden shrink-0 z-10">
 
                 {/* Background Decorations */}
                 <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
@@ -424,7 +447,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     )}
 
                     {/* Question */}
-                    <div className="flex items-start gap-3 md:gap-4 w-full max-w-5xl mt-8 md:mt-4" style={{ '--q-size': `clamp(18px, ${5 * qFontScale}vw + 0.5rem, ${38 * qFontScale}px)` } as React.CSSProperties}>
+                    <div className="flex items-start gap-3 md:gap-4 w-full max-w-5xl mt-8 md:mt-4">
                         <span className="text-black font-extrabold leading-normal shrink-0" style={{ fontSize: 'var(--q-size)' }}>Q{currentSlide + 1}.</span>
                         <div className="prose prose-black max-w-none prose-p:font-extrabold text-[length:var(--q-size)] leading-normal text-left text-black font-extrabold [&_*]:!text-[length:var(--q-size)] [&_*]:!leading-normal [&_*]:!m-0 capitalize">
                             <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
@@ -482,13 +505,14 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     // letterClasses keeps its default theme color
                                 }
                             }
-
                             return (
                                 <div
                                     key={opt.key}
-                                    className={containerClasses}
-                                    style={{ '--opt-size': `clamp(14px, ${4 * optFontScale}vw + 0.5rem, ${32 * optFontScale}px)` } as React.CSSProperties}
-                                    onClick={() => {
+                                    className="flex flex-col gap-2 w-full"
+                                >
+                                    <div
+                                        className={containerClasses}
+                                        onClick={() => {
                                         if (step === 0) {
                                             setSelectedOption(opt.key);
                                             setStep(1);
@@ -514,12 +538,13 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                             <X className="w-7 h-7 stroke-[3]" />
                                         </div>
                                     )}
+                                    </div>
                                     
                                     {/* Option Explanation */}
                                     {step >= 2 && isOptionExpEnabled && q.optionExplanations?.[opt.key] && (
                                         <div 
                                             className="ml-4 mt-2 pl-4 pr-4 py-2 text-gray-700 bg-gray-50/90 rounded-xl border-l-4 border-l-[#4285F4] shadow-sm animate-in fade-in duration-500 prose max-w-none [&>p]:m-0"
-                                            style={{ fontSize: `clamp(13px, ${3 * expFontScale}vw + 0.3rem, ${20 * expFontScale}px)` }}
+                                            style={{ fontSize: 'var(--exp-size)' }}
                                         >
                                             <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
                                                 {q.optionExplanations[opt.key]}
@@ -544,7 +569,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 </div>
                                 <div 
                                     className="prose prose-xl max-w-none text-gray-800 pl-4 font-medium"
-                                    style={{ fontSize: `clamp(15px, ${4 * expFontScale}vw + 0.4rem, ${24 * expFontScale}px)` }}
+                                    style={{ fontSize: 'var(--exp-size)' }}
                                 >
                                     <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
                                         {q.explanation}
