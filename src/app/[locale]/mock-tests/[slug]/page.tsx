@@ -294,24 +294,33 @@ export default async function MockTestLandingPage({ params }: Props) {
 
               {/* Right: CTA card (desktop — floats into content below) */}
               <div className="hidden lg:block w-80 shrink-0 -mb-16 relative z-10 group">
-                <div className="bg-white dark:bg-slate-900 rounded-lg shadow-2xl shadow-black/30 border border-slate-200/50 dark:border-slate-800/50 overflow-hidden transition-all duration-500 hover:shadow-violet-500/10 hover:-translate-y-1">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl shadow-indigo-500/10 dark:shadow-black/40 border border-slate-200/60 dark:border-slate-700/50 overflow-hidden transition-all duration-500 hover:shadow-indigo-500/20 hover:-translate-y-1.5 ring-1 ring-black/5 dark:ring-white/5">
                   {/* Card header */}
-                  <div className="bg-gradient-to-br from-violet-600 via-purple-600 to-blue-600 p-6 relative overflow-hidden">
+                  <div className="bg-gradient-to-br from-indigo-600 via-violet-600 to-purple-700 p-6 relative overflow-hidden">
+                    {/* Background decorations */}
+                    <div className="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+                    <div className="absolute bottom-0 left-0 -mb-8 -ml-8 w-32 h-32 bg-fuchsia-400/20 rounded-full blur-2xl pointer-events-none"></div>
+                    
                     {/* Header shine effect */}
                     <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out"></div>
-                    <div className="relative flex items-center gap-3 mb-2">
-                      <div className="w-10 h-10 rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-inner">
-                        <Brain className="w-5 h-5 text-white" />
+                    
+                    <div className="relative flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-white/10 border border-white/20 backdrop-blur-md flex items-center justify-center shadow-lg shrink-0">
+                        <Brain className="w-6 h-6 text-white drop-shadow-sm" />
                       </div>
-                      <div>
-                        <p className="text-xs text-blue-100 font-bold tracking-wider uppercase">Start Now</p>
-                        <h3 className="text-lg font-extrabold text-white leading-tight drop-shadow-sm line-clamp-2">{test.title}</h3>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[10px] text-indigo-100 font-extrabold tracking-widest uppercase mb-1 flex items-center gap-1.5">
+                          <Sparkles className="w-3 h-3 text-amber-300" /> Start Now
+                        </p>
+                        <h3 className="text-lg font-black text-white leading-[1.2] drop-shadow-md line-clamp-2" title={test.title}>
+                          {test.title}
+                        </h3>
                       </div>
                     </div>
                   </div>
 
                   {/* Card body */}
-                  <div className="p-5 space-y-3">
+                  <div className="px-6 py-5 space-y-3.5">
                     {[
                       { icon: HelpCircle, label: 'Questions', value: `${test.questionIds?.length ?? 0}`, show: true },
                       { icon: Clock, label: 'Duration', value: `${test.durationMin ?? 0} min`, show: true },
@@ -320,19 +329,23 @@ export default async function MockTestLandingPage({ params }: Props) {
                       { icon: AlertTriangle, label: 'Negative Marks', value: `${test.negativeMarking ?? 0}`, show: !!test.negativeMarking && test.negativeMarking > 0 },
                     ].filter(item => item.show !== false).map(({ icon: Icon, label, value }) => (
                       <div key={label} className="flex items-center justify-between text-sm">
-                        <span className="flex items-center gap-2 text-slate-500 dark:text-slate-400 font-medium">
-                          <Icon className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
+                        <span className="flex items-center gap-2.5 text-slate-500 dark:text-slate-400 font-medium">
+                          <Icon className="w-4 h-4 text-slate-400 dark:text-slate-500" />
                           {label}
                         </span>
                         <span className="font-bold text-slate-800 dark:text-slate-100">{value}</span>
                       </div>
                     ))}
+                  </div>
 
-                    <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
-                      <StartTestButton slug={test.slug} accessType={test.accessType} price={test.price} allowedSubscriptionPlans={test.allowedSubscriptionPlans} testType="mock-test" />
+                  {/* Card Footer */}
+                  <div className="px-6 pb-6 pt-4 bg-slate-50/50 dark:bg-slate-800/20 border-t border-slate-100/80 dark:border-slate-800/80">
+                    <StartTestButton slug={test.slug} accessType={test.accessType} price={test.price} allowedSubscriptionPlans={test.allowedSubscriptionPlans} testType="mock-test" />
+                    
+                    <div className="mt-4 flex items-center justify-center gap-1.5 text-center text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                      <Lock className="w-3 h-3" />
+                      <p>Strictly timed · Negative marking applies</p>
                     </div>
-
-                    <p className="text-center text-[11px] text-slate-400">Strictly timed · Negative marking applies</p>
                   </div>
                 </div>
               </div>
