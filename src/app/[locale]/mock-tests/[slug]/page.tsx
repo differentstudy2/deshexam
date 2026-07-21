@@ -430,9 +430,11 @@ ${test.negativeMarking && test.negativeMarking > 0 ? `* প্রতিটি �
 
               {/* What to expect */}
               <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-colors duration-300">
-                <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
-                  <Star className="w-5 h-5 text-amber-500" />
-                  <h2 className="text-base font-bold text-slate-800 dark:text-slate-100">
+                <div className="flex items-center gap-3 px-6 py-4 border-b border-amber-100/50 dark:border-amber-900/20 bg-gradient-to-r from-amber-50/50 to-orange-50/50 dark:from-amber-900/10 dark:to-orange-900/10">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-md shadow-amber-500/20">
+                    <Star className="w-4 h-4 text-white" />
+                  </div>
+                  <h2 className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-amber-600 to-orange-600 dark:from-amber-400 dark:to-orange-400">
                     {test.language === 'Bengali' ? 'কী আশা করবেন' : test.language === 'Hindi' ? 'क्या उम्मीद करें' : 'What to Expect'}
                   </h2>
                 </div>
@@ -518,14 +520,24 @@ ${test.negativeMarking && test.negativeMarking > 0 ? `* প্রতিটি �
                     },
                   ].filter(item => item.show !== false).map(({ icon: IconComponent, title, desc }, index) => {
                     const Icon = IconComponent as any;
+                    const gradients = [
+                      "from-blue-500 to-indigo-500 shadow-blue-500/20",
+                      "from-emerald-400 to-teal-500 shadow-emerald-500/20",
+                      "from-violet-500 to-purple-500 shadow-violet-500/20",
+                      "from-pink-500 to-rose-500 shadow-pink-500/20",
+                      "from-amber-400 to-orange-500 shadow-amber-500/20",
+                      "from-cyan-400 to-blue-500 shadow-cyan-500/20"
+                    ];
+                    const colorClass = gradients[index % gradients.length];
+
                     return (
-                    <div key={index} className="flex items-start gap-3">
-                      <div className="w-9 h-9 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
-                        <Icon className="w-4.5 h-4.5 text-slate-600 dark:text-slate-400" />
+                    <div key={index} className="flex items-start gap-3.5 group p-2 hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-xl transition-colors">
+                      <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${colorClass} flex items-center justify-center shadow-md shrink-0 transition-transform group-hover:scale-110 duration-300`}>
+                        <Icon className="w-5 h-5 text-white" />
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{title}</p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">{desc}</p>
+                        <p className="text-sm font-bold text-slate-800 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{title}</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">{desc}</p>
                       </div>
                     </div>
                   )})}
