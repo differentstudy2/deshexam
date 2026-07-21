@@ -8,7 +8,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
 import 'katex/dist/katex.min.css';
-import { X, ChevronLeft, ChevronRight, Play, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize, LayoutGrid, Sun, Moon, Eraser, Square, Circle, ArrowUpRight, Type, Presentation, ZoomIn } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Play, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize, LayoutGrid, Sun, Moon, Eraser, Square, Circle, ArrowUpRight, Type, Presentation, ZoomIn, Volume2, VolumeX } from 'lucide-react';
 
 const bnOptionsMap: Record<string, string> = {
     a: 'ক',
@@ -88,6 +88,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [drawingTool, setDrawingTool] = useState<'pen' | 'highlighter' | 'laser' | 'eraser' | 'rectangle' | 'circle' | 'arrow' | 'text' | 'magnifier'>('pen');
     const [isMagnified, setIsMagnified] = useState(false);
     const [magnifierPos, setMagnifierPos] = useState({ x: 50, y: 50 });
+    const [isSpeaking, setIsSpeaking] = useState(false);
     const [isWhiteboardMode, setIsWhiteboardMode] = useState(false);
     const [textInput, setTextInput] = useState<{ x: number, y: number, text: string } | null>(null);
     const textInputRef = useRef<HTMLTextAreaElement>(null);
@@ -476,6 +477,52 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         setIsDraggingTimer(false);
         (e.target as HTMLElement).releasePointerCapture(e.pointerId);
     };
+
+    useEffect(() => {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            setIsSpeaking(false);
+        }
+    }, [currentSlide, isOpen]);
+
+    const handleReadAloud = () => {
+        if (!('speechSynthesis' in window)) return;
+        
+        if (isSpeaking) {
+            window.speechSynthesis.cancel();
+            setIsSpeaking(false);
+            return;
+        }
+
+        const q = questions[currentSlide];
+        if (!q) return;
+
+        // Clean up markdown before reading
+        const cleanMarkdown = (text: string) => text.replace(/[*_#]/g, '').replace(/\[(.*?)\]\(.*?\)/g, '$1');
+
+        let textToRead = cleanMarkdown(q.questionText) + '. ';
+        
+        if (q.options) {
+            textToRead += 'Options are: ';
+            const optionKeys = ['a', 'b', 'c', 'd', 'e'].filter(k => q.options && q.options[k as keyof typeof q.options]);
+            optionKeys.forEach((key) => {
+                const optText = q.options![key as keyof typeof q.options];
+                if (optText) {
+                    textToRead += `Option ${bnOptionsMap[key] || key.toUpperCase()}: ${cleanMarkdown(optText)}. `;
+                }
+            });
+        }
+
+        const utterance = new SpeechSynthesisUtterance(textToRead);
+        utterance.lang = q.language === 'Bangla' ? 'bn-BD' : 'en-US';
+        
+        utterance.onend = () => setIsSpeaking(false);
+        utterance.onerror = () => setIsSpeaking(false);
+        
+        window.speechSynthesis.speak(utterance);
+        setIsSpeaking(true);
+    };
+
     const openPresentation = () => {
         setIsOpen(true);
         setCurrentSlide(0);
@@ -988,6 +1035,20 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                         </div>
                     )}
 
+                    {/* Read Aloud Button (Floating next to timer) */}
+                    <button 
+                        onClick={handleReadAloud}
+                        className={`absolute top-6 ${isTimerEnabled ? 'right-[210px]' : 'right-10'} z-50 p-2.5 rounded-2xl backdrop-blur-xl border transition-all duration-300 flex items-center justify-center ${
+                            isSpeaking 
+                                ? 'bg-blue-100/90 border-blue-300 text-blue-600 shadow-[0_8px_32px_rgba(59,130,246,0.15)] ring-1 ring-blue-300 dark:bg-blue-900/50 dark:text-blue-400' 
+                                : 'bg-white/95 dark:bg-gray-800/95 border-blue-200/60 dark:border-blue-900/60 text-[#1e3a8a] dark:text-blue-100 shadow-[0_8px_32px_rgba(59,130,246,0.15)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:scale-[1.02]'
+                        }`}
+                        title={isSpeaking ? "Stop Reading" : "Read Aloud"}
+                        style={{ transform: isTimerEnabled ? `translate(${timerPos.x}px, ${timerPos.y}px)` : 'none' }}
+                    >
+                        {isSpeaking ? <VolumeX className="w-7 h-7" /> : <Volume2 className="w-7 h-7" />}
+                    </button>
+
                     {/* Zoomable Content Wrapper */}
                     <div 
                         className="w-full flex flex-col items-center flex-1 transition-transform duration-100 ease-out" 
@@ -1005,7 +1066,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     </div>
 
                     {/* Options */}
-                    <div className={optionsLayout === 'grid' ? "grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 w-full max-w-6xl mt-2" : "flex flex-col gap-y-4 w-[90%] md:w-fit md:min-w-[500px] max-w-5xl mt-2 mx-auto"}>
+                    <div className={optionsLayout === 'grid' ? "grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 w-full max-w-6xl mt-8 md:mt-12" : "flex flex-col gap-y-6 w-[90%] md:w-fit md:min-w-[500px] max-w-5xl mt-8 md:mt-12 mx-auto"}>
                         {q.options && [
                             { key: 'a', text: q.options.a },
                             { key: 'b', text: q.options.b },
