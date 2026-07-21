@@ -21,6 +21,29 @@ const bnOptionsMap: Record<string, string> = {
 const remarkPluginsList = [remarkGfm, remarkMath];
 const rehypePluginsList = [rehypeKatex, rehypeRaw];
 
+const WATERMARK_POSITIONS = [
+    { top: '15%', left: '15%', sizeScale: 1, rot: -15, opacScale: 0.7 },
+    { top: '25%', left: '85%', sizeScale: 1.15, rot: -8, opacScale: 0.8 },
+    { top: '50%', left: '50%', sizeScale: 1.3, rot: -10, opacScale: 0.9 },
+    { top: '75%', left: '20%', sizeScale: 1, rot: -5, opacScale: 1.0 },
+    { top: '85%', left: '80%', sizeScale: 1.2, rot: -12, opacScale: 0.6 },
+    { top: '10%', left: '60%', sizeScale: 0.9, rot: 5, opacScale: 0.5 },
+    { top: '90%', left: '40%', sizeScale: 0.8, rot: 15, opacScale: 0.5 },
+    { top: '35%', left: '30%', sizeScale: 1.05, rot: 10, opacScale: 0.7 },
+    { top: '65%', left: '70%', sizeScale: 1.1, rot: -18, opacScale: 0.65 },
+    { top: '5%', left: '35%', sizeScale: 0.85, rot: -20, opacScale: 0.4 },
+    { top: '45%', left: '80%', sizeScale: 1.2, rot: 8, opacScale: 0.75 },
+    { top: '80%', left: '55%', sizeScale: 1.1, rot: -3, opacScale: 0.85 },
+    { top: '20%', left: '45%', sizeScale: 1.0, rot: 12, opacScale: 0.6 },
+    { top: '55%', left: '25%', sizeScale: 1.15, rot: -14, opacScale: 0.8 },
+    { top: '95%', left: '75%', sizeScale: 0.95, rot: 7, opacScale: 0.55 },
+    { top: '40%', left: '10%', sizeScale: 1.25, rot: -6, opacScale: 0.95 },
+    { top: '70%', left: '90%', sizeScale: 0.9, rot: 20, opacScale: 0.45 },
+    { top: '30%', left: '55%', sizeScale: 1.1, rot: -11, opacScale: 0.7 },
+    { top: '60%', left: '15%', sizeScale: 1.05, rot: 16, opacScale: 0.65 },
+    { top: '15%', left: '95%', sizeScale: 0.8, rot: -22, opacScale: 0.35 }
+];
+
 interface PresentationOverlayProps {
     questions: any[];
     classLine: string;
@@ -42,7 +65,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [isTimerEnabled, setIsTimerEnabled] = useState(true);
     const [timerSeconds, setTimerSeconds] = useState(0);
     const [wmOpacity, setWmOpacity] = useState(40);
-    const [wmSize, setWmSize] = useState(70);
+    const [wmSize, setWmSize] = useState(50);
+    const [wmCount, setWmCount] = useState(7);
     const [wmVisible, setWmVisible] = useState(true);
     const [optionsLayout, setOptionsLayout] = useState<'grid' | 'list'>('grid');
     const [isFullscreen, setIsFullscreen] = useState(false);
@@ -63,6 +87,13 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     // Drawing Tool State
     const [drawingTool, setDrawingTool] = useState<'pen' | 'highlighter' | 'laser'>('pen');
     const cursorRef = useRef<HTMLDivElement>(null);
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+    const handleCanvasWheel = (e: React.WheelEvent<HTMLCanvasElement>) => {
+        if (scrollContainerRef.current) {
+            scrollContainerRef.current.scrollTop += e.deltaY;
+        }
+    };
     
     // Spotlight State
     const [isSpotlightActive, setIsSpotlightActive] = useState(false);
@@ -333,7 +364,12 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 setTimerSeconds(0);
             }
         } else {
-            if (step < 2) {
+            const currentQ = questions[currentSlide];
+            const hasExp = isExpEnabled && currentQ?.explanation;
+            const hasOptExp = isOptionExpEnabled && currentQ?.optionExplanations && Object.keys(currentQ.optionExplanations).length > 0;
+            const maxStep = (hasExp || hasOptExp) ? 2 : 1;
+
+            if (step < maxStep) {
                 setStep(step + 1);
             } else if (currentSlide < questions.length - 1) {
                 setCurrentSlide(currentSlide + 1);
@@ -342,7 +378,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 setTimerSeconds(0);
             }
         }
-    }, [step, currentSlide, questions.length, mode]);
+    }, [step, currentSlide, questions, mode, isExpEnabled, isOptionExpEnabled]);
 
     const prevStep = useCallback(() => {
         if (mode === 'read') {
@@ -473,6 +509,14 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 setOptFontScale(s => Math.min(2.0, s + 0.1));
                 return;
             }
+            if (e.key === '[') {
+                setExpFontScale(s => Math.max(0.6, s - 0.1));
+                return;
+            }
+            if (e.key === ']') {
+                setExpFontScale(s => Math.min(2.0, s + 0.1));
+                return;
+            }
 
             if (e.key.toLowerCase() === 'l') {
                 setOptionsLayout('list');
@@ -527,7 +571,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     if (typeof window === 'undefined') return null;
 
     return createPortal(
-        <div className={`fixed inset-0 z-[99999] flex items-center justify-center select-none font-sans overflow-hidden ${isDarkMode ? 'dark bg-gray-900' : 'bg-[#f8fbff]'}`}>
+        <div className={`fixed inset-0 z-[99999] flex items-center justify-center xl:gap-[0.1rem] xl:p-[0.1rem] select-none font-sans overflow-hidden ${isDarkMode ? 'dark bg-gray-900' : 'bg-[#f8fbff]'}`}>
             <style>{`
                 @keyframes popIn {
                     0% { transform: scale(1); box-shadow: 0 0 0 rgba(52,168,83,0); }
@@ -539,96 +583,62 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 }
             `}</style>
             
-            {/* Left Banner Area */}
-            <div className="hidden lg:flex flex-1 h-full flex-col items-center justify-between bg-gradient-to-b from-[#0a192f] via-[#0b2244] to-[#041128] relative z-0 overflow-hidden font-sans shadow-[inset_-10px_0_20px_rgba(0,0,0,0.3)] border-r border-[#1a3f7c]">
-                 
-                 {/* Floating Elements Background */}
-                 <div className="absolute top-[5%] left-[25%] w-20 h-20 rounded-full border border-blue-400/20 bg-blue-500/10 blur-[8px]"></div>
-                 <div className="absolute top-[20%] right-[15%] w-10 h-10 rounded-full border border-yellow-300/30 bg-transparent blur-[2px]"></div>
-                 <div className="absolute top-[45%] left-[-10%] w-40 h-40 rounded-full bg-blue-600/10 blur-[50px]"></div>
-                 <div className="absolute bottom-[30%] right-[-5%] w-32 h-32 rounded-full bg-blue-400/10 blur-[40px]"></div>
-                 
-                 {/* Top Logo */}
-                 <div className="flex flex-col items-center justify-center w-full px-4 pt-10 xl:pt-12 z-10">
-                      <div className="flex items-center justify-center mb-8">
-                          <div className="bg-white/5 p-[clamp(0.5rem,0.8vw,1rem)] rounded-xl xl:rounded-2xl shadow-lg border border-white/10 backdrop-blur-sm">
-                              <img src="/image/logo.png" alt="DeshExam Academy" className="h-[clamp(2.5rem,4vw,5rem)] w-auto object-contain grayscale invert mix-blend-screen opacity-90 hover:opacity-100 transition-opacity duration-500" />
+            {/* Left Ad Banner (120x600) */}
+            <div className="hidden xl:flex w-[120px] h-[600px] shrink-0 flex-col items-center justify-between bg-gradient-to-b from-[#0a192f] via-[#0b2244] to-[#041128] rounded-xl overflow-hidden shadow-2xl border border-blue-400/20 relative z-10 p-3">
+                     {/* Floating Elements Background */}
+                     <div className="absolute top-[5%] left-[25%] w-16 h-16 rounded-full border border-blue-400/20 bg-blue-500/10 blur-[8px]"></div>
+                     <div className="absolute bottom-[30%] right-[-5%] w-20 h-20 rounded-full bg-blue-400/10 blur-[20px]"></div>
+                     
+                     {/* Top Logo */}
+                     <div className="flex flex-col items-center w-full z-10 pt-2">
+                          <div className="bg-white/10 p-2 rounded-lg shadow-lg border border-white/10 backdrop-blur-sm mb-3">
+                              <img src="/image/logo.png" alt="DeshExam" className="w-12 h-auto object-contain grayscale invert mix-blend-screen opacity-90 hover:opacity-100 transition-opacity" />
                           </div>
-                      </div>
-                      
-                      {/* Text Section */}
-                      <div className="text-center tracking-wide mt-2 px-2">
-                          <h3 className="text-[clamp(1.125rem,1.5vw,2rem)] text-blue-100 mb-1.5 leading-relaxed drop-shadow-sm font-medium">সঠিক প্রস্তুতি,</h3>
-                          <h3 className="text-[clamp(1.5rem,2.2vw,3rem)] text-white leading-snug drop-shadow-md font-extrabold">
-                              <span className="text-[#FFD700]">সফলতার</span> চাবিকাঠি!
-                          </h3>
-                      </div>
-                 </div>
-
-                 {/* Middle Illustration Placeholder */}
-                 <div className="flex items-center justify-center text-[clamp(4.5rem,8vw,12rem)] z-10 w-full drop-shadow-2xl opacity-95 my-4 relative">
-                     <div className="absolute inset-0 bg-blue-400/10 blur-[40px] rounded-full"></div>
-                     🏆
-                 </div>
-
-                 {/* Features List Box */}
-                 <div className="flex flex-col z-10 w-full px-6 xl:px-10 mb-4">
-                      <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-5 xl:p-6 shadow-[0_8px_32px_rgba(0,0,0,0.2)]">
-                          <div className="flex flex-col space-y-3.5 xl:space-y-4">
-                              {[
-                                  'Mock Tests',
-                                  'Chapter-wise Practice',
-                                  'Previous Year Questions',
-                                  'Smart Analytics',
-                                  'AI Performance Report'
-                              ].map((feature, idx) => (
-                                  <div key={idx} className="flex items-center gap-3">
-                                      <svg className="w-5 h-5 xl:w-[22px] xl:h-[22px] text-[#FFB800] shrink-0 drop-shadow-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                                          <polyline points="20 6 9 17 4 12"></polyline>
-                                      </svg>
-                                      <span className="text-gray-100 text-[14px] xl:text-[16px] font-semibold tracking-wide drop-shadow-sm">{feature}</span>
-                                  </div>
-                              ))}
+                          <div className="text-center">
+                              <h3 className="text-[12px] text-blue-100 mb-0.5 leading-tight font-medium">সঠিক প্রস্তুতি</h3>
+                              <h3 className="text-[14px] text-white leading-tight font-extrabold">
+                                  <span className="text-[#FFD700]">সফলতার</span>
+                              </h3>
+                              <h3 className="text-[14px] text-white leading-tight font-extrabold">চাবিকাঠি!</h3>
                           </div>
-                      </div>
-                 </div>
+                     </div>
 
-                 {/* Join Button */}
-                 <div className="w-full px-8 xl:px-12 pb-10 xl:pb-14 z-10">
-                      <button className="w-full flex flex-col items-center justify-center py-3 xl:py-3.5 bg-gradient-to-b from-[#2178ff] to-[#0a4bb8] border border-blue-400/50 rounded-full shadow-[0_8px_20px_rgba(10,75,184,0.4)] hover:from-[#2e82ff] hover:to-[#1155c9] transition-all duration-300 group">
-                          <span className="text-white font-bold text-lg xl:text-[20px] mb-0.5 drop-shadow-md group-hover:scale-105 transition-transform duration-300">Practice Today</span>
-                      </button>
-                      <div className="text-center mt-3">
-                          <span className="text-gray-300/80 text-xs xl:text-[13px] font-medium tracking-wide">Success Starts Here</span>
-                      </div>
-                 </div>
-            </div>
+                     {/* Middle Trophy */}
+                     <div className="flex items-center justify-center text-4xl w-full z-10 drop-shadow-2xl my-2 relative">
+                         <div className="absolute inset-0 bg-blue-400/20 blur-[15px] rounded-full"></div>
+                         🏆
+                     </div>
 
-            {/* Dynamic Responsive Font Styles */}
-            <style dangerouslySetInnerHTML={{ __html: `
-                .responsive-fonts {
-                    --q-size: ${20 * qFontScale}px;
-                    --opt-size: ${16 * optFontScale}px;
-                    --exp-size: ${15 * expFontScale}px;
-                }
-                @media (min-width: 768px) {
-                    .responsive-fonts {
-                        --q-size: ${28 * qFontScale}px;
-                        --opt-size: ${20 * optFontScale}px;
-                        --exp-size: ${18 * expFontScale}px;
-                    }
-                }
-                @media (min-width: 1024px) {
-                    .responsive-fonts {
-                        --q-size: ${38 * qFontScale}px;
-                        --opt-size: ${30 * optFontScale}px;
-                        --exp-size: ${24 * expFontScale}px;
-                    }
-                }
-            ` }} />
+                     {/* Features List */}
+                     <div className="flex flex-col z-10 w-full space-y-2 mb-2">
+                         <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-lg p-2.5">
+                             <div className="flex flex-col space-y-2">
+                                 {[
+                                     'Mock Test',
+                                     'Practice',
+                                     'PYQ',
+                                     'AI Report'
+                                 ].map((feature, idx) => (
+                                     <div key={idx} className="flex items-center gap-1.5">
+                                         <Check className="w-3 h-3 text-[#FFB800] shrink-0" />
+                                         <span className="text-gray-100 text-[10.5px] font-semibold tracking-wide leading-tight">{feature}</span>
+                                     </div>
+                                 ))}
+                             </div>
+                         </div>
+                     </div>
 
-            {/* Main Presentation Area */}
-            <div className="responsive-fonts relative w-full h-full lg:max-w-[177.78vh] lg:max-h-[56.25vw] bg-gradient-to-br from-[#f8fafc] via-[#f1f5f9] to-[#f8fafc] dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex flex-col shadow-2xl overflow-hidden shrink-0 z-10">
+                     {/* CTA Button */}
+                     <div className="w-full z-10 pb-2">
+                          <button className="w-full flex flex-col items-center justify-center py-2 bg-gradient-to-b from-[#2178ff] to-[#0a4bb8] border border-blue-400/50 rounded-lg shadow-[0_4px_10px_rgba(10,75,184,0.4)] hover:scale-105 transition-transform duration-300">
+                              <span className="text-white font-bold text-[12px] drop-shadow-md leading-none mb-1">Practice</span>
+                              <span className="text-white font-bold text-[12px] drop-shadow-md leading-none">Today</span>
+                          </button>
+                     </div>
+                </div>
+                 
+                {/* Main Presentation Area */}
+                <div className="responsive-fonts flex-1 min-w-0 relative w-full h-full xl:max-w-[177.78vh] xl:max-h-[56.25vw] bg-gradient-to-br from-[#f8fafc] via-[#f1f5f9] to-[#f8fafc] dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex flex-col shadow-2xl overflow-hidden shrink-0 z-10 xl:rounded-xl xl:border xl:border-gray-200 dark:border-gray-800">
 
                 {/* Main Drawing Canvas */}
                 <canvas
@@ -649,6 +659,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     onTouchMove={draw}
                     onTouchEnd={stopDrawing}
                     onTouchCancel={stopDrawing}
+                    onWheel={handleCanvasWheel}
                 />
                 
                 {/* Custom Mouse Cursor for Presentation Tools */}
@@ -706,24 +717,21 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 {/* Background Watermarks */}
                 {wmVisible && (
                     <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden select-none">
-                        <div 
-                            className="absolute top-[75%] left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-[8deg] font-black tracking-widest uppercase transition-all duration-300"
-                            style={{ 
-                                fontSize: `${wmSize}px`, 
-                                color: `rgba(229, 231, 235, ${wmOpacity / 100})` 
-                            }}
-                        >
-                            DESHEXAM
-                        </div>
-                        <div 
-                            className="absolute top-[25%] right-[10%] -translate-y-1/2 -rotate-[8deg] font-black tracking-widest uppercase transition-all duration-300"
-                            style={{ 
-                                fontSize: `${wmSize * 1.15}px`, 
-                                color: `rgba(229, 231, 235, ${(wmOpacity * 0.8) / 100})` 
-                            }}
-                        >
-                            DESHEXAM
-                        </div>
+                        {WATERMARK_POSITIONS.slice(0, wmCount).map((wm, i) => (
+                            <div 
+                                key={i}
+                                className="absolute font-black tracking-widest uppercase transition-all duration-300 whitespace-nowrap"
+                                style={{ 
+                                    top: wm.top,
+                                    left: wm.left,
+                                    transform: `translate(-50%, -50%) rotate(${wm.rot}deg)`,
+                                    fontSize: `${wmSize * wm.sizeScale}px`, 
+                                    color: `rgba(229, 231, 235, ${(wmOpacity * wm.opacScale) / 100})` 
+                                }}
+                            >
+                                DESHEXAM
+                            </div>
+                        ))}
                     </div>
                 )}
 
@@ -769,7 +777,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 </div>
 
                 {/* Main Content Area */}
-                <div className="flex-1 w-full relative flex flex-col items-center px-4 md:px-24 py-6 md:py-12 z-10 overflow-y-auto custom-scrollbar gap-8">
+                <div ref={scrollContainerRef} className="flex-1 w-full relative flex flex-col items-center px-4 md:px-24 py-6 md:py-12 z-10 overflow-y-auto custom-scrollbar gap-8">
 
                     {/* Timer */}
                     {isTimerEnabled && (
@@ -899,7 +907,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     {/* Option Explanation */}
                                     {step >= 2 && isOptionExpEnabled && q.optionExplanations?.[opt.key] && (
                                         <div 
-                                            className="ml-4 mt-2 pl-4 pr-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-50/90 dark:bg-gray-800/90 rounded-xl border-l-4 border-l-[#4285F4] shadow-sm animate-in fade-in duration-500 prose dark:prose-invert max-w-none [&>p]:m-0"
+                                            className="ml-4 mt-2 pl-4 pr-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-50/90 dark:bg-gray-800/90 rounded-xl border-l-4 border-l-[#4285F4] shadow-sm animate-in fade-in duration-500 prose dark:prose-invert max-w-none [&>p]:m-0 [&_*]:!text-[length:var(--exp-size)]"
                                             style={{ fontSize: 'var(--exp-size)' }}
                                         >
                                             <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
@@ -924,7 +932,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     Explanation
                                 </div>
                                 <div 
-                                    className="prose prose-xl dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 pl-4 font-medium"
+                                    className="prose prose-xl dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 pl-4 font-medium [&_*]:!text-[length:var(--exp-size)] [&_*]:!leading-relaxed"
                                     style={{ fontSize: 'var(--exp-size)' }}
                                 >
                                     <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
@@ -1125,11 +1133,11 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                 <span className="text-purple-600 bg-purple-50 px-2 rounded text-xs py-0.5">{Math.round(expFontScale * 100)}%</span>
                                             </div>
                                             <div className="flex items-center bg-gray-50 rounded-xl border border-gray-200 w-full overflow-hidden shadow-inner">
-                                                <button onClick={() => setExpFontScale(s => Math.max(0.6, s - 0.1))} className="flex-1 py-2 flex justify-center items-center text-gray-700 hover:bg-gray-200 font-bold border-r border-gray-200 transition-colors">
-                                                    A-
+                                                <button onClick={() => setExpFontScale(s => Math.max(0.6, s - 0.1))} className="flex-1 py-2 flex justify-center items-center gap-2 text-gray-700 hover:bg-gray-200 font-bold border-r border-gray-200 transition-colors">
+                                                    A- <kbd className="text-[10px] bg-white border border-gray-300 px-1.5 py-0.5 rounded text-gray-500 font-mono shadow-sm">[</kbd>
                                                 </button>
-                                                <button onClick={() => setExpFontScale(s => Math.min(2.0, s + 0.1))} className="flex-1 py-2 flex justify-center items-center text-gray-700 hover:bg-gray-200 font-bold transition-colors">
-                                                    A+
+                                                <button onClick={() => setExpFontScale(s => Math.min(2.0, s + 0.1))} className="flex-1 py-2 flex justify-center items-center gap-2 text-gray-700 hover:bg-gray-200 font-bold transition-colors">
+                                                    A+ <kbd className="text-[10px] bg-white border border-gray-300 px-1.5 py-0.5 rounded text-gray-500 font-mono shadow-sm">]</kbd>
                                                 </button>
                                             </div>
                                         </div>
@@ -1248,6 +1256,13 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     </div>
                                                     <div>
                                                         <div className="flex justify-between text-xs font-semibold text-gray-500 mb-2">
+                                                            <span>Count</span>
+                                                            <span className="text-blue-600">{wmCount}</span>
+                                                        </div>
+                                                        <input type="range" min="1" max="20" value={wmCount} onChange={(e) => setWmCount(Number(e.target.value))} className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600" />
+                                                    </div>
+                                                    <div>
+                                                        <div className="flex justify-between text-xs font-semibold text-gray-500 mb-2">
                                                             <span>Opacity</span>
                                                             <span className="text-blue-600">{wmOpacity}%</span>
                                                         </div>
@@ -1307,77 +1322,92 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                         {/* Controls */}
                         <div className="flex gap-3">
                             <button onClick={prevStep} className="p-3 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-700 transition-all active:scale-95">
-                                <ChevronLeft className="w-6 h-6" />
-                            </button>
-                            <button onClick={nextStep} className="p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-md transition-all active:scale-95">
-                                <ChevronRight className="w-6 h-6" />
-                            </button>
+                                        <ChevronLeft className="w-6 h-6" />
+                                    </button>
+                                    <button onClick={nextStep} className="p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-md transition-all active:scale-95">
+                                        <ChevronRight className="w-6 h-6" />
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+
+                    {/* Dynamic Responsive Font Styles */}
+                    <style dangerouslySetInnerHTML={{ __html: `
+                        .responsive-fonts {
+                            --q-size: ${20 * qFontScale}px;
+                            --opt-size: ${16 * optFontScale}px;
+                            --exp-size: ${15 * expFontScale}px;
+                        }
+                        @media (min-width: 768px) {
+                            .responsive-fonts {
+                                --q-size: ${28 * qFontScale}px;
+                                --opt-size: ${20 * optFontScale}px;
+                                --exp-size: ${18 * expFontScale}px;
+                            }
+                        }
+                        @media (min-width: 1024px) {
+                            .responsive-fonts {
+                                --q-size: ${38 * qFontScale}px;
+                                --opt-size: ${30 * optFontScale}px;
+                                --exp-size: ${24 * expFontScale}px;
+                            }
+                        }
+                    ` }} />
+
+                    {/* Close Button */}
+                    <button onClick={closePresentation} className="absolute top-4 right-6 z-50 p-2.5 bg-gray-100/80 hover:bg-gray-200 rounded-full text-gray-600 backdrop-blur-sm transition-all hover:scale-110">
+                        <X className="w-6 h-6" />
+                    </button>
                 </div>
 
-                {/* Close Button */}
-                <button onClick={closePresentation} className="absolute top-4 right-6 z-50 p-2.5 bg-gray-100/80 hover:bg-gray-200 rounded-full text-gray-600 backdrop-blur-sm transition-all hover:scale-110">
-                    <X className="w-6 h-6" />
-                </button>
+                {/* Right Ad Banner (120x600) */}
+                <div className="hidden xl:flex w-[120px] h-[600px] shrink-0 flex-col items-center justify-between bg-gradient-to-b from-[#2a0845] via-[#6441A5] to-[#2a0845] rounded-xl overflow-hidden shadow-2xl border border-purple-400/20 relative z-10 p-3">
+                     {/* Floating Elements Background */}
+                     <div className="absolute top-[10%] right-[20%] w-16 h-16 rounded-full border border-purple-400/20 bg-purple-500/10 blur-[8px]"></div>
+                     <div className="absolute bottom-[20%] left-[-10%] w-20 h-20 rounded-full bg-pink-400/10 blur-[20px]"></div>
+                     
+                     {/* Top Icon */}
+                     <div className="flex items-center justify-center text-4xl w-full z-10 pt-4 drop-shadow-lg relative">
+                         <div className="absolute inset-0 bg-purple-400/20 blur-[15px] rounded-full"></div>
+                         🎯
+                     </div>
 
-            </div>
-
-            {/* Right Banner Area */}
-            <div className="hidden lg:flex flex-1 h-full flex-col items-center justify-between bg-gradient-to-b from-[#0a2f6c] via-[#07214f] to-[#041334] relative z-0 overflow-hidden font-sans shadow-[inset_10px_0_20px_rgba(0,0,0,0.3)] border-l border-[#1a3f7c]">
-                 
-                 {/* Floating Bubbles/Orbs Background */}
-                 <div className="absolute top-[10%] left-[15%] w-24 h-24 rounded-full border border-blue-400/20 bg-blue-400/5 blur-[2px]"></div>
-                 <div className="absolute top-[8%] left-[65%] w-8 h-8 rounded-full border border-blue-300/30 bg-transparent blur-[1px]"></div>
-                 <div className="absolute top-[30%] right-[10%] w-32 h-32 rounded-full border border-blue-400/10 bg-blue-400/5 blur-[4px]"></div>
-                 <div className="absolute bottom-[25%] left-[-15%] w-48 h-48 rounded-full bg-blue-500/10 blur-[40px]"></div>
-                 <div className="absolute bottom-[10%] right-[-10%] w-56 h-56 rounded-full bg-blue-400/10 blur-[50px]"></div>
-                 
-                 {/* Top Content */}
-                 <div className="flex flex-col items-center justify-center w-full px-4 pt-8 xl:pt-10 z-10">
-                      {/* Target Icon */}
-                      <div className="text-[clamp(4rem,6vw,9rem)] leading-none mb-4 drop-shadow-[0_10px_25px_rgba(0,0,0,0.6)]">
-                          🎯
-                      </div>
-                      
-                      {/* Text Section */}
-                      <div className="text-center tracking-wide mt-1 px-2">
-                          <h3 className="text-[clamp(1rem,1.4vw,1.8rem)] text-blue-100 mb-1 leading-relaxed drop-shadow-sm font-medium">লক্ষ্য তোমার,</h3>
-                          <h3 className="text-[clamp(1.25rem,1.8vw,2.5rem)] text-white leading-snug drop-shadow-md font-bold">
-                              <span className="text-[#FFD700]">সাফল্য</span> আমাদের সাথে!
+                     {/* Text Section */}
+                     <div className="flex flex-col items-center w-full z-10 text-center mt-3">
+                          <h3 className="text-[12px] text-purple-100 mb-0.5 leading-tight font-medium">লক্ষ্য তোমার,</h3>
+                          <h3 className="text-[13px] text-white leading-tight font-extrabold">
+                              <span className="text-[#FFD700]">সফলতা</span>
                           </h3>
-                      </div>
-                 </div>
+                          <h3 className="text-[13px] text-white leading-tight font-extrabold">আমাদের সাথে!</h3>
+                     </div>
 
-                 {/* Empty space filler instead of emojis to keep design clean */}
-                 <div className="flex-grow"></div>
+                     {/* Features List */}
+                     <div className="flex flex-col z-10 w-full space-y-2 mt-4 mb-2">
+                         <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-lg p-2.5">
+                             <div className="flex flex-col space-y-2">
+                                 {[
+                                     'Daily Test',
+                                     'Unlimited',
+                                     'Analytics',
+                                     'AI Ranking',
+                                     'Report'
+                                 ].map((feature, idx) => (
+                                     <div key={idx} className="flex items-center gap-1.5">
+                                         <Check className="w-3 h-3 text-[#00E676] shrink-0" />
+                                         <span className="text-gray-100 text-[10.5px] font-semibold tracking-wide leading-tight">{feature}</span>
+                                     </div>
+                                 ))}
+                             </div>
+                         </div>
+                     </div>
 
-                 {/* Features List */}
-                 <div className="flex flex-col space-y-[clamp(8px,1vw,16px)] z-10 w-full px-[clamp(2rem,4vw,6rem)] mb-4">
-                      {[
-                          'Daily Mock Tests',
-                          'Unlimited Practice',
-                          'Instant Result',
-                          'Detailed Explanation',
-                          'Performance Tracking'
-                      ].map((feature, idx) => (
-                          <div key={idx} className="flex items-center gap-[clamp(6px,0.8vw,12px)]">
-                              <svg className="w-[clamp(14px,1.2vw,24px)] h-[clamp(14px,1.2vw,24px)] text-white shrink-0 drop-shadow-md" viewBox="0 0 24 24" fill="currentColor">
-                                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                              </svg>
-                              <span className="text-white text-[clamp(12px,1.1vw,18px)] font-medium tracking-wide drop-shadow-sm">{feature}</span>
-                          </div>
-                      ))}
-                 </div>
-
-                 {/* Join Button */}
-                 <div className="w-full px-[clamp(1.5rem,3vw,4rem)] pb-[clamp(2rem,4vw,5rem)] z-10">
-                      <button className="w-full flex flex-col items-center justify-center py-[clamp(10px,1.2vw,20px)] bg-gradient-to-b from-white/20 to-white/5 backdrop-blur-md border border-white/30 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:from-white/30 hover:to-white/10 transition-all duration-300 group">
-                          <span className="text-white text-[clamp(14px,1.4vw,24px)] font-extrabold tracking-widest mb-0.5">JOIN DESHEXAM</span>
-                          <span className="text-blue-100 text-[clamp(10px,0.8vw,14px)] font-medium tracking-wide opacity-80 group-hover:opacity-100 transition-opacity">PREMIUM MOCK TESTS</span>
-                      </button>
-                 </div>
-            </div>
+                     {/* CTA Button */}
+                     <div className="w-full z-10 pb-2">
+                          <button className="w-full flex items-center justify-center py-2.5 bg-gradient-to-r from-[#FF416C] to-[#FF4B2B] border border-red-400/50 rounded-lg shadow-[0_4px_10px_rgba(255,65,108,0.4)] hover:scale-105 transition-transform duration-300">
+                              <span className="text-white font-bold text-[13px] drop-shadow-md">Join Now</span>
+                          </button>
+                     </div>
+                </div>
 
             {/* Spotlight Overlay */}
             {isSpotlightActive && (
