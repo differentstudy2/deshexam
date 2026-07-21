@@ -241,7 +241,7 @@ export default async function MockTestLandingPage({ params }: Props) {
 
                 {/* Academic Details */}
                 {(boardName || className || subjectName || textbookName || chapterName) && (
-                  <div className="flex flex-wrap items-center gap-2 text-sm text-slate-300 bg-white/5 p-3 rounded-xl border border-white/10 mt-6 shadow-sm">
+                  <div className="flex flex-wrap items-center gap-2 text-sm text-slate-300 bg-white/5 p-3 rounded-lg border border-white/10 mt-6 shadow-sm">
                      <BookOpen className="w-4 h-4 text-emerald-400 mr-1" />
                      {boardName && <span className="bg-white/10 hover:bg-white/20 transition-colors px-2.5 py-1 rounded-md text-xs font-medium">{boardName}</span>}
                      {className && (
@@ -279,7 +279,7 @@ export default async function MockTestLandingPage({ params }: Props) {
                     { icon: FileText, label: `${test.totalMarks ?? 0} Marks`, color: 'text-amber-400', borderHover: 'hover:border-amber-500/30', bgHover: 'hover:bg-amber-500/10', show: true },
                     { icon: AlertTriangle, label: `${test.negativeMarking ?? 0} Negative`, color: 'text-red-400', borderHover: 'hover:border-red-500/30', bgHover: 'hover:bg-red-500/10', show: !!test.negativeMarking && test.negativeMarking > 0 },
                   ].filter(item => item.show !== false).map(({ icon: Icon, label, color, borderHover, bgHover }) => (
-                    <div key={label} className={`flex items-center justify-center sm:justify-start gap-2 bg-white/5 border border-white/10 rounded-xl px-2 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold text-white backdrop-blur-md shadow-lg transition-all duration-300 ${borderHover} ${bgHover} cursor-default`}>
+                    <div key={label} className={`flex items-center justify-center sm:justify-start gap-2 bg-white/5 border border-white/10 rounded-lg px-2 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold text-white backdrop-blur-md shadow-lg transition-all duration-300 ${borderHover} ${bgHover} cursor-default`}>
                       <Icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 ${color}`} />
                       <span className="truncate">{label}</span>
                     </div>
@@ -294,13 +294,13 @@ export default async function MockTestLandingPage({ params }: Props) {
 
               {/* Right: CTA card (desktop — floats into content below) */}
               <div className="hidden lg:block w-80 shrink-0 -mb-16 relative z-10 group">
-                <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl shadow-black/30 border border-slate-200/50 dark:border-slate-800/50 overflow-hidden transition-all duration-500 hover:shadow-violet-500/10 hover:-translate-y-1">
+                <div className="bg-white dark:bg-slate-900 rounded-lg shadow-2xl shadow-black/30 border border-slate-200/50 dark:border-slate-800/50 overflow-hidden transition-all duration-500 hover:shadow-violet-500/10 hover:-translate-y-1">
                   {/* Card header */}
                   <div className="bg-gradient-to-br from-violet-600 via-purple-600 to-blue-600 p-6 relative overflow-hidden">
                     {/* Header shine effect */}
                     <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out"></div>
                     <div className="relative flex items-center gap-3 mb-2">
-                      <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-inner">
+                      <div className="w-10 h-10 rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-inner">
                         <Brain className="w-5 h-5 text-white" />
                       </div>
                       <div>
@@ -357,7 +357,7 @@ export default async function MockTestLandingPage({ params }: Props) {
                   { icon: Award, label: 'Total Marks', value: `${test.totalMarks ?? 0}`, color: 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400' },
                   { icon: Target, label: 'Pass Marks', value: `${test.passingMarks ?? 0}`, color: 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400' },
                 ].map(({ icon: Icon, label, value, color }) => (
-                  <div key={label} className={`flex flex-col items-center justify-center p-4 rounded-2xl border text-center transition-colors duration-300 ${color}`}>
+                  <div key={label} className={`flex flex-col items-center justify-center p-4 rounded-lg border text-center transition-colors duration-300 ${color}`}>
                     <Icon className="w-5 h-5 mb-1 opacity-70" />
                     <p className="text-2xl font-extrabold dark:text-slate-100">{value}</p>
                     <p className="text-[11px] font-semibold uppercase tracking-wide opacity-70">{label}</p>
@@ -369,7 +369,7 @@ export default async function MockTestLandingPage({ params }: Props) {
               <UserAttemptsDisplay assessmentId={test.id} />
 
               {/* Instructions */}
-              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-colors duration-300">
+              <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-colors duration-300">
                 <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
                   <BookOpen className="w-5 h-5 text-[#107c41] dark:text-[#22c55e]" />
                   <h2 className="text-base font-bold text-slate-800 dark:text-slate-100">Instructions</h2>
@@ -398,7 +398,7 @@ ${test.negativeMarking && test.negativeMarking > 0 ? `* প্রতিটি �
                     </ReactMarkdown>
                   </div>
                   {test.examRules && (
-                    <div className="mt-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/30 rounded-xl">
+                    <div className="mt-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/30 rounded-lg">
                       <div className="flex items-center gap-2 mb-2">
                         <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-500" />
                         <span className="text-sm font-bold text-amber-700 dark:text-amber-400">Exam Rules</span>
@@ -412,7 +412,7 @@ ${test.negativeMarking && test.negativeMarking > 0 ? `* প্রতিটি �
               </div>
 
               {/* What to expect */}
-              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-colors duration-300">
+              <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-colors duration-300">
                 <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
                   <Star className="w-5 h-5 text-amber-500" />
                   <h2 className="text-base font-bold text-slate-800 dark:text-slate-100">What to Expect</h2>
@@ -435,7 +435,7 @@ ${test.negativeMarking && test.negativeMarking > 0 ? `* প্রতিটি �
                     const Icon = IconComponent as any;
                     return (
                     <div key={title} className="flex items-start gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
+                      <div className="w-9 h-9 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
                         <Icon className="w-4.5 h-4.5 text-slate-600 dark:text-slate-400" />
                       </div>
                       <div>
@@ -455,7 +455,7 @@ ${test.negativeMarking && test.negativeMarking > 0 ? `* প্রতিটি �
             {/* Desktop sticky sidebar (repeats CTA below the hero card on scroll) */}
             <div className="hidden lg:block w-72 shrink-0">
               <div className="sticky top-6 space-y-4">
-                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 transition-colors duration-300">
+                <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm p-5 transition-colors duration-300">
                   <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Quick Summary</p>
                   <div className="space-y-2.5">
                     {[
@@ -474,13 +474,15 @@ ${test.negativeMarking && test.negativeMarking > 0 ? `* প্রতিটি �
                       </div>
                     ))}
                   </div>
+
+                  <div className="pt-5 mt-5 border-t border-slate-100 dark:border-slate-800">
+                    <StartTestButton slug={test.slug} accessType={test.accessType} price={test.price} allowedSubscriptionPlans={test.allowedSubscriptionPlans} testType="mock-test" />
+
+                    {test.accessType !== 'subscription' && test.accessType !== 'both' && test.accessType !== 'one_time' && (
+                      <p className="text-center text-[11px] text-slate-400 mt-3">Free · Log in to save your progress</p>
+                    )}
+                  </div>
                 </div>
-
-                <StartTestButton slug={test.slug} accessType={test.accessType} price={test.price} allowedSubscriptionPlans={test.allowedSubscriptionPlans} testType="mock-test" />
-
-                {test.accessType !== 'subscription' && test.accessType !== 'both' && test.accessType !== 'one_time' && (
-                  <p className="text-center text-[11px] text-slate-400">Free · No sign-up required to start</p>
-                )}
                 
                 <div className="mt-6">
                   <TopScorersWidget assessmentId={test.id} />

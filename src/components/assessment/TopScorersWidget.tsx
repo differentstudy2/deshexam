@@ -71,7 +71,7 @@ export function TopScorersWidget({ assessmentId }: TopScorersWidgetProps) {
 
   if (loading) {
     return (
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 text-center transition-colors">
+      <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm p-5 text-center transition-colors">
         <Loader2 className="w-5 h-5 animate-spin mx-auto text-slate-400 mb-2" />
         <p className="text-xs text-slate-500 font-medium">Loading Top Scorers...</p>
       </div>
@@ -79,7 +79,7 @@ export function TopScorersWidget({ assessmentId }: TopScorersWidgetProps) {
   }
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-colors duration-300">
+    <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-colors duration-300">
       <div className="bg-gradient-to-r from-amber-500 to-orange-500 p-4 relative overflow-hidden">
         <div className="absolute top-0 right-0 p-2 opacity-20">
           <Trophy className="w-16 h-16 text-white" />
@@ -105,7 +105,7 @@ export function TopScorersWidget({ assessmentId }: TopScorersWidgetProps) {
             const { grade, color: gradeColor } = getGrade(scorer.percentage);
             
             return (
-              <div key={scorer.uid} className={`flex items-center gap-3 p-3 rounded-xl transition-colors ${isFirst ? 'bg-amber-50/50 dark:bg-amber-900/10' : 'hover:bg-slate-50 dark:hover:bg-slate-800/50'}`}>
+              <div key={scorer.uid} className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${isFirst ? 'bg-amber-50/50 dark:bg-amber-900/10' : 'hover:bg-slate-50 dark:hover:bg-slate-800/50'}`}>
                 <div className="w-6 h-6 shrink-0 flex items-center justify-center font-bold text-xs rounded-full">
                   {isFirst ? <Medal className="w-6 h-6 text-amber-500" /> : 
                    isSecond ? <Medal className="w-5 h-5 text-slate-400" /> : 

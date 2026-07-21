@@ -102,7 +102,7 @@ export default async function ExamPaperLandingPage({ params }: Props) {
               </div>
 
               {/* Downloads & Action Card */}
-              <div className="w-full md:w-80 bg-white shadow-xl shadow-orange-200/50 rounded-2xl p-6 border border-orange-100 flex-shrink-0">
+              <div className="w-full md:w-80 bg-white shadow-xl shadow-orange-200/50 rounded-lg p-6 border border-orange-100 flex-shrink-0">
                 <h3 className="text-xl font-bold mb-4 flex items-center">
                   <FileDown className="w-5 h-5 mr-2 text-orange-500" /> Downloads & Practice
                 </h3>
@@ -132,7 +132,7 @@ export default async function ExamPaperLandingPage({ params }: Props) {
                 </div>
 
                 {test.questionIds.length > 0 ? (
-                  <Button className="w-full bg-orange-500 hover:bg-orange-600 h-14 text-lg rounded-xl text-white" asChild>
+                  <Button className="w-full bg-orange-500 hover:bg-orange-600 h-14 text-lg rounded-lg text-white" asChild>
                     <Link href={`/exams/${test.slug}/take`}>
                       <PlayCircle className="w-5 h-5 mr-2" /> Take Online Exam
                     </Link>
