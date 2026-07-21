@@ -346,8 +346,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                     {/* Question */}
                     <div className="flex items-center gap-3 md:gap-4 w-full max-w-5xl mt-8 md:mt-4" style={{ '--q-size': `max(18px, ${38 * qFontScale}px)` } as React.CSSProperties}>
-                        <span className="text-black font-extrabold leading-tight shrink-0" style={{ fontSize: 'var(--q-size)' }}>Q{currentSlide + 1}.</span>
-                        <div className="prose prose-black max-w-none prose-p:font-extrabold prose-p:text-[length:var(--q-size)] leading-snug prose-p:my-0 prose-li:text-2xl text-left text-black">
+                        <span className="text-black font-extrabold leading-normal shrink-0" style={{ fontSize: 'var(--q-size)' }}>Q{currentSlide + 1}.</span>
+                        <div className="prose prose-black max-w-none prose-p:font-extrabold text-[length:var(--q-size)] leading-normal text-left text-black font-extrabold [&_*]:!text-[length:var(--q-size)] [&_*]:!leading-normal [&_*]:!m-0 flex items-center">
                             <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
                                 {q.questionText}
                             </ReactMarkdown>
