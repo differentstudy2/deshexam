@@ -84,7 +84,7 @@ export function MockTestReviews({ testId, slug, stats }: MockTestReviewsProps) {
     setIsSubmitting(true);
     try {
       const name = user.displayName || 'Anonymous Student';
-      const avatar = user.displayName ? user.displayName.charAt(0).toUpperCase() : 'A';
+      const avatar = user.photoURL || (user.displayName ? user.displayName.charAt(0).toUpperCase() : 'A');
       
       await submitReview(testId, user.uid, name, avatar, rating, content);
       
@@ -291,8 +291,12 @@ export function MockTestReviews({ testId, slug, stats }: MockTestReviewsProps) {
           <div className="space-y-6">
             {reviews.map((review) => (
               <div key={review.id} className="flex gap-4">
-                <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center shrink-0">
-                  <span className="font-bold text-indigo-700 dark:text-indigo-300">{review.userAvatar || 'S'}</span>
+                <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center shrink-0 overflow-hidden">
+                  {review.userAvatar?.startsWith('http') ? (
+                    <img src={review.userAvatar} alt={review.userName} className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="font-bold text-indigo-700 dark:text-indigo-300">{review.userAvatar || review.userName?.charAt(0)?.toUpperCase() || 'A'}</span>
+                  )}
                 </div>
                 <div className="flex-1">
                   <div className="flex justify-between items-start mb-1">
