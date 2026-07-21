@@ -329,8 +329,13 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 return;
             }
 
-            if (e.key.toLowerCase() === 'd') {
+            if (e.key === 'D') {
                 setIsPenActive(prev => !prev);
+                return;
+            }
+
+            if (e.key === 'C' || e.key === 'Delete' || e.key === 'Backspace') {
+                clearCanvas();
                 return;
             }
 
@@ -385,7 +390,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [isOpen, closePresentation, nextStep, prevStep, isSettingsOpen, step, currentSlide, questions]);
+    }, [isOpen, closePresentation, nextStep, prevStep, isSettingsOpen, step, currentSlide, questions, clearCanvas]);
 
     if (!isOpen) {
         return (
@@ -768,59 +773,6 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     </div>
 
                     <div className="flex items-center gap-4 md:gap-8">
-                        {/* Pen Tool */}
-                        <div className="relative">
-                            <button
-                                onClick={() => setIsPenActive(!isPenActive)}
-                                className={`p-3 rounded-full transition-all shadow-sm ${isPenActive ? 'bg-red-500 text-white ring-2 ring-red-300' : 'bg-white/60 hover:bg-white text-indigo-600'}`}
-                                title="Toggle Pen Tool"
-                            >
-                                <Pen className="w-6 h-6" />
-                            </button>
-                            
-                            {/* Pen Toolbar */}
-                            {isPenActive && (
-                                <div className="fixed bottom-[80px] left-1/2 -translate-x-1/2 md:absolute md:bottom-full md:left-auto md:-translate-x-0 md:right-0 md:mb-4 bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-gray-100 p-4 animate-in fade-in slide-in-from-bottom-2 z-50 flex flex-wrap items-center gap-3 md:gap-4 min-w-[280px] justify-center">
-                                    <div className="flex gap-2 items-center border-r pr-3 border-gray-200">
-                                        {['#ef4444', '#3b82f6', '#22c55e', '#facc15', '#000000'].map(c => (
-                                            <button 
-                                                key={c}
-                                                onClick={() => setPenColor(c)}
-                                                className={`w-5 h-5 md:w-6 md:h-6 rounded-full border-2 ${penColor === c ? 'border-gray-900 scale-110' : 'border-transparent hover:scale-110'} transition-all`}
-                                                style={{ backgroundColor: c }}
-                                            />
-                                        ))}
-                                        <input 
-                                            type="color" 
-                                            value={penColor}
-                                            onChange={e => setPenColor(e.target.value)}
-                                            className="w-6 h-6 md:w-7 md:h-7 ml-1 cursor-pointer border-0 rounded overflow-hidden" 
-                                            title="Custom Color"
-                                        />
-                                    </div>
-                                    <div className="flex gap-2 items-center border-r pr-3 border-gray-200">
-                                        <input 
-                                            type="range" 
-                                            min="2" 
-                                            max="24" 
-                                            value={penSize} 
-                                            onChange={e => setPenSize(parseInt(e.target.value))}
-                                            className="w-20 md:w-24 accent-blue-600"
-                                            title="Pen Size"
-                                        />
-                                        <div className="w-4 h-4 rounded-full flex items-center justify-center shrink-0">
-                                            <div className="bg-gray-800 rounded-full" style={{ width: Math.min(penSize, 16), height: Math.min(penSize, 16) }} />
-                                        </div>
-                                    </div>
-                                    <button 
-                                        onClick={clearCanvas}
-                                        className="p-1.5 md:p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors flex items-center gap-1.5 md:gap-2 text-xs md:text-sm font-semibold"
-                                    >
-                                        <Trash2 className="w-4 h-4 md:w-5 md:h-5" /> Clear
-                                    </button>
-                                </div>
-                            )}
-                        </div>
 
                         {/* Settings Dropdown */}
                         <div className="relative">
@@ -981,7 +933,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                             <div className="text-sm font-bold text-gray-600 mb-3 flex items-center justify-between">
                                                 <span>Drawing Tool</span>
                                                 <div className="flex items-center gap-2">
-                                                    <kbd className="text-[10px] bg-gray-100 border border-gray-200 px-1.5 py-0.5 rounded text-gray-500 font-mono shadow-sm">D</kbd>
+                                                    <kbd className="text-[10px] bg-gray-100 border border-gray-200 px-1.5 py-0.5 rounded text-gray-500 font-mono shadow-sm">Shift+D</kbd>
                                                     <button onClick={() => setIsPenActive(!isPenActive)} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${isPenActive ? 'bg-blue-600' : 'bg-gray-300'}`}>
                                                         <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${isPenActive ? 'translate-x-5' : 'translate-x-1'}`} />
                                                     </button>
@@ -1022,7 +974,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                         onClick={clearCanvas}
                                                         className="w-full py-2 text-red-500 bg-red-50 hover:bg-red-100 rounded-lg transition-colors flex items-center justify-center gap-1.5 text-xs font-bold"
                                                     >
-                                                        <Trash2 className="w-4 h-4" /> Clear Canvas
+                                                        <Trash2 className="w-4 h-4" /> Clear Canvas <kbd className="ml-1 text-[10px] bg-white border border-red-200 px-1.5 py-0.5 rounded text-red-500 font-mono shadow-sm">Shift+C</kbd>
                                                     </button>
                                                 </div>
                                             )}
