@@ -291,27 +291,43 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 </div>
 
                 {/* Header */}
-                <div className="shrink-0 bg-white border-b border-gray-200 py-3 pl-8 pr-12 flex justify-between items-center w-full z-10 shadow-sm">
+                <div className="shrink-0 bg-white border-b border-gray-200 py-3 px-4 md:pl-8 md:pr-12 flex flex-col md:flex-row justify-between items-center w-full z-10 shadow-sm gap-2 md:gap-0 relative">
                     {/* Logo Area */}
-                    <div className="flex items-center gap-3">
-                        <img src="/image/logo.png" alt="DeshExam" className="h-10 w-auto object-contain" />
-                        <div className="flex flex-col">
-                            <span className="font-extrabold text-xl text-gray-900 leading-none">Desh Exam Academy</span>
-                            <span className="text-[11px] text-gray-500 font-medium tracking-wide mt-1">Learn • Practice • Succeed</span>
+                    <div className="flex items-center gap-2 md:gap-3 w-full md:w-auto justify-between md:justify-start">
+                        <div className="flex items-center gap-2 md:gap-3">
+                            <img src="/image/logo.png" alt="DeshExam" className="h-8 md:h-10 w-auto object-contain" />
+                            <div className="flex flex-col">
+                                <span className="font-extrabold text-sm md:text-xl text-gray-900 leading-none">Desh Exam Academy</span>
+                                <span className="text-[10px] md:text-[11px] text-gray-500 font-medium tracking-wide mt-1">Learn • Practice • Succeed</span>
+                            </div>
+                        </div>
+                        {/* Mobile Close Button & Badge */}
+                        <div className="flex items-center gap-2 md:hidden">
+                            <div className="bg-blue-600 text-white px-3 py-1 rounded-full font-bold text-xs tracking-wider shadow-md">
+                                MOCK TEST
+                            </div>
+                            <button onClick={closePresentation} className="p-1.5 bg-gray-100 rounded-full text-gray-500">
+                                <X className="w-4 h-4" />
+                            </button>
                         </div>
                     </div>
                     {/* Title Area */}
-                    <div className="flex-1 text-center">
-                        <h1 className="text-3xl font-extrabold text-black tracking-tight">{classLine}</h1>
+                    <div className="flex-1 text-center w-full mt-2 md:mt-0">
+                        <h1 className="text-base md:text-3xl font-extrabold text-black tracking-tight line-clamp-1 md:line-clamp-none">{classLine}</h1>
                         {(chapterName || topicName) && (
-                            <div className="text-sm text-gray-500 font-medium mt-0.5">
+                            <div className="text-xs md:text-sm text-gray-500 font-medium mt-0.5">
                                 {[chapterName, topicName].filter(Boolean).join(' | ')}
                             </div>
                         )}
                     </div>
-                    {/* Badge Area */}
-                    <div className="bg-blue-600 text-white px-6 py-2 rounded-full font-bold text-lg tracking-wider shadow-md">
-                        MOCK TEST
+                    {/* Badge Area (Desktop) */}
+                    <div className="hidden md:flex items-center gap-4">
+                        <div className="bg-blue-600 text-white px-6 py-2 rounded-full font-bold text-lg tracking-wider shadow-md">
+                            MOCK TEST
+                        </div>
+                        <button onClick={closePresentation} className="p-2 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-500 transition-colors" title="Close Presentation">
+                            <X className="w-6 h-6" />
+                        </button>
                     </div>
                 </div>
 
@@ -329,7 +345,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     )}
 
                     {/* Question */}
-                    <div className="flex items-start gap-4 w-full max-w-5xl mt-4" style={{ '--q-size': `${38 * qFontScale}px` } as React.CSSProperties}>
+                    <div className="flex items-center gap-3 md:gap-4 w-full max-w-5xl mt-8 md:mt-4" style={{ '--q-size': `max(18px, ${38 * qFontScale}px)` } as React.CSSProperties}>
                         <span className="text-black font-extrabold leading-tight shrink-0" style={{ fontSize: 'var(--q-size)' }}>Q{currentSlide + 1}.</span>
                         <div className="prose prose-black max-w-none prose-p:font-extrabold prose-p:text-[length:var(--q-size)] leading-snug prose-p:my-0 prose-li:text-2xl text-left text-black">
                             <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
