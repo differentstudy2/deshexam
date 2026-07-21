@@ -571,7 +571,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     if (typeof window === 'undefined') return null;
 
     return createPortal(
-        <div className={`fixed inset-0 z-[99999] flex items-center justify-center xl:gap-[0.1rem] xl:p-[0.1rem] select-none font-sans overflow-hidden ${isDarkMode ? 'dark bg-gray-900' : 'bg-[#f8fbff]'}`}>
+        <div className={`fixed inset-0 w-full h-full z-[99999] flex items-center justify-between xl:gap-[0.1rem] xl:p-[0.1rem] select-none font-sans overflow-hidden ${isDarkMode ? 'dark bg-gray-900' : 'bg-[#f8fbff]'}`}>
             <style>{`
                 @keyframes popIn {
                     0% { transform: scale(1); box-shadow: 0 0 0 rgba(52,168,83,0); }
@@ -638,7 +638,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 </div>
                  
                 {/* Main Presentation Area */}
-                <div className="responsive-fonts flex-1 min-w-0 relative w-full h-full xl:max-w-[177.78vh] xl:max-h-[56.25vw] bg-gradient-to-br from-[#f8fafc] via-[#f1f5f9] to-[#f8fafc] dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex flex-col shadow-2xl overflow-hidden shrink-0 z-10 xl:rounded-xl xl:border xl:border-gray-200 dark:border-gray-800">
+                <div className="responsive-fonts flex-1 min-w-0 relative w-full h-full bg-gradient-to-br from-[#f8fafc] via-[#f1f5f9] to-[#f8fafc] dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex flex-col shadow-2xl overflow-hidden shrink-0 z-10 xl:rounded-xl xl:border xl:border-gray-200 dark:border-gray-800">
 
                 {/* Main Drawing Canvas */}
                 <canvas
