@@ -8,7 +8,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
 import 'katex/dist/katex.min.css';
-import { X, ChevronLeft, ChevronRight, Play, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize, LayoutGrid, Sun, Moon, Eraser, Square, Circle, ArrowUpRight, Type, Presentation } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Play, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize, LayoutGrid, Sun, Moon, Eraser, Square, Circle, ArrowUpRight, Type, Presentation, ZoomIn } from 'lucide-react';
 
 const bnOptionsMap: Record<string, string> = {
     a: 'ক',
@@ -85,7 +85,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [penSize, setPenSize] = useState(4);
     
     // Drawing Tool State
-    const [drawingTool, setDrawingTool] = useState<'pen' | 'highlighter' | 'laser' | 'eraser' | 'rectangle' | 'circle' | 'arrow' | 'text'>('pen');
+    const [drawingTool, setDrawingTool] = useState<'pen' | 'highlighter' | 'laser' | 'eraser' | 'rectangle' | 'circle' | 'arrow' | 'text' | 'magnifier'>('pen');
+    const [isMagnified, setIsMagnified] = useState(false);
+    const [magnifierPos, setMagnifierPos] = useState({ x: 50, y: 50 });
     const [isWhiteboardMode, setIsWhiteboardMode] = useState(false);
     const [textInput, setTextInput] = useState<{ x: number, y: number, text: string } | null>(null);
     const textInputRef = useRef<HTMLTextAreaElement>(null);
@@ -242,6 +244,22 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
             return;
         }
 
+        if (drawingTool === 'magnifier') {
+            setIsMagnified(true);
+            const rect = activeCanvasRef.current?.getBoundingClientRect();
+            if (rect) {
+                const mx = ((e.clientX - rect.left) / rect.width) * 100;
+                const my = ((e.clientY - rect.top) / rect.height) * 100;
+                setMagnifierPos({ x: mx, y: my });
+            }
+            try {
+                if (e.target && e.target.setPointerCapture && e.pointerId !== undefined) {
+                    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+                }
+            } catch (err) {}
+            return;
+        }
+
         if (drawingTool === 'text') {
             if (textInput) {
                 finalizeText();
@@ -368,6 +386,18 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
             return;
         }
 
+        if (drawingTool === 'magnifier') {
+            if (isMagnified) {
+                const rect = activeCanvasRef.current?.getBoundingClientRect();
+                if (rect) {
+                    const mx = ((e.clientX - rect.left) / rect.width) * 100;
+                    const my = ((e.clientY - rect.top) / rect.height) * 100;
+                    setMagnifierPos({ x: mx, y: my });
+                }
+            }
+            return;
+        }
+
         if (!isDrawing.current) return;
         
         currentStroke.current.push({x, y});
@@ -394,6 +424,16 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     };
 
     const stopDrawing = (e: any) => {
+        if (drawingTool === 'magnifier') {
+            setIsMagnified(false);
+            try {
+                if (e.target && e.target.releasePointerCapture && e.pointerId !== undefined) {
+                    (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+                }
+            } catch (err) {}
+            return;
+        }
+
         if (!isDrawing.current) return;
         
         isDrawing.current = false;
@@ -948,6 +988,12 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                         </div>
                     )}
 
+                    {/* Zoomable Content Wrapper */}
+                    <div 
+                        className="w-full flex flex-col items-center flex-1 transition-transform duration-100 ease-out" 
+                        style={isMagnified ? { transform: 'scale(1.7)', transformOrigin: `${magnifierPos.x}% ${magnifierPos.y}%` } : {}}
+                    >
+
                     {/* Question */}
                     <div className="flex items-start gap-3 md:gap-4 w-full max-w-5xl mt-8 md:mt-4">
                         <span className="text-black dark:text-gray-100 font-extrabold leading-normal shrink-0" style={{ fontSize: 'var(--q-size)' }}>Q{currentSlide + 1}.</span>
@@ -1080,6 +1126,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             </div>
                         </div>
                     )}
+                    
+                    </div>
                 </div>
 
                 {/* Footer */}
@@ -1372,9 +1420,15 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                         >
                                                             <Type className="w-3.5 h-3.5" /> Text
                                                         </button>
+                                                        <button 
+                                                            onClick={() => setDrawingTool('magnifier')} 
+                                                            className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'magnifier' ? 'bg-white text-indigo-600 shadow-sm border border-gray-200/50' : 'text-gray-500 hover:text-gray-700'}`}
+                                                        >
+                                                            <ZoomIn className="w-3.5 h-3.5" /> Zoom
+                                                        </button>
                                                     </div>
 
-                                                    <div className={drawingTool === 'laser' || drawingTool === 'text' ? 'opacity-50 pointer-events-none transition-opacity flex flex-col gap-4 mt-2' : 'transition-opacity flex flex-col gap-4 mt-2'}>
+                                                    <div className={drawingTool === 'laser' || drawingTool === 'text' || drawingTool === 'magnifier' ? 'opacity-50 pointer-events-none transition-opacity flex flex-col gap-4 mt-2' : 'transition-opacity flex flex-col gap-4 mt-2'}>
                                                         <div>
                                                             <div className="flex justify-between text-xs font-semibold text-gray-500 mb-2">
                                                                 <span>Color</span>
