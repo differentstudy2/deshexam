@@ -42,6 +42,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [wmOpacity, setWmOpacity] = useState(40);
     const [wmSize, setWmSize] = useState(70);
     const [wmVisible, setWmVisible] = useState(true);
+    const [optionsLayout, setOptionsLayout] = useState<'grid' | 'list'>('grid');
     const openPresentation = () => {
         setIsOpen(true);
         setCurrentSlide(0);
@@ -160,6 +161,16 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 return;
             }
 
+            if (e.key.toLowerCase() === 'l') {
+                setOptionsLayout('list');
+                return;
+            }
+
+            if (e.key.toLowerCase() === 'g') {
+                setOptionsLayout('grid');
+                return;
+            }
+
             if (!isSettingsOpen) {
                 if (e.key === 'ArrowRight' || e.key === ' ') {
                     e.preventDefault();
@@ -169,12 +180,22 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     e.preventDefault();
                     prevStep();
                 }
+                if (step === 0) {
+                    const key = e.key.toLowerCase();
+                    if (['a', 'b', 'c', 'd', 'e'].includes(key)) {
+                        const currentQ = questions[currentSlide];
+                        if (currentQ && currentQ.options && currentQ.options[key as keyof typeof currentQ.options]) {
+                            setSelectedOption(key);
+                            setStep(1);
+                        }
+                    }
+                }
             }
         };
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [isOpen, closePresentation, nextStep, prevStep, isSettingsOpen]);
+    }, [isOpen, closePresentation, nextStep, prevStep, isSettingsOpen, step, currentSlide, questions]);
 
     if (!isOpen) {
         return (
@@ -373,7 +394,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     </div>
 
                     {/* Options */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5 w-full max-w-6xl mt-2">
+                    <div className={optionsLayout === 'grid' ? "grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5 w-full max-w-6xl mt-2" : "flex flex-col gap-y-4 md:gap-y-5 w-[90%] md:w-fit md:min-w-[500px] max-w-5xl mt-2 mx-auto"}>
                         {q.options && [
                             { key: 'a', text: q.options.a },
                             { key: 'b', text: q.options.b },
@@ -500,8 +521,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             </button>
 
                             {isSettingsOpen && (
-                                <div className="absolute bottom-full mb-4 right-0 bg-white border border-gray-200 rounded-2xl shadow-2xl p-5 w-72 z-50 animate-in fade-in zoom-in-95 duration-200">
-                                    <div className="flex justify-between items-center mb-4 pb-3 border-b border-gray-100">
+                                <div className="absolute bottom-full mb-4 right-0 bg-white border border-gray-200 rounded-2xl shadow-2xl p-5 w-80 z-50 animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[70vh]">
+                                    <div className="flex justify-between items-center mb-4 pb-3 border-b border-gray-100 shrink-0">
                                         <h3 className="font-bold text-gray-800 text-lg flex items-center gap-2">
                                             <Settings className="w-5 h-5 text-gray-500" /> Settings
                                             <kbd className="ml-1 text-[10px] bg-gray-100 border border-gray-200 px-1.5 py-0.5 rounded text-gray-500 font-mono shadow-sm">S</kbd>
@@ -511,7 +532,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                         </button>
                                     </div>
 
-                                    <div className="space-y-5">
+                                    <div className="space-y-5 overflow-y-auto custom-scrollbar pr-2 pb-2">
                                         <div>
                                             <div className="text-sm font-bold text-gray-600 mb-2 flex justify-between items-center">
                                                 Presentation Mode
@@ -529,6 +550,26 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-colors ${mode === 'read' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
                                                 >
                                                     Read Mode
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <div className="text-sm font-bold text-gray-600 mb-2 flex justify-between items-center">
+                                                Options Layout
+                                            </div>
+                                            <div className="flex bg-gray-100 p-1 rounded-xl">
+                                                <button
+                                                    onClick={() => setOptionsLayout('grid')}
+                                                    className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-colors ${optionsLayout === 'grid' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                                >
+                                                    Grid
+                                                </button>
+                                                <button
+                                                    onClick={() => setOptionsLayout('list')}
+                                                    className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-colors ${optionsLayout === 'list' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                                >
+                                                    List
                                                 </button>
                                             </div>
                                         </div>
