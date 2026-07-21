@@ -9,7 +9,7 @@ import {
   Clock, HelpCircle, ShieldCheck, FileText, CheckCircle2,
   AlertTriangle, BookOpen, Target, Award, ChevronRight, ArrowRight,
   Zap, Users, BarChart3, Brain, Star, Maximize, LayoutGrid, ShieldAlert, MonitorPlay,
-  Trophy, Sparkles, LineChart, History, RotateCcw, PieChart, BookCheck, Smartphone
+  Trophy, Sparkles, LineChart, History, RotateCcw, PieChart, BookCheck, Smartphone, Lock
 } from 'lucide-react';
 import Link from 'next/link';
 import { AssessmentCard } from '@/components/assessment/AssessmentCard';
@@ -527,33 +527,43 @@ ${test.negativeMarking && test.negativeMarking > 0 ? `* প্রতিটি �
             {/* Desktop sticky sidebar (repeats CTA below the hero card on scroll) */}
             <div className="hidden lg:block w-72 shrink-0">
               <div className="sticky top-6 space-y-4">
-                <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm p-5 transition-colors duration-300">
-                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Quick Summary</p>
-                  <div className="space-y-2.5">
-                    {[
-                      { label: 'Type', value: 'Mock Test' },
-                      { label: 'Difficulty', value: test.difficulty || 'Mixed' },
-                      { label: 'Language', value: test.language || 'English' },
-                      { label: 'Questions', value: `${test.questionIds?.length ?? 0}` },
-                      { label: 'Duration', value: `${test.durationMin ?? 0} minutes` },
-                      { label: 'Total Marks', value: `${test.totalMarks ?? 0}` },
-                      { label: 'Pass Marks', value: `${test.passingMarks ?? 0}` },
-                      { label: 'Negative', value: `${test.negativeMarking ?? 0} per wrong answer`, show: !!test.negativeMarking && test.negativeMarking > 0 },
-                    ].filter(item => item.show !== false).map(({ label, value }) => (
-                      <div key={label} className="flex justify-between text-sm border-b border-slate-50 dark:border-slate-800/50 pb-1.5 last:border-0 last:pb-0">
-                        <span className="text-slate-500 dark:text-slate-400 font-medium">{label}</span>
-                        <span className="font-bold text-slate-800 dark:text-slate-200 text-right">{value}</span>
-                      </div>
-                    ))}
+                <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-lg overflow-hidden transition-colors duration-300">
+                  <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-3 border-b border-blue-700/50">
+                    <p className="text-xs font-bold text-blue-100 uppercase tracking-wider flex items-center gap-2">
+                      <Zap className="w-4 h-4 text-amber-300 fill-amber-300" />
+                      Quick Summary
+                    </p>
                   </div>
+                  <div className="p-5">
+                    <div className="space-y-2.5">
+                      {[
+                        { label: 'Type', value: 'Mock Test' },
+                        { label: 'Difficulty', value: test.difficulty || 'Mixed' },
+                        { label: 'Language', value: test.language || 'English' },
+                        { label: 'Questions', value: `${test.questionIds?.length ?? 0}` },
+                        { label: 'Duration', value: `${test.durationMin ?? 0} minutes` },
+                        { label: 'Total Marks', value: `${test.totalMarks ?? 0}` },
+                        { label: 'Pass Marks', value: `${test.passingMarks ?? 0}` },
+                        { label: 'Negative', value: `${test.negativeMarking ?? 0} per wrong answer`, show: !!test.negativeMarking && test.negativeMarking > 0 },
+                      ].filter(item => item.show !== false).map(({ label, value }) => (
+                        <div key={label} className="flex justify-between text-sm border-b border-slate-50 dark:border-slate-800/50 pb-1.5 last:border-0 last:pb-0">
+                          <span className="text-slate-500 dark:text-slate-400 font-medium">{label}</span>
+                          <span className="font-bold text-slate-800 dark:text-slate-200 text-right">{value}</span>
+                        </div>
+                      ))}
+                    </div>
 
-                  <div className="pt-5 mt-5 border-t border-slate-100 dark:border-slate-800">
-                    <StartTestButton slug={test.slug} accessType={test.accessType} price={test.price} allowedSubscriptionPlans={test.allowedSubscriptionPlans} testType="mock-test" />
-
-                    {test.accessType !== 'subscription' && test.accessType !== 'both' && test.accessType !== 'one_time' && (
-                      <p className="text-center text-[11px] text-slate-400 mt-3">Free · Log in to save your progress</p>
-                    )}
+                    <div className="pt-5 mt-5 border-t border-slate-100 dark:border-slate-800">
+                      <StartTestButton slug={test.slug} accessType={test.accessType} price={test.price} allowedSubscriptionPlans={test.allowedSubscriptionPlans} testType="mock-test" />
+                    </div>
                   </div>
+                  {test.accessType !== 'subscription' && test.accessType !== 'both' && test.accessType !== 'one_time' && (
+                    <div className="bg-slate-50 dark:bg-slate-800/50 px-5 py-3 border-t border-slate-100 dark:border-slate-800">
+                      <p className="text-center text-[11px] font-medium text-slate-500 dark:text-slate-400 flex items-center justify-center gap-1.5">
+                        <Lock className="w-3 h-3" /> Free · Log in to save your progress
+                      </p>
+                    </div>
+                  )}
                 </div>
                 
                 <div className="mt-6">
