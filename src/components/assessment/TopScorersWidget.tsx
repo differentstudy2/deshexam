@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { getTopScorersForAssessment } from '@/lib/firebase/student-analytics';
 import { getUserProfile } from '@/lib/firebase/firestore';
+import { getGrade } from '@/lib/utils';
 import { Trophy, Medal, Star, Target, Loader2 } from 'lucide-react';
 
 interface TopScorersWidgetProps {
@@ -15,6 +16,7 @@ interface ScorerData {
   avatar: string;
   score: number;
   accuracy: number;
+  percentage: number;
 }
 
 export function TopScorersWidget({ assessmentId }: TopScorersWidgetProps) {
@@ -46,11 +48,13 @@ export function TopScorersWidget({ assessmentId }: TopScorersWidgetProps) {
           
           const scoreData = attempt.scoreData || {};
           const score = scoreData.score || 0;
+          const total = scoreData.total || Math.max(1, score); // Fallback to avoid division by zero or inflated percentage if total is missing
+          const percentage = total > 0 ? (score / total) * 100 : 0;
           const accuracy = scoreData.correct + scoreData.wrong > 0 
             ? Math.round((scoreData.correct / (scoreData.correct + scoreData.wrong)) * 100) 
             : 0;
 
-          return { uid, name, avatar, score, accuracy };
+          return { uid, name, avatar, score, accuracy, percentage };
         });
 
         const resolvedScorers = await Promise.all(scorerPromises);
@@ -98,6 +102,7 @@ export function TopScorersWidget({ assessmentId }: TopScorersWidgetProps) {
             const isFirst = index === 0;
             const isSecond = index === 1;
             const isThird = index === 2;
+            const { grade, color: gradeColor } = getGrade(scorer.percentage);
             
             return (
               <div key={scorer.uid} className={`flex items-center gap-3 p-3 rounded-xl transition-colors ${isFirst ? 'bg-amber-50/50 dark:bg-amber-900/10' : 'hover:bg-slate-50 dark:hover:bg-slate-800/50'}`}>
@@ -120,9 +125,11 @@ export function TopScorersWidget({ assessmentId }: TopScorersWidgetProps) {
                 
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-bold text-slate-800 dark:text-slate-200 truncate">{scorer.name}</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                    <Target className="w-3 h-3" /> {scorer.accuracy}% Acc
-                  </p>
+                  <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                    <span className="flex items-center gap-1"><Target className="w-3 h-3" /> {scorer.accuracy}% Acc</span>
+                    <span className="text-slate-300 dark:text-slate-600">•</span>
+                    <span className={`font-bold ${gradeColor}`}>{grade} Grade</span>
+                  </div>
                 </div>
                 
                 <div className="text-right">

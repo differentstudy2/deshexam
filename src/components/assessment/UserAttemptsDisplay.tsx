@@ -3,7 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { getUserExamAttempts } from '@/lib/firebase/student-analytics';
-import { Loader2, History, CheckCircle2, XCircle, Target } from 'lucide-react';
+import { getGrade } from '@/lib/utils';
+import { Loader2, History, CheckCircle2, XCircle, Target, Award } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface UserAttemptsDisplayProps {
@@ -64,6 +65,9 @@ export function UserAttemptsDisplay({ assessmentId }: UserAttemptsDisplayProps) 
             ? Math.round((scoreData.correct / (scoreData.correct + scoreData.wrong)) * 100) 
             : 0;
             
+          const percentage = total > 0 ? (score / total) * 100 : 0;
+          const { grade, color: gradeColor } = getGrade(percentage);
+            
           const date = attempt.createdAt?.seconds 
             ? format(new Date(attempt.createdAt.seconds * 1000), 'MMM dd, yyyy • hh:mm a') 
             : 'Unknown Date';
@@ -81,6 +85,13 @@ export function UserAttemptsDisplay({ assessmentId }: UserAttemptsDisplayProps) 
                   <p className="text-lg font-bold text-blue-600 dark:text-blue-400">{score.toFixed(2)} <span className="text-xs text-slate-400">/ {total}</span></p>
                 </div>
                 
+                <div className="text-center">
+                  <p className="text-xs text-slate-500 uppercase font-semibold mb-0.5">Grade</p>
+                  <p className={`text-lg font-bold flex items-center justify-center gap-1 ${gradeColor}`}>
+                    <Award className="w-3.5 h-3.5" /> {grade}
+                  </p>
+                </div>
+
                 <div className="text-center">
                   <p className="text-xs text-slate-500 uppercase font-semibold mb-0.5">Accuracy</p>
                   <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400 flex items-center justify-center gap-1">
