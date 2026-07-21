@@ -49,17 +49,29 @@ export async function recordMistake(userId: string, questionId: string, selected
   }, { merge: true });
 }
 
-export async function recordQuestionAttempt(userId: string, questionId: string, selectedAnswer: string, isCorrect: boolean) {
+export async function recordQuestionAttempt(
+  userId: string, 
+  questionId: string, 
+  selectedAnswer: string, 
+  isCorrect: boolean | 'correct' | 'wrong' | 'skipped'
+) {
   const docId = `${userId}_${questionId}`;
   const docRef = doc(db, MISTAKES_COLLECTION, docId);
   
+  const status = typeof isCorrect === 'boolean' ? (isCorrect ? 'correct' : 'wrong') : isCorrect;
+  const isRight = status === 'correct';
+  const isWrong = status === 'wrong';
+  const isSkipped = status === 'skipped';
+
   await setDoc(docRef, {
     userId,
     questionId,
     lastSelectedAnswer: selectedAnswer,
-    mistakeCount: isCorrect ? increment(0) : increment(1),
-    correctCount: isCorrect ? increment(1) : increment(0),
-    isCorrectLatest: isCorrect,
+    mistakeCount: isWrong ? increment(1) : increment(0),
+    correctCount: isRight ? increment(1) : increment(0),
+    skipCount: isSkipped ? increment(1) : increment(0),
+    isCorrectLatest: isRight,
+    latestStatus: status,
     updatedAt: serverTimestamp()
   }, { merge: true });
 }

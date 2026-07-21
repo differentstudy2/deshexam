@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { 
@@ -13,106 +13,135 @@ import {
   Flag,
   Share2,
   CheckCircle2,
-  ChevronRight,
-  HelpCircle,
-  Eye
+  Eye,
+  Loader2
 } from 'lucide-react';
-
-// MOCK DATA
-
-const subjects = [
-  { 
-    name: 'আমার বাংলা বই', 
-    progress: 0.28,
-    mcq: { current: 1, total: 356, pct: '0.28%' },
-    cq: { current: 0, total: 2774, pct: '' },
-    content: { current: 0, total: 29, pct: '' },
-    started: '5 days ago'
-  },
-  { name: 'English For Today', progress: 0.00, mcq: { current: 0, total: 100 }, cq: { current: 0, total: 50 }, content: { current: 0, total: 20 }, started: '' },
-  { name: 'প্রাথমিক গণিত', progress: 0.00, mcq: { current: 0, total: 100 }, cq: { current: 0, total: 50 }, content: { current: 0, total: 20 }, started: '' },
-  { name: 'প্রাথমিক বিজ্ঞান', progress: 0.00, mcq: { current: 0, total: 100 }, cq: { current: 0, total: 50 }, content: { current: 0, total: 20 }, started: '' },
-  { name: 'বাংলাদেশ ও বিশ্বপরিচয়', progress: 0.00, mcq: { current: 0, total: 100 }, cq: { current: 0, total: 50 }, content: { current: 0, total: 20 }, started: '' },
-  { name: 'ইসলাম শিক্ষা', progress: 0.00, mcq: { current: 0, total: 100 }, cq: { current: 0, total: 50 }, content: { current: 0, total: 20 }, started: '' },
-  { name: 'হিন্দুধর্ম শিক্ষা', progress: 0.00, mcq: { current: 0, total: 100 }, cq: { current: 0, total: 50 }, content: { current: 0, total: 20 }, started: '' },
-  { name: 'বৌদ্ধধর্ম শিক্ষা', progress: 0.00, mcq: { current: 0, total: 100 }, cq: { current: 0, total: 50 }, content: { current: 0, total: 20 }, started: '' },
-  { name: 'খ্রিষ্টধর্ম শিক্ষা', progress: 0.00, mcq: { current: 0, total: 100 }, cq: { current: 0, total: 50 }, content: { current: 0, total: 20 }, started: '' },
-];
-
-const questions = [
-  {
-    id: 1,
-    title: '১. তুলি কোন শ্রেণিতে পড়ে?',
-    tags: ['আমার বাংলা বই', 'আমাদের পরিবেশ ও আমাদের গ্রাম'],
-    options: [
-      { text: 'ক   তৃতীয়', correct: false },
-      { text: 'খ   চতুর্থ', correct: false },
-      { text: 'গ   পঞ্চম', correct: true },
-      { text: 'ঘ   ষষ্ঠ', correct: false },
-    ],
-    views: 201
-  },
-  {
-    id: 2,
-    title: '২. আমাদের আশেপাশে যারা থাকেন, তারা আমাদের-',
-    tags: ['আমার বাংলা বই', 'আমাদের পরিবেশ ও আমাদের গ্রাম'],
-    options: [
-      { text: 'ক   আত্মীয়', correct: false },
-      { text: 'খ   অনাত্মীয়', correct: false },
-      { text: 'গ   প্রতিবেশী', correct: true },
-      { text: 'ঘ   কেউ না', correct: false },
-    ],
-    views: 141
-  },
-  {
-    id: 3,
-    title: '৩. মিতুর বড়ো বোন কোথায় পড়েন?',
-    tags: ['আমার বাংলা বই', 'আমাদের পরিবেশ ও আমাদের গ্রাম'],
-    options: [
-      { text: 'ক   কলেজে', correct: false },
-      { text: 'খ   হাইস্কুলে', correct: true },
-      { text: 'গ   ভার্সিটিতে', correct: false },
-      { text: 'ঘ   মাদ্রাসায়', correct: false },
-    ],
-    views: 193
-  },
-  {
-    id: 4,
-    title: '৪. মিতুর মা কোথায় কাজ করেন?',
-    tags: ['আমার বাংলা বই', 'আমাদের পরিবেশ ও আমাদের গ্রাম'],
-    options: [
-      { text: 'ক   হাসপাতালে', correct: true },
-      { text: 'খ   বইয়ের দোকানে', correct: false },
-      { text: 'গ   স্কুলে', correct: false },
-      { text: 'ঘ   অন্যের বাড়িতে', correct: false },
-    ],
-    views: 186
-  },
-  {
-    id: 5,
-    title: '৫. মিতুর মায়ের পেশা কী?',
-    tags: ['আমার বাংলা বই', 'আমাদের পরিবেশ ও আমাদের গ্রাম'],
-    options: [
-      { text: 'ক   ডাক্তার', correct: false },
-      { text: 'খ   ইঞ্জিনিয়ার', correct: false },
-      { text: 'গ   স্কুল শিক্ষক', correct: true },
-      { text: 'ঘ   গৃহিণী', correct: false },
-    ],
-    views: 150,
-    blurred: true
-  }
-];
+import { useAuth } from '@/hooks/use-auth';
+import { getUserMistakes } from '@/lib/firebase/student-analytics';
+import { getQuestionsByIds } from '@/lib/firebase/question-bank';
+import Link from 'next/link';
 
 export default function MistakeVaultPage() {
+  const { user, loading: authLoading } = useAuth();
+  
+  const [loading, setLoading] = useState(true);
+  const [allMistakeData, setAllMistakeData] = useState<any[]>([]);
   const [openSubjects, setOpenSubjects] = useState<Record<string, boolean>>({});
+  const [filter, setFilter] = useState<'wrong' | 'correct' | 'skipped'>('wrong');
+  
+  const [stats, setStats] = useState({ right: 0, wrong: 0, skipped: 0, total: 0, acc: 0 });
+  const [subjects, setSubjects] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (authLoading) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
+    async function fetchData() {
+      try {
+        const mistakeDocs = await getUserMistakes(user!.uid);
+        
+        if (mistakeDocs.length === 0) {
+          setLoading(false);
+          return;
+        }
+
+        const questionIds = mistakeDocs.map(d => d.questionId);
+        // Firebase 'in' query supports max 10, so if there are many, we might need chunking,
+        // but for now let's chunk if > 30.
+        const chunkedIds = [];
+        for (let i = 0; i < questionIds.length; i += 30) {
+          chunkedIds.push(questionIds.slice(i, i + 30));
+        }
+
+        let fetchedQuestions: any[] = [];
+        for (const chunk of chunkedIds) {
+           const qs = await getQuestionsByIds(chunk);
+           fetchedQuestions = [...fetchedQuestions, ...qs];
+        }
+
+        let right = 0;
+        let wrong = 0;
+        let skipped = 0;
+        
+        const subjectsMap: Record<string, any> = {};
+
+        const combinedData = mistakeDocs.map(md => {
+          const q = fetchedQuestions.find(fq => fq.id === md.questionId);
+          
+          if (md.latestStatus === 'correct') right++;
+          else if (md.latestStatus === 'skipped') skipped++;
+          else wrong++;
+
+          if (q && q.tags && q.tags.length > 0) {
+            const subjName = q.tags[0];
+            if (!subjectsMap[subjName]) {
+              subjectsMap[subjName] = { 
+                name: subjName, 
+                progress: 0, 
+                mcq: { current: 0, total: 0 },
+                cq: { current: 0, total: 0 },
+                content: { current: 0, total: 0 },
+                started: '' 
+              };
+            }
+            subjectsMap[subjName].mcq.total += 1;
+            if (md.latestStatus !== 'correct') {
+              subjectsMap[subjName].mcq.current += 1;
+            }
+          }
+
+          return { ...md, question: q };
+        }).filter(d => d.question); // Filter out orphans
+
+        const total = right + wrong + skipped;
+        const acc = total > 0 ? (right / total) * 100 : 0;
+
+        setStats({ right, wrong, skipped, total, acc });
+        
+        const subjArr = Object.values(subjectsMap).map(s => {
+           s.progress = s.mcq.total > 0 ? ((s.mcq.total - s.mcq.current) / s.mcq.total) * 100 : 0;
+           return s;
+        });
+        
+        setSubjects(subjArr);
+        setAllMistakeData(combinedData);
+      } catch (error) {
+        console.error("Failed to fetch mistakes:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, [user, authLoading]);
 
   const toggleSubject = (name: string) => {
     setOpenSubjects(prev => ({ ...prev, [name]: !prev[name] }));
   };
 
+  if (authLoading || loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <Loader2 className="w-8 h-8 animate-spin text-slate-400" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center min-h-[50vh] text-slate-500">
+        Please login to view your mistake vault.
+      </div>
+    );
+  }
+
+  const filteredQuestions = allMistakeData.filter(d => d.latestStatus === filter || (filter === 'wrong' && !d.latestStatus));
+
   return (
     <div className="w-full max-w-[1400px] mx-auto pb-12 text-slate-800 dark:text-slate-100 relative">
-      
       <div className="flex flex-col lg:flex-row gap-6 items-start">
         
         {/* LEFT COLUMN: Vault Content */}
@@ -132,12 +161,12 @@ export default function MistakeVaultPage() {
                     <circle 
                       cx="50" cy="50" r="45" fill="none" stroke="#ef4444" strokeWidth="8" 
                       strokeDasharray={`${2 * Math.PI * 45}`} 
-                      strokeDashoffset={`${2 * Math.PI * 45 * (1 - 0.167)}`}
+                      strokeDashoffset={`${2 * Math.PI * 45 * (1 - (stats.acc / 100))}`}
                       strokeLinecap="round" 
                     />
                   </svg>
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className="text-xl font-bold text-slate-800 dark:text-white">16.7%</span>
+                    <span className="text-xl font-bold text-slate-800 dark:text-white">{stats.acc.toFixed(1)}%</span>
                     <span className="text-[10px] font-bold text-slate-400">ACC.</span>
                   </div>
                 </div>
@@ -146,19 +175,19 @@ export default function MistakeVaultPage() {
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 w-full">
                     <div className="flex items-center justify-center gap-2 px-3 py-1.5 bg-slate-50 dark:bg-slate-800 rounded-md border border-slate-100 dark:border-slate-700">
                       <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
-                      <span className="text-xs font-bold text-slate-600 dark:text-slate-300">1 <span className="font-medium text-slate-400">RIGHT</span></span>
+                      <span className="text-xs font-bold text-slate-600 dark:text-slate-300">{stats.right} <span className="font-medium text-slate-400">RIGHT</span></span>
                     </div>
                     <div className="flex items-center justify-center gap-2 px-3 py-1.5 bg-slate-50 dark:bg-slate-800 rounded-md border border-slate-100 dark:border-slate-700">
                       <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
-                      <span className="text-xs font-bold text-slate-600 dark:text-slate-300">5 <span className="font-medium text-slate-400">WRONG</span></span>
+                      <span className="text-xs font-bold text-slate-600 dark:text-slate-300">{stats.wrong} <span className="font-medium text-slate-400">WRONG</span></span>
                     </div>
                     <div className="flex items-center justify-center gap-2 px-3 py-1.5 bg-slate-50 dark:bg-slate-800 rounded-md border border-slate-100 dark:border-slate-700">
                       <span className="w-1.5 h-1.5 rounded-full bg-yellow-500"></span>
-                      <span className="text-xs font-bold text-slate-600 dark:text-slate-300">0 <span className="font-medium text-slate-400">SKIP</span></span>
+                      <span className="text-xs font-bold text-slate-600 dark:text-slate-300">{stats.skipped} <span className="font-medium text-slate-400">SKIP</span></span>
                     </div>
                     <div className="flex items-center justify-center gap-2 px-3 py-1.5 bg-slate-50 dark:bg-slate-800 rounded-md border border-slate-100 dark:border-slate-700">
                       <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-                      <span className="text-xs font-bold text-slate-600 dark:text-slate-300">6 <span className="font-medium text-slate-400">TOTAL</span></span>
+                      <span className="text-xs font-bold text-slate-600 dark:text-slate-300">{stats.total} <span className="font-medium text-slate-400">TOTAL</span></span>
                     </div>
                   </div>
                 </div>
@@ -182,94 +211,111 @@ export default function MistakeVaultPage() {
           {/* Filter Tabs */}
           <div className="flex justify-center border-b border-slate-200 dark:border-slate-800 pb-2 relative">
              <div className="flex items-center gap-4">
-               <button className="px-4 py-1.5 bg-red-600 text-white font-bold text-xs rounded border border-red-600">
-                 Wrong (5)
+               <button 
+                  onClick={() => setFilter('wrong')}
+                  className={`px-4 py-1.5 font-bold text-xs rounded border ${filter === 'wrong' ? 'bg-red-600 text-white border-red-600' : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50'}`}
+                >
+                 Wrong ({stats.wrong})
                </button>
-               <button className="px-4 py-1.5 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 font-bold text-xs rounded border border-slate-200 dark:border-slate-700 hover:bg-slate-50">
-                 Right (1)
+               <button 
+                  onClick={() => setFilter('correct')}
+                  className={`px-4 py-1.5 font-bold text-xs rounded border ${filter === 'correct' ? 'bg-green-600 text-white border-green-600' : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50'}`}
+                >
+                 Right ({stats.right})
                </button>
-               <button className="px-4 py-1.5 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 font-bold text-xs rounded border border-slate-200 dark:border-slate-700 hover:bg-slate-50">
-                 Skipped (0)
+               <button 
+                  onClick={() => setFilter('skipped')}
+                  className={`px-4 py-1.5 font-bold text-xs rounded border ${filter === 'skipped' ? 'bg-yellow-500 text-white border-yellow-500' : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50'}`}
+                >
+                 Skipped ({stats.skipped})
                </button>
              </div>
-             {/* Dotted line below tabs to match screenshot styling exactly */}
              <div className="absolute -bottom-[1px] w-full border-b border-dashed border-slate-300 dark:border-slate-700 -z-10"></div>
           </div>
 
           {/* Question Cards Container */}
           <div className="space-y-4 relative pb-10">
-            {questions.map((q, i) => (
-              <Card key={i} className={`bg-white dark:bg-slate-900 shadow-sm border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden ${q.blurred ? 'opacity-30 blur-[2px] pointer-events-none' : ''}`}>
-                <div className="p-5">
-                  <h3 className="font-bold text-slate-800 dark:text-slate-100 text-[15px] mb-3">{q.title}</h3>
-                  <div className="flex flex-wrap gap-2 mb-5">
-                    {q.tags.map((tag, ti) => (
-                      <span key={ti} className="px-2.5 py-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 text-[10px] rounded-full">
-                        {tag}
-                      </span>
-                    ))}
+            {filteredQuestions.length === 0 ? (
+              <div className="text-center py-12 text-slate-500">
+                No questions found for this filter.
+              </div>
+            ) : filteredQuestions.map((data, i) => {
+              const q = data.question;
+              const options = q.options ? Object.entries(q.options).map(([key, val]) => ({
+                key, text: `${key.toUpperCase()}   ${val}`, correct: q.correctAnswer?.toLowerCase() === key.toLowerCase()
+              })) : [];
+
+              return (
+                <Card key={i} className="bg-white dark:bg-slate-900 shadow-sm border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden">
+                  <div className="p-5">
+                    <h3 className="font-bold text-slate-800 dark:text-slate-100 text-[15px] mb-3">{q.questionText}</h3>
+                    <div className="flex flex-wrap gap-2 mb-5">
+                      {q.tags?.map((tag: string, ti: number) => (
+                        <span key={ti} className="px-2.5 py-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 text-[10px] rounded-full">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                    
+                    {options.length > 0 && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {options.map((opt, oi) => {
+                          const isLastPicked = data.lastSelectedAnswer?.toLowerCase() === opt.key.toLowerCase();
+                          let borderClass = 'border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 text-slate-600 dark:text-slate-400';
+                          if (opt.correct) borderClass = 'border-green-500 bg-white dark:bg-slate-900';
+                          else if (isLastPicked) borderClass = 'border-red-500 bg-red-50 dark:bg-red-900/20';
+
+                          return (
+                            <div 
+                              key={oi} 
+                              className={`px-4 py-2.5 rounded-md text-[13px] font-medium border flex items-center ${borderClass}`}
+                            >
+                              {opt.correct ? (
+                                <>
+                                  <div className="w-5 h-5 rounded-full bg-green-500 text-white flex items-center justify-center shrink-0 mr-3 shadow-sm">
+                                    <span className="text-[10px] font-bold">{opt.text.split(' ')[0]}</span>
+                                  </div>
+                                  <span className="text-slate-800 dark:text-slate-200">{opt.text.substring(opt.text.indexOf(' ') + 1).trim()}</span>
+                                </>
+                              ) : isLastPicked ? (
+                                <>
+                                  <div className="w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center shrink-0 mr-3 shadow-sm">
+                                    <span className="text-[10px] font-bold">{opt.text.split(' ')[0]}</span>
+                                  </div>
+                                  <span className="text-red-700 dark:text-red-300">{opt.text.substring(opt.text.indexOf(' ') + 1).trim()}</span>
+                                </>
+                              ) : (
+                                <div className="flex items-center gap-3">
+                                  <span className="text-slate-500 font-bold ml-1.5">{opt.text.split(' ')[0]}</span>
+                                  <span>{opt.text.substring(opt.text.indexOf(' ') + 1).trim()}</span>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {q.options.map((opt, oi) => (
-                      <div 
-                        key={oi} 
-                        className={`px-4 py-2.5 rounded-md text-[13px] font-medium border flex items-center ${
-                          opt.correct 
-                            ? 'border-green-500 bg-white dark:bg-slate-900' 
-                            : 'border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 text-slate-600 dark:text-slate-400'
-                        }`}
-                      >
-                        {opt.correct ? (
-                          <>
-                            <div className="w-5 h-5 rounded-full bg-green-500 text-white flex items-center justify-center shrink-0 mr-3 shadow-sm">
-                              <span className="text-[10px] font-bold">{opt.text.split(' ')[0]}</span>
-                            </div>
-                            <span className="text-slate-800 dark:text-slate-200">{opt.text.substring(opt.text.indexOf(' ') + 1).trim()}</span>
-                          </>
-                        ) : (
-                          <div className="flex items-center gap-3">
-                            <span className="text-slate-500 font-bold ml-1.5">{opt.text.split(' ')[0]}</span>
-                            <span>{opt.text.substring(opt.text.indexOf(' ') + 1).trim()}</span>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                
-                {/* Card Footer Tools */}
-                <div className="px-5 py-3 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/30 dark:bg-slate-900/50">
-                  <div className="flex items-center gap-1 text-[11px] font-bold text-slate-500 cursor-pointer">
-                    DES <ChevronDown className="w-3 h-3" />
-                  </div>
-                  <div className="flex items-center gap-4 text-slate-400">
-                    <div className="flex items-center gap-1.5 text-xs font-semibold cursor-pointer hover:text-slate-600">
-                      <Eye className="w-4 h-4" /> {q.views}
+                  {/* Card Footer Tools */}
+                  <div className="px-5 py-3 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/30 dark:bg-slate-900/50">
+                    <div className="flex items-center gap-1 text-[11px] font-bold text-slate-500 cursor-pointer">
+                      DES <ChevronDown className="w-3 h-3" />
                     </div>
-                    <PieChart className="w-4 h-4 cursor-pointer hover:text-slate-600" />
-                    <Bookmark className="w-4 h-4 cursor-pointer hover:text-slate-600" />
-                    <Heart className="w-4 h-4 cursor-pointer hover:text-red-500" />
-                    <Flag className="w-4 h-4 cursor-pointer hover:text-slate-600" />
-                    <Share2 className="w-4 h-4 cursor-pointer hover:text-slate-600" />
+                    <div className="flex items-center gap-4 text-slate-400">
+                      <div className="flex items-center gap-1.5 text-xs font-semibold cursor-pointer hover:text-slate-600">
+                        <Eye className="w-4 h-4" /> 0
+                      </div>
+                      <PieChart className="w-4 h-4 cursor-pointer hover:text-slate-600" />
+                      <Bookmark className="w-4 h-4 cursor-pointer hover:text-slate-600" />
+                      <Heart className="w-4 h-4 cursor-pointer hover:text-red-500" />
+                      <Flag className="w-4 h-4 cursor-pointer hover:text-slate-600" />
+                      <Share2 className="w-4 h-4 cursor-pointer hover:text-slate-600" />
+                    </div>
                   </div>
-                </div>
-              </Card>
-            ))}
-
-            {/* Premium Unlock Overlay */}
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-full max-w-[400px] z-10">
-              <Card className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm shadow-xl border-slate-200/50 dark:border-slate-700/50 rounded-xl overflow-hidden text-center py-8 px-6">
-                <h2 className="text-[20px] font-bold text-slate-900 dark:text-white mb-3">সব প্রশ্ন দেখতে আনলক করুন</h2>
-                <p className="text-[13px] font-medium text-slate-600 dark:text-slate-400 mb-6 px-4">
-                  আরও বেশি প্রশ্ন, সমাধান ও পূর্ণ সুবিধা পেতে প্রিমিয়াম সাবস্ক্রিপশন নিন।
-                </p>
-                <Button className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-bold rounded-md px-8 shadow-md">
-                  প্রিমিয়ামে আপগ্রেড করুন
-                </Button>
-              </Card>
-            </div>
-            
+                </Card>
+              );
+            })}
           </div>
         </div>
 
@@ -282,7 +328,9 @@ export default function MistakeVaultPage() {
             </CardHeader>
             <CardContent className="p-0">
               <div className="h-[600px] lg:h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar p-2 space-y-2">
-                {subjects.map((sub, i) => {
+                {subjects.length === 0 ? (
+                  <div className="text-center py-6 text-slate-500 text-sm">No data available.</div>
+                ) : subjects.map((sub, i) => {
                   const isOpen = openSubjects[sub.name];
                   
                   if (isOpen) {
@@ -304,7 +352,7 @@ export default function MistakeVaultPage() {
                         <div className="flex justify-between items-start mb-3 gap-2">
                           <div className="space-y-0.5">
                             <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-700 dark:text-slate-300">
-                              <span className="w-1.5 h-1.5 rounded-full bg-green-500 shrink-0"></span> {sub.mcq.current}<span className="text-slate-400 font-medium whitespace-nowrap">/{sub.mcq.total} {sub.mcq.pct && `(${sub.mcq.pct})`}</span>
+                              <span className="w-1.5 h-1.5 rounded-full bg-green-500 shrink-0"></span> {sub.mcq.current}<span className="text-slate-400 font-medium whitespace-nowrap">/{sub.mcq.total}</span>
                             </div>
                             <div className="text-[9px] font-semibold text-slate-400 ml-3 uppercase">MCQ</div>
                           </div>
@@ -323,18 +371,9 @@ export default function MistakeVaultPage() {
                         </div>
                         
                         <div className="w-full h-1 bg-slate-100 dark:bg-slate-800 rounded-full mb-4 overflow-hidden flex">
-                          <div className="h-full bg-green-500" style={{ width: '1%' }}></div>
+                          <div className="h-full bg-green-500" style={{ width: `${sub.progress}%` }}></div>
                           <div className="h-full bg-blue-500" style={{ width: '0%' }}></div>
                           <div className="h-full bg-purple-500" style={{ width: '0%' }}></div>
-                        </div>
-                        
-                        <div className="flex justify-between items-center mt-2">
-                          <div className="text-[10px] text-slate-500 font-medium">
-                            {sub.started ? `Started: ${sub.started}` : ''}
-                          </div>
-                          <div className="text-[10px] font-semibold text-blue-500 flex items-center gap-1 cursor-pointer hover:underline">
-                            View Report <ArrowRight className="w-3 h-3" />
-                          </div>
                         </div>
                       </div>
                     );

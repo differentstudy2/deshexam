@@ -12,7 +12,7 @@ import { QuestionBankEntry } from '@/lib/question-bank-types';
 import { useAuth } from '@/hooks/use-auth';
 import { useAuthDialog } from '@/hooks/use-auth-dialog';
 import { getUserProfile } from '@/lib/firebase/firestore';
-import { saveExamAttempt, getUserExamAttemptsCount } from '@/lib/firebase/student-analytics';
+import { saveExamAttempt, getUserExamAttemptsCount, recordQuestionAttempt } from '@/lib/firebase/student-analytics';
 
 type QuestionState = 'unvisited' | 'answered' | 'skipped' | 'review' | 'current';
 
@@ -394,14 +394,17 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
       const userAnswer = answers[q.id];
       if (!userAnswer) {
         skipped += 1;
+        if (user) recordQuestionAttempt(user.uid, q.id, '', 'skipped').catch(console.error);
       } else {
         const isCorrect = q.correctAnswer && userAnswer.toLowerCase() === q.correctAnswer.toLowerCase();
         if (isCorrect) {
           correct += 1;
           score += (q.marks || 1);
+          if (user) recordQuestionAttempt(user.uid, q.id, userAnswer, 'correct').catch(console.error);
         } else {
           wrong += 1;
           score -= (mockTest.negativeMarking || 0);
+          if (user) recordQuestionAttempt(user.uid, q.id, userAnswer, 'wrong').catch(console.error);
         }
       }
     });
