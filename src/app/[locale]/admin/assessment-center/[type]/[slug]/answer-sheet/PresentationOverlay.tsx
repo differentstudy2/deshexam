@@ -59,7 +59,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     
     // Drawing Tool State
     const [drawingTool, setDrawingTool] = useState<'pen' | 'highlighter' | 'laser'>('pen');
-    const [laserPos, setLaserPos] = useState({ x: -100, y: -100 });
+    const laserRef = useRef<HTMLDivElement>(null);
     
     // Spotlight State
     const [isSpotlightActive, setIsSpotlightActive] = useState(false);
@@ -75,9 +75,10 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     }, [isSpotlightActive]);
     
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const activeCanvasRef = useRef<HTMLCanvasElement>(null);
     const contextRef = useRef<CanvasRenderingContext2D | null>(null);
     const isDrawing = useRef(false);
-    const lastPos = useRef({ x: 0, y: 0 });
+    const currentStroke = useRef<{x: number, y: number}[]>([]);
 
     // Initialize Canvas
     useEffect(() => {
@@ -128,6 +129,13 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         if (canvas && context) {
             context.clearRect(0, 0, canvas.width, canvas.height);
         }
+        const activeCanvas = activeCanvasRef.current;
+        if (activeCanvas) {
+            const activeCtx = activeCanvas.getContext('2d');
+            if (activeCtx) {
+                activeCtx.clearRect(0, 0, activeCanvas.width, activeCanvas.height);
+            }
+        }
     }, []);
 
     useEffect(() => {
@@ -159,7 +167,10 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         
         if (drawingTool === 'laser') {
             const { x, y } = getCoordinates(e);
-            setLaserPos({ x, y });
+            if (laserRef.current) {
+                laserRef.current.style.left = `${x}px`;
+                laserRef.current.style.top = `${y}px`;
+            }
             return;
         }
         
@@ -186,21 +197,49 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         } catch (err) {}
 
         const { x, y } = getCoordinates(e);
+        currentStroke.current = [{x, y}];
+        redrawActiveStroke();
+    };
 
-        lastPos.current = { x, y };
+    const redrawActiveStroke = () => {
+        const canvas = activeCanvasRef.current;
+        if (!canvas) return;
         
-        // Draw a dot on click
-        const ctx = contextRef.current;
-        if (ctx) {
-            ctx.globalAlpha = drawingTool === 'highlighter' ? 0.3 : 1.0;
-            ctx.globalCompositeOperation = drawingTool === 'highlighter' ? 'multiply' : 'source-over';
-            const size = drawingTool === 'highlighter' ? penSize * 5 : penSize;
-            
-            ctx.beginPath();
-            ctx.arc(x, y, size / 2, 0, Math.PI * 2);
+        if (canvas.width !== canvas.offsetWidth || canvas.height !== canvas.offsetHeight) {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+        }
+        
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        if (currentStroke.current.length === 0) return;
+        
+        ctx.globalAlpha = drawingTool === 'highlighter' ? 0.3 : 1.0;
+        ctx.globalCompositeOperation = drawingTool === 'highlighter' ? 'multiply' : 'source-over';
+        const size = drawingTool === 'highlighter' ? penSize * 5 : penSize;
+        
+        ctx.beginPath();
+        ctx.moveTo(currentStroke.current[0].x, currentStroke.current[0].y);
+        
+        if (currentStroke.current.length === 1) {
+            ctx.arc(currentStroke.current[0].x, currentStroke.current[0].y, size / 2, 0, Math.PI * 2);
             ctx.fillStyle = penColor;
             ctx.fill();
+            return;
         }
+        
+        for (let i = 1; i < currentStroke.current.length; i++) {
+            ctx.lineTo(currentStroke.current[i].x, currentStroke.current[i].y);
+        }
+        
+        ctx.strokeStyle = penColor;
+        ctx.lineWidth = size;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.stroke();
     };
 
     const draw = (e: any) => {
@@ -209,43 +248,42 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         const { x, y } = getCoordinates(e);
         
         if (drawingTool === 'laser') {
-            setLaserPos({ x, y });
+            if (laserRef.current) {
+                laserRef.current.style.left = `${x}px`;
+                laserRef.current.style.top = `${y}px`;
+            }
             return;
         }
 
         if (!isDrawing.current) return;
         
-        const ctx = contextRef.current;
-        if (!ctx) return;
-
-        ctx.globalAlpha = drawingTool === 'highlighter' ? 0.3 : 1.0;
-        ctx.globalCompositeOperation = drawingTool === 'highlighter' ? 'multiply' : 'source-over';
-        const size = drawingTool === 'highlighter' ? penSize * 5 : penSize;
-
-        ctx.beginPath();
-        ctx.moveTo(lastPos.current.x, lastPos.current.y);
-        ctx.lineTo(x, y);
-        ctx.strokeStyle = penColor;
-        ctx.lineWidth = size;
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-        ctx.stroke();
-
-        lastPos.current = { x, y };
+        currentStroke.current.push({x, y});
+        redrawActiveStroke();
     };
 
     const stopDrawing = (e: any) => {
         if (!isDrawing.current) return;
         
-        if (contextRef.current) {
-            contextRef.current.closePath();
-        }
         isDrawing.current = false;
         try {
             if (e.target && e.target.releasePointerCapture && e.pointerId !== undefined) {
                 (e.target as HTMLElement).releasePointerCapture(e.pointerId);
             }
         } catch (err) {}
+
+        const mainCanvas = canvasRef.current;
+        const activeCanvas = activeCanvasRef.current;
+        if (mainCanvas && activeCanvas) {
+            const ctx = mainCanvas.getContext('2d');
+            if (ctx) {
+                ctx.drawImage(activeCanvas, 0, 0);
+            }
+            const activeCtx = activeCanvas.getContext('2d');
+            if (activeCtx) {
+                activeCtx.clearRect(0, 0, activeCanvas.width, activeCanvas.height);
+            }
+        }
+        currentStroke.current = [];
     };
 
     const handleTimerPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -556,10 +594,16 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
             {/* Main Presentation Area */}
             <div className="responsive-fonts relative w-full h-full lg:max-w-[177.78vh] lg:max-h-[56.25vw] bg-gradient-to-br from-[#f8fafc] via-[#f1f5f9] to-[#f8fafc] flex flex-col shadow-2xl overflow-hidden shrink-0 z-10">
 
-                {/* Drawing Canvas */}
+                {/* Main Drawing Canvas */}
                 <canvas
                     ref={canvasRef}
-                    className={`absolute inset-0 w-full h-full z-20 touch-none ${isPenActive ? (drawingTool === 'laser' ? 'pointer-events-auto cursor-none' : 'pointer-events-auto cursor-crosshair') : 'pointer-events-none'}`}
+                    className={`absolute inset-0 w-full h-full z-20 pointer-events-none`}
+                />
+
+                {/* Active Stroke Canvas (Top Layer) */}
+                <canvas
+                    ref={activeCanvasRef}
+                    className={`absolute inset-0 w-full h-full z-30 touch-none ${isPenActive ? (drawingTool === 'laser' ? 'pointer-events-auto cursor-none' : 'pointer-events-auto cursor-crosshair') : 'pointer-events-none'}`}
                     onPointerDown={startDrawing}
                     onPointerMove={draw}
                     onPointerUp={stopDrawing}
@@ -574,12 +618,13 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 {/* Laser Pointer Dot */}
                 {isPenActive && drawingTool === 'laser' && (
                     <div 
+                        ref={laserRef}
                         className="absolute w-4 h-4 bg-red-500 rounded-full z-30 pointer-events-none shadow-[0_0_15px_5px_rgba(239,68,68,0.8)] border border-white/50"
                         style={{ 
-                            left: laserPos.x, 
-                            top: laserPos.y,
+                            left: -100, 
+                            top: -100,
                             transform: 'translate(-50%, -50%)',
-                            transition: 'left 0.05s ease-out, top 0.05s ease-out'
+                            willChange: 'left, top'
                         }}
                     />
                 )}
