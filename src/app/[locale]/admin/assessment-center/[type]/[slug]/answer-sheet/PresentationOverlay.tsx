@@ -728,13 +728,13 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 )}
 
                 {/* Header */}
-                <div className="shrink-0 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-800 dark:via-gray-800 dark:to-gray-800 border-b border-indigo-100 dark:border-gray-700 py-3 px-4 md:pl-6 md:pr-8 flex flex-col md:flex-row justify-between items-center w-full z-30 shadow-sm gap-3 md:gap-0 relative">
+                <div className="shrink-0 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-800 dark:via-gray-800 dark:to-gray-800 border-b border-indigo-100 dark:border-gray-700 py-[0.1rem] px-4 md:pl-6 md:pr-8 flex flex-col md:flex-row justify-between items-center w-full z-30 shadow-sm gap-3 md:gap-0 relative">
                     {/* Logo Area */}
                     <div className="flex items-center gap-2 md:gap-3 w-full md:w-auto justify-between md:justify-start">
                         <div className="flex items-center gap-2 md:gap-3 px-1">
                             <img src="/image/logo.png" alt="DeshExam" className="h-8 md:h-9 w-auto object-contain drop-shadow-sm" />
                             <div className="flex flex-col">
-                                <span className="font-extrabold text-sm md:text-lg text-indigo-950 dark:text-gray-100 leading-none">Desh Exam Academy</span>
+                                <span className="font-extrabold text-[1rem] text-indigo-950 dark:text-gray-100 leading-none">Desh Exam Academy</span>
                                 <span className="text-[9px] md:text-[10px] text-indigo-800/70 dark:text-gray-400 font-bold tracking-wide mt-1 uppercase">Learn • Practice • Succeed</span>
                             </div>
                         </div>
@@ -750,7 +750,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     </div>
                     {/* Title Area */}
                     <div className="flex-1 text-center w-full mt-1 md:mt-0 px-2 md:px-6">
-                        <h1 className="text-base md:text-2xl font-extrabold text-indigo-950 dark:text-gray-100 tracking-tight line-clamp-1 md:line-clamp-none">{classLine}</h1>
+                        <h1 className="text-[1rem] font-extrabold text-indigo-950 dark:text-gray-100 tracking-tight line-clamp-1 md:line-clamp-none">{classLine}</h1>
                         {(chapterName || topicName) && (
                             <div className="text-xs md:text-sm text-indigo-800 dark:text-gray-300 font-semibold mt-1.5 tracking-wide uppercase">
                                 {[chapterName, topicName].filter(Boolean).join(' | ')}
@@ -937,7 +937,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 </div>
 
                 {/* Footer */}
-                <div className="shrink-0 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-800 dark:via-gray-800 dark:to-gray-800 border-t border-indigo-100 dark:border-gray-700 py-4 px-4 md:pl-12 md:pr-8 flex justify-between items-center w-full z-30 shadow-[0_-2px_10px_rgba(0,0,0,0.02)] relative">
+                <div className="shrink-0 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-800 dark:via-gray-800 dark:to-gray-800 border-t border-indigo-100 dark:border-gray-700 py-[0.1rem] px-4 md:pl-12 md:pr-8 flex justify-between items-center w-full z-30 shadow-[0_-2px_10px_rgba(0,0,0,0.02)] relative">
                     <div className="flex items-center text-indigo-900/70 dark:text-gray-400 font-semibold text-sm md:text-lg">
                         © DeshExam
                     </div>
