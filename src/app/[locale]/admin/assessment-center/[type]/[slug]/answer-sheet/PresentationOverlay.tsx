@@ -44,6 +44,10 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [wmVisible, setWmVisible] = useState(true);
     const [optionsLayout, setOptionsLayout] = useState<'grid' | 'list'>('grid');
 
+    const [isExpEnabled, setIsExpEnabled] = useState(true);
+    const [isOptionExpEnabled, setIsOptionExpEnabled] = useState(true);
+    const [expFontScale, setExpFontScale] = useState(1);
+
     const [timerPos, setTimerPos] = useState({ x: 0, y: 0 });
     const [isDraggingTimer, setIsDraggingTimer] = useState(false);
     const dragStartPos = useRef({ x: 0, y: 0 });
@@ -420,9 +424,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     )}
 
                     {/* Question */}
-                    <div className="flex items-center gap-3 md:gap-4 w-full max-w-5xl mt-8 md:mt-4" style={{ '--q-size': `clamp(18px, ${5 * qFontScale}vw + 0.5rem, ${38 * qFontScale}px)` } as React.CSSProperties}>
+                    <div className="flex items-start gap-3 md:gap-4 w-full max-w-5xl mt-8 md:mt-4" style={{ '--q-size': `clamp(18px, ${5 * qFontScale}vw + 0.5rem, ${38 * qFontScale}px)` } as React.CSSProperties}>
                         <span className="text-black font-extrabold leading-normal shrink-0" style={{ fontSize: 'var(--q-size)' }}>Q{currentSlide + 1}.</span>
-                        <div className="prose prose-black max-w-none prose-p:font-extrabold text-[length:var(--q-size)] leading-normal text-left text-black font-extrabold [&_*]:!text-[length:var(--q-size)] [&_*]:!leading-normal [&_*]:!m-0 flex items-center capitalize">
+                        <div className="prose prose-black max-w-none prose-p:font-extrabold text-[length:var(--q-size)] leading-normal text-left text-black font-extrabold [&_*]:!text-[length:var(--q-size)] [&_*]:!leading-normal [&_*]:!m-0 capitalize">
                             <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
                                 {q.questionText}
                             </ReactMarkdown>
@@ -510,13 +514,25 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                             <X className="w-7 h-7 stroke-[3]" />
                                         </div>
                                     )}
+                                    
+                                    {/* Option Explanation */}
+                                    {step >= 2 && isOptionExpEnabled && q.optionExplanations?.[opt.key] && (
+                                        <div 
+                                            className="ml-4 mt-2 pl-4 pr-4 py-2 text-gray-700 bg-gray-50/90 rounded-xl border-l-4 border-l-[#4285F4] shadow-sm animate-in fade-in duration-500 prose max-w-none [&>p]:m-0"
+                                            style={{ fontSize: `clamp(13px, ${3 * expFontScale}vw + 0.3rem, ${20 * expFontScale}px)` }}
+                                        >
+                                            <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
+                                                {q.optionExplanations[opt.key]}
+                                            </ReactMarkdown>
+                                        </div>
+                                    )}
                                 </div>
                             );
                         })}
                     </div>
 
                     {/* Explanation */}
-                    {step >= 2 && q.explanation && (
+                    {step >= 2 && q.explanation && isExpEnabled && (
                         <div className="w-full max-w-5xl mt-4 animate-in fade-in slide-in-from-bottom-8 duration-700">
                             <div className="bg-white p-6 rounded-3xl border border-gray-200 shadow-xl relative overflow-hidden">
                                 {/* Small colored accent line on the left */}
@@ -526,7 +542,10 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     <span className="text-2xl">💡</span>
                                     Explanation
                                 </div>
-                                <div className="prose prose-xl max-w-none text-gray-800 pl-4 font-medium">
+                                <div 
+                                    className="prose prose-xl max-w-none text-gray-800 pl-4 font-medium"
+                                    style={{ fontSize: `clamp(15px, ${4 * expFontScale}vw + 0.4rem, ${24 * expFontScale}px)` }}
+                                >
                                     <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
                                         {q.explanation}
                                     </ReactMarkdown>
@@ -557,7 +576,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             </button>
 
                             {isSettingsOpen && (
-                                <div className="absolute bottom-full mb-4 right-0 bg-white border border-gray-200 rounded-2xl shadow-2xl p-5 w-80 z-50 animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[70vh]">
+                                <div className="fixed bottom-[80px] left-1/2 -translate-x-1/2 md:absolute md:bottom-full md:left-auto md:right-0 md:translate-x-0 md:mb-4 bg-white border border-gray-200 rounded-2xl shadow-2xl p-5 w-[90vw] sm:w-80 z-50 animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[70vh] md:max-h-[60vh]">
                                     <div className="flex justify-between items-center mb-4 pb-3 border-b border-gray-100 shrink-0">
                                         <h3 className="font-bold text-gray-800 text-lg flex items-center gap-2">
                                             <Settings className="w-5 h-5 text-gray-500" /> Settings
@@ -628,6 +647,32 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                                         <hr className="border-gray-100" />
 
+                                        <div className="flex items-center justify-between">
+                                            <div className="text-sm font-bold text-gray-600">
+                                                Show Explanation
+                                            </div>
+                                            <button
+                                                onClick={() => setIsExpEnabled(!isExpEnabled)}
+                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isExpEnabled ? 'bg-blue-600' : 'bg-gray-300'}`}
+                                            >
+                                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isExpEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
+                                            </button>
+                                        </div>
+
+                                        <div className="flex items-center justify-between">
+                                            <div className="text-sm font-bold text-gray-600">
+                                                Show Options Explanation
+                                            </div>
+                                            <button
+                                                onClick={() => setIsOptionExpEnabled(!isOptionExpEnabled)}
+                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isOptionExpEnabled ? 'bg-blue-600' : 'bg-gray-300'}`}
+                                            >
+                                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isOptionExpEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
+                                            </button>
+                                        </div>
+
+                                        <hr className="border-gray-100" />
+
                                         <div>
                                             <div className="text-sm font-bold text-gray-600 mb-2 flex justify-between">
                                                 <span>Question Font Size</span>
@@ -654,6 +699,21 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                 </button>
                                                 <button onClick={() => setOptFontScale(s => Math.min(2.0, s + 0.1))} className="flex-1 py-2 flex justify-center items-center gap-2 text-gray-700 hover:bg-gray-200 font-bold transition-colors">
                                                     A+ <kbd className="text-[10px] bg-white border border-gray-300 px-1.5 py-0.5 rounded text-gray-500 font-mono shadow-sm">P</kbd>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <div className="text-sm font-bold text-gray-600 mb-2 flex justify-between">
+                                                <span>Explanation Font Size</span>
+                                                <span className="text-purple-600 bg-purple-50 px-2 rounded text-xs py-0.5">{Math.round(expFontScale * 100)}%</span>
+                                            </div>
+                                            <div className="flex items-center bg-gray-50 rounded-xl border border-gray-200 w-full overflow-hidden shadow-inner">
+                                                <button onClick={() => setExpFontScale(s => Math.max(0.6, s - 0.1))} className="flex-1 py-2 flex justify-center items-center text-gray-700 hover:bg-gray-200 font-bold border-r border-gray-200 transition-colors">
+                                                    A-
+                                                </button>
+                                                <button onClick={() => setExpFontScale(s => Math.min(2.0, s + 0.1))} className="flex-1 py-2 flex justify-center items-center text-gray-700 hover:bg-gray-200 font-bold transition-colors">
+                                                    A+
                                                 </button>
                                             </div>
                                         </div>
