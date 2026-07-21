@@ -423,22 +423,22 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                  {/* Top Logo */}
                  <div className="flex flex-col items-center justify-center w-full px-4 pt-10 xl:pt-12 z-10">
                       <div className="flex items-center justify-center mb-8">
-                          <div className="bg-white/5 p-2 xl:p-2.5 rounded-xl xl:rounded-2xl shadow-lg border border-white/10 backdrop-blur-sm">
-                              <img src="/image/logo.png" alt="DeshExam Academy" className="h-10 xl:h-[3rem] w-auto object-contain grayscale invert mix-blend-screen opacity-90 hover:opacity-100 transition-opacity duration-500" />
+                          <div className="bg-white/5 p-[clamp(0.5rem,0.8vw,1rem)] rounded-xl xl:rounded-2xl shadow-lg border border-white/10 backdrop-blur-sm">
+                              <img src="/image/logo.png" alt="DeshExam Academy" className="h-[clamp(2.5rem,4vw,5rem)] w-auto object-contain grayscale invert mix-blend-screen opacity-90 hover:opacity-100 transition-opacity duration-500" />
                           </div>
                       </div>
                       
                       {/* Text Section */}
                       <div className="text-center tracking-wide mt-2 px-2">
-                          <h3 className="text-lg xl:text-xl text-blue-100 mb-1.5 leading-relaxed drop-shadow-sm font-medium">সঠিক প্রস্তুতি,</h3>
-                          <h3 className="text-2xl xl:text-[1.75rem] text-white leading-snug drop-shadow-md font-extrabold">
+                          <h3 className="text-[clamp(1.125rem,1.5vw,2rem)] text-blue-100 mb-1.5 leading-relaxed drop-shadow-sm font-medium">সঠিক প্রস্তুতি,</h3>
+                          <h3 className="text-[clamp(1.5rem,2.2vw,3rem)] text-white leading-snug drop-shadow-md font-extrabold">
                               <span className="text-[#FFD700]">সফলতার</span> চাবিকাঠি!
                           </h3>
                       </div>
                  </div>
 
                  {/* Middle Illustration Placeholder */}
-                 <div className="flex items-center justify-center text-[4.5rem] xl:text-[5.5rem] z-10 w-full drop-shadow-2xl opacity-95 my-4 relative">
+                 <div className="flex items-center justify-center text-[clamp(4.5rem,8vw,12rem)] z-10 w-full drop-shadow-2xl opacity-95 my-4 relative">
                      <div className="absolute inset-0 bg-blue-400/10 blur-[40px] rounded-full"></div>
                      🏆
                  </div>
@@ -1039,14 +1039,14 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                  {/* Top Content */}
                  <div className="flex flex-col items-center justify-center w-full px-4 pt-8 xl:pt-10 z-10">
                       {/* Target Icon */}
-                      <div className="text-[4rem] xl:text-[5rem] leading-none mb-4 drop-shadow-[0_10px_25px_rgba(0,0,0,0.6)]">
+                      <div className="text-[clamp(4rem,6vw,9rem)] leading-none mb-4 drop-shadow-[0_10px_25px_rgba(0,0,0,0.6)]">
                           🎯
                       </div>
                       
                       {/* Text Section */}
                       <div className="text-center tracking-wide mt-1 px-2">
-                          <h3 className="text-base xl:text-lg text-blue-100 mb-1 leading-relaxed drop-shadow-sm font-medium">লক্ষ্য তোমার,</h3>
-                          <h3 className="text-xl xl:text-[1.5rem] text-white leading-snug drop-shadow-md font-bold">
+                          <h3 className="text-[clamp(1rem,1.4vw,1.8rem)] text-blue-100 mb-1 leading-relaxed drop-shadow-sm font-medium">লক্ষ্য তোমার,</h3>
+                          <h3 className="text-[clamp(1.25rem,1.8vw,2.5rem)] text-white leading-snug drop-shadow-md font-bold">
                               <span className="text-[#FFD700]">সাফল্য</span> আমাদের সাথে!
                           </h3>
                       </div>
@@ -1056,7 +1056,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                  <div className="flex-grow"></div>
 
                  {/* Features List */}
-                 <div className="flex flex-col space-y-3 z-10 w-full px-12 xl:px-16 mb-4">
+                 <div className="flex flex-col space-y-[clamp(8px,1vw,16px)] z-10 w-full px-[clamp(2rem,4vw,6rem)] mb-4">
                       {[
                           'Daily Mock Tests',
                           'Unlimited Practice',
@@ -1064,20 +1064,20 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                           'Detailed Explanation',
                           'Performance Tracking'
                       ].map((feature, idx) => (
-                          <div key={idx} className="flex items-center gap-2">
-                              <svg className="w-3.5 h-3.5 xl:w-4 xl:h-4 text-white shrink-0 drop-shadow-md" viewBox="0 0 24 24" fill="currentColor">
+                          <div key={idx} className="flex items-center gap-[clamp(6px,0.8vw,12px)]">
+                              <svg className="w-[clamp(14px,1.2vw,24px)] h-[clamp(14px,1.2vw,24px)] text-white shrink-0 drop-shadow-md" viewBox="0 0 24 24" fill="currentColor">
                                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                               </svg>
-                              <span className="text-white text-[12px] xl:text-[13px] font-medium tracking-wide drop-shadow-sm">{feature}</span>
+                              <span className="text-white text-[clamp(12px,1.1vw,18px)] font-medium tracking-wide drop-shadow-sm">{feature}</span>
                           </div>
                       ))}
                  </div>
 
                  {/* Join Button */}
-                 <div className="w-full px-6 xl:px-10 pb-8 xl:pb-12 z-10">
-                      <button className="w-full flex flex-col items-center justify-center py-2.5 xl:py-3 bg-gradient-to-b from-white/20 to-white/5 backdrop-blur-md border border-white/30 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:from-white/30 hover:to-white/10 transition-all duration-300 group">
-                          <span className="text-white text-[15px] xl:text-[17px] font-extrabold tracking-widest mb-0.5">JOIN DESHEXAM</span>
-                          <span className="text-blue-100 text-[10px] xl:text-[11px] font-medium tracking-wide opacity-80 group-hover:opacity-100 transition-opacity">PREMIUM MOCK TESTS</span>
+                 <div className="w-full px-[clamp(1.5rem,3vw,4rem)] pb-[clamp(2rem,4vw,5rem)] z-10">
+                      <button className="w-full flex flex-col items-center justify-center py-[clamp(10px,1.2vw,20px)] bg-gradient-to-b from-white/20 to-white/5 backdrop-blur-md border border-white/30 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:from-white/30 hover:to-white/10 transition-all duration-300 group">
+                          <span className="text-white text-[clamp(14px,1.4vw,24px)] font-extrabold tracking-widest mb-0.5">JOIN DESHEXAM</span>
+                          <span className="text-blue-100 text-[clamp(10px,0.8vw,14px)] font-medium tracking-wide opacity-80 group-hover:opacity-100 transition-opacity">PREMIUM MOCK TESTS</span>
                       </button>
                  </div>
             </div>
