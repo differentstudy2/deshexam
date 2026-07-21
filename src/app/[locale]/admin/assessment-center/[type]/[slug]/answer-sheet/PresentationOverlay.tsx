@@ -8,7 +8,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
 import 'katex/dist/katex.min.css';
-import { X, ChevronLeft, ChevronRight, Play, Settings, Check, Clock, Pen, Trash2, Focus } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Play, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2 } from 'lucide-react';
 
 const bnOptionsMap: Record<string, string> = {
     a: 'ক',
@@ -56,6 +56,10 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [isPenActive, setIsPenActive] = useState(false);
     const [penColor, setPenColor] = useState('#ef4444');
     const [penSize, setPenSize] = useState(4);
+    
+    // Drawing Tool State
+    const [drawingTool, setDrawingTool] = useState<'pen' | 'highlighter' | 'laser'>('pen');
+    const [laserPos, setLaserPos] = useState({ x: -100, y: -100 });
     
     // Spotlight State
     const [isSpotlightActive, setIsSpotlightActive] = useState(false);
@@ -153,6 +157,12 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const startDrawing = (e: any) => {
         if (!isPenActive) return;
         
+        if (drawingTool === 'laser') {
+            const { x, y } = getCoordinates(e);
+            setLaserPos({ x, y });
+            return;
+        }
+        
         const canvas = canvasRef.current;
         if (!canvas) return;
 
@@ -182,26 +192,41 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         // Draw a dot on click
         const ctx = contextRef.current;
         if (ctx) {
+            ctx.globalAlpha = drawingTool === 'highlighter' ? 0.3 : 1.0;
+            ctx.globalCompositeOperation = drawingTool === 'highlighter' ? 'multiply' : 'source-over';
+            const size = drawingTool === 'highlighter' ? penSize * 5 : penSize;
+            
             ctx.beginPath();
-            ctx.arc(x, y, penSize / 2, 0, Math.PI * 2);
+            ctx.arc(x, y, size / 2, 0, Math.PI * 2);
             ctx.fillStyle = penColor;
             ctx.fill();
         }
     };
 
     const draw = (e: any) => {
-        if (!isDrawing.current || !isPenActive) return;
+        if (!isPenActive) return;
+        
+        const { x, y } = getCoordinates(e);
+        
+        if (drawingTool === 'laser') {
+            setLaserPos({ x, y });
+            return;
+        }
+
+        if (!isDrawing.current) return;
         
         const ctx = contextRef.current;
         if (!ctx) return;
 
-        const { x, y } = getCoordinates(e);
+        ctx.globalAlpha = drawingTool === 'highlighter' ? 0.3 : 1.0;
+        ctx.globalCompositeOperation = drawingTool === 'highlighter' ? 'multiply' : 'source-over';
+        const size = drawingTool === 'highlighter' ? penSize * 5 : penSize;
 
         ctx.beginPath();
         ctx.moveTo(lastPos.current.x, lastPos.current.y);
         ctx.lineTo(x, y);
         ctx.strokeStyle = penColor;
-        ctx.lineWidth = penSize;
+        ctx.lineWidth = size;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
         ctx.stroke();
@@ -534,7 +559,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 {/* Drawing Canvas */}
                 <canvas
                     ref={canvasRef}
-                    className={`absolute inset-0 w-full h-full z-20 touch-none ${isPenActive ? 'pointer-events-auto cursor-crosshair' : 'pointer-events-none'}`}
+                    className={`absolute inset-0 w-full h-full z-20 touch-none ${isPenActive ? (drawingTool === 'laser' ? 'pointer-events-auto cursor-none' : 'pointer-events-auto cursor-crosshair') : 'pointer-events-none'}`}
                     onPointerDown={startDrawing}
                     onPointerMove={draw}
                     onPointerUp={stopDrawing}
@@ -545,6 +570,19 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     onTouchEnd={stopDrawing}
                     onTouchCancel={stopDrawing}
                 />
+                
+                {/* Laser Pointer Dot */}
+                {isPenActive && drawingTool === 'laser' && (
+                    <div 
+                        className="absolute w-4 h-4 bg-red-500 rounded-full z-30 pointer-events-none shadow-[0_0_15px_5px_rgba(239,68,68,0.8)] border border-white/50"
+                        style={{ 
+                            left: laserPos.x, 
+                            top: laserPos.y,
+                            transform: 'translate(-50%, -50%)',
+                            transition: 'left 0.05s ease-out, top 0.05s ease-out'
+                        }}
+                    />
+                )}
 
                 {/* Background Decorations */}
                 <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
@@ -997,7 +1035,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                                         <div>
                                             <div className="text-sm font-bold text-gray-600 mb-3 flex items-center justify-between">
-                                                <span>Drawing Tool</span>
+                                                <span>Presentation Tools</span>
                                                 <div className="flex items-center gap-2">
                                                     <kbd className="text-[10px] bg-gray-100 border border-gray-200 px-1.5 py-0.5 rounded text-gray-500 font-mono shadow-sm">Shift+D</kbd>
                                                     <button onClick={() => setIsPenActive(!isPenActive)} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${isPenActive ? 'bg-blue-600' : 'bg-gray-300'}`}>
@@ -1007,34 +1045,59 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                             </div>
                                             {isPenActive && (
                                                 <div className="space-y-4 bg-gray-50 p-3 rounded-xl border border-gray-100 shadow-inner mb-4">
-                                                    <div>
-                                                        <div className="flex justify-between text-xs font-semibold text-gray-500 mb-2">
-                                                            <span>Color</span>
-                                                        </div>
-                                                        <div className="flex gap-2 items-center flex-wrap">
-                                                            {['#ef4444', '#3b82f6', '#22c55e', '#facc15', '#000000'].map(c => (
-                                                                <button 
-                                                                    key={c}
-                                                                    onClick={() => setPenColor(c)}
-                                                                    className={`w-5 h-5 rounded-full border-2 ${penColor === c ? 'border-gray-900 scale-110' : 'border-transparent hover:scale-110'} transition-all`}
-                                                                    style={{ backgroundColor: c }}
-                                                                />
-                                                            ))}
-                                                            <input 
-                                                                type="color" 
-                                                                value={penColor}
-                                                                onChange={e => setPenColor(e.target.value)}
-                                                                className="w-6 h-6 ml-1 cursor-pointer border-0 rounded overflow-hidden" 
-                                                                title="Custom Color"
-                                                            />
-                                                        </div>
+                                                    
+                                                    {/* Tool Selector */}
+                                                    <div className="flex gap-2 p-1.5 bg-gray-200/50 rounded-lg">
+                                                        <button 
+                                                            onClick={() => setDrawingTool('pen')} 
+                                                            className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'pen' ? 'bg-white text-blue-600 shadow-sm border border-gray-200/50' : 'text-gray-500 hover:text-gray-700'}`}
+                                                        >
+                                                            <Pen className="w-3.5 h-3.5" /> Pen
+                                                        </button>
+                                                        <button 
+                                                            onClick={() => setDrawingTool('highlighter')} 
+                                                            className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'highlighter' ? 'bg-white text-yellow-600 shadow-sm border border-gray-200/50' : 'text-gray-500 hover:text-gray-700'}`}
+                                                        >
+                                                            <Highlighter className="w-3.5 h-3.5" /> Marker
+                                                        </button>
+                                                        <button 
+                                                            onClick={() => setDrawingTool('laser')} 
+                                                            className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'laser' ? 'bg-white text-red-500 shadow-sm border border-gray-200/50' : 'text-gray-500 hover:text-gray-700'}`}
+                                                        >
+                                                            <MousePointer2 className="w-3.5 h-3.5" /> Laser
+                                                        </button>
                                                     </div>
-                                                    <div>
-                                                        <div className="flex justify-between text-xs font-semibold text-gray-500 mb-2">
-                                                            <span>Size</span>
-                                                            <span className="text-blue-600">{penSize}px</span>
+
+                                                    <div className={drawingTool === 'laser' ? 'opacity-50 pointer-events-none transition-opacity flex flex-col gap-4' : 'transition-opacity flex flex-col gap-4'}>
+                                                        <div>
+                                                            <div className="flex justify-between text-xs font-semibold text-gray-500 mb-2">
+                                                                <span>Color</span>
+                                                            </div>
+                                                            <div className="flex gap-2 items-center flex-wrap">
+                                                                {['#ef4444', '#3b82f6', '#22c55e', '#facc15', '#000000'].map(c => (
+                                                                    <button 
+                                                                        key={c}
+                                                                        onClick={() => setPenColor(c)}
+                                                                        className={`w-5 h-5 rounded-full border-2 ${penColor === c ? 'border-gray-900 scale-110' : 'border-transparent hover:scale-110'} transition-all`}
+                                                                        style={{ backgroundColor: c }}
+                                                                    />
+                                                                ))}
+                                                                <input 
+                                                                    type="color" 
+                                                                    value={penColor}
+                                                                    onChange={e => setPenColor(e.target.value)}
+                                                                    className="w-6 h-6 ml-1 cursor-pointer border-0 rounded overflow-hidden" 
+                                                                    title="Custom Color"
+                                                                />
+                                                            </div>
                                                         </div>
-                                                        <input type="range" min="2" max="24" value={penSize} onChange={(e) => setPenSize(Number(e.target.value))} className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600" />
+                                                        <div>
+                                                            <div className="flex justify-between text-xs font-semibold text-gray-500 mb-2">
+                                                                <span>Size</span>
+                                                                <span className="text-blue-600">{penSize}px</span>
+                                                            </div>
+                                                            <input type="range" min="2" max="24" value={penSize} onChange={(e) => setPenSize(Number(e.target.value))} className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600" />
+                                                        </div>
                                                     </div>
                                                     <button 
                                                         onClick={clearCanvas}
