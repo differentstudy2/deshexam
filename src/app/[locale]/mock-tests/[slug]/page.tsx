@@ -286,7 +286,7 @@ export default async function MockTestLandingPage({ params }: Props) {
 
                 {/* Mobile CTA */}
                 <div className="lg:hidden">
-                  <StartTestButton slug={test.slug} accessType={test.accessType} price={test.price} allowedSubscriptionPlans={test.allowedSubscriptionPlans} />
+                  <StartTestButton slug={test.slug} accessType={test.accessType} price={test.price} allowedSubscriptionPlans={test.allowedSubscriptionPlans} testType="mock-test" />
                 </div>
               </div>
 
@@ -327,7 +327,7 @@ export default async function MockTestLandingPage({ params }: Props) {
                     ))}
 
                     <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
-                      <StartTestButton slug={test.slug} accessType={test.accessType} price={test.price} allowedSubscriptionPlans={test.allowedSubscriptionPlans} />
+                      <StartTestButton slug={test.slug} accessType={test.accessType} price={test.price} allowedSubscriptionPlans={test.allowedSubscriptionPlans} testType="mock-test" />
                     </div>
 
                     <p className="text-center text-[11px] text-slate-400">Strictly timed · Negative marking applies</p>
@@ -471,7 +471,7 @@ ${test.negativeMarking && test.negativeMarking > 0 ? `* প্রতিটি �
                   </div>
                 </div>
 
-                <StartTestButton slug={test.slug} accessType={test.accessType} price={test.price} allowedSubscriptionPlans={test.allowedSubscriptionPlans} />
+                <StartTestButton slug={test.slug} accessType={test.accessType} price={test.price} allowedSubscriptionPlans={test.allowedSubscriptionPlans} testType="mock-test" />
 
                 {test.accessType !== 'subscription' && test.accessType !== 'both' && test.accessType !== 'one_time' && (
                   <p className="text-center text-[11px] text-slate-400">Free · No sign-up required to start</p>
@@ -500,7 +500,7 @@ ${test.negativeMarking && test.negativeMarking > 0 ? `* প্রতিটি �
 
         {/* Mobile sticky bottom CTA */}
         <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 px-4 py-3 shadow-xl transition-colors duration-300">
-          <StartTestButton slug={test.slug} accessType={test.accessType} price={test.price} allowedSubscriptionPlans={test.allowedSubscriptionPlans} />
+          <StartTestButton slug={test.slug} accessType={test.accessType} price={test.price} allowedSubscriptionPlans={test.allowedSubscriptionPlans} testType="mock-test" />
         </div>
       </div>
     </>

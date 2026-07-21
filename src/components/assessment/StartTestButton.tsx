@@ -24,9 +24,10 @@ interface StartTestButtonProps {
   price?: number;
   allowedSubscriptionPlans?: string[];
   basePath?: string;
+  testType?: 'quiz' | 'practice' | 'mock-test' | 'exam';
 }
 
-export function StartTestButton({ slug, accessType = 'free', price = 0, allowedSubscriptionPlans = [], basePath = '/mock-tests' }: StartTestButtonProps) {
+export function StartTestButton({ slug, accessType = 'free', price = 0, allowedSubscriptionPlans = [], basePath = '/mock-tests', testType = 'mock-test' }: StartTestButtonProps) {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const { toast } = useToast();
@@ -100,7 +101,7 @@ export function StartTestButton({ slug, accessType = 'free', price = 0, allowedS
               amount: order.amount,
               currency: order.currency,
               name: 'DeshExam',
-              description: `Purchase of Mock Test`,
+              description: `Purchase of ${testType === 'quiz' ? 'Quiz' : testType === 'practice' ? 'Practice Set' : testType === 'exam' ? 'Exam' : 'Mock Test'}`,
               order_id: order.id,
               handler: async function (response: any) {
                   try {
@@ -192,6 +193,8 @@ export function StartTestButton({ slug, accessType = 'free', price = 0, allowedS
         }
       }
 
+      const testLabel = testType === 'quiz' ? 'Quiz' : testType === 'practice' ? 'Practice Set' : testType === 'exam' ? 'Exam' : 'Mock Test';
+
       return (
         <Button 
           onClick={handleStart} 
@@ -199,9 +202,9 @@ export function StartTestButton({ slug, accessType = 'free', price = 0, allowedS
           className="w-full bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-700 hover:to-violet-700 h-14 text-lg rounded-xl transition-all font-bold shadow-lg shadow-blue-600/25 text-white"
         >
           {isStarting ? (
-            <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Launching Exam...</>
+            <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Launching {testLabel}...</>
           ) : (
-            <><PlayCircle className="w-5 h-5 mr-2" /> Start Mock Test</>
+            <><PlayCircle className="w-5 h-5 mr-2" /> Start {testLabel}</>
           )}
         </Button>
       );
