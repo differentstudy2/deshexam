@@ -271,7 +271,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
             </div>
 
             {/* Main Presentation Area */}
-            <div className="relative w-full h-full max-w-[177.78vh] max-h-[56.25vw] bg-[#f8f9fc] flex flex-col shadow-2xl overflow-hidden shrink-0 z-10">
+            <div className="relative w-full h-full md:max-w-[177.78vh] md:max-h-[56.25vw] bg-[#f8f9fc] flex flex-col shadow-2xl overflow-hidden shrink-0 z-10">
 
                 {/* Background Decorations */}
                 <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
@@ -350,7 +350,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 </div>
 
                 {/* Main Content Area */}
-                <div className="flex-1 w-full relative flex flex-col items-center px-24 py-12 z-10 overflow-y-auto custom-scrollbar gap-8">
+                <div className="flex-1 w-full relative flex flex-col items-center px-4 md:px-24 py-6 md:py-12 z-10 overflow-y-auto custom-scrollbar gap-8">
 
                     {/* Timer */}
                     {isTimerEnabled && (
@@ -373,7 +373,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     </div>
 
                     {/* Options */}
-                    <div className="grid grid-cols-2 gap-x-8 gap-y-5 w-full max-w-6xl mt-2">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5 w-full max-w-6xl mt-2">
                         {q.options && [
                             { key: 'a', text: q.options.a },
                             { key: 'b', text: q.options.b },
@@ -480,15 +480,15 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 </div>
 
                 {/* Footer */}
-                <div className="shrink-0 bg-white border-t border-gray-200 py-4 pl-12 pr-8 flex justify-between items-center w-full z-20 shadow-[0_-2px_10px_rgba(0,0,0,0.02)]">
-                    <div className="flex items-center text-gray-600 font-semibold text-lg">
+                <div className="shrink-0 bg-white border-t border-gray-200 py-4 px-4 md:pl-12 md:pr-8 flex justify-between items-center w-full z-20 shadow-[0_-2px_10px_rgba(0,0,0,0.02)]">
+                    <div className="flex items-center text-gray-600 font-semibold text-sm md:text-lg">
                         © DeshExam
                     </div>
-                    <div className="flex items-center text-gray-600 font-semibold text-lg tracking-wide">
+                    <div className="hidden md:flex items-center text-gray-600 font-semibold text-lg tracking-wide">
                         www.deshexam.com
                     </div>
 
-                    <div className="flex items-center gap-8">
+                    <div className="flex items-center gap-4 md:gap-8">
                         {/* Settings Dropdown */}
                         <div className="relative">
                             <button
