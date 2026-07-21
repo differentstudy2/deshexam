@@ -595,11 +595,11 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                               <img src="/image/logo.png" alt="DeshExam" className="w-12 h-auto object-contain grayscale invert mix-blend-screen opacity-90 hover:opacity-100 transition-opacity" />
                           </div>
                           <div className="text-center">
-                              <h3 className="text-[12px] text-blue-100 mb-0.5 leading-tight font-medium">সঠিক প্রস্তুতি</h3>
-                              <h3 className="text-[14px] text-white leading-tight font-extrabold">
+                              <h3 className="text-[14px] text-blue-100 mb-0.5 leading-tight font-medium">সঠিক প্রস্তুতি</h3>
+                              <h3 className="text-[18px] text-white leading-tight font-extrabold">
                                   <span className="text-[#FFD700]">সফলতার</span>
                               </h3>
-                              <h3 className="text-[14px] text-white leading-tight font-extrabold">চাবিকাঠি!</h3>
+                              <h3 className="text-[18px] text-white leading-tight font-extrabold">চাবিকাঠি!</h3>
                           </div>
                      </div>
 
@@ -620,8 +620,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                      'AI Report'
                                  ].map((feature, idx) => (
                                      <div key={idx} className="flex items-center gap-1.5">
-                                         <Check className="w-3 h-3 text-[#FFB800] shrink-0" />
-                                         <span className="text-gray-100 text-[10.5px] font-semibold tracking-wide leading-tight">{feature}</span>
+                                         <Check className="w-4 h-4 text-[#FFB800] shrink-0" />
+                                         <span className="text-gray-100 text-[13px] font-semibold tracking-wide leading-tight">{feature}</span>
                                      </div>
                                  ))}
                              </div>
@@ -631,8 +631,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                      {/* CTA Button */}
                      <div className="w-full z-10 pb-2">
                           <button className="w-full flex flex-col items-center justify-center py-2 bg-gradient-to-b from-[#2178ff] to-[#0a4bb8] border border-blue-400/50 rounded-lg shadow-[0_4px_10px_rgba(10,75,184,0.4)] hover:scale-105 transition-transform duration-300">
-                              <span className="text-white font-bold text-[12px] drop-shadow-md leading-none mb-1">Practice</span>
-                              <span className="text-white font-bold text-[12px] drop-shadow-md leading-none">Today</span>
+                              <span className="text-white font-bold text-[14px] drop-shadow-md leading-none mb-1">Practice</span>
+                              <span className="text-white font-bold text-[14px] drop-shadow-md leading-none">Today</span>
                           </button>
                      </div>
                 </div>
@@ -1374,11 +1374,11 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                      {/* Text Section */}
                      <div className="flex flex-col items-center w-full z-10 text-center mt-3">
-                          <h3 className="text-[12px] text-purple-100 mb-0.5 leading-tight font-medium">লক্ষ্য তোমার,</h3>
-                          <h3 className="text-[13px] text-white leading-tight font-extrabold">
+                          <h3 className="text-[14px] text-purple-100 mb-0.5 leading-tight font-medium">লক্ষ্য তোমার,</h3>
+                          <h3 className="text-[17px] text-white leading-tight font-extrabold">
                               <span className="text-[#FFD700]">সফলতা</span>
                           </h3>
-                          <h3 className="text-[13px] text-white leading-tight font-extrabold">আমাদের সাথে!</h3>
+                          <h3 className="text-[17px] text-white leading-tight font-extrabold">আমাদের সাথে!</h3>
                      </div>
 
                      {/* Features List */}
@@ -1393,8 +1393,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                      'Report'
                                  ].map((feature, idx) => (
                                      <div key={idx} className="flex items-center gap-1.5">
-                                         <Check className="w-3 h-3 text-[#00E676] shrink-0" />
-                                         <span className="text-gray-100 text-[10.5px] font-semibold tracking-wide leading-tight">{feature}</span>
+                                         <Check className="w-4 h-4 text-[#00E676] shrink-0" />
+                                         <span className="text-gray-100 text-[13px] font-semibold tracking-wide leading-tight">{feature}</span>
                                      </div>
                                  ))}
                              </div>
@@ -1404,7 +1404,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                      {/* CTA Button */}
                      <div className="w-full z-10 pb-2">
                           <button className="w-full flex items-center justify-center py-2.5 bg-gradient-to-r from-[#FF416C] to-[#FF4B2B] border border-red-400/50 rounded-lg shadow-[0_4px_10px_rgba(255,65,108,0.4)] hover:scale-105 transition-transform duration-300">
-                              <span className="text-white font-bold text-[13px] drop-shadow-md">Join Now</span>
+                              <span className="text-white font-bold text-[15px] drop-shadow-md">Join Now</span>
                           </button>
                      </div>
                 </div>
