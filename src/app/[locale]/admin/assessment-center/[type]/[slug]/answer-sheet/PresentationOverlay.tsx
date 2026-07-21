@@ -8,7 +8,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
 import 'katex/dist/katex.min.css';
-import { X, ChevronLeft, ChevronRight, Play, Settings, Check, Clock, Pen, Trash2 } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Play, Settings, Check, Clock, Pen, Trash2, Focus } from 'lucide-react';
 
 const bnOptionsMap: Record<string, string> = {
     a: 'ক',
@@ -56,6 +56,19 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [isPenActive, setIsPenActive] = useState(false);
     const [penColor, setPenColor] = useState('#ef4444');
     const [penSize, setPenSize] = useState(4);
+    
+    // Spotlight State
+    const [isSpotlightActive, setIsSpotlightActive] = useState(false);
+    const [spotlightPos, setSpotlightPos] = useState({ x: 0, y: 0 });
+
+    useEffect(() => {
+        if (!isSpotlightActive) return;
+        const handleMouseMove = (e: MouseEvent) => {
+            setSpotlightPos({ x: e.clientX, y: e.clientY });
+        };
+        window.addEventListener('mousemove', handleMouseMove);
+        return () => window.removeEventListener('mousemove', handleMouseMove);
+    }, [isSpotlightActive]);
     
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const contextRef = useRef<CanvasRenderingContext2D | null>(null);
@@ -332,6 +345,11 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
             if (e.key === 'D') {
                 setIsPenActive(prev => !prev);
+                return;
+            }
+
+            if (e.key === 'F') {
+                setIsSpotlightActive(prev => !prev);
                 return;
             }
 
@@ -616,16 +634,30 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     {/* Timer */}
                     {isTimerEnabled && (
                         <div 
-                            className={`absolute top-6 right-10 bg-white border border-gray-200 shadow-sm rounded-xl px-4 py-2 flex items-center gap-2 text-gray-700 font-bold font-mono text-2xl animate-in fade-in zoom-in duration-300 z-50 select-none ${isDraggingTimer ? 'cursor-grabbing scale-105 shadow-md' : 'cursor-grab'}`}
+                            className={`absolute top-6 right-10 flex items-center gap-3 px-5 py-2.5 rounded-2xl backdrop-blur-xl border z-50 select-none transition-all duration-300 font-mono text-[26px] font-black tracking-widest ${
+                                step >= 1 
+                                    ? 'bg-gray-100/90 border-gray-200/50 text-gray-400 shadow-sm'
+                                    : 'bg-white/95 border-blue-200/60 text-[#1e3a8a] shadow-[0_8px_32px_rgba(59,130,246,0.15)] ring-1 ring-blue-100'
+                            } ${isDraggingTimer ? 'cursor-grabbing scale-105 shadow-[0_16px_48px_rgba(59,130,246,0.25)] ring-blue-300' : 'cursor-grab hover:shadow-[0_12px_40px_rgba(59,130,246,0.2)] hover:scale-[1.02]'}`}
                             style={{ transform: `translate(${timerPos.x}px, ${timerPos.y}px)` }}
                             onPointerDown={handleTimerPointerDown}
                             onPointerMove={handleTimerPointerMove}
                             onPointerUp={handleTimerPointerUp}
                             onPointerCancel={handleTimerPointerUp}
                         >
-                            <Clock className="w-6 h-6 text-blue-500 pointer-events-none" />
-                            <span className={`pointer-events-none ${step >= 1 ? "text-gray-400" : "text-gray-800"}`}>
-                                {String(Math.floor(timerSeconds / 60)).padStart(2, '0')}:{String(timerSeconds % 60).padStart(2, '0')}
+                            <div className="relative flex items-center justify-center shrink-0">
+                                <Clock className={`w-7 h-7 transition-colors duration-300 ${step >= 1 ? 'text-gray-400' : 'text-blue-600'} pointer-events-none`} />
+                                {step === 0 && (
+                                    <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5 pointer-events-none">
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+                                    </span>
+                                )}
+                            </div>
+                            <span className="pointer-events-none drop-shadow-sm flex items-center w-[90px] justify-center">
+                                {String(Math.floor(timerSeconds / 60)).padStart(2, '0')}
+                                <span className={`${step === 0 && timerSeconds % 2 === 0 ? 'opacity-100' : step === 0 ? 'opacity-50' : 'opacity-100'} transition-opacity duration-300 mx-0.5`}>:</span>
+                                {String(timerSeconds % 60).padStart(2, '0')}
                             </span>
                         </div>
                     )}
@@ -774,6 +806,15 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     </div>
 
                     <div className="flex items-center gap-4 md:gap-8">
+                        {/* Spotlight Toggle Button */}
+                        <button
+                            onClick={() => setIsSpotlightActive(!isSpotlightActive)}
+                            className={`p-3 rounded-full transition-all shadow-sm ${isSpotlightActive ? 'bg-yellow-500 text-white ring-2 ring-yellow-300' : 'bg-white/60 hover:bg-white text-indigo-600'}`}
+                            title="Toggle Spotlight (Shift+F)"
+                        >
+                            <Focus className="w-6 h-6" />
+                        </button>
+                        
                         {/* Pen Toggle Button */}
                         <button
                             onClick={() => setIsPenActive(!isPenActive)}
@@ -934,6 +975,22 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     A+
                                                 </button>
                                             </div>
+                                        </div>
+
+                                        <hr className="border-gray-100" />
+
+                                        <div className="flex items-center justify-between">
+                                            <div className="text-sm font-bold text-gray-600 flex items-center gap-2">
+                                                <Focus className="w-4 h-4 text-yellow-500" />
+                                                Spotlight Mode
+                                                <kbd className="ml-auto text-[10px] bg-gray-100 border border-gray-200 px-1.5 py-0.5 rounded text-gray-500 font-mono shadow-sm">Shift+F</kbd>
+                                            </div>
+                                            <button
+                                                onClick={() => setIsSpotlightActive(!isSpotlightActive)}
+                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isSpotlightActive ? 'bg-yellow-500' : 'bg-gray-300'}`}
+                                            >
+                                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isSpotlightActive ? 'translate-x-6' : 'translate-x-1'}`} />
+                                            </button>
                                         </div>
 
                                         <hr className="border-gray-100" />
@@ -1100,6 +1157,16 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                       </button>
                  </div>
             </div>
+
+            {/* Spotlight Overlay */}
+            {isSpotlightActive && (
+                <div 
+                    className="fixed inset-0 z-[9999] pointer-events-none transition-opacity duration-300"
+                    style={{
+                        background: `radial-gradient(circle at ${spotlightPos.x}px ${spotlightPos.y}px, transparent 60px, rgba(0,0,0,0.85) 150px)`
+                    }}
+                />
+            )}
         </div>,
         document.body
     );
