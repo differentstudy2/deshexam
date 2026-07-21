@@ -20,9 +20,12 @@ interface MockTestReviewsProps {
   testId: string;
   slug: string;
   stats?: ReviewStats;
+  testTitle?: string;
+  testType?: string;
+  testLanguage?: string;
 }
 
-export function MockTestReviews({ testId, slug, stats }: MockTestReviewsProps) {
+export function MockTestReviews({ testId, slug, stats, testTitle, testType, testLanguage }: MockTestReviewsProps) {
   const { user } = useAuth();
   
   const [reviews, setReviews] = useState<MockTestReview[]>([]);
@@ -146,6 +149,11 @@ export function MockTestReviews({ testId, slug, stats }: MockTestReviewsProps) {
     setIsGenerating(true);
     try {
       let prompt = `Write a short, realistic student review (1-3 sentences) for an online mock test platform. The student gave a rating of ${rating} out of 5 stars. Do not include quotes.`;
+      
+      if (testTitle) prompt += ` The test they took is titled "${testTitle}".`;
+      if (testType) prompt += ` The test type/format is "${testType}".`;
+      if (testLanguage) prompt += ` IMPORTANT: You MUST write the review text entirely in the ${testLanguage} language.`;
+
       if (rating >= 4) {
         prompt += 'The review should be very positive, highlighting good questions, clear explanations, or a smooth interface.';
       } else if (rating === 3) {

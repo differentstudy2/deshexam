@@ -547,7 +547,14 @@ ${test.negativeMarking && test.negativeMarking > 0 ? `* প্রতিটি �
               </div>
 
               {/* Reviews Section */}
-              <MockTestReviews testId={test.id} slug={test.slug} stats={test.reviewStats} />
+              <MockTestReviews 
+                testId={test.id} 
+                slug={test.slug} 
+                stats={test.reviewStats} 
+                testTitle={test.title}
+                testType={test.questionType || 'Mock Test'}
+                testLanguage={test.language}
+              />
 
             </div>
 
