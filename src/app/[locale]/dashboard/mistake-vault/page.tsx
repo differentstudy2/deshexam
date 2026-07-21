@@ -48,7 +48,7 @@ export default function MistakeVaultPage() {
           return;
         }
 
-        const questionIds = mistakeDocs.map(d => d.questionId);
+        const questionIds = mistakeDocs.map((d: any) => d.questionId);
         // Firebase 'in' query supports max 10, so if there are many, we might need chunking,
         // but for now let's chunk if > 30.
         const chunkedIds = [];
@@ -68,7 +68,7 @@ export default function MistakeVaultPage() {
         
         const subjectsMap: Record<string, any> = {};
 
-        const combinedData = mistakeDocs.map(md => {
+        const combinedData = mistakeDocs.map((md: any) => {
           const q = fetchedQuestions.find(fq => fq.id === md.questionId);
           
           if (md.latestStatus === 'correct') right++;
@@ -138,7 +138,7 @@ export default function MistakeVaultPage() {
     );
   }
 
-  const filteredQuestions = allMistakeData.filter(d => d.latestStatus === filter || (filter === 'wrong' && !d.latestStatus));
+  const filteredQuestions = allMistakeData.filter((d: any) => d.latestStatus === filter || (filter === 'wrong' && !d.latestStatus));
 
   return (
     <div className="w-full max-w-[1400px] mx-auto pb-12 text-slate-800 dark:text-slate-100 relative">
@@ -323,7 +323,7 @@ export default function MistakeVaultPage() {
         <div className="w-full lg:w-[320px] xl:w-[350px] shrink-0">
           <Card className="bg-white dark:bg-slate-900 shadow-sm border-slate-200 dark:border-slate-800 rounded-xl sticky top-24 overflow-hidden">
             <CardHeader className="p-4 pb-3 flex flex-row items-center justify-between border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
-              <CardTitle className="text-[13px] font-bold text-slate-900 dark:text-white">Subjects Report</CardTitle>
+              <CardTitle className="text-[15px] font-bold text-slate-900 dark:text-white">Subjects Report</CardTitle>
               <ArrowRight className="w-4 h-4 text-slate-400" />
             </CardHeader>
             <CardContent className="p-0">
@@ -340,7 +340,7 @@ export default function MistakeVaultPage() {
                           className="flex justify-between items-center cursor-pointer mb-4"
                           onClick={() => toggleSubject(sub.name)}
                         >
-                          <h4 className="font-bold text-[13px] text-slate-800 dark:text-slate-100">{sub.name}</h4>
+                          <h4 className="font-bold text-[15px] text-slate-800 dark:text-slate-100">{sub.name}</h4>
                           <div className="flex items-center gap-2">
                             <span className="text-[11px] font-bold text-green-600">{sub.progress.toFixed(2)}%</span>
                             <div className="bg-slate-100 dark:bg-slate-800 rounded px-1 py-0.5 cursor-pointer hover:bg-slate-200 transition-colors">
@@ -385,7 +385,7 @@ export default function MistakeVaultPage() {
                       className="px-4 py-2.5 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer group rounded-lg border border-transparent hover:border-slate-100 dark:hover:border-slate-800"
                       onClick={() => toggleSubject(sub.name)}
                     >
-                      <span className="text-[12px] font-bold text-slate-700 dark:text-slate-300 truncate pr-2">{sub.name}</span>
+                      <span className="text-[14px] font-bold text-slate-700 dark:text-slate-300 truncate pr-2">{sub.name}</span>
                       <div className="flex items-center gap-2 shrink-0">
                         <span className="text-[11px] font-bold text-green-600">{sub.progress.toFixed(2)}%</span>
                         <div className="bg-slate-100 dark:bg-slate-800 rounded px-1 py-0.5 group-hover:bg-slate-200 dark:group-hover:bg-slate-700 transition-colors">
