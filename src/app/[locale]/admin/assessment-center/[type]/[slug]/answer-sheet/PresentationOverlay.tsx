@@ -8,7 +8,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
 import 'katex/dist/katex.min.css';
-import { X, ChevronLeft, ChevronRight, Play, Settings, Check, Clock } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Play, Settings, Check, Clock, Pen, Trash2 } from 'lucide-react';
 
 const bnOptionsMap: Record<string, string> = {
     a: 'ক',
@@ -51,6 +51,101 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [timerPos, setTimerPos] = useState({ x: 0, y: 0 });
     const [isDraggingTimer, setIsDraggingTimer] = useState(false);
     const dragStartPos = useRef({ x: 0, y: 0 });
+
+    // Pen Tool State
+    const [isPenActive, setIsPenActive] = useState(false);
+    const [penColor, setPenColor] = useState('#ef4444');
+    const [penSize, setPenSize] = useState(4);
+    
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const contextRef = useRef<CanvasRenderingContext2D | null>(null);
+    const isDrawing = useRef(false);
+
+    // Initialize Canvas
+    useEffect(() => {
+        if (!isOpen) return;
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const resizeCanvas = () => {
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            const context = canvas.getContext('2d');
+            if (context) {
+                context.lineCap = 'round';
+                context.lineJoin = 'round';
+                contextRef.current = context;
+            }
+        };
+
+        // Delay slightly to ensure layout is done
+        setTimeout(resizeCanvas, 100);
+        
+        window.addEventListener('resize', resizeCanvas);
+        return () => window.removeEventListener('resize', resizeCanvas);
+    }, [isOpen]);
+
+    const clearCanvas = useCallback(() => {
+        const canvas = canvasRef.current;
+        const context = contextRef.current;
+        if (canvas && context) {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+        }
+    }, []);
+
+    useEffect(() => {
+        clearCanvas();
+    }, [currentSlide, clearCanvas]);
+
+    // Drawing Handlers
+    const startDrawing = (e: React.PointerEvent<HTMLCanvasElement>) => {
+        if (!isPenActive) return;
+        
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const rect = canvas.getBoundingClientRect();
+        // Calculate coordinate relative to canvas bounding box
+        const offsetX = e.clientX - rect.left;
+        const offsetY = e.clientY - rect.top;
+
+        if (contextRef.current) {
+            contextRef.current.beginPath();
+            contextRef.current.moveTo(offsetX, offsetY);
+            contextRef.current.strokeStyle = penColor;
+            contextRef.current.lineWidth = penSize;
+            
+            isDrawing.current = true;
+            (e.target as HTMLElement).setPointerCapture(e.pointerId);
+        }
+    };
+
+    const draw = (e: React.PointerEvent<HTMLCanvasElement>) => {
+        if (!isDrawing.current || !isPenActive) return;
+        
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const rect = canvas.getBoundingClientRect();
+        const offsetX = e.clientX - rect.left;
+        const offsetY = e.clientY - rect.top;
+
+        if (contextRef.current) {
+            contextRef.current.lineTo(offsetX, offsetY);
+            contextRef.current.stroke();
+        }
+    };
+
+    const stopDrawing = (e: React.PointerEvent<HTMLCanvasElement>) => {
+        if (!isDrawing.current) return;
+        
+        if (contextRef.current) {
+            contextRef.current.closePath();
+        }
+        isDrawing.current = false;
+        (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+    };
 
     const handleTimerPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
         setIsDraggingTimer(true);
@@ -344,6 +439,17 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
             {/* Main Presentation Area */}
             <div className="responsive-fonts relative w-full h-full lg:max-w-[177.78vh] lg:max-h-[56.25vw] bg-gradient-to-br from-[#f8fafc] via-[#f1f5f9] to-[#f8fafc] flex flex-col shadow-2xl overflow-hidden shrink-0 z-10">
 
+                {/* Drawing Canvas */}
+                <canvas
+                    ref={canvasRef}
+                    className={`absolute inset-0 z-[60] touch-none ${isPenActive ? 'pointer-events-auto cursor-crosshair' : 'pointer-events-none'}`}
+                    onPointerDown={startDrawing}
+                    onPointerMove={draw}
+                    onPointerUp={stopDrawing}
+                    onPointerCancel={stopDrawing}
+                    onPointerOut={stopDrawing}
+                />
+
                 {/* Background Decorations */}
                 <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
                     {/* Soft glowing mesh gradients */}
@@ -590,6 +696,60 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     </div>
 
                     <div className="flex items-center gap-4 md:gap-8">
+                        {/* Pen Tool */}
+                        <div className="relative">
+                            <button
+                                onClick={() => setIsPenActive(!isPenActive)}
+                                className={`p-3 rounded-full transition-all shadow-sm ${isPenActive ? 'bg-red-500 text-white ring-2 ring-red-300' : 'bg-white/60 hover:bg-white text-indigo-600'}`}
+                                title="Toggle Pen Tool"
+                            >
+                                <Pen className="w-6 h-6" />
+                            </button>
+                            
+                            {/* Pen Toolbar */}
+                            {isPenActive && (
+                                <div className="fixed bottom-[80px] left-1/2 -translate-x-1/2 md:absolute md:bottom-full md:left-auto md:-translate-x-0 md:right-0 md:mb-4 bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-gray-100 p-4 animate-in fade-in slide-in-from-bottom-2 z-50 flex flex-wrap items-center gap-3 md:gap-4 min-w-[280px] justify-center">
+                                    <div className="flex gap-2 items-center border-r pr-3 border-gray-200">
+                                        {['#ef4444', '#3b82f6', '#22c55e', '#facc15', '#000000'].map(c => (
+                                            <button 
+                                                key={c}
+                                                onClick={() => setPenColor(c)}
+                                                className={`w-5 h-5 md:w-6 md:h-6 rounded-full border-2 ${penColor === c ? 'border-gray-900 scale-110' : 'border-transparent hover:scale-110'} transition-all`}
+                                                style={{ backgroundColor: c }}
+                                            />
+                                        ))}
+                                        <input 
+                                            type="color" 
+                                            value={penColor}
+                                            onChange={e => setPenColor(e.target.value)}
+                                            className="w-6 h-6 md:w-7 md:h-7 ml-1 cursor-pointer border-0 rounded overflow-hidden" 
+                                            title="Custom Color"
+                                        />
+                                    </div>
+                                    <div className="flex gap-2 items-center border-r pr-3 border-gray-200">
+                                        <input 
+                                            type="range" 
+                                            min="2" 
+                                            max="24" 
+                                            value={penSize} 
+                                            onChange={e => setPenSize(parseInt(e.target.value))}
+                                            className="w-20 md:w-24 accent-blue-600"
+                                            title="Pen Size"
+                                        />
+                                        <div className="w-4 h-4 rounded-full flex items-center justify-center shrink-0">
+                                            <div className="bg-gray-800 rounded-full" style={{ width: Math.min(penSize, 16), height: Math.min(penSize, 16) }} />
+                                        </div>
+                                    </div>
+                                    <button 
+                                        onClick={clearCanvas}
+                                        className="p-1.5 md:p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors flex items-center gap-1.5 md:gap-2 text-xs md:text-sm font-semibold"
+                                    >
+                                        <Trash2 className="w-4 h-4 md:w-5 md:h-5" /> Clear
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+
                         {/* Settings Dropdown */}
                         <div className="relative">
                             <button
