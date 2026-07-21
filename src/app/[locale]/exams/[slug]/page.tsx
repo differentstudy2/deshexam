@@ -5,9 +5,10 @@ import { ExamPaper } from '@/lib/assessment-types';
 import { Metadata, ResolvingMetadata } from 'next';
 import { formatTitleForBrowser } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { HelpCircle, ShieldCheck, PlayCircle, FileDown, BookOpen, ExternalLink } from 'lucide-react';
+import { HelpCircle, ShieldCheck, PlayCircle, FileDown, BookOpen, ExternalLink, FileText } from 'lucide-react';
 import Link from 'next/link';
 import { AssessmentCard } from '@/components/assessment/AssessmentCard';
+import { UserAttemptsDisplay } from '@/components/assessment/UserAttemptsDisplay';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -146,6 +147,8 @@ export default async function ExamPaperLandingPage({ params }: Props) {
         </div>
 
         <div className="container max-w-5xl mx-auto px-4 py-12 space-y-16">
+          <UserAttemptsDisplay assessmentId={test.id} />
+
           {related.length > 0 && (
             <section>
               <h2 className="text-2xl font-bold mb-6">Related Previous Year Papers</h2>

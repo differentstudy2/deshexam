@@ -15,6 +15,7 @@ import Link from 'next/link';
 import { AssessmentCard } from '@/components/assessment/AssessmentCard';
 import { StartTestButton } from '@/components/assessment/StartTestButton';
 import { MockTestReviews } from '@/components/assessment/MockTestReviews';
+import { UserAttemptsDisplay } from '@/components/assessment/UserAttemptsDisplay';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -420,6 +421,9 @@ export default async function QuizLandingPage({ params }: Props) {
                   </div>
                 ))}
               </div>
+
+              {/* User Attempts */}
+              <UserAttemptsDisplay assessmentId={test.id} />
 
               {/* Instructions */}
               <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-colors duration-300">

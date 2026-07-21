@@ -123,6 +123,17 @@ export async function getUserExamAttemptsCount(userId: string, assessmentId: str
   return snap.size;
 }
 
+export async function getUserExamAttempts(userId: string, assessmentId: string) {
+  const q = query(
+    collection(db, EXAM_ATTEMPTS_COLLECTION),
+    where('userId', '==', userId),
+    where('assessmentId', '==', assessmentId)
+  );
+  const snap = await getDocs(q);
+  const results = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  return results.sort((a: any, b: any) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+}
+
 // ----------------------------------------------------
 // Leaderboard & Daily Challenges
 // ----------------------------------------------------
