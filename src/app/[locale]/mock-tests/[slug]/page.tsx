@@ -9,7 +9,7 @@ import {
   Clock, HelpCircle, ShieldCheck, FileText, CheckCircle2,
   AlertTriangle, BookOpen, Target, Award, ChevronRight, ArrowRight,
   Zap, Users, BarChart3, Brain, Star, Maximize, LayoutGrid, ShieldAlert, MonitorPlay,
-  Trophy, Sparkles, LineChart, BookCheck, History, Smartphone, PieChart, RotateCcw
+  Trophy, Sparkles, LineChart, History, RotateCcw, PieChart
 } from 'lucide-react';
 import Link from 'next/link';
 import { AssessmentCard } from '@/components/assessment/AssessmentCard';
@@ -350,13 +350,16 @@ export default async function MockTestLandingPage({ params }: Props) {
             <div className="flex-1 space-y-8">
 
               {/* Quick facts strip */}
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-3">
                 {[
                   { icon: HelpCircle, label: 'Questions', value: `${test.questionIds?.length ?? 0}`, color: 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-400' },
                   { icon: Clock, label: 'Duration', value: `${test.durationMin ?? 0} min`, color: 'bg-violet-50 dark:bg-violet-900/20 border-violet-200 dark:border-violet-800 text-violet-700 dark:text-violet-400' },
                   { icon: Award, label: 'Total Marks', value: `${test.totalMarks ?? 0}`, color: 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400' },
                   { icon: Target, label: 'Pass Marks', value: `${test.passingMarks ?? 0}`, color: 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400' },
                   { icon: Users, label: 'Total Attempts', value: (test.attemptCount && test.attemptCount >= 1000) ? test.attemptCount.toLocaleString() : '75K', color: 'bg-pink-50 dark:bg-pink-900/20 border-pink-200 dark:border-pink-800 text-pink-700 dark:text-pink-400' },
+                  { icon: BarChart3, label: 'Average Score', value: test.averageScore ? `${test.averageScore}%` : 'N/A', color: 'bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-400' },
+                  { icon: LayoutGrid, label: 'Question Type', value: test.questionType || 'MCQ', color: 'bg-cyan-50 dark:bg-cyan-900/20 border-cyan-200 dark:border-cyan-800 text-cyan-700 dark:text-cyan-400' },
+                  { icon: BookOpen, label: 'Subject', value: subjectName || 'Mixed', color: 'bg-rose-50 dark:bg-rose-900/20 border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-400' },
                 ].map(({ icon: Icon, label, value, color }) => (
                   <div key={label} className={`flex flex-col items-center justify-center p-4 rounded-lg border text-center transition-colors duration-300 ${color}`}>
                     <Icon className="w-5 h-5 mb-1 opacity-70" />
