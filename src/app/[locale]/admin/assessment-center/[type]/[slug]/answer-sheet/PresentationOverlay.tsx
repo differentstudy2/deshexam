@@ -39,7 +39,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
     const [isTimerEnabled, setIsTimerEnabled] = useState(true);
     const [timerSeconds, setTimerSeconds] = useState(0);
-
+    const [wmOpacity, setWmOpacity] = useState(40);
+    const [wmSize, setWmSize] = useState(70);
+    const [wmVisible, setWmVisible] = useState(true);
     const openPresentation = () => {
         setIsOpen(true);
         setCurrentSlide(0);
@@ -282,13 +284,29 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     {/* Watermark removed from here, moved to foreground */}
                 </div>
 
-                {/* Foreground Watermarks */}
-                <div className="absolute top-[75%] left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-[8deg] text-[70px] font-black text-gray-200/50 tracking-widest uppercase z-30 pointer-events-none select-none">
-                    DESHEXAM
-                </div>
-                <div className="absolute top-[25%] right-[10%] -translate-y-1/2 -rotate-[8deg] text-[80px] font-black text-gray-200/40 tracking-widest uppercase z-30 pointer-events-none select-none">
-                    DESHEXAM
-                </div>
+                {/* Background Watermarks */}
+                {wmVisible && (
+                    <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden select-none">
+                        <div 
+                            className="absolute top-[75%] left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-[8deg] font-black tracking-widest uppercase transition-all duration-300"
+                            style={{ 
+                                fontSize: `${wmSize}px`, 
+                                color: `rgba(229, 231, 235, ${wmOpacity / 100})` 
+                            }}
+                        >
+                            DESHEXAM
+                        </div>
+                        <div 
+                            className="absolute top-[25%] right-[10%] -translate-y-1/2 -rotate-[8deg] font-black tracking-widest uppercase transition-all duration-300"
+                            style={{ 
+                                fontSize: `${wmSize * 1.15}px`, 
+                                color: `rgba(229, 231, 235, ${(wmOpacity * 0.8) / 100})` 
+                            }}
+                        >
+                            DESHEXAM
+                        </div>
+                    </div>
+                )}
 
                 {/* Header */}
                 <div className="shrink-0 bg-white border-b border-gray-200 py-3 px-4 md:pl-8 md:pr-12 flex flex-col md:flex-row justify-between items-center w-full z-10 shadow-sm gap-2 md:gap-0 relative">
@@ -347,7 +365,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     {/* Question */}
                     <div className="flex items-center gap-3 md:gap-4 w-full max-w-5xl mt-8 md:mt-4" style={{ '--q-size': `max(18px, ${38 * qFontScale}px)` } as React.CSSProperties}>
                         <span className="text-black font-extrabold leading-normal shrink-0" style={{ fontSize: 'var(--q-size)' }}>Q{currentSlide + 1}.</span>
-                        <div className="prose prose-black max-w-none prose-p:font-extrabold text-[length:var(--q-size)] leading-normal text-left text-black font-extrabold [&_*]:!text-[length:var(--q-size)] [&_*]:!leading-normal [&_*]:!m-0 flex items-center">
+                        <div className="prose prose-black max-w-none prose-p:font-extrabold text-[length:var(--q-size)] leading-normal text-left text-black font-extrabold [&_*]:!text-[length:var(--q-size)] [&_*]:!leading-normal [&_*]:!m-0 flex items-center capitalize">
                             <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
                                 {q.questionText}
                             </ReactMarkdown>
@@ -419,7 +437,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     <div className={letterClasses}>
                                         {optLetter}
                                     </div>
-                                    <div className="prose max-w-none text-black [&>p]:m-0 [&>p]:text-[length:var(--opt-size)] [&>p]:font-semibold [&>p]:leading-snug flex-1">
+                                    <div className="prose max-w-none text-black [&>p]:m-0 [&>p]:text-[length:var(--opt-size)] [&>p]:font-semibold [&>p]:leading-snug flex-1 capitalize">
                                         <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
                                             {opt.text}
                                         </ReactMarkdown>
@@ -561,6 +579,35 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     A+ <kbd className="text-[10px] bg-white border border-gray-300 px-1.5 py-0.5 rounded text-gray-500 font-mono shadow-sm">P</kbd>
                                                 </button>
                                             </div>
+                                        </div>
+
+                                        <hr className="border-gray-100" />
+
+                                        <div>
+                                            <div className="text-sm font-bold text-gray-600 mb-3 flex items-center justify-between">
+                                                <span>Watermark</span>
+                                                <button onClick={() => setWmVisible(!wmVisible)} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${wmVisible ? 'bg-blue-600' : 'bg-gray-300'}`}>
+                                                    <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${wmVisible ? 'translate-x-5' : 'translate-x-1'}`} />
+                                                </button>
+                                            </div>
+                                            {wmVisible && (
+                                                <div className="space-y-4 bg-gray-50 p-3 rounded-xl border border-gray-100 shadow-inner">
+                                                    <div>
+                                                        <div className="flex justify-between text-xs font-semibold text-gray-500 mb-2">
+                                                            <span>Size</span>
+                                                            <span className="text-blue-600">{wmSize}px</span>
+                                                        </div>
+                                                        <input type="range" min="20" max="150" value={wmSize} onChange={(e) => setWmSize(Number(e.target.value))} className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600" />
+                                                    </div>
+                                                    <div>
+                                                        <div className="flex justify-between text-xs font-semibold text-gray-500 mb-2">
+                                                            <span>Opacity</span>
+                                                            <span className="text-blue-600">{wmOpacity}%</span>
+                                                        </div>
+                                                        <input type="range" min="5" max="100" value={wmOpacity} onChange={(e) => setWmOpacity(Number(e.target.value))} className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600" />
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>

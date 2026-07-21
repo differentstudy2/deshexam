@@ -632,7 +632,7 @@ export default async function AnswerSheetPage({
                                                                         </label>
                                                                     </div>
                                                                 </div>
-                                                                <div className="prose prose-black max-w-none flex-1 prose-p:font-bold prose-p:text-[22px] print-q-text print:leading-snug prose-p:my-0 prose-li:text-[18px]">
+                                                                <div className="prose prose-black max-w-none flex-1 prose-p:font-bold prose-p:text-[22px] print-q-text print:leading-snug prose-p:my-0 prose-li:text-[18px] capitalize">
                                                                     <span className="hidden [html[data-layout='presentation']_&]:block float-left font-bold text-black mr-2">Q{index + 1}.</span>
                                                                     <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeRaw]}>
                                                                         {q.questionText}
@@ -699,7 +699,7 @@ export default async function AnswerSheetPage({
                                                                                 </>
                                                                             ) : optLetter}
                                                                         </div>
-                                                                        <div className="prose prose-sm max-w-none text-gray-700 [&>p]:m-0 w-full print-opt-text">
+                                                                        <div className="prose prose-sm max-w-none text-gray-700 [&>p]:m-0 w-full print-opt-text capitalize">
                                                                             <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeRaw]}>
                                                                                 {opt.text}
                                                                             </ReactMarkdown>
