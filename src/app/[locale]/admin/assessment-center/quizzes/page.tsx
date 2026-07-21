@@ -301,11 +301,11 @@ export default function QuizzesPage() {
     }
 
     return (
-        <div className="p-6 space-y-6">
-            <div className="flex items-center justify-between">
-                <h1 className="text-3xl font-bold">Quizzes</h1>
-                <div className="flex items-center gap-4">
-                    <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700">
+        <div className="p-4 md:p-6 space-y-6 overflow-hidden">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <h1 className="text-2xl sm:text-3xl font-bold">Quizzes</h1>
+                <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto justify-between sm:justify-end">
+                    <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700 shrink-0">
                         <button 
                             onClick={() => setDisplayMode('list')} 
                             className={`p-2 rounded-md transition-all ${displayMode === 'list' ? 'bg-white dark:bg-slate-700 shadow-sm text-indigo-600 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'}`}
@@ -321,7 +321,7 @@ export default function QuizzesPage() {
                             <LayoutGrid className="w-4 h-4" />
                         </button>
                     </div>
-                    <Button onClick={() => { setEditData({}); setView('editor'); }}>
+                    <Button onClick={() => { setEditData({}); setView('editor'); }} className="shrink-0">
                         <PlusCircle className="mr-2 h-4 w-4" /> Create Quiz
                     </Button>
                 </div>
@@ -408,10 +408,10 @@ export default function QuizzesPage() {
 
             <Card>
                 <CardHeader>
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                         <CardTitle>All Quizzes</CardTitle>
                         {selectedIds.length > 0 && (
-                            <div className="flex items-center gap-2 bg-indigo-50 dark:bg-indigo-900/20 px-4 py-2 rounded-lg border border-indigo-100 dark:border-indigo-800/30">
+                            <div className="flex flex-wrap items-center gap-2 bg-indigo-50 dark:bg-indigo-900/20 px-4 py-2 rounded-lg border border-indigo-100 dark:border-indigo-800/30">
                                 <span className="text-sm font-medium text-indigo-800 dark:text-indigo-300">{selectedIds.length} selected</span>
                                 <Button size="sm" variant="outline" className="bg-white dark:bg-slate-800 border-indigo-200 dark:border-indigo-700 text-indigo-700 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/50" onClick={() => setIsBulkEditModalOpen(true)}>
                                     <CheckSquare className="w-4 h-4 mr-2" /> Bulk Edit
@@ -432,14 +432,14 @@ export default function QuizzesPage() {
                                     />
                                 </TableHead>
                                 <TableHead className="w-[60px]">Image</TableHead>
-                                <TableHead>Title</TableHead>
-                                <TableHead>Duration</TableHead>
-                                <TableHead>Marks</TableHead>
-                                <TableHead>Questions</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead>Pricing</TableHead>
-                                <TableHead>Reviews</TableHead>
-                                <TableHead>Actions</TableHead>
+                                <TableHead className="min-w-[200px]">Title</TableHead>
+                                <TableHead className="whitespace-nowrap">Duration</TableHead>
+                                <TableHead className="whitespace-nowrap">Marks</TableHead>
+                                <TableHead className="whitespace-nowrap">Questions</TableHead>
+                                <TableHead className="whitespace-nowrap">Status</TableHead>
+                                <TableHead className="whitespace-nowrap">Pricing</TableHead>
+                                <TableHead className="whitespace-nowrap">Reviews</TableHead>
+                                <TableHead className="whitespace-nowrap">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
