@@ -69,14 +69,22 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         const resizeCanvas = () => {
             const canvas = canvasRef.current;
             if (!canvas) return;
-            const rect = canvas.getBoundingClientRect();
+            const newWidth = canvas.offsetWidth;
+            const newHeight = canvas.offsetHeight;
             
-            // Only resize if dimensions changed to prevent accidental clearing
-            if (canvas.width !== rect.width || canvas.height !== rect.height) {
-                canvas.width = rect.width;
-                canvas.height = rect.height;
+            // If the new dimensions are zero, don't set them, just return
+            if (newWidth === 0 || newHeight === 0) return;
+
+            if (canvas.width !== newWidth || canvas.height !== newHeight) {
+                // If the new dimensions are zero, don't set them, just return
+                if (newWidth === 0 || newHeight === 0) return;
+
+                canvas.width = newWidth;
+                canvas.height = newHeight;
                 const context = canvas.getContext('2d');
                 if (context) {
+                    context.lineCap = 'round';
+                    context.lineJoin = 'round';
                     contextRef.current = context;
                 }
             }
@@ -109,27 +117,34 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         clearCanvas();
     }, [currentSlide, clearCanvas]);
 
+    const getCoordinates = (e: React.PointerEvent<HTMLCanvasElement>) => {
+        const canvas = canvasRef.current;
+        if (!canvas) return { x: 0, y: 0 };
+        const rect = canvas.getBoundingClientRect();
+        return {
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top
+        };
+    };
+
     // Drawing Handlers
     const startDrawing = (e: React.PointerEvent<HTMLCanvasElement>) => {
         if (!isPenActive) return;
         
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-
-        const rect = canvas.getBoundingClientRect();
-        lastPos.current = {
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top
-        };
-
         isDrawing.current = true;
-        (e.target as HTMLElement).setPointerCapture(e.pointerId);
+        try {
+            (e.target as HTMLElement).setPointerCapture(e.pointerId);
+        } catch (err) {}
+
+        const { x, y } = getCoordinates(e);
+
+        lastPos.current = { x, y };
         
         // Draw a dot on click
         const ctx = contextRef.current;
         if (ctx) {
             ctx.beginPath();
-            ctx.arc(lastPos.current.x, lastPos.current.y, penSize / 2, 0, Math.PI * 2);
+            ctx.arc(x, y, penSize / 2, 0, Math.PI * 2);
             ctx.fillStyle = penColor;
             ctx.fill();
         }
@@ -138,24 +153,21 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const draw = (e: React.PointerEvent<HTMLCanvasElement>) => {
         if (!isDrawing.current || !isPenActive) return;
         
-        const canvas = canvasRef.current;
         const ctx = contextRef.current;
-        if (!canvas || !ctx) return;
+        if (!ctx) return;
 
-        const rect = canvas.getBoundingClientRect();
-        const currentX = e.clientX - rect.left;
-        const currentY = e.clientY - rect.top;
+        const { x, y } = getCoordinates(e);
 
         ctx.beginPath();
         ctx.moveTo(lastPos.current.x, lastPos.current.y);
-        ctx.lineTo(currentX, currentY);
+        ctx.lineTo(x, y);
         ctx.strokeStyle = penColor;
         ctx.lineWidth = penSize;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
         ctx.stroke();
 
-        lastPos.current = { x: currentX, y: currentY };
+        lastPos.current = { x, y };
     };
 
     const stopDrawing = (e: React.PointerEvent<HTMLCanvasElement>) => {
@@ -463,7 +475,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 {/* Drawing Canvas */}
                 <canvas
                     ref={canvasRef}
-                    className={`absolute inset-0 z-[60] touch-none ${isPenActive ? 'pointer-events-auto cursor-crosshair' : 'pointer-events-none'}`}
+                    className={`absolute inset-0 w-full h-full z-20 touch-none ${isPenActive ? 'pointer-events-auto cursor-crosshair' : 'pointer-events-none'}`}
                     onPointerDown={startDrawing}
                     onPointerMove={draw}
                     onPointerUp={stopDrawing}
@@ -513,7 +525,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 )}
 
                 {/* Header */}
-                <div className="shrink-0 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 border-b border-indigo-100 py-3 px-4 md:pl-6 md:pr-8 flex flex-col md:flex-row justify-between items-center w-full z-10 shadow-sm gap-3 md:gap-0 relative">
+                <div className="shrink-0 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 border-b border-indigo-100 py-3 px-4 md:pl-6 md:pr-8 flex flex-col md:flex-row justify-between items-center w-full z-30 shadow-sm gap-3 md:gap-0 relative">
                     {/* Logo Area */}
                     <div className="flex items-center gap-2 md:gap-3 w-full md:w-auto justify-between md:justify-start">
                         <div className="flex items-center gap-2 md:gap-3 px-1">
@@ -708,7 +720,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 </div>
 
                 {/* Footer */}
-                <div className="shrink-0 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 border-t border-indigo-100 py-4 px-4 md:pl-12 md:pr-8 flex justify-between items-center w-full z-20 shadow-[0_-2px_10px_rgba(0,0,0,0.02)] relative">
+                <div className="shrink-0 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 border-t border-indigo-100 py-4 px-4 md:pl-12 md:pr-8 flex justify-between items-center w-full z-30 shadow-[0_-2px_10px_rgba(0,0,0,0.02)] relative">
                     <div className="flex items-center text-indigo-900/70 font-semibold text-sm md:text-lg">
                         © DeshExam
                     </div>
