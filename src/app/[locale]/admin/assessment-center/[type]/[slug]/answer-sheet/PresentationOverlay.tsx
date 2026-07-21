@@ -8,7 +8,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
 import 'katex/dist/katex.min.css';
-import { X, ChevronLeft, ChevronRight, Play, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2 } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Play, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize } from 'lucide-react';
 
 const bnOptionsMap: Record<string, string> = {
     a: 'ক',
@@ -43,6 +43,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [wmSize, setWmSize] = useState(70);
     const [wmVisible, setWmVisible] = useState(true);
     const [optionsLayout, setOptionsLayout] = useState<'grid' | 'list'>('grid');
+    const [isFullscreen, setIsFullscreen] = useState(false);
 
     const [isExpEnabled, setIsExpEnabled] = useState(true);
     const [isOptionExpEnabled, setIsOptionExpEnabled] = useState(true);
@@ -316,6 +317,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const closePresentation = useCallback(() => {
         setIsOpen(false);
         document.body.style.overflow = '';
+        if (document.fullscreenElement && document.exitFullscreen) {
+            document.exitFullscreen().catch(err => console.error(err));
+        }
     }, []);
 
     const nextStep = useCallback(() => {
@@ -377,6 +381,28 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     }, [isOpen, isTimerEnabled, step, currentSlide]);
 
     useEffect(() => {
+        const handleFullscreenChange = () => {
+            setIsFullscreen(!!document.fullscreenElement);
+        };
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    }, []);
+
+    const toggleFullscreen = useCallback(async () => {
+        if (!document.fullscreenElement) {
+            try {
+                await document.documentElement.requestFullscreen();
+            } catch (err) {
+                console.error('Error attempting to enable fullscreen:', err);
+            }
+        } else {
+            if (document.exitFullscreen) {
+                await document.exitFullscreen();
+            }
+        }
+    }, []);
+
+    useEffect(() => {
         if (!isOpen) return;
 
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -413,6 +439,12 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
             if (e.key === 'F') {
                 setIsSpotlightActive(prev => !prev);
+                return;
+            }
+
+            if (e.key === 'F11') {
+                e.preventDefault();
+                toggleFullscreen();
                 return;
             }
 
@@ -910,6 +942,15 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     </div>
 
                     <div className="flex items-center gap-4 md:gap-8">
+                        {/* Fullscreen Toggle Button */}
+                        <button
+                            onClick={toggleFullscreen}
+                            className="p-3 rounded-full transition-all shadow-sm bg-white/60 hover:bg-white text-indigo-600"
+                            title="Toggle Fullscreen (F11)"
+                        >
+                            {isFullscreen ? <Minimize className="w-6 h-6" /> : <Maximize className="w-6 h-6" />}
+                        </button>
+
                         {/* Spotlight Toggle Button */}
                         <button
                             onClick={() => setIsSpotlightActive(!isSpotlightActive)}
