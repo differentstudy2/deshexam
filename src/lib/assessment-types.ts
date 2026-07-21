@@ -24,6 +24,7 @@ export interface AssessmentBase {
   tags?: string[];
   verificationBadges?: string[];
   language?: string;
+  attemptCount?: number;
 
   questionIds: string[]; // Link to QuestionBankEntry
   difficulty: AssessmentDifficulty;

@@ -4,7 +4,7 @@ import React from 'react';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Clock, HelpCircle, ShieldCheck, Trophy, FileText, ArrowRight, Star } from 'lucide-react';
+import { Clock, HelpCircle, ShieldCheck, Trophy, FileText, ArrowRight, Star, Users } from 'lucide-react';
 import Link from 'next/link';
 import { AssessmentBase } from '@/lib/assessment-types';
 import Image from 'next/image';
@@ -106,6 +106,10 @@ export function AssessmentCard({ assessment, type, href }: AssessmentCardProps) 
               ~{(assessment as any).estimatedTimeMin} Mins
             </div>
           )}
+          <div className="flex items-center">
+            <Users className="w-4 h-4 mr-1.5 text-slate-400" />
+            {assessment.attemptCount ? assessment.attemptCount.toLocaleString() : '0'} Attempted
+          </div>
         </div>
 
         {/* Verification Badges */}

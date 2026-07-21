@@ -234,7 +234,7 @@ export default async function MockTestLandingPage({ params }: Props) {
                 </h1>
 
                 {test.description && (
-                  <p className="text-slate-400 text-base lg:text-lg max-w-xl leading-relaxed mt-4">
+                  <p className="text-slate-400 text-base lg:text-lg leading-relaxed mt-4">
                     {test.description}
                   </p>
                 )}
