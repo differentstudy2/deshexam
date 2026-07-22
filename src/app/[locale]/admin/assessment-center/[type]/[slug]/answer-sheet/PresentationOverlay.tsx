@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -154,8 +154,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [selectedVideo, setSelectedVideo] = useState(VIDEO_OPTIONS[0].url);
     const [videoOpacity, setVideoOpacity] = useState(40);
     const [bgOpacity, setBgOpacity] = useState(100);
-    const [qBgColor, setQBgColor] = useState('transparent');
-    const [qTextColor, setQTextColor] = useState('default');
+    const [qBgColor, setQBgColor] = useState('bg-white/90 dark:bg-gray-800/90');
+    const [qTextColor, setQTextColor] = useState('#000000');
 
     const getBgThemeClasses = () => {
         switch(bgTheme) {
@@ -946,6 +946,19 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [isOpen, closePresentation, nextStep, prevStep, isSettingsOpen, step, currentSlide, questions, clearCanvas]);
+    const currentQ = questions[currentSlide];
+    
+    const parsedOptions = useMemo(() => {
+        if (!currentQ || !currentQ.options) return [];
+        const arr = [
+            { key: 'a', text: currentQ.options.a },
+            { key: 'b', text: currentQ.options.b },
+            { key: 'c', text: currentQ.options.c },
+            { key: 'd', text: currentQ.options.d }
+        ];
+        if (currentQ.options.e) arr.push({ key: 'e', text: currentQ.options.e });
+        return arr;
+    }, [currentQ]);
 
     if (!isOpen) {
         return (
@@ -1301,13 +1314,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                     {/* Options */}
                     <div className={optionsLayout === 'grid' ? "grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 w-full max-w-6xl mt-12 md:mt-16" : "flex flex-col gap-y-6 w-[90%] md:w-fit md:min-w-[500px] max-w-5xl mt-12 md:mt-16 mx-auto"}>
-                        {q.options && [
-                            { key: 'a', text: q.options.a },
-                            { key: 'b', text: q.options.b },
-                            { key: 'c', text: q.options.c },
-                            { key: 'd', text: q.options.d },
-                            ...(q.options.e ? [{ key: 'e', text: q.options.e }] : [])
-                        ].map((opt, oIdx) => {
+                        {parsedOptions.length > 0 && parsedOptions.map((opt: { key: string, text: string }, oIdx: number) => {
                             const isCorrect = q.correctAnswer && q.correctAnswer.toLowerCase().includes(opt.key);
                             const optLetter = q.language === 'Bangla' || !q.language ? bnOptionsMap[opt.key] : opt.key.toUpperCase();
 
