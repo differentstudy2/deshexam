@@ -582,6 +582,27 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         setIsSpeaking(true);
     };
 
+    const handleReadAloudRef = useRef(handleReadAloud);
+    useEffect(() => {
+        handleReadAloudRef.current = handleReadAloud;
+    });
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+            const key = e.key.toLowerCase();
+            
+            if (key === 'a') {
+                setIsAutoPlayReadAloud(prev => !prev);
+            } else if (key === 'r') {
+                handleReadAloudRef.current(true);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
+
     const openPresentation = () => {
         setIsOpen(true);
         setCurrentSlide(0);
@@ -1097,18 +1118,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             </div>
                         )}
 
-                        {/* Read Aloud Button */}
-                        <button 
-                            onClick={() => handleReadAloud()}
-                            className={`flex items-center justify-center px-3.5 md:px-5 rounded-xl md:rounded-2xl backdrop-blur-xl border transition-all duration-300 ${
-                                isSpeaking 
-                                    ? 'bg-blue-100/90 border-blue-300 text-blue-600 shadow-[0_8px_32px_rgba(59,130,246,0.15)] ring-1 ring-blue-300 dark:bg-blue-900/50 dark:text-blue-400' 
-                                    : 'bg-white/95 dark:bg-gray-800/95 border-blue-200/60 dark:border-blue-900/60 text-[#1e3a8a] dark:text-blue-100 shadow-[0_8px_32px_rgba(59,130,246,0.15)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:scale-[1.02]'
-                            }`}
-                            title={isSpeaking ? "Stop Reading" : "Read Aloud"}
-                        >
-                            {isSpeaking ? <Pause className="w-5 h-5 md:w-7 md:h-7 fill-current" /> : <Play className="w-5 h-5 md:w-7 md:h-7 fill-current" />}
-                        </button>
+
                     </div>
 
                     {/* Zoomable Content Wrapper */}
@@ -1264,6 +1274,15 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                     <div className="flex items-center gap-2 md:gap-4 lg:gap-8 ml-auto w-full md:w-auto justify-between md:justify-end">
                         <div className="flex items-center gap-2 md:gap-4">
+                            {/* Read Aloud Toggle Button (Footer) */}
+                            <button
+                                onClick={() => handleReadAloud()}
+                                className={`p-2 md:p-3 rounded-full transition-all shadow-sm shrink-0 ${isSpeaking ? 'bg-indigo-600 text-white ring-2 ring-indigo-300' : 'bg-white/60 hover:bg-white text-indigo-600 dark:bg-gray-700/60 dark:hover:bg-gray-700 dark:text-gray-300'}`}
+                                title={isSpeaking ? "Stop Reading (R)" : "Read Aloud (R)"}
+                            >
+                                {isSpeaking ? <Pause className="w-5 h-5 md:w-6 md:h-6 fill-current" /> : <Play className="w-5 h-5 md:w-6 md:h-6 fill-current" />}
+                            </button>
+
                             {/* Dark Mode Toggle Button */}
                             <button
                                 onClick={() => setIsDarkMode(!isDarkMode)}
@@ -1394,6 +1413,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                             <div className="text-sm font-bold text-gray-600 flex items-center gap-2">
                                                 <Volume2 className="w-4 h-4 text-blue-500" />
                                                 Auto Play Read Aloud
+                                                <kbd className="ml-auto text-[10px] bg-gray-100 border border-gray-200 px-1.5 py-0.5 rounded text-gray-500 font-mono shadow-sm">A</kbd>
                                             </div>
                                             <button
                                                 onClick={() => setIsAutoPlayReadAloud(!isAutoPlayReadAloud)}
