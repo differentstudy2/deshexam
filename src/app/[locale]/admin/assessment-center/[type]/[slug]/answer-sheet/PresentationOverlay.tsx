@@ -597,6 +597,31 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     setIsAutoPlayReadAloud(prev => !prev);
                 } else if (key === 'r') {
                     handleReadAloudRef.current(true);
+                } else if (key === 'f') {
+                    setIsSpotlightActive(prev => !prev);
+                } else if (key === 'd') {
+                    setIsPenActive(prev => !prev);
+                } else if (key === 'w') {
+                    setIsWhiteboardMode(prev => !prev);
+                } else if (key === 'n') {
+                    setIsDarkMode(prev => !prev);
+                } else if (['p', 'm', 'l', 'e', 'b', 'c', 'v', 't', 'z'].includes(key)) {
+                    setIsPenActive(true);
+                    if (key === 'p') setDrawingTool('pen');
+                    else if (key === 'm') setDrawingTool('highlighter');
+                    else if (key === 'l') setDrawingTool('laser');
+                    else if (key === 'e') setDrawingTool('eraser');
+                    else if (key === 'b') setDrawingTool('rectangle');
+                    else if (key === 'c') setDrawingTool('circle');
+                    else if (key === 'v') setDrawingTool('arrow');
+                    else if (key === 't') setDrawingTool('text');
+                    else if (key === 'z') setDrawingTool('magnifier');
+                }
+            } else {
+                if (key === 's') {
+                    setIsSettingsOpen(prev => !prev);
+                } else if (key === 't') {
+                    setIsTimerEnabled(prev => !prev);
                 }
             }
         };
@@ -1004,7 +1029,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     left: wm.left,
                                     transform: `translate(-50%, -50%) rotate(${wm.rot}deg)`,
                                     fontSize: `${wmSize * wm.sizeScale}px`, 
-                                    color: `rgba(229, 231, 235, ${isDarkMode ? 0 : (wmOpacity * wm.opacScale) / 100})` 
+                                    color: `rgba(229, 231, 235, ${isDarkMode ? 0.1 : (wmOpacity * wm.opacScale) / 100})` 
                                 }}
                             >
                                 DESHEXAM
@@ -1289,7 +1314,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             <button
                                 onClick={() => setIsDarkMode(!isDarkMode)}
                                 className="p-2 md:p-3 rounded-full transition-all shadow-sm bg-white/60 hover:bg-white text-indigo-600 dark:bg-gray-700/60 dark:hover:bg-gray-700 dark:text-gray-300 shrink-0"
-                                title="Toggle Dark Mode"
+                                title="Toggle Dark Mode (Shift+N)"
                             >
                                 {isDarkMode ? <Sun className="w-5 h-5 md:w-6 md:h-6" /> : <Moon className="w-5 h-5 md:w-6 md:h-6" />}
                             </button>
@@ -1315,7 +1340,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             <button
                                 onClick={() => setIsWhiteboardMode(!isWhiteboardMode)}
                                 className={`hidden md:block p-2 md:p-3 rounded-full transition-all shadow-sm shrink-0 ${isWhiteboardMode ? 'bg-indigo-600 text-white ring-2 ring-indigo-300' : 'bg-white/60 hover:bg-white text-indigo-600'}`}
-                                title="Toggle Whiteboard Mode"
+                                title="Toggle Whiteboard Mode (Shift+W)"
                             >
                                 <Presentation className="w-5 h-5 md:w-6 md:h-6" />
                             </button>
@@ -1534,24 +1559,28 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                         <button 
                                                             onClick={() => setDrawingTool('pen')} 
                                                             className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'pen' ? 'bg-white text-blue-600 shadow-sm border border-gray-200/50' : 'text-gray-500 hover:text-gray-700'}`}
+                                                            title="Pen (Shift+P)"
                                                         >
                                                             <Pen className="w-3.5 h-3.5" /> Pen
                                                         </button>
                                                         <button 
                                                             onClick={() => setDrawingTool('highlighter')} 
                                                             className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'highlighter' ? 'bg-white text-yellow-600 shadow-sm border border-gray-200/50' : 'text-gray-500 hover:text-gray-700'}`}
+                                                            title="Marker (Shift+M)"
                                                         >
                                                             <Highlighter className="w-3.5 h-3.5" /> Marker
                                                         </button>
                                                         <button 
                                                             onClick={() => setDrawingTool('laser')} 
                                                             className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'laser' ? 'bg-white text-red-500 shadow-sm border border-gray-200/50' : 'text-gray-500 hover:text-gray-700'}`}
+                                                            title="Laser (Shift+L)"
                                                         >
                                                             <MousePointer2 className="w-3.5 h-3.5" /> Laser
                                                         </button>
                                                         <button 
                                                             onClick={() => setDrawingTool('eraser')} 
                                                             className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'eraser' ? 'bg-white text-gray-800 shadow-sm border border-gray-200/50' : 'text-gray-500 hover:text-gray-700'}`}
+                                                            title="Eraser (Shift+E)"
                                                         >
                                                             <Eraser className="w-3.5 h-3.5" /> Eraser
                                                         </button>
@@ -1560,30 +1589,35 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                         <button 
                                                             onClick={() => setDrawingTool('rectangle')} 
                                                             className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'rectangle' ? 'bg-white text-indigo-600 shadow-sm border border-gray-200/50' : 'text-gray-500 hover:text-gray-700'}`}
+                                                            title="Rect (Shift+B)"
                                                         >
                                                             <Square className="w-3.5 h-3.5" /> Rect
                                                         </button>
                                                         <button 
                                                             onClick={() => setDrawingTool('circle')} 
                                                             className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'circle' ? 'bg-white text-indigo-600 shadow-sm border border-gray-200/50' : 'text-gray-500 hover:text-gray-700'}`}
+                                                            title="Circle (Shift+C)"
                                                         >
                                                             <Circle className="w-3.5 h-3.5" /> Circle
                                                         </button>
                                                         <button 
                                                             onClick={() => setDrawingTool('arrow')} 
                                                             className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'arrow' ? 'bg-white text-indigo-600 shadow-sm border border-gray-200/50' : 'text-gray-500 hover:text-gray-700'}`}
+                                                            title="Arrow (Shift+V)"
                                                         >
                                                             <ArrowUpRight className="w-3.5 h-3.5" /> Arrow
                                                         </button>
                                                         <button 
                                                             onClick={() => setDrawingTool('text')} 
                                                             className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'text' ? 'bg-white text-indigo-600 shadow-sm border border-gray-200/50' : 'text-gray-500 hover:text-gray-700'}`}
+                                                            title="Text (Shift+T)"
                                                         >
                                                             <Type className="w-3.5 h-3.5" /> Text
                                                         </button>
                                                         <button 
                                                             onClick={() => setDrawingTool('magnifier')} 
                                                             className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'magnifier' ? 'bg-white text-indigo-600 shadow-sm border border-gray-200/50' : 'text-gray-500 hover:text-gray-700'}`}
+                                                            title="Zoom (Shift+Z)"
                                                         >
                                                             <ZoomIn className="w-3.5 h-3.5" /> Zoom
                                                         </button>
