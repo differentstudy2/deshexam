@@ -1007,7 +1007,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     {/* Timer */}
                     {isTimerEnabled && (
                         <div 
-                            className={`absolute top-6 right-10 flex items-center gap-3 px-5 py-2.5 rounded-2xl backdrop-blur-xl border z-50 select-none transition-all duration-300 font-mono text-[26px] font-black tracking-widest ${
+                            className={`absolute top-2 right-2 md:top-6 md:right-10 flex items-center gap-1.5 md:gap-3 px-3 py-1.5 md:px-5 md:py-2.5 rounded-xl md:rounded-2xl backdrop-blur-xl border z-[60] select-none transition-all duration-300 font-mono text-lg md:text-[26px] font-black tracking-widest ${
                                 step >= 1 
                                     ? 'bg-gray-100/90 dark:bg-gray-800/90 border-gray-200/50 dark:border-gray-700/50 text-gray-400 dark:text-gray-500 shadow-sm'
                                     : 'bg-white/95 dark:bg-gray-800/95 border-blue-200/60 dark:border-blue-900/60 text-[#1e3a8a] dark:text-blue-100 shadow-[0_8px_32px_rgba(59,130,246,0.15)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.3)] ring-1 ring-blue-100 dark:ring-blue-900/50'
@@ -1019,15 +1019,15 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             onPointerCancel={handleTimerPointerUp}
                         >
                             <div className="relative flex items-center justify-center shrink-0">
-                                <Clock className={`w-7 h-7 transition-colors duration-300 ${step >= 1 ? 'text-gray-400 dark:text-gray-500' : 'text-blue-600 dark:text-blue-400'} pointer-events-none`} />
+                                <Clock className={`w-5 h-5 md:w-7 md:h-7 transition-colors duration-300 ${step >= 1 ? 'text-gray-400 dark:text-gray-500' : 'text-blue-600 dark:text-blue-400'} pointer-events-none`} />
                                 {step === 0 && (
-                                    <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5 pointer-events-none">
+                                    <span className="absolute -top-1 -right-1 flex h-2 w-2 md:h-2.5 md:w-2.5 pointer-events-none">
                                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+                                        <span className="relative inline-flex rounded-full h-2 w-2 md:h-2.5 md:w-2.5 bg-red-500"></span>
                                     </span>
                                 )}
                             </div>
-                            <span className="pointer-events-none drop-shadow-sm flex items-center w-[90px] justify-center">
+                            <span className="pointer-events-none drop-shadow-sm flex items-center w-[60px] md:w-[90px] justify-center">
                                 {String(Math.floor(timerSeconds / 60)).padStart(2, '0')}
                                 <span className={`${step === 0 && timerSeconds % 2 === 0 ? 'opacity-100' : step === 0 ? 'opacity-50' : 'opacity-100'} transition-opacity duration-300 mx-0.5`}>:</span>
                                 {String(timerSeconds % 60).padStart(2, '0')}
@@ -1038,7 +1038,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     {/* Read Aloud Button (Floating next to timer) */}
                     <button 
                         onClick={handleReadAloud}
-                        className={`absolute top-6 ${isTimerEnabled ? 'right-[210px]' : 'right-10'} z-50 p-2.5 rounded-2xl backdrop-blur-xl border transition-all duration-300 flex items-center justify-center ${
+                        className={`absolute top-2 md:top-6 ${isTimerEnabled ? 'right-[130px] md:right-[210px]' : 'right-2 md:right-10'} z-[60] p-1.5 md:p-2.5 rounded-xl md:rounded-2xl backdrop-blur-xl border transition-all duration-300 flex items-center justify-center ${
                             isSpeaking 
                                 ? 'bg-blue-100/90 border-blue-300 text-blue-600 shadow-[0_8px_32px_rgba(59,130,246,0.15)] ring-1 ring-blue-300 dark:bg-blue-900/50 dark:text-blue-400' 
                                 : 'bg-white/95 dark:bg-gray-800/95 border-blue-200/60 dark:border-blue-900/60 text-[#1e3a8a] dark:text-blue-100 shadow-[0_8px_32px_rgba(59,130,246,0.15)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:scale-[1.02]'
@@ -1046,7 +1046,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                         title={isSpeaking ? "Stop Reading" : "Read Aloud"}
                         style={{ transform: isTimerEnabled ? `translate(${timerPos.x}px, ${timerPos.y}px)` : 'none' }}
                     >
-                        {isSpeaking ? <VolumeX className="w-7 h-7" /> : <Volume2 className="w-7 h-7" />}
+                        {isSpeaking ? <VolumeX className="w-5 h-5 md:w-7 md:h-7" /> : <Volume2 className="w-5 h-5 md:w-7 md:h-7" />}
                     </button>
 
                     {/* Zoomable Content Wrapper */}
@@ -1192,68 +1192,69 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 </div>
 
                 {/* Footer */}
-                <div className="shrink-0 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-800 dark:via-gray-800 dark:to-gray-800 border-t border-indigo-100 dark:border-gray-700 py-[0.1rem] px-4 md:pl-12 md:pr-8 flex justify-between items-center w-full z-30 shadow-[0_-2px_10px_rgba(0,0,0,0.02)] relative transition-colors duration-500">
-                    <div className="flex items-center text-indigo-900/70 dark:text-gray-400 font-semibold text-sm md:text-lg">
+                <div className="shrink-0 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-800 dark:via-gray-800 dark:to-gray-800 border-t border-indigo-100 dark:border-gray-700 py-2 px-2 md:pl-12 md:pr-8 flex justify-between items-center w-full z-30 shadow-[0_-2px_10px_rgba(0,0,0,0.02)] relative transition-colors duration-500 overflow-x-auto custom-scrollbar">
+                    <div className="hidden md:flex items-center text-indigo-900/70 dark:text-gray-400 font-semibold text-sm md:text-lg whitespace-nowrap mr-4">
                         © DeshExam
                     </div>
-                    <div className="hidden md:flex items-center text-indigo-900/70 dark:text-gray-400 font-semibold text-lg tracking-wide">
+                    <div className="hidden lg:flex items-center text-indigo-900/70 dark:text-gray-400 font-semibold text-lg tracking-wide whitespace-nowrap">
                         www.deshexam.com
                     </div>
 
-                    <div className="flex items-center gap-4 md:gap-8">
-                        {/* Dark Mode Toggle Button */}
-                        <button
-                            onClick={() => setIsDarkMode(!isDarkMode)}
-                            className="p-3 rounded-full transition-all shadow-sm bg-white/60 hover:bg-white text-indigo-600 dark:bg-gray-700/60 dark:hover:bg-gray-700 dark:text-gray-300"
-                            title="Toggle Dark Mode"
-                        >
-                            {isDarkMode ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
-                        </button>
-                        {/* Fullscreen Toggle Button */}
-                        <button
-                            onClick={toggleFullscreen}
-                            className="p-3 rounded-full transition-all shadow-sm bg-white/60 hover:bg-white text-indigo-600"
-                            title="Toggle Fullscreen (F11)"
-                        >
-                            {isFullscreen ? <Minimize className="w-6 h-6" /> : <Maximize className="w-6 h-6" />}
-                        </button>
-
-                        {/* Spotlight Toggle Button */}
-                        <button
-                            onClick={() => setIsSpotlightActive(!isSpotlightActive)}
-                            className={`p-3 rounded-full transition-all shadow-sm ${isSpotlightActive ? 'bg-yellow-500 text-white ring-2 ring-yellow-300' : 'bg-white/60 hover:bg-white text-indigo-600'}`}
-                            title="Toggle Spotlight (Shift+F)"
-                        >
-                            <Focus className="w-6 h-6" />
-                        </button>
-                        
-                        {/* Whiteboard Toggle Button */}
-                        <button
-                            onClick={() => setIsWhiteboardMode(!isWhiteboardMode)}
-                            className={`p-3 rounded-full transition-all shadow-sm ${isWhiteboardMode ? 'bg-indigo-600 text-white ring-2 ring-indigo-300' : 'bg-white/60 hover:bg-white text-indigo-600'}`}
-                            title="Toggle Whiteboard Mode"
-                        >
-                            <Presentation className="w-6 h-6" />
-                        </button>
-
-                        {/* Pen Toggle Button */}
-                        <button
-                            onClick={() => setIsPenActive(!isPenActive)}
-                            className={`p-3 rounded-full transition-all shadow-sm ${isPenActive ? 'bg-red-500 text-white ring-2 ring-red-300' : 'bg-white/60 hover:bg-white text-indigo-600'}`}
-                            title="Toggle Pen Tool (Shift+D)"
-                        >
-                            <Pen className="w-6 h-6" />
-                        </button>
-
-                        {/* Settings Dropdown */}
-                        <div className="relative">
+                    <div className="flex items-center gap-2 md:gap-4 lg:gap-8 ml-auto w-full md:w-auto justify-between md:justify-end">
+                        <div className="flex items-center gap-2 md:gap-4">
+                            {/* Dark Mode Toggle Button */}
                             <button
-                                onClick={() => setIsSettingsOpen(!isSettingsOpen)}
-                                className={`p-3 rounded-full transition-all shadow-sm ${isSettingsOpen ? 'bg-indigo-600 text-white ring-2 ring-indigo-300' : 'bg-white/60 hover:bg-white text-indigo-600'}`}
-                                title="Display Settings"
+                                onClick={() => setIsDarkMode(!isDarkMode)}
+                                className="p-2 md:p-3 rounded-full transition-all shadow-sm bg-white/60 hover:bg-white text-indigo-600 dark:bg-gray-700/60 dark:hover:bg-gray-700 dark:text-gray-300 shrink-0"
+                                title="Toggle Dark Mode"
                             >
-                                <Settings className={`w-6 h-6 transition-transform duration-300 ${isSettingsOpen ? 'rotate-90' : ''}`} />
+                                {isDarkMode ? <Sun className="w-5 h-5 md:w-6 md:h-6" /> : <Moon className="w-5 h-5 md:w-6 md:h-6" />}
                             </button>
+                            {/* Fullscreen Toggle Button */}
+                            <button
+                                onClick={toggleFullscreen}
+                                className="hidden sm:block p-2 md:p-3 rounded-full transition-all shadow-sm bg-white/60 hover:bg-white text-indigo-600 shrink-0"
+                                title="Toggle Fullscreen (F11)"
+                            >
+                                {isFullscreen ? <Minimize className="w-5 h-5 md:w-6 md:h-6" /> : <Maximize className="w-5 h-5 md:w-6 md:h-6" />}
+                            </button>
+
+                            {/* Spotlight Toggle Button */}
+                            <button
+                                onClick={() => setIsSpotlightActive(!isSpotlightActive)}
+                                className={`hidden sm:block p-2 md:p-3 rounded-full transition-all shadow-sm shrink-0 ${isSpotlightActive ? 'bg-yellow-500 text-white ring-2 ring-yellow-300' : 'bg-white/60 hover:bg-white text-indigo-600'}`}
+                                title="Toggle Spotlight (Shift+F)"
+                            >
+                                <Focus className="w-5 h-5 md:w-6 md:h-6" />
+                            </button>
+                            
+                            {/* Whiteboard Toggle Button */}
+                            <button
+                                onClick={() => setIsWhiteboardMode(!isWhiteboardMode)}
+                                className={`p-2 md:p-3 rounded-full transition-all shadow-sm shrink-0 ${isWhiteboardMode ? 'bg-indigo-600 text-white ring-2 ring-indigo-300' : 'bg-white/60 hover:bg-white text-indigo-600'}`}
+                                title="Toggle Whiteboard Mode"
+                            >
+                                <Presentation className="w-5 h-5 md:w-6 md:h-6" />
+                            </button>
+
+                            {/* Pen Toggle Button */}
+                            <button
+                                onClick={() => setIsPenActive(!isPenActive)}
+                                className={`p-2 md:p-3 rounded-full transition-all shadow-sm shrink-0 ${isPenActive ? 'bg-red-500 text-white ring-2 ring-red-300' : 'bg-white/60 hover:bg-white text-indigo-600'}`}
+                                title="Toggle Pen Tool (Shift+D)"
+                            >
+                                <Pen className="w-5 h-5 md:w-6 md:h-6" />
+                            </button>
+
+                            {/* Settings Dropdown */}
+                            <div className="relative shrink-0">
+                                <button
+                                    onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+                                    className={`p-2 md:p-3 rounded-full transition-all shadow-sm ${isSettingsOpen ? 'bg-indigo-600 text-white ring-2 ring-indigo-300' : 'bg-white/60 hover:bg-white text-indigo-600'}`}
+                                    title="Display Settings"
+                                >
+                                    <Settings className={`w-5 h-5 md:w-6 md:h-6 transition-transform duration-300 ${isSettingsOpen ? 'rotate-90' : ''}`} />
+                                </button>
 
                             {isSettingsOpen && (
                                 <div className="fixed bottom-[80px] left-1/2 -translate-x-1/2 md:absolute md:bottom-full md:left-auto md:right-0 md:translate-x-0 md:mb-4 bg-white border border-gray-200 rounded-2xl shadow-2xl p-5 w-[90vw] sm:w-80 z-50 animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[70vh] md:max-h-[60vh]">
@@ -1570,14 +1571,16 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             )}
                         </div>
 
-                        <div className="relative flex items-center justify-center">
+                        </div>
+
+                        <div className="relative flex items-center justify-center shrink-0 ml-auto md:ml-0">
                             <button
                                 onClick={() => setIsNavigatorOpen(!isNavigatorOpen)}
-                                className={`flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-xl transition-all shadow-sm font-semibold text-sm md:text-lg ${isNavigatorOpen ? 'bg-indigo-600 text-white ring-2 ring-indigo-300' : 'bg-white/60 hover:bg-white text-indigo-700'}`}
+                                className={`flex items-center gap-1.5 md:gap-2 px-2.5 py-1.5 md:px-4 md:py-2 rounded-xl transition-all shadow-sm font-semibold text-xs md:text-lg ${isNavigatorOpen ? 'bg-indigo-600 text-white ring-2 ring-indigo-300' : 'bg-white/60 hover:bg-white text-indigo-700'}`}
                                 title="Slide Navigator"
                             >
                                 <LayoutGrid className="w-4 h-4 md:w-5 md:h-5" />
-                                Page {String(currentSlide + 1).padStart(2, '0')} <span className="text-xs md:text-sm opacity-70">/ {questions.length}</span>
+                                <span className="hidden sm:inline">Page </span>{String(currentSlide + 1).padStart(2, '0')} <span className="text-[10px] md:text-sm opacity-70">/ {questions.length}</span>
                             </button>
 
                             {isNavigatorOpen && (
@@ -1614,16 +1617,16 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                         </div>
 
                         {/* Controls */}
-                        <div className="flex gap-3">
-                            <button onClick={prevStep} className="p-3 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-700 transition-all active:scale-95">
-                                        <ChevronLeft className="w-6 h-6" />
-                                    </button>
-                                    <button onClick={nextStep} className="p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-md transition-all active:scale-95">
-                                        <ChevronRight className="w-6 h-6" />
-                                    </button>
-                                </div>
-                            </div>
+                        <div className="flex gap-2 md:gap-3 shrink-0">
+                            <button onClick={prevStep} className="p-2 md:p-3 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-700 transition-all active:scale-95">
+                                <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
+                            </button>
+                            <button onClick={nextStep} className="p-2 md:p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-md transition-all active:scale-95">
+                                <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
+                            </button>
                         </div>
+                    </div>
+                </div>
 
                     {/* Dynamic Responsive Font Styles */}
                     <style dangerouslySetInnerHTML={{ __html: `
