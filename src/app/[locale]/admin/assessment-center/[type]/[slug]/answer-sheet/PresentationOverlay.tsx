@@ -534,7 +534,6 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         utterance.lang = q.language === 'Bangla' ? 'bn-BD' : 'en-US';
         
         utterance.onend = () => {
-            setIsSpeaking(false);
             if (isAutoPlayRef.current && stepRef.current === 0 && q.correctAnswer) {
                 const correctKey = q.correctAnswer.toLowerCase().trim();
                 const optionKeys = ['a', 'b', 'c', 'd', 'e'].filter(k => q.options && q.options[k as keyof typeof q.options]);
@@ -543,20 +542,38 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     setSelectedOption(validKey);
                     setStep(1);
                     
-                    setTimeout(() => {
-                        if (isAutoPlayRef.current) {
-                            setCurrentSlide(prev => {
-                                if (prev === currentSlideLocal && prev < questions.length - 1) {
-                                    setStep(0);
-                                    setSelectedOption(null);
-                                    setTimerSeconds(0);
-                                    return prev + 1;
-                                }
-                                return prev;
-                            });
-                        }
-                    }, 2000);
+                    const isBangla = q.language === 'Bangla';
+                    const correctOptText = cleanMarkdown(q.options![validKey as keyof typeof q.options] || '');
+                    const correctText = isBangla 
+                        ? `সঠিক উত্তর: অপশন ${bnOptionsMap[validKey]}, ${correctOptText}` 
+                        : `Correct Answer is: Option ${validKey.toUpperCase()}, ${correctOptText}`;
+                    
+                    const correctUtterance = new SpeechSynthesisUtterance(correctText);
+                    correctUtterance.lang = isBangla ? 'bn-BD' : 'en-US';
+                    
+                    correctUtterance.onend = () => {
+                        setIsSpeaking(false);
+                        setTimeout(() => {
+                            if (isAutoPlayRef.current) {
+                                setCurrentSlide(prev => {
+                                    if (prev === currentSlideLocal && prev < questions.length - 1) {
+                                        setStep(0);
+                                        setSelectedOption(null);
+                                        setTimerSeconds(0);
+                                        return prev + 1;
+                                    }
+                                    return prev;
+                                });
+                            }
+                        }, 1500);
+                    };
+                    correctUtterance.onerror = () => setIsSpeaking(false);
+                    window.speechSynthesis.speak(correctUtterance);
+                } else {
+                    setIsSpeaking(false);
                 }
+            } else {
+                setIsSpeaking(false);
             }
         };
         utterance.onerror = () => setIsSpeaking(false);
