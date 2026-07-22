@@ -55,7 +55,7 @@ const CONFETTI_CONFIG = {
 };
 
 import 'katex/dist/katex.min.css';
-import { X, ChevronLeft, ChevronRight, Play, Pause, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize, LayoutGrid, Sun, Moon, Eraser, Square, Circle, ArrowUpRight, Type, Presentation, ZoomIn, Volume2, VolumeX, MonitorPlay, Lightbulb, MessageCircle, Stamp, Droplet, Music, AlignLeft } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Play, Pause, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize, LayoutGrid, Sun, Moon, Eraser, Square, Circle, ArrowUpRight, Type, Presentation, ZoomIn, Volume2, VolumeX, MonitorPlay, Lightbulb, MessageCircle, Stamp, Droplet, Music, AlignLeft, Keyboard } from 'lucide-react';
 
 const bnOptionsMap: Record<string, string> = {
     a: 'ক',
@@ -148,6 +148,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
     const [isConfettiActive, setIsConfettiActive] = useState(false);
     const [isLofiEnabled, setIsLofiEnabled] = useState(false);
+    const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
     const [selectedMusic, setSelectedMusic] = useState(MUSIC_OPTIONS[0].url);
     const [musicVolume, setMusicVolume] = useState(0.5);
     const [consecutiveCorrect, setConsecutiveCorrect] = useState(0);
@@ -157,6 +158,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [bgOpacity, setBgOpacity] = useState(100);
     const [qBgColor, setQBgColor] = useState('bg-white/90 dark:bg-gray-800/90');
     const [qTextColor, setQTextColor] = useState('#000000');
+    const [animSpeed, setAnimSpeed] = useState(0.8);
 
     const getBgThemeClasses = () => {
         switch(bgTheme) {
@@ -681,7 +683,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
             const key = e.key.toLowerCase();
             
             if (e.shiftKey) {
-                if (key === 'a') {
+                if (key === '?') {
+                    setIsShortcutsOpen(prev => !prev);
+                } else if (key === 'a') {
                     setIsAutoPlayReadAloud(prev => !prev);
                 } else if (key === 'r') {
                     handleReadAloudRef.current(true);
@@ -1305,7 +1309,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 initial={{ opacity: 0, x: 40 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: -40 }}
-                                transition={{ duration: 0.8, ease: 'easeOut' }}
+                                transition={{ duration: animSpeed, ease: 'easeOut' }}
                                 className="w-full flex flex-col items-center flex-1"
                             >
 
@@ -1329,7 +1333,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                         animate="visible"
                         variants={{
                             hidden: {},
-                            visible: { transition: { staggerChildren: 0.4 } }
+                            visible: { transition: { staggerChildren: animSpeed / 2 } }
                         }}
                     >
                         {parsedOptions.length > 0 && parsedOptions.map((opt: { key: string, text: string }, oIdx: number) => {
@@ -1548,6 +1552,46 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 <Pen className="w-5 h-5 md:w-6 md:h-6" />
                             </button>
 
+                            {/* Keyboard Shortcuts Toggle Button */}
+                            <div className="relative shrink-0">
+                                <button
+                                    onClick={() => setIsShortcutsOpen(!isShortcutsOpen)}
+                                    className={`p-2 md:p-3 rounded-full transition-all shadow-sm ${isShortcutsOpen ? 'bg-indigo-600 text-white ring-2 ring-indigo-300' : 'bg-white/60 hover:bg-white text-indigo-600 dark:bg-gray-700/60 dark:hover:bg-gray-700 dark:text-gray-300'}`}
+                                    title="Keyboard Shortcuts (Shift+?)"
+                                >
+                                    <Keyboard className="w-5 h-5 md:w-6 md:h-6" />
+                                </button>
+
+                                {isShortcutsOpen && (
+                                    <div className="fixed bottom-[80px] left-1/2 -translate-x-1/2 md:absolute md:bottom-full md:left-auto md:right-0 md:translate-x-0 md:mb-4 bg-white/95 backdrop-blur-xl border border-white/40 rounded-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] ring-1 ring-gray-900/5 p-5 w-[90vw] sm:w-[400px] z-50 animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[70vh] md:max-h-[60vh]">
+                                        <div className="flex justify-between items-center mb-4 pb-3 border-b border-gray-100 shrink-0">
+                                            <h3 className="font-bold text-gray-800 text-lg flex items-center gap-2">
+                                                <Keyboard className="w-5 h-5 text-gray-500" /> Keyboard Shortcuts
+                                            </h3>
+                                            <button onClick={() => setIsShortcutsOpen(false)} className="p-1 text-gray-400 hover:bg-gray-100 rounded-full hover:text-gray-700 transition-colors">
+                                                <X className="w-5 h-5" />
+                                            </button>
+                                        </div>
+                                        <div className="space-y-3 overflow-y-auto custom-scrollbar pr-2 pb-2 text-sm text-gray-700">
+                                            <div className="flex justify-between items-center border-b border-gray-50 pb-2"><span className="font-medium">Toggle Shortcuts</span><kbd className="bg-gray-100 border border-gray-200 px-2 py-0.5 rounded font-mono text-xs">Shift + ?</kbd></div>
+                                            <div className="flex justify-between items-center border-b border-gray-50 pb-2"><span className="font-medium">Next / Previous</span><kbd className="bg-gray-100 border border-gray-200 px-2 py-0.5 rounded font-mono text-xs">← / →</kbd></div>
+                                            <div className="flex justify-between items-center border-b border-gray-50 pb-2"><span className="font-medium">Select Option A-E</span><kbd className="bg-gray-100 border border-gray-200 px-2 py-0.5 rounded font-mono text-xs">A - E</kbd></div>
+                                            <div className="flex justify-between items-center border-b border-gray-50 pb-2"><span className="font-medium">Read Aloud</span><kbd className="bg-gray-100 border border-gray-200 px-2 py-0.5 rounded font-mono text-xs">Shift + R</kbd></div>
+                                            <div className="flex justify-between items-center border-b border-gray-50 pb-2"><span className="font-medium">Auto-Play Read Aloud</span><kbd className="bg-gray-100 border border-gray-200 px-2 py-0.5 rounded font-mono text-xs">Shift + A</kbd></div>
+                                            <div className="flex justify-between items-center border-b border-gray-50 pb-2"><span className="font-medium">Toggle Timer</span><kbd className="bg-gray-100 border border-gray-200 px-2 py-0.5 rounded font-mono text-xs">T</kbd></div>
+                                            <div className="flex justify-between items-center border-b border-gray-50 pb-2"><span className="font-medium">Toggle Dark Mode</span><kbd className="bg-gray-100 border border-gray-200 px-2 py-0.5 rounded font-mono text-xs">Shift + N</kbd></div>
+                                            <div className="flex justify-between items-center border-b border-gray-50 pb-2"><span className="font-medium">Toggle Fullscreen</span><kbd className="bg-gray-100 border border-gray-200 px-2 py-0.5 rounded font-mono text-xs">F11</kbd></div>
+                                            <div className="flex justify-between items-center border-b border-gray-50 pb-2"><span className="font-medium">Toggle Settings</span><kbd className="bg-gray-100 border border-gray-200 px-2 py-0.5 rounded font-mono text-xs">S</kbd></div>
+                                            <div className="flex justify-between items-center border-b border-gray-50 pb-2"><span className="font-medium">Toggle Spotlight</span><kbd className="bg-gray-100 border border-gray-200 px-2 py-0.5 rounded font-mono text-xs">Shift + F</kbd></div>
+                                            <div className="flex justify-between items-center border-b border-gray-50 pb-2"><span className="font-medium">Whiteboard Mode</span><kbd className="bg-gray-100 border border-gray-200 px-2 py-0.5 rounded font-mono text-xs">Shift + W</kbd></div>
+                                            <div className="flex justify-between items-center border-b border-gray-50 pb-2"><span className="font-medium">Toggle Pen Tool</span><kbd className="bg-gray-100 border border-gray-200 px-2 py-0.5 rounded font-mono text-xs">Shift + D</kbd></div>
+                                            <div className="flex justify-between items-center border-b border-gray-50 pb-2"><span className="font-medium">Show Explanation</span><kbd className="bg-gray-100 border border-gray-200 px-2 py-0.5 rounded font-mono text-xs">Shift + X</kbd></div>
+                                            <div className="flex justify-between items-center pb-2"><span className="font-medium">Show Option Explanations</span><kbd className="bg-gray-100 border border-gray-200 px-2 py-0.5 rounded font-mono text-xs">Shift + O</kbd></div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
                             {/* Settings Dropdown */}
                             <div className="relative shrink-0">
                                 <button
@@ -1609,6 +1653,26 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                 >
                                                     List
                                                 </button>
+                                            </div>
+                                        </div>
+
+                                        <hr className="border-gray-100" />
+
+                                        <div>
+                                            <div className="text-sm font-bold text-gray-700 mb-2 flex justify-between items-center">
+                                                <span className="flex items-center gap-2"><Play className="w-4 h-4 text-indigo-500" /> Animation Speed</span>
+                                            </div>
+                                            <div className="flex items-center gap-3 bg-gray-50 px-2 py-1.5 rounded-lg border border-gray-200">
+                                                <input 
+                                                    type="range" 
+                                                    min="0.1" 
+                                                    max="2.0" 
+                                                    step="0.1"
+                                                    value={animSpeed} 
+                                                    onChange={(e) => setAnimSpeed(Number(e.target.value))}
+                                                    className="flex-1 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                                />
+                                                <span className="text-xs font-bold text-gray-500 w-8 text-right">{animSpeed.toFixed(1)}s</span>
                                             </div>
                                         </div>
 
