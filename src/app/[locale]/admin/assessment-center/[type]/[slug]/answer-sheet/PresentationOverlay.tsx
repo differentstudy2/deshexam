@@ -152,9 +152,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [eliminatedOptions, setEliminatedOptions] = useState<string[]>([]);
     const [showHeader, setShowHeader] = useState(true);
     const [showLogo, setShowLogo] = useState(true);
-    const [headerScale, setHeaderScale] = useState(1);
-    const [headerTitleScale, setHeaderTitleScale] = useState(1);
-    const [headerTitleAlign, setHeaderTitleAlign] = useState<'left'|'center'|'right'>('center');
+    const [headerScale, setHeaderScale] = useState(0.9);
+    const [headerTitleScale, setHeaderTitleScale] = useState(0.9);
+    const [headerTitleAlign, setHeaderTitleAlign] = useState<'left'|'center'|'right'>('left');
     const [selectedMusic, setSelectedMusic] = useState(MUSIC_OPTIONS[0].url);
     const [musicVolume, setMusicVolume] = useState(0.5);
     const [consecutiveCorrect, setConsecutiveCorrect] = useState(0);
