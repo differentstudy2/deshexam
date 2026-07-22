@@ -7,6 +7,7 @@ import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
+import Confetti from 'react-dom-confetti';
 import 'katex/dist/katex.min.css';
 import { X, ChevronLeft, ChevronRight, Play, Pause, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize, LayoutGrid, Sun, Moon, Eraser, Square, Circle, ArrowUpRight, Type, Presentation, ZoomIn, Volume2, VolumeX } from 'lucide-react';
 
@@ -95,6 +96,11 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const textInputRef = useRef<HTMLTextAreaElement>(null);
     const cursorRef = useRef<HTMLDivElement>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const lofiAudioRef = useRef<HTMLAudioElement>(null);
+    const popAudioRef = useRef<HTMLAudioElement>(null);
+
+    const [isConfettiActive, setIsConfettiActive] = useState(false);
+    const [isLofiEnabled, setIsLofiEnabled] = useState(false);
 
     const isAutoPlayRef = useRef(isAutoPlayReadAloud);
     const stepRef = useRef(step);
@@ -711,6 +717,16 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     }, [isOpen, isTimerEnabled, step, currentSlide]);
 
     useEffect(() => {
+        if (lofiAudioRef.current) {
+            if (isLofiEnabled && isOpen) {
+                lofiAudioRef.current.play().catch(e => console.warn('Audio play failed:', e));
+            } else {
+                lofiAudioRef.current.pause();
+            }
+        }
+    }, [isLofiEnabled, isOpen]);
+
+    useEffect(() => {
         const handleFullscreenChange = () => {
             setIsFullscreen(!!document.fullscreenElement);
         };
@@ -1107,6 +1123,10 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                         </button>
                     </div>
                 </div>
+                
+                {/* Hidden Audio Elements */}
+                <audio ref={lofiAudioRef} src="/audio/lofi.mp3" loop />
+                <audio ref={popAudioRef} src="/audio/correct-pop.mp3" preload="auto" />
 
                 {/* Main Content Area */}
                 <div ref={scrollContainerRef} className="flex-1 w-full relative flex flex-col items-center px-4 md:px-24 py-6 md:py-12 z-10 overflow-y-auto custom-scrollbar gap-8">
@@ -1216,14 +1236,27 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             return (
                                 <div
                                     key={opt.key}
-                                    className="flex flex-col gap-2 w-full"
+                                    className="flex flex-col gap-2 w-full relative"
                                 >
+                                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none">
+                                        <Confetti active={isConfettiActive && isSelected && showCorrect} config={{ spread: 90, elementCount: 70, duration: 3000, startVelocity: 30, colors: ['#34A853', '#FABB05', '#4285F4', '#EA4335'] }} />
+                                    </div>
                                     <div
                                         className={containerClasses}
                                         onClick={() => {
                                         if (step === 0) {
                                             setSelectedOption(opt.key);
                                             setStep(1);
+                                            
+                                            // Trigger confetti and sound if correct
+                                            if (q.correctAnswer && q.correctAnswer.toLowerCase().trim().includes(opt.key)) {
+                                                setIsConfettiActive(true);
+                                                if (popAudioRef.current) {
+                                                    popAudioRef.current.currentTime = 0;
+                                                    popAudioRef.current.play().catch(e => console.warn('Pop audio failed:', e));
+                                                }
+                                                setTimeout(() => setIsConfettiActive(false), 2000);
+                                            }
                                         }
                                     }}
                                 >
@@ -1447,6 +1480,21 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isAutoPlayReadAloud ? 'bg-blue-600' : 'bg-gray-300'}`}
                                             >
                                                 <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isAutoPlayReadAloud ? 'translate-x-6' : 'translate-x-1'}`} />
+                                            </button>
+                                        </div>
+
+                                        <hr className="border-gray-100" />
+
+                                        <div className="flex items-center justify-between">
+                                            <div className="text-sm font-bold text-gray-600 flex items-center gap-2">
+                                                <Volume2 className="w-4 h-4 text-blue-500" />
+                                                Focus Mode (Lo-Fi)
+                                            </div>
+                                            <button
+                                                onClick={() => setIsLofiEnabled(!isLofiEnabled)}
+                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isLofiEnabled ? 'bg-blue-600' : 'bg-gray-300'}`}
+                                            >
+                                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isLofiEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
                                             </button>
                                         </div>
 
@@ -1726,6 +1774,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                             <X className="w-4 h-4 md:w-5 md:h-5" />
                                         </button>
                                     </div>
+
                                     <div className="overflow-y-auto custom-scrollbar pr-2 pb-2">
                                         <div className="grid grid-cols-5 gap-2">
                                             {questions.map((_, idx) => (
