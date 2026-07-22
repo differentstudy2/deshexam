@@ -153,6 +153,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [bgTheme, setBgTheme] = useState<'default' | 'mesh' | 'grid' | 'dots' | 'video'>('dots');
     const [selectedVideo, setSelectedVideo] = useState(VIDEO_OPTIONS[0].url);
     const [videoOpacity, setVideoOpacity] = useState(40);
+    const [qBgColor, setQBgColor] = useState('transparent');
+    const [qTextColor, setQTextColor] = useState('default');
 
     const getBgThemeClasses = () => {
         switch(bgTheme) {
@@ -1266,9 +1268,12 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     >
 
                     {/* Question */}
-                    <div className="flex items-start gap-3 md:gap-4 w-full max-w-5xl mt-8 md:mt-4">
-                        <span className={`${bgTheme === 'video' ? 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]' : 'text-black dark:text-gray-100'} font-extrabold leading-normal shrink-0`} style={{ fontSize: 'var(--q-size)' }}>Q{currentSlide + 1}.</span>
-                        <div className={`prose max-w-none prose-p:font-extrabold text-[length:var(--q-size)] leading-normal text-left font-extrabold capitalize [&_*]:!text-[length:var(--q-size)] [&_*]:!leading-normal [&_*]:!m-0 ${bgTheme === 'video' ? 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] [&_*]:!text-white [&_*]:!drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]' : 'text-black dark:text-gray-100 [&_*]:!text-black dark:[&_*]:!text-gray-100'}`}>
+                    <div 
+                        className={`flex items-start gap-3 md:gap-4 w-full max-w-5xl mt-8 md:mt-4 transition-all duration-300 ${qBgColor !== 'transparent' ? `${qBgColor} p-4 md:p-6 rounded-2xl border border-gray-200/50 dark:border-gray-700/50 backdrop-blur-md shadow-lg` : ''}`}
+                        style={{ '--q-color': qTextColor !== 'default' ? qTextColor : undefined } as React.CSSProperties}
+                    >
+                        <span className={`font-extrabold leading-normal shrink-0 ${qTextColor !== 'default' ? 'text-[var(--q-color)] drop-shadow-sm' : (bgTheme === 'video' ? 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]' : 'text-black dark:text-gray-100')}`} style={{ fontSize: 'var(--q-size)' }}>Q{currentSlide + 1}.</span>
+                        <div className={`prose max-w-none prose-p:font-extrabold text-[length:var(--q-size)] leading-normal text-left font-extrabold capitalize [&_*]:!text-[length:var(--q-size)] [&_*]:!leading-normal [&_*]:!m-0 ${qTextColor !== 'default' ? 'text-[var(--q-color)] [&_*]:!text-[var(--q-color)] drop-shadow-sm [&_*]:!drop-shadow-sm' : (bgTheme === 'video' ? 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] [&_*]:!text-white [&_*]:!drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]' : 'text-black dark:text-gray-100 [&_*]:!text-black dark:[&_*]:!text-gray-100')}`}>
                             <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
                                 {q.questionText}
                             </ReactMarkdown>
@@ -1595,6 +1600,44 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     </div>
                                                 </div>
                                             )}
+                                        </div>
+
+                                        <hr className="border-gray-100" />
+
+                                        <div>
+                                            <div className="text-sm font-bold text-gray-700 mb-2 flex justify-between items-center">
+                                                <span className="flex items-center gap-2"><Highlighter className="w-4 h-4 text-indigo-500" /> Question Styling</span>
+                                            </div>
+                                            <div className="space-y-3">
+                                                {/* Background Color */}
+                                                <div className="flex items-center gap-2 bg-gray-50 px-2 py-1.5 rounded-lg border border-gray-200">
+                                                    <span className="text-[10px] font-bold text-gray-500 min-w-[50px] uppercase">Bg Color:</span>
+                                                    <div className="flex gap-1.5 flex-1 justify-end">
+                                                        <button onClick={() => setQBgColor('transparent')} className={`w-5 h-5 rounded-full border-2 ${qBgColor === 'transparent' ? 'border-blue-500' : 'border-transparent'} relative`} title="Transparent">
+                                                            <div className="absolute inset-0 rounded-full bg-transparent overflow-hidden border border-gray-300">
+                                                                <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200" style={{ backgroundImage: 'repeating-linear-gradient(45deg, #e5e7eb 25%, transparent 25%, transparent 75%, #e5e7eb 75%, #e5e7eb), repeating-linear-gradient(45deg, #e5e7eb 25%, transparent 25%, transparent 75%, #e5e7eb 75%, #e5e7eb)', backgroundPosition: '0 0, 3px 3px', backgroundSize: '6px 6px' }}></div>
+                                                            </div>
+                                                        </button>
+                                                        <button onClick={() => setQBgColor('bg-white/90 dark:bg-gray-800/90')} className={`w-5 h-5 rounded-full border border-gray-300 bg-white shadow-sm ring-2 ${qBgColor === 'bg-white/90 dark:bg-gray-800/90' ? 'ring-blue-500' : 'ring-transparent'}`} title="White/Dark"></button>
+                                                        <button onClick={() => setQBgColor('bg-blue-50/90 dark:bg-blue-900/50')} className={`w-5 h-5 rounded-full border border-blue-200 bg-blue-100 shadow-sm ring-2 ${qBgColor === 'bg-blue-50/90 dark:bg-blue-900/50' ? 'ring-blue-500' : 'ring-transparent'}`} title="Blue"></button>
+                                                        <button onClick={() => setQBgColor('bg-indigo-50/90 dark:bg-indigo-900/50')} className={`w-5 h-5 rounded-full border border-indigo-200 bg-indigo-100 shadow-sm ring-2 ${qBgColor === 'bg-indigo-50/90 dark:bg-indigo-900/50' ? 'ring-blue-500' : 'ring-transparent'}`} title="Indigo"></button>
+                                                        <button onClick={() => setQBgColor('bg-black/50 dark:bg-black/80')} className={`w-5 h-5 rounded-full border border-gray-700 bg-gray-900 shadow-sm ring-2 ${qBgColor === 'bg-black/50 dark:bg-black/80' ? 'ring-blue-500' : 'ring-transparent'}`} title="Black/Dark"></button>
+                                                    </div>
+                                                </div>
+
+                                                {/* Text Color */}
+                                                <div className="flex items-center gap-2 bg-gray-50 px-2 py-1.5 rounded-lg border border-gray-200">
+                                                    <span className="text-[10px] font-bold text-gray-500 min-w-[50px] uppercase">Text Color:</span>
+                                                    <div className="flex gap-1.5 flex-1 justify-end">
+                                                        <button onClick={() => setQTextColor('default')} className={`w-5 h-5 rounded-full border border-gray-300 shadow-sm text-[9px] font-bold flex items-center justify-center bg-gray-100 text-gray-500 ring-2 ${qTextColor === 'default' ? 'ring-blue-500' : 'ring-transparent'}`} title="Auto">A</button>
+                                                        <button onClick={() => setQTextColor('#000000')} className={`w-5 h-5 rounded-full border border-gray-800 shadow-sm bg-black ring-2 ${qTextColor === '#000000' ? 'ring-blue-500' : 'ring-transparent'}`} title="Black"></button>
+                                                        <button onClick={() => setQTextColor('#ffffff')} className={`w-5 h-5 rounded-full border border-gray-300 shadow-sm bg-white ring-2 ${qTextColor === '#ffffff' ? 'ring-blue-500' : 'ring-transparent'}`} title="White"></button>
+                                                        <button onClick={() => setQTextColor('#ef4444')} className={`w-5 h-5 rounded-full border border-red-500 shadow-sm bg-red-500 ring-2 ${qTextColor === '#ef4444' ? 'ring-blue-500' : 'ring-transparent'}`} title="Red"></button>
+                                                        <button onClick={() => setQTextColor('#3b82f6')} className={`w-5 h-5 rounded-full border border-blue-500 shadow-sm bg-blue-500 ring-2 ${qTextColor === '#3b82f6' ? 'ring-blue-500' : 'ring-transparent'}`} title="Blue"></button>
+                                                        <button onClick={() => setQTextColor('#f59e0b')} className={`w-5 h-5 rounded-full border border-amber-500 shadow-sm bg-amber-500 ring-2 ${qTextColor === '#f59e0b' ? 'ring-blue-500' : 'ring-transparent'}`} title="Yellow"></button>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
 
                                         <hr className="border-gray-100" />
