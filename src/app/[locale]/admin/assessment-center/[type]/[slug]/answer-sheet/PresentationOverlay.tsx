@@ -90,6 +90,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [magnifierPos, setMagnifierPos] = useState({ x: 50, y: 50 });
     const [isSpeaking, setIsSpeaking] = useState(false);
     const [isWhiteboardMode, setIsWhiteboardMode] = useState(false);
+    const [isAutoPlayReadAloud, setIsAutoPlayReadAloud] = useState(false);
     const [textInput, setTextInput] = useState<{ x: number, y: number, text: string } | null>(null);
     const textInputRef = useRef<HTMLTextAreaElement>(null);
     const cursorRef = useRef<HTMLDivElement>(null);
@@ -482,13 +483,20 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         if ('speechSynthesis' in window) {
             window.speechSynthesis.cancel();
             setIsSpeaking(false);
+            
+            if (isOpen && isAutoPlayReadAloud) {
+                const timer = setTimeout(() => {
+                    handleReadAloud(true);
+                }, 300);
+                return () => clearTimeout(timer);
+            }
         }
-    }, [currentSlide, isOpen]);
+    }, [currentSlide, isOpen, isAutoPlayReadAloud]);
 
-    const handleReadAloud = () => {
+    const handleReadAloud = (forcePlay = false) => {
         if (!('speechSynthesis' in window)) return;
         
-        if (isSpeaking) {
+        if (isSpeaking && !forcePlay) {
             window.speechSynthesis.cancel();
             setIsSpeaking(false);
             return;
@@ -922,7 +930,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     left: wm.left,
                                     transform: `translate(-50%, -50%) rotate(${wm.rot}deg)`,
                                     fontSize: `${wmSize * wm.sizeScale}px`, 
-                                    color: `rgba(229, 231, 235, ${(wmOpacity * wm.opacScale) / 100})` 
+                                    color: `rgba(229, 231, 235, ${isDarkMode ? 0 : (wmOpacity * wm.opacScale) / 100})` 
                                 }}
                             >
                                 DESHEXAM
@@ -1004,50 +1012,53 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 {/* Main Content Area */}
                 <div ref={scrollContainerRef} className="flex-1 w-full relative flex flex-col items-center px-4 md:px-24 py-6 md:py-12 z-10 overflow-y-auto custom-scrollbar gap-8">
 
-                    {/* Timer */}
-                    {isTimerEnabled && (
-                        <div 
-                            className={`absolute top-2 right-2 md:top-6 md:right-10 flex items-center gap-1.5 md:gap-3 px-3 py-1.5 md:px-5 md:py-2.5 rounded-xl md:rounded-2xl backdrop-blur-xl border z-[60] select-none transition-all duration-300 font-mono text-lg md:text-[26px] font-black tracking-widest ${
-                                step >= 1 
-                                    ? 'bg-gray-100/90 dark:bg-gray-800/90 border-gray-200/50 dark:border-gray-700/50 text-gray-400 dark:text-gray-500 shadow-sm'
-                                    : 'bg-white/95 dark:bg-gray-800/95 border-blue-200/60 dark:border-blue-900/60 text-[#1e3a8a] dark:text-blue-100 shadow-[0_8px_32px_rgba(59,130,246,0.15)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.3)] ring-1 ring-blue-100 dark:ring-blue-900/50'
-                            } ${isDraggingTimer ? 'cursor-grabbing scale-105 shadow-[0_16px_48px_rgba(59,130,246,0.25)] ring-blue-300 dark:ring-blue-700' : 'cursor-grab hover:shadow-[0_12px_40px_rgba(59,130,246,0.2)] hover:scale-[1.02]'}`}
-                            style={{ transform: `translate(${timerPos.x}px, ${timerPos.y}px)` }}
-                            onPointerDown={handleTimerPointerDown}
-                            onPointerMove={handleTimerPointerMove}
-                            onPointerUp={handleTimerPointerUp}
-                            onPointerCancel={handleTimerPointerUp}
-                        >
-                            <div className="relative flex items-center justify-center shrink-0">
-                                <Clock className={`w-5 h-5 md:w-7 md:h-7 transition-colors duration-300 ${step >= 1 ? 'text-gray-400 dark:text-gray-500' : 'text-blue-600 dark:text-blue-400'} pointer-events-none`} />
-                                {step === 0 && (
-                                    <span className="absolute -top-1 -right-1 flex h-2 w-2 md:h-2.5 md:w-2.5 pointer-events-none">
-                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                        <span className="relative inline-flex rounded-full h-2 w-2 md:h-2.5 md:w-2.5 bg-red-500"></span>
-                                    </span>
-                                )}
-                            </div>
-                            <span className="pointer-events-none drop-shadow-sm flex items-center w-[60px] md:w-[90px] justify-center">
-                                {String(Math.floor(timerSeconds / 60)).padStart(2, '0')}
-                                <span className={`${step === 0 && timerSeconds % 2 === 0 ? 'opacity-100' : step === 0 ? 'opacity-50' : 'opacity-100'} transition-opacity duration-300 mx-0.5`}>:</span>
-                                {String(timerSeconds % 60).padStart(2, '0')}
-                            </span>
-                        </div>
-                    )}
-
-                    {/* Read Aloud Button (Floating next to timer) */}
-                    <button 
-                        onClick={handleReadAloud}
-                        className={`absolute top-2 md:top-6 ${isTimerEnabled ? 'right-[130px] md:right-[210px]' : 'right-2 md:right-10'} z-[60] p-1.5 md:p-2.5 rounded-xl md:rounded-2xl backdrop-blur-xl border transition-all duration-300 flex items-center justify-center ${
-                            isSpeaking 
-                                ? 'bg-blue-100/90 border-blue-300 text-blue-600 shadow-[0_8px_32px_rgba(59,130,246,0.15)] ring-1 ring-blue-300 dark:bg-blue-900/50 dark:text-blue-400' 
-                                : 'bg-white/95 dark:bg-gray-800/95 border-blue-200/60 dark:border-blue-900/60 text-[#1e3a8a] dark:text-blue-100 shadow-[0_8px_32px_rgba(59,130,246,0.15)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:scale-[1.02]'
-                        }`}
-                        title={isSpeaking ? "Stop Reading" : "Read Aloud"}
-                        style={{ transform: isTimerEnabled ? `translate(${timerPos.x}px, ${timerPos.y}px)` : 'none' }}
+                    {/* Floating Controls (Timer & Read Aloud) */}
+                    <div 
+                        className={`absolute bottom-20 right-4 md:bottom-28 md:right-10 flex items-center gap-2 md:gap-4 z-[60]`}
+                        style={{ transform: `translate(${timerPos.x}px, ${timerPos.y}px)` }}
                     >
-                        {isSpeaking ? <VolumeX className="w-5 h-5 md:w-7 md:h-7" /> : <Volume2 className="w-5 h-5 md:w-7 md:h-7" />}
-                    </button>
+                        {isTimerEnabled && (
+                            <div 
+                                className={`flex items-center gap-1.5 md:gap-3 px-3 py-1.5 md:px-5 md:py-2.5 rounded-xl md:rounded-2xl backdrop-blur-xl border select-none transition-all duration-300 font-mono text-lg md:text-[26px] font-black tracking-widest ${
+                                    step >= 1 
+                                        ? 'bg-gray-100/90 dark:bg-gray-800/90 border-gray-200/50 dark:border-gray-700/50 text-gray-400 dark:text-gray-500 shadow-sm'
+                                        : 'bg-white/95 dark:bg-gray-800/95 border-blue-200/60 dark:border-blue-900/60 text-[#1e3a8a] dark:text-blue-100 shadow-[0_8px_32px_rgba(59,130,246,0.15)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.3)] ring-1 ring-blue-100 dark:ring-blue-900/50'
+                                } ${isDraggingTimer ? 'cursor-grabbing scale-105 shadow-[0_16px_48px_rgba(59,130,246,0.25)] ring-blue-300 dark:ring-blue-700' : 'cursor-grab hover:shadow-[0_12px_40px_rgba(59,130,246,0.2)] hover:scale-[1.02]'}`}
+                                onPointerDown={handleTimerPointerDown}
+                                onPointerMove={handleTimerPointerMove}
+                                onPointerUp={handleTimerPointerUp}
+                                onPointerCancel={handleTimerPointerUp}
+                            >
+                                <div className="relative flex items-center justify-center shrink-0">
+                                    <Clock className={`w-5 h-5 md:w-7 md:h-7 transition-colors duration-300 ${step >= 1 ? 'text-gray-400 dark:text-gray-500' : 'text-blue-600 dark:text-blue-400'} pointer-events-none`} />
+                                    {step === 0 && (
+                                        <span className="absolute -top-1 -right-1 flex h-2 w-2 md:h-2.5 md:w-2.5 pointer-events-none">
+                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                            <span className="relative inline-flex rounded-full h-2 w-2 md:h-2.5 md:w-2.5 bg-red-500"></span>
+                                        </span>
+                                    )}
+                                </div>
+                                <span className="pointer-events-none drop-shadow-sm flex items-center w-[60px] md:w-[90px] justify-center">
+                                    {String(Math.floor(timerSeconds / 60)).padStart(2, '0')}
+                                    <span className={`${step === 0 && timerSeconds % 2 === 0 ? 'opacity-100' : step === 0 ? 'opacity-50' : 'opacity-100'} transition-opacity duration-300 mx-0.5`}>:</span>
+                                    {String(timerSeconds % 60).padStart(2, '0')}
+                                </span>
+                            </div>
+                        )}
+
+                        {/* Read Aloud Button */}
+                        <button 
+                            onClick={() => handleReadAloud()}
+                            className={`flex items-center justify-center h-[42px] w-[42px] md:h-[62px] md:w-[62px] rounded-xl md:rounded-2xl backdrop-blur-xl border transition-all duration-300 ${
+                                isSpeaking 
+                                    ? 'bg-blue-100/90 border-blue-300 text-blue-600 shadow-[0_8px_32px_rgba(59,130,246,0.15)] ring-1 ring-blue-300 dark:bg-blue-900/50 dark:text-blue-400' 
+                                    : 'bg-white/95 dark:bg-gray-800/95 border-blue-200/60 dark:border-blue-900/60 text-[#1e3a8a] dark:text-blue-100 shadow-[0_8px_32px_rgba(59,130,246,0.15)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:scale-[1.02]'
+                            }`}
+                            title={isSpeaking ? "Stop Reading" : "Read Aloud"}
+                        >
+                            {isSpeaking ? <VolumeX className="w-5 h-5 md:w-7 md:h-7" /> : <Volume2 className="w-5 h-5 md:w-7 md:h-7" />}
+                        </button>
+                    </div>
 
                     {/* Zoomable Content Wrapper */}
                     <div 
@@ -1192,7 +1203,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 </div>
 
                 {/* Footer */}
-                <div className="shrink-0 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-800 dark:via-gray-800 dark:to-gray-800 border-t border-indigo-100 dark:border-gray-700 py-2 px-2 md:pl-12 md:pr-8 flex justify-between items-center w-full z-30 shadow-[0_-2px_10px_rgba(0,0,0,0.02)] relative transition-colors duration-500 overflow-x-auto custom-scrollbar">
+                <div className="shrink-0 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-800 dark:via-gray-800 dark:to-gray-800 border-t border-indigo-100 dark:border-gray-700 py-2 px-2 md:pl-12 md:pr-8 flex justify-between items-center w-full z-30 shadow-[0_-2px_10px_rgba(0,0,0,0.02)] relative transition-colors duration-500 overflow-visible">
                     <div className="flex items-center text-indigo-900/70 dark:text-gray-400 font-semibold text-sm md:text-lg whitespace-nowrap mr-2 md:mr-4">
                         © DeshExam
                     </div>
@@ -1323,6 +1334,21 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isTimerEnabled ? 'bg-blue-600' : 'bg-gray-300'}`}
                                             >
                                                 <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isTimerEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
+                                            </button>
+                                        </div>
+
+                                        <hr className="border-gray-100" />
+
+                                        <div className="flex items-center justify-between">
+                                            <div className="text-sm font-bold text-gray-600 flex items-center gap-2">
+                                                <Volume2 className="w-4 h-4 text-blue-500" />
+                                                Auto Play Read Aloud
+                                            </div>
+                                            <button
+                                                onClick={() => setIsAutoPlayReadAloud(!isAutoPlayReadAloud)}
+                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isAutoPlayReadAloud ? 'bg-blue-600' : 'bg-gray-300'}`}
+                                            >
+                                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isAutoPlayReadAloud ? 'translate-x-6' : 'translate-x-1'}`} />
                                             </button>
                                         </div>
 
