@@ -592,10 +592,12 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
             if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
             const key = e.key.toLowerCase();
             
-            if (key === 'a') {
-                setIsAutoPlayReadAloud(prev => !prev);
-            } else if (key === 'r') {
-                handleReadAloudRef.current(true);
+            if (e.shiftKey) {
+                if (key === 'a') {
+                    setIsAutoPlayReadAloud(prev => !prev);
+                } else if (key === 'r') {
+                    handleReadAloudRef.current(true);
+                }
             }
         };
 
@@ -1413,7 +1415,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                             <div className="text-sm font-bold text-gray-600 flex items-center gap-2">
                                                 <Volume2 className="w-4 h-4 text-blue-500" />
                                                 Auto Play Read Aloud
-                                                <kbd className="ml-auto text-[10px] bg-gray-100 border border-gray-200 px-1.5 py-0.5 rounded text-gray-500 font-mono shadow-sm">A</kbd>
+                                                <kbd className="ml-auto text-[10px] bg-gray-100 border border-gray-200 px-1.5 py-0.5 rounded text-gray-500 font-mono shadow-sm">Shift+A</kbd>
                                             </div>
                                             <button
                                                 onClick={() => setIsAutoPlayReadAloud(!isAutoPlayReadAloud)}
