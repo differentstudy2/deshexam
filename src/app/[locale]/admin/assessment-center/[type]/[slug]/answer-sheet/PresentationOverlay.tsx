@@ -8,7 +8,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
 import 'katex/dist/katex.min.css';
-import { X, ChevronLeft, ChevronRight, Play, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize, LayoutGrid, Sun, Moon, Eraser, Square, Circle, ArrowUpRight, Type, Presentation, ZoomIn, Volume2, VolumeX } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Play, Pause, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize, LayoutGrid, Sun, Moon, Eraser, Square, Circle, ArrowUpRight, Type, Presentation, ZoomIn, Volume2, VolumeX } from 'lucide-react';
 
 const bnOptionsMap: Record<string, string> = {
     a: 'ক',
@@ -529,6 +529,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
             });
         }
 
+        const currentSlideLocal = currentSlide;
         const utterance = new SpeechSynthesisUtterance(textToRead);
         utterance.lang = q.language === 'Bangla' ? 'bn-BD' : 'en-US';
         
@@ -541,6 +542,20 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 if (validKey) {
                     setSelectedOption(validKey);
                     setStep(1);
+                    
+                    setTimeout(() => {
+                        if (isAutoPlayRef.current) {
+                            setCurrentSlide(prev => {
+                                if (prev === currentSlideLocal && prev < questions.length - 1) {
+                                    setStep(0);
+                                    setSelectedOption(null);
+                                    setTimerSeconds(0);
+                                    return prev + 1;
+                                }
+                                return prev;
+                            });
+                        }
+                    }, 2000);
                 }
             }
         };
@@ -1075,7 +1090,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             }`}
                             title={isSpeaking ? "Stop Reading" : "Read Aloud"}
                         >
-                            {isSpeaking ? <VolumeX className="w-5 h-5 md:w-7 md:h-7" /> : <Volume2 className="w-5 h-5 md:w-7 md:h-7" />}
+                            {isSpeaking ? <Pause className="w-5 h-5 md:w-7 md:h-7 fill-current" /> : <Play className="w-5 h-5 md:w-7 md:h-7 fill-current" />}
                         </button>
                     </div>
 
