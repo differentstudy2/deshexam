@@ -8,6 +8,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
 import Confetti from 'react-dom-confetti';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const MUSIC_OPTIONS = [
     { id: 'lofi', name: 'Lo-Fi Chill', url: '/audio/lofi.mp3' },
@@ -1298,6 +1299,15 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                         className="w-full flex flex-col items-center flex-1 transition-transform duration-100 ease-out" 
                         style={isMagnified ? { transform: 'scale(1.7)', transformOrigin: `${magnifierPos.x}% ${magnifierPos.y}%` } : {}}
                     >
+                        <AnimatePresence mode="wait">
+                            <motion.div
+                                key={currentSlide}
+                                initial={{ opacity: 0, x: 40 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -40 }}
+                                transition={{ duration: 0.8, ease: 'easeOut' }}
+                                className="w-full flex flex-col items-center flex-1"
+                            >
 
                     {/* Question */}
                     <div 
@@ -1313,7 +1323,15 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     </div>
 
                     {/* Options */}
-                    <div className={optionsLayout === 'grid' ? "grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 w-full max-w-6xl mt-12 md:mt-16" : "flex flex-col gap-y-6 w-[90%] md:w-fit md:min-w-[500px] max-w-5xl mt-12 md:mt-16 mx-auto"}>
+                    <motion.div 
+                        className={optionsLayout === 'grid' ? "grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 w-full max-w-6xl mt-12 md:mt-16" : "flex flex-col gap-y-6 w-[90%] md:w-fit md:min-w-[500px] max-w-5xl mt-12 md:mt-16 mx-auto"}
+                        initial="hidden"
+                        animate="visible"
+                        variants={{
+                            hidden: {},
+                            visible: { transition: { staggerChildren: 0.4 } }
+                        }}
+                    >
                         {parsedOptions.length > 0 && parsedOptions.map((opt: { key: string, text: string }, oIdx: number) => {
                             const isCorrect = q.correctAnswer && q.correctAnswer.toLowerCase().includes(opt.key);
                             const optLetter = q.language === 'Bangla' || !q.language ? bnOptionsMap[opt.key] : opt.key.toUpperCase();
@@ -1356,8 +1374,12 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 }
                             }
                             return (
-                                <div
+                                <motion.div
                                     key={opt.key}
+                                    variants={{
+                                        hidden: { opacity: 0, y: 20 },
+                                        visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100, damping: 14 } }
+                                    }}
                                     className="flex flex-col gap-2 w-full relative"
                                 >
                                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none">
@@ -1429,10 +1451,10 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                             </ReactMarkdown>
                                         </div>
                                     )}
-                                </div>
+                                </motion.div>
                             );
                         })}
-                    </div>
+                    </motion.div>
 
                     {/* Explanation */}
                     {step >= 2 && q.explanation && isExpEnabled && (
@@ -1457,6 +1479,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                         </div>
                     )}
                     
+                            </motion.div>
+                        </AnimatePresence>
                     </div>
                 </div>
 
