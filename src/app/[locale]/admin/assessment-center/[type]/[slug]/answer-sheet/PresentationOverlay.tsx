@@ -1193,7 +1193,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                 {/* Footer */}
                 <div className="shrink-0 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-800 dark:via-gray-800 dark:to-gray-800 border-t border-indigo-100 dark:border-gray-700 py-2 px-2 md:pl-12 md:pr-8 flex justify-between items-center w-full z-30 shadow-[0_-2px_10px_rgba(0,0,0,0.02)] relative transition-colors duration-500 overflow-x-auto custom-scrollbar">
-                    <div className="hidden md:flex items-center text-indigo-900/70 dark:text-gray-400 font-semibold text-sm md:text-lg whitespace-nowrap mr-4">
+                    <div className="flex items-center text-indigo-900/70 dark:text-gray-400 font-semibold text-sm md:text-lg whitespace-nowrap mr-2 md:mr-4">
                         © DeshExam
                     </div>
                     <div className="hidden lg:flex items-center text-indigo-900/70 dark:text-gray-400 font-semibold text-lg tracking-wide whitespace-nowrap">
@@ -1213,7 +1213,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             {/* Fullscreen Toggle Button */}
                             <button
                                 onClick={toggleFullscreen}
-                                className="hidden sm:block p-2 md:p-3 rounded-full transition-all shadow-sm bg-white/60 hover:bg-white text-indigo-600 shrink-0"
+                                className="p-2 md:p-3 rounded-full transition-all shadow-sm bg-white/60 hover:bg-white text-indigo-600 shrink-0"
                                 title="Toggle Fullscreen (F11)"
                             >
                                 {isFullscreen ? <Minimize className="w-5 h-5 md:w-6 md:h-6" /> : <Maximize className="w-5 h-5 md:w-6 md:h-6" />}
@@ -1231,7 +1231,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             {/* Whiteboard Toggle Button */}
                             <button
                                 onClick={() => setIsWhiteboardMode(!isWhiteboardMode)}
-                                className={`p-2 md:p-3 rounded-full transition-all shadow-sm shrink-0 ${isWhiteboardMode ? 'bg-indigo-600 text-white ring-2 ring-indigo-300' : 'bg-white/60 hover:bg-white text-indigo-600'}`}
+                                className={`hidden md:block p-2 md:p-3 rounded-full transition-all shadow-sm shrink-0 ${isWhiteboardMode ? 'bg-indigo-600 text-white ring-2 ring-indigo-300' : 'bg-white/60 hover:bg-white text-indigo-600'}`}
                                 title="Toggle Whiteboard Mode"
                             >
                                 <Presentation className="w-5 h-5 md:w-6 md:h-6" />
@@ -1573,7 +1573,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                         </div>
 
-                        <div className="relative flex items-center justify-center shrink-0 ml-auto md:ml-0">
+                        <div className="relative hidden md:flex items-center justify-center shrink-0 ml-auto md:ml-0">
                             <button
                                 onClick={() => setIsNavigatorOpen(!isNavigatorOpen)}
                                 className={`flex items-center gap-1.5 md:gap-2 px-2.5 py-1.5 md:px-4 md:py-2 rounded-xl transition-all shadow-sm font-semibold text-xs md:text-lg ${isNavigatorOpen ? 'bg-indigo-600 text-white ring-2 ring-indigo-300' : 'bg-white/60 hover:bg-white text-indigo-700'}`}
