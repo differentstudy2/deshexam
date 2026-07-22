@@ -1029,7 +1029,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     left: wm.left,
                                     transform: `translate(-50%, -50%) rotate(${wm.rot}deg)`,
                                     fontSize: `${wmSize * wm.sizeScale}px`, 
-                                    color: `rgba(229, 231, 235, ${isDarkMode ? 0.1 : (wmOpacity * wm.opacScale) / 100})` 
+                                    color: `rgba(229, 231, 235, ${(wmOpacity * wm.opacScale * (isDarkMode ? 0.25 : 1)) / 100})` 
                                 }}
                             >
                                 DESHEXAM
