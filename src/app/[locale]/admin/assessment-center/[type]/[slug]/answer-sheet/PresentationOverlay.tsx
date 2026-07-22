@@ -1219,44 +1219,54 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                 {/* Header */}
                 {showHeader && (
-                    <div className="shrink-0 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-800 dark:via-gray-800 dark:to-gray-800 border-b border-indigo-100 dark:border-gray-700 py-[0.1rem] px-4 md:pl-6 md:pr-8 flex flex-col md:flex-row justify-between items-center w-full z-30 shadow-sm gap-3 md:gap-0 relative transition-colors duration-500" style={{ padding: `${0.1 * headerScale}rem ${1.5 * headerScale}rem` }}>
+                    <div 
+                        className="shrink-0 bg-gradient-to-r from-indigo-50 via-white to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 border-b border-indigo-100/50 dark:border-gray-700/50 flex flex-col md:flex-row justify-between items-center w-full z-30 shadow-sm relative transition-all duration-500 px-3 md:px-6" 
+                        style={{ 
+                            paddingTop: `${0.75 * headerScale}rem`,
+                            paddingBottom: `${0.75 * headerScale}rem`,
+                            gap: `${0.5 * headerScale}rem`
+                        }}
+                    >
                         {/* Logo Area */}
-                        <div className="flex items-center gap-2 md:gap-3 w-full md:w-auto justify-between md:justify-start">
+                        <div className="flex items-center w-full md:w-auto justify-between md:justify-start">
                             {showLogo && (
-                                <div className="flex items-center gap-2 md:gap-3 px-1">
+                                <div className="flex items-center gap-2 md:gap-3">
                                     <img src="/image/logo.png" alt="DeshExam" style={{ height: `${2.25 * headerScale}rem` }} className="w-auto object-contain drop-shadow-sm" />
-                                    <div className="flex flex-col">
-                                        <span className="font-extrabold text-indigo-950 dark:text-gray-100 leading-none" style={{ fontSize: `${1 * headerScale}rem` }}>Desh Exam Academy</span>
-                                        <span className="text-indigo-800/70 dark:text-gray-400 font-bold tracking-wide mt-1 uppercase" style={{ fontSize: `${0.625 * headerScale}rem` }}>Learn • Practice • Succeed</span>
+                                    <div className="flex flex-col justify-center">
+                                        <span className="font-extrabold text-indigo-950 dark:text-gray-100 leading-tight" style={{ fontSize: `${1.1 * headerScale}rem` }}>Desh Exam Academy</span>
+                                        <span className="text-indigo-800/80 dark:text-gray-400 font-bold tracking-widest uppercase mt-0.5" style={{ fontSize: `${0.55 * headerScale}rem` }}>Learn • Practice • Succeed</span>
                                     </div>
                                 </div>
                             )}
-                            {/* Mobile Close Button & Badge */}
-                            <div className="flex items-center gap-2 md:hidden">
-                                <div className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-3 py-1 rounded-full font-bold text-xs tracking-wider shadow-md" style={{ fontSize: `${0.75 * headerScale}rem`, padding: `${0.25 * headerScale}rem ${0.75 * headerScale}rem` }}>
+                            
+                            {/* Mobile Actions */}
+                            <div className="flex md:hidden items-center gap-2 shrink-0">
+                                <div className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-full font-bold tracking-widest shadow-md flex items-center justify-center whitespace-nowrap" style={{ fontSize: `${0.7 * headerScale}rem`, padding: `${0.35 * headerScale}rem ${0.8 * headerScale}rem` }}>
                                     MOCK TEST
                                 </div>
-                                <button onClick={closePresentation} className="bg-white/60 hover:bg-white rounded-full text-indigo-600 shadow-sm transition-colors flex items-center justify-center" style={{ width: `${2 * headerScale}rem`, height: `${2 * headerScale}rem` }}>
-                                    <X style={{ width: `${1.25 * headerScale}rem`, height: `${1.25 * headerScale}rem` }} />
+                                <button onClick={closePresentation} className="bg-white/90 dark:bg-gray-800 hover:bg-white dark:hover:bg-gray-700 rounded-full text-indigo-600 dark:text-indigo-400 shadow-sm border border-indigo-100 dark:border-gray-600 transition-colors flex items-center justify-center shrink-0" style={{ width: `${2.2 * headerScale}rem`, height: `${2.2 * headerScale}rem` }}>
+                                    <X style={{ width: `${1.2 * headerScale}rem`, height: `${1.2 * headerScale}rem` }} strokeWidth={2.5} />
                                 </button>
                             </div>
                         </div>
+
                         {/* Title Area */}
-                        <div className="flex-1 text-center w-full mt-1 md:mt-0 px-2 md:px-6">
-                            <h1 className="font-extrabold text-indigo-950 dark:text-gray-100 tracking-tight line-clamp-1 md:line-clamp-none" style={{ fontSize: `${1 * headerScale}rem` }}>{classLine}</h1>
+                        <div className="flex-1 text-center w-full md:px-6 flex flex-col justify-center items-center">
+                            <h1 className="font-extrabold text-indigo-950 dark:text-gray-100 tracking-tight line-clamp-1 md:line-clamp-none" style={{ fontSize: `${1.1 * headerScale}rem` }}>{classLine}</h1>
                             {(chapterName || topicName) && (
-                                <div className="text-indigo-800 dark:text-gray-300 font-semibold mt-1.5 tracking-wide uppercase" style={{ fontSize: `${0.875 * headerScale}rem` }}>
+                                <div className="text-indigo-700 dark:text-gray-400 font-bold tracking-wider uppercase mt-1" style={{ fontSize: `${0.75 * headerScale}rem` }}>
                                     {[chapterName, topicName].filter(Boolean).join(' | ')}
                                 </div>
                             )}
                         </div>
-                        {/* Badge Area (Desktop) */}
-                        <div className="hidden md:flex items-center gap-4">
-                            <div className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-full font-bold tracking-wider shadow-md" style={{ fontSize: `${1.125 * headerScale}rem`, padding: `${0.5 * headerScale}rem ${1.5 * headerScale}rem` }}>
+
+                        {/* Desktop Actions */}
+                        <div className="hidden md:flex items-center gap-3 justify-end shrink-0">
+                            <div className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-full font-extrabold tracking-widest shadow-md flex items-center justify-center whitespace-nowrap" style={{ fontSize: `${0.85 * headerScale}rem`, padding: `${0.5 * headerScale}rem ${1.25 * headerScale}rem` }}>
                                 MOCK TEST
                             </div>
-                            <button onClick={closePresentation} className="bg-white/60 hover:bg-white rounded-full text-indigo-600 shadow-sm transition-all flex items-center justify-center" style={{ width: `${2.5 * headerScale}rem`, height: `${2.5 * headerScale}rem` }} title="Close Presentation">
-                                <X style={{ width: `${1.5 * headerScale}rem`, height: `${1.5 * headerScale}rem` }} />
+                            <button onClick={closePresentation} className="bg-white/90 dark:bg-gray-800 hover:bg-white dark:hover:bg-gray-700 rounded-full text-indigo-600 dark:text-indigo-400 shadow-sm border border-indigo-100 dark:border-gray-600 transition-all hover:scale-105 flex items-center justify-center shrink-0" style={{ width: `${2.75 * headerScale}rem`, height: `${2.75 * headerScale}rem` }} title="Close Presentation">
+                                <X style={{ width: `${1.4 * headerScale}rem`, height: `${1.4 * headerScale}rem` }} strokeWidth={2.5} />
                             </button>
                         </div>
                     </div>
