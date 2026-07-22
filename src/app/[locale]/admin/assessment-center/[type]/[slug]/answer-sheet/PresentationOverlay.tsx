@@ -149,6 +149,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [isConfettiActive, setIsConfettiActive] = useState(false);
     const [isLofiEnabled, setIsLofiEnabled] = useState(false);
     const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
+    const [eliminatedOptions, setEliminatedOptions] = useState<string[]>([]);
     const [selectedMusic, setSelectedMusic] = useState(MUSIC_OPTIONS[0].url);
     const [musicVolume, setMusicVolume] = useState(0.5);
     const [consecutiveCorrect, setConsecutiveCorrect] = useState(0);
@@ -309,6 +310,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
     useEffect(() => {
         clearCanvas();
+        setEliminatedOptions([]);
     }, [currentSlide, clearCanvas]);
 
     const getCoordinates = (e: any) => {
@@ -1359,7 +1361,10 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             let letterClasses = `shrink-0 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full text-lg md:text-xl font-black transition-colors duration-300 ${theme.letterBg} ${theme.letterText}`;
 
                             if (step === 0) {
-                                if (isSelected) {
+                                if (eliminatedOptions.includes(opt.key)) {
+                                    containerClasses = `flex items-center gap-3 md:gap-4 py-2 px-3 rounded-lg border-2 transition-all duration-300 opacity-40 grayscale border-gray-300 bg-gray-50 dark:bg-gray-800/50`;
+                                    letterClasses = `shrink-0 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full text-lg md:text-xl font-black transition-colors duration-300 bg-gray-300 text-gray-500`;
+                                } else if (isSelected) {
                                     containerClasses = `flex items-center gap-3 md:gap-4 py-2 px-3 rounded-lg border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(66,133,244,0.15)] bg-[#e8f0fe] dark:bg-[#4285F4]/20 border-[#4285F4] transform scale-[1.02] cursor-pointer ring-2 ring-[#4285F4]/30`;
                                     letterClasses = `shrink-0 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full text-lg md:text-xl font-black transition-colors duration-300 bg-[#4285F4] text-white`;
                                 } else {
@@ -1391,8 +1396,17 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     </div>
                                     <div
                                         className={containerClasses}
+                                        onContextMenu={(e) => {
+                                            e.preventDefault();
+                                            if (step === 0) {
+                                                setEliminatedOptions(prev => 
+                                                    prev.includes(opt.key) ? prev.filter(k => k !== opt.key) : [...prev, opt.key]
+                                                );
+                                            }
+                                        }}
                                         onClick={() => {
                                         if (step === 0) {
+                                            if (eliminatedOptions.includes(opt.key)) return;
                                             setSelectedOption(opt.key);
                                             setStep(1);
                                             
@@ -1426,7 +1440,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     <div className={letterClasses}>
                                         {optLetter}
                                     </div>
-                                    <div className="prose dark:prose-invert max-w-none text-black dark:text-gray-100 [&>p]:m-0 [&>p]:text-[length:var(--opt-size)] [&>p]:font-semibold [&>p]:leading-snug flex-1 capitalize">
+                                    <div className={`prose dark:prose-invert max-w-none text-black dark:text-gray-100 [&>p]:m-0 [&>p]:text-[length:var(--opt-size)] [&>p]:font-semibold [&>p]:leading-snug flex-1 capitalize ${eliminatedOptions.includes(opt.key) && step === 0 ? 'line-through opacity-50' : ''}`}>
                                         <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
                                             {opt.text}
                                         </ReactMarkdown>
