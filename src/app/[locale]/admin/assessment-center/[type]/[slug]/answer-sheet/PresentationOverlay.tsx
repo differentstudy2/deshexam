@@ -153,16 +153,27 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [bgTheme, setBgTheme] = useState<'default' | 'mesh' | 'grid' | 'dots' | 'video'>('dots');
     const [selectedVideo, setSelectedVideo] = useState(VIDEO_OPTIONS[0].url);
     const [videoOpacity, setVideoOpacity] = useState(40);
+    const [bgOpacity, setBgOpacity] = useState(100);
     const [qBgColor, setQBgColor] = useState('transparent');
     const [qTextColor, setQTextColor] = useState('default');
 
     const getBgThemeClasses = () => {
         switch(bgTheme) {
-            case 'mesh': return 'bg-gradient-to-br from-indigo-100 via-purple-50 to-teal-100 dark:from-indigo-950 dark:via-purple-900 dark:to-teal-950';
-            case 'grid': return 'bg-[#f8fafc] dark:bg-gray-900 bg-[linear-gradient(to_right,#8080801a_1px,transparent_1px),linear-gradient(to_bottom,#8080801a_1px,transparent_1px)] bg-[size:24px_24px]';
-            case 'dots': return 'bg-[#f8fafc] dark:bg-gray-900 bg-[radial-gradient(#cbd5e1_1.5px,transparent_1.5px)] dark:bg-[radial-gradient(#374151_1.5px,transparent_1.5px)] [background-size:20px_20px]';
+            case 'mesh': return 'bg-indigo-50 dark:bg-indigo-950';
+            case 'grid': return 'bg-[#f8fafc] dark:bg-gray-900';
+            case 'dots': return 'bg-[#f8fafc] dark:bg-gray-900';
             case 'video': return 'bg-black/90 text-white';
-            default: return 'bg-slate-50 dark:bg-slate-950 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.25),rgba(255,255,255,0))] dark:bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.2),rgba(255,255,255,0))]';
+            default: return 'bg-slate-50 dark:bg-slate-950';
+        }
+    };
+
+    const getBgThemeOverlayClasses = () => {
+        switch(bgTheme) {
+            case 'mesh': return 'bg-gradient-to-br from-indigo-100 via-purple-50 to-teal-100 dark:from-indigo-950 dark:via-purple-900 dark:to-teal-950';
+            case 'grid': return 'bg-[linear-gradient(to_right,#8080801a_1px,transparent_1px),linear-gradient(to_bottom,#8080801a_1px,transparent_1px)] bg-[size:24px_24px]';
+            case 'dots': return 'bg-[radial-gradient(#cbd5e1_1.5px,transparent_1.5px)] dark:bg-[radial-gradient(#374151_1.5px,transparent_1.5px)] [background-size:20px_20px]';
+            case 'video': return '';
+            default: return 'bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.25),rgba(255,255,255,0))] dark:bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.2),rgba(255,255,255,0))]';
         }
     };
 
@@ -1033,6 +1044,14 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 {/* Main Presentation Area */}
                 <div className={`responsive-fonts flex-1 min-w-0 relative w-full h-full ${getBgThemeClasses()} flex flex-col shadow-2xl overflow-hidden shrink-0 z-10 xl:rounded-xl xl:border xl:border-gray-200 dark:border-gray-800 transition-colors duration-500`}>
 
+                {/* Background Pattern Overlay */}
+                {bgTheme !== 'video' && (
+                    <div 
+                        className={`absolute inset-0 z-0 pointer-events-none transition-opacity duration-300 ${getBgThemeOverlayClasses()}`}
+                        style={{ opacity: bgOpacity / 100 }}
+                    />
+                )}
+
                 {/* Video Background */}
                 {bgTheme === 'video' && (
                     <>
@@ -1598,6 +1617,20 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                         />
                                                         <span className="text-xs font-bold text-gray-500 w-8 text-right">{videoOpacity}%</span>
                                                     </div>
+                                                </div>
+                                            )}
+                                            {bgTheme !== 'video' && (
+                                                <div className="mt-2 flex items-center gap-3 bg-gray-50 px-2 py-1.5 rounded-lg border border-gray-200">
+                                                    <Sun className="w-4 h-4 text-gray-400 shrink-0" />
+                                                    <input 
+                                                        type="range" 
+                                                        min="0" 
+                                                        max="100" 
+                                                        value={bgOpacity} 
+                                                        onChange={(e) => setBgOpacity(Number(e.target.value))}
+                                                        className="flex-1 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                                    />
+                                                    <span className="text-xs font-bold text-gray-500 w-8 text-right">{bgOpacity}%</span>
                                                 </div>
                                             )}
                                         </div>

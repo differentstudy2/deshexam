@@ -809,3 +809,7 @@ html {
   -ms-overflow-style: auto;
   scrollbar-width: thin;
 }
+
+.rounded-2xl {
+    border-radius: 0.2rem;
+}
