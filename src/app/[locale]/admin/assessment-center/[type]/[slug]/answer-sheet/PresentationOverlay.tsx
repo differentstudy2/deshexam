@@ -19,7 +19,22 @@ const MUSIC_OPTIONS = [
     { id: 'cafe', name: 'Cafe Ambience', url: '/audio/cafe.mp3' },
     { id: 'jazz', name: 'Smooth Jazz', url: '/audio/jazz.mp3' },
     { id: 'classic', name: 'Classical Music', url: '/audio/classic.mp3' },
-    { id: 'meditation', name: 'Meditation Bowl', url: '/audio/meditation.mp3' }
+    { id: 'meditation', name: 'Meditation Bowl', url: '/audio/meditation.mp3' },
+    { id: 'ticking', name: 'Ticking Clock', url: '/audio/ticking.mp3' },
+    { id: 'calc_guess', name: 'A Calculated Guess', url: '/audio/A_Calculated_Guess.mp3' },
+    { id: 'porcelain_rain', name: 'Porcelain Against the Rain', url: '/audio/Porcelain_Against_the_Rain.mp3' },
+    { id: 'sec_solve', name: 'Seconds to Solve', url: '/audio/Seconds_to_Solve.mp3' },
+    { id: 'seven_letters', name: 'Seven Letters Down', url: '/audio/Seven_Letters_Down.mp3' },
+    { id: 'steps_clarity', name: 'Steps Toward Clarity', url: '/audio/Steps_Toward_Clarity.mp3' },
+    { id: 'sunlight_cedar', name: 'Sunlight on Cedar', url: '/audio/Sunlight_on_Cedar.mp3' },
+    { id: 'last_answer', name: 'The Last Answer', url: '/audio/The_Last_Answer.mp3' },
+    { id: 'last_pendulum', name: 'The Last Pendulum', url: '/audio/The_Last_Pendulum.mp3' },
+    { id: 'library_storm', name: 'The Library Storm', url: '/audio/The_Library_Storm.mp3' },
+    { id: 'longest_min', name: 'The Longest Minute', url: '/audio/The_Longest_Minute.mp3' },
+    { id: 'weightless_page', name: 'The Weightless Page', url: '/audio/The_Weightless_Page.mp3' },
+    { id: 'ticking_margin', name: 'Ticking Margin', url: '/audio/Ticking_Margin.mp3' },
+    { id: 'tiptoe_still', name: 'Tiptoe into Stillness', url: '/audio/Tiptoe_into_Stillness.mp3' },
+    { id: 'twelve_stories', name: 'Twelve Stories Above', url: '/audio/Twelve_Stories_Above.mp3' }
 ];
 
 const CONFETTI_CONFIG = {
@@ -125,10 +140,17 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [isConfettiActive, setIsConfettiActive] = useState(false);
     const [isLofiEnabled, setIsLofiEnabled] = useState(false);
     const [selectedMusic, setSelectedMusic] = useState(MUSIC_OPTIONS[0].url);
+    const [musicVolume, setMusicVolume] = useState(0.5);
     const [consecutiveCorrect, setConsecutiveCorrect] = useState(0);
 
     const isAutoPlayRef = useRef(isAutoPlayReadAloud);
     const stepRef = useRef(step);
+
+    useEffect(() => {
+        if (lofiAudioRef.current) {
+            lofiAudioRef.current.volume = musicVolume;
+        }
+    }, [musicVolume]);
 
     useEffect(() => {
         isAutoPlayRef.current = isAutoPlayReadAloud;
@@ -1540,7 +1562,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                 </button>
                                             </div>
                                             {isLofiEnabled && (
-                                                <div className="pl-6 pr-2">
+                                                <div className="pl-6 pr-2 flex flex-col gap-3">
                                                     <select
                                                         value={selectedMusic}
                                                         onChange={(e) => {
@@ -1557,6 +1579,22 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                             <option key={opt.id} value={opt.url}>{opt.name}</option>
                                                         ))}
                                                     </select>
+                                                    <div className="flex items-center gap-3">
+                                                        <VolumeX className="w-4 h-4 text-gray-400" />
+                                                        <input 
+                                                            type="range" 
+                                                            min="0" 
+                                                            max="1" 
+                                                            step="0.05" 
+                                                            value={musicVolume}
+                                                            onChange={(e) => setMusicVolume(parseFloat(e.target.value))}
+                                                            className="flex-1 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                                        />
+                                                        <div className="flex items-center gap-1 min-w-[3.5rem]">
+                                                            <Volume2 className="w-4 h-4 text-gray-400" />
+                                                            <span className="text-xs font-semibold text-gray-500">{Math.round(musicVolume * 100)}%</span>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             )}
                                         </div>
