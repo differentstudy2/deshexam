@@ -1574,7 +1574,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             </button>
 
                             {/* Keyboard Shortcuts Toggle Button */}
-                            <div className="relative shrink-0">
+                            <div className="relative shrink-0 hidden md:block">
                                 <button
                                     onClick={() => setIsShortcutsOpen(!isShortcutsOpen)}
                                     className={`p-2 md:p-3 rounded-full transition-all shadow-sm ${isShortcutsOpen ? 'bg-indigo-600 text-white ring-2 ring-indigo-300' : 'bg-white/60 hover:bg-white text-indigo-600 dark:bg-gray-700/60 dark:hover:bg-gray-700 dark:text-gray-300'}`}
