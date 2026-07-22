@@ -153,6 +153,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [showHeader, setShowHeader] = useState(true);
     const [showLogo, setShowLogo] = useState(true);
     const [headerScale, setHeaderScale] = useState(1);
+    const [headerTitleScale, setHeaderTitleScale] = useState(1);
+    const [headerTitleAlign, setHeaderTitleAlign] = useState<'left'|'center'|'right'>('center');
     const [selectedMusic, setSelectedMusic] = useState(MUSIC_OPTIONS[0].url);
     const [musicVolume, setMusicVolume] = useState(0.5);
     const [consecutiveCorrect, setConsecutiveCorrect] = useState(0);
@@ -1251,10 +1253,14 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                         </div>
 
                         {/* Title Area */}
-                        <div className="flex-1 text-center w-full md:px-6 flex flex-col justify-center items-center">
-                            <h1 className="font-extrabold text-indigo-950 dark:text-gray-100 tracking-tight line-clamp-1 md:line-clamp-none" style={{ fontSize: `${1.1 * headerScale}rem` }}>{classLine}</h1>
+                        <div className={`flex-1 w-full md:px-6 flex flex-col justify-center ${
+                            headerTitleAlign === 'left' ? 'items-start text-left' :
+                            headerTitleAlign === 'right' ? 'items-end text-right' :
+                            'items-center text-center'
+                        }`}>
+                            <h1 className="font-extrabold text-indigo-950 dark:text-gray-100 tracking-tight line-clamp-1 md:line-clamp-none" style={{ fontSize: `${1.1 * headerScale * headerTitleScale}rem` }}>{classLine}</h1>
                             {(chapterName || topicName) && (
-                                <div className="text-indigo-700 dark:text-gray-400 font-bold tracking-wider uppercase mt-1" style={{ fontSize: `${0.75 * headerScale}rem` }}>
+                                <div className="text-indigo-700 dark:text-gray-400 font-bold tracking-wider uppercase mt-1" style={{ fontSize: `${0.75 * headerScale * headerTitleScale}rem` }}>
                                     {[chapterName, topicName].filter(Boolean).join(' | ')}
                                 </div>
                             )}
@@ -1716,6 +1722,23 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                                 className="flex-1 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
                                                             />
                                                             <span className="text-xs font-bold text-gray-500 w-8 text-right">{(headerScale * 100).toFixed(0)}%</span>
+                                                        </div>
+                                                        <div className="flex items-center gap-3 bg-gray-50 px-2 py-1.5 rounded-lg border border-gray-200">
+                                                            <span className="text-xs font-bold text-gray-500 min-w-[50px]">Text Size</span>
+                                                            <input 
+                                                                type="range" min="0.5" max="2.5" step="0.1"
+                                                                value={headerTitleScale} onChange={(e) => setHeaderTitleScale(Number(e.target.value))}
+                                                                className="flex-1 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                                            />
+                                                            <span className="text-xs font-bold text-gray-500 w-8 text-right">{(headerTitleScale * 100).toFixed(0)}%</span>
+                                                        </div>
+                                                        <div className="flex flex-col gap-1.5 bg-gray-50 px-2 py-1.5 rounded-lg border border-gray-200">
+                                                            <span className="text-xs font-bold text-gray-500">Text Alignment</span>
+                                                            <div className="flex items-center justify-between gap-2">
+                                                                <button onClick={() => setHeaderTitleAlign('left')} className={`flex-1 py-1 rounded text-xs font-bold transition-colors ${headerTitleAlign === 'left' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}`}>Left</button>
+                                                                <button onClick={() => setHeaderTitleAlign('center')} className={`flex-1 py-1 rounded text-xs font-bold transition-colors ${headerTitleAlign === 'center' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}`}>Center</button>
+                                                                <button onClick={() => setHeaderTitleAlign('right')} className={`flex-1 py-1 rounded text-xs font-bold transition-colors ${headerTitleAlign === 'right' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}`}>Right</button>
+                                                            </div>
                                                         </div>
                                                     </>
                                                 )}
