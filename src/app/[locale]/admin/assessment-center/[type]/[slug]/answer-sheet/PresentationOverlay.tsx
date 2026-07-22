@@ -55,7 +55,7 @@ const CONFETTI_CONFIG = {
 };
 
 import 'katex/dist/katex.min.css';
-import { X, ChevronLeft, ChevronRight, Play, Pause, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize, LayoutGrid, Sun, Moon, Eraser, Square, Circle, ArrowUpRight, Type, Presentation, ZoomIn, Volume2, VolumeX, MonitorPlay, Lightbulb, MessageCircle, Stamp, Droplet, Music, AlignLeft, Keyboard } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Play, Pause, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize, LayoutGrid, Sun, Moon, Eraser, Square, Circle, ArrowUpRight, Type, Presentation, ZoomIn, Volume2, VolumeX, MonitorPlay, Lightbulb, MessageCircle, Stamp, Droplet, Music, AlignLeft, Keyboard, Printer } from 'lucide-react';
 
 const bnOptionsMap: Record<string, string> = {
     a: 'ক',
@@ -989,20 +989,28 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     if (typeof window === 'undefined') return null;
 
     return createPortal(
-        <div className={`fixed inset-0 w-full h-full z-[99999] flex items-center justify-between xl:gap-[0.1rem] xl:p-[0.1rem] select-none font-sans overflow-hidden transition-colors duration-500 ${isDarkMode ? 'dark bg-gray-900' : 'bg-[#f8fbff]'}`}>
-            <style>{`
-                @keyframes popIn {
-                    0% { transform: scale(1); box-shadow: 0 0 0 rgba(52,168,83,0); }
-                    50% { transform: scale(1.05); box-shadow: 0 0 40px rgba(52,168,83,0.6); }
-                    100% { transform: scale(1.03); box-shadow: 0 0 30px rgba(52,168,83,0.5); }
-                }
-                .animate-pop-in {
-                    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-                }
-            `}</style>
-            
-            {/* Left Ad Banner (160x600) */}
-            <div className="hidden xl:flex w-[160px] h-[600px] shrink-0 flex-col items-center justify-between bg-gradient-to-b from-[#0a192f] via-[#0b2244] to-[#041128] rounded-xl overflow-hidden shadow-2xl border border-blue-400/20 relative z-10 p-3">
+        <>
+            <div className={`print:hidden fixed inset-0 w-full h-full z-[99999] flex items-center justify-between xl:gap-[0.1rem] xl:p-[0.1rem] select-none font-sans overflow-hidden transition-colors duration-500 ${isDarkMode ? 'dark bg-gray-900' : 'bg-[#f8fbff]'}`}>
+                <style>{`
+                    @keyframes popIn {
+                        0% { transform: scale(1); box-shadow: 0 0 0 rgba(52,168,83,0); }
+                        50% { transform: scale(1.05); box-shadow: 0 0 40px rgba(52,168,83,0.6); }
+                        100% { transform: scale(1.03); box-shadow: 0 0 30px rgba(52,168,83,0.5); }
+                    }
+                    .animate-pop-in {
+                        animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+                    }
+                    @media print {
+                        @page { size: A4 landscape; margin: 10mm; }
+                        body { margin: 0 !important; overflow: visible !important; background: white !important; }
+                        body > *:not(.print-only) { display: none !important; }
+                        .print-only { display: block !important; position: static !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
+                        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                    }
+                `}</style>
+                
+                {/* Left Ad Banner (160x600) */}
+                <div className="hidden xl:flex w-[160px] h-[600px] shrink-0 flex-col items-center justify-between bg-gradient-to-b from-[#0a192f] via-[#0b2244] to-[#041128] rounded-xl overflow-hidden shadow-2xl border border-blue-400/20 relative z-10 p-3">
                      {/* Floating Elements Background */}
                      <div className="absolute top-[5%] left-[25%] w-16 h-16 rounded-full border border-blue-400/20 bg-blue-500/10 blur-[8px]"></div>
                      <div className="absolute bottom-[30%] right-[-5%] w-20 h-20 rounded-full bg-blue-400/10 blur-[20px]"></div>
@@ -1560,6 +1568,15 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 title="Toggle Fullscreen (F11)"
                             >
                                 {isFullscreen ? <Minimize className="w-5 h-5 md:w-6 md:h-6" /> : <Maximize className="w-5 h-5 md:w-6 md:h-6" />}
+                            </button>
+
+                            {/* Print Button */}
+                            <button
+                                onClick={() => window.print()}
+                                className="hidden md:block p-2 md:p-3 rounded-full transition-all shadow-sm bg-white/60 hover:bg-white text-indigo-600 shrink-0"
+                                title="Print Slides (Ctrl+P)"
+                            >
+                                <Printer className="w-5 h-5 md:w-6 md:h-6" />
                             </button>
 
                             {/* Spotlight Toggle Button */}
@@ -2340,7 +2357,144 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     }}
                 />
             )}
-        </div>,
+            </div> {/* Close print:hidden container */}
+
+            {/* Print Only Container */}
+            <div className="print-only hidden print:block w-full bg-white text-black relative z-[999999]" style={{ WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}>
+                {questions.map((q, idx) => {
+                    const parsedOptions = (() => {
+                        if (!q.options) return [];
+                        try { return typeof q.options === 'string' ? JSON.parse(q.options) : q.options; } catch(e) { return []; }
+                    })();
+                    const opts = parsedOptions.length > 0 ? parsedOptions : (() => {
+                        const arr = [
+                            { key: 'a', text: q.options?.a || '' },
+                            { key: 'b', text: q.options?.b || '' },
+                            { key: 'c', text: q.options?.c || '' },
+                            { key: 'd', text: q.options?.d || '' }
+                        ];
+                        if (q.options?.e) arr.push({ key: 'e', text: q.options.e });
+                        return arr.filter((x: any) => x.text);
+                    })();
+
+                    return (
+                        <div key={idx} className={`w-full h-[100vh] flex items-center justify-center select-none font-sans overflow-hidden transition-colors duration-500 ${isDarkMode ? 'dark bg-gray-900' : 'bg-[#f8fbff]'}`} style={{ pageBreakAfter: 'always' }}>
+                            {/* Main Presentation Area Only (No side banners) */}
+                            <div className={`responsive-fonts relative w-full h-full ${getBgThemeClasses()} flex flex-col shadow-2xl overflow-hidden z-10 transition-colors duration-500`}>
+                                {bgTheme !== 'video' && (
+                                    <div className={`absolute inset-0 z-0 pointer-events-none transition-opacity duration-300 ${getBgThemeOverlayClasses()}`} style={{ opacity: bgOpacity / 100 }} />
+                                )}
+                                
+                                <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+                                    <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-200/30 blur-[100px]"></div>
+                                    <div className="absolute bottom-[-10%] right-[-5%] w-[50%] h-[50%] rounded-full bg-pink-200/30 blur-[100px]"></div>
+                                    <div className="absolute top-[20%] right-[10%] w-[30%] h-[30%] rounded-full bg-purple-200/30 blur-[80px]"></div>
+                                    <div className="absolute top-0 left-0 w-full h-full" style={{ backgroundImage: 'radial-gradient(rgba(99, 102, 241, 0.06) 2px, transparent 2px)', backgroundSize: '32px 32px', opacity: 0.8 }}></div>
+                                    <div className="absolute top-[15%] right-[-5%] w-72 h-72 rounded-full border-[1px] border-indigo-200/40 opacity-60"></div>
+                                    <div className="absolute top-[18%] right-[-2%] w-56 h-56 rounded-full border-[1px] border-purple-200/40 opacity-60"></div>
+                                    <div className="absolute bottom-[20%] left-[5%] w-48 h-48 rounded-full border-[1px] border-pink-200/40 opacity-60"></div>
+                                </div>
+
+                                {wmVisible && (
+                                    <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden select-none">
+                                        {WATERMARK_POSITIONS.slice(0, wmCount).map((wm, i) => (
+                                            <div 
+                                                key={i}
+                                                className="absolute font-black tracking-widest uppercase transition-all duration-300 whitespace-nowrap"
+                                                style={{ 
+                                                    top: wm.top, left: wm.left,
+                                                    transform: `translate(-50%, -50%) rotate(${wm.rot}deg)`,
+                                                    fontSize: `${wmSize * wm.sizeScale}px`, 
+                                                    color: `rgba(229, 231, 235, ${(wmOpacity * wm.opacScale * (isDarkMode ? 0.25 : 1)) / 100})` 
+                                                }}
+                                            >DESHEXAM</div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {/* Header */}
+                                {showHeader && (
+                                    <div 
+                                        className="shrink-0 bg-gradient-to-r from-indigo-50 via-white to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 border-b border-indigo-100/50 dark:border-gray-700/50 flex flex-row justify-between items-center w-full z-30 shadow-sm relative px-6 py-4" 
+                                    >
+                                        <div className="flex items-center gap-3 w-1/3">
+                                            {showLogo && <img src="/image/logo.png" alt="DeshExam" className="h-10 w-auto object-contain drop-shadow-sm" />}
+                                            <div className="flex flex-col justify-center">
+                                                <span className="font-extrabold text-indigo-950 dark:text-gray-100 leading-tight text-lg">Desh Exam Academy</span>
+                                                <span className="text-indigo-800/80 dark:text-gray-400 font-bold tracking-widest uppercase mt-0.5 text-[10px]">Learn • Practice • Succeed</span>
+                                            </div>
+                                        </div>
+                                        <div className={`flex-1 w-full px-6 flex flex-col justify-center ${headerTitleAlign === 'left' ? 'items-start text-left' : headerTitleAlign === 'right' ? 'items-end text-right' : 'items-center text-center'}`}>
+                                            <h1 className="font-extrabold text-indigo-950 dark:text-gray-100 tracking-tight text-lg">{classLine}</h1>
+                                            {(chapterName || topicName) && (
+                                                <div className="text-indigo-700 dark:text-gray-400 font-bold tracking-wider uppercase mt-1 text-xs">
+                                                    {[chapterName, topicName].filter(Boolean).join(' | ')}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="flex items-center justify-end shrink-0 w-1/3">
+                                            <div className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-full font-extrabold tracking-widest shadow-md flex items-center justify-center whitespace-nowrap px-6 py-2 text-sm">
+                                                MOCK TEST
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Question & Options */}
+                                <div className="flex-1 w-full relative flex flex-col items-center px-12 py-10 z-10 justify-center">
+                                    <div 
+                                        className={`w-full max-w-[90%] xl:max-w-6xl rounded-3xl p-12 shadow-[0_20px_50px_rgba(0,0,0,0.1)] backdrop-blur-sm border transition-all duration-500 relative z-20 ${qBgColor} border-white/20 dark:border-gray-700/50`}
+                                        style={{ boxShadow: isDarkMode ? '0 20px 40px -10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1)' : '0 20px 40px -10px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.5)' }}
+                                    >
+                                        <div className="flex items-start gap-4 mb-12 border-b border-gray-200/50 dark:border-gray-700/50 pb-10">
+                                            <div className="flex items-center gap-4 shrink-0">
+                                                <span className="font-black text-[32px] bg-clip-text text-transparent bg-gradient-to-br from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 drop-shadow-sm">
+                                                    Q{idx + 1}.
+                                                </span>
+                                            </div>
+                                            <div className="flex-1 w-full relative pt-1">
+                                                <div className={`prose max-w-none prose-p:font-black font-black text-[32px] leading-snug ${qTextColor !== 'default' ? 'text-[var(--q-color)]' : 'text-gray-900 dark:text-gray-100'} [&_*]:!text-[32px] [&_*]:!leading-snug [&>p]:m-0`} style={{ '--q-color': qTextColor !== 'default' ? qTextColor : undefined } as React.CSSProperties}>
+                                                    <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
+                                                        {q.questionText}
+                                                    </ReactMarkdown>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className={optionsLayout === 'grid' ? "grid grid-cols-2 gap-x-12 gap-y-10" : "flex flex-col gap-8 max-w-4xl mx-auto"}>
+                                            {opts.map((opt: any, oIdx: number) => {
+                                                const optLetter = q.language === 'Bangla' || !q.language ? bnOptionsMap[opt.key] : opt.key.toUpperCase();
+                                                const colorThemes = [
+                                                    { border: 'border-[#4285F4]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#4285F4]/75', letterText: 'text-white' },
+                                                    { border: 'border-[#34A853]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#34A853]/75', letterText: 'text-white' },
+                                                    { border: 'border-[#F9AB00]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#F9AB00]/75', letterText: 'text-white' },
+                                                    { border: 'border-[#EA4335]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#EA4335]/75', letterText: 'text-white' },
+                                                    { border: 'border-[#9C27B0]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#9C27B0]/75', letterText: 'text-white' },
+                                                ];
+                                                const theme = colorThemes[oIdx % colorThemes.length];
+
+                                                return (
+                                                    <div key={opt.key} className={`flex items-center gap-5 py-4 px-6 rounded-xl border-2 shadow-[0_4px_12px_rgba(0,0,0,0.04)] ${theme.bg} ${theme.border} min-h-[80px]`}>
+                                                        <div className={`shrink-0 w-14 h-14 flex items-center justify-center rounded-full text-2xl font-black ${theme.letterBg} ${theme.letterText}`}>
+                                                            {optLetter}
+                                                        </div>
+                                                        <div className="prose dark:prose-invert max-w-none text-black dark:text-gray-100 font-bold text-[24px] flex items-center [&_*]:!text-[24px] [&_*]:!leading-tight [&_*]:!m-0">
+                                                            <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
+                                                                {opt.text}
+                                                            </ReactMarkdown>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+        </>,
         document.body
     );
 }
