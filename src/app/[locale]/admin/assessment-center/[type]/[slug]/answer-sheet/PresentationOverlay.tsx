@@ -37,6 +37,14 @@ const MUSIC_OPTIONS = [
     { id: 'twelve_stories', name: 'Twelve Stories Above', url: '/audio/Twelve_Stories_Above.mp3' }
 ];
 
+const VIDEO_OPTIONS = [
+    { id: 'v1', name: 'High-Tech Digital', url: '/videos/A_high_tech_digital_quiz_backg.mp4' },
+    { id: 'v2', name: 'Abstract Minimalist', url: '/videos/A_seamless_slow_moving_abstra.mp4' },
+    { id: 'v3', name: 'Gold & White', url: '/videos/Slow_elegant_gold_and_white_g.mp4' },
+    { id: 'v4', name: 'Gold & White (Alt)', url: '/videos/Slow_elegant_gold_and_white_g (1).mp4' },
+    { id: 'v5', name: 'Modern TV Studio', url: '/videos/Wide_shot_of_an_empty_modern.mp4' }
+];
+
 const CONFETTI_CONFIG = {
     spread: 90,
     elementCount: 70,
@@ -142,14 +150,17 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [selectedMusic, setSelectedMusic] = useState(MUSIC_OPTIONS[0].url);
     const [musicVolume, setMusicVolume] = useState(0.5);
     const [consecutiveCorrect, setConsecutiveCorrect] = useState(0);
-    const [bgTheme, setBgTheme] = useState<'default' | 'mesh' | 'grid' | 'dots'>('default');
+    const [bgTheme, setBgTheme] = useState<'default' | 'mesh' | 'grid' | 'dots' | 'video'>('dots');
+    const [selectedVideo, setSelectedVideo] = useState(VIDEO_OPTIONS[0].url);
+    const [videoOpacity, setVideoOpacity] = useState(40);
 
     const getBgThemeClasses = () => {
         switch(bgTheme) {
             case 'mesh': return 'bg-gradient-to-br from-indigo-100 via-purple-50 to-teal-100 dark:from-indigo-950 dark:via-purple-900 dark:to-teal-950';
             case 'grid': return 'bg-[#f8fafc] dark:bg-gray-900 bg-[linear-gradient(to_right,#8080801a_1px,transparent_1px),linear-gradient(to_bottom,#8080801a_1px,transparent_1px)] bg-[size:24px_24px]';
             case 'dots': return 'bg-[#f8fafc] dark:bg-gray-900 bg-[radial-gradient(#cbd5e1_1.5px,transparent_1.5px)] dark:bg-[radial-gradient(#374151_1.5px,transparent_1.5px)] [background-size:20px_20px]';
-            default: return 'bg-gradient-to-br from-[#f8fafc] via-[#f1f5f9] to-[#f8fafc] dark:from-gray-900 dark:via-gray-800 dark:to-gray-900';
+            case 'video': return 'bg-black/90 text-white';
+            default: return 'bg-slate-50 dark:bg-slate-950 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.25),rgba(255,255,255,0))] dark:bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.2),rgba(255,255,255,0))]';
         }
     };
 
@@ -1020,6 +1031,24 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 {/* Main Presentation Area */}
                 <div className={`responsive-fonts flex-1 min-w-0 relative w-full h-full ${getBgThemeClasses()} flex flex-col shadow-2xl overflow-hidden shrink-0 z-10 xl:rounded-xl xl:border xl:border-gray-200 dark:border-gray-800 transition-colors duration-500`}>
 
+                {/* Video Background */}
+                {bgTheme === 'video' && (
+                    <>
+                        <video 
+                            key={selectedVideo}
+                            autoPlay 
+                            loop 
+                            muted 
+                            playsInline
+                            className="absolute inset-0 w-full h-full object-cover z-0 mix-blend-screen pointer-events-none"
+                            style={{ opacity: videoOpacity / 100 }}
+                        >
+                            <source src={selectedVideo} type="video/mp4" />
+                        </video>
+                        <div className="absolute inset-0 w-full h-full z-0 pointer-events-none bg-[radial-gradient(rgba(255,255,255,0.15)_1.5px,transparent_1.5px)] [background-size:20px_20px]"></div>
+                    </>
+                )}
+
                 {/* Main Drawing Canvas */}
                 <canvas
                     ref={canvasRef}
@@ -1238,8 +1267,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                     {/* Question */}
                     <div className="flex items-start gap-3 md:gap-4 w-full max-w-5xl mt-8 md:mt-4">
-                        <span className="text-black dark:text-gray-100 font-extrabold leading-normal shrink-0" style={{ fontSize: 'var(--q-size)' }}>Q{currentSlide + 1}.</span>
-                        <div className="prose prose-black dark:prose-invert max-w-none prose-p:font-extrabold text-[length:var(--q-size)] leading-normal text-left text-black dark:text-gray-100 font-extrabold [&_*]:!text-[length:var(--q-size)] [&_*]:!leading-normal [&_*]:!m-0 capitalize">
+                        <span className={`${bgTheme === 'video' ? 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]' : 'text-black dark:text-gray-100'} font-extrabold leading-normal shrink-0`} style={{ fontSize: 'var(--q-size)' }}>Q{currentSlide + 1}.</span>
+                        <div className={`prose max-w-none prose-p:font-extrabold text-[length:var(--q-size)] leading-normal text-left font-extrabold capitalize [&_*]:!text-[length:var(--q-size)] [&_*]:!leading-normal [&_*]:!m-0 ${bgTheme === 'video' ? 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] [&_*]:!text-white [&_*]:!drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]' : 'text-black dark:text-gray-100 [&_*]:!text-black dark:[&_*]:!text-gray-100'}`}>
                             <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
                                 {q.questionText}
                             </ReactMarkdown>
@@ -1534,12 +1563,38 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                             <div className="text-sm font-bold text-gray-700 mb-2 flex justify-between items-center">
                                                 <span className="flex items-center gap-2"><LayoutGrid className="w-4 h-4 text-indigo-500" /> Background Theme</span>
                                             </div>
-                                            <div className="flex bg-gray-100 p-1 rounded-xl">
-                                                <button onClick={() => setBgTheme('default')} className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'default' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Default</button>
-                                                <button onClick={() => setBgTheme('mesh')} className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'mesh' ? 'bg-white text-purple-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Mesh</button>
-                                                <button onClick={() => setBgTheme('grid')} className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'grid' ? 'bg-white text-emerald-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Grid</button>
-                                                <button onClick={() => setBgTheme('dots')} className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'dots' ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Dots</button>
+                                            <div className="flex bg-gray-100 p-1 rounded-xl flex-wrap gap-1">
+                                                <button onClick={() => setBgTheme('default')} className={`flex-1 py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'default' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Default</button>
+                                                <button onClick={() => setBgTheme('mesh')} className={`flex-1 py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'mesh' ? 'bg-white text-purple-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Mesh</button>
+                                                <button onClick={() => setBgTheme('grid')} className={`flex-1 py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'grid' ? 'bg-white text-emerald-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Grid</button>
+                                                <button onClick={() => setBgTheme('dots')} className={`flex-1 py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'dots' ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Dots</button>
+                                                <button onClick={() => setBgTheme('video')} className={`flex-1 py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'video' ? 'bg-white text-rose-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Video</button>
                                             </div>
+                                            {bgTheme === 'video' && (
+                                                <div className="mt-2 space-y-2">
+                                                    <select
+                                                        value={selectedVideo}
+                                                        onChange={(e) => setSelectedVideo(e.target.value)}
+                                                        className="w-full text-sm bg-gray-50 border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:border-blue-500 text-gray-700 font-semibold"
+                                                    >
+                                                        {VIDEO_OPTIONS.map(opt => (
+                                                            <option key={opt.id} value={opt.url}>{opt.name}</option>
+                                                        ))}
+                                                    </select>
+                                                    <div className="flex items-center gap-3 bg-gray-50 px-2 py-1.5 rounded-lg border border-gray-200">
+                                                        <Sun className="w-4 h-4 text-gray-400 shrink-0" />
+                                                        <input 
+                                                            type="range" 
+                                                            min="5" 
+                                                            max="100" 
+                                                            value={videoOpacity} 
+                                                            onChange={(e) => setVideoOpacity(Number(e.target.value))}
+                                                            className="flex-1 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                                        />
+                                                        <span className="text-xs font-bold text-gray-500 w-8 text-right">{videoOpacity}%</span>
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
 
                                         <hr className="border-gray-100" />
