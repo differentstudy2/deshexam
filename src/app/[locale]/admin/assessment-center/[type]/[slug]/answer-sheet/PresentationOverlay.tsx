@@ -150,6 +150,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [isLofiEnabled, setIsLofiEnabled] = useState(false);
     const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
     const [eliminatedOptions, setEliminatedOptions] = useState<string[]>([]);
+    const [showHeader, setShowHeader] = useState(true);
+    const [showLogo, setShowLogo] = useState(true);
+    const [headerScale, setHeaderScale] = useState(1);
     const [selectedMusic, setSelectedMusic] = useState(MUSIC_OPTIONS[0].url);
     const [musicVolume, setMusicVolume] = useState(0.5);
     const [consecutiveCorrect, setConsecutiveCorrect] = useState(0);
@@ -1215,45 +1218,49 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 )}
 
                 {/* Header */}
-                <div className="shrink-0 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-800 dark:via-gray-800 dark:to-gray-800 border-b border-indigo-100 dark:border-gray-700 py-[0.1rem] px-4 md:pl-6 md:pr-8 flex flex-col md:flex-row justify-between items-center w-full z-30 shadow-sm gap-3 md:gap-0 relative transition-colors duration-500">
-                    {/* Logo Area */}
-                    <div className="flex items-center gap-2 md:gap-3 w-full md:w-auto justify-between md:justify-start">
-                        <div className="flex items-center gap-2 md:gap-3 px-1">
-                            <img src="/image/logo.png" alt="DeshExam" className="h-8 md:h-9 w-auto object-contain drop-shadow-sm" />
-                            <div className="flex flex-col">
-                                <span className="font-extrabold text-[1rem] text-indigo-950 dark:text-gray-100 leading-none">Desh Exam Academy</span>
-                                <span className="text-[9px] md:text-[10px] text-indigo-800/70 dark:text-gray-400 font-bold tracking-wide mt-1 uppercase">Learn • Practice • Succeed</span>
+                {showHeader && (
+                    <div className="shrink-0 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-800 dark:via-gray-800 dark:to-gray-800 border-b border-indigo-100 dark:border-gray-700 py-[0.1rem] px-4 md:pl-6 md:pr-8 flex flex-col md:flex-row justify-between items-center w-full z-30 shadow-sm gap-3 md:gap-0 relative transition-colors duration-500" style={{ padding: `${0.1 * headerScale}rem ${1.5 * headerScale}rem` }}>
+                        {/* Logo Area */}
+                        <div className="flex items-center gap-2 md:gap-3 w-full md:w-auto justify-between md:justify-start">
+                            {showLogo && (
+                                <div className="flex items-center gap-2 md:gap-3 px-1">
+                                    <img src="/image/logo.png" alt="DeshExam" style={{ height: `${2.25 * headerScale}rem` }} className="w-auto object-contain drop-shadow-sm" />
+                                    <div className="flex flex-col">
+                                        <span className="font-extrabold text-indigo-950 dark:text-gray-100 leading-none" style={{ fontSize: `${1 * headerScale}rem` }}>Desh Exam Academy</span>
+                                        <span className="text-indigo-800/70 dark:text-gray-400 font-bold tracking-wide mt-1 uppercase" style={{ fontSize: `${0.625 * headerScale}rem` }}>Learn • Practice • Succeed</span>
+                                    </div>
+                                </div>
+                            )}
+                            {/* Mobile Close Button & Badge */}
+                            <div className="flex items-center gap-2 md:hidden">
+                                <div className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-3 py-1 rounded-full font-bold text-xs tracking-wider shadow-md" style={{ fontSize: `${0.75 * headerScale}rem`, padding: `${0.25 * headerScale}rem ${0.75 * headerScale}rem` }}>
+                                    MOCK TEST
+                                </div>
+                                <button onClick={closePresentation} className="bg-white/60 hover:bg-white rounded-full text-indigo-600 shadow-sm transition-colors flex items-center justify-center" style={{ width: `${2 * headerScale}rem`, height: `${2 * headerScale}rem` }}>
+                                    <X style={{ width: `${1.25 * headerScale}rem`, height: `${1.25 * headerScale}rem` }} />
+                                </button>
                             </div>
                         </div>
-                        {/* Mobile Close Button & Badge */}
-                        <div className="flex items-center gap-2 md:hidden">
-                            <div className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-3 py-1 rounded-full font-bold text-xs tracking-wider shadow-md">
+                        {/* Title Area */}
+                        <div className="flex-1 text-center w-full mt-1 md:mt-0 px-2 md:px-6">
+                            <h1 className="font-extrabold text-indigo-950 dark:text-gray-100 tracking-tight line-clamp-1 md:line-clamp-none" style={{ fontSize: `${1 * headerScale}rem` }}>{classLine}</h1>
+                            {(chapterName || topicName) && (
+                                <div className="text-indigo-800 dark:text-gray-300 font-semibold mt-1.5 tracking-wide uppercase" style={{ fontSize: `${0.875 * headerScale}rem` }}>
+                                    {[chapterName, topicName].filter(Boolean).join(' | ')}
+                                </div>
+                            )}
+                        </div>
+                        {/* Badge Area (Desktop) */}
+                        <div className="hidden md:flex items-center gap-4">
+                            <div className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-full font-bold tracking-wider shadow-md" style={{ fontSize: `${1.125 * headerScale}rem`, padding: `${0.5 * headerScale}rem ${1.5 * headerScale}rem` }}>
                                 MOCK TEST
                             </div>
-                            <button onClick={closePresentation} className="p-1.5 bg-white/60 hover:bg-white rounded-full text-indigo-600 shadow-sm transition-colors">
-                                <X className="w-5 h-5" />
+                            <button onClick={closePresentation} className="bg-white/60 hover:bg-white rounded-full text-indigo-600 shadow-sm transition-all flex items-center justify-center" style={{ width: `${2.5 * headerScale}rem`, height: `${2.5 * headerScale}rem` }} title="Close Presentation">
+                                <X style={{ width: `${1.5 * headerScale}rem`, height: `${1.5 * headerScale}rem` }} />
                             </button>
                         </div>
                     </div>
-                    {/* Title Area */}
-                    <div className="flex-1 text-center w-full mt-1 md:mt-0 px-2 md:px-6">
-                        <h1 className="text-[1rem] font-extrabold text-indigo-950 dark:text-gray-100 tracking-tight line-clamp-1 md:line-clamp-none">{classLine}</h1>
-                        {(chapterName || topicName) && (
-                            <div className="text-xs md:text-sm text-indigo-800 dark:text-gray-300 font-semibold mt-1.5 tracking-wide uppercase">
-                                {[chapterName, topicName].filter(Boolean).join(' | ')}
-                            </div>
-                        )}
-                    </div>
-                    {/* Badge Area (Desktop) */}
-                    <div className="hidden md:flex items-center gap-4">
-                        <div className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-6 py-2 rounded-full font-bold text-lg tracking-wider shadow-md">
-                            MOCK TEST
-                        </div>
-                        <button onClick={closePresentation} className="p-2.5 bg-white/60 hover:bg-white rounded-full text-indigo-600 shadow-sm transition-all" title="Close Presentation">
-                            <X className="w-6 h-6" />
-                        </button>
-                    </div>
-                </div>
+                )}
                 
                 {/* Hidden Audio Elements */}
                 <audio ref={lofiAudioRef} src={selectedMusic} loop />
@@ -1667,6 +1674,41 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                 >
                                                     List
                                                 </button>
+                                            </div>
+                                        </div>
+
+                                        <hr className="border-gray-100" />
+
+                                        <div>
+                                            <div className="text-sm font-bold text-gray-700 mb-2 flex justify-between items-center">
+                                                <span className="flex items-center gap-2"><LayoutGrid className="w-4 h-4 text-indigo-500" /> Header Settings</span>
+                                            </div>
+                                            <div className="space-y-3">
+                                                <div className="flex items-center justify-between">
+                                                    <span className="text-xs font-bold text-gray-500">Show Header</span>
+                                                    <button onClick={() => setShowHeader(!showHeader)} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${showHeader ? 'bg-blue-600' : 'bg-gray-300'}`}>
+                                                        <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${showHeader ? 'translate-x-5' : 'translate-x-1'}`} />
+                                                    </button>
+                                                </div>
+                                                {showHeader && (
+                                                    <>
+                                                        <div className="flex items-center justify-between">
+                                                            <span className="text-xs font-bold text-gray-500">Show Logo</span>
+                                                            <button onClick={() => setShowLogo(!showLogo)} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${showLogo ? 'bg-blue-600' : 'bg-gray-300'}`}>
+                                                                <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${showLogo ? 'translate-x-5' : 'translate-x-1'}`} />
+                                                            </button>
+                                                        </div>
+                                                        <div className="flex items-center gap-3 bg-gray-50 px-2 py-1.5 rounded-lg border border-gray-200">
+                                                            <span className="text-xs font-bold text-gray-500 min-w-[50px]">Scale</span>
+                                                            <input 
+                                                                type="range" min="0.5" max="1.5" step="0.1"
+                                                                value={headerScale} onChange={(e) => setHeaderScale(Number(e.target.value))}
+                                                                className="flex-1 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                                            />
+                                                            <span className="text-xs font-bold text-gray-500 w-8 text-right">{(headerScale * 100).toFixed(0)}%</span>
+                                                        </div>
+                                                    </>
+                                                )}
                                             </div>
                                         </div>
 
