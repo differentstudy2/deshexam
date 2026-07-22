@@ -8,6 +8,28 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
 import Confetti from 'react-dom-confetti';
+
+const MUSIC_OPTIONS = [
+    { id: 'lofi', name: 'Lo-Fi Chill', url: '/audio/lofi.mp3' },
+    { id: 'ambient', name: 'Ambient Focus', url: '/audio/ambient.mp3' },
+    { id: 'nature', name: 'Nature Sounds', url: '/audio/nature.mp3' },
+    { id: 'piano', name: 'Soft Piano', url: '/audio/piano.mp3' },
+    { id: 'rain', name: 'Rain Sounds', url: '/audio/rain.mp3' },
+    { id: 'binaural', name: 'Binaural Beats', url: '/audio/binaural.mp3' },
+    { id: 'cafe', name: 'Cafe Ambience', url: '/audio/cafe.mp3' },
+    { id: 'jazz', name: 'Smooth Jazz', url: '/audio/jazz.mp3' },
+    { id: 'classic', name: 'Classical Music', url: '/audio/classic.mp3' },
+    { id: 'meditation', name: 'Meditation Bowl', url: '/audio/meditation.mp3' }
+];
+
+const CONFETTI_CONFIG = {
+    spread: 90,
+    elementCount: 70,
+    duration: 3000,
+    startVelocity: 30,
+    colors: ['#34A853', '#FABB05', '#4285F4', '#EA4335']
+};
+
 import 'katex/dist/katex.min.css';
 import { X, ChevronLeft, ChevronRight, Play, Pause, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize, LayoutGrid, Sun, Moon, Eraser, Square, Circle, ArrowUpRight, Type, Presentation, ZoomIn, Volume2, VolumeX } from 'lucide-react';
 
@@ -98,9 +120,12 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const lofiAudioRef = useRef<HTMLAudioElement>(null);
     const popAudioRef = useRef<HTMLAudioElement>(null);
+    const wowAudioRef = useRef<HTMLAudioElement>(null);
 
     const [isConfettiActive, setIsConfettiActive] = useState(false);
     const [isLofiEnabled, setIsLofiEnabled] = useState(false);
+    const [selectedMusic, setSelectedMusic] = useState(MUSIC_OPTIONS[0].url);
+    const [consecutiveCorrect, setConsecutiveCorrect] = useState(0);
 
     const isAutoPlayRef = useRef(isAutoPlayReadAloud);
     const stepRef = useRef(step);
@@ -1125,8 +1150,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 </div>
                 
                 {/* Hidden Audio Elements */}
-                <audio ref={lofiAudioRef} src="/audio/lofi.mp3" loop />
+                <audio ref={lofiAudioRef} src={selectedMusic} loop />
                 <audio ref={popAudioRef} src="/audio/correct-pop.mp3" preload="auto" />
+                <audio ref={wowAudioRef} src="/audio/wow.mp3" preload="auto" />
 
                 {/* Main Content Area */}
                 <div ref={scrollContainerRef} className="flex-1 w-full relative flex flex-col items-center px-4 md:px-24 py-6 md:py-12 z-10 overflow-y-auto custom-scrollbar gap-8">
@@ -1239,7 +1265,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     className="flex flex-col gap-2 w-full relative"
                                 >
                                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none">
-                                        <Confetti active={isConfettiActive && isSelected && showCorrect} config={{ spread: 90, elementCount: 70, duration: 3000, startVelocity: 30, colors: ['#34A853', '#FABB05', '#4285F4', '#EA4335'] }} />
+                                        <Confetti active={isConfettiActive && isSelected && showCorrect} config={CONFETTI_CONFIG} />
                                     </div>
                                     <div
                                         className={containerClasses}
@@ -1250,12 +1276,27 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                             
                                             // Trigger confetti and sound if correct
                                             if (q.correctAnswer && q.correctAnswer.toLowerCase().trim().includes(opt.key)) {
+                                                const newConsecutive = consecutiveCorrect + 1;
+                                                setConsecutiveCorrect(newConsecutive);
                                                 setIsConfettiActive(true);
-                                                if (popAudioRef.current) {
-                                                    popAudioRef.current.currentTime = 0;
-                                                    popAudioRef.current.play().catch(e => console.warn('Pop audio failed:', e));
+                                                
+                                                if (newConsecutive > 0 && newConsecutive % 5 === 0) {
+                                                    // Play WOW sound every 5 consecutive correct answers
+                                                    if (wowAudioRef.current) {
+                                                        wowAudioRef.current.currentTime = 0;
+                                                        wowAudioRef.current.play().catch(e => console.warn('Wow audio failed:', e));
+                                                    }
+                                                } else {
+                                                    // Normal pop sound
+                                                    if (popAudioRef.current) {
+                                                        popAudioRef.current.currentTime = 0;
+                                                        popAudioRef.current.play().catch(e => console.warn('Pop audio failed:', e));
+                                                    }
                                                 }
                                                 setTimeout(() => setIsConfettiActive(false), 2000);
+                                            } else {
+                                                // Reset on wrong answer
+                                                setConsecutiveCorrect(0);
                                             }
                                         }
                                     }}
@@ -1485,17 +1526,39 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                                         <hr className="border-gray-100" />
 
-                                        <div className="flex items-center justify-between">
-                                            <div className="text-sm font-bold text-gray-600 flex items-center gap-2">
-                                                <Volume2 className="w-4 h-4 text-blue-500" />
-                                                Focus Mode (Lo-Fi)
+                                        <div className="flex flex-col gap-2">
+                                            <div className="flex items-center justify-between">
+                                                <div className="text-sm font-bold text-gray-600 flex items-center gap-2">
+                                                    <Volume2 className="w-4 h-4 text-blue-500" />
+                                                    Focus Mode (Music)
+                                                </div>
+                                                <button
+                                                    onClick={() => setIsLofiEnabled(!isLofiEnabled)}
+                                                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isLofiEnabled ? 'bg-blue-600' : 'bg-gray-300'}`}
+                                                >
+                                                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isLofiEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
+                                                </button>
                                             </div>
-                                            <button
-                                                onClick={() => setIsLofiEnabled(!isLofiEnabled)}
-                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isLofiEnabled ? 'bg-blue-600' : 'bg-gray-300'}`}
-                                            >
-                                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isLofiEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
-                                            </button>
+                                            {isLofiEnabled && (
+                                                <div className="pl-6 pr-2">
+                                                    <select
+                                                        value={selectedMusic}
+                                                        onChange={(e) => {
+                                                            setSelectedMusic(e.target.value);
+                                                            // Restart audio if it's already playing
+                                                            if (isLofiEnabled && lofiAudioRef.current) {
+                                                                lofiAudioRef.current.src = e.target.value;
+                                                                lofiAudioRef.current.play().catch(console.warn);
+                                                            }
+                                                        }}
+                                                        className="w-full text-sm bg-gray-50 border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:border-blue-500 text-gray-700 font-semibold"
+                                                    >
+                                                        {MUSIC_OPTIONS.map(opt => (
+                                                            <option key={opt.id} value={opt.url}>{opt.name}</option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                            )}
                                         </div>
 
                                         <hr className="border-gray-100" />
