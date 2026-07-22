@@ -96,6 +96,14 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const cursorRef = useRef<HTMLDivElement>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
 
+    const isAutoPlayRef = useRef(isAutoPlayReadAloud);
+    const stepRef = useRef(step);
+
+    useEffect(() => {
+        isAutoPlayRef.current = isAutoPlayReadAloud;
+        stepRef.current = step;
+    }, [isAutoPlayReadAloud, step]);
+
     useEffect(() => {
         if (textInput && textInputRef.current) {
             textInputRef.current.focus();
@@ -524,7 +532,18 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         const utterance = new SpeechSynthesisUtterance(textToRead);
         utterance.lang = q.language === 'Bangla' ? 'bn-BD' : 'en-US';
         
-        utterance.onend = () => setIsSpeaking(false);
+        utterance.onend = () => {
+            setIsSpeaking(false);
+            if (isAutoPlayRef.current && stepRef.current === 0 && q.correctAnswer) {
+                const correctKey = q.correctAnswer.toLowerCase().trim();
+                const optionKeys = ['a', 'b', 'c', 'd', 'e'].filter(k => q.options && q.options[k as keyof typeof q.options]);
+                const validKey = optionKeys.find(k => correctKey.includes(k));
+                if (validKey) {
+                    setSelectedOption(validKey);
+                    setStep(1);
+                }
+            }
+        };
         utterance.onerror = () => setIsSpeaking(false);
         
         window.speechSynthesis.speak(utterance);
@@ -1014,7 +1033,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                     {/* Floating Controls (Timer & Read Aloud) */}
                     <div 
-                        className={`absolute bottom-20 right-4 md:bottom-28 md:right-10 flex items-center gap-2 md:gap-4 z-[60]`}
+                        className={`absolute bottom-20 right-4 md:bottom-28 md:right-10 flex items-stretch gap-2 md:gap-3 z-[60]`}
                         style={{ transform: `translate(${timerPos.x}px, ${timerPos.y}px)` }}
                     >
                         {isTimerEnabled && (
@@ -1049,7 +1068,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                         {/* Read Aloud Button */}
                         <button 
                             onClick={() => handleReadAloud()}
-                            className={`flex items-center justify-center h-[42px] w-[42px] md:h-[62px] md:w-[62px] rounded-xl md:rounded-2xl backdrop-blur-xl border transition-all duration-300 ${
+                            className={`flex items-center justify-center px-3.5 md:px-5 rounded-xl md:rounded-2xl backdrop-blur-xl border transition-all duration-300 ${
                                 isSpeaking 
                                     ? 'bg-blue-100/90 border-blue-300 text-blue-600 shadow-[0_8px_32px_rgba(59,130,246,0.15)] ring-1 ring-blue-300 dark:bg-blue-900/50 dark:text-blue-400' 
                                     : 'bg-white/95 dark:bg-gray-800/95 border-blue-200/60 dark:border-blue-900/60 text-[#1e3a8a] dark:text-blue-100 shadow-[0_8px_32px_rgba(59,130,246,0.15)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:scale-[1.02]'
