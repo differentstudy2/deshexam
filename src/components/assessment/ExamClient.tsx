@@ -967,7 +967,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
         <div className="hidden md:flex flex-col h-full w-full bg-[#EDF1F5] dark:bg-[#0f172a] font-sans transition-colors duration-300">
 
           {/* Top Header */}
-          <header className="bg-gradient-to-r from-white via-white to-slate-50/80 dark:from-slate-800 dark:via-slate-800 dark:to-slate-900/50 rounded-[5px] m-2 px-6 py-3 shadow-md border border-white/60 dark:border-slate-700/50 flex items-center justify-between z-30 flex-shrink-0 transition-colors duration-300">
+          <header className="bg-gradient-to-r from-indigo-50/80 via-blue-50/80 to-emerald-50/80 dark:from-slate-800 dark:via-indigo-950/40 dark:to-emerald-950/30 backdrop-blur-md rounded-[5px] m-2 px-6 py-3 shadow-sm border border-indigo-100/50 dark:border-indigo-800/30 flex items-center justify-between z-30 flex-shrink-0 transition-colors duration-300">
             {/* Left: Logo & Title */}
             <div className="flex items-center gap-4 flex-shrink-0 min-w-0">
               <div className="flex items-center gap-3">
@@ -1415,30 +1415,31 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
               </div>
 
               {/* Quick Actions Mini Card */}
-              <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md rounded-xl shadow-sm border border-slate-200/60 dark:border-slate-700/50 p-2.5 flex-shrink-0 flex items-center justify-between mt-auto">
-                <button className="flex flex-col items-center gap-1 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors group w-1/4">
-                  <div className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/50 transition-colors">
+              <div className="bg-gradient-to-r from-violet-500 to-fuchsia-500 dark:from-violet-800 dark:to-fuchsia-800 rounded-xl shadow-md border border-white/20 dark:border-white/10 p-2.5 flex-shrink-0 flex items-center justify-between mt-auto relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-16 h-16 bg-white/20 rounded-full blur-xl pointer-events-none"></div>
+                <button onClick={() => alert('Calculator feature coming soon!')} className="flex flex-col items-center gap-1 text-white/80 hover:text-white transition-colors group w-1/4 relative z-10">
+                  <div className="p-1.5 rounded-lg bg-white/10 group-hover:bg-white/20 shadow-sm transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
                   </div>
-                  <span className="text-[9px] font-bold uppercase tracking-wider">Calc</span>
+                  <span className="text-[9px] font-bold uppercase tracking-wider drop-shadow-sm">Calc</span>
                 </button>
-                <button className="flex flex-col items-center gap-1 text-slate-500 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 transition-colors group w-1/4">
-                  <div className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 group-hover:bg-amber-100 dark:group-hover:bg-amber-900/50 transition-colors">
+                <button onClick={() => alert('Thanks for reporting! We will review this question.')} className="flex flex-col items-center gap-1 text-white/80 hover:text-white transition-colors group w-1/4 relative z-10">
+                  <div className="p-1.5 rounded-lg bg-white/10 group-hover:bg-white/20 shadow-sm transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                   </div>
-                  <span className="text-[9px] font-bold uppercase tracking-wider">Report</span>
+                  <span className="text-[9px] font-bold uppercase tracking-wider drop-shadow-sm">Report</span>
                 </button>
-                <button className="flex flex-col items-center gap-1 text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors group w-1/4">
-                  <div className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 group-hover:bg-emerald-100 dark:group-hover:bg-emerald-900/50 transition-colors">
+                <button onClick={() => alert('Shortcuts:\n• Space: Skip Question\n• Enter: Save & Next\n• A,B,C,D: Select Option')} className="flex flex-col items-center gap-1 text-white/80 hover:text-white transition-colors group w-1/4 relative z-10">
+                  <div className="p-1.5 rounded-lg bg-white/10 group-hover:bg-white/20 shadow-sm transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                   </div>
-                  <span className="text-[9px] font-bold uppercase tracking-wider">Info</span>
+                  <span className="text-[9px] font-bold uppercase tracking-wider drop-shadow-sm">Info</span>
                 </button>
-                <button className="flex flex-col items-center gap-1 text-slate-500 dark:text-slate-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors group w-1/4">
-                  <div className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 group-hover:bg-purple-100 dark:group-hover:bg-purple-900/50 transition-colors">
+                <button onClick={() => { if (!document.fullscreenElement) { document.documentElement.requestFullscreen().catch(e=>console.error(e)); } else { document.exitFullscreen().catch(e=>console.error(e)); } }} className="flex flex-col items-center gap-1 text-white/80 hover:text-white transition-colors group w-1/4 relative z-10">
+                  <div className="p-1.5 rounded-lg bg-white/10 group-hover:bg-white/20 shadow-sm transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>
                   </div>
-                  <span className="text-[9px] font-bold uppercase tracking-wider">Zoom</span>
+                  <span className="text-[9px] font-bold uppercase tracking-wider drop-shadow-sm">Zoom</span>
                 </button>
               </div>
 
