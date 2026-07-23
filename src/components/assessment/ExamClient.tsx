@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Bookmark, Flag, Maximize, Minimize, AlertCircle, Clock, Moon, Sun, LayoutGrid, X, ToggleLeft, ToggleRight, Lock, Loader2 } from 'lucide-react';
+import { ArrowLeft, Bookmark, Flag, Maximize, Minimize, AlertCircle, Clock, Moon, Sun, LayoutGrid, X, ToggleLeft, ToggleRight, Lock, Loader2, Presentation, Target } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -13,6 +13,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useAuthDialog } from '@/hooks/use-auth-dialog';
 import { getUserProfile } from '@/lib/firebase/firestore';
 import { saveExamAttempt, getUserExamAttemptsCount, recordQuestionAttempt } from '@/lib/firebase/student-analytics';
+import PresentationOverlay from './PresentationOverlay';
 
 type QuestionState = 'unvisited' | 'answered' | 'skipped' | 'review' | 'current';
 
@@ -98,6 +99,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
   const [hasStarted, setHasStarted] = useState(false);
   const [wasKicked, setWasKicked] = useState(false);
   const [showMobileNav, setShowMobileNav] = useState(false);
+  const [showPresentationMode, setShowPresentationMode] = useState(false);
   const [autoSaveNext, setAutoSaveNext] = useState(false);
 
   // --- ACCESS CONTROL STATE ---
@@ -655,6 +657,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
     : [];
 
   return (
+    <>
     <div className="fixed inset-0 z-[100] bg-[#F1F5F9] md:bg-[#F8FAFC] dark:bg-[#0f172a] md:dark:bg-[#0f172a] flex flex-col h-[100dvh] overflow-hidden text-slate-900 dark:text-slate-50 font-inter transition-colors duration-300">
 
       <AnimatePresence>
@@ -710,6 +713,9 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
               </button>
               <button onClick={() => setShowMobileNav(true)}>
                 <LayoutGrid className="w-5 h-5" />
+              </button>
+              <button onClick={() => setShowPresentationMode(true)} title="Presentation Mode">
+                <Presentation className="w-5 h-5" />
               </button>
               {!isReviewMode && (
                 <button 
@@ -987,21 +993,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
             </div>
           </div>
 
-          {/* Center: Progress */}
-          <div className="flex flex-col items-center justify-center w-1/3">
-            <div className="flex items-center gap-6 mb-2">
-              <span className="font-bold text-slate-800 dark:text-slate-100 text-[15px]">Question {currentQuestionIndex + 1} / {questions.length}</span>
-              <div className="flex gap-3 text-sm font-semibold">
-                <span className="bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full text-slate-700 dark:text-slate-300 transition-colors">Attempted: {totalAttempted}</span>
-                <span className="bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full text-slate-700 dark:text-slate-300 transition-colors">Remaining: {questions.length - totalAttempted}</span>
-              </div>
-            </div>
-            {!isReviewMode && (
-              <div className="w-full max-w-[300px] h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden transition-colors">
-                <div className="h-full bg-[#16A34A] rounded-full transition-all duration-300" style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}></div>
-              </div>
-            )}
-          </div>
+
 
           {/* Right: Actions */}
           <div className="flex items-center gap-3">
@@ -1013,6 +1005,9 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
             </button>
             <button onClick={toggleTheme} className="w-10 h-10 rounded-full flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
               {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
+            <button onClick={() => setShowPresentationMode(true)} className="w-10 h-10 rounded-full flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" title="Presentation Mode">
+              <Presentation className="w-5 h-5" />
             </button>
             <div className="h-6 w-px bg-slate-200 dark:bg-slate-700 mx-1 transition-colors"></div>
 
@@ -1335,6 +1330,35 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
           {/* Right Sidebar - Premium Analytics & AI */}
           <aside className="w-[240px] lg:w-[270px] xl:w-[300px] 2xl:w-[320px] flex flex-col gap-3 xl:gap-4 overflow-y-auto hide-scrollbar flex-shrink-0 h-full">
 
+            {/* Premium Exam Progress Card */}
+            <div className="bg-gradient-to-br from-white to-slate-50/50 dark:from-[#1e293b] dark:to-slate-900/80 rounded-2xl shadow-md border border-white/60 dark:border-slate-700/50 p-4 xl:p-5 transition-colors duration-300 flex flex-col">
+              <h3 className="font-bold text-[17px] text-slate-900 dark:text-slate-50 mb-4 flex items-center gap-2">
+                <Target className="w-5 h-5 text-blue-500" /> Exam Progress
+              </h3>
+              
+              <div className="flex items-end justify-between mb-2">
+                <span className="text-3xl font-extrabold text-slate-900 dark:text-slate-50 leading-none">{currentQuestionIndex + 1} <span className="text-lg text-slate-400 font-bold">/ {questions.length}</span></span>
+                <span className="text-sm font-bold text-slate-500 dark:text-slate-400">Questions</span>
+              </div>
+              
+              {!isReviewMode && (
+                <div className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-4 mt-2 border border-slate-200/50 dark:border-slate-700/50 shadow-inner">
+                  <div className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full transition-all duration-300 shadow-[0_0_10px_rgba(59,130,246,0.5)]" style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}></div>
+                </div>
+              )}
+
+              <div className="grid grid-cols-2 gap-3 mt-2">
+                <div className="bg-blue-50/50 dark:bg-blue-900/20 rounded-xl p-3 border border-blue-100/50 dark:border-blue-800/30 flex flex-col items-center justify-center transition-colors">
+                  <span className="text-[11px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider mb-1">Attempted</span>
+                  <span className="text-xl font-black text-slate-800 dark:text-slate-200">{totalAttempted}</span>
+                </div>
+                <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-200/50 dark:border-slate-700/50 flex flex-col items-center justify-center transition-colors">
+                  <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Remaining</span>
+                  <span className="text-xl font-black text-slate-800 dark:text-slate-200">{questions.length - totalAttempted}</span>
+                </div>
+              </div>
+            </div>
+
             {/* Premium Analytics */}
             <div className="bg-gradient-to-br from-[#F8FAFC] to-[#EFF6FF] dark:from-slate-800 dark:to-blue-950/30 rounded-2xl shadow-md border border-white/60 dark:border-slate-700/50 p-4 xl:p-5 transition-colors duration-300 flex-1 flex flex-col justify-center min-h-[260px]">
               <h3 className="font-bold text-[17px] text-slate-900 dark:text-slate-50 mb-4 transition-colors">Premium Analytics</h3>
@@ -1438,6 +1462,24 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
         </main>
       </div>
 
+      {showPresentationMode && (
+        <div className="fixed inset-0 z-[300] bg-white dark:bg-slate-900">
+          <button 
+            onClick={() => setShowPresentationMode(false)}
+            className="absolute top-4 right-4 z-[400] w-12 h-12 bg-black/10 dark:bg-white/10 hover:bg-black/20 dark:hover:bg-white/20 backdrop-blur-md border border-black/20 dark:border-white/20 rounded-full flex items-center justify-center text-slate-900 dark:text-white shadow-xl transition-all hover:scale-105"
+            title="Exit Presentation Mode"
+          >
+            <X className="w-6 h-6 drop-shadow-md" />
+          </button>
+          <PresentationOverlay 
+            questions={questions}
+            classLine={mockTest.title}
+            autoStart={true}
+            onClose={() => setShowPresentationMode(false)}
+          />
+        </div>
+      )}
+
       <style dangerouslySetInnerHTML={{
         __html: `
         html.dark body { background-color: #0f172a !important; }
@@ -1451,5 +1493,6 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
         .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
       `}} />
     </div>
+    </>
   );
 }

@@ -96,9 +96,11 @@ interface PresentationOverlayProps {
     classLine: string;
     chapterName?: string;
     topicName?: string;
+    autoStart?: boolean;
+    onClose?: () => void;
 }
 
-export default function PresentationOverlay({ questions, classLine, chapterName, topicName }: PresentationOverlayProps) {
+export default function PresentationOverlay({ questions, classLine, chapterName, topicName, autoStart, onClose }: PresentationOverlayProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [currentSlide, setCurrentSlide] = useState(0);
     const [step, setStep] = useState(0); // 0: Question, 1: Show Answer, 2: Show Explanation
@@ -732,14 +734,20 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, []);
 
-    const openPresentation = () => {
+    const openPresentation = useCallback(() => {
         setIsOpen(true);
         setCurrentSlide(0);
         setStep(mode === 'read' ? 2 : 0);
         setSelectedOption(null);
         setTimerSeconds(0);
         document.body.style.overflow = 'hidden';
-    };
+    }, [mode]);
+
+    useEffect(() => {
+        if (autoStart) {
+            openPresentation();
+        }
+    }, [autoStart, openPresentation]);
 
     const closePresentation = useCallback(() => {
         setIsOpen(false);
@@ -747,7 +755,10 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         if (document.fullscreenElement && document.exitFullscreen) {
             document.exitFullscreen().catch(err => console.error(err));
         }
-    }, []);
+        if (onClose) {
+            onClose();
+        }
+    }, [onClose]);
 
     const nextStep = useCallback(() => {
         if (mode === 'read') {

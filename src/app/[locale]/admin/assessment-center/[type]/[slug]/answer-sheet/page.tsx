@@ -15,7 +15,7 @@ import 'katex/dist/katex.min.css';
 import { Lightbulb, CheckCircle2, XCircle, Check, Edit, Eye, Settings } from 'lucide-react';
 import Link from 'next/link';
 import PrintButton from './PrintButton';
-import PresentationOverlay from './PresentationOverlay';
+import PresentationOverlay from '@/components/assessment/PresentationOverlay';
 import { QRCodeSVG } from 'qrcode.react';
 
 const bnOptionsMap: Record<string, string> = {
