@@ -1241,17 +1241,17 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                               key={key}
                               onClick={() => handleOptionSelect(key)}
                               className={cn(
-                                "flex items-center w-full min-h-[48px] md:min-h-[52px] px-4 py-2 rounded-[16px] border text-left transition-all duration-200 relative group",
+                                "flex items-center justify-center text-center w-full min-h-[48px] md:min-h-[52px] px-14 py-2 rounded-[16px] border transition-all duration-200 relative group",
                                 optionClass
                               )}
                             >
                               <div className={cn(
-                                "w-9 h-9 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-[15px] mr-4 border transition-colors",
+                                "absolute left-4 w-9 h-9 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-[15px] border transition-colors",
                                 bubbleClass
                               )}>
                                 {key.toUpperCase()}
                               </div>
-                              <span className={cn("text-[18px] pr-20 transition-colors", textClass)}>
+                              <span className={cn("text-[18px] transition-colors", textClass)}>
                                 {optionText}
                               </span>
                               <span className="absolute right-4 text-xs font-bold text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity">
