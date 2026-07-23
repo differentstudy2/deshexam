@@ -602,13 +602,16 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
             </div>
           </div>
 
-          <div className="flex gap-4 justify-center">
-            <Button onClick={() => router.back()} className="h-12 px-8 rounded-full font-semibold border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" variant="outline">
+          <div className="flex flex-col sm:flex-row flex-wrap gap-4 justify-center w-full">
+            <Button onClick={() => router.back()} className="h-12 px-6 sm:px-8 rounded-full font-semibold border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors w-full sm:w-auto" variant="outline">
               Return to Dashboard
+            </Button>
+            <Button onClick={() => window.location.reload()} className="h-12 px-6 sm:px-8 rounded-full font-semibold border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors w-full sm:w-auto" variant="outline">
+              Retake
             </Button>
             <Button
               onClick={() => setIsReviewMode(true)}
-              className="h-12 px-8 rounded-full font-semibold bg-[#16A34A] dark:bg-emerald-600 hover:bg-green-700 dark:hover:bg-emerald-700 text-white border-0 shadow-sm transition-colors"
+              className="h-12 px-6 sm:px-8 rounded-full font-semibold bg-[#16A34A] dark:bg-emerald-600 hover:bg-green-700 dark:hover:bg-emerald-700 text-white border-0 shadow-sm transition-colors w-full sm:w-auto"
             >
               View Solutions
             </Button>
