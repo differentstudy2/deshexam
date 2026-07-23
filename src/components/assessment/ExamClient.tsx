@@ -967,7 +967,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
         <div className="hidden md:flex flex-col h-full w-full bg-[#EDF1F5] dark:bg-[#0f172a] font-sans transition-colors duration-300">
 
           {/* Top Header */}
-          <header className="bg-gradient-to-r from-white via-white to-slate-50/80 dark:from-slate-800 dark:via-slate-800 dark:to-slate-900/50 rounded-[5px] m-1 px-6 py-3 shadow-md border border-white/60 dark:border-slate-700/50 flex items-center justify-between z-30 flex-shrink-0 transition-colors duration-300">
+          <header className="bg-gradient-to-r from-white via-white to-slate-50/80 dark:from-slate-800 dark:via-slate-800 dark:to-slate-900/50 rounded-[5px] m-2 px-6 py-3 shadow-md border border-white/60 dark:border-slate-700/50 flex items-center justify-between z-30 flex-shrink-0 transition-colors duration-300">
             {/* Left: Logo & Title */}
             <div className="flex items-center gap-4 flex-shrink-0 min-w-0">
               <div className="flex items-center gap-3">
