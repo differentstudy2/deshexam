@@ -616,7 +616,7 @@ export default async function AnswerSheetPage({
                                                         <div className="flex justify-between items-start mb-4">
                                                             <div className="flex items-baseline gap-3 w-full">
                                                                 <div className="flex flex-col shrink-0 question-sidebar">
-                                                                    <span className="text-black font-bold text-[22px] print-q-num">Q{index + 1}.</span>
+                                                                    <span className="text-indigo-600 dark:text-indigo-400 print:text-black font-bold text-[22px] print-q-num">Q{index + 1}.</span>
                                                                     <div className="flex flex-col gap-2 mt-4 print:hidden opacity-60 hover:opacity-100 transition-opacity">
                                                                         <label className="flex items-center gap-1.5 cursor-pointer text-[10px] font-semibold text-gray-600 hover:text-gray-900" title="Show Main Explanation">
                                                                             <input type="checkbox" defaultChecked className="toggle-exp-local w-3 h-3 text-blue-600 rounded border-gray-300 focus:ring-blue-500" />
@@ -633,7 +633,7 @@ export default async function AnswerSheetPage({
                                                                     </div>
                                                                 </div>
                                                                 <div className="prose prose-black max-w-none flex-1 prose-p:font-bold prose-p:text-[22px] print-q-text print:leading-snug prose-p:my-0 prose-li:text-[18px] capitalize">
-                                                                    <span className="hidden [html[data-layout='presentation']_&]:block float-left font-bold text-black mr-2">Q{index + 1}.</span>
+                                                                    <span className="hidden [html[data-layout='presentation']_&]:block float-left font-bold text-indigo-600 dark:text-indigo-400 print:text-black mr-2">Q{index + 1}.</span>
                                                                     <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeRaw]}>
                                                                         {q.questionText}
                                                                     </ReactMarkdown>
