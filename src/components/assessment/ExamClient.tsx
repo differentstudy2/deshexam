@@ -1327,55 +1327,73 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                   <button
                     onClick={() => setShowLayoutSettings(!showLayoutSettings)}
                     className={cn(
-                      "p-2 rounded-lg transition-colors border",
+                      "w-10 h-10 flex items-center justify-center rounded-full transition-all duration-300 border shadow-sm group",
                       showLayoutSettings 
-                        ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800"
-                        : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 border-slate-200 dark:border-slate-700"
+                        ? "bg-blue-600 text-white border-blue-600 shadow-blue-500/25 rotate-90"
+                        : "bg-white dark:bg-[#1e293b] text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-slate-600 hover:rotate-45"
                     )}
                     title="Layout Settings"
                   >
-                    <Settings className="w-4 h-4" />
+                    <Settings className="w-4 h-4 transition-transform duration-500" />
                   </button>
 
                   <AnimatePresence>
                     {showLayoutSettings && (
                       <motion.div
-                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        transition={{ duration: 0.15 }}
-                        className="absolute bottom-[calc(100%+12px)] right-0 w-48 bg-white dark:bg-[#1e293b] rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 p-3 z-50"
+                        initial={{ opacity: 0, y: 15, scale: 0.9, filter: 'blur(4px)' }}
+                        animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+                        exit={{ opacity: 0, y: 10, scale: 0.95, filter: 'blur(2px)' }}
+                        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                        className="absolute bottom-[calc(100%+16px)] right-0 w-[220px] bg-white/90 dark:bg-[#0f172a]/90 backdrop-blur-xl rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.4)] border border-white/50 dark:border-slate-700/50 p-4 z-50 overflow-hidden"
                       >
-                        <h3 className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Options Layout</h3>
-                        <div className="flex bg-slate-100 dark:bg-slate-800/80 rounded-lg p-1">
-                          <button
-                            onClick={() => {
-                              setOptionsLayout('list');
-                              setShowLayoutSettings(false);
-                            }}
-                            className={cn(
-                              "flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md transition-all text-[12px] font-bold",
-                              optionsLayout === 'list' 
-                                ? "bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-blue-400" 
-                                : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
-                            )}
-                          >
-                            <List className="w-3.5 h-3.5" /> List
-                          </button>
-                          <button
-                            onClick={() => {
-                              setOptionsLayout('grid');
-                              setShowLayoutSettings(false);
-                            }}
-                            className={cn(
-                              "flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md transition-all text-[12px] font-bold",
-                              optionsLayout === 'grid' 
-                                ? "bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-blue-400" 
-                                : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
-                            )}
-                          >
-                            <LayoutGrid className="w-3.5 h-3.5" /> Grid
-                          </button>
+                        {/* Decorative background glows */}
+                        <div className="absolute -top-10 -right-10 w-24 h-24 bg-blue-500/20 dark:bg-blue-500/10 rounded-full blur-2xl pointer-events-none"></div>
+                        <div className="absolute -bottom-10 -left-10 w-24 h-24 bg-indigo-500/20 dark:bg-indigo-500/10 rounded-full blur-2xl pointer-events-none"></div>
+                        
+                        <div className="relative z-10">
+                          <div className="flex items-center gap-2 mb-3">
+                            <div className="p-1.5 bg-blue-100 dark:bg-blue-500/20 rounded-lg text-blue-600 dark:text-blue-400">
+                              <Settings className="w-3.5 h-3.5" />
+                            </div>
+                            <h3 className="text-[12px] font-extrabold text-slate-800 dark:text-slate-200 uppercase tracking-widest">Layout Settings</h3>
+                          </div>
+                          
+                          <div className="flex bg-slate-100/80 dark:bg-slate-800/60 p-1 rounded-xl shadow-inner border border-slate-200/50 dark:border-slate-700/50 backdrop-blur-sm">
+                            <button
+                              onClick={() => {
+                                setOptionsLayout('list');
+                                setTimeout(() => setShowLayoutSettings(false), 200);
+                              }}
+                              className={cn(
+                                "flex-1 flex items-center justify-center gap-2 py-2 rounded-lg transition-all duration-300 text-[12px] font-bold relative overflow-hidden",
+                                optionsLayout === 'list' 
+                                  ? "text-white shadow-md" 
+                                  : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-slate-700/50"
+                              )}
+                            >
+                              {optionsLayout === 'list' && (
+                                <motion.div layoutId="layout-active-bg" className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg -z-10" />
+                              )}
+                              <List className="w-3.5 h-3.5" /> List
+                            </button>
+                            <button
+                              onClick={() => {
+                                setOptionsLayout('grid');
+                                setTimeout(() => setShowLayoutSettings(false), 200);
+                              }}
+                              className={cn(
+                                "flex-1 flex items-center justify-center gap-2 py-2 rounded-lg transition-all duration-300 text-[12px] font-bold relative overflow-hidden",
+                                optionsLayout === 'grid' 
+                                  ? "text-white shadow-md" 
+                                  : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-slate-700/50"
+                              )}
+                            >
+                              {optionsLayout === 'grid' && (
+                                <motion.div layoutId="layout-active-bg" className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg -z-10" />
+                              )}
+                              <LayoutGrid className="w-3.5 h-3.5" /> Grid
+                            </button>
+                          </div>
                         </div>
                       </motion.div>
                     )}
