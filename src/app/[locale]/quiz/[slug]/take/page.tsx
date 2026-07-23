@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import { unstable_cache } from 'next/cache';
 import { ExamClient, ExamConfig } from '@/components/assessment/ExamClient';
 import { getAssessmentBySlug, getAssessment } from '@/lib/firebase/assessment';
+import { getTaxonomyNodeById } from '@/lib/firebase/taxonomy';
 import { getQuestionsByIds } from '@/lib/firebase/question-bank';
 import { Quiz } from '@/lib/assessment-types';
 import { Metadata, ResolvingMetadata } from 'next';
@@ -51,6 +52,14 @@ export default async function QuizTakePage({ params }: Props) {
   const questionIds = quiz.questionIds || [];
   const rawQuestions = await getCachedQuestions(questionIds);
 
+  let taxonomyParts: string[] = [];
+  if (quiz.boardId) { const node = await getTaxonomyNodeById(quiz.boardId); if (node) taxonomyParts.push(node.acronym || node.title); }
+  if (quiz.classId) { const node = await getTaxonomyNodeById(quiz.classId); if (node) taxonomyParts.push(node.title); }
+  if (quiz.subjectId) { const node = await getTaxonomyNodeById(quiz.subjectId); if (node) taxonomyParts.push(node.title); }
+  if (quiz.chapterId) { const node = await getTaxonomyNodeById(quiz.chapterId); if (node) taxonomyParts.push(node.title); }
+  
+  const taxonomyLine = taxonomyParts.length > 0 ? taxonomyParts.join(' • ') : undefined;
+
   const examConfig: ExamConfig = {
     id: quiz.id,
     slug: quiz.slug,
@@ -63,7 +72,8 @@ export default async function QuizTakePage({ params }: Props) {
     shuffleQuestions: false,
     shuffleOptions: false,
     accessType: quiz.accessType,
-    allowedSubscriptionPlans: quiz.allowedSubscriptionPlans
+    allowedSubscriptionPlans: quiz.allowedSubscriptionPlans,
+    taxonomyLine
   };
 
   const serializedQuestions = JSON.parse(JSON.stringify(rawQuestions));

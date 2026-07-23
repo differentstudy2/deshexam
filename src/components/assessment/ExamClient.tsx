@@ -30,6 +30,7 @@ export interface ExamConfig {
   shuffleOptions?: boolean;
   accessType?: 'free' | 'subscription' | 'one_time' | 'both';
   allowedSubscriptionPlans?: string[];
+  taxonomyLine?: string;
 }
 
 interface ExamClientProps {
@@ -985,10 +986,21 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
             <div className="h-8 w-px bg-slate-300 dark:bg-slate-700 hidden xl:block flex-shrink-0 mx-2"></div>
             <div className="flex items-center gap-4 min-w-0">
               <div className="flex flex-col min-w-0">
-                <h1 className="font-bold text-lg text-slate-900 dark:text-slate-50 leading-tight truncate max-w-[200px] sm:max-w-[250px] lg:max-w-[300px] xl:max-w-[400px]" title={mockTest.title}>
+                <h1 className="font-bold text-lg text-slate-900 dark:text-slate-50 leading-tight line-clamp-1 flex-1" title={mockTest.title}>
                   {isReviewMode ? "Reviewing Solutions" : mockTest.title}
                 </h1>
-                <p className="text-sm text-slate-500 dark:text-slate-400 font-medium truncate">{(mockTest as any).category || "General Studies"} • Full Length</p>
+                <div className="flex items-center gap-2 mt-1.5 overflow-hidden w-full">
+                  {(mockTest.taxonomyLine || (mockTest as any).category || "General Studies").split(' • ').map((part: string, idx: number, arr: string[]) => (
+                    <div key={idx} className="flex items-center gap-2 flex-shrink-0">
+                      <span className="text-[11px] font-extrabold px-2.5 py-0.5 rounded-md bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-800/50 tracking-wide uppercase">
+                        {part}
+                      </span>
+                      {idx < arr.length - 1 && (
+                        <span className="text-slate-300 dark:text-slate-600 text-[10px]">▶</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -1473,7 +1485,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
           </button>
           <PresentationOverlay 
             questions={questions}
-            classLine={mockTest.title}
+            classLine={mockTest.taxonomyLine || mockTest.title}
             autoStart={true}
             onClose={() => setShowPresentationMode(false)}
           />
