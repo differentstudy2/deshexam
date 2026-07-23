@@ -1107,19 +1107,6 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
               {/* Top Bar: Info & Mini Navigator */}
               <div className="flex items-center justify-between bg-white dark:bg-[#1e293b] rounded-[12px] px-4 py-2 shadow-sm border border-slate-100 dark:border-slate-700 transition-colors">
 
-                {/* Left Side Info */}
-                <div className="flex items-center gap-2 flex-shrink-0 w-[150px] lg:w-[200px]">
-                  <span className={cn(
-                    "px-3 py-1 rounded-full text-[13px] font-bold",
-                    currentQ.difficulty === 'Easy' ? "bg-[#DCFCE7] dark:bg-[#064e3b] text-[#166534] dark:text-[#34d399]" :
-                      currentQ.difficulty === 'Medium' ? "bg-[#FEF9C3] dark:bg-[#713f12] text-[#A16207] dark:text-[#fde047]" :
-                        "bg-[#FEE2E2] dark:bg-[#7f1d1d] text-[#B91C1C] dark:text-[#fca5a5]"
-                  )}>{currentQ.difficulty || 'Easy'}</span>
-                  <span className="px-3 py-1 rounded-full text-[13px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 transition-colors hidden xl:block truncate max-w-[120px]">
-                    {(mockTest as any).category || "General Knowledge"}
-                  </span>
-                </div>
-
                 {/* Center: Mini Navigator */}
                 <div className="flex items-center justify-center flex-1 min-w-0">
                   <div className="bg-slate-50 dark:bg-slate-800/50 rounded-full px-2 py-1 flex items-center gap-1 border border-slate-100 dark:border-slate-700 transition-colors">
@@ -1166,13 +1153,6 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                     </div>
                     <button onClick={() => { if (currentQuestionIndex < questions.length - 1) setCurrentQuestionIndex(prev => prev + 1); }} disabled={currentQuestionIndex === questions.length - 1} className="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-slate-700 disabled:opacity-30"><ArrowLeft className="w-4 h-4 rotate-180" /></button>
                   </div>
-                </div>
-
-                {/* Right Side Marks */}
-                <div className="text-[14px] font-bold flex items-center justify-end gap-1.5 flex-shrink-0 w-[150px] lg:w-[200px]">
-                  <span className="text-[#16A34A] dark:text-emerald-500">+{currentQ.marks || 1}</span>
-                  <span className="text-slate-300 dark:text-slate-600">|</span>
-                  <span className="text-red-500 dark:text-red-400">-{mockTest.negativeMarking || 0.25}</span>
                 </div>
               </div>
 
