@@ -845,18 +845,21 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
 
           {/* Content Area */}
           <div className="flex-1 overflow-y-auto px-2 pb-24 hide-scrollbar flex flex-col gap-3">
-            <div className="bg-gradient-to-br from-white to-blue-50/30 dark:from-[#1e293b] dark:to-slate-900/80 rounded-2xl p-5 shadow-md border border-white/60 dark:border-slate-700/50 transition-colors">
+            <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-md rounded-2xl p-5 shadow-md border border-white/40 dark:border-slate-700/50 transition-colors">
+              <div className="relative z-10">
               <div
                 className="text-xl font-bold leading-snug text-slate-900 dark:text-slate-50 transition-colors"
                 dangerouslySetInnerHTML={{ __html: currentQ.questionText || '' }}
               />
+              </div>
             </div>
-            <div className="bg-gradient-to-br from-white to-slate-50/50 dark:from-[#1e293b] dark:to-slate-900/80 rounded-2xl p-4 shadow-sm border border-white/60 dark:border-slate-700/50 flex flex-col gap-2 transition-colors">
+            <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-md rounded-2xl p-4 shadow-sm border border-white/40 dark:border-slate-700/50 flex flex-col gap-2 transition-colors">
+              <div className="relative z-10 flex flex-col gap-2">
               {currentOptionsKeys.map((key) => {
                 const isSelected = answers[currentQ.id] === key;
                 const optionText = (currentQ.options as any)[key];
 
-                let optionClass = "border-slate-200 dark:border-slate-700 bg-white dark:bg-[#1e293b] hover:bg-blue-50/50 hover:border-blue-300 dark:hover:bg-slate-800 dark:hover:border-slate-500 hover:shadow-sm";
+                let optionClass = "border-slate-200/50 dark:border-slate-700/50 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm hover:bg-blue-50/80 hover:border-blue-300 dark:hover:bg-slate-800/80 dark:hover:border-slate-500 hover:shadow-sm";
                 let bubbleClass = "border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800";
                 let textClass = "text-slate-700 dark:text-slate-200 font-medium";
 
@@ -902,6 +905,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                   </button>
                 );
               })}
+              </div>
             </div>
 
             {isReviewMode && currentQ.explanation && (
@@ -1022,7 +1026,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
         </div>
 
         {/* ── DESKTOP UI ── */}
-        <div className="hidden md:flex flex-col h-full w-full bg-[#EDF1F5] dark:bg-[#0f172a] font-sans transition-colors duration-300">
+        <div className="hidden md:flex flex-col h-full w-full bg-transparent font-sans transition-colors duration-300">
 
           {/* Top Header */}
           {showHeader && (
@@ -1236,16 +1240,19 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                     className="flex flex-col gap-4"
                   >
                     {/* Question Card */}
-                    <div className="bg-gradient-to-br from-white to-blue-50/30 dark:from-[#1e293b] dark:to-slate-900/80 rounded-2xl p-5 lg:p-6 shadow-md border border-white/60 dark:border-slate-700/50 flex flex-col transition-colors duration-300">
+                    <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-md rounded-2xl p-5 lg:p-6 shadow-md border border-white/40 dark:border-slate-700/50 flex flex-col transition-colors duration-300">
+                      <div className="relative z-10">
 
                       <div
                         className="text-[26px] font-bold leading-tight text-slate-900 dark:text-slate-50 transition-colors"
                         dangerouslySetInnerHTML={{ __html: currentQ.questionText || '' }}
                       />
+                      </div>
                     </div>
 
                     {/* Options Card */}
-                    <div className="bg-gradient-to-br from-white to-slate-50/50 dark:from-[#1e293b] dark:to-slate-900/80 rounded-2xl p-4 lg:p-5 shadow-sm border border-white/60 dark:border-slate-700/50 flex flex-col transition-colors duration-300">
+                    <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-md rounded-2xl p-4 lg:p-5 shadow-sm border border-white/40 dark:border-slate-700/50 flex flex-col transition-colors duration-300">
+                      <div className="relative z-10 w-full">
 
                       <div className={cn(
                         "grid gap-3",
@@ -1255,20 +1262,20 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                           const isSelected = answers[currentQ.id] === key;
                           const optionText = (currentQ.options as any)[key];
 
-                          let defaultOptionClass = "border-slate-200 dark:border-slate-700 bg-white dark:bg-[#1e293b]";
+                          let defaultOptionClass = "border-slate-200/50 dark:border-slate-700/50 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm";
                           let defaultBubbleClass = "border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800";
                           
                           if (idx === 0) {
-                            defaultOptionClass = "border-[#6B9DF2]/60 dark:border-blue-700/50 bg-white dark:bg-[#1e293b] hover:bg-blue-50/50 dark:hover:bg-slate-800";
+                            defaultOptionClass = "border-[#6B9DF2]/60 dark:border-blue-700/50 bg-white/60 dark:bg-slate-800/60 hover:bg-blue-50/80 dark:hover:bg-slate-800/80 backdrop-blur-sm";
                             defaultBubbleClass = "bg-[#6B9DF2] text-white border-transparent shadow-sm";
                           } else if (idx === 1) {
-                            defaultOptionClass = "border-[#65C27B]/60 dark:border-green-700/50 bg-white dark:bg-[#1e293b] hover:bg-green-50/50 dark:hover:bg-slate-800";
+                            defaultOptionClass = "border-[#65C27B]/60 dark:border-green-700/50 bg-white/60 dark:bg-slate-800/60 hover:bg-green-50/80 dark:hover:bg-slate-800/80 backdrop-blur-sm";
                             defaultBubbleClass = "bg-[#65C27B] text-white border-transparent shadow-sm";
                           } else if (idx === 2) {
-                            defaultOptionClass = "border-[#F5B435]/60 dark:border-amber-700/50 bg-white dark:bg-[#1e293b] hover:bg-amber-50/50 dark:hover:bg-slate-800";
+                            defaultOptionClass = "border-[#F5B435]/60 dark:border-amber-700/50 bg-white/60 dark:bg-slate-800/60 hover:bg-amber-50/80 dark:hover:bg-slate-800/80 backdrop-blur-sm";
                             defaultBubbleClass = "bg-[#F5B435] text-white border-transparent shadow-sm";
                           } else if (idx === 3) {
-                            defaultOptionClass = "border-[#EF6861]/60 dark:border-red-700/50 bg-white dark:bg-[#1e293b] hover:bg-red-50/50 dark:hover:bg-slate-800";
+                            defaultOptionClass = "border-[#EF6861]/60 dark:border-red-700/50 bg-white/60 dark:bg-slate-800/60 hover:bg-red-50/80 dark:hover:bg-slate-800/80 backdrop-blur-sm";
                             defaultBubbleClass = "bg-[#EF6861] text-white border-transparent shadow-sm";
                           }
 
@@ -1321,6 +1328,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                             </button>
                           );
                         })}
+                        </div>
                       </div>
                     </div>
 
@@ -1697,18 +1705,8 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
           </div>
         )}
 
-        <style dangerouslySetInnerHTML={{
-          __html: `
-        html.dark body { background-color: #0f172a !important; }
-        html:not(.dark) body { background-color: #F8FAFC !important; }
-        body { overflow: hidden !important; }
-        footer { display: none !important; }
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
-      `}} />
+        {/* Global Styles */}
+        <style dangerouslySetInnerHTML={{ __html: "html.dark body { background-color: #0f172a !important; } html:not(.dark) body { background-color: #F8FAFC !important; } body { overflow: hidden !important; } footer { display: none !important; } .hide-scrollbar::-webkit-scrollbar { display: none; } .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; } .custom-scrollbar::-webkit-scrollbar { width: 4px; } .custom-scrollbar::-webkit-scrollbar-track { background: transparent; } .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }" }} />
       </div>
     </>
   );
