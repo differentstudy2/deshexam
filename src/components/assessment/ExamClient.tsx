@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Bookmark, Flag, Maximize, Minimize, AlertCircle, Clock, Moon, Sun, LayoutGrid, X, ToggleLeft, ToggleRight, Lock, Loader2, Presentation, Target } from 'lucide-react';
+import { ArrowLeft, Bookmark, Flag, Maximize, Minimize, AlertCircle, Clock, Moon, Sun, LayoutGrid, List, X, ToggleLeft, ToggleRight, Lock, Loader2, Presentation, Target } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -103,6 +103,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
   const [showMobileNav, setShowMobileNav] = useState(false);
   const [showPresentationMode, setShowPresentationMode] = useState(false);
   const [autoSaveNext, setAutoSaveNext] = useState(false);
+  const [optionsLayout, setOptionsLayout] = useState<'list' | 'grid'>('list');
 
   // --- ACCESS CONTROL STATE ---
   const { user, loading: authLoading } = useAuth();
@@ -1184,7 +1185,39 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                     {/* Options Card */}
                     <div className="bg-gradient-to-br from-white to-slate-50/50 dark:from-[#1e293b] dark:to-slate-900/80 rounded-2xl p-4 lg:p-5 shadow-sm border border-white/60 dark:border-slate-700/50 flex flex-col transition-colors duration-300">
 
-                      <div className="flex flex-col gap-3">
+                      <div className="flex justify-end mb-3">
+                        <div className="bg-slate-100 dark:bg-slate-800/80 rounded-lg p-1 flex items-center gap-1 border border-slate-200/50 dark:border-slate-700/50">
+                          <button
+                            onClick={() => setOptionsLayout('list')}
+                            className={cn(
+                              "p-1.5 rounded-md transition-all",
+                              optionsLayout === 'list' 
+                                ? "bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-blue-400" 
+                                : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                            )}
+                            title="List View"
+                          >
+                            <List className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => setOptionsLayout('grid')}
+                            className={cn(
+                              "p-1.5 rounded-md transition-all",
+                              optionsLayout === 'grid' 
+                                ? "bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-blue-400" 
+                                : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                            )}
+                            title="Grid View"
+                          >
+                            <LayoutGrid className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className={cn(
+                        "grid gap-3",
+                        optionsLayout === 'grid' ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1"
+                      )}>
                         {currentOptionsKeys.map((key) => {
                           const isSelected = answers[currentQ.id] === key;
                           const optionText = (currentQ.options as any)[key];
