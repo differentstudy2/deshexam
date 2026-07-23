@@ -1190,12 +1190,29 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                         "grid gap-3",
                         optionsLayout === 'grid' ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1"
                       )}>
-                        {currentOptionsKeys.map((key) => {
+                        {currentOptionsKeys.map((key, idx) => {
                           const isSelected = answers[currentQ.id] === key;
                           const optionText = (currentQ.options as any)[key];
 
-                          let optionClass = "border-slate-200 dark:border-slate-700 bg-white dark:bg-[#1e293b] hover:bg-blue-50/50 hover:border-blue-300 hover:shadow-sm hover:-translate-y-0.5 dark:hover:bg-slate-800 dark:hover:border-slate-500";
-                          let bubbleClass = "border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800";
+                          let defaultOptionClass = "border-slate-200 dark:border-slate-700 bg-white dark:bg-[#1e293b]";
+                          let defaultBubbleClass = "border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800";
+                          
+                          if (idx === 0) {
+                            defaultOptionClass = "border-[#6B9DF2]/60 dark:border-blue-700/50 bg-white dark:bg-[#1e293b] hover:bg-blue-50/50 dark:hover:bg-slate-800";
+                            defaultBubbleClass = "bg-[#6B9DF2] text-white border-transparent shadow-sm";
+                          } else if (idx === 1) {
+                            defaultOptionClass = "border-[#65C27B]/60 dark:border-green-700/50 bg-white dark:bg-[#1e293b] hover:bg-green-50/50 dark:hover:bg-slate-800";
+                            defaultBubbleClass = "bg-[#65C27B] text-white border-transparent shadow-sm";
+                          } else if (idx === 2) {
+                            defaultOptionClass = "border-[#F5B435]/60 dark:border-amber-700/50 bg-white dark:bg-[#1e293b] hover:bg-amber-50/50 dark:hover:bg-slate-800";
+                            defaultBubbleClass = "bg-[#F5B435] text-white border-transparent shadow-sm";
+                          } else if (idx === 3) {
+                            defaultOptionClass = "border-[#EF6861]/60 dark:border-red-700/50 bg-white dark:bg-[#1e293b] hover:bg-red-50/50 dark:hover:bg-slate-800";
+                            defaultBubbleClass = "bg-[#EF6861] text-white border-transparent shadow-sm";
+                          }
+
+                          let optionClass = `${defaultOptionClass} hover:shadow-sm hover:-translate-y-0.5 transition-all`;
+                          let bubbleClass = defaultBubbleClass;
                           let textClass = "text-slate-700 dark:text-slate-200 font-medium";
 
                           if (isSelected) {
