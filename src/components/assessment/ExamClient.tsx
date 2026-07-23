@@ -1112,16 +1112,31 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                   <div className="w-full bg-slate-50 dark:bg-slate-800/50 rounded-full px-2 py-1 flex items-center justify-between gap-2 border border-slate-100 dark:border-slate-700 transition-colors">
                     <button onClick={handlePrevious} disabled={currentQuestionIndex === 0} className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-30 shadow-sm border border-slate-200 dark:border-slate-600 transition-colors"><ArrowLeft className="w-4 h-4" /></button>
                     <div className="flex-1 flex items-center justify-center gap-1.5 overflow-x-auto hide-scrollbar scroll-smooth px-2 mask-edges">
-                      {questions.map((q, idx) => {
-                        const state = questionStates[q.id] || 'unvisited';
-                        const isCurrent = currentQuestionIndex === idx;
-
-                        if (Math.abs(idx - currentQuestionIndex) > 10 && idx !== 0 && idx !== questions.length - 1) {
-                          if (idx === 1 || idx === questions.length - 2) return <span key={q.id} className="text-[#0B476D] dark:text-blue-300 font-bold px-1 tracking-widest flex items-center justify-center">...</span>;
-                          return null;
+                      {(() => {
+                        const maxVisible = 16;
+                        let start = Math.max(1, currentQuestionIndex - Math.floor(maxVisible / 2));
+                        let end = start + maxVisible - 1;
+                        if (end >= questions.length - 1) {
+                          end = questions.length - 2;
+                          start = Math.max(1, end - maxVisible + 1);
                         }
+                        
+                        return questions.map((q, idx) => {
+                          const state = questionStates[q.id] || 'unvisited';
+                          const isCurrent = currentQuestionIndex === idx;
 
-                        let navClass = "bg-transparent text-[#0B476D] dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-slate-700";
+                          if (idx !== 0 && idx !== questions.length - 1) {
+                            if (idx < start) {
+                              if (idx === start - 1) return <span key={`dots-left-${q.id}`} className="text-[#0B476D] dark:text-blue-300 font-bold px-1 tracking-widest flex items-center justify-center">...</span>;
+                              return null;
+                            }
+                            if (idx > end) {
+                              if (idx === end + 1) return <span key={`dots-right-${q.id}`} className="text-[#0B476D] dark:text-blue-300 font-bold px-1 tracking-widest flex items-center justify-center">...</span>;
+                              return null;
+                            }
+                          }
+
+                          let navClass = "bg-transparent text-[#0B476D] dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-slate-700";
 
                         if (isCurrent) {
                           navClass = "bg-[#166534] dark:bg-emerald-600 text-white shadow-sm";
@@ -1149,7 +1164,8 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                             {idx + 1}
                           </button>
                         );
-                      })}
+                      });
+                    })()}
                     </div>
                     <button onClick={() => { if (currentQuestionIndex < questions.length - 1) setCurrentQuestionIndex(prev => prev + 1); }} disabled={currentQuestionIndex === questions.length - 1} className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-30 shadow-sm border border-slate-200 dark:border-slate-600 transition-colors"><ArrowLeft className="w-4 h-4 rotate-180" /></button>
                   </div>
@@ -1274,12 +1290,24 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                       >
                         Clear Response
                       </button>
-                      <button
-                        onClick={handleSaveAndNext}
-                        className="h-10 px-6 rounded-full bg-[#166534] hover:bg-green-800 text-white font-bold flex items-center gap-1.5 whitespace-nowrap shadow-sm transition-colors text-sm"
-                      >
-                        Save & Next
-                      </button>
+                      {currentQuestionIndex === questions.length - 1 ? (
+                        <button
+                          onClick={() => {
+                            handleSaveAndNext();
+                            setShowSubmitConfirm(true);
+                          }}
+                          className="h-10 px-8 rounded-full bg-[#2563EB] hover:bg-blue-700 text-white font-bold flex items-center gap-1.5 whitespace-nowrap shadow-sm transition-colors text-sm"
+                        >
+                          Submit
+                        </button>
+                      ) : (
+                        <button
+                          onClick={handleSaveAndNext}
+                          className="h-10 px-6 rounded-full bg-[#166534] hover:bg-green-800 text-white font-bold flex items-center gap-1.5 whitespace-nowrap shadow-sm transition-colors text-sm"
+                        >
+                          Save & Next
+                        </button>
+                      )}
                       <button
                         onClick={() => { if (currentQuestionIndex < questions.length - 1) setCurrentQuestionIndex(prev => prev + 1); }}
                         disabled={currentQuestionIndex === questions.length - 1}
