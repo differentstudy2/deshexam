@@ -1083,6 +1083,40 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
 
 
 
+              {/* Settings Card */}
+              <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-4 shrink-0 transition-colors">
+                <h2 className="font-bold text-sm text-slate-900 dark:text-slate-50 mb-3">Settings</h2>
+                <div className="flex items-center justify-between">
+                  <span className="text-[13px] font-semibold text-slate-600 dark:text-slate-400">Options Layout</span>
+                  <div className="bg-slate-100 dark:bg-slate-800/80 rounded-lg p-1 flex items-center gap-1 border border-slate-200/50 dark:border-slate-700/50">
+                    <button
+                      onClick={() => setOptionsLayout('list')}
+                      className={cn(
+                        "p-1 rounded-md transition-all",
+                        optionsLayout === 'list' 
+                          ? "bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-blue-400" 
+                          : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                      )}
+                      title="List View"
+                    >
+                      <List className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={() => setOptionsLayout('grid')}
+                      className={cn(
+                        "p-1 rounded-md transition-all",
+                        optionsLayout === 'grid' 
+                          ? "bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-blue-400" 
+                          : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                      )}
+                      title="Grid View"
+                    >
+                      <LayoutGrid className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               {/* AdSense Slot */}
               <div className="mt-auto shrink-0 pt-2">
                 <AdUnit
@@ -1184,35 +1218,6 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
 
                     {/* Options Card */}
                     <div className="bg-gradient-to-br from-white to-slate-50/50 dark:from-[#1e293b] dark:to-slate-900/80 rounded-2xl p-4 lg:p-5 shadow-sm border border-white/60 dark:border-slate-700/50 flex flex-col transition-colors duration-300">
-
-                      <div className="flex justify-end mb-3">
-                        <div className="bg-slate-100 dark:bg-slate-800/80 rounded-lg p-1 flex items-center gap-1 border border-slate-200/50 dark:border-slate-700/50">
-                          <button
-                            onClick={() => setOptionsLayout('list')}
-                            className={cn(
-                              "p-1.5 rounded-md transition-all",
-                              optionsLayout === 'list' 
-                                ? "bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-blue-400" 
-                                : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
-                            )}
-                            title="List View"
-                          >
-                            <List className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => setOptionsLayout('grid')}
-                            className={cn(
-                              "p-1.5 rounded-md transition-all",
-                              optionsLayout === 'grid' 
-                                ? "bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-blue-400" 
-                                : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
-                            )}
-                            title="Grid View"
-                          >
-                            <LayoutGrid className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
 
                       <div className={cn(
                         "grid gap-3",
