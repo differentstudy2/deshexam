@@ -845,7 +845,19 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
 
           {/* Content Area */}
           <div className="flex-1 overflow-y-auto px-2 pb-24 hide-scrollbar flex flex-col gap-3">
-            <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-md rounded-2xl p-5 shadow-md border border-white/40 dark:border-slate-700/50 transition-colors">
+            <div className={`relative overflow-hidden rounded-2xl p-5 shadow-md border border-slate-200 dark:border-slate-700/50 transition-colors ${getBgThemeClasses()}`}>
+              {bgTheme !== 'video' && (
+                <div className={`absolute inset-0 z-0 pointer-events-none transition-opacity duration-300 ${getBgThemeOverlayClasses()}`} />
+              )}
+              {bgTheme === 'video' && (
+                <video
+                  key={selectedVideo}
+                  autoPlay loop muted playsInline
+                  className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none opacity-40"
+                >
+                  <source src={selectedVideo} type="video/mp4" />
+                </video>
+              )}
               <div className="relative z-10">
               <div
                 className="text-xl font-bold leading-snug text-slate-900 dark:text-slate-50 transition-colors"
@@ -853,34 +865,57 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
               />
               </div>
             </div>
-            <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-md rounded-2xl p-4 shadow-sm border border-white/40 dark:border-slate-700/50 flex flex-col gap-2 transition-colors">
+            <div className={`relative overflow-hidden rounded-2xl p-4 shadow-sm border border-slate-200 dark:border-slate-700/50 flex flex-col gap-2 transition-colors ${getBgThemeClasses()}`}>
+              {bgTheme !== 'video' && (
+                <div className={`absolute inset-0 z-0 pointer-events-none transition-opacity duration-300 ${getBgThemeOverlayClasses()}`} />
+              )}
+              {bgTheme === 'video' && (
+                <video
+                  key={selectedVideo}
+                  autoPlay loop muted playsInline
+                  className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none opacity-40"
+                >
+                  <source src={selectedVideo} type="video/mp4" />
+                </video>
+              )}
               <div className="relative z-10 flex flex-col gap-2">
-              {currentOptionsKeys.map((key) => {
+              {currentOptionsKeys.map((key, idx) => {
                 const isSelected = answers[currentQ.id] === key;
                 const optionText = (currentQ.options as any)[key];
 
-                let optionClass = "border-slate-200/50 dark:border-slate-700/50 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm hover:bg-blue-50/80 hover:border-blue-300 dark:hover:bg-slate-800/80 dark:hover:border-slate-500 hover:shadow-sm";
-                let bubbleClass = "border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800";
+                const colorThemes = [
+                  { border: 'border-[#4285F4]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#4285F4]/75', letterText: 'text-white', activeBg: 'bg-[#e8f0fe] dark:bg-[#4285F4]/20', activeBorder: 'border-[#4285F4]', activeRing: 'ring-[#4285F4]/30', activeLetterBg: 'bg-[#4285F4]' },
+                  { border: 'border-[#34A853]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#34A853]/75', letterText: 'text-white', activeBg: 'bg-[#e6f4ea] dark:bg-[#34A853]/20', activeBorder: 'border-[#34A853]', activeRing: 'ring-[#34A853]/30', activeLetterBg: 'bg-[#34A853]' },
+                  { border: 'border-[#F9AB00]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#F9AB00]/75', letterText: 'text-white', activeBg: 'bg-[#fef7e0] dark:bg-[#F9AB00]/20', activeBorder: 'border-[#F9AB00]', activeRing: 'ring-[#F9AB00]/30', activeLetterBg: 'bg-[#F9AB00]' },
+                  { border: 'border-[#EA4335]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#EA4335]/75', letterText: 'text-white', activeBg: 'bg-[#fce8e6] dark:bg-[#EA4335]/20', activeBorder: 'border-[#EA4335]', activeRing: 'ring-[#EA4335]/30', activeLetterBg: 'bg-[#EA4335]' },
+                  { border: 'border-[#9C27B0]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#9C27B0]/75', letterText: 'text-white', activeBg: 'bg-[#f3e5f5] dark:bg-[#9C27B0]/20', activeBorder: 'border-[#9C27B0]', activeRing: 'ring-[#9C27B0]/30', activeLetterBg: 'bg-[#9C27B0]' },
+                ];
+                const theme = colorThemes[idx % colorThemes.length];
+
+                let optionClass = `border-2 transition-all duration-300 shadow-[0_4px_12px_rgba(0,0,0,0.04)] ${theme.bg} ${theme.border} hover:scale-[1.01] hover:shadow-md cursor-pointer hover:border-gray-300`;
+                let bubbleClass = `border-transparent transition-colors duration-300 ${theme.letterBg} ${theme.letterText}`;
                 let textClass = "text-slate-700 dark:text-slate-200 font-medium";
 
                 if (isSelected) {
-                  optionClass = "border-emerald-400 dark:border-emerald-500/50 bg-gradient-to-r from-emerald-50 to-teal-50/50 dark:from-emerald-900/40 dark:to-teal-900/20 shadow-sm ring-1 ring-emerald-500/20";
-                  bubbleClass = "border-transparent text-white bg-gradient-to-br from-emerald-500 to-teal-600 shadow-sm";
-                  textClass = "text-emerald-900 dark:text-emerald-100 font-bold";
+                  optionClass = `border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(66,133,244,0.15)] ${theme.activeBg} ${theme.activeBorder} transform scale-[1.02] cursor-pointer ring-2 ${theme.activeRing}`;
+                  bubbleClass = `border-transparent transition-colors duration-300 ${theme.activeLetterBg} text-white`;
+                  textClass = "text-slate-900 dark:text-slate-50 font-bold";
                 }
 
-                if (isReviewMode) {
+                if (isReviewMode || examMode === 'read') {
                   const isCorrectAnswer = currentQ.correctAnswer && key.toLowerCase() === currentQ.correctAnswer.toLowerCase();
                   if (isCorrectAnswer) {
-                    optionClass = "border-emerald-400 dark:border-emerald-500/50 bg-gradient-to-r from-emerald-50 to-teal-50/50 dark:from-emerald-900/40 dark:to-teal-900/20 shadow-sm ring-1 ring-emerald-500/20";
-                    bubbleClass = "border-transparent text-white bg-gradient-to-br from-emerald-500 to-teal-600 shadow-sm";
-                    textClass = "text-emerald-900 dark:text-emerald-100 font-bold";
+                    optionClass = `border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(52,168,83,0.3)] bg-[#e6f4ea] dark:bg-[#34A853]/20 border-[#34A853] transform scale-[1.02] z-10`;
+                    bubbleClass = `border-transparent transition-colors duration-300 bg-[#34A853] text-white`;
+                    textClass = "text-[#166534] dark:text-emerald-100 font-bold";
                   } else if (isSelected && !isCorrectAnswer) {
-                    optionClass = "border-red-400 dark:border-red-500/50 bg-gradient-to-r from-red-50 to-rose-50/50 dark:from-red-900/40 dark:to-rose-900/20 shadow-sm ring-1 ring-red-500/20";
-                    bubbleClass = "border-transparent text-white bg-gradient-to-br from-red-500 to-rose-600 shadow-sm";
+                    optionClass = `border-2 transition-all duration-300 opacity-60 border-[#EA4335] bg-[#fce8e6] dark:bg-[#EA4335]/20`;
+                    bubbleClass = `border-transparent transition-colors duration-300 bg-[#EA4335] text-white`;
                     textClass = "text-red-900 dark:text-red-100 font-bold";
                   } else {
-                    optionClass = "border-slate-200 dark:border-slate-700 bg-white dark:bg-[#1e293b] opacity-60";
+                    optionClass = `border-2 transition-all duration-300 opacity-40 grayscale border-gray-300 bg-gray-50 dark:bg-gray-800/50`;
+                    bubbleClass = `border-transparent transition-colors duration-300 bg-gray-300 text-gray-500`;
+                    textClass = "text-slate-700 dark:text-slate-200 font-medium";
                   }
                 }
 
@@ -1240,7 +1275,19 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                     className="flex flex-col gap-4"
                   >
                     {/* Question Card */}
-                    <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-md rounded-2xl p-5 lg:p-6 shadow-md border border-white/40 dark:border-slate-700/50 flex flex-col transition-colors duration-300">
+                    <div className={`relative overflow-hidden rounded-2xl p-5 lg:p-6 shadow-md border border-slate-200 dark:border-slate-700/50 flex flex-col transition-colors duration-300 ${getBgThemeClasses()}`}>
+                      {bgTheme !== 'video' && (
+                        <div className={`absolute inset-0 z-0 pointer-events-none transition-opacity duration-300 ${getBgThemeOverlayClasses()}`} />
+                      )}
+                      {bgTheme === 'video' && (
+                        <video
+                          key={selectedVideo}
+                          autoPlay loop muted playsInline
+                          className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none opacity-40"
+                        >
+                          <source src={selectedVideo} type="video/mp4" />
+                        </video>
+                      )}
                       <div className="relative z-10">
 
                       <div
@@ -1251,7 +1298,19 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                     </div>
 
                     {/* Options Card */}
-                    <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-md rounded-2xl p-4 lg:p-5 shadow-sm border border-white/40 dark:border-slate-700/50 flex flex-col transition-colors duration-300">
+                    <div className={`relative overflow-hidden rounded-2xl p-4 lg:p-5 shadow-sm border border-slate-200 dark:border-slate-700/50 flex flex-col transition-colors duration-300 ${getBgThemeClasses()}`}>
+                      {bgTheme !== 'video' && (
+                        <div className={`absolute inset-0 z-0 pointer-events-none transition-opacity duration-300 ${getBgThemeOverlayClasses()}`} />
+                      )}
+                      {bgTheme === 'video' && (
+                        <video
+                          key={selectedVideo}
+                          autoPlay loop muted playsInline
+                          className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none opacity-40"
+                        >
+                          <source src={selectedVideo} type="video/mp4" />
+                        </video>
+                      )}
                       <div className="relative z-10 w-full">
 
                       <div className={cn(
@@ -1262,45 +1321,39 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                           const isSelected = answers[currentQ.id] === key;
                           const optionText = (currentQ.options as any)[key];
 
-                          let defaultOptionClass = "border-slate-200/50 dark:border-slate-700/50 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm";
-                          let defaultBubbleClass = "border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800";
-                          
-                          if (idx === 0) {
-                            defaultOptionClass = "border-[#6B9DF2]/60 dark:border-blue-700/50 bg-white/60 dark:bg-slate-800/60 hover:bg-blue-50/80 dark:hover:bg-slate-800/80 backdrop-blur-sm";
-                            defaultBubbleClass = "bg-[#6B9DF2] text-white border-transparent shadow-sm";
-                          } else if (idx === 1) {
-                            defaultOptionClass = "border-[#65C27B]/60 dark:border-green-700/50 bg-white/60 dark:bg-slate-800/60 hover:bg-green-50/80 dark:hover:bg-slate-800/80 backdrop-blur-sm";
-                            defaultBubbleClass = "bg-[#65C27B] text-white border-transparent shadow-sm";
-                          } else if (idx === 2) {
-                            defaultOptionClass = "border-[#F5B435]/60 dark:border-amber-700/50 bg-white/60 dark:bg-slate-800/60 hover:bg-amber-50/80 dark:hover:bg-slate-800/80 backdrop-blur-sm";
-                            defaultBubbleClass = "bg-[#F5B435] text-white border-transparent shadow-sm";
-                          } else if (idx === 3) {
-                            defaultOptionClass = "border-[#EF6861]/60 dark:border-red-700/50 bg-white/60 dark:bg-slate-800/60 hover:bg-red-50/80 dark:hover:bg-slate-800/80 backdrop-blur-sm";
-                            defaultBubbleClass = "bg-[#EF6861] text-white border-transparent shadow-sm";
-                          }
+                          const colorThemes = [
+                            { border: 'border-[#4285F4]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#4285F4]/75', letterText: 'text-white', activeBg: 'bg-[#e8f0fe] dark:bg-[#4285F4]/20', activeBorder: 'border-[#4285F4]', activeRing: 'ring-[#4285F4]/30', activeLetterBg: 'bg-[#4285F4]' },
+                            { border: 'border-[#34A853]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#34A853]/75', letterText: 'text-white', activeBg: 'bg-[#e6f4ea] dark:bg-[#34A853]/20', activeBorder: 'border-[#34A853]', activeRing: 'ring-[#34A853]/30', activeLetterBg: 'bg-[#34A853]' },
+                            { border: 'border-[#F9AB00]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#F9AB00]/75', letterText: 'text-white', activeBg: 'bg-[#fef7e0] dark:bg-[#F9AB00]/20', activeBorder: 'border-[#F9AB00]', activeRing: 'ring-[#F9AB00]/30', activeLetterBg: 'bg-[#F9AB00]' },
+                            { border: 'border-[#EA4335]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#EA4335]/75', letterText: 'text-white', activeBg: 'bg-[#fce8e6] dark:bg-[#EA4335]/20', activeBorder: 'border-[#EA4335]', activeRing: 'ring-[#EA4335]/30', activeLetterBg: 'bg-[#EA4335]' },
+                            { border: 'border-[#9C27B0]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#9C27B0]/75', letterText: 'text-white', activeBg: 'bg-[#f3e5f5] dark:bg-[#9C27B0]/20', activeBorder: 'border-[#9C27B0]', activeRing: 'ring-[#9C27B0]/30', activeLetterBg: 'bg-[#9C27B0]' },
+                          ];
+                          const theme = colorThemes[idx % colorThemes.length];
 
-                          let optionClass = `${defaultOptionClass} hover:shadow-sm hover:-translate-y-0.5 transition-all`;
-                          let bubbleClass = defaultBubbleClass;
+                          let optionClass = `border-2 transition-all duration-300 shadow-[0_4px_12px_rgba(0,0,0,0.04)] ${theme.bg} ${theme.border} hover:scale-[1.01] hover:shadow-md cursor-pointer hover:border-gray-300`;
+                          let bubbleClass = `border-transparent transition-colors duration-300 ${theme.letterBg} ${theme.letterText}`;
                           let textClass = "text-slate-700 dark:text-slate-200 font-medium";
 
                           if (isSelected) {
-                            optionClass = "border-emerald-400 dark:border-emerald-500/50 bg-gradient-to-r from-emerald-50 to-teal-50/50 dark:from-emerald-900/40 dark:to-teal-900/20 shadow-sm ring-1 ring-emerald-500/20";
-                            bubbleClass = "border-transparent text-white bg-gradient-to-br from-emerald-500 to-teal-600 shadow-sm";
-                            textClass = "text-emerald-900 dark:text-emerald-100 font-bold";
+                            optionClass = `border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(66,133,244,0.15)] ${theme.activeBg} ${theme.activeBorder} transform scale-[1.02] cursor-pointer ring-2 ${theme.activeRing}`;
+                            bubbleClass = `border-transparent transition-colors duration-300 ${theme.activeLetterBg} text-white`;
+                            textClass = "text-slate-900 dark:text-slate-50 font-bold";
                           }
 
                           if (isReviewMode || examMode === 'read') {
                             const isCorrectAnswer = currentQ.correctAnswer && key.toLowerCase() === currentQ.correctAnswer.toLowerCase();
                             if (isCorrectAnswer) {
-                              optionClass = "border-emerald-400 dark:border-emerald-500/50 bg-gradient-to-r from-emerald-50 to-teal-50/50 dark:from-emerald-900/40 dark:to-teal-900/20 shadow-sm ring-1 ring-emerald-500/20";
-                              bubbleClass = "border-transparent text-white bg-gradient-to-br from-emerald-500 to-teal-600 shadow-sm";
-                              textClass = "text-emerald-900 dark:text-emerald-100 font-bold";
+                              optionClass = `border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(52,168,83,0.3)] bg-[#e6f4ea] dark:bg-[#34A853]/20 border-[#34A853] transform scale-[1.02] z-10`;
+                              bubbleClass = `border-transparent transition-colors duration-300 bg-[#34A853] text-white`;
+                              textClass = "text-[#166534] dark:text-emerald-100 font-bold";
                             } else if (isSelected && !isCorrectAnswer) {
-                              optionClass = "border-red-400 dark:border-red-500/50 bg-gradient-to-r from-red-50 to-rose-50/50 dark:from-red-900/40 dark:to-rose-900/20 shadow-sm ring-1 ring-red-500/20";
-                              bubbleClass = "border-transparent text-white bg-gradient-to-br from-red-500 to-rose-600 shadow-sm";
+                              optionClass = `border-2 transition-all duration-300 opacity-60 border-[#EA4335] bg-[#fce8e6] dark:bg-[#EA4335]/20`;
+                              bubbleClass = `border-transparent transition-colors duration-300 bg-[#EA4335] text-white`;
                               textClass = "text-red-900 dark:text-red-100 font-bold";
                             } else {
-                              optionClass = "border-slate-200 dark:border-slate-700 bg-white dark:bg-[#1e293b] opacity-60";
+                              optionClass = `border-2 transition-all duration-300 opacity-40 grayscale border-gray-300 bg-gray-50 dark:bg-gray-800/50`;
+                              bubbleClass = `border-transparent transition-colors duration-300 bg-gray-300 text-gray-500`;
+                              textClass = "text-slate-700 dark:text-slate-200 font-medium";
                             }
                           }
 
