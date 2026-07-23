@@ -1344,9 +1344,21 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 >
 
                                     {/* Question */}
-                                    <div
-                                        className={`flex items-start gap-3 md:gap-4 w-full max-w-5xl mt-8 md:mt-2 transition-all duration-300 ${qBgColor !== 'transparent' ? `${qBgColor} p-4 md:p-2 rounded-2xl border border-gray-200/50 dark:border-gray-700/50 backdrop-blur-md shadow-lg` : ''}`}
-                                        style={{ '--q-color': qTextColor !== 'default' ? qTextColor : undefined } as React.CSSProperties}
+                                    <div 
+                                        className={`flex items-start gap-3 md:gap-4 w-full max-w-5xl mt-8 md:mt-2 transition-all duration-300 ${qBgColor !== 'transparent' ? `${qBgColor} p-4 md:p-6 rounded-2xl border border-gray-200/50 dark:border-gray-700/50 backdrop-blur-md shadow-lg` : ''}`}
+                                        style={{ 
+                                            '--q-color': qTextColor !== 'default' ? qTextColor : undefined,
+                                            ...(qBgColor !== 'transparent' && bgTheme === 'dots' ? {
+                                                backgroundImage: `radial-gradient(${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'} 1.5px, transparent 1.5px)`,
+                                                backgroundSize: '16px 16px'
+                                            } : qBgColor !== 'transparent' && bgTheme === 'grid' ? {
+                                                backgroundImage: `linear-gradient(to right, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px)`,
+                                                backgroundSize: '16px 16px'
+                                            } : {
+                                                backgroundImage: 'none',
+                                                backgroundSize: 'auto'
+                                            })
+                                        } as React.CSSProperties}
                                     >
                                         <span className={`font-extrabold leading-normal shrink-0 ${qTextColor !== 'default' ? 'text-[var(--q-color)] drop-shadow-sm' : (bgTheme === 'video' ? 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]' : 'text-black dark:text-gray-100')}`} style={{ fontSize: 'var(--q-size)' }}>Q{currentSlide + 1}.</span>
                                         <div className={`prose max-w-none prose-p:font-extrabold text-[length:var(--q-size)] leading-normal text-left font-extrabold capitalize [&_*]:!text-[length:var(--q-size)] [&_*]:!leading-normal [&_*]:!m-0 ${qTextColor !== 'default' ? 'text-[var(--q-color)] [&_*]:!text-[var(--q-color)] drop-shadow-sm [&_*]:!drop-shadow-sm' : (bgTheme === 'video' ? 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] [&_*]:!text-white [&_*]:!drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]' : 'text-black dark:text-gray-100 [&_*]:!text-black dark:[&_*]:!text-gray-100')}`}>
@@ -1424,6 +1436,18 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     </div>
                                                     <div
                                                         className={containerClasses}
+                                                        style={{
+                                                            ...(bgTheme === 'dots' ? {
+                                                                backgroundImage: `radial-gradient(${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'} 1.5px, transparent 1.5px)`,
+                                                                backgroundSize: '12px 12px'
+                                                            } : bgTheme === 'grid' ? {
+                                                                backgroundImage: `linear-gradient(to right, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px)`,
+                                                                backgroundSize: '12px 12px'
+                                                            } : {
+                                                                backgroundImage: 'none',
+                                                                backgroundSize: 'auto'
+                                                            })
+                                                        }}
                                                         onContextMenu={(e) => {
                                                             e.preventDefault();
                                                             if (step === 0) {
