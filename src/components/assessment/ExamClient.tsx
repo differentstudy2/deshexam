@@ -892,6 +892,8 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                   ];
                   const theme = colorThemes[idx % colorThemes.length];
 
+                  const hasAnySelection = !!answers[currentQ.id];
+                  
                   let optionClass = `border-2 transition-all duration-300 shadow-[0_4px_12px_rgba(0,0,0,0.04)] ${theme.bg} ${theme.border} hover:scale-[1.01] hover:shadow-md cursor-pointer hover:border-gray-300`;
                   let bubbleClass = `border-transparent transition-colors duration-300 ${theme.letterBg} ${theme.letterText}`;
                   let textClass = "text-slate-700 dark:text-slate-200 font-medium";
@@ -900,6 +902,10 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                     optionClass = `border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(66,133,244,0.15)] ${theme.activeBg} ${theme.activeBorder} transform scale-[1.02] cursor-pointer ring-2 ${theme.activeRing}`;
                     bubbleClass = `border-transparent transition-colors duration-300 ${theme.activeLetterBg} text-white`;
                     textClass = "text-slate-900 dark:text-slate-50 font-bold";
+                  } else if (hasAnySelection) {
+                    optionClass = `border-2 transition-all duration-300 opacity-50 bg-gray-50 dark:bg-gray-800/40 border-gray-200 dark:border-gray-700 cursor-pointer hover:opacity-75`;
+                    bubbleClass = `border-transparent transition-colors duration-300 bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400`;
+                    textClass = "text-slate-500 dark:text-slate-400 font-medium";
                   }
 
                   if (isReviewMode || examMode === 'read') {
@@ -1330,6 +1336,8 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                             ];
                             const theme = colorThemes[idx % colorThemes.length];
 
+                            const hasAnySelection = !!answers[currentQ.id];
+
                             let optionClass = `border-2 transition-all duration-300 shadow-[0_4px_12px_rgba(0,0,0,0.04)] ${theme.bg} ${theme.border} hover:scale-[1.01] hover:shadow-md cursor-pointer hover:border-gray-300`;
                             let bubbleClass = `border-transparent transition-colors duration-300 ${theme.letterBg} ${theme.letterText}`;
                             let textClass = "text-slate-700 dark:text-slate-200 font-medium";
@@ -1338,6 +1346,10 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                               optionClass = `border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(66,133,244,0.15)] ${theme.activeBg} ${theme.activeBorder} transform scale-[1.02] cursor-pointer ring-2 ${theme.activeRing}`;
                               bubbleClass = `border-transparent transition-colors duration-300 ${theme.activeLetterBg} text-white`;
                               textClass = "text-slate-900 dark:text-slate-50 font-bold";
+                            } else if (hasAnySelection) {
+                              optionClass = `border-2 transition-all duration-300 opacity-50 bg-gray-50 dark:bg-gray-800/40 border-gray-200 dark:border-gray-700 cursor-pointer hover:opacity-75`;
+                              bubbleClass = `border-transparent transition-colors duration-300 bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400`;
+                              textClass = "text-slate-500 dark:text-slate-400 font-medium";
                             }
 
                             if (isReviewMode || examMode === 'read') {
