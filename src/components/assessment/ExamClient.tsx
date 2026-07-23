@@ -1374,6 +1374,28 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                 </div>
               </div>
 
+              {/* Deshexam Academy Ad Card */}
+              <div className="bg-gradient-to-br from-slate-900 to-slate-800 dark:from-slate-950 dark:to-black rounded-2xl p-4 text-white shadow-xl border border-slate-700/60 dark:border-slate-800 flex-shrink-0 relative overflow-hidden group cursor-pointer hover:shadow-2xl transition-all duration-300 mt-2">
+                <div className="absolute -top-4 -right-4 w-24 h-24 bg-amber-500/20 rounded-full blur-2xl pointer-events-none group-hover:bg-amber-500/30 transition-colors duration-500"></div>
+                <div className="absolute -bottom-4 -left-4 w-20 h-20 bg-blue-500/10 rounded-full blur-xl pointer-events-none"></div>
+                <div className="flex items-center justify-between relative z-10">
+                  <div className="flex flex-col">
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-400 mb-1 drop-shadow-sm flex items-center gap-1">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                      Premium
+                    </span>
+                    <h4 className="font-extrabold text-[15px] leading-tight text-white flex items-center gap-1.5">
+                      Desh Exam <span className="bg-gradient-to-r from-amber-400 to-amber-600 text-slate-900 px-1.5 py-0.5 rounded-[4px] text-[9px] font-black tracking-widest uppercase shadow-sm">Academy</span>
+                    </h4>
+                    <p className="text-[11px] font-medium text-slate-400 mt-1.5 max-w-[150px] leading-snug">Unlock unlimited tests & detailed analytics</p>
+                  </div>
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 text-slate-900 flex items-center justify-center shadow-[0_0_15px_rgba(245,158,11,0.3)] transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
 
             </aside>
           </main>
