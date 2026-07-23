@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Bookmark, Flag, Maximize, Minimize, AlertCircle, Clock, Moon, Sun, LayoutGrid, List, X, ToggleLeft, ToggleRight, Lock, Loader2, Presentation, Target } from 'lucide-react';
+import { ArrowLeft, Bookmark, Flag, Maximize, Minimize, AlertCircle, Clock, Moon, Sun, LayoutGrid, List, Settings, X, ToggleLeft, ToggleRight, Lock, Loader2, Presentation, Target } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -104,6 +104,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
   const [showPresentationMode, setShowPresentationMode] = useState(false);
   const [autoSaveNext, setAutoSaveNext] = useState(false);
   const [optionsLayout, setOptionsLayout] = useState<'list' | 'grid'>('list');
+  const [showLayoutSettings, setShowLayoutSettings] = useState(false);
 
   // --- ACCESS CONTROL STATE ---
   const { user, loading: authLoading } = useAuth();
@@ -1083,40 +1084,6 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
 
 
 
-              {/* Settings Card */}
-              <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-4 shrink-0 transition-colors">
-                <h2 className="font-bold text-sm text-slate-900 dark:text-slate-50 mb-3">Settings</h2>
-                <div className="flex items-center justify-between">
-                  <span className="text-[13px] font-semibold text-slate-600 dark:text-slate-400">Options Layout</span>
-                  <div className="bg-slate-100 dark:bg-slate-800/80 rounded-lg p-1 flex items-center gap-1 border border-slate-200/50 dark:border-slate-700/50">
-                    <button
-                      onClick={() => setOptionsLayout('list')}
-                      className={cn(
-                        "p-1 rounded-md transition-all",
-                        optionsLayout === 'list' 
-                          ? "bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-blue-400" 
-                          : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
-                      )}
-                      title="List View"
-                    >
-                      <List className="w-3.5 h-3.5" />
-                    </button>
-                    <button
-                      onClick={() => setOptionsLayout('grid')}
-                      className={cn(
-                        "p-1 rounded-md transition-all",
-                        optionsLayout === 'grid' 
-                          ? "bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-blue-400" 
-                          : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
-                      )}
-                      title="Grid View"
-                    >
-                      <LayoutGrid className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-
               {/* AdSense Slot */}
               <div className="mt-auto shrink-0 pt-2">
                 <AdUnit
@@ -1295,7 +1262,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
 
               {/* Bottom Action Bar */}
               <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1e293b] border-t border-slate-200 dark:border-slate-700 py-3 px-2 flex items-center justify-center z-20 transition-colors duration-300 rounded-b-[12px] lg:rounded-none">
-                <div className="flex flex-nowrap items-center justify-start lg:justify-center gap-2 pointer-events-auto w-full overflow-x-auto hide-scrollbar px-2">
+                <div className="flex flex-nowrap items-center justify-start lg:justify-center gap-2 pointer-events-auto w-full overflow-x-auto hide-scrollbar px-2 pr-14">
                   <button
                     onClick={handlePrevious}
                     disabled={currentQuestionIndex === 0}
@@ -1353,6 +1320,66 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                       Next Question
                     </button>
                   )}
+                </div>
+
+                {/* Layout Settings Toggle */}
+                <div className="absolute right-4 bottom-1/2 translate-y-1/2 z-50">
+                  <button
+                    onClick={() => setShowLayoutSettings(!showLayoutSettings)}
+                    className={cn(
+                      "p-2 rounded-lg transition-colors border",
+                      showLayoutSettings 
+                        ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800"
+                        : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 border-slate-200 dark:border-slate-700"
+                    )}
+                    title="Layout Settings"
+                  >
+                    <Settings className="w-4 h-4" />
+                  </button>
+
+                  <AnimatePresence>
+                    {showLayoutSettings && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute bottom-[calc(100%+12px)] right-0 w-48 bg-white dark:bg-[#1e293b] rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 p-3 z-50"
+                      >
+                        <h3 className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Options Layout</h3>
+                        <div className="flex bg-slate-100 dark:bg-slate-800/80 rounded-lg p-1">
+                          <button
+                            onClick={() => {
+                              setOptionsLayout('list');
+                              setShowLayoutSettings(false);
+                            }}
+                            className={cn(
+                              "flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md transition-all text-[12px] font-bold",
+                              optionsLayout === 'list' 
+                                ? "bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-blue-400" 
+                                : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                            )}
+                          >
+                            <List className="w-3.5 h-3.5" /> List
+                          </button>
+                          <button
+                            onClick={() => {
+                              setOptionsLayout('grid');
+                              setShowLayoutSettings(false);
+                            }}
+                            className={cn(
+                              "flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md transition-all text-[12px] font-bold",
+                              optionsLayout === 'grid' 
+                                ? "bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-blue-400" 
+                                : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                            )}
+                          >
+                            <LayoutGrid className="w-3.5 h-3.5" /> Grid
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               </div>
 
