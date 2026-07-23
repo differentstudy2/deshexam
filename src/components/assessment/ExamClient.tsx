@@ -1067,47 +1067,6 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
               <h2 className="font-bold text-lg text-slate-900 dark:text-slate-50 mb-1">Questions</h2>
               <p className="text-sm text-slate-500 dark:text-slate-400 font-medium mb-4">Jump to question</p>
 
-              <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar hide-scrollbar mb-4">
-                <div className="grid grid-cols-5 gap-2.5">
-                  {questions.map((q, idx) => {
-                    const state = questionStates[q.id] || 'unvisited';
-                    const isCurrent = currentQuestionIndex === idx;
-
-                    let pillClass = "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-500"; // unvisited default
-                    if (isCurrent) {
-                      pillClass = "bg-[#166534] dark:bg-emerald-600 border-[#166534] dark:border-emerald-600 text-white"; // dark green solid
-                    } else if (state === 'answered') {
-                      pillClass = "bg-[#DCFCE7] dark:bg-[#064e3b] border-[#22C55E] dark:border-[#047857] text-[#166534] dark:text-[#34d399]"; // light green bg
-                    } else if (state === 'skipped') {
-                      pillClass = "bg-[#FEE2E2] dark:bg-[#7f1d1d] border-[#EF4444] dark:border-[#b91c1c] text-[#B91C1C] dark:text-[#fca5a5]"; // light red bg
-                    } else if (state === 'review') {
-                      pillClass = "bg-[#FEF9C3] dark:bg-[#713f12] border-[#EAB308] dark:border-[#a16207] text-[#A16207] dark:text-[#fde047]"; // light yellow bg
-                    }
-
-                    if (isReviewMode) {
-                      const uAnswer = answers[q.id];
-                      if (!uAnswer) pillClass = "bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400";
-                      else if (q.correctAnswer && uAnswer.toLowerCase() === q.correctAnswer.toLowerCase()) pillClass = "bg-[#16A34A] dark:bg-emerald-600 border-[#16A34A] dark:border-emerald-600 text-white";
-                      else pillClass = "bg-[#EF4444] dark:bg-red-600 border-[#EF4444] dark:border-red-600 text-white";
-                      if (isCurrent) pillClass += " ring-2 ring-offset-2 ring-blue-500 dark:ring-offset-slate-900";
-                    }
-
-                    return (
-                      <button
-                        key={q.id}
-                        onClick={() => jumpToQuestion(idx)}
-                        className={cn(
-                          "w-full aspect-square rounded-[10px] border flex items-center justify-center text-[13px] font-bold transition-all relative",
-                          pillClass
-                        )}
-                      >
-                        <span className="relative z-10">{idx > 8 ? `Q${idx + 1}` : idx + 1}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
               {/* Legend */}
               <div className="flex flex-wrap gap-x-3 gap-y-2 text-[12px] font-semibold text-slate-600 dark:text-slate-400 mt-auto pt-4 border-t border-slate-100 dark:border-slate-700 transition-colors">
                 <div className="flex items-center gap-1.5 w-[calc(50%-6px)]"><div className="w-6 h-4 bg-[#166534] dark:bg-emerald-600 rounded-[4px]"></div>Current</div>
