@@ -6,11 +6,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Bookmark, Flag, Maximize, Minimize, AlertCircle, Clock, Moon, Sun, LayoutGrid, List, Settings, X, ToggleLeft, ToggleRight, Lock, Loader2, Presentation, Target, MonitorPlay, Play } from 'lucide-react';
 
 const VIDEO_OPTIONS = [
-    { id: 'v1', name: 'High-Tech Digital', url: '/videos/A_high_tech_digital_quiz_backg.mp4' },
-    { id: 'v2', name: 'Abstract Minimalist', url: '/videos/A_seamless_slow_moving_abstra.mp4' },
-    { id: 'v3', name: 'Gold & White', url: '/videos/Slow_elegant_gold_and_white_g.mp4' },
-    { id: 'v4', name: 'Gold & White (Alt)', url: '/videos/Slow_elegant_gold_and_white_g (1).mp4' },
-    { id: 'v5', name: 'Modern TV Studio', url: '/videos/Wide_shot_of_an_empty_modern.mp4' }
+  { id: 'v1', name: 'High-Tech Digital', url: '/videos/A_high_tech_digital_quiz_backg.mp4' },
+  { id: 'v2', name: 'Abstract Minimalist', url: '/videos/A_seamless_slow_moving_abstra.mp4' },
+  { id: 'v3', name: 'Gold & White', url: '/videos/Slow_elegant_gold_and_white_g.mp4' },
+  { id: 'v4', name: 'Gold & White (Alt)', url: '/videos/Slow_elegant_gold_and_white_g (1).mp4' },
+  { id: 'v5', name: 'Modern TV Studio', url: '/videos/Wide_shot_of_an_empty_modern.mp4' }
 ];
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
@@ -859,10 +859,10 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                 </video>
               )}
               <div className="relative z-10">
-              <div
-                className="text-xl font-bold leading-snug text-slate-900 dark:text-slate-50 transition-colors"
-                dangerouslySetInnerHTML={{ __html: currentQ.questionText || '' }}
-              />
+                <div
+                  className="text-xl font-bold leading-snug text-slate-900 dark:text-slate-50 transition-colors"
+                  dangerouslySetInnerHTML={{ __html: currentQ.questionText || '' }}
+                />
               </div>
             </div>
             <div className={`relative overflow-hidden rounded-2xl p-4 shadow-sm border border-slate-200 dark:border-slate-700/50 flex flex-col gap-2 transition-colors ${getBgThemeClasses()}`}>
@@ -879,67 +879,67 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                 </video>
               )}
               <div className="relative z-10 flex flex-col gap-2">
-              {currentOptionsKeys.map((key, idx) => {
-                const isSelected = answers[currentQ.id] === key;
-                const optionText = (currentQ.options as any)[key];
+                {currentOptionsKeys.map((key, idx) => {
+                  const isSelected = answers[currentQ.id] === key;
+                  const optionText = (currentQ.options as any)[key];
 
-                const colorThemes = [
-                  { border: 'border-[#4285F4]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#4285F4]/75', letterText: 'text-white', activeBg: 'bg-[#e8f0fe] dark:bg-[#4285F4]/20', activeBorder: 'border-[#4285F4]', activeRing: 'ring-[#4285F4]/30', activeLetterBg: 'bg-[#4285F4]' },
-                  { border: 'border-[#34A853]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#34A853]/75', letterText: 'text-white', activeBg: 'bg-[#e6f4ea] dark:bg-[#34A853]/20', activeBorder: 'border-[#34A853]', activeRing: 'ring-[#34A853]/30', activeLetterBg: 'bg-[#34A853]' },
-                  { border: 'border-[#F9AB00]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#F9AB00]/75', letterText: 'text-white', activeBg: 'bg-[#fef7e0] dark:bg-[#F9AB00]/20', activeBorder: 'border-[#F9AB00]', activeRing: 'ring-[#F9AB00]/30', activeLetterBg: 'bg-[#F9AB00]' },
-                  { border: 'border-[#EA4335]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#EA4335]/75', letterText: 'text-white', activeBg: 'bg-[#fce8e6] dark:bg-[#EA4335]/20', activeBorder: 'border-[#EA4335]', activeRing: 'ring-[#EA4335]/30', activeLetterBg: 'bg-[#EA4335]' },
-                  { border: 'border-[#9C27B0]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#9C27B0]/75', letterText: 'text-white', activeBg: 'bg-[#f3e5f5] dark:bg-[#9C27B0]/20', activeBorder: 'border-[#9C27B0]', activeRing: 'ring-[#9C27B0]/30', activeLetterBg: 'bg-[#9C27B0]' },
-                ];
-                const theme = colorThemes[idx % colorThemes.length];
+                  const colorThemes = [
+                    { border: 'border-[#4285F4]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#4285F4]/75', letterText: 'text-white', activeBg: 'bg-[#e8f0fe] dark:bg-[#4285F4]/20', activeBorder: 'border-[#4285F4]', activeRing: 'ring-[#4285F4]/30', activeLetterBg: 'bg-[#4285F4]' },
+                    { border: 'border-[#34A853]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#34A853]/75', letterText: 'text-white', activeBg: 'bg-[#e6f4ea] dark:bg-[#34A853]/20', activeBorder: 'border-[#34A853]', activeRing: 'ring-[#34A853]/30', activeLetterBg: 'bg-[#34A853]' },
+                    { border: 'border-[#F9AB00]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#F9AB00]/75', letterText: 'text-white', activeBg: 'bg-[#fef7e0] dark:bg-[#F9AB00]/20', activeBorder: 'border-[#F9AB00]', activeRing: 'ring-[#F9AB00]/30', activeLetterBg: 'bg-[#F9AB00]' },
+                    { border: 'border-[#EA4335]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#EA4335]/75', letterText: 'text-white', activeBg: 'bg-[#fce8e6] dark:bg-[#EA4335]/20', activeBorder: 'border-[#EA4335]', activeRing: 'ring-[#EA4335]/30', activeLetterBg: 'bg-[#EA4335]' },
+                    { border: 'border-[#9C27B0]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#9C27B0]/75', letterText: 'text-white', activeBg: 'bg-[#f3e5f5] dark:bg-[#9C27B0]/20', activeBorder: 'border-[#9C27B0]', activeRing: 'ring-[#9C27B0]/30', activeLetterBg: 'bg-[#9C27B0]' },
+                  ];
+                  const theme = colorThemes[idx % colorThemes.length];
 
-                let optionClass = `border-2 transition-all duration-300 shadow-[0_4px_12px_rgba(0,0,0,0.04)] ${theme.bg} ${theme.border} hover:scale-[1.01] hover:shadow-md cursor-pointer hover:border-gray-300`;
-                let bubbleClass = `border-transparent transition-colors duration-300 ${theme.letterBg} ${theme.letterText}`;
-                let textClass = "text-slate-700 dark:text-slate-200 font-medium";
+                  let optionClass = `border-2 transition-all duration-300 shadow-[0_4px_12px_rgba(0,0,0,0.04)] ${theme.bg} ${theme.border} hover:scale-[1.01] hover:shadow-md cursor-pointer hover:border-gray-300`;
+                  let bubbleClass = `border-transparent transition-colors duration-300 ${theme.letterBg} ${theme.letterText}`;
+                  let textClass = "text-slate-700 dark:text-slate-200 font-medium";
 
-                if (isSelected) {
-                  optionClass = `border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(66,133,244,0.15)] ${theme.activeBg} ${theme.activeBorder} transform scale-[1.02] cursor-pointer ring-2 ${theme.activeRing}`;
-                  bubbleClass = `border-transparent transition-colors duration-300 ${theme.activeLetterBg} text-white`;
-                  textClass = "text-slate-900 dark:text-slate-50 font-bold";
-                }
-
-                if (isReviewMode || examMode === 'read') {
-                  const isCorrectAnswer = currentQ.correctAnswer && key.toLowerCase() === currentQ.correctAnswer.toLowerCase();
-                  if (isCorrectAnswer) {
-                    optionClass = `border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(52,168,83,0.3)] bg-[#e6f4ea] dark:bg-[#34A853]/20 border-[#34A853] transform scale-[1.02] z-10`;
-                    bubbleClass = `border-transparent transition-colors duration-300 bg-[#34A853] text-white`;
-                    textClass = "text-[#166534] dark:text-emerald-100 font-bold";
-                  } else if (isSelected && !isCorrectAnswer) {
-                    optionClass = `border-2 transition-all duration-300 opacity-60 border-[#EA4335] bg-[#fce8e6] dark:bg-[#EA4335]/20`;
-                    bubbleClass = `border-transparent transition-colors duration-300 bg-[#EA4335] text-white`;
-                    textClass = "text-red-900 dark:text-red-100 font-bold";
-                  } else {
-                    optionClass = `border-2 transition-all duration-300 opacity-40 grayscale border-gray-300 bg-gray-50 dark:bg-gray-800/50`;
-                    bubbleClass = `border-transparent transition-colors duration-300 bg-gray-300 text-gray-500`;
-                    textClass = "text-slate-700 dark:text-slate-200 font-medium";
+                  if (isSelected) {
+                    optionClass = `border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(66,133,244,0.15)] ${theme.activeBg} ${theme.activeBorder} transform scale-[1.02] cursor-pointer ring-2 ${theme.activeRing}`;
+                    bubbleClass = `border-transparent transition-colors duration-300 ${theme.activeLetterBg} text-white`;
+                    textClass = "text-slate-900 dark:text-slate-50 font-bold";
                   }
-                }
 
-                return (
-                  <button
-                    key={key}
-                    onClick={() => handleOptionSelect(key)}
-                    className={cn(
-                      "flex items-center w-full min-h-[48px] p-2 rounded-[16px] border text-left transition-all duration-200",
-                      optionClass
-                    )}
-                  >
-                    <div className={cn(
-                      "w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-base mr-3 border transition-colors",
-                      bubbleClass
-                    )}>
-                      {key.toUpperCase()}
-                    </div>
-                    <span className={cn("text-[18px] transition-colors", textClass)}>
-                      {optionText}
-                    </span>
-                  </button>
-                );
-              })}
+                  if (isReviewMode || examMode === 'read') {
+                    const isCorrectAnswer = currentQ.correctAnswer && key.toLowerCase() === currentQ.correctAnswer.toLowerCase();
+                    if (isCorrectAnswer) {
+                      optionClass = `border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(52,168,83,0.3)] bg-[#e6f4ea] dark:bg-[#34A853]/20 border-[#34A853] transform scale-[1.02] z-10`;
+                      bubbleClass = `border-transparent transition-colors duration-300 bg-[#34A853] text-white`;
+                      textClass = "text-[#166534] dark:text-emerald-100 font-bold";
+                    } else if (isSelected && !isCorrectAnswer) {
+                      optionClass = `border-2 transition-all duration-300 opacity-60 border-[#EA4335] bg-[#fce8e6] dark:bg-[#EA4335]/20`;
+                      bubbleClass = `border-transparent transition-colors duration-300 bg-[#EA4335] text-white`;
+                      textClass = "text-red-900 dark:text-red-100 font-bold";
+                    } else {
+                      optionClass = `border-2 transition-all duration-300 opacity-40 grayscale border-gray-300 bg-gray-50 dark:bg-gray-800/50`;
+                      bubbleClass = `border-transparent transition-colors duration-300 bg-gray-300 text-gray-500`;
+                      textClass = "text-slate-700 dark:text-slate-200 font-medium";
+                    }
+                  }
+
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => handleOptionSelect(key)}
+                      className={cn(
+                        "flex items-center w-full min-h-[48px] p-2 rounded-[16px] border text-left transition-all duration-200",
+                        optionClass
+                      )}
+                    >
+                      <div className={cn(
+                        "w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-base mr-3 border transition-colors",
+                        bubbleClass
+                      )}>
+                        {key.toUpperCase()}
+                      </div>
+                      <span className={cn("text-[18px] transition-colors", textClass)}>
+                        {optionText}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -1065,9 +1065,9 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
 
           {/* Top Header */}
           {showHeader && (
-            <header 
+            <header
               className="bg-gradient-to-r from-indigo-700 via-purple-700 to-blue-800 dark:from-indigo-900 dark:via-purple-900 dark:to-blue-950 text-white rounded-[5px] m-2 px-6 py-3 shadow-lg border border-white/10 flex items-center justify-between z-30 flex-shrink-0 transition-colors duration-300"
-              style={{ transform: `scale(${headerScale})`, transformOrigin: 'top center', marginBottom: `calc(0.5rem - ${1-headerScale} * 4rem)` }}
+              style={{ transform: `scale(${headerScale})`, transformOrigin: 'top center', marginBottom: `calc(0.5rem - ${1 - headerScale} * 4rem)` }}
             >
               {/* Left: Logo & Title */}
               <div className="flex items-center gap-4 flex-shrink-0 min-w-0">
@@ -1093,76 +1093,76 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                   <div className={`flex flex-col min-w-0 ${headerTitleAlign === 'center' ? 'items-center text-center' : headerTitleAlign === 'right' ? 'items-end text-right' : 'items-start text-left'}`}>
                     <h1 className="font-bold text-lg text-white leading-tight line-clamp-1 flex-1 drop-shadow-sm" title={mockTest.title}>
                       {isReviewMode ? "Reviewing Solutions" : mockTest.title}
-                  </h1>
-                  <div className="flex items-center gap-2 mt-1.5 overflow-hidden w-full">
-                    {(mockTest.taxonomyLine || (mockTest as any).category || "General Studies").split(' • ').map((part: string, idx: number, arr: string[]) => (
-                      <div key={idx} className="flex items-center gap-2 flex-shrink-0">
-                        <span className="text-[11px] font-extrabold px-2.5 py-0.5 rounded-md bg-white/15 text-white border border-white/20 tracking-wide uppercase shadow-sm">
-                          {part}
-                        </span>
-                        {idx < arr.length - 1 && (
-                          <span className="text-white/40 text-[10px]">▶</span>
-                        )}
-                      </div>
-                    ))}
+                    </h1>
+                    <div className="flex items-center gap-2 mt-1.5 overflow-hidden w-full">
+                      {(mockTest.taxonomyLine || (mockTest as any).category || "General Studies").split(' • ').map((part: string, idx: number, arr: string[]) => (
+                        <div key={idx} className="flex items-center gap-2 flex-shrink-0">
+                          <span className="text-[11px] font-extrabold px-2.5 py-0.5 rounded-md bg-white/15 text-white border border-white/20 tracking-wide uppercase shadow-sm">
+                            {part}
+                          </span>
+                          {idx < arr.length - 1 && (
+                            <span className="text-white/40 text-[10px]">▶</span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
 
 
-            {/* Right: Actions */}
-            <div className="flex items-center gap-3">
-              <button className="w-10 h-10 rounded-full flex items-center justify-center text-white/80 hover:bg-white/10 hover:text-white transition-colors">
-                <Bookmark className="w-5 h-5" />
-              </button>
-              <button onClick={toggleFullscreen} className="w-10 h-10 rounded-full flex items-center justify-center text-white/80 hover:bg-white/10 hover:text-white transition-colors">
-                {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
-              </button>
-              <button onClick={toggleTheme} className="w-10 h-10 rounded-full flex items-center justify-center text-white/80 hover:bg-white/10 hover:text-white transition-colors">
-                {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-              </button>
-              <button onClick={() => setShowPresentationMode(true)} className="w-10 h-10 rounded-full flex items-center justify-center text-white/80 hover:bg-white/10 hover:text-white transition-colors" title="Presentation Mode">
-                <Presentation className="w-5 h-5" />
-              </button>
-              <div className="h-6 w-px bg-white/20 mx-1 transition-colors"></div>
+              {/* Right: Actions */}
+              <div className="flex items-center gap-3">
+                <button className="w-10 h-10 rounded-full flex items-center justify-center text-white/80 hover:bg-white/10 hover:text-white transition-colors">
+                  <Bookmark className="w-5 h-5" />
+                </button>
+                <button onClick={toggleFullscreen} className="w-10 h-10 rounded-full flex items-center justify-center text-white/80 hover:bg-white/10 hover:text-white transition-colors">
+                  {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
+                </button>
+                <button onClick={toggleTheme} className="w-10 h-10 rounded-full flex items-center justify-center text-white/80 hover:bg-white/10 hover:text-white transition-colors">
+                  {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                </button>
+                <button onClick={() => setShowPresentationMode(true)} className="w-10 h-10 rounded-full flex items-center justify-center text-white/80 hover:bg-white/10 hover:text-white transition-colors" title="Presentation Mode">
+                  <Presentation className="w-5 h-5" />
+                </button>
+                <div className="h-6 w-px bg-white/20 mx-1 transition-colors"></div>
 
-              {!isReviewMode ? (
-                <>
-                  <button
-                    onClick={() => setAutoSaveNext(!autoSaveNext)}
-                    className={cn(
-                      "h-10 px-3 rounded-full font-bold text-sm flex items-center gap-1.5 border transition-colors shadow-sm",
-                      autoSaveNext
-                        ? "bg-white/20 text-white border-white/40"
-                        : "bg-white/5 text-white/60 border-white/10 hover:bg-white/10 hover:text-white"
-                    )}
-                    title="Automatically save and go to next question"
-                  >
-                    {autoSaveNext ? <ToggleRight className="w-5 h-5" /> : <ToggleLeft className="w-5 h-5" />}
-                  </button>
+                {!isReviewMode ? (
+                  <>
+                    <button
+                      onClick={() => setAutoSaveNext(!autoSaveNext)}
+                      className={cn(
+                        "h-10 px-3 rounded-full font-bold text-sm flex items-center gap-1.5 border transition-colors shadow-sm",
+                        autoSaveNext
+                          ? "bg-white/20 text-white border-white/40"
+                          : "bg-white/5 text-white/60 border-white/10 hover:bg-white/10 hover:text-white"
+                      )}
+                      title="Automatically save and go to next question"
+                    >
+                      {autoSaveNext ? <ToggleRight className="w-5 h-5" /> : <ToggleLeft className="w-5 h-5" />}
+                    </button>
+                    <Button
+                      onClick={() => setShowSubmitConfirm(true)}
+                      className="bg-[#EF4444] hover:bg-red-600 text-white rounded-full px-6 font-bold shadow-sm border border-red-500/50"
+                    >
+                      Submit
+                    </Button>
+                    <div className="bg-white/15 text-white px-4 py-2 rounded-full font-bold flex items-center gap-2 shadow-sm border border-white/20 transition-colors backdrop-blur-md">
+                      <Clock className="w-5 h-5 text-emerald-300" />
+                      <span className="text-[15px]">{formatTime(timeLeft)}</span>
+                    </div>
+                  </>
+                ) : (
                   <Button
-                    onClick={() => setShowSubmitConfirm(true)}
-                    className="bg-[#EF4444] hover:bg-red-600 text-white rounded-full px-6 font-bold shadow-sm border border-red-500/50"
+                    onClick={() => setIsReviewMode(false)}
+                    className="bg-slate-800 dark:bg-slate-700 hover:bg-slate-700 dark:hover:bg-slate-600 text-white rounded-full px-6 font-bold shadow-sm"
                   >
-                    Submit
+                    Close Review
                   </Button>
-                  <div className="bg-white/15 text-white px-4 py-2 rounded-full font-bold flex items-center gap-2 shadow-sm border border-white/20 transition-colors backdrop-blur-md">
-                    <Clock className="w-5 h-5 text-emerald-300" />
-                    <span className="text-[15px]">{formatTime(timeLeft)}</span>
-                  </div>
-                </>
-              ) : (
-                <Button
-                  onClick={() => setIsReviewMode(false)}
-                  className="bg-slate-800 dark:bg-slate-700 hover:bg-slate-700 dark:hover:bg-slate-600 text-white rounded-full px-6 font-bold shadow-sm"
-                >
-                  Close Review
-                </Button>
-              )}
-            </div>
-          </header>
+                )}
+              </div>
+            </header>
           )}
 
           {/* Main Content Area */}
@@ -1170,7 +1170,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
 
             {/* Left Sidebar */}
             <aside className="order-2 lg:order-1 w-full lg:w-[260px] xl:w-[280px] flex flex-col gap-2 xl:gap-3 overflow-y-auto hide-scrollbar flex-shrink-0 lg:h-full">
-              
+
               {/* Site Promo Ad */}
               <div className="rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 p-4 text-white shadow-[0_8px_30px_-4px_rgba(79,70,229,0.3)] border border-indigo-400/30 relative overflow-hidden group shrink-0">
                 <div className="absolute inset-0 bg-[url('/noise.png')] opacity-10 mix-blend-overlay pointer-events-none"></div>
@@ -1212,7 +1212,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                           end = questions.length - 2;
                           start = Math.max(1, end - maxVisible + 1);
                         }
-                        
+
                         return questions.map((q, idx) => {
                           const state = questionStates[q.id] || 'unvisited';
                           const isCurrent = currentQuestionIndex === idx;
@@ -1230,34 +1230,34 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
 
                           let navClass = "bg-transparent text-[#0B476D] dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-slate-700";
 
-                        if (isCurrent) {
-                          navClass = "bg-[#166534] dark:bg-emerald-600 text-white shadow-sm";
-                        } else if (isReviewMode) {
-                          const uAnswer = answers[q.id];
-                          if (uAnswer && q.correctAnswer && uAnswer.toLowerCase() === q.correctAnswer.toLowerCase()) navClass = "bg-transparent text-[#16A34A] dark:text-emerald-400";
-                          else if (uAnswer) navClass = "bg-transparent text-[#DC2626] dark:text-red-400";
-                        } else if (state === 'answered') {
-                          navClass = "bg-transparent text-[#16A34A] dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-slate-700";
-                        } else if (state === 'review') {
-                          navClass = "bg-transparent text-[#D97706] dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-slate-700";
-                        } else if (state === 'skipped') {
-                          navClass = "bg-transparent text-[#DC2626] dark:text-red-400 hover:bg-red-50 dark:hover:bg-slate-700";
-                        }
+                          if (isCurrent) {
+                            navClass = "bg-[#166534] dark:bg-emerald-600 text-white shadow-sm";
+                          } else if (isReviewMode) {
+                            const uAnswer = answers[q.id];
+                            if (uAnswer && q.correctAnswer && uAnswer.toLowerCase() === q.correctAnswer.toLowerCase()) navClass = "bg-transparent text-[#16A34A] dark:text-emerald-400";
+                            else if (uAnswer) navClass = "bg-transparent text-[#DC2626] dark:text-red-400";
+                          } else if (state === 'answered') {
+                            navClass = "bg-transparent text-[#16A34A] dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-slate-700";
+                          } else if (state === 'review') {
+                            navClass = "bg-transparent text-[#D97706] dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-slate-700";
+                          } else if (state === 'skipped') {
+                            navClass = "bg-transparent text-[#DC2626] dark:text-red-400 hover:bg-red-50 dark:hover:bg-slate-700";
+                          }
 
-                        return (
-                          <button
-                            key={q.id}
-                            onClick={() => jumpToQuestion(idx)}
-                            className={cn(
-                              "w-7 h-7 rounded-md flex items-center justify-center text-[14px] font-bold transition-all",
-                              navClass
-                            )}
-                          >
-                            {idx + 1}
-                          </button>
-                        );
-                      });
-                    })()}
+                          return (
+                            <button
+                              key={q.id}
+                              onClick={() => jumpToQuestion(idx)}
+                              className={cn(
+                                "w-7 h-7 rounded-md flex items-center justify-center text-[14px] font-bold transition-all",
+                                navClass
+                              )}
+                            >
+                              {idx + 1}
+                            </button>
+                          );
+                        });
+                      })()}
                     </div>
                     <button onClick={() => { if (currentQuestionIndex < questions.length - 1) setCurrentQuestionIndex(prev => prev + 1); }} disabled={currentQuestionIndex === questions.length - 1} className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-30 shadow-sm border border-slate-200 dark:border-slate-600 transition-colors"><ArrowLeft className="w-4 h-4 rotate-180" /></button>
                   </div>
@@ -1290,10 +1290,10 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                       )}
                       <div className="relative z-10">
 
-                      <div
-                        className="text-[26px] font-bold leading-tight text-slate-900 dark:text-slate-50 transition-colors"
-                        dangerouslySetInnerHTML={{ __html: currentQ.questionText || '' }}
-                      />
+                        <div
+                          className="text-[26px] font-bold leading-tight text-slate-900 dark:text-slate-50 transition-colors"
+                          dangerouslySetInnerHTML={{ __html: currentQ.questionText || '' }}
+                        />
                       </div>
                     </div>
 
@@ -1313,74 +1313,74 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                       )}
                       <div className="relative z-10 w-full">
 
-                      <div className={cn(
-                        "grid gap-3",
-                        optionsLayout === 'grid' ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1 max-w-md mx-auto w-full"
-                      )}>
-                        {currentOptionsKeys.map((key, idx) => {
-                          const isSelected = answers[currentQ.id] === key;
-                          const optionText = (currentQ.options as any)[key];
+                        <div className={cn(
+                          "grid gap-3",
+                          optionsLayout === 'grid' ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1 max-w-md mx-auto w-full"
+                        )}>
+                          {currentOptionsKeys.map((key, idx) => {
+                            const isSelected = answers[currentQ.id] === key;
+                            const optionText = (currentQ.options as any)[key];
 
-                          const colorThemes = [
-                            { border: 'border-[#4285F4]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#4285F4]/75', letterText: 'text-white', activeBg: 'bg-[#e8f0fe] dark:bg-[#4285F4]/20', activeBorder: 'border-[#4285F4]', activeRing: 'ring-[#4285F4]/30', activeLetterBg: 'bg-[#4285F4]' },
-                            { border: 'border-[#34A853]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#34A853]/75', letterText: 'text-white', activeBg: 'bg-[#e6f4ea] dark:bg-[#34A853]/20', activeBorder: 'border-[#34A853]', activeRing: 'ring-[#34A853]/30', activeLetterBg: 'bg-[#34A853]' },
-                            { border: 'border-[#F9AB00]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#F9AB00]/75', letterText: 'text-white', activeBg: 'bg-[#fef7e0] dark:bg-[#F9AB00]/20', activeBorder: 'border-[#F9AB00]', activeRing: 'ring-[#F9AB00]/30', activeLetterBg: 'bg-[#F9AB00]' },
-                            { border: 'border-[#EA4335]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#EA4335]/75', letterText: 'text-white', activeBg: 'bg-[#fce8e6] dark:bg-[#EA4335]/20', activeBorder: 'border-[#EA4335]', activeRing: 'ring-[#EA4335]/30', activeLetterBg: 'bg-[#EA4335]' },
-                            { border: 'border-[#9C27B0]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#9C27B0]/75', letterText: 'text-white', activeBg: 'bg-[#f3e5f5] dark:bg-[#9C27B0]/20', activeBorder: 'border-[#9C27B0]', activeRing: 'ring-[#9C27B0]/30', activeLetterBg: 'bg-[#9C27B0]' },
-                          ];
-                          const theme = colorThemes[idx % colorThemes.length];
+                            const colorThemes = [
+                              { border: 'border-[#4285F4]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#4285F4]/75', letterText: 'text-white', activeBg: 'bg-[#e8f0fe] dark:bg-[#4285F4]/20', activeBorder: 'border-[#4285F4]', activeRing: 'ring-[#4285F4]/30', activeLetterBg: 'bg-[#4285F4]' },
+                              { border: 'border-[#34A853]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#34A853]/75', letterText: 'text-white', activeBg: 'bg-[#e6f4ea] dark:bg-[#34A853]/20', activeBorder: 'border-[#34A853]', activeRing: 'ring-[#34A853]/30', activeLetterBg: 'bg-[#34A853]' },
+                              { border: 'border-[#F9AB00]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#F9AB00]/75', letterText: 'text-white', activeBg: 'bg-[#fef7e0] dark:bg-[#F9AB00]/20', activeBorder: 'border-[#F9AB00]', activeRing: 'ring-[#F9AB00]/30', activeLetterBg: 'bg-[#F9AB00]' },
+                              { border: 'border-[#EA4335]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#EA4335]/75', letterText: 'text-white', activeBg: 'bg-[#fce8e6] dark:bg-[#EA4335]/20', activeBorder: 'border-[#EA4335]', activeRing: 'ring-[#EA4335]/30', activeLetterBg: 'bg-[#EA4335]' },
+                              { border: 'border-[#9C27B0]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#9C27B0]/75', letterText: 'text-white', activeBg: 'bg-[#f3e5f5] dark:bg-[#9C27B0]/20', activeBorder: 'border-[#9C27B0]', activeRing: 'ring-[#9C27B0]/30', activeLetterBg: 'bg-[#9C27B0]' },
+                            ];
+                            const theme = colorThemes[idx % colorThemes.length];
 
-                          let optionClass = `border-2 transition-all duration-300 shadow-[0_4px_12px_rgba(0,0,0,0.04)] ${theme.bg} ${theme.border} hover:scale-[1.01] hover:shadow-md cursor-pointer hover:border-gray-300`;
-                          let bubbleClass = `border-transparent transition-colors duration-300 ${theme.letterBg} ${theme.letterText}`;
-                          let textClass = "text-slate-700 dark:text-slate-200 font-medium";
+                            let optionClass = `border-2 transition-all duration-300 shadow-[0_4px_12px_rgba(0,0,0,0.04)] ${theme.bg} ${theme.border} hover:scale-[1.01] hover:shadow-md cursor-pointer hover:border-gray-300`;
+                            let bubbleClass = `border-transparent transition-colors duration-300 ${theme.letterBg} ${theme.letterText}`;
+                            let textClass = "text-slate-700 dark:text-slate-200 font-medium";
 
-                          if (isSelected) {
-                            optionClass = `border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(66,133,244,0.15)] ${theme.activeBg} ${theme.activeBorder} transform scale-[1.02] cursor-pointer ring-2 ${theme.activeRing}`;
-                            bubbleClass = `border-transparent transition-colors duration-300 ${theme.activeLetterBg} text-white`;
-                            textClass = "text-slate-900 dark:text-slate-50 font-bold";
-                          }
-
-                          if (isReviewMode || examMode === 'read') {
-                            const isCorrectAnswer = currentQ.correctAnswer && key.toLowerCase() === currentQ.correctAnswer.toLowerCase();
-                            if (isCorrectAnswer) {
-                              optionClass = `border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(52,168,83,0.3)] bg-[#e6f4ea] dark:bg-[#34A853]/20 border-[#34A853] transform scale-[1.02] z-10`;
-                              bubbleClass = `border-transparent transition-colors duration-300 bg-[#34A853] text-white`;
-                              textClass = "text-[#166534] dark:text-emerald-100 font-bold";
-                            } else if (isSelected && !isCorrectAnswer) {
-                              optionClass = `border-2 transition-all duration-300 opacity-60 border-[#EA4335] bg-[#fce8e6] dark:bg-[#EA4335]/20`;
-                              bubbleClass = `border-transparent transition-colors duration-300 bg-[#EA4335] text-white`;
-                              textClass = "text-red-900 dark:text-red-100 font-bold";
-                            } else {
-                              optionClass = `border-2 transition-all duration-300 opacity-40 grayscale border-gray-300 bg-gray-50 dark:bg-gray-800/50`;
-                              bubbleClass = `border-transparent transition-colors duration-300 bg-gray-300 text-gray-500`;
-                              textClass = "text-slate-700 dark:text-slate-200 font-medium";
+                            if (isSelected) {
+                              optionClass = `border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(66,133,244,0.15)] ${theme.activeBg} ${theme.activeBorder} transform scale-[1.02] cursor-pointer ring-2 ${theme.activeRing}`;
+                              bubbleClass = `border-transparent transition-colors duration-300 ${theme.activeLetterBg} text-white`;
+                              textClass = "text-slate-900 dark:text-slate-50 font-bold";
                             }
-                          }
 
-                          return (
-                            <button
-                              key={key}
-                              onClick={() => handleOptionSelect(key)}
-                              className={cn(
-                                "flex items-center w-full min-h-[48px] md:min-h-[52px] px-4 py-2 rounded-[16px] border text-left transition-all duration-200 relative group",
-                                optionClass
-                              )}
-                            >
-                              <div className={cn(
-                                "w-9 h-9 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-[15px] mr-4 border transition-colors",
-                                bubbleClass
-                              )}>
-                                {key.toUpperCase()}
-                              </div>
-                              <span className={cn("text-[18px] pr-20 transition-colors", textClass)}>
-                                {optionText}
-                              </span>
-                              <span className="absolute right-4 text-xs font-bold text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                                (Press {key.toUpperCase()})
-                              </span>
-                            </button>
-                          );
-                        })}
+                            if (isReviewMode || examMode === 'read') {
+                              const isCorrectAnswer = currentQ.correctAnswer && key.toLowerCase() === currentQ.correctAnswer.toLowerCase();
+                              if (isCorrectAnswer) {
+                                optionClass = `border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(52,168,83,0.3)] bg-[#e6f4ea] dark:bg-[#34A853]/20 border-[#34A853] transform scale-[1.02] z-10`;
+                                bubbleClass = `border-transparent transition-colors duration-300 bg-[#34A853] text-white`;
+                                textClass = "text-[#166534] dark:text-emerald-100 font-bold";
+                              } else if (isSelected && !isCorrectAnswer) {
+                                optionClass = `border-2 transition-all duration-300 opacity-60 border-[#EA4335] bg-[#fce8e6] dark:bg-[#EA4335]/20`;
+                                bubbleClass = `border-transparent transition-colors duration-300 bg-[#EA4335] text-white`;
+                                textClass = "text-red-900 dark:text-red-100 font-bold";
+                              } else {
+                                optionClass = `border-2 transition-all duration-300 opacity-40 grayscale border-gray-300 bg-gray-50 dark:bg-gray-800/50`;
+                                bubbleClass = `border-transparent transition-colors duration-300 bg-gray-300 text-gray-500`;
+                                textClass = "text-slate-700 dark:text-slate-200 font-medium";
+                              }
+                            }
+
+                            return (
+                              <button
+                                key={key}
+                                onClick={() => handleOptionSelect(key)}
+                                className={cn(
+                                  "flex items-center w-full min-h-[48px] md:min-h-[52px] px-4 py-2 rounded-[5px] border text-left transition-all duration-200 relative group",
+                                  optionClass
+                                )}
+                              >
+                                <div className={cn(
+                                  "w-9 h-9 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-[15px] mr-4 border transition-colors",
+                                  bubbleClass
+                                )}>
+                                  {key.toUpperCase()}
+                                </div>
+                                <span className={cn("text-[18px] pr-20 transition-colors", textClass)}>
+                                  {optionText}
+                                </span>
+                                <span className="absolute right-4 text-xs font-bold text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  (Press {key.toUpperCase()})
+                                </span>
+                              </button>
+                            );
+                          })}
                         </div>
                       </div>
                     </div>
@@ -1467,7 +1467,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                     onClick={() => setShowLayoutSettings(!showLayoutSettings)}
                     className={cn(
                       "w-10 h-10 flex items-center justify-center rounded-full transition-all duration-300 border shadow-sm group",
-                      showLayoutSettings 
+                      showLayoutSettings
                         ? "bg-blue-600 text-white border-blue-600 shadow-blue-500/25 rotate-90"
                         : "bg-white dark:bg-[#1e293b] text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-slate-600 hover:rotate-45"
                     )}
@@ -1486,142 +1486,142 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                         className="absolute bottom-[calc(100%+16px)] right-0 w-[90vw] sm:w-[340px] bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-xl rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.4)] border border-white/50 dark:border-slate-700/50 p-5 z-50 overflow-hidden flex flex-col max-h-[70vh]"
                       >
                         <div className="flex justify-between items-center mb-4 pb-3 border-b border-gray-100 dark:border-gray-800 shrink-0">
-                            <h3 className="font-bold text-gray-800 dark:text-gray-200 text-lg flex items-center gap-2">
-                                <Settings className="w-5 h-5 text-gray-500" /> Settings
-                            </h3>
-                            <button onClick={() => setShowLayoutSettings(false)} className="p-1 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
-                                <X className="w-5 h-5" />
-                            </button>
+                          <h3 className="font-bold text-gray-800 dark:text-gray-200 text-lg flex items-center gap-2">
+                            <Settings className="w-5 h-5 text-gray-500" /> Settings
+                          </h3>
+                          <button onClick={() => setShowLayoutSettings(false)} className="p-1 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
+                            <X className="w-5 h-5" />
+                          </button>
                         </div>
                         <div className="space-y-5 overflow-y-auto custom-scrollbar pr-2 pb-2">
-                            <div>
-                                <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
-                                    <MonitorPlay className="w-4 h-4 text-indigo-500" /> Exam Mode
-                                </div>
-                                <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl">
-                                    <button
-                                        onClick={() => setExamMode('test')}
-                                        className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-colors ${examMode === 'test' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}
-                                    >
-                                        Test Mode
-                                    </button>
-                                    <button
-                                        onClick={() => setExamMode('read')}
-                                        className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-colors ${examMode === 'read' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}
-                                    >
-                                        Read Mode
-                                    </button>
-                                </div>
+                          <div>
+                            <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
+                              <MonitorPlay className="w-4 h-4 text-indigo-500" /> Exam Mode
                             </div>
-                            <div>
-                                <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
-                                    <LayoutGrid className="w-4 h-4 text-indigo-500" /> Options Layout
-                                </div>
-                                <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl">
-                                    <button
-                                        onClick={() => setOptionsLayout('grid')}
-                                        className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-colors ${optionsLayout === 'grid' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}
-                                    >
-                                        Grid
-                                    </button>
-                                    <button
-                                        onClick={() => setOptionsLayout('list')}
-                                        className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-colors ${optionsLayout === 'list' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}
-                                    >
-                                        List
-                                    </button>
-                                </div>
+                            <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl">
+                              <button
+                                onClick={() => setExamMode('test')}
+                                className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-colors ${examMode === 'test' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                              >
+                                Test Mode
+                              </button>
+                              <button
+                                onClick={() => setExamMode('read')}
+                                className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-colors ${examMode === 'read' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                              >
+                                Read Mode
+                              </button>
                             </div>
-                            <hr className="border-gray-100 dark:border-gray-800" />
-                            <div>
-                                <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
-                                    <LayoutGrid className="w-4 h-4 text-indigo-500" /> Header Settings
-                                </div>
-                                <div className="space-y-3">
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Show Header</span>
-                                        <button onClick={() => setShowHeader(!showHeader)} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${showHeader ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}>
-                                            <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${showHeader ? 'translate-x-5' : 'translate-x-1'}`} />
-                                        </button>
-                                    </div>
-                                    {showHeader && (
-                                        <>
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Show Logo</span>
-                                                <button onClick={() => setShowLogo(!showLogo)} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${showLogo ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}>
-                                                    <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${showLogo ? 'translate-x-5' : 'translate-x-1'}`} />
-                                                </button>
-                                            </div>
-                                            <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800/50 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
-                                                <span className="text-xs font-bold text-gray-500 dark:text-gray-400 min-w-[50px]">Scale</span>
-                                                <input
-                                                    type="range" min="0.5" max="1.5" step="0.1"
-                                                    value={headerScale} onChange={(e) => setHeaderScale(Number(e.target.value))}
-                                                    className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
-                                                />
-                                                <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-8 text-right">{(headerScale * 100).toFixed(0)}%</span>
-                                            </div>
-                                            <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800/50 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
-                                                <span className="text-xs font-bold text-gray-500 dark:text-gray-400 min-w-[50px]">Text Size</span>
-                                                <input
-                                                    type="range" min="0.5" max="2.5" step="0.1"
-                                                    value={headerTitleScale} onChange={(e) => setHeaderTitleScale(Number(e.target.value))}
-                                                    className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
-                                                />
-                                                <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-8 text-right">{(headerTitleScale * 100).toFixed(0)}%</span>
-                                            </div>
-                                            <div className="flex flex-col gap-1.5 bg-gray-50 dark:bg-gray-800/50 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
-                                                <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Text Alignment</span>
-                                                <div className="flex items-center justify-between gap-2">
-                                                    <button onClick={() => setHeaderTitleAlign('left')} className={`flex-1 py-1 rounded text-xs font-bold transition-colors ${headerTitleAlign === 'left' ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}`}>Left</button>
-                                                    <button onClick={() => setHeaderTitleAlign('center')} className={`flex-1 py-1 rounded text-xs font-bold transition-colors ${headerTitleAlign === 'center' ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}`}>Center</button>
-                                                    <button onClick={() => setHeaderTitleAlign('right')} className={`flex-1 py-1 rounded text-xs font-bold transition-colors ${headerTitleAlign === 'right' ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}`}>Right</button>
-                                                </div>
-                                            </div>
-                                        </>
-                                    )}
-                                </div>
+                          </div>
+                          <div>
+                            <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
+                              <LayoutGrid className="w-4 h-4 text-indigo-500" /> Options Layout
                             </div>
-                            <hr className="border-gray-100 dark:border-gray-800" />
-                            <div>
-                                <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
-                                    <Play className="w-4 h-4 text-indigo-500" /> Animation Speed
-                                </div>
-                                <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800/50 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                            <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl">
+                              <button
+                                onClick={() => setOptionsLayout('grid')}
+                                className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-colors ${optionsLayout === 'grid' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                              >
+                                Grid
+                              </button>
+                              <button
+                                onClick={() => setOptionsLayout('list')}
+                                className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-colors ${optionsLayout === 'list' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                              >
+                                List
+                              </button>
+                            </div>
+                          </div>
+                          <hr className="border-gray-100 dark:border-gray-800" />
+                          <div>
+                            <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
+                              <LayoutGrid className="w-4 h-4 text-indigo-500" /> Header Settings
+                            </div>
+                            <div className="space-y-3">
+                              <div className="flex items-center justify-between">
+                                <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Show Header</span>
+                                <button onClick={() => setShowHeader(!showHeader)} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${showHeader ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}>
+                                  <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${showHeader ? 'translate-x-5' : 'translate-x-1'}`} />
+                                </button>
+                              </div>
+                              {showHeader && (
+                                <>
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Show Logo</span>
+                                    <button onClick={() => setShowLogo(!showLogo)} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${showLogo ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}>
+                                      <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${showLogo ? 'translate-x-5' : 'translate-x-1'}`} />
+                                    </button>
+                                  </div>
+                                  <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800/50 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400 min-w-[50px]">Scale</span>
                                     <input
-                                        type="range" min="0.1" max="2.0" step="0.1"
-                                        value={animSpeed} onChange={(e) => setAnimSpeed(Number(e.target.value))}
-                                        className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                      type="range" min="0.5" max="1.5" step="0.1"
+                                      value={headerScale} onChange={(e) => setHeaderScale(Number(e.target.value))}
+                                      className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
                                     />
-                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-8 text-right">{animSpeed.toFixed(1)}s</span>
-                                </div>
-                            </div>
-                            <hr className="border-gray-100 dark:border-gray-800" />
-                            <div>
-                                <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
-                                    <LayoutGrid className="w-4 h-4 text-indigo-500" /> Background Theme
-                                </div>
-                                <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl flex-wrap gap-1">
-                                    <button onClick={() => setBgTheme('default')} className={`flex-1 py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'default' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}>Default</button>
-                                    <button onClick={() => setBgTheme('mesh')} className={`flex-1 py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'mesh' ? 'bg-white dark:bg-gray-700 text-purple-600 dark:text-purple-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}>Mesh</button>
-                                    <button onClick={() => setBgTheme('grid')} className={`flex-1 py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'grid' ? 'bg-white dark:bg-gray-700 text-emerald-600 dark:text-emerald-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}>Grid</button>
-                                    <button onClick={() => setBgTheme('dots')} className={`flex-1 py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'dots' ? 'bg-white dark:bg-gray-700 text-orange-600 dark:text-orange-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}>Dots</button>
-                                    <button onClick={() => setBgTheme('video')} className={`flex-1 py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'video' ? 'bg-white dark:bg-gray-700 text-rose-600 dark:text-rose-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}>Video</button>
-                                </div>
-                                {bgTheme === 'video' && (
-                                    <div className="mt-2 space-y-2">
-                                        <select
-                                            value={selectedVideo}
-                                            onChange={(e) => setSelectedVideo(e.target.value)}
-                                            className="w-full text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 focus:outline-none focus:border-blue-500 text-gray-700 dark:text-gray-300 font-semibold"
-                                        >
-                                            {VIDEO_OPTIONS.map(opt => (
-                                                <option key={opt.id} value={opt.url}>{opt.name}</option>
-                                            ))}
-                                        </select>
+                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-8 text-right">{(headerScale * 100).toFixed(0)}%</span>
+                                  </div>
+                                  <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800/50 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400 min-w-[50px]">Text Size</span>
+                                    <input
+                                      type="range" min="0.5" max="2.5" step="0.1"
+                                      value={headerTitleScale} onChange={(e) => setHeaderTitleScale(Number(e.target.value))}
+                                      className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                    />
+                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-8 text-right">{(headerTitleScale * 100).toFixed(0)}%</span>
+                                  </div>
+                                  <div className="flex flex-col gap-1.5 bg-gray-50 dark:bg-gray-800/50 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Text Alignment</span>
+                                    <div className="flex items-center justify-between gap-2">
+                                      <button onClick={() => setHeaderTitleAlign('left')} className={`flex-1 py-1 rounded text-xs font-bold transition-colors ${headerTitleAlign === 'left' ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}`}>Left</button>
+                                      <button onClick={() => setHeaderTitleAlign('center')} className={`flex-1 py-1 rounded text-xs font-bold transition-colors ${headerTitleAlign === 'center' ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}`}>Center</button>
+                                      <button onClick={() => setHeaderTitleAlign('right')} className={`flex-1 py-1 rounded text-xs font-bold transition-colors ${headerTitleAlign === 'right' ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}`}>Right</button>
                                     </div>
-                                )}
+                                  </div>
+                                </>
+                              )}
                             </div>
+                          </div>
+                          <hr className="border-gray-100 dark:border-gray-800" />
+                          <div>
+                            <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
+                              <Play className="w-4 h-4 text-indigo-500" /> Animation Speed
+                            </div>
+                            <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800/50 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                              <input
+                                type="range" min="0.1" max="2.0" step="0.1"
+                                value={animSpeed} onChange={(e) => setAnimSpeed(Number(e.target.value))}
+                                className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                              />
+                              <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-8 text-right">{animSpeed.toFixed(1)}s</span>
+                            </div>
+                          </div>
+                          <hr className="border-gray-100 dark:border-gray-800" />
+                          <div>
+                            <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
+                              <LayoutGrid className="w-4 h-4 text-indigo-500" /> Background Theme
+                            </div>
+                            <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl flex-wrap gap-1">
+                              <button onClick={() => setBgTheme('default')} className={`flex-1 py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'default' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}>Default</button>
+                              <button onClick={() => setBgTheme('mesh')} className={`flex-1 py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'mesh' ? 'bg-white dark:bg-gray-700 text-purple-600 dark:text-purple-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}>Mesh</button>
+                              <button onClick={() => setBgTheme('grid')} className={`flex-1 py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'grid' ? 'bg-white dark:bg-gray-700 text-emerald-600 dark:text-emerald-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}>Grid</button>
+                              <button onClick={() => setBgTheme('dots')} className={`flex-1 py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'dots' ? 'bg-white dark:bg-gray-700 text-orange-600 dark:text-orange-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}>Dots</button>
+                              <button onClick={() => setBgTheme('video')} className={`flex-1 py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'video' ? 'bg-white dark:bg-gray-700 text-rose-600 dark:text-rose-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}>Video</button>
+                            </div>
+                            {bgTheme === 'video' && (
+                              <div className="mt-2 space-y-2">
+                                <select
+                                  value={selectedVideo}
+                                  onChange={(e) => setSelectedVideo(e.target.value)}
+                                  className="w-full text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 focus:outline-none focus:border-blue-500 text-gray-700 dark:text-gray-300 font-semibold"
+                                >
+                                  {VIDEO_OPTIONS.map(opt => (
+                                    <option key={opt.id} value={opt.url}>{opt.name}</option>
+                                  ))}
+                                </select>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </motion.div>
                     )}
@@ -1638,7 +1638,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
               <div className="bg-gradient-to-br from-indigo-600 via-blue-600 to-indigo-800 dark:from-indigo-900 dark:via-blue-900 dark:to-indigo-950 text-white rounded-2xl shadow-[0_8px_30px_-4px_rgba(79,70,229,0.3)] border border-indigo-400/30 p-4 transition-colors duration-300 flex flex-col relative overflow-hidden flex-shrink-0">
                 <div className="absolute top-0 right-0 -mt-8 -mr-8 w-32 h-32 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
                 <div className="absolute bottom-0 left-0 -mb-8 -ml-8 w-24 h-24 bg-blue-400/20 rounded-full blur-xl pointer-events-none"></div>
-                
+
                 <div className="flex items-center justify-between mb-3 relative z-10">
                   <h3 className="font-bold text-[15px] text-white flex items-center gap-2 drop-shadow-sm">
                     <Target className="w-4 h-4 text-indigo-200" /> Progress
@@ -1673,7 +1673,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                 <div className="flex items-center justify-between relative z-10">
                   <div className="flex flex-col">
                     <span className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-400 mb-1 drop-shadow-sm flex items-center gap-1">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
                       Premium
                     </span>
                     <h4 className="font-extrabold text-[15px] leading-tight text-white flex items-center gap-1.5">
@@ -1698,11 +1698,11 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                 {/* AdSense ins tag */}
                 <div className="w-full relative z-10 overflow-hidden flex justify-center">
                   <ins className="adsbygoogle"
-                       style={{ display: 'block', width: '100%', height: '100%' }}
-                       data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-                       data-ad-slot="XXXXXXXXXX"
-                       data-ad-format="auto"
-                       data-full-width-responsive="true"></ins>
+                    style={{ display: 'block', width: '100%', height: '100%' }}
+                    data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                    data-ad-slot="XXXXXXXXXX"
+                    data-ad-format="auto"
+                    data-full-width-responsive="true"></ins>
                 </div>
               </div>
 
@@ -1727,7 +1727,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                   </div>
                   <span className="text-[9px] font-bold uppercase tracking-wider drop-shadow-sm">Info</span>
                 </button>
-                <button onClick={() => { if (!document.fullscreenElement) { document.documentElement.requestFullscreen().catch(e=>console.error(e)); } else { document.exitFullscreen().catch(e=>console.error(e)); } }} className="flex flex-col items-center gap-1 text-white/80 hover:text-white transition-colors group w-1/4 relative z-10">
+                <button onClick={() => { if (!document.fullscreenElement) { document.documentElement.requestFullscreen().catch(e => console.error(e)); } else { document.exitFullscreen().catch(e => console.error(e)); } }} className="flex flex-col items-center gap-1 text-white/80 hover:text-white transition-colors group w-1/4 relative z-10">
                   <div className="p-1.5 rounded-lg bg-white/10 group-hover:bg-white/20 shadow-sm transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>
                   </div>
