@@ -1342,134 +1342,39 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
             {/* Right Sidebar - Premium Analytics & AI */}
             <aside className="w-[240px] lg:w-[270px] xl:w-[300px] 2xl:w-[320px] flex flex-col gap-3 xl:gap-4 overflow-y-auto hide-scrollbar flex-shrink-0 h-full">
 
-              {/* Premium Exam Progress Card */}
-              <div className="bg-gradient-to-br from-white to-slate-50/50 dark:from-[#1e293b] dark:to-slate-900/80 rounded-2xl shadow-md border border-white/60 dark:border-slate-700/50 p-4 xl:p-5 transition-colors duration-300 flex flex-col">
-                <h3 className="font-bold text-[17px] text-slate-900 dark:text-slate-50 mb-4 flex items-center gap-2">
-                  <Target className="w-5 h-5 text-blue-500" /> Exam Progress
-                </h3>
-
-                <div className="flex items-end justify-between mb-2">
-                  <span className="text-3xl font-extrabold text-slate-900 dark:text-slate-50 leading-none">{currentQuestionIndex + 1} <span className="text-lg text-slate-400 font-bold">/ {questions.length}</span></span>
-                  <span className="text-sm font-bold text-slate-500 dark:text-slate-400">Questions</span>
+              {/* Premium Exam Progress Card (Compact) */}
+              <div className="bg-gradient-to-br from-indigo-600 via-blue-600 to-indigo-800 dark:from-indigo-900 dark:via-blue-900 dark:to-indigo-950 text-white rounded-2xl shadow-[0_8px_30px_-4px_rgba(79,70,229,0.3)] border border-indigo-400/30 p-4 transition-colors duration-300 flex flex-col relative overflow-hidden flex-shrink-0">
+                <div className="absolute top-0 right-0 -mt-8 -mr-8 w-32 h-32 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+                <div className="absolute bottom-0 left-0 -mb-8 -ml-8 w-24 h-24 bg-blue-400/20 rounded-full blur-xl pointer-events-none"></div>
+                
+                <div className="flex items-center justify-between mb-3 relative z-10">
+                  <h3 className="font-bold text-[15px] text-white flex items-center gap-2 drop-shadow-sm">
+                    <Target className="w-4 h-4 text-indigo-200" /> Progress
+                  </h3>
+                  <div className="text-[13px] font-extrabold text-indigo-900 dark:text-indigo-950 bg-white/95 backdrop-blur-sm px-2 py-0.5 rounded-md shadow-sm">
+                    {currentQuestionIndex + 1} <span className="text-indigo-400/80">/ {questions.length}</span>
+                  </div>
                 </div>
 
                 {!isReviewMode && (
-                  <div className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-4 mt-2 border border-slate-200/50 dark:border-slate-700/50 shadow-inner">
-                    <div className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full transition-all duration-300 shadow-[0_0_10px_rgba(59,130,246,0.5)]" style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}></div>
+                  <div className="w-full h-1.5 bg-black/20 dark:bg-black/40 rounded-full overflow-hidden mb-3 shadow-inner relative z-10">
+                    <div className="h-full bg-gradient-to-r from-emerald-400 to-cyan-400 rounded-full transition-all duration-300 shadow-[0_0_10px_rgba(52,211,153,0.6)]" style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}></div>
                   </div>
                 )}
 
-                <div className="grid grid-cols-2 gap-3 mt-2">
-                  <div className="bg-blue-50/50 dark:bg-blue-900/20 rounded-xl p-3 border border-blue-100/50 dark:border-blue-800/30 flex flex-col items-center justify-center transition-colors">
-                    <span className="text-[11px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider mb-1">Attempted</span>
-                    <span className="text-xl font-black text-slate-800 dark:text-slate-200">{totalAttempted}</span>
+                <div className="flex justify-between items-center bg-white/10 dark:bg-white/5 backdrop-blur-md rounded-xl p-2.5 border border-white/20 dark:border-white/10 shadow-sm relative z-10">
+                  <div className="flex flex-col items-center flex-1 border-r border-white/20 dark:border-white/10">
+                    <span className="text-[10px] font-bold text-indigo-100 uppercase tracking-widest mb-0.5 drop-shadow-sm">Attempted</span>
+                    <span className="text-base font-black text-white leading-tight drop-shadow-md">{totalAttempted}</span>
                   </div>
-                  <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-200/50 dark:border-slate-700/50 flex flex-col items-center justify-center transition-colors">
-                    <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Remaining</span>
-                    <span className="text-xl font-black text-slate-800 dark:text-slate-200">{questions.length - totalAttempted}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Premium Analytics */}
-              <div className="bg-gradient-to-br from-[#F8FAFC] to-[#EFF6FF] dark:from-slate-800 dark:to-blue-950/30 rounded-2xl shadow-md border border-white/60 dark:border-slate-700/50 p-4 xl:p-5 transition-colors duration-300 flex-1 flex flex-col justify-center min-h-[260px]">
-                <h3 className="font-bold text-[17px] text-slate-900 dark:text-slate-50 mb-4 transition-colors">Premium Analytics</h3>
-
-                {/* 2x2 Grid Stats */}
-                <div className="grid grid-cols-2 gap-2 mb-6">
-                  <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-100 dark:border-slate-700/50 transition-colors">
-                    <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-0.5 transition-colors">Attempted</div>
-                    <div className="text-lg font-bold text-slate-900 dark:text-slate-50 transition-colors">{totalAttempted}</div>
-                  </div>
-                  <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-100 dark:border-slate-700/50 transition-colors">
-                    <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-0.5 transition-colors">Remaining</div>
-                    <div className="text-lg font-bold text-slate-900 dark:text-slate-50 transition-colors">{questions.length - totalAttempted}</div>
-                  </div>
-                  <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-100 dark:border-slate-700/50 transition-colors">
-                    <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-0.5 transition-colors">Marked</div>
-                    <div className="text-lg font-bold text-amber-600 dark:text-amber-500 transition-colors">{totalReview}</div>
-                  </div>
-                  <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-100 dark:border-slate-700/50 transition-colors">
-                    <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-0.5 transition-colors">Accuracy</div>
-                    <div className="text-lg font-bold text-[#16A34A] dark:text-[#34d399] transition-colors">{liveAccuracy}%</div>
-                  </div>
-                </div>
-
-                {/* SVG Doughnut Chart */}
-                <div className="flex items-center gap-4">
-                  <div className="relative w-20 h-20 flex-shrink-0">
-                    <svg viewBox="0 0 36 36" className="w-full h-full rotate-[-90deg]">
-                      {/* Background circle */}
-                      <path
-                        className="text-slate-100 dark:text-slate-700 transition-colors"
-                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                        fill="none" stroke="currentColor" strokeWidth="4"
-                      />
-                      {/* Correct (Green) - ~50% */}
-                      <path
-                        className="text-[#16A34A] dark:text-emerald-500 transition-colors"
-                        strokeDasharray="50, 100"
-                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                        fill="none" stroke="currentColor" strokeWidth="4"
-                      />
-                      {/* Wrong (Red) - ~15% */}
-                      <path
-                        className="text-[#DC2626] dark:text-red-500 transition-colors"
-                        strokeDasharray="15, 100"
-                        strokeDashoffset="-50"
-                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                        fill="none" stroke="currentColor" strokeWidth="4"
-                      />
-                    </svg>
-                  </div>
-                  <div className="flex flex-col gap-2 text-sm font-semibold">
-                    <div className="flex items-center gap-2 text-[#16A34A] dark:text-emerald-500 transition-colors"><div className="w-2.5 h-2.5 rounded-full bg-[#16A34A] dark:bg-emerald-500"></div>Correct %</div>
-                    <div className="flex items-center gap-2 text-[#DC2626] dark:text-red-500 transition-colors"><div className="w-2.5 h-2.5 rounded-full bg-[#DC2626] dark:bg-red-500"></div>Wrong %</div>
-                    <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 transition-colors"><div className="w-2.5 h-2.5 rounded-full bg-slate-200 dark:bg-slate-700"></div>Skipped %</div>
+                  <div className="flex flex-col items-center flex-1">
+                    <span className="text-[10px] font-bold text-indigo-100 uppercase tracking-widest mb-0.5 drop-shadow-sm">Remaining</span>
+                    <span className="text-base font-black text-white leading-tight drop-shadow-md">{questions.length - totalAttempted}</span>
                   </div>
                 </div>
               </div>
 
-              {/* AI Insight */}
-              <div className="bg-gradient-to-br from-[#FAF5FF] to-[#F3E8FF] dark:from-slate-800 dark:to-purple-950/30 rounded-2xl shadow-md border border-white/60 dark:border-slate-700/50 p-4 xl:p-5 transition-colors duration-300 flex-1 flex flex-col justify-center min-h-[240px]">
-                <h3 className="font-bold text-[17px] text-slate-900 dark:text-slate-50 mb-3 flex items-center gap-2 transition-colors">
-                  <span>✨</span> AI Insight
-                </h3>
-                <div className="text-[13px] font-semibold text-slate-700 dark:text-slate-300 flex flex-col gap-1.5 mb-4 transition-colors">
-                  <div className="flex justify-between"><span>Difficulty:</span><span className="text-slate-900 dark:text-slate-50 transition-colors">{currentQ.difficulty || 'Medium'}</span></div>
-                  <div className="flex justify-between"><span>Topic:</span><span className="text-slate-900 dark:text-slate-50 transition-colors">{(mockTest as any).category || "General Studies"}</span></div>
-                  <div className="flex justify-between"><span>Avg solve time:</span><span className="text-slate-900 dark:text-slate-50 transition-colors">21 sec</span></div>
-                  <div className="flex justify-between"><span>Similar Q:</span><span className="text-[#16A34A] dark:text-emerald-500 transition-colors">Available</span></div>
-                </div>
-                <div className="grid grid-cols-2 gap-2 mb-2">
-                  <button className="py-2 rounded-full border border-slate-200 dark:border-slate-600 text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">Hint</button>
-                  <button className="py-2 rounded-full border border-slate-200 dark:border-slate-600 text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">Explain</button>
-                </div>
-                <button className="w-full py-2 rounded-full border border-slate-200 dark:border-slate-600 text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">Practice Similar</button>
-              </div>
 
-              {/* Quick Tools */}
-              <div className="bg-gradient-to-br from-[#F0FDF4] to-[#DCFCE7] dark:from-slate-800 dark:to-emerald-950/20 rounded-2xl shadow-md border border-white/60 dark:border-slate-700/50 p-4 xl:p-5 transition-colors duration-300 flex-1 flex flex-col justify-center min-h-[140px]">
-                <h3 className="font-bold text-[17px] text-slate-900 dark:text-slate-50 mb-3 transition-colors">Quick tools</h3>
-                <div className="grid grid-cols-4 gap-2">
-                  <button className="flex flex-col items-center gap-1.5 p-2 rounded-xl border border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-[11px] font-bold text-slate-600 dark:text-slate-400">
-                    <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-300 transition-colors"><span className="text-lg">+</span></div>
-                    Calculator
-                  </button>
-                  <button className="flex flex-col items-center gap-1.5 p-2 rounded-xl border border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-[11px] font-bold text-slate-600 dark:text-slate-400">
-                    <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-300 transition-colors"><span className="text-sm">✎</span></div>
-                    Notes
-                  </button>
-                  <button className="flex flex-col items-center gap-1.5 p-2 rounded-xl border border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-[11px] font-bold text-slate-600 dark:text-slate-400">
-                    <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-300 transition-colors"><AlertCircle className="w-4 h-4" /></div>
-                    Report
-                  </button>
-                  <button className="flex flex-col items-center gap-1.5 p-2 rounded-xl border border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-[11px] font-bold text-slate-600 dark:text-slate-400">
-                    <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-300 transition-colors"><Maximize className="w-4 h-4" /></div>
-                    Zoom
-                  </button>
-                </div>
-              </div>
             </aside>
           </main>
         </div>
