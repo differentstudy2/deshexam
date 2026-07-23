@@ -1070,26 +1070,14 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
             <aside className="order-2 lg:order-1 w-full lg:w-[260px] xl:w-[280px] flex flex-col gap-2 xl:gap-3 overflow-y-auto hide-scrollbar flex-shrink-0 lg:h-full">
               
               {/* Site Promo Ad */}
-              <div className="rounded-2xl bg-gradient-to-br from-slate-900 to-[#1e1b4b] dark:from-[#020617] dark:to-[#171033] p-5 shadow-[0_8px_30px_-4px_rgba(30,27,75,0.4)] border border-indigo-500/20 relative overflow-hidden group shrink-0">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl transform translate-x-8 -translate-y-8 group-hover:bg-indigo-500/20 transition-colors duration-500 pointer-events-none"></div>
-                <div className="absolute bottom-0 left-0 w-24 h-24 bg-purple-500/10 rounded-full blur-2xl transform -translate-x-8 translate-y-8 group-hover:bg-purple-500/20 transition-colors duration-500 pointer-events-none"></div>
-                
-                <div className="relative z-10">
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="font-extrabold text-[16px] leading-tight text-white flex items-center gap-2 drop-shadow-sm">
-                      Desh Exam
-                    </h3>
-                    <span className="bg-gradient-to-r from-amber-200 to-yellow-400 text-yellow-950 text-[10px] px-2 py-0.5 rounded-full font-black tracking-widest uppercase shadow-[0_0_10px_rgba(250,204,21,0.3)]">
-                      PRO
-                    </span>
-                  </div>
-                  <p className="text-[13px] text-slate-300 mb-4 leading-relaxed font-medium">
-                    Unlock <span className="text-white font-semibold">mock tests</span>, <span className="text-white font-semibold">AI analytics</span> & <span className="text-white font-semibold">ad-free</span> experience.
-                  </p>
-                  <Button size="sm" className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 text-white border-0 shadow-[0_4px_15px_-3px_rgba(99,102,241,0.4)] hover:shadow-[0_6px_20px_-3px_rgba(99,102,241,0.6)] transition-all duration-300 rounded-[10px] h-10 font-bold text-[14px]">
-                    Upgrade Now <ArrowLeft className="w-4 h-4 ml-1.5 rotate-180" />
-                  </Button>
-                </div>
+              <div className="rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 p-4 text-white shadow-[0_8px_30px_-4px_rgba(79,70,229,0.3)] border border-indigo-400/30 relative overflow-hidden group shrink-0">
+                <div className="absolute inset-0 bg-[url('/noise.png')] opacity-10 mix-blend-overlay pointer-events-none"></div>
+                <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full blur-2xl transform translate-x-8 -translate-y-8 group-hover:scale-110 transition-transform duration-500"></div>
+                <h3 className="font-bold text-[15px] leading-tight mb-1">Desh Exam PRO</h3>
+                <p className="text-xs text-white/80 mb-3 leading-relaxed">Unlock mock tests, AI analytics & ad-free experience.</p>
+                <Button size="sm" className="w-full bg-white text-indigo-600 hover:bg-slate-50 text-xs font-bold h-8">
+                  Upgrade Now
+                </Button>
               </div>
 
 
