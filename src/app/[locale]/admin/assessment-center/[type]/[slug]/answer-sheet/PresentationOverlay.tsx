@@ -1358,7 +1358,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                 backgroundImage: 'none',
                                                 backgroundSize: 'auto'
                                             })
-                                        } as React.CSSProperties}
+                                        } as unknown as React.CSSProperties}
                                     >
                                         <span className={`font-extrabold leading-normal shrink-0 ${qTextColor !== 'default' ? 'text-[var(--q-color)] drop-shadow-sm' : (bgTheme === 'video' ? 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]' : 'text-black dark:text-gray-100')}`} style={{ fontSize: 'var(--q-size)' }}>Q{currentSlide + 1}.</span>
                                         <div className={`prose max-w-none prose-p:font-extrabold text-[length:var(--q-size)] leading-normal text-left font-extrabold capitalize [&_*]:!text-[length:var(--q-size)] [&_*]:!leading-normal [&_*]:!m-0 ${qTextColor !== 'default' ? 'text-[var(--q-color)] [&_*]:!text-[var(--q-color)] drop-shadow-sm [&_*]:!drop-shadow-sm' : (bgTheme === 'video' ? 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] [&_*]:!text-white [&_*]:!drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]' : 'text-black dark:text-gray-100 [&_*]:!text-black dark:[&_*]:!text-gray-100')}`}>
