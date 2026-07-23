@@ -3,7 +3,15 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Bookmark, Flag, Maximize, Minimize, AlertCircle, Clock, Moon, Sun, LayoutGrid, List, Settings, X, ToggleLeft, ToggleRight, Lock, Loader2, Presentation, Target } from 'lucide-react';
+import { ArrowLeft, Bookmark, Flag, Maximize, Minimize, AlertCircle, Clock, Moon, Sun, LayoutGrid, List, Settings, X, ToggleLeft, ToggleRight, Lock, Loader2, Presentation, Target, MonitorPlay, Play } from 'lucide-react';
+
+const VIDEO_OPTIONS = [
+    { id: 'v1', name: 'High-Tech Digital', url: '/videos/A_high_tech_digital_quiz_backg.mp4' },
+    { id: 'v2', name: 'Abstract Minimalist', url: '/videos/A_seamless_slow_moving_abstra.mp4' },
+    { id: 'v3', name: 'Gold & White', url: '/videos/Slow_elegant_gold_and_white_g.mp4' },
+    { id: 'v4', name: 'Gold & White (Alt)', url: '/videos/Slow_elegant_gold_and_white_g (1).mp4' },
+    { id: 'v5', name: 'Modern TV Studio', url: '/videos/Wide_shot_of_an_empty_modern.mp4' }
+];
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -106,6 +114,16 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
   const [optionsLayout, setOptionsLayout] = useState<'list' | 'grid'>('list');
   const [showLayoutSettings, setShowLayoutSettings] = useState(false);
 
+  // --- PRESENTATION SETTINGS STATE ---
+  const [examMode, setExamMode] = useState<'test' | 'read'>('test');
+  const [showHeader, setShowHeader] = useState(true);
+  const [showLogo, setShowLogo] = useState(true);
+  const [headerScale, setHeaderScale] = useState(1);
+  const [headerTitleScale, setHeaderTitleScale] = useState(1);
+  const [headerTitleAlign, setHeaderTitleAlign] = useState<'left' | 'center' | 'right'>('left');
+  const [animSpeed, setAnimSpeed] = useState(0.5);
+  const [bgTheme, setBgTheme] = useState<'default' | 'mesh' | 'grid' | 'dots' | 'video'>('default');
+  const [selectedVideo, setSelectedVideo] = useState('/videos/bg1.mp4');
   // --- ACCESS CONTROL STATE ---
   const { user, loading: authLoading } = useAuth();
   const [profileLoading, setProfileLoading] = useState(true);
@@ -663,10 +681,44 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
     ? Object.keys(currentQ.options).filter(k => currentQ.options![k as keyof typeof currentQ.options] && String(currentQ.options![k as keyof typeof currentQ.options]).trim() !== '').sort()
     : [];
 
+  const getBgThemeClasses = () => {
+    switch (bgTheme) {
+      case 'mesh': return 'bg-indigo-50 dark:bg-indigo-950';
+      case 'grid': return 'bg-[#f8fafc] dark:bg-gray-900';
+      case 'dots': return 'bg-[#f8fafc] dark:bg-gray-900';
+      case 'video': return 'bg-black/90 text-white';
+      default: return 'bg-[#F1F5F9] md:bg-[#F8FAFC] dark:bg-[#0f172a] md:dark:bg-[#0f172a]';
+    }
+  };
+
+  const getBgThemeOverlayClasses = () => {
+    switch (bgTheme) {
+      case 'mesh': return 'bg-gradient-to-br from-indigo-100 via-purple-50 to-teal-100 dark:from-indigo-950 dark:via-purple-900 dark:to-teal-950';
+      case 'grid': return 'bg-[linear-gradient(to_right,#8080801a_1px,transparent_1px),linear-gradient(to_bottom,#8080801a_1px,transparent_1px)] bg-[size:24px_24px]';
+      case 'dots': return 'bg-[radial-gradient(#cbd5e1_1.5px,transparent_1.5px)] dark:bg-[radial-gradient(#374151_1.5px,transparent_1.5px)] [background-size:20px_20px]';
+      case 'video': return '';
+      default: return '';
+    }
+  };
+
   return (
     <>
-      <div className="fixed inset-0 z-[100] bg-[#F1F5F9] md:bg-[#F8FAFC] dark:bg-[#0f172a] md:dark:bg-[#0f172a] flex flex-col h-[100dvh] overflow-hidden text-slate-900 dark:text-slate-50 font-inter transition-colors duration-300">
-
+      <div className={`fixed inset-0 z-[100] ${getBgThemeClasses()} flex flex-col h-[100dvh] overflow-hidden text-slate-900 dark:text-slate-50 font-inter transition-colors duration-300`}>
+        {bgTheme !== 'video' && (
+          <div className={`absolute inset-0 z-0 pointer-events-none transition-opacity duration-300 ${getBgThemeOverlayClasses()}`} />
+        )}
+        {bgTheme === 'video' && (
+          <video
+            key={selectedVideo}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none opacity-40"
+          >
+            <source src={selectedVideo} type="video/mp4" />
+          </video>
+        )}
         <AnimatePresence>
           {showSubmitConfirm && (
             <motion.div
@@ -973,27 +1025,35 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
         <div className="hidden md:flex flex-col h-full w-full bg-[#EDF1F5] dark:bg-[#0f172a] font-sans transition-colors duration-300">
 
           {/* Top Header */}
-          <header className="bg-gradient-to-r from-indigo-700 via-purple-700 to-blue-800 dark:from-indigo-900 dark:via-purple-900 dark:to-blue-950 text-white rounded-[5px] m-2 px-6 py-3 shadow-lg border border-white/10 flex items-center justify-between z-30 flex-shrink-0 transition-colors duration-300">
-            {/* Left: Logo & Title */}
-            <div className="flex items-center gap-4 flex-shrink-0 min-w-0">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center relative overflow-hidden flex-shrink-0 shadow-sm p-0.5">
-                  <img src="/favicon-bg.png" alt="DeshExam Logo" className="w-full h-full object-cover m-0 !mb-0 rounded-md" />
-                </div>
-                <div className="hidden xl:flex flex-col justify-center">
-                  <span className="font-extrabold text-[19px] leading-[1.1] tracking-tight text-white drop-shadow-sm">
-                    Desh Exam
-                  </span>
-                  <span className="text-[9px] font-extrabold tracking-[0.25em] text-white/70 uppercase leading-none mt-0.5 ml-[2px]">
-                    Academy
-                  </span>
-                </div>
-              </div>
-              <div className="h-8 w-px bg-white/20 hidden xl:block flex-shrink-0 mx-2"></div>
-              <div className="flex items-center gap-4 min-w-0">
-                <div className="flex flex-col min-w-0">
-                  <h1 className="font-bold text-lg text-white leading-tight line-clamp-1 flex-1 drop-shadow-sm" title={mockTest.title}>
-                    {isReviewMode ? "Reviewing Solutions" : mockTest.title}
+          {showHeader && (
+            <header 
+              className="bg-gradient-to-r from-indigo-700 via-purple-700 to-blue-800 dark:from-indigo-900 dark:via-purple-900 dark:to-blue-950 text-white rounded-[5px] m-2 px-6 py-3 shadow-lg border border-white/10 flex items-center justify-between z-30 flex-shrink-0 transition-colors duration-300"
+              style={{ transform: `scale(${headerScale})`, transformOrigin: 'top center', marginBottom: `calc(0.5rem - ${1-headerScale} * 4rem)` }}
+            >
+              {/* Left: Logo & Title */}
+              <div className="flex items-center gap-4 flex-shrink-0 min-w-0">
+                {showLogo && (
+                  <>
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center relative overflow-hidden flex-shrink-0 shadow-sm p-0.5">
+                        <img src="/favicon-bg.png" alt="DeshExam Logo" className="w-full h-full object-cover m-0 !mb-0 rounded-md" />
+                      </div>
+                      <div className="hidden xl:flex flex-col justify-center">
+                        <span className="font-extrabold text-[19px] leading-[1.1] tracking-tight text-white drop-shadow-sm">
+                          Desh Exam
+                        </span>
+                        <span className="text-[9px] font-extrabold tracking-[0.25em] text-white/70 uppercase leading-none mt-0.5 ml-[2px]">
+                          Academy
+                        </span>
+                      </div>
+                    </div>
+                    <div className="h-8 w-px bg-white/20 hidden xl:block flex-shrink-0 mx-2"></div>
+                  </>
+                )}
+                <div className="flex items-center gap-4 min-w-0" style={{ transform: `scale(${headerTitleScale})`, transformOrigin: showLogo ? 'left center' : 'center' }}>
+                  <div className={`flex flex-col min-w-0 ${headerTitleAlign === 'center' ? 'items-center text-center' : headerTitleAlign === 'right' ? 'items-end text-right' : 'items-start text-left'}`}>
+                    <h1 className="font-bold text-lg text-white leading-tight line-clamp-1 flex-1 drop-shadow-sm" title={mockTest.title}>
+                      {isReviewMode ? "Reviewing Solutions" : mockTest.title}
                   </h1>
                   <div className="flex items-center gap-2 mt-1.5 overflow-hidden w-full">
                     {(mockTest.taxonomyLine || (mockTest as any).category || "General Studies").split(' • ').map((part: string, idx: number, arr: string[]) => (
@@ -1064,6 +1124,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
               )}
             </div>
           </header>
+          )}
 
           {/* Main Content Area */}
           <main className="flex-1 flex flex-col lg:flex-row gap-5 px-4 pb-4 overflow-y-auto lg:overflow-hidden max-w-[1800px] mx-auto w-full">
@@ -1188,7 +1249,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
 
                       <div className={cn(
                         "grid gap-3",
-                        optionsLayout === 'grid' ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1 max-w-xl mx-auto w-full"
+                        optionsLayout === 'grid' ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1 max-w-md mx-auto w-full"
                       )}>
                         {currentOptionsKeys.map((key, idx) => {
                           const isSelected = answers[currentQ.id] === key;
@@ -1221,7 +1282,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                             textClass = "text-emerald-900 dark:text-emerald-100 font-bold";
                           }
 
-                          if (isReviewMode) {
+                          if (isReviewMode || examMode === 'read') {
                             const isCorrectAnswer = currentQ.correctAnswer && key.toLowerCase() === currentQ.correctAnswer.toLowerCase();
                             if (isCorrectAnswer) {
                               optionClass = "border-emerald-400 dark:border-emerald-500/50 bg-gradient-to-r from-emerald-50 to-teal-50/50 dark:from-emerald-900/40 dark:to-teal-900/20 shadow-sm ring-1 ring-emerald-500/20";
@@ -1263,7 +1324,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                       </div>
                     </div>
 
-                    {isReviewMode && currentQ.explanation && (
+                    {(isReviewMode || examMode === 'read') && currentQ.explanation && (
                       <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/50 rounded-[8px] p-6 shadow-sm transition-colors">
                         <h4 className="font-bold text-blue-900 dark:text-blue-100 mb-2 flex items-center gap-2 transition-colors">
                           <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-400" />
@@ -1361,56 +1422,145 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                         animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
                         exit={{ opacity: 0, y: 10, scale: 0.95, filter: 'blur(2px)' }}
                         transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                        className="absolute bottom-[calc(100%+16px)] right-0 w-[220px] bg-white/90 dark:bg-[#0f172a]/90 backdrop-blur-xl rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.4)] border border-white/50 dark:border-slate-700/50 p-4 z-50 overflow-hidden"
+                        className="absolute bottom-[calc(100%+16px)] right-0 w-[90vw] sm:w-[340px] bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-xl rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.4)] border border-white/50 dark:border-slate-700/50 p-5 z-50 overflow-hidden flex flex-col max-h-[70vh]"
                       >
-                        {/* Decorative background glows */}
-                        <div className="absolute -top-10 -right-10 w-24 h-24 bg-blue-500/20 dark:bg-blue-500/10 rounded-full blur-2xl pointer-events-none"></div>
-                        <div className="absolute -bottom-10 -left-10 w-24 h-24 bg-indigo-500/20 dark:bg-indigo-500/10 rounded-full blur-2xl pointer-events-none"></div>
-                        
-                        <div className="relative z-10">
-                          <div className="flex items-center gap-2 mb-3">
-                            <div className="p-1.5 bg-blue-100 dark:bg-blue-500/20 rounded-lg text-blue-600 dark:text-blue-400">
-                              <Settings className="w-3.5 h-3.5" />
+                        <div className="flex justify-between items-center mb-4 pb-3 border-b border-gray-100 dark:border-gray-800 shrink-0">
+                            <h3 className="font-bold text-gray-800 dark:text-gray-200 text-lg flex items-center gap-2">
+                                <Settings className="w-5 h-5 text-gray-500" /> Settings
+                            </h3>
+                            <button onClick={() => setShowLayoutSettings(false)} className="p-1 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+                        <div className="space-y-5 overflow-y-auto custom-scrollbar pr-2 pb-2">
+                            <div>
+                                <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
+                                    <MonitorPlay className="w-4 h-4 text-indigo-500" /> Exam Mode
+                                </div>
+                                <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl">
+                                    <button
+                                        onClick={() => setExamMode('test')}
+                                        className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-colors ${examMode === 'test' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                                    >
+                                        Test Mode
+                                    </button>
+                                    <button
+                                        onClick={() => setExamMode('read')}
+                                        className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-colors ${examMode === 'read' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                                    >
+                                        Read Mode
+                                    </button>
+                                </div>
                             </div>
-                            <h3 className="text-[12px] font-extrabold text-slate-800 dark:text-slate-200 uppercase tracking-widest">Layout Settings</h3>
-                          </div>
-                          
-                          <div className="flex bg-slate-100/80 dark:bg-slate-800/60 p-1 rounded-xl shadow-inner border border-slate-200/50 dark:border-slate-700/50 backdrop-blur-sm">
-                            <button
-                              onClick={() => {
-                                setOptionsLayout('list');
-                                setTimeout(() => setShowLayoutSettings(false), 200);
-                              }}
-                              className={cn(
-                                "flex-1 flex items-center justify-center gap-2 py-2 rounded-lg transition-all duration-300 text-[12px] font-bold relative overflow-hidden",
-                                optionsLayout === 'list' 
-                                  ? "text-white shadow-md" 
-                                  : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-slate-700/50"
-                              )}
-                            >
-                              {optionsLayout === 'list' && (
-                                <motion.div layoutId="layout-active-bg" className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg -z-10" />
-                              )}
-                              <List className="w-3.5 h-3.5" /> List
-                            </button>
-                            <button
-                              onClick={() => {
-                                setOptionsLayout('grid');
-                                setTimeout(() => setShowLayoutSettings(false), 200);
-                              }}
-                              className={cn(
-                                "flex-1 flex items-center justify-center gap-2 py-2 rounded-lg transition-all duration-300 text-[12px] font-bold relative overflow-hidden",
-                                optionsLayout === 'grid' 
-                                  ? "text-white shadow-md" 
-                                  : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-slate-700/50"
-                              )}
-                            >
-                              {optionsLayout === 'grid' && (
-                                <motion.div layoutId="layout-active-bg" className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg -z-10" />
-                              )}
-                              <LayoutGrid className="w-3.5 h-3.5" /> Grid
-                            </button>
-                          </div>
+                            <div>
+                                <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
+                                    <LayoutGrid className="w-4 h-4 text-indigo-500" /> Options Layout
+                                </div>
+                                <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl">
+                                    <button
+                                        onClick={() => setOptionsLayout('grid')}
+                                        className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-colors ${optionsLayout === 'grid' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                                    >
+                                        Grid
+                                    </button>
+                                    <button
+                                        onClick={() => setOptionsLayout('list')}
+                                        className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-colors ${optionsLayout === 'list' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                                    >
+                                        List
+                                    </button>
+                                </div>
+                            </div>
+                            <hr className="border-gray-100 dark:border-gray-800" />
+                            <div>
+                                <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
+                                    <LayoutGrid className="w-4 h-4 text-indigo-500" /> Header Settings
+                                </div>
+                                <div className="space-y-3">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Show Header</span>
+                                        <button onClick={() => setShowHeader(!showHeader)} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${showHeader ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}>
+                                            <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${showHeader ? 'translate-x-5' : 'translate-x-1'}`} />
+                                        </button>
+                                    </div>
+                                    {showHeader && (
+                                        <>
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Show Logo</span>
+                                                <button onClick={() => setShowLogo(!showLogo)} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${showLogo ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}>
+                                                    <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${showLogo ? 'translate-x-5' : 'translate-x-1'}`} />
+                                                </button>
+                                            </div>
+                                            <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800/50 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                <span className="text-xs font-bold text-gray-500 dark:text-gray-400 min-w-[50px]">Scale</span>
+                                                <input
+                                                    type="range" min="0.5" max="1.5" step="0.1"
+                                                    value={headerScale} onChange={(e) => setHeaderScale(Number(e.target.value))}
+                                                    className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                                />
+                                                <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-8 text-right">{(headerScale * 100).toFixed(0)}%</span>
+                                            </div>
+                                            <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800/50 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                <span className="text-xs font-bold text-gray-500 dark:text-gray-400 min-w-[50px]">Text Size</span>
+                                                <input
+                                                    type="range" min="0.5" max="2.5" step="0.1"
+                                                    value={headerTitleScale} onChange={(e) => setHeaderTitleScale(Number(e.target.value))}
+                                                    className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                                />
+                                                <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-8 text-right">{(headerTitleScale * 100).toFixed(0)}%</span>
+                                            </div>
+                                            <div className="flex flex-col gap-1.5 bg-gray-50 dark:bg-gray-800/50 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Text Alignment</span>
+                                                <div className="flex items-center justify-between gap-2">
+                                                    <button onClick={() => setHeaderTitleAlign('left')} className={`flex-1 py-1 rounded text-xs font-bold transition-colors ${headerTitleAlign === 'left' ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}`}>Left</button>
+                                                    <button onClick={() => setHeaderTitleAlign('center')} className={`flex-1 py-1 rounded text-xs font-bold transition-colors ${headerTitleAlign === 'center' ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}`}>Center</button>
+                                                    <button onClick={() => setHeaderTitleAlign('right')} className={`flex-1 py-1 rounded text-xs font-bold transition-colors ${headerTitleAlign === 'right' ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}`}>Right</button>
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+                            <hr className="border-gray-100 dark:border-gray-800" />
+                            <div>
+                                <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
+                                    <Play className="w-4 h-4 text-indigo-500" /> Animation Speed
+                                </div>
+                                <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800/50 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                                    <input
+                                        type="range" min="0.1" max="2.0" step="0.1"
+                                        value={animSpeed} onChange={(e) => setAnimSpeed(Number(e.target.value))}
+                                        className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                    />
+                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-8 text-right">{animSpeed.toFixed(1)}s</span>
+                                </div>
+                            </div>
+                            <hr className="border-gray-100 dark:border-gray-800" />
+                            <div>
+                                <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
+                                    <LayoutGrid className="w-4 h-4 text-indigo-500" /> Background Theme
+                                </div>
+                                <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl flex-wrap gap-1">
+                                    <button onClick={() => setBgTheme('default')} className={`flex-1 py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'default' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}>Default</button>
+                                    <button onClick={() => setBgTheme('mesh')} className={`flex-1 py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'mesh' ? 'bg-white dark:bg-gray-700 text-purple-600 dark:text-purple-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}>Mesh</button>
+                                    <button onClick={() => setBgTheme('grid')} className={`flex-1 py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'grid' ? 'bg-white dark:bg-gray-700 text-emerald-600 dark:text-emerald-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}>Grid</button>
+                                    <button onClick={() => setBgTheme('dots')} className={`flex-1 py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'dots' ? 'bg-white dark:bg-gray-700 text-orange-600 dark:text-orange-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}>Dots</button>
+                                    <button onClick={() => setBgTheme('video')} className={`flex-1 py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'video' ? 'bg-white dark:bg-gray-700 text-rose-600 dark:text-rose-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}>Video</button>
+                                </div>
+                                {bgTheme === 'video' && (
+                                    <div className="mt-2 space-y-2">
+                                        <select
+                                            value={selectedVideo}
+                                            onChange={(e) => setSelectedVideo(e.target.value)}
+                                            className="w-full text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 focus:outline-none focus:border-blue-500 text-gray-700 dark:text-gray-300 font-semibold"
+                                        >
+                                            {VIDEO_OPTIONS.map(opt => (
+                                                <option key={opt.id} value={opt.url}>{opt.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                       </motion.div>
                     )}
