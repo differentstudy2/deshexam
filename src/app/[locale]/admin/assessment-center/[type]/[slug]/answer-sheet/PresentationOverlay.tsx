@@ -616,12 +616,11 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         let textToRead = cleanMarkdown(q.questionText) + '. ';
         
         if (q.options) {
-            textToRead += 'Options are: ';
             const optionKeys = ['a', 'b', 'c', 'd', 'e'].filter(k => q.options && q.options[k as keyof typeof q.options]);
             optionKeys.forEach((key) => {
                 const optText = q.options![key as keyof typeof q.options];
                 if (optText) {
-                    textToRead += `Option ${bnOptionsMap[key] || key.toUpperCase()}: ${cleanMarkdown(optText)}. `;
+                    textToRead += `${bnOptionsMap[key] || key.toUpperCase()}: ${cleanMarkdown(optText)}. `;
                 }
             });
         }
@@ -642,8 +641,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     const isBangla = q.language === 'Bangla';
                     const correctOptText = cleanMarkdown(q.options![validKey as keyof typeof q.options] || '');
                     const correctText = isBangla 
-                        ? `সঠিক উত্তর: অপশন ${bnOptionsMap[validKey]}, ${correctOptText}` 
-                        : `Correct Answer is: Option ${validKey.toUpperCase()}, ${correctOptText}`;
+                        ? `সঠিক উত্তর: ${bnOptionsMap[validKey]}, ${correctOptText}` 
+                        : `Correct Answer is: ${validKey.toUpperCase()}, ${correctOptText}`;
                     
                     const correctUtterance = new SpeechSynthesisUtterance(correctText);
                     correctUtterance.lang = isBangla ? 'bn-BD' : 'en-US';
@@ -1478,14 +1477,24 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     </div>
 
                                     {step >= 1 && showCorrect && (
-                                        <div className="shrink-0 text-white bg-[#34A853] rounded-full p-1.5 shadow-sm">
+                                        <motion.div 
+                                            initial={{ x: -200, opacity: 0, scale: 0.5 }}
+                                            animate={{ x: 0, opacity: 1, scale: 1 }}
+                                            transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
+                                            className="shrink-0 text-white bg-[#34A853] rounded-full p-1.5 shadow-sm relative z-20"
+                                        >
                                             <Check className="w-7 h-7 stroke-[3]" />
-                                        </div>
+                                        </motion.div>
                                     )}
                                     {step >= 1 && showWrong && isSelected && (
-                                        <div className="shrink-0 text-white bg-[#EA4335] rounded-full p-1.5 shadow-sm">
+                                        <motion.div 
+                                            initial={{ x: -200, opacity: 0, scale: 0.5 }}
+                                            animate={{ x: 0, opacity: 1, scale: 1 }}
+                                            transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
+                                            className="shrink-0 text-white bg-[#EA4335] rounded-full p-1.5 shadow-sm relative z-20"
+                                        >
                                             <X className="w-7 h-7 stroke-[3]" />
-                                        </div>
+                                        </motion.div>
                                     )}
                                     </div>
                                     
