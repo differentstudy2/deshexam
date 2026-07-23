@@ -1156,7 +1156,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                 </div>
               </div>
 
-              <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-4 pr-1 pb-4">
+              <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-4 pr-1 pb-24">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={currentQ.id}
@@ -1249,7 +1249,56 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                 </AnimatePresence>
               </div>
 
+              {/* Bottom Action Bar */}
+              <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1e293b] border-t border-slate-200 dark:border-slate-700 py-3 px-2 flex items-center justify-center z-20 transition-colors duration-300 rounded-b-[12px] lg:rounded-none">
+                <div className="flex flex-nowrap items-center justify-start lg:justify-center gap-2 pointer-events-auto w-full overflow-x-auto hide-scrollbar px-2">
+                  <button
+                    onClick={handlePrevious}
+                    disabled={currentQuestionIndex === 0}
+                    className="h-10 px-5 rounded-full border border-slate-300 bg-white font-bold text-slate-700 whitespace-nowrap disabled:opacity-50 hover:bg-slate-50 transition-colors flex items-center gap-1.5 text-sm"
+                  >
+                    <ArrowLeft className="w-4 h-4" /> Previous
+                  </button>
 
+                  {!isReviewMode ? (
+                    <>
+                      <button
+                        onClick={handleMarkReview}
+                        className="h-10 px-6 rounded-full font-bold text-[#B45309] border border-[#B45309] hover:bg-amber-50 whitespace-nowrap transition-colors text-sm"
+                      >
+                        Mark for Review
+                      </button>
+                      <button
+                        onClick={handleClear}
+                        className="h-10 px-6 rounded-full font-bold text-slate-600 border border-slate-300 hover:bg-slate-50 whitespace-nowrap transition-colors text-sm"
+                      >
+                        Clear Response
+                      </button>
+                      <button
+                        onClick={handleSaveAndNext}
+                        className="h-10 px-6 rounded-full bg-[#166534] hover:bg-green-800 text-white font-bold flex items-center gap-1.5 whitespace-nowrap shadow-sm transition-colors text-sm"
+                      >
+                        Save & Next
+                      </button>
+                      <button
+                        onClick={() => { if (currentQuestionIndex < questions.length - 1) setCurrentQuestionIndex(prev => prev + 1); }}
+                        disabled={currentQuestionIndex === questions.length - 1}
+                        className="h-10 px-6 rounded-full bg-slate-800 hover:bg-slate-700 text-white font-bold flex items-center gap-1.5 whitespace-nowrap shadow-sm transition-colors text-sm disabled:opacity-50"
+                      >
+                        Next <ArrowLeft className="w-4 h-4 rotate-180" />
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      onClick={handleSaveAndNext}
+                      disabled={currentQuestionIndex === questions.length - 1}
+                      className="h-10 px-8 rounded-full font-bold bg-[#2563EB] hover:bg-blue-700 text-white shadow-sm transition-colors text-sm"
+                    >
+                      Next Question
+                    </button>
+                  )}
+                </div>
+              </div>
 
             </section>
 
@@ -1359,57 +1408,6 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
 
             </aside>
           </main>
-
-          {/* Bottom Action Footer */}
-          <div className="w-full bg-white dark:bg-[#1e293b] border-t border-slate-200 dark:border-slate-700 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] z-20 mt-auto flex-shrink-0 transition-colors duration-300">
-            <div className="max-w-[1800px] mx-auto px-4 py-3 flex items-center justify-center gap-2 overflow-x-auto hide-scrollbar w-full">
-              <button
-                onClick={handlePrevious}
-                disabled={currentQuestionIndex === 0}
-                className="h-10 px-5 rounded-full border border-slate-300 bg-white font-bold text-slate-700 whitespace-nowrap disabled:opacity-50 hover:bg-slate-50 transition-colors flex items-center gap-1.5 text-sm"
-              >
-                <ArrowLeft className="w-4 h-4" /> Previous
-              </button>
-
-              {!isReviewMode ? (
-                <>
-                  <button
-                    onClick={handleMarkReview}
-                    className="h-10 px-6 rounded-full font-bold text-[#B45309] border border-[#B45309] hover:bg-amber-50 whitespace-nowrap transition-colors text-sm"
-                  >
-                    Mark for Review
-                  </button>
-                  <button
-                    onClick={handleClear}
-                    className="h-10 px-6 rounded-full font-bold text-slate-600 border border-slate-300 hover:bg-slate-50 whitespace-nowrap transition-colors text-sm"
-                  >
-                    Clear Response
-                  </button>
-                  <button
-                    onClick={handleSaveAndNext}
-                    className="h-10 px-6 rounded-full bg-[#166534] hover:bg-green-800 text-white font-bold flex items-center gap-1.5 whitespace-nowrap shadow-sm transition-colors text-sm"
-                  >
-                    Save & Next
-                  </button>
-                  <button
-                    onClick={() => { if (currentQuestionIndex < questions.length - 1) setCurrentQuestionIndex(prev => prev + 1); }}
-                    disabled={currentQuestionIndex === questions.length - 1}
-                    className="h-10 px-6 rounded-full bg-slate-800 hover:bg-slate-700 text-white font-bold flex items-center gap-1.5 whitespace-nowrap shadow-sm transition-colors text-sm disabled:opacity-50"
-                  >
-                    Next <ArrowLeft className="w-4 h-4 rotate-180" />
-                  </button>
-                </>
-              ) : (
-                <button
-                  onClick={handleSaveAndNext}
-                  disabled={currentQuestionIndex === questions.length - 1}
-                  className="h-10 px-8 rounded-full font-bold bg-[#2563EB] hover:bg-blue-700 text-white shadow-sm transition-colors text-sm"
-                >
-                  Next Question
-                </button>
-              )}
-            </div>
-          </div>
         </div>
 
         {showPresentationMode && (
