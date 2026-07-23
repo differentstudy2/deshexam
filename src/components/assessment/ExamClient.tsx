@@ -967,36 +967,36 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
         <div className="hidden md:flex flex-col h-full w-full bg-[#EDF1F5] dark:bg-[#0f172a] font-sans transition-colors duration-300">
 
           {/* Top Header */}
-          <header className="bg-gradient-to-r from-indigo-50/80 via-blue-50/80 to-emerald-50/80 dark:from-slate-800 dark:via-indigo-950/40 dark:to-emerald-950/30 backdrop-blur-md rounded-[5px] m-2 px-6 py-3 shadow-sm border border-indigo-100/50 dark:border-indigo-800/30 flex items-center justify-between z-30 flex-shrink-0 transition-colors duration-300">
+          <header className="bg-gradient-to-r from-indigo-700 via-purple-700 to-blue-800 dark:from-indigo-900 dark:via-purple-900 dark:to-blue-950 text-white rounded-[5px] m-2 px-6 py-3 shadow-lg border border-white/10 flex items-center justify-between z-30 flex-shrink-0 transition-colors duration-300">
             {/* Left: Logo & Title */}
             <div className="flex items-center gap-4 flex-shrink-0 min-w-0">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-white dark:bg-slate-800 rounded-lg flex items-center justify-center relative overflow-hidden flex-shrink-0 border border-slate-200 dark:border-slate-700 shadow-sm">
-                  <img src="/favicon-bg.png" alt="DeshExam Logo" className="w-full h-full object-cover m-0 !mb-0 rounded-none" />
+                <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center relative overflow-hidden flex-shrink-0 shadow-sm p-0.5">
+                  <img src="/favicon-bg.png" alt="DeshExam Logo" className="w-full h-full object-cover m-0 !mb-0 rounded-md" />
                 </div>
                 <div className="hidden xl:flex flex-col justify-center">
-                  <span className="font-extrabold text-[19px] leading-[1.1] tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-emerald-500 dark:from-blue-400 dark:to-emerald-400">
+                  <span className="font-extrabold text-[19px] leading-[1.1] tracking-tight text-white drop-shadow-sm">
                     Desh Exam
                   </span>
-                  <span className="text-[9px] font-extrabold tracking-[0.25em] text-slate-500 dark:text-slate-400 uppercase leading-none mt-0.5 ml-[2px]">
+                  <span className="text-[9px] font-extrabold tracking-[0.25em] text-white/70 uppercase leading-none mt-0.5 ml-[2px]">
                     Academy
                   </span>
                 </div>
               </div>
-              <div className="h-8 w-px bg-slate-300 dark:bg-slate-700 hidden xl:block flex-shrink-0 mx-2"></div>
+              <div className="h-8 w-px bg-white/20 hidden xl:block flex-shrink-0 mx-2"></div>
               <div className="flex items-center gap-4 min-w-0">
                 <div className="flex flex-col min-w-0">
-                  <h1 className="font-bold text-lg text-slate-900 dark:text-slate-50 leading-tight line-clamp-1 flex-1" title={mockTest.title}>
+                  <h1 className="font-bold text-lg text-white leading-tight line-clamp-1 flex-1 drop-shadow-sm" title={mockTest.title}>
                     {isReviewMode ? "Reviewing Solutions" : mockTest.title}
                   </h1>
                   <div className="flex items-center gap-2 mt-1.5 overflow-hidden w-full">
                     {(mockTest.taxonomyLine || (mockTest as any).category || "General Studies").split(' • ').map((part: string, idx: number, arr: string[]) => (
                       <div key={idx} className="flex items-center gap-2 flex-shrink-0">
-                        <span className="text-[11px] font-extrabold px-2.5 py-0.5 rounded-md bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-800/50 tracking-wide uppercase">
+                        <span className="text-[11px] font-extrabold px-2.5 py-0.5 rounded-md bg-white/15 text-white border border-white/20 tracking-wide uppercase shadow-sm">
                           {part}
                         </span>
                         {idx < arr.length - 1 && (
-                          <span className="text-slate-300 dark:text-slate-600 text-[10px]">▶</span>
+                          <span className="text-white/40 text-[10px]">▶</span>
                         )}
                       </div>
                     ))}
@@ -1009,19 +1009,19 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
 
             {/* Right: Actions */}
             <div className="flex items-center gap-3">
-              <button className="w-10 h-10 rounded-full flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+              <button className="w-10 h-10 rounded-full flex items-center justify-center text-white/80 hover:bg-white/10 hover:text-white transition-colors">
                 <Bookmark className="w-5 h-5" />
               </button>
-              <button onClick={toggleFullscreen} className="w-10 h-10 rounded-full flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+              <button onClick={toggleFullscreen} className="w-10 h-10 rounded-full flex items-center justify-center text-white/80 hover:bg-white/10 hover:text-white transition-colors">
                 {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
               </button>
-              <button onClick={toggleTheme} className="w-10 h-10 rounded-full flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+              <button onClick={toggleTheme} className="w-10 h-10 rounded-full flex items-center justify-center text-white/80 hover:bg-white/10 hover:text-white transition-colors">
                 {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
               </button>
-              <button onClick={() => setShowPresentationMode(true)} className="w-10 h-10 rounded-full flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" title="Presentation Mode">
+              <button onClick={() => setShowPresentationMode(true)} className="w-10 h-10 rounded-full flex items-center justify-center text-white/80 hover:bg-white/10 hover:text-white transition-colors" title="Presentation Mode">
                 <Presentation className="w-5 h-5" />
               </button>
-              <div className="h-6 w-px bg-slate-200 dark:bg-slate-700 mx-1 transition-colors"></div>
+              <div className="h-6 w-px bg-white/20 mx-1 transition-colors"></div>
 
               {!isReviewMode ? (
                 <>
@@ -1030,8 +1030,8 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                     className={cn(
                       "h-10 px-3 rounded-full font-bold text-sm flex items-center gap-1.5 border transition-colors shadow-sm",
                       autoSaveNext
-                        ? "bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800"
-                        : "bg-white dark:bg-[#1e293b] text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700"
+                        ? "bg-white/20 text-white border-white/40"
+                        : "bg-white/5 text-white/60 border-white/10 hover:bg-white/10 hover:text-white"
                     )}
                     title="Automatically save and go to next question"
                   >
@@ -1039,12 +1039,12 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                   </button>
                   <Button
                     onClick={() => setShowSubmitConfirm(true)}
-                    className="bg-[#EF4444] hover:bg-red-600 text-white rounded-full px-6 font-bold shadow-sm"
+                    className="bg-[#EF4444] hover:bg-red-600 text-white rounded-full px-6 font-bold shadow-sm border border-red-500/50"
                   >
                     Submit
                   </Button>
-                  <div className="bg-[#DCFCE7] dark:bg-[#064e3b] text-[#166534] dark:text-[#34d399] px-4 py-2 rounded-full font-bold flex items-center gap-2 shadow-sm border border-[#bbf7d0] dark:border-[#047857] transition-colors">
-                    <Clock className="w-5 h-5" />
+                  <div className="bg-white/15 text-white px-4 py-2 rounded-full font-bold flex items-center gap-2 shadow-sm border border-white/20 transition-colors backdrop-blur-md">
+                    <Clock className="w-5 h-5 text-emerald-300" />
                     <span className="text-[15px]">{formatTime(timeLeft)}</span>
                   </div>
                 </>
