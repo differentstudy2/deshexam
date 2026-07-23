@@ -1075,7 +1075,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                 {/* Main Presentation Area */}
                 <div 
-                    className={`responsive-fonts flex-1 min-w-0 relative w-full h-full ${getBgThemeClasses()} flex flex-col shadow-2xl overflow-hidden shrink-0 z-10 xl:rounded-xl xl:border xl:border-gray-200 dark:border-gray-800 transition-colors duration-500`}
+                    className={`responsive-fonts flex-1 min-w-0 relative w-full h-full ${getBgThemeClasses()} flex flex-col shadow-2xl overflow-hidden shrink-0 z-10 xl:rounded-xl xl:border xl:border-gray-200 dark:border-gray-800 transition-colors duration-500 ${isPenActive && drawingTool === 'laser' ? 'cursor-none [&_*]:cursor-none' : ''}`}
                     onPointerMove={(e) => {
                         if (isPenActive && drawingTool === 'laser') {
                             draw(e);
