@@ -1074,7 +1074,14 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 </div>
 
                 {/* Main Presentation Area */}
-                <div className={`responsive-fonts flex-1 min-w-0 relative w-full h-full ${getBgThemeClasses()} flex flex-col shadow-2xl overflow-hidden shrink-0 z-10 xl:rounded-xl xl:border xl:border-gray-200 dark:border-gray-800 transition-colors duration-500`}>
+                <div 
+                    className={`responsive-fonts flex-1 min-w-0 relative w-full h-full ${getBgThemeClasses()} flex flex-col shadow-2xl overflow-hidden shrink-0 z-10 xl:rounded-xl xl:border xl:border-gray-200 dark:border-gray-800 transition-colors duration-500`}
+                    onPointerMove={(e) => {
+                        if (isPenActive && drawingTool === 'laser') {
+                            draw(e);
+                        }
+                    }}
+                >
 
                     {/* Background Pattern Overlay */}
                     {bgTheme !== 'video' && (
@@ -1111,7 +1118,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     {/* Active Stroke Canvas (Top Layer) */}
                     <canvas
                         ref={activeCanvasRef}
-                        className={`absolute inset-0 w-full h-full z-30 touch-none ${isPenActive ? 'pointer-events-auto cursor-none' : 'pointer-events-none'}`}
+                        className={`absolute inset-0 w-full h-full z-30 touch-none ${isPenActive && drawingTool !== 'laser' ? 'pointer-events-auto cursor-none' : 'pointer-events-none'}`}
                         onPointerDown={startDrawing}
                         onPointerMove={draw}
                         onPointerUp={stopDrawing}
