@@ -602,16 +602,16 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row flex-wrap gap-4 justify-center w-full">
-            <Button onClick={() => router.back()} className="h-12 px-6 sm:px-8 rounded-full font-semibold border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors w-full sm:w-auto" variant="outline">
+          <div className="flex gap-4 justify-center">
+            <Button onClick={() => router.back()} className="h-12 px-8 rounded-full font-semibold border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" variant="outline">
               Return to Dashboard
             </Button>
-            <Button onClick={() => window.location.reload()} className="h-12 px-6 sm:px-8 rounded-full font-semibold border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors w-full sm:w-auto" variant="outline">
+            <Button onClick={() => window.location.reload()} className="h-12 px-8 rounded-full font-semibold border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" variant="outline">
               Retake
             </Button>
             <Button
               onClick={() => setIsReviewMode(true)}
-              className="h-12 px-6 sm:px-8 rounded-full font-semibold bg-[#16A34A] dark:bg-emerald-600 hover:bg-green-700 dark:hover:bg-emerald-700 text-white border-0 shadow-sm transition-colors w-full sm:w-auto"
+              className="h-12 px-8 rounded-full font-semibold bg-[#16A34A] dark:bg-emerald-600 hover:bg-green-700 dark:hover:bg-emerald-700 text-white border-0 shadow-sm transition-colors"
             >
               View Solutions
             </Button>
@@ -1064,10 +1064,10 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
           </header>
 
           {/* Main Content Area */}
-          <main className="flex-1 flex flex-col lg:flex-row gap-5 px-4 pb-4 overflow-y-auto lg:overflow-hidden max-w-[1800px] mx-auto w-full">
+          <main className="flex-1 flex gap-5 px-4 pb-4 overflow-hidden max-w-[1800px] mx-auto w-full">
 
             {/* Left Sidebar */}
-            <aside className="w-full lg:w-[260px] xl:w-[280px] flex flex-col gap-2 xl:gap-3 lg:overflow-y-auto hide-scrollbar flex-shrink-0 h-auto lg:h-full">
+            <aside className="w-[230px] lg:w-[260px] xl:w-[280px] flex flex-col gap-2 xl:gap-3 overflow-y-auto hide-scrollbar flex-shrink-0 h-full">
               
               {/* Site Promo Ad */}
               <div className="rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 p-4 text-white shadow-[0_8px_30px_-4px_rgba(79,70,229,0.3)] border border-indigo-400/30 relative overflow-hidden group shrink-0">
@@ -1102,7 +1102,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
             </aside>
 
             {/* Center Main Area */}
-            <section className="flex-1 flex flex-col gap-4 min-w-0 relative h-auto lg:h-full lg:overflow-hidden">
+            <section className="flex-1 flex flex-col gap-4 overflow-hidden min-w-0 relative">
 
               {/* Top Bar: Info & Mini Navigator */}
               <div className="flex items-center justify-between bg-white dark:bg-[#1e293b] rounded-[12px] px-4 py-2 shadow-sm border border-slate-100 dark:border-slate-700 transition-colors">
@@ -1323,7 +1323,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
             </section>
 
             {/* Right Sidebar - Premium Analytics & AI */}
-            <aside className="w-full lg:w-[270px] xl:w-[300px] 2xl:w-[320px] flex flex-col gap-2 xl:gap-3 lg:overflow-y-auto hide-scrollbar flex-shrink-0 h-auto lg:h-full">
+            <aside className="w-[240px] lg:w-[270px] xl:w-[300px] 2xl:w-[320px] flex flex-col gap-2 xl:gap-3 overflow-y-auto hide-scrollbar flex-shrink-0 h-full">
 
               {/* Premium Exam Progress Card (Compact) */}
               <div className="bg-gradient-to-br from-indigo-600 via-blue-600 to-indigo-800 dark:from-indigo-900 dark:via-blue-900 dark:to-indigo-950 text-white rounded-2xl shadow-[0_8px_30px_-4px_rgba(79,70,229,0.3)] border border-indigo-400/30 p-4 transition-colors duration-300 flex flex-col relative overflow-hidden flex-shrink-0">
