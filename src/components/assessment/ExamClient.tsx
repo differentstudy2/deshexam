@@ -1104,20 +1104,20 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
             {/* Center Main Area */}
             <section className="order-1 lg:order-2 flex-1 flex flex-col gap-4 overflow-hidden min-w-0 relative">
 
-              {/* Top Bar: Info & Mini Navigator */}
-              <div className="flex items-center justify-between bg-white dark:bg-[#1e293b] rounded-[12px] px-4 py-2 shadow-sm border border-slate-100 dark:border-slate-700 transition-colors">
+              {/* Top Bar: Mini Navigator */}
+              <div className="flex items-center bg-white dark:bg-[#1e293b] rounded-[12px] p-2 shadow-sm border border-slate-100 dark:border-slate-700 transition-colors">
 
                 {/* Center: Mini Navigator */}
-                <div className="flex items-center justify-center flex-1 min-w-0">
-                  <div className="bg-slate-50 dark:bg-slate-800/50 rounded-full px-2 py-1 flex items-center gap-1 border border-slate-100 dark:border-slate-700 transition-colors">
-                    <button onClick={handlePrevious} disabled={currentQuestionIndex === 0} className="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 disabled:opacity-30"><ArrowLeft className="w-4 h-4" /></button>
-                    <div className="flex items-center gap-1 overflow-x-auto hide-scrollbar max-w-[300px] xl:max-w-[400px]">
+                <div className="flex items-center w-full min-w-0">
+                  <div className="w-full bg-slate-50 dark:bg-slate-800/50 rounded-full px-2 py-1 flex items-center justify-between gap-2 border border-slate-100 dark:border-slate-700 transition-colors">
+                    <button onClick={handlePrevious} disabled={currentQuestionIndex === 0} className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-30 shadow-sm border border-slate-200 dark:border-slate-600 transition-colors"><ArrowLeft className="w-4 h-4" /></button>
+                    <div className="flex-1 flex items-center justify-center gap-1.5 overflow-x-auto hide-scrollbar scroll-smooth px-2 mask-edges">
                       {questions.map((q, idx) => {
                         const state = questionStates[q.id] || 'unvisited';
                         const isCurrent = currentQuestionIndex === idx;
 
-                        if (Math.abs(idx - currentQuestionIndex) > 4 && idx !== 0 && idx !== questions.length - 1) {
-                          if (idx === 1 || idx === questions.length - 2) return <span key={q.id} className="text-[#0B476D] dark:text-blue-300 font-bold px-1 tracking-widest">...</span>;
+                        if (Math.abs(idx - currentQuestionIndex) > 10 && idx !== 0 && idx !== questions.length - 1) {
+                          if (idx === 1 || idx === questions.length - 2) return <span key={q.id} className="text-[#0B476D] dark:text-blue-300 font-bold px-1 tracking-widest flex items-center justify-center">...</span>;
                           return null;
                         }
 
@@ -1151,7 +1151,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                         );
                       })}
                     </div>
-                    <button onClick={() => { if (currentQuestionIndex < questions.length - 1) setCurrentQuestionIndex(prev => prev + 1); }} disabled={currentQuestionIndex === questions.length - 1} className="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-slate-700 disabled:opacity-30"><ArrowLeft className="w-4 h-4 rotate-180" /></button>
+                    <button onClick={() => { if (currentQuestionIndex < questions.length - 1) setCurrentQuestionIndex(prev => prev + 1); }} disabled={currentQuestionIndex === questions.length - 1} className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-30 shadow-sm border border-slate-200 dark:border-slate-600 transition-colors"><ArrowLeft className="w-4 h-4 rotate-180" /></button>
                   </div>
                 </div>
               </div>
