@@ -1261,8 +1261,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                             {/* Title Area */}
                             <div className={`flex-1 w-full md:px-6 flex flex-col justify-center ${headerTitleAlign === 'left' ? 'items-start text-left' :
-                                    headerTitleAlign === 'right' ? 'items-end text-right' :
-                                        'items-center text-center'
+                                headerTitleAlign === 'right' ? 'items-end text-right' :
+                                    'items-center text-center'
                                 }`}>
                                 <h1 className="font-extrabold text-indigo-950 dark:text-gray-100 tracking-tight line-clamp-1 md:line-clamp-none" style={{ fontSize: `${1.1 * headerScale * headerTitleScale}rem` }}>{classLine}</h1>
                                 {(chapterName || topicName) && (
@@ -1300,8 +1300,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             {isTimerEnabled && (
                                 <div
                                     className={`flex items-center gap-1.5 md:gap-3 px-3 py-1.5 md:px-5 md:py-2.5 rounded-xl md:rounded-2xl backdrop-blur-xl border select-none transition-all duration-300 font-mono text-lg md:text-[26px] font-black tracking-widest ${step >= 1
-                                            ? 'bg-gray-100/90 dark:bg-gray-800/90 border-gray-200/50 dark:border-gray-700/50 text-gray-400 dark:text-gray-500 shadow-sm'
-                                            : 'bg-white/95 dark:bg-gray-800/95 border-blue-200/60 dark:border-blue-900/60 text-[#1e3a8a] dark:text-blue-100 shadow-[0_8px_32px_rgba(59,130,246,0.15)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.3)] ring-1 ring-blue-100 dark:ring-blue-900/50'
+                                        ? 'bg-gray-100/90 dark:bg-gray-800/90 border-gray-200/50 dark:border-gray-700/50 text-gray-400 dark:text-gray-500 shadow-sm'
+                                        : 'bg-white/95 dark:bg-gray-800/95 border-blue-200/60 dark:border-blue-900/60 text-[#1e3a8a] dark:text-blue-100 shadow-[0_8px_32px_rgba(59,130,246,0.15)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.3)] ring-1 ring-blue-100 dark:ring-blue-900/50'
                                         } ${isDraggingTimer ? 'cursor-grabbing scale-105 shadow-[0_16px_48px_rgba(59,130,246,0.25)] ring-blue-300 dark:ring-blue-700' : 'cursor-grab hover:shadow-[0_12px_40px_rgba(59,130,246,0.2)] hover:scale-[1.02]'}`}
                                     onPointerDown={handleTimerPointerDown}
                                     onPointerMove={handleTimerPointerMove}
@@ -1358,7 +1358,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                                     {/* Options */}
                                     <motion.div
-                                        className={optionsLayout === 'grid' ? "grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 w-full max-w-6xl mt-12 md:mt-16" : "flex flex-col gap-y-3 w-[90%] md:w-fit md:min-w-[500px] max-w-5xl mt-12 md:mt-16 mx-auto"}
+                                        className={optionsLayout === 'grid' ? "grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 w-full max-w-6xl mt-12 md:mt-16" : "flex flex-col gap-y-3 w-[90%] md:w-fit md:min-w-[500px] max-w-5xl mt-12 md:mt-12 mx-auto"}
                                         initial="hidden"
                                         animate="visible"
                                         variants={{
