@@ -1340,7 +1340,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
             </section>
 
             {/* Right Sidebar - Premium Analytics & AI */}
-            <aside className="w-[240px] lg:w-[270px] xl:w-[300px] 2xl:w-[320px] flex flex-col gap-3 xl:gap-4 overflow-y-auto hide-scrollbar flex-shrink-0 h-full">
+            <aside className="w-[240px] lg:w-[270px] xl:w-[300px] 2xl:w-[320px] flex flex-col gap-2 xl:gap-3 overflow-y-auto hide-scrollbar flex-shrink-0 h-full">
 
               {/* Premium Exam Progress Card (Compact) */}
               <div className="bg-gradient-to-br from-indigo-600 via-blue-600 to-indigo-800 dark:from-indigo-900 dark:via-blue-900 dark:to-indigo-950 text-white rounded-2xl shadow-[0_8px_30px_-4px_rgba(79,70,229,0.3)] border border-indigo-400/30 p-4 transition-colors duration-300 flex flex-col relative overflow-hidden flex-shrink-0">
@@ -1375,7 +1375,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
               </div>
 
               {/* Deshexam Academy Ad Card */}
-              <div className="bg-gradient-to-br from-slate-900 to-slate-800 dark:from-slate-950 dark:to-black rounded-2xl p-4 text-white shadow-xl border border-slate-700/60 dark:border-slate-800 flex-shrink-0 relative overflow-hidden group cursor-pointer hover:shadow-2xl transition-all duration-300 mt-2">
+              <div className="bg-gradient-to-br from-slate-900 to-slate-800 dark:from-slate-950 dark:to-black rounded-2xl p-4 text-white shadow-xl border border-slate-700/60 dark:border-slate-800 flex-shrink-0 relative overflow-hidden group cursor-pointer hover:shadow-2xl transition-all duration-300">
                 <div className="absolute -top-4 -right-4 w-24 h-24 bg-amber-500/20 rounded-full blur-2xl pointer-events-none group-hover:bg-amber-500/30 transition-colors duration-500"></div>
                 <div className="absolute -bottom-4 -left-4 w-20 h-20 bg-blue-500/10 rounded-full blur-xl pointer-events-none"></div>
                 <div className="flex items-center justify-between relative z-10">
@@ -1394,6 +1394,23 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                       <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
                   </div>
+                </div>
+              </div>
+
+              {/* AdSense Ad Slot */}
+              <div className="w-full min-h-[250px] bg-slate-50 dark:bg-slate-800/30 rounded-2xl flex items-center justify-center border border-slate-200/60 dark:border-slate-700/50 flex-shrink-0 overflow-hidden relative">
+                {/* Placeholder text (visible while loading or if blocked) */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 opacity-50">
+                  <span className="text-[10px] font-bold tracking-[0.2em] uppercase">Advertisement</span>
+                </div>
+                {/* AdSense ins tag */}
+                <div className="w-full relative z-10 overflow-hidden flex justify-center">
+                  <ins className="adsbygoogle"
+                       style={{ display: 'block', width: '100%', height: '100%' }}
+                       data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                       data-ad-slot="XXXXXXXXXX"
+                       data-ad-format="auto"
+                       data-full-width-responsive="true"></ins>
                 </div>
               </div>
 
