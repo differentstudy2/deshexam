@@ -2453,7 +2453,11 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 <div className="flex-1 w-full relative flex flex-col items-center px-12 py-10 z-10 justify-center">
                                     <div 
                                         className={`w-full max-w-[90%] xl:max-w-6xl rounded-3xl p-12 shadow-[0_20px_50px_rgba(0,0,0,0.1)] backdrop-blur-sm border transition-all duration-500 relative z-20 ${qBgColor} border-white/20 dark:border-gray-700/50`}
-                                        style={{ boxShadow: isDarkMode ? '0 20px 40px -10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1)' : '0 20px 40px -10px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.5)' }}
+                                        style={{ 
+                                            boxShadow: isDarkMode ? '0 20px 40px -10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1)' : '0 20px 40px -10px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.5)',
+                                            backgroundImage: `linear-gradient(to right, ${isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'} 1px, transparent 1px)`,
+                                            backgroundSize: '24px 24px'
+                                        }}
                                     >
                                         <div className="flex items-start gap-4 mb-12 border-b border-gray-200/50 dark:border-gray-700/50 pb-10">
                                             <div className="flex items-center gap-4 shrink-0">
@@ -2483,7 +2487,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                 const theme = colorThemes[oIdx % colorThemes.length];
 
                                                 return (
-                                                    <div key={opt.key} className={`flex items-center gap-5 py-4 px-6 rounded-xl border-2 shadow-[0_4px_12px_rgba(0,0,0,0.04)] ${theme.bg} ${theme.border} min-h-[80px]`}>
+                                                    <div key={opt.key} className={`flex items-center gap-5 py-2 px-3 rounded-xl border-2 shadow-[0_4px_12px_rgba(0,0,0,0.04)] ${theme.bg} ${theme.border} min-h-[50px]`}>
                                                         <div className={`shrink-0 w-14 h-14 flex items-center justify-center rounded-full text-2xl font-black ${theme.letterBg} ${theme.letterText}`}>
                                                             {optLetter}
                                                         </div>
