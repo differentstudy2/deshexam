@@ -14,6 +14,7 @@ import { useAuthDialog } from '@/hooks/use-auth-dialog';
 import { getUserProfile } from '@/lib/firebase/firestore';
 import { saveExamAttempt, getUserExamAttemptsCount, recordQuestionAttempt } from '@/lib/firebase/student-analytics';
 import PresentationOverlay from './PresentationOverlay';
+import { AdUnit } from '@/components/ui/ad-unit';
 
 type QuestionState = 'unvisited' | 'answered' | 'skipped' | 'review' | 'current';
 
@@ -1062,18 +1063,38 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
           {/* Main Content Area */}
           <main className="flex-1 flex gap-5 px-4 pb-4 overflow-hidden max-w-[1800px] mx-auto w-full">
 
-            {/* Left Sidebar - Question Navigator */}
-            <aside className="w-[230px] lg:w-[260px] xl:w-[280px] flex flex-col bg-gradient-to-b from-white to-slate-50/80 dark:from-slate-800 dark:to-slate-900/50 rounded-2xl shadow-sm border border-white/60 dark:border-slate-700/50 p-4 xl:p-5 overflow-hidden flex-shrink-0 transition-colors duration-300">
-              <h2 className="font-bold text-lg text-slate-900 dark:text-slate-50 mb-1">Questions</h2>
-              <p className="text-sm text-slate-500 dark:text-slate-400 font-medium mb-4">Jump to question</p>
+            {/* Left Sidebar */}
+            <aside className="w-[230px] lg:w-[260px] xl:w-[280px] flex flex-col gap-2 xl:gap-3 overflow-y-auto hide-scrollbar flex-shrink-0 h-full">
+              
+              {/* Site Promo Ad */}
+              <div className="rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 p-4 text-white shadow-[0_8px_30px_-4px_rgba(79,70,229,0.3)] border border-indigo-400/30 relative overflow-hidden group shrink-0">
+                <div className="absolute inset-0 bg-[url('/noise.png')] opacity-10 mix-blend-overlay pointer-events-none"></div>
+                <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full blur-2xl transform translate-x-8 -translate-y-8 group-hover:scale-110 transition-transform duration-500"></div>
+                <h3 className="font-bold text-[15px] leading-tight mb-1">Desh Exam PRO</h3>
+                <p className="text-xs text-white/80 mb-3 leading-relaxed">Unlock mock tests, AI analytics & ad-free experience.</p>
+                <Button size="sm" className="w-full bg-white text-indigo-600 hover:bg-slate-50 text-xs font-bold h-8">
+                  Upgrade Now
+                </Button>
+              </div>
 
-              {/* Legend */}
-              <div className="flex flex-wrap gap-x-3 gap-y-2 text-[12px] font-semibold text-slate-600 dark:text-slate-400 mt-auto pt-4 border-t border-slate-100 dark:border-slate-700 transition-colors">
-                <div className="flex items-center gap-1.5 w-[calc(50%-6px)]"><div className="w-6 h-4 bg-[#166534] dark:bg-emerald-600 rounded-[4px]"></div>Current</div>
-                <div className="flex items-center gap-1.5 w-[calc(50%-6px)]"><div className="w-6 h-4 bg-[#DCFCE7] dark:bg-[#064e3b] rounded-[4px]"></div>Answered</div>
-                <div className="flex items-center gap-1.5 w-[calc(50%-6px)]"><div className="w-6 h-4 bg-[#FEE2E2] dark:bg-[#7f1d1d] rounded-[4px]"></div>Unanswered</div>
-                <div className="flex items-center gap-1.5 w-[calc(50%-6px)]"><div className="w-6 h-4 bg-[#FEF9C3] dark:bg-[#713f12] rounded-[4px]"></div>Review</div>
-                <div className="flex items-center gap-1.5 w-full"><div className="w-6 h-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-[4px]"></div>Not Visited</div>
+              {/* Legend Card */}
+              <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-4 shrink-0 transition-colors">
+                <h2 className="font-bold text-sm text-slate-900 dark:text-slate-50 mb-3">Legend</h2>
+                <div className="flex flex-wrap gap-x-3 gap-y-3 text-[12px] font-semibold text-slate-600 dark:text-slate-400">
+                  <div className="flex items-center gap-1.5 w-[calc(50%-6px)]"><div className="w-6 h-4 bg-[#166534] dark:bg-emerald-600 rounded-[4px]"></div>Current</div>
+                  <div className="flex items-center gap-1.5 w-[calc(50%-6px)]"><div className="w-6 h-4 bg-[#DCFCE7] dark:bg-[#064e3b] rounded-[4px]"></div>Answered</div>
+                  <div className="flex items-center gap-1.5 w-[calc(50%-6px)]"><div className="w-6 h-4 bg-[#FEE2E2] dark:bg-[#7f1d1d] rounded-[4px]"></div>Unanswered</div>
+                  <div className="flex items-center gap-1.5 w-[calc(50%-6px)]"><div className="w-6 h-4 bg-[#FEF9C3] dark:bg-[#713f12] rounded-[4px]"></div>Review</div>
+                  <div className="flex items-center gap-1.5 w-full"><div className="w-6 h-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-[4px]"></div>Not Visited</div>
+                </div>
+              </div>
+
+              {/* AdSense Slot */}
+              <div className="mt-auto shrink-0 pt-2">
+                <AdUnit
+                  format="vertical"
+                  className="w-full min-h-[250px] rounded-2xl overflow-hidden shadow-sm border border-slate-100 dark:border-slate-700 bg-white dark:bg-[#1e293b]"
+                />
               </div>
             </aside>
 
