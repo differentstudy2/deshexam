@@ -903,9 +903,9 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                     bubbleClass = `border-transparent transition-colors duration-300 ${theme.activeLetterBg} text-white`;
                     textClass = "text-slate-900 dark:text-slate-50 font-bold";
                   } else if (hasAnySelection) {
-                    optionClass = `border-2 transition-all duration-300 opacity-50 bg-gray-50 dark:bg-gray-800/40 border-gray-200 dark:border-gray-700 cursor-pointer hover:opacity-75`;
-                    bubbleClass = `border-transparent transition-colors duration-300 bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400`;
-                    textClass = "text-slate-500 dark:text-slate-400 font-medium";
+                    optionClass = `border-2 transition-all duration-300 opacity-70 bg-gray-50 dark:bg-gray-800/60 border-gray-200 dark:border-gray-600 cursor-pointer hover:opacity-100 hover:bg-gray-100 dark:hover:bg-gray-700`;
+                    bubbleClass = `border-transparent transition-colors duration-300 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300`;
+                    textClass = "text-slate-600 dark:text-slate-300 font-medium";
                   }
 
                   if (isReviewMode || examMode === 'read') {
@@ -1347,9 +1347,9 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                               bubbleClass = `border-transparent transition-colors duration-300 ${theme.activeLetterBg} text-white`;
                               textClass = "text-slate-900 dark:text-slate-50 font-bold";
                             } else if (hasAnySelection) {
-                              optionClass = `border-2 transition-all duration-300 opacity-50 bg-gray-50 dark:bg-gray-800/40 border-gray-200 dark:border-gray-700 cursor-pointer hover:opacity-75`;
-                              bubbleClass = `border-transparent transition-colors duration-300 bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400`;
-                              textClass = "text-slate-500 dark:text-slate-400 font-medium";
+                              optionClass = `border-2 transition-all duration-300 opacity-70 bg-gray-50 dark:bg-gray-800/60 border-gray-200 dark:border-gray-600 cursor-pointer hover:opacity-100 hover:bg-gray-100 dark:hover:bg-gray-700`;
+                              bubbleClass = `border-transparent transition-colors duration-300 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300`;
+                              textClass = "text-slate-600 dark:text-slate-300 font-medium";
                             }
 
                             if (isReviewMode || examMode === 'read') {
