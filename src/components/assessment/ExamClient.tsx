@@ -1080,17 +1080,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                 </Button>
               </div>
 
-              {/* Legend Card */}
-              <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-4 shrink-0 transition-colors">
-                <h2 className="font-bold text-sm text-slate-900 dark:text-slate-50 mb-3">Legend</h2>
-                <div className="flex flex-wrap gap-x-3 gap-y-3 text-[12px] font-semibold text-slate-600 dark:text-slate-400">
-                  <div className="flex items-center gap-1.5 w-[calc(50%-6px)]"><div className="w-6 h-4 bg-[#166534] dark:bg-emerald-600 rounded-[4px]"></div>Current</div>
-                  <div className="flex items-center gap-1.5 w-[calc(50%-6px)]"><div className="w-6 h-4 bg-[#DCFCE7] dark:bg-[#064e3b] rounded-[4px]"></div>Answered</div>
-                  <div className="flex items-center gap-1.5 w-[calc(50%-6px)]"><div className="w-6 h-4 bg-[#FEE2E2] dark:bg-[#7f1d1d] rounded-[4px]"></div>Unanswered</div>
-                  <div className="flex items-center gap-1.5 w-[calc(50%-6px)]"><div className="w-6 h-4 bg-[#FEF9C3] dark:bg-[#713f12] rounded-[4px]"></div>Review</div>
-                  <div className="flex items-center gap-1.5 w-full"><div className="w-6 h-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-[4px]"></div>Not Visited</div>
-                </div>
-              </div>
+
 
               {/* AdSense Slot */}
               <div className="mt-auto shrink-0 pt-2">
