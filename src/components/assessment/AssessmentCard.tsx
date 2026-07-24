@@ -15,9 +15,10 @@ interface AssessmentCardProps {
   type: 'Practice' | 'Quiz' | 'Mock Test' | 'Exam';
   href: string;
   taxonomyString?: string;
+  classNameString?: string;
 }
 
-export function AssessmentCard({ assessment, type, href, taxonomyString }: AssessmentCardProps) {
+export function AssessmentCard({ assessment, type, href, taxonomyString, classNameString }: AssessmentCardProps) {
   // Determine Type Colors & Icons
   let typeColor = 'bg-green-100 text-green-700';
   let Icon = HelpCircle;
@@ -77,10 +78,17 @@ export function AssessmentCard({ assessment, type, href, taxonomyString }: Asses
 
       <CardHeader className="pb-3 flex-none">
         <div className="flex items-center justify-between mb-3">
-          <Badge variant="outline" className={cn("font-medium", typeColor)}>
-            <Icon className="w-3 h-3 mr-1" />
-            {type}
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className={cn("font-medium", typeColor)}>
+              <Icon className="w-3 h-3 mr-1" />
+              {type}
+            </Badge>
+            {classNameString && (
+              <Badge variant="secondary" className="bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 font-medium">
+                {classNameString}
+              </Badge>
+            )}
+          </div>
           <div className="flex items-center gap-1.5">
             {assessment.reviewStats && assessment.reviewStats.totalReviews > 0 && (
               <div className="flex items-center gap-1 text-[11px] font-bold text-amber-500 bg-amber-50 dark:bg-amber-900/20 px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-800/50">

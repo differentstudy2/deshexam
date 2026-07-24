@@ -122,7 +122,7 @@ export default async function PracticeLandingPage({ params }: Props) {
     if (r.classId) { const node = await getTaxonomyNodeById(r.classId); if (node) tClass = node.title; }
     if (r.subjectId) { const node = await getTaxonomyNodeById(r.subjectId); if (node) tSubject = node.title; }
     const taxonomyString = [tBoard, tClass, tSubject].filter(Boolean).join(' • ');
-    return { ...r, taxonomyString };
+    return { ...r, taxonomyString, classString: tClass };
   }));
 
   let boardName = '';
@@ -684,7 +684,7 @@ ${test.negativeMarking && test.negativeMarking > 0 ? `* প্রতিটি �
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
                 {related.map(r => (
-                  <AssessmentCard key={r.id} assessment={r as any} type="Practice" href={`/practice/${r.slug}`} taxonomyString={r.taxonomyString} />
+                  <AssessmentCard key={r.id} assessment={r as any} type="Practice" href={`/practice/${r.slug}`} taxonomyString={r.taxonomyString} classNameString={r.classString} />
                 ))}
               </div>
             </section>
