@@ -110,25 +110,25 @@ export function AssessmentCard({ assessment, type, href, taxonomyString }: Asses
           </p>
         )}
 
-        <div className="flex flex-wrap gap-2 text-sm w-full">
-          <div className="flex-1 min-w-[30%] flex items-center justify-center gap-1.5 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 px-2.5 py-1.5 rounded-md font-medium text-xs border border-indigo-100 dark:border-indigo-800/50">
+        <div className="grid grid-cols-2 gap-2 text-sm w-full">
+          <div className="flex items-center justify-center gap-1.5 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 px-2.5 py-1.5 rounded-md font-medium text-xs border border-indigo-100 dark:border-indigo-800/50">
             <ListChecks className="w-3.5 h-3.5 shrink-0" />
             <span className="truncate">{assessment.questionIds?.length || 0} Qs</span>
           </div>
           {/* We can cast and check for estimatedTimeMin or timeLimitMin if we want, or just rely on generic metadata if added later */}
           {(assessment as any).timeLimitMin && (
-            <div className="flex-1 min-w-[30%] flex items-center justify-center gap-1.5 bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300 px-2.5 py-1.5 rounded-md font-medium text-xs border border-orange-100 dark:border-orange-800/50">
+            <div className="flex items-center justify-center gap-1.5 bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300 px-2.5 py-1.5 rounded-md font-medium text-xs border border-orange-100 dark:border-orange-800/50">
               <Timer className="w-3.5 h-3.5 shrink-0" />
               <span className="truncate">{(assessment as any).timeLimitMin}m</span>
             </div>
           )}
           {(assessment as any).estimatedTimeMin && (
-            <div className="flex-1 min-w-[30%] flex items-center justify-center gap-1.5 bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300 px-2.5 py-1.5 rounded-md font-medium text-xs border border-orange-100 dark:border-orange-800/50">
+            <div className="flex items-center justify-center gap-1.5 bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300 px-2.5 py-1.5 rounded-md font-medium text-xs border border-orange-100 dark:border-orange-800/50">
               <Timer className="w-3.5 h-3.5 shrink-0" />
               <span className="truncate">~{(assessment as any).estimatedTimeMin}m</span>
             </div>
           )}
-          <div className="flex-1 min-w-[30%] flex items-center justify-center gap-1.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 px-2.5 py-1.5 rounded-md font-medium text-xs border border-emerald-100 dark:border-emerald-800/50">
+          <div className="flex items-center justify-center gap-1.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 px-2.5 py-1.5 rounded-md font-medium text-xs border border-emerald-100 dark:border-emerald-800/50">
             <UsersRound className="w-3.5 h-3.5 shrink-0" />
             <span className="truncate">{(!assessment.attemptCount || assessment.attemptCount < 1000) ? '75K+' : assessment.attemptCount.toLocaleString()}</span>
           </div>
