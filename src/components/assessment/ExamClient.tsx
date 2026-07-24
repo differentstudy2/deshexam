@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Bookmark, Flag, Maximize, Minimize, AlertCircle, Clock, Moon, Sun, LayoutGrid, List, Settings, X, ToggleLeft, ToggleRight, Lock, Loader2, Presentation, Target, MonitorPlay, Play, Check } from 'lucide-react';
+import { ArrowLeft, Bookmark, Flag, Maximize, Minimize, AlertCircle, Clock, Moon, Sun, LayoutGrid, List, Settings, X, ToggleLeft, ToggleRight, Lock, Loader2, Presentation, Target, MonitorPlay, Play, Check, Crown } from 'lucide-react';
 
 const VIDEO_OPTIONS = [
   { id: 'v1', name: 'High-Tech Digital', url: '/videos/A_high_tech_digital_quiz_backg.mp4' },
@@ -126,7 +126,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
   const [questionTextColor, setQuestionTextColor] = useState('');
   const [questionBgColor, setQuestionBgColor] = useState('');
   const [animSpeed, setAnimSpeed] = useState(0.5);
-  const [bgTheme, setBgTheme] = useState<'default' | 'mesh' | 'grid' | 'dots' | 'video'>('default');
+  const [bgTheme, setBgTheme] = useState<'default' | 'mesh' | 'grid' | 'dots' | 'video' | 'premium_1' | 'premium_2' | 'premium_3' | 'premium_4' | 'premium_5'>('default');
   const [selectedVideo, setSelectedVideo] = useState('/videos/bg1.mp4');
   const [watermarkText, setWatermarkText] = useState('DESHEXAM');
   const [watermarkOpacity, setWatermarkOpacity] = useState(0.05);
@@ -694,6 +694,11 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
       case 'grid': return 'bg-[#f8fafc] dark:bg-gray-900';
       case 'dots': return 'bg-[#f8fafc] dark:bg-gray-900';
       case 'video': return 'bg-black/90 text-white';
+      case 'premium_1': return 'bg-[#FFFBEB] dark:bg-[#451a03]'; // Amber Tint
+      case 'premium_2': return 'bg-[#F0FDF4] dark:bg-[#052e16]'; // Emerald Tint
+      case 'premium_3': return 'bg-[#EFF6FF] dark:bg-[#172554]'; // Blue Tint
+      case 'premium_4': return 'bg-[#FAF5FF] dark:bg-[#3b0764]'; // Purple Tint
+      case 'premium_5': return 'bg-[#FFF1F2] dark:bg-[#4c0519]'; // Rose Tint
       default: return 'bg-[#F1F5F9] md:bg-[#F8FAFC] dark:bg-[#0f172a] md:dark:bg-[#0f172a]';
     }
   };
@@ -1772,6 +1777,38 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                                   </select>
                                 </div>
                               )}
+                              
+                              {/* Premium Colors */}
+                              <div className="relative mt-3">
+                                {!isPremiumUser && (
+                                  <div className="absolute inset-0 z-10 bg-slate-50/40 dark:bg-slate-900/40 backdrop-blur-[1.5px] rounded-xl flex items-center justify-center">
+                                    <a href="/pricing" className="bg-gradient-to-r from-amber-500 to-orange-600 text-white text-[10px] font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 hover:scale-105 transition-transform cursor-pointer">
+                                      <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                      Premium Only
+                                    </a>
+                                  </div>
+                                )}
+                                <div className={`text-[11px] font-bold text-amber-500 uppercase tracking-wider mb-2 flex items-center gap-1 ${!isPremiumUser ? 'opacity-50' : ''}`}>
+                                  <Crown className="w-3 h-3" /> Premium Solid Colors
+                                </div>
+                                <div className={`flex gap-2 flex-wrap ${!isPremiumUser ? 'opacity-50 pointer-events-none select-none' : ''}`}>
+                                  {[
+                                    { id: 'premium_1', color: '#FFFBEB', title: 'Amber Tint' }, 
+                                    { id: 'premium_2', color: '#F0FDF4', title: 'Emerald Tint' }, 
+                                    { id: 'premium_3', color: '#EFF6FF', title: 'Blue Tint' }, 
+                                    { id: 'premium_4', color: '#FAF5FF', title: 'Purple Tint' }, 
+                                    { id: 'premium_5', color: '#FFF1F2', title: 'Rose Tint' }, 
+                                  ].map((p) => (
+                                    <button
+                                      key={p.id}
+                                      onClick={() => setBgTheme(p.id as any)}
+                                      className={`w-8 h-8 rounded-full border-2 transition-transform shadow-sm ${bgTheme === p.id ? 'scale-110 border-blue-500' : 'border-slate-200 dark:border-slate-700 hover:scale-105'}`}
+                                      style={{ backgroundColor: p.color }}
+                                      title={p.title}
+                                    />
+                                  ))}
+                                </div>
+                              </div>
                             </div>
                             
                             <div className="h-px w-full bg-gradient-to-r from-transparent via-slate-200 dark:via-slate-700 to-transparent my-1"></div>
