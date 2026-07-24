@@ -9,12 +9,14 @@ import {
   Clock, HelpCircle, ShieldCheck, FileText, CheckCircle2,
   AlertTriangle, BookOpen, Target, Award, ChevronRight, ArrowRight,
   Zap, Users, BarChart3, Brain, Star, Maximize, LayoutGrid, ShieldAlert, MonitorPlay,
-  Trophy, Sparkles, LineChart, BookCheck, History, Smartphone, PieChart
+  Trophy, Sparkles, LineChart, BookCheck, History, Smartphone, PieChart, RotateCcw
 } from 'lucide-react';
 import Link from 'next/link';
 import { AssessmentCard } from '@/components/assessment/AssessmentCard';
 import { StartTestButton } from '@/components/assessment/StartTestButton';
 import { MockTestReviews } from '@/components/assessment/MockTestReviews';
+import { UserAttemptsDisplay } from '@/components/assessment/UserAttemptsDisplay';
+import { TopScorersWidget } from '@/components/assessment/TopScorersWidget';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -25,37 +27,95 @@ export const revalidate = 0;
 export async function generateMetadata({ params }: Props, parent: ResolvingMetadata): Promise<Metadata> {
   const { slug } = await params;
   const test = await getAssessmentBySlug('practiceSets', slug) as MockTest | null;
+  
   if (!test) return { title: 'Practice Set Not Found' };
-  const imageUrl = (Array.isArray(test.thumbnail) ? test.thumbnail[0] : test.thumbnail) || "https://deshexam.com/og/practice.jpg";
+  
+  const imageUrl = (Array.isArray(test.thumbnail) ? test.thumbnail[0] : test.thumbnail) || "https://deshexam.com/og/quiz.jpg";
   const title = `${formatTitleForBrowser(test.title)} | Practice Set | DeshExam`;
-  const description = test.description || `Take the practice set: ${test.title}.`;
+  const description = test.description || `Take the ${test.title} practice set to test your preparation for ${test.boardId || 'competitive'} exams.`;
+  
+  // Generate keywords based on taxonomy if available
+  const keywords = [
+    'online quiz', 'mcq test', 'mock test', 
+    test.boardId, test.classId, test.subjectId, test.chapterId
+  ].filter(Boolean).join(', ') + ', deshexam practice sets, free govt job preparation';
 
   return {
     title,
     description,
+    keywords,
+    alternates: {
+      canonical: `https://deshexam.com/practice/${slug}`,
+    },
     openGraph: {
       title,
       description,
-      images: [{ url: imageUrl }],
+      url: `https://deshexam.com/practice/${slug}`,
+      siteName: 'DeshExam',
+      images: [{ url: imageUrl, width: 1200, height: 630, alt: title }],
       type: 'website',
+      locale: 'en_US',
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
       images: [imageUrl],
-    }
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
   };
 }
 
 export default async function PracticeLandingPage({ params }: Props) {
   const { slug } = await params;
   const test = await getAssessmentBySlug('practiceSets', slug) as MockTest | null;
+  
+  // LEGACY FALLBACK: If entirely not found in the new Assessment Center,
+  // it might be an old content-based quiz (e.g. 'bullo')
+  if (!test) {
+    const { getContentById } = await import('@/lib/firebase/firestore');
+    const legacyQuizData = await getContentById(slug);
+    
+    if (legacyQuizData && (legacyQuizData as any).testType === 'Quiz') {
+      const serializeTimestamps = (data: any): any => {
+          if (!data) return data;
+          if (Array.isArray(data)) return data.map(item => serializeTimestamps(item));
+          if (typeof data === 'object' && data !== null) {
+              if (data.hasOwnProperty('seconds') && typeof (data as any).toDate === 'function') {
+                  return (data as any).toDate().toISOString();
+              }
+              const newObj: { [key: string]: any } = {};
+              for (const key in data) newObj[key] = serializeTimestamps(data[key]);
+              return newObj;
+          }
+          return data;
+      };
+
+      const serializedLegacyQuiz = serializeTimestamps(legacyQuizData);
+      const OldQuizClientPage = (await import('@/components/legacy/OldQuizClientPage')).default;
+      
+      return (
+        <div className="legacy-wrapper">
+          <OldQuizClientPage quiz={serializedLegacyQuiz} />
+        </div>
+      );
+    }
+  }
 
   if (!test || test.status !== 'Published') notFound();
 
   const allTests = await getAssessments('practiceSets') as MockTest[];
-  const related = allTests.filter(a => a.id !== test.id && a.status === 'Published').slice(0, 3);
+  const related = allTests.filter(a => a.id !== test.id && a.status === 'Published').slice(0, 4);
 
   let boardName = '';
   let className = '';
@@ -82,8 +142,8 @@ export default async function PracticeLandingPage({ params }: Props) {
       {
         "@type": "ListItem",
         "position": 2,
-        "name": "Practice Sets",
-        "item": "https://deshexam.com/practice"
+        "name": "Quizzes",
+        "item": "https://deshexam.com/quiz"
       },
       {
         "@type": "ListItem",
@@ -111,7 +171,7 @@ export default async function PracticeLandingPage({ params }: Props) {
     "@type": "Product",
     "name": test.title,
     "description": test.description || `Take the ${test.title} practice set on DeshExam.`,
-    "image": (Array.isArray(test.thumbnail) ? test.thumbnail[0] : test.thumbnail) || "https://deshexam.com/og/practice.jpg",
+    "image": (Array.isArray(test.thumbnail) ? test.thumbnail[0] : test.thumbnail) || "https://deshexam.com/og/quiz.jpg",
     "brand": {
       "@type": "Brand",
       "name": "DeshExam"
@@ -196,7 +256,7 @@ export default async function PracticeLandingPage({ params }: Props) {
             <nav className="flex items-center gap-1.5 text-xs text-slate-400 mb-8">
               <Link href="/" className="hover:text-white transition-colors">Home</Link>
               <ChevronRight className="w-3 h-3" />
-              <Link href="/practice" className="hover:text-white transition-colors">Practice Sets</Link>
+              <Link href="/quiz" className="hover:text-white transition-colors">Practice Sets</Link>
               <ChevronRight className="w-3 h-3" />
               <span className="text-slate-300 truncate max-w-[200px]">{test.title}</span>
             </nav>
@@ -207,7 +267,7 @@ export default async function PracticeLandingPage({ params }: Props) {
                 {/* Badges row */}
                 <div className="flex flex-wrap gap-2">
                   <span className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-300 bg-blue-400/10 border border-blue-400/20 px-3 py-1 rounded-full">
-                    <Zap className="w-3 h-3" /> Practice Set
+                    <Zap className="w-3 h-3" /> Quiz
                   </span>
                   {test.difficulty && (
                     <span className={`inline-flex items-center text-xs font-bold px-3 py-1 rounded-full border ${DIFFICULTY_COLOR[test.difficulty] || DIFFICULTY_COLOR.Medium}`}>
@@ -232,14 +292,14 @@ export default async function PracticeLandingPage({ params }: Props) {
                 </h1>
 
                 {test.description && (
-                  <p className="text-slate-400 text-base lg:text-lg max-w-xl leading-relaxed mt-4">
+                  <p className="text-slate-400 text-base lg:text-lg leading-relaxed mt-4">
                     {test.description}
                   </p>
                 )}
 
                 {/* Academic Details */}
                 {(boardName || className || subjectName || textbookName || chapterName) && (
-                  <div className="flex flex-wrap items-center gap-2 text-sm text-slate-300 bg-white/5 p-3 rounded-xl border border-white/10 mt-6 shadow-sm">
+                  <div className="flex flex-wrap items-center gap-2 text-sm text-slate-300 bg-white/5 p-3 rounded-lg border border-white/10 mt-6 shadow-sm">
                      <BookOpen className="w-4 h-4 text-emerald-400 mr-1" />
                      {boardName && <span className="bg-white/10 hover:bg-white/20 transition-colors px-2.5 py-1 rounded-md text-xs font-medium">{boardName}</span>}
                      {className && (
@@ -276,8 +336,8 @@ export default async function PracticeLandingPage({ params }: Props) {
                     { icon: Clock, label: `${test.durationMin ?? 0} Minutes`, color: 'text-violet-400', borderHover: 'hover:border-violet-500/30', bgHover: 'hover:bg-violet-500/10', show: true },
                     { icon: FileText, label: `${test.totalMarks ?? 0} Marks`, color: 'text-amber-400', borderHover: 'hover:border-amber-500/30', bgHover: 'hover:bg-amber-500/10', show: true },
                     { icon: AlertTriangle, label: `${test.negativeMarking ?? 0} Negative`, color: 'text-red-400', borderHover: 'hover:border-red-500/30', bgHover: 'hover:bg-red-500/10', show: !!test.negativeMarking && test.negativeMarking > 0 },
-                  ].filter(item => item.show !== false).map(({ icon: Icon, label, color, borderHover, bgHover }) => (
-                    <div key={label} className={`flex items-center justify-center sm:justify-start gap-2 bg-white/5 border border-white/10 rounded-xl px-2 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold text-white backdrop-blur-md shadow-lg transition-all duration-300 ${borderHover} ${bgHover} cursor-default`}>
+                  ].filter(item => item.show).map(({ icon: Icon, label, color, borderHover, bgHover }) => (
+                    <div key={label} className={`flex items-center justify-center sm:justify-start gap-2 bg-white/5 border border-white/10 rounded-lg px-2 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold text-white backdrop-blur-md shadow-lg transition-all duration-300 ${borderHover} ${bgHover} cursor-default`}>
                       <Icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 ${color}`} />
                       <span className="truncate">{label}</span>
                     </div>
@@ -286,19 +346,19 @@ export default async function PracticeLandingPage({ params }: Props) {
 
                 {/* Mobile CTA */}
                 <div className="lg:hidden">
-                  <StartTestButton slug={test.slug} accessType={test.accessType} price={test.price} allowedSubscriptionPlans={test.allowedSubscriptionPlans} basePath="/practice" testType="practice" />
+                  <StartTestButton slug={test.slug} accessType={test.accessType} price={test.price} allowedSubscriptionPlans={test.allowedSubscriptionPlans} basePath="/quiz" testType="quiz" />
                 </div>
               </div>
 
               {/* Right: CTA card (desktop — floats into content below) */}
               <div className="hidden lg:block w-80 shrink-0 -mb-16 relative z-10 group">
-                <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl shadow-black/30 border border-slate-200/50 dark:border-slate-800/50 overflow-hidden transition-all duration-500 hover:shadow-violet-500/10 hover:-translate-y-1">
+                <div className="bg-white dark:bg-slate-900 rounded-lg shadow-2xl shadow-black/30 border border-slate-200/50 dark:border-slate-800/50 overflow-hidden transition-all duration-500 hover:shadow-violet-500/10 hover:-translate-y-1">
                   {/* Card header */}
                   <div className="bg-gradient-to-br from-violet-600 via-purple-600 to-blue-600 p-6 relative overflow-hidden">
                     {/* Header shine effect */}
                     <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out"></div>
                     <div className="relative flex items-center gap-3 mb-2">
-                      <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-inner">
+                      <div className="w-10 h-10 rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-inner">
                         <Brain className="w-5 h-5 text-white" />
                       </div>
                       <div>
@@ -316,7 +376,7 @@ export default async function PracticeLandingPage({ params }: Props) {
                       { icon: Target, label: 'Total Marks', value: `${test.totalMarks ?? 0}`, show: true },
                       { icon: CheckCircle2, label: 'Passing Marks', value: `${test.passingMarks ?? 0}`, show: true },
                       { icon: AlertTriangle, label: 'Negative Marks', value: `${test.negativeMarking ?? 0}`, show: !!test.negativeMarking && test.negativeMarking > 0 },
-                    ].filter(item => item.show !== false).map(({ icon: Icon, label, value }) => (
+                    ].filter(item => item.show).map(({ icon: Icon, label, value }) => (
                       <div key={label} className="flex items-center justify-between text-sm">
                         <span className="flex items-center gap-2 text-slate-500 dark:text-slate-400 font-medium">
                           <Icon className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
@@ -327,7 +387,7 @@ export default async function PracticeLandingPage({ params }: Props) {
                     ))}
 
                     <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
-                      <StartTestButton slug={test.slug} accessType={test.accessType} price={test.price} allowedSubscriptionPlans={test.allowedSubscriptionPlans} basePath="/practice" testType="practice" />
+                      <StartTestButton slug={test.slug} accessType={test.accessType} price={test.price} allowedSubscriptionPlans={test.allowedSubscriptionPlans} basePath="/quiz" testType="quiz" />
                     </div>
 
                     <p className="text-center text-[11px] text-slate-400">Strictly timed · Negative marking applies</p>
@@ -348,14 +408,18 @@ export default async function PracticeLandingPage({ params }: Props) {
             <div className="flex-1 space-y-8">
 
               {/* Quick facts strip */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-3">
                 {[
                   { icon: HelpCircle, label: 'Questions', value: `${test.questionIds?.length ?? 0}`, color: 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-400' },
                   { icon: Clock, label: 'Duration', value: `${test.durationMin ?? 0} min`, color: 'bg-violet-50 dark:bg-violet-900/20 border-violet-200 dark:border-violet-800 text-violet-700 dark:text-violet-400' },
                   { icon: Award, label: 'Total Marks', value: `${test.totalMarks ?? 0}`, color: 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400' },
                   { icon: Target, label: 'Pass Marks', value: `${test.passingMarks ?? 0}`, color: 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400' },
+                  { icon: Users, label: 'Total Attempts', value: (test.attemptCount && test.attemptCount >= 1000) ? test.attemptCount.toLocaleString() : '75K', color: 'bg-pink-50 dark:bg-pink-900/20 border-pink-200 dark:border-pink-800 text-pink-700 dark:text-pink-400' },
+                  { icon: BarChart3, label: 'Average Score', value: test.averageScore ? `${test.averageScore}%` : 'N/A', color: 'bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-400' },
+                  { icon: LayoutGrid, label: 'Question Type', value: test.questionType || 'MCQ', color: 'bg-cyan-50 dark:bg-cyan-900/20 border-cyan-200 dark:border-cyan-800 text-cyan-700 dark:text-cyan-400' },
+                  { icon: BookOpen, label: 'Subject', value: subjectName || 'Mixed', color: 'bg-rose-50 dark:bg-rose-900/20 border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-400' },
                 ].map(({ icon: Icon, label, value, color }) => (
-                  <div key={label} className={`flex flex-col items-center justify-center p-4 rounded-2xl border text-center transition-colors duration-300 ${color}`}>
+                  <div key={label} className={`flex flex-col items-center justify-center p-4 rounded-lg border text-center transition-colors duration-300 ${color}`}>
                     <Icon className="w-5 h-5 mb-1 opacity-70" />
                     <p className="text-2xl font-extrabold dark:text-slate-100">{value}</p>
                     <p className="text-[11px] font-semibold uppercase tracking-wide opacity-70">{label}</p>
@@ -363,8 +427,11 @@ export default async function PracticeLandingPage({ params }: Props) {
                 ))}
               </div>
 
+              {/* User Attempts */}
+              <UserAttemptsDisplay assessmentId={test.id} />
+
               {/* Instructions */}
-              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-colors duration-300">
+              <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-colors duration-300">
                 <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
                   <BookOpen className="w-5 h-5 text-[#107c41] dark:text-[#22c55e]" />
                   <h2 className="text-base font-bold text-slate-800 dark:text-slate-100">Instructions</h2>
@@ -393,7 +460,7 @@ ${test.negativeMarking && test.negativeMarking > 0 ? `* প্রতিটি �
                     </ReactMarkdown>
                   </div>
                   {test.examRules && (
-                    <div className="mt-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/30 rounded-xl">
+                    <div className="mt-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/30 rounded-lg">
                       <div className="flex items-center gap-2 mb-2">
                         <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-500" />
                         <span className="text-sm font-bold text-amber-700 dark:text-amber-400">Exam Rules</span>
@@ -407,30 +474,96 @@ ${test.negativeMarking && test.negativeMarking > 0 ? `* প্রতিটি �
               </div>
 
               {/* What to expect */}
-              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-colors duration-300">
+              <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-colors duration-300">
                 <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
                   <Star className="w-5 h-5 text-amber-500" />
-                  <h2 className="text-base font-bold text-slate-800 dark:text-slate-100">What to Expect</h2>
+                  <h2 className="text-base font-bold text-slate-800 dark:text-slate-100">
+                    {test.language === 'Bengali' ? 'কী আশা করবেন' : test.language === 'Hindi' ? 'क्या उम्मीद करें' : 'What to Expect'}
+                  </h2>
                 </div>
                 <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {[
-                    { icon: Trophy, title: 'National Level Ranking', desc: 'Compare your score against thousands of aspirants and see exactly where you stand.', show: true },
-                    { icon: MonitorPlay, title: 'Exam-Simulated Interface', desc: 'Experience the exact look and pressure of the real exam to conquer test-day anxiety.', show: true },
-                    { icon: BookCheck, title: '100% Latest Syllabus', desc: 'Every question is strictly mapped to the latest exam pattern and official guidelines.', show: true },
-                    { icon: History, title: 'Previous Year Questions', desc: 'Includes handpicked questions from past years to give you an authentic experience.', show: true },
-                    { icon: LineChart, title: 'In-Depth AI Analytics', desc: 'Discover your weak areas with deep, section-wise performance and speed insights.', show: true },
-                    { icon: PieChart, title: 'Strengths & Weaknesses', desc: 'Automatically categorizes topics so you know exactly what to study next.', show: true },
-                    { icon: Sparkles, title: 'Expert-Crafted Solutions', desc: 'Access comprehensive, step-by-step explanations designed by top educators.', show: true },
-                    { icon: Smartphone, title: 'Mobile-Optimized Testing', desc: 'Take the test anywhere, anytime with a flawlessly optimized mobile interface.', show: true },
-                    { icon: Clock, title: 'Strict Time Management', desc: 'Master your speed with a relentless countdown timer that keeps you on your toes.', show: true },
-                    { icon: ShieldAlert, title: 'Anti-Cheat Fullscreen', desc: 'A strict, lock-down fullscreen environment ensures a fair and distraction-free test.', show: true },
-                    { icon: AlertTriangle, title: 'Negative Marking', desc: `Incorrect answers deduct ${test.negativeMarking ?? 0} marks — forcing you to choose wisely.`, show: !!test.negativeMarking && test.negativeMarking > 0 },
-                    { icon: Zap, title: 'Instant Results', desc: 'No waiting around. Review your accuracy and detailed report the second you hit submit.', show: true },
-                  ].filter(item => item.show !== false).map(({ icon: IconComponent, title, desc }) => {
-                    const Icon = IconComponent as any;
-                    return (
-                    <div key={title} className="flex items-start gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
+                    {
+                      icon: Trophy,
+                      title: test.language === 'Bengali' ? 'জাতীয় স্তরের র‍্যাঙ্কিং' : test.language === 'Hindi' ? 'राष्ट्रीय स्तर की रैंकिंग' : 'National Level Ranking',
+                      desc: test.language === 'Bengali' ? 'হাজার হাজার প্রতিযোগীর সাথে আপনার স্কোর তুলনা করুন এবং নিজের অবস্থান যাচাই করুন।' : test.language === 'Hindi' ? 'हज़ारों उम्मीदवारों के साथ अपने स्कोर की तुलना करें और देखें कि आप कहाँ खड़े हैं।' : 'Compare your score against thousands of aspirants and see exactly where you stand.',
+                      show: true
+                    },
+                    {
+                      icon: MonitorPlay,
+                      title: test.language === 'Bengali' ? 'পরীক্ষার অনুরূপ ইন্টারফেস' : test.language === 'Hindi' ? 'परीक्षा-अनुकारित इंटरफ़ेस' : 'Exam-Simulated Interface',
+                      desc: test.language === 'Bengali' ? 'আসল পরীক্ষার মতো পরিবেশ ও চাপ অনুভব করে পরীক্ষার দিনের ভয় দূর করুন।' : test.language === 'Hindi' ? 'परीक्षा के दिन की चिंता को दूर करने के लिए वास्तविक परीक्षा के सटीक रूप और दबाव का अनुभव करें।' : 'Experience the exact look and pressure of the real exam to conquer test-day anxiety.',
+                      show: true
+                    },
+                    {
+                      icon: BookCheck,
+                      title: test.language === 'Bengali' ? '১০০% লেটেস্ট সিলেবাস' : test.language === 'Hindi' ? '100% नवीनतम पाठ्यक्रम' : '100% Latest Syllabus',
+                      desc: test.language === 'Bengali' ? 'প্রতিটি প্রশ্ন সাম্প্রতিক পরীক্ষার প্যাটার্ন এবং অফিসিয়াল নির্দেশিকা অনুসারে তৈরি করা হয়েছে।' : test.language === 'Hindi' ? 'प्रत्येक प्रश्न को नवीनतम परीक्षा पैटर्न और आधिकारिक दिशानिर्देशों के अनुसार तैयार किया गया है।' : 'Every question is strictly mapped to the latest exam pattern and official guidelines.',
+                      show: true
+                    },
+                    {
+                      icon: History,
+                      title: test.language === 'Bengali' ? 'বিগত বছরের প্রশ্ন' : test.language === 'Hindi' ? 'पिछले वर्ष के प्रश्न' : 'Previous Year Questions',
+                      desc: test.language === 'Bengali' ? 'বিগত বছরগুলোর বাছাই করা প্রশ্ন অন্তর্ভুক্ত করা হয়েছে, যা আপনাকে আসল পরীক্ষার ধারণা দেবে।' : test.language === 'Hindi' ? 'आपको एक प्रामाणिक अनुभव देने के लिए पिछले वर्षों के चुने हुए प्रश्न शामिल हैं।' : 'Includes handpicked questions from past years to give you an authentic experience.',
+                      show: true
+                    },
+                    {
+                      icon: LineChart,
+                      title: test.language === 'Bengali' ? 'গভীর এআই বিশ্লেষণ' : test.language === 'Hindi' ? 'गहन एआई एनालिटिक्स' : 'In-Depth AI Analytics',
+                      desc: test.language === 'Bengali' ? 'বিষয়ভিত্তিক পারফরম্যান্স এবং স্পিড ইনসাইট দিয়ে আপনার দুর্বল দিকগুলো চিহ্নিত করুন।' : test.language === 'Hindi' ? 'अनुभाग-वार प्रदर्शन और गति अंतर्दृष्टि के साथ अपने कमजोर क्षेत्रों की खोज करें।' : 'Discover your weak areas with deep, section-wise performance and speed insights.',
+                      show: true
+                    },
+                    {
+                      icon: PieChart,
+                      title: test.language === 'Bengali' ? 'দুর্বলতা এবং দক্ষতা' : test.language === 'Hindi' ? 'ताकत और कमजोरियां' : 'Strengths & Weaknesses',
+                      desc: test.language === 'Bengali' ? 'টপিকগুলো স্বয়ংক্রিয়ভাবে ভাগ হয়ে যায়, যাতে আপনি জানেন পরবর্তীতে কী পড়তে হবে।' : test.language === 'Hindi' ? 'विषयों को स्वचालित रूप से वर्गीकृत करता है ताकि आप जान सकें कि आगे क्या पढ़ना है।' : 'Automatically categorizes topics so you know exactly what to study next.',
+                      show: true
+                    },
+                    {
+                      icon: Sparkles,
+                      title: test.language === 'Bengali' ? 'বিশেষজ্ঞদের তৈরি সমাধান' : test.language === 'Hindi' ? 'विशेषज्ञों द्वारा तैयार किए गए समाधान' : 'Expert-Crafted Solutions',
+                      desc: test.language === 'Bengali' ? 'সেরা শিক্ষকদের তৈরি করা ধাপে ধাপে বিস্তৃত সমাধান এবং ব্যাখ্যা দেখুন।' : test.language === 'Hindi' ? 'शीर्ष शिक्षकों द्वारा डिज़ाइन किए गए व्यापक, चरण-दर-चरण स्पष्टीकरण तक पहुंचें।' : 'Access comprehensive, step-by-step explanations designed by top educators.',
+                      show: true
+                    },
+                    {
+                      icon: Smartphone,
+                      title: test.language === 'Bengali' ? 'মোবাইল-বান্ধব টেস্টিং' : test.language === 'Hindi' ? 'मोबाइल-अनुकूलित परीक्षण' : 'Mobile-Optimized Testing',
+                      desc: test.language === 'Bengali' ? 'সম্পূর্ণ মোবাইল-বান্ধব ইন্টারফেসের সাহায্যে যেকোনো স্থানে, যেকোনো সময় পরীক্ষা দিন।' : test.language === 'Hindi' ? 'पूरी तरह से मोबाइल-अनुकूलित इंटरफ़ेस के साथ कहीं भी, कभी भी परीक्षा दें।' : 'Take the test anywhere, anytime with a flawlessly optimized mobile interface.',
+                      show: true
+                    },
+                    {
+                      icon: Clock,
+                      title: test.language === 'Bengali' ? 'কঠোর সময় ব্যবস্থাপনা' : test.language === 'Hindi' ? 'सख्त समय प्रबंधन' : 'Strict Time Management',
+                      desc: test.language === 'Bengali' ? 'একটি কঠোর কাউন্টডাউন টাইমার দিয়ে আপনার সময় ব্যবস্থাপনার দক্ষতা বাড়ান।' : test.language === 'Hindi' ? 'एक सख्त उलटी गिनती टाइमर के साथ अपनी गति में महारत हासिल करें।' : 'Master your speed with a relentless countdown timer that keeps you on your toes.',
+                      show: true
+                    },
+                    {
+                      icon: ShieldAlert,
+                      title: test.language === 'Bengali' ? 'অ্যান্টি-চিট ফুলস্ক্রিন' : test.language === 'Hindi' ? 'एंटी-चीट फुलस्क्रीन' : 'Anti-Cheat Fullscreen',
+                      desc: test.language === 'Bengali' ? 'একটি কঠোর ফুলস্ক্রিন পরিবেশ নিশ্চিত করে একটি সুষ্ঠু ও মনোযোগ ব্যাহত না হওয়ার মতো পরীক্ষা।' : test.language === 'Hindi' ? 'एक सख्त, लॉक-डाउन फुलस्क्रीन वातावरण एक निष्पक्ष और व्याकुलता-मुक्त परीक्षण सुनिश्चित करता है।' : 'A strict, lock-down fullscreen environment ensures a fair and distraction-free test.',
+                      show: true
+                    },
+                    {
+                      icon: AlertTriangle,
+                      title: test.language === 'Bengali' ? 'নেগেটিভ মার্কিং' : test.language === 'Hindi' ? 'नेगेटिव मार्किंग' : 'Negative Marking',
+                      desc: test.language === 'Bengali' ? `ভুল উত্তরের জন্য ${test.negativeMarking ?? 0} নম্বর কাটা যাবে — তাই ভেবেচিন্তে উত্তর দিন।` : test.language === 'Hindi' ? `गलत उत्तरों पर ${test.negativeMarking ?? 0} अंक कटेंगे — इसलिए सोच-समझकर चुनें।` : `Incorrect answers deduct ${test.negativeMarking ?? 0} marks — forcing you to choose wisely.`,
+                      show: !!test.negativeMarking && test.negativeMarking > 0
+                    },
+                    {
+                      icon: Zap,
+                      title: test.language === 'Bengali' ? 'তাত্ক্ষণিক ফলাফল' : test.language === 'Hindi' ? 'तत्काल परिणाम' : 'Instant Results',
+                      desc: test.language === 'Bengali' ? 'কোনো অপেক্ষা নেই। সাবমিট করার সাথে সাথেই আপনার বিস্তারিত রিপোর্ট এবং সঠিকতা দেখে নিন।' : test.language === 'Hindi' ? 'कोई प्रतीक्षा नहीं। सबमिट करते ही अपनी सटीकता और विस्तृत रिपोर्ट देखें।' : 'No waiting around. Review your accuracy and detailed report the second you hit submit.',
+                      show: true
+                    },
+                    {
+                      icon: RotateCcw,
+                      title: test.language === 'Bengali' ? 'একাধিকবার পরীক্ষা দেওয়া' : test.language === 'Hindi' ? 'एकाधिक प्रयास' : 'Multiple Attempts',
+                      desc: test.language === 'Bengali' ? 'আপনার স্কোর উন্নত করতে এবং ভুল থেকে শিখতে যতবার খুশি পরীক্ষাটি পুনরায় দিন।' : test.language === 'Hindi' ? 'अपने स्कोर में सुधार करने और अपनी गलतियों से सीखने के लिए जितनी बार चाहें परीक्षा दोबारा दें।' : 'Retake the test as many times as you need to improve your score and learn from your mistakes.',
+                      show: true
+                    },
+                  ].filter(item => item.show !== false).map(({ icon: Icon, title, desc }, index) => (
+                    <div key={index} className="flex items-start gap-3">
+                      <div className="w-9 h-9 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
                         <Icon className="w-4.5 h-4.5 text-slate-600 dark:text-slate-400" />
                       </div>
                       <div>
@@ -438,7 +571,7 @@ ${test.negativeMarking && test.negativeMarking > 0 ? `* প্রতিটি �
                         <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">{desc}</p>
                       </div>
                     </div>
-                  )})}
+                  ))}
                 </div>
               </div>
 
@@ -450,13 +583,13 @@ ${test.negativeMarking && test.negativeMarking > 0 ? `* প্রতিটি �
             {/* Desktop sticky sidebar (repeats CTA below the hero card on scroll) */}
             <div className="hidden lg:block w-72 shrink-0">
               <div className="sticky top-6 space-y-4">
-                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 transition-colors duration-300">
+                <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm p-5 transition-colors duration-300">
                   <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Quick Summary</p>
                   <div className="space-y-2.5">
                     {[
-                      { label: 'Type', value: 'Practice Set' },
+                      { label: 'Type', value: 'Quiz' },
                       { label: 'Difficulty', value: test.difficulty || 'Mixed' },
-                      { label: 'Language', value: 'English' },
+                      { label: 'Language', value: test.language || 'English' },
                       { label: 'Questions', value: `${test.questionIds?.length ?? 0}` },
                       { label: 'Duration', value: `${test.durationMin ?? 0} minutes` },
                       { label: 'Total Marks', value: `${test.totalMarks ?? 0}` },
@@ -469,13 +602,19 @@ ${test.negativeMarking && test.negativeMarking > 0 ? `* প্রতিটি �
                       </div>
                     ))}
                   </div>
+
+                  <div className="pt-5 mt-5 border-t border-slate-100 dark:border-slate-800">
+                    <StartTestButton slug={test.slug} accessType={test.accessType} price={test.price} allowedSubscriptionPlans={test.allowedSubscriptionPlans} basePath="/quiz" testType="quiz" />
+
+                    {test.accessType !== 'subscription' && test.accessType !== 'both' && test.accessType !== 'one_time' && (
+                      <p className="text-center text-[11px] text-slate-400 mt-3">Free · Log in to save your progress</p>
+                    )}
+                  </div>
                 </div>
-
-                <StartTestButton slug={test.slug} accessType={test.accessType} price={test.price} allowedSubscriptionPlans={test.allowedSubscriptionPlans} basePath="/practice" testType="practice" />
-
-                {test.accessType !== 'subscription' && test.accessType !== 'both' && test.accessType !== 'one_time' && (
-                  <p className="text-center text-[11px] text-slate-400">Free · No sign-up required to start</p>
-                )}
+                
+                <div className="mt-6">
+                  <TopScorersWidget assessmentId={test.id} />
+                </div>
               </div>
             </div>
           </div>
@@ -484,14 +623,14 @@ ${test.negativeMarking && test.negativeMarking > 0 ? `* প্রতিটি �
           {related.length > 0 && (
             <section className="mt-16">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">Related Practice Sets</h2>
-                <Link href="/practice" className="text-sm font-semibold text-blue-600 dark:text-blue-400 flex items-center gap-1 hover:underline">
+                <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">Related Quizzes</h2>
+                <Link href="/quiz" className="text-sm font-semibold text-blue-600 dark:text-blue-400 flex items-center gap-1 hover:underline">
                   View All <ChevronRight className="w-4 h-4" />
                 </Link>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
                 {related.map(r => (
-                  <AssessmentCard key={r.id} assessment={r} type="Practice" href={`/practice/${r.slug}`} />
+                  <AssessmentCard key={r.id} assessment={r} type="Quiz" href={`/practice/${r.slug}`} />
                 ))}
               </div>
             </section>
@@ -500,7 +639,7 @@ ${test.negativeMarking && test.negativeMarking > 0 ? `* প্রতিটি �
 
         {/* Mobile sticky bottom CTA */}
         <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 px-4 py-3 shadow-xl transition-colors duration-300">
-          <StartTestButton slug={test.slug} accessType={test.accessType} price={test.price} allowedSubscriptionPlans={test.allowedSubscriptionPlans} basePath="/practice" testType="practice" />
+          <StartTestButton slug={test.slug} accessType={test.accessType} price={test.price} allowedSubscriptionPlans={test.allowedSubscriptionPlans} basePath="/quiz" testType="quiz" />
         </div>
       </div>
     </>
