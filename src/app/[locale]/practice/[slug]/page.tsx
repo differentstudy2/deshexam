@@ -4,12 +4,12 @@ import { getTaxonomyNodeById } from '@/lib/firebase/taxonomy';
 import { notFound } from 'next/navigation';
 import { MockTest } from '@/lib/assessment-types';
 import { Metadata, ResolvingMetadata } from 'next';
-import { formatTitleForBrowser } from '@/lib/utils';
+import { formatTitleForBrowser, cn } from '@/lib/utils';
 import {
   Clock, HelpCircle, ShieldCheck, FileText, CheckCircle2,
   AlertTriangle, BookOpen, Target, Award, ChevronRight, ArrowRight,
   Zap, Users, BarChart3, Brain, Star, Maximize, LayoutGrid, ShieldAlert, MonitorPlay,
-  Trophy, Sparkles, LineChart, BookCheck, History, Smartphone, PieChart, RotateCcw
+  Trophy, Sparkles, LineChart, BookCheck, History, Smartphone, PieChart, RotateCcw, Crown, Lock
 } from 'lucide-react';
 import Link from 'next/link';
 import { AssessmentCard } from '@/components/assessment/AssessmentCard';
@@ -432,9 +432,11 @@ export default async function PracticeLandingPage({ params }: Props) {
 
               {/* Instructions */}
               <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-colors duration-300">
-                <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
-                  <BookOpen className="w-5 h-5 text-[#107c41] dark:text-[#22c55e]" />
-                  <h2 className="text-base font-bold text-slate-800 dark:text-slate-100">Instructions</h2>
+                <div className="flex items-center gap-3 px-6 py-4 border-b border-emerald-100/50 dark:border-emerald-900/20 bg-gradient-to-r from-emerald-50/50 to-teal-50/50 dark:from-emerald-900/10 dark:to-teal-900/10">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center shadow-md shadow-emerald-500/20">
+                    <BookOpen className="w-4 h-4 text-white" />
+                  </div>
+                  <h2 className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-400 dark:to-teal-400">Instructions</h2>
                 </div>
                 <div className="p-6">
                   <div className="prose prose-slate dark:prose-invert max-w-none !prose-p:my-0 !prose-p:text-[1rem] !prose-p:leading-relaxed prose-ol:list-decimal prose-strong:font-semibold">
@@ -475,9 +477,11 @@ ${test.negativeMarking && test.negativeMarking > 0 ? `* প্রতিটি �
 
               {/* What to expect */}
               <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-colors duration-300">
-                <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
-                  <Star className="w-5 h-5 text-amber-500" />
-                  <h2 className="text-base font-bold text-slate-800 dark:text-slate-100">
+                <div className="flex items-center gap-3 px-6 py-4 border-b border-amber-100/50 dark:border-amber-900/20 bg-gradient-to-r from-amber-50/50 to-orange-50/50 dark:from-amber-900/10 dark:to-orange-900/10">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-md shadow-amber-500/20">
+                    <Star className="w-4 h-4 text-white" />
+                  </div>
+                  <h2 className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-amber-600 to-orange-600 dark:from-amber-400 dark:to-orange-400">
                     {test.language === 'Bengali' ? 'কী আশা করবেন' : test.language === 'Hindi' ? 'क्या उम्मीद करें' : 'What to Expect'}
                   </h2>
                 </div>
@@ -583,33 +587,63 @@ ${test.negativeMarking && test.negativeMarking > 0 ? `* প্রতিটি �
             {/* Desktop sticky sidebar (repeats CTA below the hero card on scroll) */}
             <div className="hidden lg:block w-72 shrink-0">
               <div className="sticky top-6 space-y-4">
-                <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm p-5 transition-colors duration-300">
-                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Quick Summary</p>
-                  <div className="space-y-2.5">
-                    {[
-                      { label: 'Type', value: 'Quiz' },
-                      { label: 'Difficulty', value: test.difficulty || 'Mixed' },
-                      { label: 'Language', value: test.language || 'English' },
-                      { label: 'Questions', value: `${test.questionIds?.length ?? 0}` },
-                      { label: 'Duration', value: `${test.durationMin ?? 0} minutes` },
-                      { label: 'Total Marks', value: `${test.totalMarks ?? 0}` },
-                      { label: 'Pass Marks', value: `${test.passingMarks ?? 0}` },
-                      { label: 'Negative', value: `${test.negativeMarking ?? 0} per wrong answer`, show: !!test.negativeMarking && test.negativeMarking > 0 },
-                    ].filter(item => item.show !== false).map(({ label, value }) => (
-                      <div key={label} className="flex justify-between text-sm border-b border-slate-50 dark:border-slate-800/50 pb-1.5 last:border-0 last:pb-0">
-                        <span className="text-slate-500 dark:text-slate-400 font-medium">{label}</span>
-                        <span className="font-bold text-slate-800 dark:text-slate-200 text-right">{value}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="pt-5 mt-5 border-t border-slate-100 dark:border-slate-800">
-                    <StartTestButton slug={test.slug} accessType={test.accessType} price={test.price} allowedSubscriptionPlans={test.allowedSubscriptionPlans} basePath="/quiz" testType="quiz" />
-
-                    {test.accessType !== 'subscription' && test.accessType !== 'both' && test.accessType !== 'one_time' && (
-                      <p className="text-center text-[11px] text-slate-400 mt-3">Free · Log in to save your progress</p>
+                <div className={cn(
+                  "rounded-xl border shadow-lg overflow-hidden transition-colors duration-300",
+                  (test.accessType === 'subscription' || test.accessType === 'both' || test.accessType === 'one_time')
+                    ? "bg-white dark:bg-slate-900 border-amber-200 dark:border-amber-800 shadow-amber-500/10"
+                    : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800"
+                )}>
+                  <div className={cn(
+                    "px-5 py-3 border-b flex justify-between items-center",
+                    (test.accessType === 'subscription' || test.accessType === 'both' || test.accessType === 'one_time')
+                      ? "bg-gradient-to-r from-amber-500 to-orange-600 border-amber-600"
+                      : "bg-gradient-to-r from-emerald-600 to-teal-600 border-emerald-700/50"
+                  )}>
+                    <p className={cn(
+                      "text-xs font-bold uppercase tracking-wider flex items-center gap-2",
+                      (test.accessType === 'subscription' || test.accessType === 'both' || test.accessType === 'one_time')
+                        ? "text-white"
+                        : "text-emerald-100"
+                    )}>
+                      <Target className={cn("w-4 h-4", (test.accessType === 'subscription' || test.accessType === 'both' || test.accessType === 'one_time') ? "text-amber-100 fill-amber-100" : "text-emerald-300 fill-emerald-300")} />
+                      Quick Summary
+                    </p>
+                    {(test.accessType === 'subscription' || test.accessType === 'both' || test.accessType === 'one_time') && (
+                      <span className="flex items-center gap-1 text-[9px] uppercase font-black text-amber-700 dark:text-amber-600 bg-amber-100 dark:bg-amber-200 px-1.5 py-0.5 rounded shadow-sm">
+                        <Crown className="w-2.5 h-2.5" /> Premium
+                      </span>
                     )}
                   </div>
+                  <div className="p-5">
+                    <div className="space-y-2.5">
+                      {[
+                        { label: 'Type', value: 'Practice Set' },
+                        { label: 'Difficulty', value: test.difficulty || 'Mixed' },
+                        { label: 'Language', value: test.language || 'English' },
+                        { label: 'Questions', value: `${test.questionIds?.length ?? 0}` },
+                        { label: 'Duration', value: `${test.durationMin ?? 0} minutes` },
+                        { label: 'Total Marks', value: `${test.totalMarks ?? 0}` },
+                        { label: 'Pass Marks', value: `${test.passingMarks ?? 0}` },
+                        { label: 'Negative', value: `${test.negativeMarking ?? 0} per wrong answer`, show: !!test.negativeMarking && test.negativeMarking > 0 },
+                      ].filter(item => item.show !== false).map(({ label, value }) => (
+                        <div key={label} className="flex justify-between text-sm border-b border-slate-50 dark:border-slate-800/50 pb-1.5 last:border-0 last:pb-0">
+                          <span className="text-slate-500 dark:text-slate-400 font-medium">{label}</span>
+                          <span className="font-bold text-slate-800 dark:text-slate-200 text-right">{value}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="pt-5 mt-5 border-t border-slate-100 dark:border-slate-800">
+                      <StartTestButton slug={test.slug} accessType={test.accessType} price={test.price} allowedSubscriptionPlans={test.allowedSubscriptionPlans} basePath="/practice" testType="practice" />
+                    </div>
+                  </div>
+                  {test.accessType !== 'subscription' && test.accessType !== 'both' && test.accessType !== 'one_time' && (
+                    <div className="bg-slate-50 dark:bg-slate-800/50 px-5 py-3 border-t border-slate-100 dark:border-slate-800">
+                      <p className="text-center text-[11px] font-medium text-slate-500 dark:text-slate-400 flex items-center justify-center gap-1.5">
+                        <Lock className="w-3 h-3" /> Free · Log in to save your progress
+                      </p>
+                    </div>
+                  )}
                 </div>
                 
                 <div className="mt-6">
@@ -623,14 +657,14 @@ ${test.negativeMarking && test.negativeMarking > 0 ? `* প্রতিটি �
           {related.length > 0 && (
             <section className="mt-16">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">Related Quizzes</h2>
-                <Link href="/quiz" className="text-sm font-semibold text-blue-600 dark:text-blue-400 flex items-center gap-1 hover:underline">
+                <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">Related Practice Sets</h2>
+                <Link href="/practice" className="text-sm font-semibold text-blue-600 dark:text-blue-400 flex items-center gap-1 hover:underline">
                   View All <ChevronRight className="w-4 h-4" />
                 </Link>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
                 {related.map(r => (
-                  <AssessmentCard key={r.id} assessment={r} type="Quiz" href={`/practice/${r.slug}`} />
+                  <AssessmentCard key={r.id} assessment={r} type="Practice" href={`/practice/${r.slug}`} />
                 ))}
               </div>
             </section>
@@ -639,7 +673,7 @@ ${test.negativeMarking && test.negativeMarking > 0 ? `* প্রতিটি �
 
         {/* Mobile sticky bottom CTA */}
         <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 px-4 py-3 shadow-xl transition-colors duration-300">
-          <StartTestButton slug={test.slug} accessType={test.accessType} price={test.price} allowedSubscriptionPlans={test.allowedSubscriptionPlans} basePath="/quiz" testType="quiz" />
+          <StartTestButton slug={test.slug} accessType={test.accessType} price={test.price} allowedSubscriptionPlans={test.allowedSubscriptionPlans} basePath="/practice" testType="practice" />
         </div>
       </div>
     </>

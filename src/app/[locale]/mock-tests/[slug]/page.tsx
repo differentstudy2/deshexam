@@ -4,12 +4,12 @@ import { getTaxonomyNodeById } from '@/lib/firebase/taxonomy';
 import { notFound } from 'next/navigation';
 import { MockTest } from '@/lib/assessment-types';
 import { Metadata, ResolvingMetadata } from 'next';
-import { formatTitleForBrowser } from '@/lib/utils';
+import { formatTitleForBrowser, cn } from '@/lib/utils';
 import {
   Clock, HelpCircle, ShieldCheck, FileText, CheckCircle2,
   AlertTriangle, BookOpen, Target, Award, ChevronRight, ArrowRight,
   Zap, Users, BarChart3, Brain, Star, Maximize, LayoutGrid, ShieldAlert, MonitorPlay,
-  Trophy, Sparkles, LineChart, History, RotateCcw, PieChart, BookCheck, Smartphone, Lock
+  Trophy, Sparkles, LineChart, History, RotateCcw, PieChart, BookCheck, Smartphone, Lock, Crown
 } from 'lucide-react';
 import Link from 'next/link';
 import { AssessmentCard } from '@/components/assessment/AssessmentCard';
@@ -561,12 +561,32 @@ ${test.negativeMarking && test.negativeMarking > 0 ? `* প্রতিটি �
             {/* Desktop sticky sidebar (repeats CTA below the hero card on scroll) */}
             <div className="hidden lg:block w-72 shrink-0">
               <div className="sticky top-6 space-y-4">
-                <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-lg overflow-hidden transition-colors duration-300">
-                  <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-3 border-b border-blue-700/50">
-                    <p className="text-xs font-bold text-blue-100 uppercase tracking-wider flex items-center gap-2">
-                      <Zap className="w-4 h-4 text-amber-300 fill-amber-300" />
+                <div className={cn(
+                  "rounded-xl border shadow-lg overflow-hidden transition-colors duration-300",
+                  (test.accessType === 'subscription' || test.accessType === 'both' || test.accessType === 'one_time')
+                    ? "bg-white dark:bg-slate-900 border-amber-200 dark:border-amber-800 shadow-amber-500/10"
+                    : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800"
+                )}>
+                  <div className={cn(
+                    "px-5 py-3 border-b flex justify-between items-center",
+                    (test.accessType === 'subscription' || test.accessType === 'both' || test.accessType === 'one_time')
+                      ? "bg-gradient-to-r from-amber-500 to-orange-600 border-amber-600"
+                      : "bg-gradient-to-r from-blue-600 to-indigo-600 border-blue-700/50"
+                  )}>
+                    <p className={cn(
+                      "text-xs font-bold uppercase tracking-wider flex items-center gap-2",
+                      (test.accessType === 'subscription' || test.accessType === 'both' || test.accessType === 'one_time')
+                        ? "text-white"
+                        : "text-blue-100"
+                    )}>
+                      <Zap className={cn("w-4 h-4", (test.accessType === 'subscription' || test.accessType === 'both' || test.accessType === 'one_time') ? "text-amber-100 fill-amber-100" : "text-amber-300 fill-amber-300")} />
                       Quick Summary
                     </p>
+                    {(test.accessType === 'subscription' || test.accessType === 'both' || test.accessType === 'one_time') && (
+                      <span className="flex items-center gap-1 text-[9px] uppercase font-black text-amber-700 dark:text-amber-600 bg-amber-100 dark:bg-amber-200 px-1.5 py-0.5 rounded shadow-sm">
+                        <Crown className="w-2.5 h-2.5" /> Premium
+                      </span>
+                    )}
                   </div>
                   <div className="p-5">
                     <div className="space-y-2.5">

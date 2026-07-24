@@ -4,7 +4,7 @@ import React from 'react';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Clock, HelpCircle, ShieldCheck, Trophy, FileText, ArrowRight, Star, Users } from 'lucide-react';
+import { Clock, HelpCircle, ShieldCheck, Trophy, FileText, ArrowRight, Star, Users, Crown } from 'lucide-react';
 import Link from 'next/link';
 import { AssessmentBase } from '@/lib/assessment-types';
 import Image from 'next/image';
@@ -47,8 +47,17 @@ export function AssessmentCard({ assessment, type, href }: AssessmentCardProps) 
   if (assessment.difficulty === 'Hard') diffColor = 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400';
   if (assessment.difficulty === 'Expert') diffColor = 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400';
 
+  const isPremium = assessment.accessType === 'subscription' || assessment.accessType === 'both' || assessment.accessType === 'one_time';
+  
+  if (isPremium) {
+    btnColor = 'from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 shadow-amber-500/25 text-white';
+  }
+
   return (
-    <Card className="flex flex-col h-full overflow-hidden hover:shadow-lg transition-all duration-300 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-blue-500/50 dark:hover:border-blue-500/50 group">
+    <Card className={cn(
+      "flex flex-col h-full overflow-hidden hover:shadow-lg transition-all duration-300 bg-white dark:bg-slate-900 border group",
+      isPremium ? "border-amber-200 dark:border-amber-800/50 hover:border-amber-400 dark:hover:border-amber-500/80 shadow-amber-500/5" : "border-slate-200 dark:border-slate-800 hover:border-blue-500/50 dark:hover:border-blue-500/50"
+    )}>
       {/* Thumbnail or colored top border (DEMO IMAGE APPLIED) */}
       <div className="relative w-full h-40 bg-slate-100 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-800 overflow-hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -57,7 +66,12 @@ export function AssessmentCard({ assessment, type, href }: AssessmentCardProps) 
           alt={assessment.title} 
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent"></div>
+        {isPremium && (
+          <div className="absolute top-3 right-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[10px] uppercase font-black tracking-wider px-3 py-1 rounded-full shadow-lg flex items-center gap-1.5 border border-white/20 backdrop-blur-md">
+            <Crown className="w-3 h-3" /> PREMIUM
+          </div>
+        )}
       </div>
 
       <CardHeader className="pb-3 flex-none">
