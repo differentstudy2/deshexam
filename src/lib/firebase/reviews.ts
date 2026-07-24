@@ -83,7 +83,6 @@ export async function submitReview(
 ): Promise<void> {
   const reviewId = `${testId}_${userId}`;
   const reviewRef = doc(db, REVIEWS_COLLECTION, reviewId);
-  const testRef = doc(db, MOCK_TESTS_COLLECTION, testId);
 
   await runTransaction(db, async (transaction) => {
     // 1. Read existing review to know if we are creating or updating
@@ -92,8 +91,18 @@ export async function submitReview(
     const oldRating = isUpdate ? existingReviewDoc.data()?.rating : null;
 
     // 2. Read the mock test document to get current stats
-    const testDoc = await transaction.get(testRef);
-    if (!testDoc.exists()) {
+    // The test ID could belong to quizzes, mock_tests, exams, or practice_sets
+    const collectionsToCheck = ['mock_tests', 'quizzes', 'exams', 'practice_sets'];
+    let actualTestRef = null;
+    let testDoc = null;
+    
+    for (const col of collectionsToCheck) {
+      actualTestRef = doc(db, col, testId);
+      testDoc = await transaction.get(actualTestRef);
+      if (testDoc.exists()) break;
+    }
+
+    if (!actualTestRef || !testDoc || !testDoc.exists()) {
       throw new Error("Mock test does not exist!");
     }
 
@@ -169,7 +178,7 @@ export async function submitReview(
     }
 
     // 4. Update stats on test document
-    transaction.update(testRef, { reviewStats: updatedStats });
+    transaction.update(actualTestRef, { reviewStats: updatedStats });
   });
 }
 

@@ -124,9 +124,10 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
   const [questionScale, setQuestionScale] = useState(1);
   const [optionScale, setOptionScale] = useState(1);
   const [questionTextColor, setQuestionTextColor] = useState('');
+  const [themeTextColor, setThemeTextColor] = useState('');
   const [questionBgColor, setQuestionBgColor] = useState('');
   const [animSpeed, setAnimSpeed] = useState(0.5);
-  const [bgTheme, setBgTheme] = useState<'default' | 'mesh' | 'grid' | 'dots' | 'video' | 'premium_1' | 'premium_2' | 'premium_3' | 'premium_4' | 'premium_5'>('default');
+  const [bgTheme, setBgTheme] = useState<'default' | 'mesh' | 'grid' | 'dots' | 'video' | 'premium_1' | 'premium_2' | 'premium_3' | 'premium_4' | 'premium_5' | 'premium_6' | 'premium_7' | 'premium_8'>('default');
   const [selectedVideo, setSelectedVideo] = useState('/videos/bg1.mp4');
   const [watermarkText, setWatermarkText] = useState('DESHEXAM');
   const [watermarkOpacity, setWatermarkOpacity] = useState(0.05);
@@ -694,11 +695,14 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
       case 'grid': return 'bg-[#f8fafc] dark:bg-gray-900';
       case 'dots': return 'bg-[#f8fafc] dark:bg-gray-900';
       case 'video': return 'bg-black/90 text-white';
-      case 'premium_1': return 'bg-[#FFFBEB] dark:bg-[#451a03]'; // Amber Tint
-      case 'premium_2': return 'bg-[#F0FDF4] dark:bg-[#052e16]'; // Emerald Tint
-      case 'premium_3': return 'bg-[#EFF6FF] dark:bg-[#172554]'; // Blue Tint
-      case 'premium_4': return 'bg-[#FAF5FF] dark:bg-[#3b0764]'; // Purple Tint
-      case 'premium_5': return 'bg-[#FFF1F2] dark:bg-[#4c0519]'; // Rose Tint
+      case 'premium_1': return 'bg-[linear-gradient(135deg,#f6d365_0%,#fda085_100%)] text-slate-900';
+      case 'premium_2': return 'bg-[linear-gradient(135deg,#a18cd1_0%,#fbc2eb_100%)] text-slate-900';
+      case 'premium_3': return 'bg-[linear-gradient(135deg,#84fab0_0%,#8fd3f4_100%)] text-slate-900';
+      case 'premium_4': return 'bg-[linear-gradient(135deg,#e0c3fc_0%,#8ec5fc_100%)] text-slate-900';
+      case 'premium_5': return 'bg-[linear-gradient(135deg,#09203f_0%,#537895_100%)] text-slate-50';
+      case 'premium_6': return 'bg-[linear-gradient(135deg,#141e30_0%,#243b55_100%)] text-slate-50';
+      case 'premium_7': return 'bg-[linear-gradient(135deg,#434343_0%,#000000_100%)] text-slate-50';
+      case 'premium_8': return 'bg-[linear-gradient(135deg,#667eea_0%,#764ba2_100%)] text-slate-50';
       default: return 'bg-[#F1F5F9] md:bg-[#F8FAFC] dark:bg-[#0f172a] md:dark:bg-[#0f172a]';
     }
   };
@@ -715,7 +719,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
 
   return (
     <>
-      <div className={`fixed inset-0 z-[100] ${getBgThemeClasses()} flex flex-col h-[100dvh] overflow-hidden text-slate-900 dark:text-slate-50 font-inter transition-colors duration-300`}>
+      <div className={`fixed inset-0 z-[100] ${getBgThemeClasses()} flex flex-col h-[100dvh] overflow-hidden text-slate-900 dark:text-slate-50 font-inter transition-colors duration-300`} style={{ color: themeTextColor || undefined }}>
         {bgTheme !== 'video' && (
           <div className={`absolute inset-0 z-0 pointer-events-none transition-opacity duration-300 ${getBgThemeOverlayClasses()}`} />
         )}
@@ -1750,8 +1754,13 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
 
                             {/* Background Theme */}
                             <div>
-                              <div className="text-[13px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-2">
-                                <LayoutGrid className="w-4 h-4 text-indigo-500" /> Background Theme
+                              <div className="text-[13px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3 flex items-center justify-between">
+                                <span className="flex items-center gap-2"><LayoutGrid className="w-4 h-4 text-indigo-500" /> Background Theme</span>
+                                <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg border border-slate-200 dark:border-slate-700">
+                                  <span className="text-[10px] text-slate-400 capitalize">Text Color</span>
+                                  <input type="color" value={themeTextColor || (theme === 'dark' ? '#f8fafc' : '#0f172a')} onChange={(e) => setThemeTextColor(e.target.value)} className="w-4 h-4 p-0 border-0 rounded cursor-pointer" title="Custom Page Text Color" />
+                                  <button onClick={() => setThemeTextColor('')} className="hover:text-red-500 text-slate-400 ml-1"><X className="w-3 h-3" /></button>
+                                </div>
                               </div>
                               <div className="grid grid-cols-3 gap-2">
                                 {['default', 'mesh', 'grid', 'dots', 'video'].map((theme) => (
@@ -1789,21 +1798,24 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                                   </div>
                                 )}
                                 <div className={`text-[11px] font-bold text-amber-500 uppercase tracking-wider mb-2 flex items-center gap-1 ${!isPremiumUser ? 'opacity-50' : ''}`}>
-                                  <Crown className="w-3 h-3" /> Premium Solid Colors
+                                  <Crown className="w-3 h-3" /> Premium Gradients
                                 </div>
                                 <div className={`flex gap-2 flex-wrap ${!isPremiumUser ? 'opacity-50 pointer-events-none select-none' : ''}`}>
                                   {[
-                                    { id: 'premium_1', color: '#FFFBEB', title: 'Amber Tint' }, 
-                                    { id: 'premium_2', color: '#F0FDF4', title: 'Emerald Tint' }, 
-                                    { id: 'premium_3', color: '#EFF6FF', title: 'Blue Tint' }, 
-                                    { id: 'premium_4', color: '#FAF5FF', title: 'Purple Tint' }, 
-                                    { id: 'premium_5', color: '#FFF1F2', title: 'Rose Tint' }, 
+                                    { id: 'premium_1', gradient: 'linear-gradient(135deg, #f6d365 0%, #fda085 100%)', title: 'Sunset' }, 
+                                    { id: 'premium_2', gradient: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)', title: 'Amethyst' }, 
+                                    { id: 'premium_3', gradient: 'linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)', title: 'Mint' }, 
+                                    { id: 'premium_4', gradient: 'linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)', title: 'Periwinkle' }, 
+                                    { id: 'premium_5', gradient: 'linear-gradient(135deg, #09203f 0%, #537895 100%)', title: 'Deep Ocean' }, 
+                                    { id: 'premium_6', gradient: 'linear-gradient(135deg, #141e30 0%, #243b55 100%)', title: 'Midnight' }, 
+                                    { id: 'premium_7', gradient: 'linear-gradient(135deg, #434343 0%, #000000 100%)', title: 'Onyx' }, 
+                                    { id: 'premium_8', gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', title: 'Royal Purple' }, 
                                   ].map((p) => (
                                     <button
                                       key={p.id}
                                       onClick={() => setBgTheme(p.id as any)}
-                                      className={`w-8 h-8 rounded-full border-2 transition-transform shadow-sm ${bgTheme === p.id ? 'scale-110 border-blue-500' : 'border-slate-200 dark:border-slate-700 hover:scale-105'}`}
-                                      style={{ backgroundColor: p.color }}
+                                      className={`w-6 h-6 rounded-full border border-white/20 shadow-sm shrink-0 hover:scale-110 transition-transform ${bgTheme === p.id ? 'ring-2 ring-blue-500 ring-offset-1 dark:ring-offset-slate-900' : ''}`}
+                                      style={{ background: p.gradient }}
                                       title={p.title}
                                     />
                                   ))}
