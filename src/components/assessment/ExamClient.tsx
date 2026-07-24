@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Bookmark, Flag, Maximize, Minimize, AlertCircle, Clock, Moon, Sun, LayoutGrid, List, Settings, X, ToggleLeft, ToggleRight, Lock, Loader2, Presentation, Target, MonitorPlay, Play } from 'lucide-react';
+import { ArrowLeft, Bookmark, Flag, Maximize, Minimize, AlertCircle, Clock, Moon, Sun, LayoutGrid, List, Settings, X, ToggleLeft, ToggleRight, Lock, Loader2, Presentation, Target, MonitorPlay, Play, Check } from 'lucide-react';
 
 const VIDEO_OPTIONS = [
   { id: 'v1', name: 'High-Tech Digital', url: '/videos/A_high_tech_digital_quiz_backg.mp4' },
@@ -58,7 +58,7 @@ const shuffleArray = <T,>(array: T[]): T[] => {
 
 export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
   const router = useRouter();
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, resolvedTheme } = useTheme();
   const { openAuthDialog } = useAuthDialog();
 
   const toggleTheme = () => {
@@ -121,9 +121,17 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
   const [headerScale, setHeaderScale] = useState(1);
   const [headerTitleScale, setHeaderTitleScale] = useState(1);
   const [headerTitleAlign, setHeaderTitleAlign] = useState<'left' | 'center' | 'right'>('left');
+  const [questionScale, setQuestionScale] = useState(1);
+  const [optionScale, setOptionScale] = useState(1);
+  const [questionTextColor, setQuestionTextColor] = useState('');
+  const [questionBgColor, setQuestionBgColor] = useState('');
   const [animSpeed, setAnimSpeed] = useState(0.5);
   const [bgTheme, setBgTheme] = useState<'default' | 'mesh' | 'grid' | 'dots' | 'video'>('default');
   const [selectedVideo, setSelectedVideo] = useState('/videos/bg1.mp4');
+  const [watermarkText, setWatermarkText] = useState('DESHEXAM');
+  const [watermarkOpacity, setWatermarkOpacity] = useState(0.05);
+  const [watermarkSize, setWatermarkSize] = useState(15);
+  const [watermarkSpacing, setWatermarkSpacing] = useState(100);
   // --- ACCESS CONTROL STATE ---
   const { user, loading: authLoading } = useAuth();
   const [profileLoading, setProfileLoading] = useState(true);
@@ -131,6 +139,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
   const [requiresLogin, setRequiresLogin] = useState(false);
   const [attemptsExceeded, setAttemptsExceeded] = useState(false);
   const [userAttemptCount, setUserAttemptCount] = useState(0);
+  const [isPremiumUser, setIsPremiumUser] = useState(false);
 
   useEffect(() => {
     if (authLoading) return;
@@ -141,23 +150,21 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
       return;
     }
 
-    // For free tests, user is logged in
-    if (mockTest.accessType === 'free' || !mockTest.accessType) {
-      setHasAccess(true);
-
-      if (mockTest.attemptsAllowed && mockTest.attemptsAllowed > 0) {
-        getUserExamAttemptsCount(user.uid, mockTest.id).then(count => {
-          setUserAttemptCount(count);
-          if (count >= mockTest.attemptsAllowed!) setAttemptsExceeded(true);
-        }).catch(console.error);
-      }
-
-      setProfileLoading(false);
-      return;
-    }
-
     getUserProfile(user.uid).then(profile => {
       const userPlan = profile?.subscriptionPlan || null;
+      setIsPremiumUser(userPlan === 'pro' || userPlan === 'pass');
+
+      if (mockTest.accessType === 'free' || !mockTest.accessType) {
+        setHasAccess(true);
+        if (mockTest.attemptsAllowed && mockTest.attemptsAllowed > 0) {
+          getUserExamAttemptsCount(user.uid, mockTest.id).then(count => {
+            setUserAttemptCount(count);
+            if (count >= mockTest.attemptsAllowed!) setAttemptsExceeded(true);
+          }).catch(console.error);
+        }
+        return;
+      }
+
       const purchasedTests = profile?.purchasedTests || [];
       const allowedPlans = mockTest.allowedSubscriptionPlans || [];
 
@@ -707,6 +714,15 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
         {bgTheme !== 'video' && (
           <div className={`absolute inset-0 z-0 pointer-events-none transition-opacity duration-300 ${getBgThemeOverlayClasses()}`} />
         )}
+        {watermarkText && (
+          <div 
+            className="absolute inset-0 pointer-events-none z-40" 
+            style={{ 
+              backgroundImage: `url("data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${watermarkSpacing}" height="${watermarkSpacing}"><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="${watermarkSize}" font-family="sans-serif" font-weight="900" fill="${(resolvedTheme || theme) === 'dark' ? '%23ffffff' : '%23000000'}" fill-opacity="${watermarkOpacity}" transform="rotate(-35 ${watermarkSpacing/2} ${watermarkSpacing/2})">${watermarkText}</text></svg>`)}")`,
+              backgroundRepeat: 'repeat'
+            }} 
+          />
+        )}
         {bgTheme === 'video' && (
           <video
             key={selectedVideo}
@@ -845,8 +861,8 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
 
           {/* Content Area */}
           <div className="flex-1 overflow-y-auto px-2 pb-24 hide-scrollbar flex flex-col gap-3">
-            <div className={`relative overflow-hidden rounded-2xl p-5 shadow-md border border-slate-200 dark:border-slate-700/50 transition-colors ${getBgThemeClasses()}`}>
-              {bgTheme !== 'video' && (
+            <div className={`relative overflow-hidden rounded-2xl p-5 shadow-md border border-slate-200 dark:border-slate-700/50 transition-colors ${getBgThemeClasses()}`} style={questionBgColor ? { background: questionBgColor } : undefined}>
+              {bgTheme !== 'video' && !questionBgColor && (
                 <div className={`absolute inset-0 z-0 pointer-events-none transition-opacity duration-300 ${getBgThemeOverlayClasses()}`} />
               )}
               {bgTheme === 'video' && (
@@ -861,6 +877,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
               <div className="relative z-10">
                 <div
                   className="text-xl font-bold leading-snug text-slate-900 dark:text-slate-50 transition-colors"
+                  style={{ fontSize: `${1.25 * questionScale}rem`, color: questionTextColor || undefined }}
                   dangerouslySetInnerHTML={{ __html: currentQ.questionText || '' }}
                 />
               </div>
@@ -940,9 +957,14 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                       )}>
                         {key.toUpperCase()}
                       </div>
-                      <span className={cn("text-[18px] transition-colors", textClass)}>
+                      <span className={cn("text-[18px] transition-colors pr-8", textClass)} style={{ fontSize: `${1.125 * optionScale}rem` }}>
                         {optionText}
                       </span>
+                      {(isReviewMode || examMode === 'read') && currentQ.correctAnswer && key.toLowerCase() === currentQ.correctAnswer.toLowerCase() && (
+                        <div className="ml-auto w-6 h-6 rounded-full bg-[#34A853] text-white flex items-center justify-center shrink-0">
+                          <Check className="w-4 h-4" strokeWidth={3} />
+                        </div>
+                      )}
                     </button>
                   );
                 })}
@@ -1281,8 +1303,8 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                     className="flex flex-col gap-4"
                   >
                     {/* Question Card */}
-                    <div className={`relative overflow-hidden rounded-2xl p-5 lg:p-6 shadow-md border border-slate-200 dark:border-slate-700/50 flex flex-col transition-colors duration-300 ${getBgThemeClasses()}`}>
-                      {bgTheme !== 'video' && (
+                    <div className={`relative overflow-hidden rounded-2xl p-5 lg:p-6 shadow-md border border-slate-200 dark:border-slate-700/50 flex flex-col transition-colors duration-300 ${getBgThemeClasses()}`} style={questionBgColor ? { background: questionBgColor } : undefined}>
+                      {bgTheme !== 'video' && !questionBgColor && (
                         <div className={`absolute inset-0 z-0 pointer-events-none transition-opacity duration-300 ${getBgThemeOverlayClasses()}`} />
                       )}
                       {bgTheme === 'video' && (
@@ -1298,6 +1320,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
 
                         <div
                           className="text-[26px] font-bold leading-tight text-slate-900 dark:text-slate-50 transition-colors"
+                          style={{ fontSize: `${1.625 * questionScale}rem`, color: questionTextColor || undefined }}
                           dangerouslySetInnerHTML={{ __html: currentQ.questionText || '' }}
                         />
                       </div>
@@ -1347,9 +1370,9 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                               bubbleClass = `border-transparent transition-colors duration-300 ${theme.activeLetterBg} text-white`;
                               textClass = "text-slate-900 dark:text-slate-50 font-bold";
                             } else if (hasAnySelection) {
-                              optionClass = `border-2 transition-all duration-300 opacity-70 bg-gray-50 dark:bg-gray-800/60 border-gray-200 dark:border-gray-600 cursor-pointer hover:opacity-100 hover:bg-gray-100 dark:hover:bg-gray-700`;
-                              bubbleClass = `border-transparent transition-colors duration-300 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300`;
-                              textClass = "text-slate-600 dark:text-slate-300 font-medium";
+                              optionClass = `border-2 transition-all duration-300 bg-white dark:bg-gray-800/80 border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700`;
+                              bubbleClass = `border-transparent transition-colors duration-300 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300`;
+                              textClass = "text-slate-600 dark:text-slate-400 font-medium";
                             }
 
                             if (isReviewMode || examMode === 'read') {
@@ -1359,13 +1382,13 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                                 bubbleClass = `border-transparent transition-colors duration-300 bg-[#34A853] text-white`;
                                 textClass = "text-[#166534] dark:text-emerald-100 font-bold";
                               } else if (isSelected && !isCorrectAnswer) {
-                                optionClass = `border-2 transition-all duration-300 opacity-60 border-[#EA4335] bg-[#fce8e6] dark:bg-[#EA4335]/20`;
+                                optionClass = `border-2 transition-all duration-300 border-[#EA4335] bg-[#fce8e6] dark:bg-[#EA4335]/20`;
                                 bubbleClass = `border-transparent transition-colors duration-300 bg-[#EA4335] text-white`;
                                 textClass = "text-red-900 dark:text-red-100 font-bold";
                               } else {
-                                optionClass = `border-2 transition-all duration-300 opacity-40 grayscale border-gray-300 bg-gray-50 dark:bg-gray-800/50`;
-                                bubbleClass = `border-transparent transition-colors duration-300 bg-gray-300 text-gray-500`;
-                                textClass = "text-slate-700 dark:text-slate-200 font-medium";
+                                optionClass = `border-2 transition-all duration-300 opacity-60 border-slate-100 dark:border-slate-700 bg-white dark:bg-gray-800/80`;
+                                bubbleClass = `border-transparent transition-colors duration-300 ${theme.letterBg} text-white`;
+                                textClass = "text-slate-600 dark:text-slate-300 font-medium";
                               }
                             }
 
@@ -1384,12 +1407,19 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                                 )}>
                                   {key.toUpperCase()}
                                 </div>
-                                <span className={cn("text-[18px] pr-20 transition-colors", textClass)}>
+                                <span className={cn("text-[18px] pr-20 transition-colors", textClass)} style={{ fontSize: `${1.125 * optionScale}rem` }}>
                                   {optionText}
                                 </span>
-                                <span className="absolute right-4 text-xs font-bold text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                                  (Press {key.toUpperCase()})
-                                </span>
+                                {(isReviewMode || examMode === 'read') && currentQ.correctAnswer && key.toLowerCase() === currentQ.correctAnswer.toLowerCase() && (
+                                  <div className="absolute right-4 w-7 h-7 rounded-full bg-[#34A853] text-white flex items-center justify-center shrink-0 shadow-sm">
+                                    <Check className="w-4 h-4" strokeWidth={3} />
+                                  </div>
+                                )}
+                                {!(isReviewMode || examMode === 'read') && (
+                                  <span className="absolute right-4 text-xs font-bold text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    (Press {key.toUpperCase()})
+                                  </span>
+                                )}
                               </button>
                             );
                           })}
@@ -1495,144 +1525,324 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                         animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
                         exit={{ opacity: 0, y: 10, scale: 0.95, filter: 'blur(2px)' }}
                         transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                        className="absolute bottom-[calc(100%+16px)] right-0 w-[90vw] sm:w-[340px] bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-xl rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.4)] border border-white/50 dark:border-slate-700/50 p-5 z-50 overflow-hidden flex flex-col max-h-[70vh]"
+                        className="absolute bottom-[calc(100%+16px)] right-0 w-[90vw] sm:w-[360px] bg-white/80 dark:bg-[#0f172a]/80 backdrop-blur-2xl rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)] border border-white/60 dark:border-slate-700/50 p-1 z-50 overflow-hidden flex flex-col max-h-[75vh]"
                       >
-                        <div className="flex justify-between items-center mb-4 pb-3 border-b border-gray-100 dark:border-gray-800 shrink-0">
-                          <h3 className="font-bold text-gray-800 dark:text-gray-200 text-lg flex items-center gap-2">
-                            <Settings className="w-5 h-5 text-gray-500" /> Settings
-                          </h3>
-                          <button onClick={() => setShowLayoutSettings(false)} className="p-1 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
-                            <X className="w-5 h-5" />
-                          </button>
-                        </div>
-                        <div className="space-y-5 overflow-y-auto custom-scrollbar pr-2 pb-2">
-                          <div>
-                            <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
-                              <MonitorPlay className="w-4 h-4 text-indigo-500" /> Exam Mode
-                            </div>
-                            <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl">
-                              <button
-                                onClick={() => setExamMode('test')}
-                                className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-colors ${examMode === 'test' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}
-                              >
-                                Test Mode
-                              </button>
-                              <button
-                                onClick={() => setExamMode('read')}
-                                className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-colors ${examMode === 'read' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}
-                              >
-                                Read Mode
-                              </button>
-                            </div>
+                        <div className="bg-white/50 dark:bg-slate-900/50 backdrop-blur-md rounded-[22px] p-3.5 h-full flex flex-col min-h-0">
+                          <div className="flex justify-between items-center mb-3 pb-3 border-b border-slate-200/50 dark:border-slate-700/50 shrink-0">
+                            <h3 className="font-extrabold text-slate-800 dark:text-slate-100 text-lg flex items-center gap-2.5 tracking-tight">
+                              <div className="p-1.5 rounded-lg bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400">
+                                <Settings className="w-5 h-5" />
+                              </div>
+                              Appearance
+                            </h3>
+                            <button onClick={() => setShowLayoutSettings(false)} className="p-1.5 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full hover:text-slate-700 dark:hover:text-slate-300 transition-colors">
+                              <X className="w-5 h-5" />
+                            </button>
                           </div>
-                          <div>
-                            <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
-                              <LayoutGrid className="w-4 h-4 text-indigo-500" /> Options Layout
-                            </div>
-                            <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl">
-                              <button
-                                onClick={() => setOptionsLayout('grid')}
-                                className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-colors ${optionsLayout === 'grid' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}
-                              >
-                                Grid
-                              </button>
-                              <button
-                                onClick={() => setOptionsLayout('list')}
-                                className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-colors ${optionsLayout === 'list' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}
-                              >
-                                List
-                              </button>
-                            </div>
-                          </div>
-                          <hr className="border-gray-100 dark:border-gray-800" />
-                          <div>
-                            <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
-                              <LayoutGrid className="w-4 h-4 text-indigo-500" /> Header Settings
-                            </div>
-                            <div className="space-y-3">
-                              <div className="flex items-center justify-between">
-                                <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Show Header</span>
-                                <button onClick={() => setShowHeader(!showHeader)} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${showHeader ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}>
-                                  <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${showHeader ? 'translate-x-5' : 'translate-x-1'}`} />
+                          
+                          <div className="space-y-4 overflow-y-auto custom-scrollbar pr-2 pb-2 flex-1 min-h-0">
+                            {/* Exam Mode */}
+                            <div>
+                              <div className="text-[13px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                                <MonitorPlay className="w-4 h-4 text-indigo-500" /> Mode
+                              </div>
+                              <div className="flex bg-slate-100/80 dark:bg-slate-800/80 p-1 rounded-xl border border-slate-200/50 dark:border-slate-700/50">
+                                <button
+                                  onClick={() => setExamMode('test')}
+                                  className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-all duration-300 ${examMode === 'test' ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm border border-slate-200/50 dark:border-slate-600/50' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                                >
+                                  Test Mode
+                                </button>
+                                <button
+                                  onClick={() => setExamMode('read')}
+                                  className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-all duration-300 ${examMode === 'read' ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm border border-slate-200/50 dark:border-slate-600/50' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                                >
+                                  Read Mode
                                 </button>
                               </div>
-                              {showHeader && (
-                                <>
-                                  <div className="flex items-center justify-between">
-                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Show Logo</span>
-                                    <button onClick={() => setShowLogo(!showLogo)} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${showLogo ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}>
-                                      <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${showLogo ? 'translate-x-5' : 'translate-x-1'}`} />
+                            </div>
+
+                            {/* Options Layout */}
+                            <div>
+                              <div className="text-[13px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                                <LayoutGrid className="w-4 h-4 text-indigo-500" /> Options Layout
+                              </div>
+                              <div className="flex bg-slate-100/80 dark:bg-slate-800/80 p-1 rounded-xl border border-slate-200/50 dark:border-slate-700/50">
+                                <button
+                                  onClick={() => setOptionsLayout('grid')}
+                                  className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-all duration-300 ${optionsLayout === 'grid' ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm border border-slate-200/50 dark:border-slate-600/50' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                                >
+                                  Grid View
+                                </button>
+                                <button
+                                  onClick={() => setOptionsLayout('list')}
+                                  className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-all duration-300 ${optionsLayout === 'list' ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm border border-slate-200/50 dark:border-slate-600/50' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                                >
+                                  List View
+                                </button>
+                              </div>
+                            </div>
+                            
+                            <div className="h-px w-full bg-gradient-to-r from-transparent via-slate-200 dark:via-slate-700 to-transparent my-1"></div>
+
+                            {/* Header Settings */}
+                            <div>
+                              <div className="text-[13px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                                <LayoutGrid className="w-4 h-4 text-indigo-500" /> Header Customization
+                              </div>
+                              <div className="space-y-3">
+                                <div className="flex items-center justify-between group">
+                                  <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 transition-colors">Show Header Bar</span>
+                                  <button onClick={() => setShowHeader(!showHeader)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none shadow-inner ${showHeader ? 'bg-blue-600' : 'bg-slate-300 dark:bg-slate-600'}`}>
+                                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform duration-300 ${showHeader ? 'translate-x-6' : 'translate-x-1'}`} />
+                                  </button>
+                                </div>
+                                {showHeader && (
+                                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="space-y-3 overflow-hidden pt-1">
+                                    <div className="flex items-center justify-between">
+                                      <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Show Brand Logo</span>
+                                      <button onClick={() => setShowLogo(!showLogo)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none shadow-inner ${showLogo ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-600'}`}>
+                                        <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform duration-300 ${showLogo ? 'translate-x-6' : 'translate-x-1'}`} />
+                                      </button>
+                                    </div>
+                                    <div className="flex items-center gap-3 bg-slate-50 dark:bg-slate-800/60 p-2 rounded-xl border border-slate-100 dark:border-slate-700/50">
+                                      <span className="text-xs font-bold text-slate-500 dark:text-slate-400 w-12">Scale</span>
+                                      <input
+                                        type="range" min="0.5" max="1.5" step="0.1"
+                                        value={headerScale} onChange={(e) => setHeaderScale(Number(e.target.value))}
+                                        className="flex-1 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                      />
+                                      <span className="text-xs font-bold text-blue-600 dark:text-blue-400 w-9 text-right bg-blue-50 dark:bg-blue-900/30 px-1 py-0.5 rounded">{(headerScale * 100).toFixed(0)}%</span>
+                                    </div>
+                                    <div className="flex items-center gap-3 bg-slate-50 dark:bg-slate-800/60 p-2 rounded-xl border border-slate-100 dark:border-slate-700/50">
+                                      <span className="text-xs font-bold text-slate-500 dark:text-slate-400 w-12">Text</span>
+                                      <input
+                                        type="range" min="0.5" max="2.5" step="0.01"
+                                        value={headerTitleScale} onChange={(e) => setHeaderTitleScale(Number(e.target.value))}
+                                        className="flex-1 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                      />
+                                      <span className="text-xs font-bold text-blue-600 dark:text-blue-400 w-9 text-right bg-blue-50 dark:bg-blue-900/30 px-1 py-0.5 rounded">{(headerTitleScale * 100).toFixed(0)}%</span>
+                                    </div>
+                                    <div className="flex flex-col gap-2 bg-slate-50 dark:bg-slate-800/60 p-2 rounded-xl border border-slate-100 dark:border-slate-700/50">
+                                      <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Alignment</span>
+                                      <div className="flex items-center justify-between gap-2">
+                                        <button onClick={() => setHeaderTitleAlign('left')} className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all ${headerTitleAlign === 'left' ? 'bg-blue-500 text-white shadow-sm' : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600'}`}>Left</button>
+                                        <button onClick={() => setHeaderTitleAlign('center')} className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all ${headerTitleAlign === 'center' ? 'bg-blue-500 text-white shadow-sm' : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600'}`}>Center</button>
+                                        <button onClick={() => setHeaderTitleAlign('right')} className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all ${headerTitleAlign === 'right' ? 'bg-blue-500 text-white shadow-sm' : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600'}`}>Right</button>
+                                      </div>
+                                    </div>
+                                  </motion.div>
+                                )}
+                              </div>
+                            </div>
+                            
+                            <div className="h-px w-full bg-gradient-to-r from-transparent via-slate-200 dark:via-slate-700 to-transparent my-1"></div>
+
+                            {/* Question Styling Settings */}
+                            <div>
+                              <div className="text-[13px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                                <Settings className="w-4 h-4 text-indigo-500" /> Question Styling
+                              </div>
+                              <div className="space-y-3">
+                                {/* Size */}
+                                <div className="flex flex-col gap-2 bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-xl border border-slate-100 dark:border-slate-700/50">
+                                  <div className="flex items-center gap-3">
+                                    <span className="text-xs font-bold text-slate-500 dark:text-slate-400 w-20 whitespace-nowrap">Question Size</span>
+                                    <input
+                                      type="range" min="0.5" max="2.5" step="0.01"
+                                      value={questionScale} onChange={(e) => setQuestionScale(Number(e.target.value))}
+                                      className="flex-1 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                    />
+                                    <span className="text-xs font-bold text-blue-600 dark:text-blue-400 w-9 text-right bg-blue-50 dark:bg-blue-900/30 px-1 py-0.5 rounded">{(questionScale * 100).toFixed(0)}%</span>
+                                  </div>
+                                  <div className="flex items-center gap-3">
+                                    <span className="text-xs font-bold text-slate-500 dark:text-slate-400 w-20 whitespace-nowrap">Options Size</span>
+                                    <input
+                                      type="range" min="0.5" max="2.0" step="0.01"
+                                      value={optionScale} onChange={(e) => setOptionScale(Number(e.target.value))}
+                                      className="flex-1 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                    />
+                                    <span className="text-xs font-bold text-blue-600 dark:text-blue-400 w-9 text-right bg-blue-50 dark:bg-blue-900/30 px-1 py-0.5 rounded">{(optionScale * 100).toFixed(0)}%</span>
+                                  </div>
+                                </div>
+                                
+                                {/* Colors */}
+                                <div className="flex flex-col gap-3 bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-xl border border-slate-100 dark:border-slate-700/50">
+                                  <div className="flex items-center gap-3">
+                                    <div className="flex flex-col gap-1.5 flex-1 min-w-0">
+                                      <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Text Color</span>
+                                      <div className="flex items-center gap-2">
+                                        <input type="color" value={questionTextColor || (theme === 'dark' ? '#f8fafc' : '#0f172a')} onChange={(e) => setQuestionTextColor(e.target.value)} className="w-8 h-8 p-0 border-0 rounded cursor-pointer shrink-0" />
+                                        <span className="text-xs text-slate-400 truncate">{questionTextColor || 'Default'}</span>
+                                      </div>
+                                    </div>
+                                    <div className="flex flex-col gap-1.5 flex-1 border-l border-slate-200 dark:border-slate-700 pl-3 min-w-0">
+                                      <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Background</span>
+                                      <div className="flex items-center gap-2">
+                                        <input type="color" value={questionBgColor.startsWith('linear') ? '#ffffff' : (questionBgColor || (theme === 'dark' ? '#1e293b' : '#ffffff'))} onChange={(e) => setQuestionBgColor(e.target.value)} className="w-8 h-8 p-0 border-0 rounded cursor-pointer shrink-0" />
+                                        <span className="text-xs text-slate-400 truncate max-w-[60px]">{questionBgColor.startsWith('linear') ? 'Gradient' : (questionBgColor || 'Default')}</span>
+                                      </div>
+                                    </div>
+                                    <button onClick={() => { setQuestionTextColor(''); setQuestionBgColor(''); }} className="p-2 self-end bg-slate-200 dark:bg-slate-700 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors group shrink-0" title="Reset Colors">
+                                      <X className="w-4 h-4 text-slate-500 group-hover:text-red-500 transition-colors" />
                                     </button>
                                   </div>
-                                  <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800/50 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
-                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400 min-w-[50px]">Scale</span>
-                                    <input
-                                      type="range" min="0.5" max="1.5" step="0.1"
-                                      value={headerScale} onChange={(e) => setHeaderScale(Number(e.target.value))}
-                                      className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
-                                    />
-                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-8 text-right">{(headerScale * 100).toFixed(0)}%</span>
-                                  </div>
-                                  <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800/50 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
-                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400 min-w-[50px]">Text Size</span>
-                                    <input
-                                      type="range" min="0.5" max="2.5" step="0.1"
-                                      value={headerTitleScale} onChange={(e) => setHeaderTitleScale(Number(e.target.value))}
-                                      className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
-                                    />
-                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-8 text-right">{(headerTitleScale * 100).toFixed(0)}%</span>
-                                  </div>
-                                  <div className="flex flex-col gap-1.5 bg-gray-50 dark:bg-gray-800/50 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
-                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Text Alignment</span>
-                                    <div className="flex items-center justify-between gap-2">
-                                      <button onClick={() => setHeaderTitleAlign('left')} className={`flex-1 py-1 rounded text-xs font-bold transition-colors ${headerTitleAlign === 'left' ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}`}>Left</button>
-                                      <button onClick={() => setHeaderTitleAlign('center')} className={`flex-1 py-1 rounded text-xs font-bold transition-colors ${headerTitleAlign === 'center' ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}`}>Center</button>
-                                      <button onClick={() => setHeaderTitleAlign('right')} className={`flex-1 py-1 rounded text-xs font-bold transition-colors ${headerTitleAlign === 'right' ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}`}>Right</button>
+
+                                  {/* Solid Presets */}
+                                  <div className="flex items-center gap-2 pt-2.5 border-t border-slate-200 dark:border-slate-700/50">
+                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider w-14">Solid:</span>
+                                    <div className="flex gap-2 flex-1 flex-wrap">
+                                      {[
+                                        { bg: '#ffffff', text: '#0f172a' },
+                                        { bg: '#f8fafc', text: '#0f172a' },
+                                        { bg: '#eff6ff', text: '#1e3a8a' }, 
+                                        { bg: '#f0fdf4', text: '#14532d' },
+                                        { bg: '#fffbeb', text: '#78350f' },
+                                        { bg: '#fef2f2', text: '#7f1d1d' },
+                                        { bg: '#1e293b', text: '#f8fafc' },
+                                        { bg: '#0f172a', text: '#f1f5f9' },
+                                      ].map((preset, i) => (
+                                        <button
+                                          key={i}
+                                          onClick={() => { setQuestionBgColor(preset.bg); setQuestionTextColor(preset.text); }}
+                                          className="w-5 h-5 rounded-full border shadow-sm shrink-0 hover:scale-110 transition-transform"
+                                          style={{ background: preset.bg, borderColor: preset.text + '40' }}
+                                          title="Apply Preset"
+                                        />
+                                      ))}
                                     </div>
                                   </div>
-                                </>
+
+                                  {/* Premium Presets */}
+                                  <div className="flex items-center gap-2 pt-2 border-t border-slate-200 dark:border-slate-700/50">
+                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider w-14">Premium:</span>
+                                    <div className="flex gap-2 flex-1 flex-wrap">
+                                      {[
+                                        { bg: 'linear-gradient(135deg, #f6d365 0%, #fda085 100%)', text: '#78350f' },
+                                        { bg: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)', text: '#4c1d95' },
+                                        { bg: 'linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)', text: '#064e3b' },
+                                        { bg: 'linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)', text: '#1e3a8a' },
+                                        { bg: 'linear-gradient(135deg, #09203f 0%, #537895 100%)', text: '#f8fafc' },
+                                        { bg: 'linear-gradient(135deg, #141e30 0%, #243b55 100%)', text: '#e2e8f0' },
+                                        { bg: 'linear-gradient(135deg, #434343 0%, #000000 100%)', text: '#ffffff' },
+                                        { bg: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', text: '#ffffff' },
+                                      ].map((preset, i) => (
+                                        <button
+                                          key={`premium-${i}`}
+                                          onClick={() => { setQuestionBgColor(preset.bg); setQuestionTextColor(preset.text); }}
+                                          className="w-5 h-5 rounded-full border border-white/20 shadow-sm shrink-0 hover:scale-110 transition-transform"
+                                          style={{ background: preset.bg }}
+                                          title="Apply Premium Gradient"
+                                        />
+                                      ))}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <div className="h-px w-full bg-gradient-to-r from-transparent via-slate-200 dark:via-slate-700 to-transparent my-1"></div>
+
+                            {/* Background Theme */}
+                            <div>
+                              <div className="text-[13px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                                <LayoutGrid className="w-4 h-4 text-indigo-500" /> Background Theme
+                              </div>
+                              <div className="grid grid-cols-3 gap-2">
+                                {['default', 'mesh', 'grid', 'dots', 'video'].map((theme) => (
+                                  <button
+                                    key={theme}
+                                    onClick={() => setBgTheme(theme as any)}
+                                    className={`py-1.5 px-1 text-xs font-bold rounded-xl transition-all duration-300 border ${bgTheme === theme ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-700 shadow-sm' : 'bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
+                                  >
+                                    {theme.charAt(0).toUpperCase() + theme.slice(1)}
+                                  </button>
+                                ))}
+                              </div>
+                              {bgTheme === 'video' && (
+                                <div className="mt-2">
+                                  <select
+                                    value={selectedVideo}
+                                    onChange={(e) => setSelectedVideo(e.target.value)}
+                                    className="w-full text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-700 dark:text-slate-300 font-semibold transition-all shadow-sm"
+                                  >
+                                    {VIDEO_OPTIONS.map(opt => (
+                                      <option key={opt.id} value={opt.url}>{opt.name}</option>
+                                    ))}
+                                  </select>
+                                </div>
                               )}
                             </div>
-                          </div>
-                          <hr className="border-gray-100 dark:border-gray-800" />
-                          <div>
-                            <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
-                              <Play className="w-4 h-4 text-indigo-500" /> Animation Speed
-                            </div>
-                            <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800/50 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
-                              <input
-                                type="range" min="0.1" max="2.0" step="0.1"
-                                value={animSpeed} onChange={(e) => setAnimSpeed(Number(e.target.value))}
-                                className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
-                              />
-                              <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-8 text-right">{animSpeed.toFixed(1)}s</span>
-                            </div>
-                          </div>
-                          <hr className="border-gray-100 dark:border-gray-800" />
-                          <div>
-                            <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
-                              <LayoutGrid className="w-4 h-4 text-indigo-500" /> Background Theme
-                            </div>
-                            <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl flex-wrap gap-1">
-                              <button onClick={() => setBgTheme('default')} className={`flex-1 py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'default' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}>Default</button>
-                              <button onClick={() => setBgTheme('mesh')} className={`flex-1 py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'mesh' ? 'bg-white dark:bg-gray-700 text-purple-600 dark:text-purple-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}>Mesh</button>
-                              <button onClick={() => setBgTheme('grid')} className={`flex-1 py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'grid' ? 'bg-white dark:bg-gray-700 text-emerald-600 dark:text-emerald-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}>Grid</button>
-                              <button onClick={() => setBgTheme('dots')} className={`flex-1 py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'dots' ? 'bg-white dark:bg-gray-700 text-orange-600 dark:text-orange-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}>Dots</button>
-                              <button onClick={() => setBgTheme('video')} className={`flex-1 py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'video' ? 'bg-white dark:bg-gray-700 text-rose-600 dark:text-rose-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}>Video</button>
-                            </div>
-                            {bgTheme === 'video' && (
-                              <div className="mt-2 space-y-2">
-                                <select
-                                  value={selectedVideo}
-                                  onChange={(e) => setSelectedVideo(e.target.value)}
-                                  className="w-full text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 focus:outline-none focus:border-blue-500 text-gray-700 dark:text-gray-300 font-semibold"
-                                >
-                                  {VIDEO_OPTIONS.map(opt => (
-                                    <option key={opt.id} value={opt.url}>{opt.name}</option>
-                                  ))}
-                                </select>
+                            
+                            <div className="h-px w-full bg-gradient-to-r from-transparent via-slate-200 dark:via-slate-700 to-transparent my-1"></div>
+
+                            {/* Animation Speed */}
+                            <div>
+                              <div className="text-[13px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                                <Play className="w-4 h-4 text-indigo-500" /> Animation Speed
                               </div>
-                            )}
+                              <div className="flex items-center gap-3 bg-slate-50 dark:bg-slate-800/60 p-2 rounded-xl border border-slate-100 dark:border-slate-700/50">
+                                <input
+                                  type="range" min="0.1" max="2.0" step="0.1"
+                                  value={animSpeed} onChange={(e) => setAnimSpeed(Number(e.target.value))}
+                                  className="flex-1 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                />
+                                <span className="text-xs font-bold text-blue-600 dark:text-blue-400 w-9 text-right bg-blue-50 dark:bg-blue-900/30 px-1 py-0.5 rounded">{animSpeed.toFixed(1)}s</span>
+                              </div>
+                            </div>
+
+                            <div className="h-px w-full bg-gradient-to-r from-transparent via-slate-200 dark:via-slate-700 to-transparent my-1"></div>
+
+                            {/* Watermark Settings */}
+                            <div className="relative">
+                              {!isPremiumUser && (
+                                <div className="absolute inset-0 z-10 bg-slate-50/40 dark:bg-slate-900/40 backdrop-blur-[1.5px] rounded-xl flex items-center justify-center mt-6">
+                                  <a href="/pricing" className="bg-gradient-to-r from-amber-500 to-orange-600 text-white text-[10px] font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 hover:scale-105 transition-transform cursor-pointer">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                    Premium Only
+                                  </a>
+                                </div>
+                              )}
+                              <div className={`text-[13px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-2 ${!isPremiumUser ? 'opacity-50' : ''}`}>
+                                <Presentation className="w-4 h-4 text-indigo-500" /> Watermark
+                              </div>
+                              <div className={`flex flex-col gap-3 bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-xl border border-slate-100 dark:border-slate-700/50 ${!isPremiumUser ? 'opacity-50 pointer-events-none select-none' : ''}`}>
+                                <input
+                                  type="text"
+                                  value={watermarkText}
+                                  onChange={(e) => setWatermarkText(e.target.value)}
+                                  placeholder="Watermark Text (e.g. DESHEXAM)"
+                                  className="w-full text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-700 dark:text-slate-300 font-semibold"
+                                />
+                                <div className="flex items-center gap-3">
+                                  <span className="text-xs font-bold text-slate-500 dark:text-slate-400 w-16 whitespace-nowrap">Opacity</span>
+                                  <input
+                                    type="range" min="0" max="0.3" step="0.01"
+                                    value={watermarkOpacity} onChange={(e) => setWatermarkOpacity(Number(e.target.value))}
+                                    className="flex-1 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                  />
+                                  <span className="text-xs font-bold text-blue-600 dark:text-blue-400 w-10 text-right bg-blue-50 dark:bg-blue-900/30 px-1 py-0.5 rounded">{Math.round(watermarkOpacity * 100)}%</span>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                  <span className="text-xs font-bold text-slate-500 dark:text-slate-400 w-16 whitespace-nowrap">Size</span>
+                                  <input
+                                    type="range" min="10" max="100" step="1"
+                                    value={watermarkSize} onChange={(e) => setWatermarkSize(Number(e.target.value))}
+                                    className="flex-1 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                  />
+                                  <span className="text-xs font-bold text-blue-600 dark:text-blue-400 w-10 text-right bg-blue-50 dark:bg-blue-900/30 px-1 py-0.5 rounded">{watermarkSize}</span>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                  <span className="text-xs font-bold text-slate-500 dark:text-slate-400 w-16 whitespace-nowrap">Spacing</span>
+                                  <input
+                                    type="range" min="100" max="1000" step="10"
+                                    value={watermarkSpacing} onChange={(e) => setWatermarkSpacing(Number(e.target.value))}
+                                    className="flex-1 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                  />
+                                  <span className="text-xs font-bold text-blue-600 dark:text-blue-400 w-10 text-right bg-blue-50 dark:bg-blue-900/30 px-1 py-0.5 rounded">{watermarkSpacing}</span>
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </motion.div>
@@ -1753,6 +1963,15 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
 
         {showPresentationMode && (
           <div className="fixed inset-0 z-[300] bg-white dark:bg-slate-900">
+            {watermarkText && (
+              <div 
+                className="absolute inset-0 pointer-events-none z-0" 
+                style={{ 
+                  backgroundImage: `url("data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${watermarkSpacing}" height="${watermarkSpacing}"><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="${watermarkSize}" font-family="sans-serif" font-weight="900" fill="${(resolvedTheme || theme) === 'dark' ? '%23ffffff' : '%23000000'}" fill-opacity="${watermarkOpacity}" transform="rotate(-35 ${watermarkSpacing/2} ${watermarkSpacing/2})">${watermarkText}</text></svg>`)}")`,
+                  backgroundRepeat: 'repeat'
+                }} 
+              />
+            )}
             <button
               onClick={() => setShowPresentationMode(false)}
               className="absolute top-4 right-4 z-[400] w-12 h-12 bg-black/10 dark:bg-white/10 hover:bg-black/20 dark:hover:bg-white/20 backdrop-blur-md border border-black/20 dark:border-white/20 rounded-full flex items-center justify-center text-slate-900 dark:text-white shadow-xl transition-all hover:scale-105"
@@ -1760,13 +1979,16 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
             >
               <X className="w-6 h-6 drop-shadow-md" />
             </button>
-            <PresentationOverlay
-              questions={questions}
-              classLine={mockTest.title}
-              chapterName={mockTest.taxonomyLine}
-              autoStart={true}
-              onClose={() => setShowPresentationMode(false)}
-            />
+            <div className="relative z-10 w-full h-full">
+              <PresentationOverlay
+                questions={questions}
+                classLine={mockTest.title}
+                chapterName={mockTest.taxonomyLine}
+                autoStart={true}
+                onClose={() => setShowPresentationMode(false)}
+                isPremiumUser={isPremiumUser}
+              />
+            </div>
           </div>
         )}
 
