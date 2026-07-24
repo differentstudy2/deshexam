@@ -115,17 +115,15 @@ export function AssessmentCard({ assessment, type, href, taxonomyString }: Asses
             <ListChecks className="w-3.5 h-3.5 shrink-0" />
             <span className="truncate">{assessment.questionIds?.length || 0} Qs</span>
           </div>
-          {/* We can cast and check for estimatedTimeMin or timeLimitMin if we want, or just rely on generic metadata if added later */}
-          {(assessment as any).timeLimitMin && (
+          {/* Unified Time display */}
+          {((assessment as any).durationMin || (assessment as any).timeLimitMin || (assessment as any).estimatedTimeMin) && (
             <div className="flex items-center justify-center gap-1.5 bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300 px-2.5 py-1.5 rounded-md font-medium text-xs border border-orange-100 dark:border-orange-800/50">
               <Timer className="w-3.5 h-3.5 shrink-0" />
-              <span className="truncate">{(assessment as any).timeLimitMin}m</span>
-            </div>
-          )}
-          {(assessment as any).estimatedTimeMin && (
-            <div className="flex items-center justify-center gap-1.5 bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300 px-2.5 py-1.5 rounded-md font-medium text-xs border border-orange-100 dark:border-orange-800/50">
-              <Timer className="w-3.5 h-3.5 shrink-0" />
-              <span className="truncate">~{(assessment as any).estimatedTimeMin}m</span>
+              <span className="truncate">
+                {((assessment as any).durationMin || (assessment as any).timeLimitMin) 
+                  ? `${(assessment as any).durationMin || (assessment as any).timeLimitMin}m` 
+                  : `~${(assessment as any).estimatedTimeMin}m`}
+              </span>
             </div>
           )}
           <div className="flex items-center justify-center gap-1.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 px-2.5 py-1.5 rounded-md font-medium text-xs border border-emerald-100 dark:border-emerald-800/50">
