@@ -115,7 +115,15 @@ export default async function PracticeLandingPage({ params }: Props) {
   if (!test || test.status !== 'Published') notFound();
 
   const allTests = await getAssessments('practiceSets') as MockTest[];
-  const related = allTests.filter(a => a.id !== test.id && a.status === 'Published').slice(0, 4);
+  const rawRelated = allTests.filter(a => a.id !== test.id && a.status === 'Published').slice(0, 4);
+  const related = await Promise.all(rawRelated.map(async (r) => {
+    let tBoard = '', tClass = '', tSubject = '';
+    if (r.boardId) { const node = await getTaxonomyNodeById(r.boardId); if (node) tBoard = node.acronym || node.title; }
+    if (r.classId) { const node = await getTaxonomyNodeById(r.classId); if (node) tClass = node.title; }
+    if (r.subjectId) { const node = await getTaxonomyNodeById(r.subjectId); if (node) tSubject = node.title; }
+    const taxonomyString = [tBoard, tClass, tSubject].filter(Boolean).join(' • ');
+    return { ...r, taxonomyString };
+  }));
 
   let boardName = '';
   let className = '';
@@ -676,7 +684,7 @@ ${test.negativeMarking && test.negativeMarking > 0 ? `* প্রতিটি �
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
                 {related.map(r => (
-                  <AssessmentCard key={r.id} assessment={r} type="Practice" href={`/practice/${r.slug}`} />
+                  <AssessmentCard key={r.id} assessment={r as any} type="Practice" href={`/practice/${r.slug}`} taxonomyString={r.taxonomyString} />
                 ))}
               </div>
             </section>

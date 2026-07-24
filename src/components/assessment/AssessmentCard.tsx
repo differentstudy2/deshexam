@@ -4,7 +4,7 @@ import React from 'react';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Clock, HelpCircle, ShieldCheck, Trophy, FileText, ArrowRight, Star, Users, Crown } from 'lucide-react';
+import { Clock, HelpCircle, ShieldCheck, Trophy, FileText, ArrowRight, Star, Users, Crown, ListChecks, Timer, UsersRound } from 'lucide-react';
 import Link from 'next/link';
 import { AssessmentBase } from '@/lib/assessment-types';
 import Image from 'next/image';
@@ -14,9 +14,10 @@ interface AssessmentCardProps {
   assessment: AssessmentBase;
   type: 'Practice' | 'Quiz' | 'Mock Test' | 'Exam';
   href: string;
+  taxonomyString?: string;
 }
 
-export function AssessmentCard({ assessment, type, href }: AssessmentCardProps) {
+export function AssessmentCard({ assessment, type, href, taxonomyString }: AssessmentCardProps) {
   // Determine Type Colors & Icons
   let typeColor = 'bg-green-100 text-green-700';
   let Icon = HelpCircle;
@@ -98,30 +99,37 @@ export function AssessmentCard({ assessment, type, href }: AssessmentCardProps) 
       </CardHeader>
 
       <CardContent className="flex-grow pb-4">
-        <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2 mb-4">
-          {assessment.description || `Test your knowledge with this interactive ${type.toLowerCase()}.`}
-        </p>
+        {taxonomyString ? (
+          <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/50 px-3 py-2 rounded-lg line-clamp-2 mb-4 flex items-center gap-1.5">
+            <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
+            {taxonomyString}
+          </p>
+        ) : (
+          <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2 mb-4">
+            {assessment.description || `Test your knowledge with this interactive ${type.toLowerCase()}.`}
+          </p>
+        )}
 
-        <div className="flex flex-wrap gap-y-2 gap-x-4 text-sm text-slate-600 dark:text-slate-400">
-          <div className="flex items-center">
-            <HelpCircle className="w-4 h-4 mr-1.5 text-slate-400" />
+        <div className="flex flex-wrap gap-2 text-sm">
+          <div className="flex items-center gap-1.5 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 px-2.5 py-1 rounded-md font-medium text-xs border border-indigo-100 dark:border-indigo-800/50">
+            <ListChecks className="w-3.5 h-3.5" />
             {assessment.questionIds?.length || 0} Questions
           </div>
           {/* We can cast and check for estimatedTimeMin or timeLimitMin if we want, or just rely on generic metadata if added later */}
           {(assessment as any).timeLimitMin && (
-            <div className="flex items-center">
-              <Clock className="w-4 h-4 mr-1.5 text-slate-400" />
+            <div className="flex items-center gap-1.5 bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300 px-2.5 py-1 rounded-md font-medium text-xs border border-orange-100 dark:border-orange-800/50">
+              <Timer className="w-3.5 h-3.5" />
               {(assessment as any).timeLimitMin} Mins
             </div>
           )}
           {(assessment as any).estimatedTimeMin && (
-            <div className="flex items-center">
-              <Clock className="w-4 h-4 mr-1.5 text-slate-400" />
+            <div className="flex items-center gap-1.5 bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300 px-2.5 py-1 rounded-md font-medium text-xs border border-orange-100 dark:border-orange-800/50">
+              <Timer className="w-3.5 h-3.5" />
               ~{(assessment as any).estimatedTimeMin} Mins
             </div>
           )}
-          <div className="flex items-center">
-            <Users className="w-4 h-4 mr-1.5 text-slate-400" />
+          <div className="flex items-center gap-1.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 px-2.5 py-1 rounded-md font-medium text-xs border border-emerald-100 dark:border-emerald-800/50">
+            <UsersRound className="w-3.5 h-3.5" />
             {assessment.attemptCount ? assessment.attemptCount.toLocaleString() : '0'} Attempted
           </div>
         </div>
