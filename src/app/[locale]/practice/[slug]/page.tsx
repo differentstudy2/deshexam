@@ -565,17 +565,29 @@ ${test.negativeMarking && test.negativeMarking > 0 ? `* প্রতিটি �
                       desc: test.language === 'Bengali' ? 'আপনার স্কোর উন্নত করতে এবং ভুল থেকে শিখতে যতবার খুশি পরীক্ষাটি পুনরায় দিন।' : test.language === 'Hindi' ? 'अपने स्कोर में सुधार करने और अपनी गलतियों से सीखने के लिए जितनी बार चाहें परीक्षा दोबारा दें।' : 'Retake the test as many times as you need to improve your score and learn from your mistakes.',
                       show: true
                     },
-                  ].filter(item => item.show !== false).map(({ icon: Icon, title, desc }, index) => (
-                    <div key={index} className="flex items-start gap-3">
-                      <div className="w-9 h-9 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
-                        <Icon className="w-4.5 h-4.5 text-slate-600 dark:text-slate-400" />
+                  ].filter(item => item.show !== false).map(({ icon: IconComponent, title, desc }, index) => {
+                    const Icon = IconComponent as any;
+                    const gradients = [
+                      "from-blue-500 to-indigo-500 shadow-blue-500/20",
+                      "from-emerald-400 to-teal-500 shadow-emerald-500/20",
+                      "from-violet-500 to-purple-500 shadow-violet-500/20",
+                      "from-pink-500 to-rose-500 shadow-pink-500/20",
+                      "from-amber-400 to-orange-500 shadow-amber-500/20",
+                      "from-cyan-400 to-blue-500 shadow-cyan-500/20"
+                    ];
+                    const colorClass = gradients[index % gradients.length];
+
+                    return (
+                    <div key={index} className="flex items-start gap-3.5 group p-2 hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-xl transition-colors">
+                      <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${colorClass} flex items-center justify-center shadow-md shrink-0 transition-transform group-hover:scale-110 duration-300`}>
+                        <Icon className="w-5 h-5 text-white" />
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{title}</p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">{desc}</p>
+                        <p className="text-sm font-bold text-slate-800 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{title}</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">{desc}</p>
                       </div>
                     </div>
-                  ))}
+                  )})}
                 </div>
               </div>
 
