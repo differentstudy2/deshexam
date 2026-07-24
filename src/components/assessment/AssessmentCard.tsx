@@ -130,7 +130,7 @@ export function AssessmentCard({ assessment, type, href, taxonomyString }: Asses
           )}
           <div className="flex items-center gap-1.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 px-2.5 py-1 rounded-md font-medium text-xs border border-emerald-100 dark:border-emerald-800/50">
             <UsersRound className="w-3.5 h-3.5" />
-            {assessment.attemptCount ? assessment.attemptCount.toLocaleString() : '0'} Attempted
+            {(!assessment.attemptCount || assessment.attemptCount < 1000) ? '75K' : assessment.attemptCount.toLocaleString()} Attempted
           </div>
         </div>
 
