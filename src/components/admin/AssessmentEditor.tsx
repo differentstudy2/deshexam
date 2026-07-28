@@ -558,10 +558,17 @@ export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock 
                                         )}
                                     </div>
                                 </div>
-                                <div>
-                                    <label className="text-sm font-medium">Attempts Allowed</label>
-                                    <Input type="number" value={editData.attemptsAllowed ?? 1} onChange={e => setEditData({...editData, attemptsAllowed: e.target.value === '' ? undefined : parseInt(e.target.value)})} />
-                                    <p className="text-xs text-slate-500 mt-1">Set 0 for unlimited, 1 for strict simulation.</p>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="text-sm font-medium">Attempts Allowed</label>
+                                        <Input type="number" value={editData.attemptsAllowed ?? 1} onChange={e => setEditData({...editData, attemptsAllowed: e.target.value === '' ? undefined : parseInt(e.target.value)})} />
+                                        <p className="text-xs text-slate-500 mt-1">0 for unlimited, 1 for strict.</p>
+                                    </div>
+                                    <div>
+                                        <label className="text-sm font-medium">Total Attempts (Display)</label>
+                                        <Input type="number" value={editData.attemptCount ?? 0} onChange={e => setEditData({...editData, attemptCount: e.target.value === '' ? undefined : parseInt(e.target.value)})} />
+                                        <p className="text-xs text-slate-500 mt-1">Override total attempts shown.</p>
+                                    </div>
                                 </div>
                                 
                                 <div className="space-y-4 pt-4 border-t">
