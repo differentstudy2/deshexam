@@ -631,6 +631,13 @@ export const addTestSubmission = async (submissionData: any) => {
             xp: increment(10)
         });
 
+        if (submissionData.testId) {
+            const assessmentRef = doc(db, "assessments", submissionData.testId);
+            await updateDoc(assessmentRef, {
+                attemptCount: increment(1)
+            });
+        }
+
         return docRef.id;
     } catch (e) {
         console.error("Error adding document: ", e);
@@ -671,6 +678,14 @@ export const addPracticeSetSubmission = async (submissionData: any) => {
         await updateDoc(userRef, {
             xp: increment(5)
         });
+
+        const assessmentId = submissionData.practiceSetId || submissionData.testId;
+        if (assessmentId) {
+            const assessmentRef = doc(db, "assessments", assessmentId);
+            await updateDoc(assessmentRef, {
+                attemptCount: increment(1)
+            });
+        }
 
         return docRef.id;
     } catch (e) {
