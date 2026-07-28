@@ -329,18 +329,18 @@ export default function QuizzesPage() {
 
             {/* Filters */}
             <div className="flex flex-col gap-4 bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                <div className="flex flex-col sm:flex-row gap-4">
-                    <div className="relative flex-1">
+                <div className="flex flex-wrap items-center gap-4">
+                    <div className="relative flex-1 min-w-[200px]">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                         <Input 
                             placeholder="Search quizzes by title..." 
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="pl-9"
+                            className="pl-9 bg-slate-50 dark:bg-slate-800/50"
                         />
                     </div>
                     <Select value={statusFilter} onValueChange={setStatusFilter}>
-                        <SelectTrigger className="w-full sm:w-[180px]">
+                        <SelectTrigger className="w-[140px] bg-slate-50 dark:bg-slate-800/50">
                             <SelectValue placeholder="Status" />
                         </SelectTrigger>
                         <SelectContent>
@@ -351,8 +351,8 @@ export default function QuizzesPage() {
                         </SelectContent>
                     </Select>
                     <Select value={accessFilter} onValueChange={setAccessFilter}>
-                        <SelectTrigger className="w-full sm:w-[180px]">
-                            <SelectValue placeholder="Access Type" />
+                        <SelectTrigger className="w-[140px] bg-slate-50 dark:bg-slate-800/50">
+                            <SelectValue placeholder="Access" />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="all">All Access</SelectItem>
@@ -363,12 +363,8 @@ export default function QuizzesPage() {
                             <SelectItem value="both">Both</SelectItem>
                         </SelectContent>
                     </Select>
-                </div>
-                
-                {/* Taxonomy Filters */}
-                <div className="flex flex-wrap gap-4 pt-4 border-t border-slate-100 dark:border-slate-800">
                     <Select value={boardFilter} onValueChange={setBoardFilter}>
-                        <SelectTrigger className="w-[160px]">
+                        <SelectTrigger className="w-[140px] bg-slate-50 dark:bg-slate-800/50">
                             <SelectValue placeholder="Board" />
                         </SelectTrigger>
                         <SelectContent>
@@ -377,7 +373,7 @@ export default function QuizzesPage() {
                         </SelectContent>
                     </Select>
                     <Select value={classFilter} onValueChange={setClassFilter}>
-                        <SelectTrigger className="w-[160px]">
+                        <SelectTrigger className="w-[140px] bg-slate-50 dark:bg-slate-800/50">
                             <SelectValue placeholder="Class" />
                         </SelectTrigger>
                         <SelectContent>
@@ -386,7 +382,7 @@ export default function QuizzesPage() {
                         </SelectContent>
                     </Select>
                     <Select value={subjectFilter} onValueChange={setSubjectFilter}>
-                        <SelectTrigger className="w-[160px]">
+                        <SelectTrigger className="w-[140px] bg-slate-50 dark:bg-slate-800/50">
                             <SelectValue placeholder="Subject" />
                         </SelectTrigger>
                         <SelectContent>
@@ -395,7 +391,7 @@ export default function QuizzesPage() {
                         </SelectContent>
                     </Select>
                     <Select value={examFilter} onValueChange={setExamFilter}>
-                        <SelectTrigger className="w-[160px]">
+                        <SelectTrigger className="w-[140px] bg-slate-50 dark:bg-slate-800/50">
                             <SelectValue placeholder="Exam" />
                         </SelectTrigger>
                         <SelectContent>
@@ -548,17 +544,22 @@ export default function QuizzesPage() {
                             ) : (
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                     {filteredQuizs.map(test => (
-                                        <div key={test.id} className={`group relative flex flex-col bg-white dark:bg-slate-900 border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow ${selectedIds.includes(test.id) ? 'ring-2 ring-indigo-500 border-transparent' : 'border-slate-200 dark:border-slate-800'}`}>
+                                        <div key={test.id} className={`group relative flex flex-col bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-slate-700/50 rounded-2xl overflow-hidden shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] dark:hover:shadow-[0_8px_30px_rgba(255,255,255,0.04)] transition-all duration-300 hover:-translate-y-1 ${selectedIds.includes(test.id) ? 'ring-2 ring-indigo-500 bg-indigo-50/50 dark:bg-indigo-900/20' : ''}`}>
                                             {/* Top Image Area */}
-                                            <div className="relative h-40 bg-slate-100 dark:bg-slate-800 flex items-center justify-center border-b border-slate-100 dark:border-slate-800">
+                                            <div className="relative h-44 bg-slate-100 dark:bg-slate-800 flex items-center justify-center border-b border-slate-100 dark:border-slate-800 overflow-hidden">
                                                 {test.thumbnail && (!Array.isArray(test.thumbnail) || test.thumbnail.length > 0) ? (
-                                                    <img src={Array.isArray(test.thumbnail) ? test.thumbnail[0] : test.thumbnail} alt={test.title} className="w-full h-full object-cover" />
+                                                    <img src={Array.isArray(test.thumbnail) ? test.thumbnail[0] : test.thumbnail} alt={test.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                                                 ) : (
-                                                    <ImageIcon className="w-8 h-8 text-slate-300 dark:text-slate-600" />
+                                                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 to-slate-100 dark:from-indigo-900/20 dark:to-slate-800 flex items-center justify-center transition-transform duration-700 group-hover:scale-110">
+                                                        <ImageIcon className="w-10 h-10 text-slate-300 dark:text-slate-600 drop-shadow-sm" />
+                                                    </div>
                                                 )}
                                                 
+                                                {/* Gradient Overlay for Image Text/Badges */}
+                                                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20 pointer-events-none" />
+
                                                 {/* Checkbox */}
-                                                <div className="absolute top-3 left-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur rounded p-1 shadow-sm">
+                                                <div className="absolute top-3 left-3 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-md p-1 shadow-sm border border-white/20">
                                                     <Checkbox 
                                                         checked={selectedIds.includes(test.id)}
                                                         onCheckedChange={(checked) => handleToggleSelect(test.id, !!checked)}
@@ -567,32 +568,44 @@ export default function QuizzesPage() {
 
                                                 {/* Status Badge */}
                                                 <div className="absolute top-3 right-3">
-                                                    <span className={`px-2 py-1 text-[10px] font-bold uppercase tracking-wider rounded shadow-sm ${test.status === 'Published' ? 'bg-emerald-500 text-white' : test.status === 'Archived' ? 'bg-slate-500 text-white' : 'bg-amber-500 text-white'}`}>
+                                                    <span className={`px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md shadow-sm backdrop-blur-md ${test.status === 'Published' ? 'bg-emerald-500/90 text-white border border-emerald-400/50' : test.status === 'Archived' ? 'bg-slate-600/90 text-white border border-slate-500/50' : 'bg-amber-500/90 text-white border border-amber-400/50'}`}>
                                                         {test.status}
                                                     </span>
                                                 </div>
                                             </div>
 
                                             {/* Content Area */}
-                                            <div className="p-4 flex-1 flex flex-col">
-                                                <h3 className="font-semibold text-slate-900 dark:text-slate-100 line-clamp-2 mb-2 pr-6">{test.title}</h3>
+                                            <div className="p-5 flex-1 flex flex-col bg-gradient-to-b from-transparent to-slate-50/50 dark:to-slate-900/50">
+                                                <h3 className="font-bold text-slate-800 dark:text-slate-100 mb-1.5 line-clamp-2 leading-tight group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{test.title}</h3>
                                                 
-                                                {/* Meta Info */}
-                                                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-500 dark:text-slate-400 mb-4 mt-auto">
-                                                    <div><span className="font-medium text-slate-700 dark:text-slate-300">{(test as any).durationMin || '-'}</span> min</div>
-                                                    <div><span className="font-medium text-slate-700 dark:text-slate-300">{(test as any).totalMarks || '-'}</span> marks</div>
-                                                    <div><span className="font-medium text-slate-700 dark:text-slate-300">{test.questionIds?.length || 0}</span> Qs</div>
+                                                <div className="mt-3 grid grid-cols-3 gap-2 text-xs text-slate-500 dark:text-slate-400 mb-5">
+                                                    <div className="flex flex-col gap-1 bg-slate-50 dark:bg-slate-800/50 p-2 rounded-lg border border-slate-100 dark:border-slate-800 text-center">
+                                                        <span className="font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider text-[9px] sm:text-[10px]">Time</span>
+                                                        <span className="font-semibold text-slate-700 dark:text-slate-300 text-xs sm:text-sm">{(test as any).durationMin || '-'}m</span>
+                                                    </div>
+                                                    <div className="flex flex-col gap-1 bg-slate-50 dark:bg-slate-800/50 p-2 rounded-lg border border-slate-100 dark:border-slate-800 text-center">
+                                                        <span className="font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider text-[9px] sm:text-[10px]">Marks</span>
+                                                        <span className="font-semibold text-slate-700 dark:text-slate-300 text-xs sm:text-sm">{(test as any).totalMarks || '-'}</span>
+                                                    </div>
+                                                    <div className="flex flex-col gap-1 bg-slate-50 dark:bg-slate-800/50 p-2 rounded-lg border border-slate-100 dark:border-slate-800 text-center">
+                                                        <span className="font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider text-[9px] sm:text-[10px]">Qs</span>
+                                                        <span className="font-semibold text-slate-700 dark:text-slate-300 text-xs sm:text-sm">{test.questionIds?.length || 0}</span>
+                                                    </div>
                                                 </div>
 
-                                                {/* Footer Line: Price & Actions */}
-                                                <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800 mt-auto">
-                                                    <div className="flex items-center gap-1.5 font-medium text-slate-700 dark:text-slate-300 text-sm">
+                                                <div className="mt-auto flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800">
+                                                    <div className="flex items-center gap-2 font-semibold text-sm text-slate-800 dark:text-slate-200">
                                                         {test.accessType === 'free' ? (
-                                                            <Unlock className="w-4 h-4 text-emerald-600" />
+                                                            <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 px-2.5 py-1 rounded-full border border-emerald-100 dark:border-emerald-800/30">
+                                                                <Unlock className="w-3.5 h-3.5" />
+                                                                <span>Free</span>
+                                                            </div>
                                                         ) : (
-                                                            <Lock className="w-4 h-4 text-amber-600" />
+                                                            <div className="flex items-center gap-1.5 text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20 px-2.5 py-1 rounded-full border border-indigo-100 dark:border-indigo-800/30">
+                                                                <Lock className="w-3.5 h-3.5" />
+                                                                <span>₹ {test.price || 0}</span>
+                                                            </div>
                                                         )}
-                                                        <span>₹ {test.accessType === 'free' ? '0' : (test.price || 0)}</span>
                                                     </div>
                                                     <div className="flex items-center gap-1 text-sm font-medium ml-3">
                                                         <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
