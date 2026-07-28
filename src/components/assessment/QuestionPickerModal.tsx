@@ -23,6 +23,8 @@ export function QuestionPickerModal({ open, onOpenChange, onSelectQuestions, pre
     const [questions, setQuestions] = useState<QuestionBankEntry[]>([]);
     const [loading, setLoading] = useState(false);
     const [selectedMap, setSelectedMap] = useState<Record<string, QuestionBankEntry>>({});
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
     
     // Filters
     const [search, setSearch] = useState('');
@@ -67,6 +69,7 @@ export function QuestionPickerModal({ open, onOpenChange, onSelectQuestions, pre
             }
             
             setQuestions(data);
+            setCurrentPage(1); // Reset to first page
         } catch (error) {
             console.error("Failed to fetch questions:", error);
         } finally {
@@ -183,11 +186,11 @@ export function QuestionPickerModal({ open, onOpenChange, onSelectQuestions, pre
                                     </button>
                                 </div>
                                 <div className="text-sm text-slate-500">
-                                    Showing {questions.length} questions
+                                    Showing {(currentPage - 1) * itemsPerPage + 1}-{Math.min(currentPage * itemsPerPage, questions.length)} of {questions.length}
                                 </div>
                             </div>
                             
-                            {questions.map(q => {
+                            {questions.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map(q => {
                                 const isSelected = !!selectedMap[q.id];
                                 const isPreSelected = preSelectedIds.includes(q.id);
                                 return (
@@ -224,6 +227,30 @@ export function QuestionPickerModal({ open, onOpenChange, onSelectQuestions, pre
                                     </div>
                                 );
                             })}
+                            
+                            {questions.length > itemsPerPage && (
+                                <div className="flex items-center justify-center gap-2 pt-4 border-t mt-4">
+                                    <Button 
+                                        variant="outline" 
+                                        size="sm" 
+                                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                        disabled={currentPage === 1}
+                                    >
+                                        Previous
+                                    </Button>
+                                    <span className="text-sm text-slate-500 font-medium px-2">
+                                        Page {currentPage} of {Math.ceil(questions.length / itemsPerPage)}
+                                    </span>
+                                    <Button 
+                                        variant="outline" 
+                                        size="sm" 
+                                        onClick={() => setCurrentPage(p => Math.min(Math.ceil(questions.length / itemsPerPage), p + 1))}
+                                        disabled={currentPage === Math.ceil(questions.length / itemsPerPage)}
+                                    >
+                                        Next
+                                    </Button>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>

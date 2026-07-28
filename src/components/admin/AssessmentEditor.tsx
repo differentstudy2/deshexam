@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { PlusCircle, Pencil, Trash2, ArrowLeft, Loader2, ListPlus, Copy, GripVertical, Sparkles, Upload, Link as LinkIcon, Image as ImageIcon, Wand2, Check, ChevronDown, Search, CheckCircle2, Printer } from 'lucide-react';
+import { PlusCircle, Pencil, Trash2, ArrowLeft, Loader2, ListPlus, Copy, GripVertical, Sparkles, Upload, Link as LinkIcon, Image as ImageIcon, Wand2, Check, ChevronDown, Search, CheckCircle2, Printer, FileText, Compass, ListChecks, Settings } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { useToast } from '@/hooks/use-toast';
@@ -327,9 +327,14 @@ export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock 
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="md:col-span-2 space-y-6">
-                        <Card>
-                            <CardHeader className="flex flex-row items-center justify-between">
-                                <CardTitle>Basic Details</CardTitle>
+                        <Card className="border-slate-200/60 dark:border-slate-800 shadow-sm bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl overflow-hidden">
+                            <CardHeader className="flex flex-row items-center justify-between border-b border-blue-100 dark:border-blue-800/50 bg-blue-50/80 dark:bg-blue-900/20 py-4 mb-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400">
+                                        <FileText className="w-4 h-4" />
+                                    </div>
+                                    <CardTitle className="text-base text-slate-800 dark:text-slate-100">Basic Details</CardTitle>
+                                </div>
                                 <Button 
                                     variant="outline" 
                                     size="sm" 
@@ -348,7 +353,7 @@ export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock 
                                 </div>
                                 <div>
                                     <label className="text-sm font-medium">Slug</label>
-                                    <Input value={editData.slug || ''} onChange={e => setEditData({...editData, slug: e.target.value})} placeholder="wbcs-prelims-mock-1" />
+                                    <Input value={editData.slug || ''} onChange={e => setEditData({...editData, slug: e.target.value})} placeholder="wbcs-prelims-mock-1" disabled={!!initialData?.id} />
                                 </div>
                                 <div>
                                     <label className="text-sm font-medium">Description</label>
@@ -356,7 +361,7 @@ export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock 
                                 </div>
                                 <div>
                                     <label className="text-sm font-medium">Instructions for Students</label>
-                                    <Textarea value={editData.instructions || ''} onChange={e => setEditData({...editData, instructions: e.target.value})} rows={3} placeholder="Read carefully before starting..." />
+                                    <Textarea value={editData.instructions || ''} onChange={e => setEditData({...editData, instructions: e.target.value})} rows={4} placeholder="Read carefully before starting..." className="resize-y min-h-[100px]" />
                                 </div>
                             </CardContent>
                         </Card>
@@ -368,9 +373,14 @@ export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock 
                             defaultAiPrompt={editData.title || ''}
                         />
 
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="text-base text-slate-800 dark:text-slate-100">Content Mapping (Taxonomy)</CardTitle>
+                        <Card className="border-slate-200/60 dark:border-slate-800 shadow-sm bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl overflow-hidden">
+                            <CardHeader className="border-b border-emerald-100 dark:border-emerald-800/50 bg-emerald-50/80 dark:bg-emerald-900/20 py-4 mb-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-400">
+                                        <Compass className="w-4 h-4" />
+                                    </div>
+                                    <CardTitle className="text-base text-slate-800 dark:text-slate-100">Content Mapping (Taxonomy)</CardTitle>
+                                </div>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="grid grid-cols-2 gap-4">
@@ -424,9 +434,14 @@ export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock 
                             </CardContent>
                         </Card>
 
-                        <Card>
-                            <CardHeader className="flex flex-row items-center justify-between pb-4">
-                                <CardTitle>Questions ({editData.questionIds?.length || 0})</CardTitle>
+                        <Card className="border-slate-200/60 dark:border-slate-800 shadow-sm bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl overflow-hidden">
+                            <CardHeader className="flex flex-row items-center justify-between border-b border-indigo-100 dark:border-indigo-800/50 bg-indigo-50/80 dark:bg-indigo-900/20 py-4 mb-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-400">
+                                        <ListChecks className="w-4 h-4" />
+                                    </div>
+                                    <CardTitle className="text-base text-slate-800 dark:text-slate-100">Questions ({editData.questionIds?.length || 0})</CardTitle>
+                                </div>
                                 <div className="flex gap-2">
                                     {editData.id && editData.questionIds && editData.questionIds.length > 0 && collectionPath && (
                                         <Button size="icon" variant="outline" title="Print Answer Sheet" className="h-9 w-9 text-emerald-600 border-emerald-200 hover:bg-emerald-50 dark:hover:bg-emerald-950" onClick={() => window.open(`/admin/assessment-center/${collectionPath}/${editData.id}/answer-sheet`, '_blank')}>
@@ -483,8 +498,15 @@ export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock 
                     </div>
 
                     <div className="space-y-6">
-                        <Card>
-                            <CardHeader><CardTitle>Exam Configuration</CardTitle></CardHeader>
+                        <Card className="border-slate-200/60 dark:border-slate-800 shadow-sm bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl overflow-hidden">
+                            <CardHeader className="border-b border-orange-100 dark:border-orange-800/50 bg-orange-50/80 dark:bg-orange-900/20 py-4 mb-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-orange-100 text-orange-600 dark:bg-orange-900/50 dark:text-orange-400">
+                                        <Settings className="w-4 h-4" />
+                                    </div>
+                                    <CardTitle className="text-base text-slate-800 dark:text-slate-100">Exam Configuration</CardTitle>
+                                </div>
+                            </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="flex items-center justify-between bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg border border-blue-100 dark:border-blue-800/50 mb-4">
                                     <div className="space-y-0.5">
@@ -507,28 +529,30 @@ export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock 
                                         </SelectContent>
                                     </Select>
                                 </div>
-                                <div>
-                                    <label className="text-sm font-medium">Difficulty</label>
-                                    <Select value={editData.difficulty || 'Hard'} onValueChange={v => setEditData({...editData, difficulty: v as any})}>
-                                        <SelectTrigger><SelectValue /></SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="Easy">Easy</SelectItem>
-                                            <SelectItem value="Medium">Medium</SelectItem>
-                                            <SelectItem value="Hard">Hard</SelectItem>
-                                            <SelectItem value="Expert">Expert</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                <div>
-                                    <label className="text-sm font-medium">Language</label>
-                                    <Select value={editData.language || 'English'} onValueChange={v => setEditData({...editData, language: v})}>
-                                        <SelectTrigger><SelectValue /></SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="English">English</SelectItem>
-                                            <SelectItem value="Bengali">Bengali</SelectItem>
-                                            <SelectItem value="Hindi">Hindi</SelectItem>
-                                        </SelectContent>
-                                    </Select>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="text-sm font-medium">Difficulty</label>
+                                        <Select value={editData.difficulty || 'Hard'} onValueChange={v => setEditData({...editData, difficulty: v as any})}>
+                                            <SelectTrigger><SelectValue /></SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="Easy">Easy</SelectItem>
+                                                <SelectItem value="Medium">Medium</SelectItem>
+                                                <SelectItem value="Hard">Hard</SelectItem>
+                                                <SelectItem value="Expert">Expert</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div>
+                                        <label className="text-sm font-medium">Language</label>
+                                        <Select value={editData.language || 'English'} onValueChange={v => setEditData({...editData, language: v})}>
+                                            <SelectTrigger><SelectValue /></SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="English">English</SelectItem>
+                                                <SelectItem value="Bengali">Bengali</SelectItem>
+                                                <SelectItem value="Hindi">Hindi</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
