@@ -151,13 +151,29 @@ function AcademyCard({ subject, index }: { subject: Subject, index: number }) {
             const progress = await getTextbookProgress(user.uid, subject.id);
             const completedCount = progress?.completedChapters?.length || 0;
             
-            const chQ = query(
-              collection(db, 'taxonomy_nodes'), 
-              where('type', '==', 'chapter'), 
-              where('parentId', '==', subject.id)
-            );
-            const chSnap = await getCountFromServer(chQ);
-            const totalCount = chSnap.data().count;
+            const cacheKey = `academy_chapter_count_${subject.id}`;
+            const cached = localStorage.getItem(cacheKey);
+            let totalCount = 0;
+            
+            if (cached) {
+                try {
+                    const parsed = JSON.parse(cached);
+                    if (Date.now() - parsed.timestamp < 1000 * 60 * 60 * 24) { // 24 hour cache
+                        totalCount = parsed.count;
+                    }
+                } catch(e) {}
+            }
+
+            if (!totalCount) {
+                const chQ = query(
+                  collection(db, 'taxonomy_nodes'), 
+                  where('type', '==', 'chapter'), 
+                  where('parentId', '==', subject.id)
+                );
+                const chSnap = await getCountFromServer(chQ);
+                totalCount = chSnap.data().count;
+                localStorage.setItem(cacheKey, JSON.stringify({ count: totalCount, timestamp: Date.now() }));
+            }
 
             if (totalCount > 0) {
                 const percentage = Math.round((completedCount / totalCount) * 100);

@@ -37,6 +37,19 @@ const TextbookStats = ({ textbookId }: { textbookId: string }) => {
 
     useEffect(() => {
         const fetchStats = async () => {
+            const cacheKey = `textbook_stats_${textbookId}`;
+            const cached = localStorage.getItem(cacheKey);
+            if (cached) {
+                try {
+                    const parsed = JSON.parse(cached);
+                    if (Date.now() - parsed.timestamp < 1000 * 60 * 60) { // 1 hour cache
+                        setStats(parsed.stats);
+                        setLoading(false);
+                        return;
+                    }
+                } catch(e) {}
+            }
+
             let chapterCount = 0;
             let topicCount = 0;
             let practiceSetCount = 0;
@@ -53,7 +66,10 @@ const TextbookStats = ({ textbookId }: { textbookId: string }) => {
                 const topicsSnap = await getCountFromServer(topicsRef);
                 topicCount += topicsSnap.data().count;
             }
-            setStats({ chapterCount, topicCount, practiceSetCount });
+            
+            const newStats = { chapterCount, topicCount, practiceSetCount };
+            setStats(newStats);
+            localStorage.setItem(cacheKey, JSON.stringify({ stats: newStats, timestamp: Date.now() }));
             setLoading(false);
         };
         fetchStats();

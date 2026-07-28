@@ -65,7 +65,21 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
     setTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
-  const [questions] = useState<QuestionBankEntry[]>(() => {
+  const STORAGE_KEY = `exam_progress_${mockTest.id}`;
+
+  const [questions, setQuestions] = useState<QuestionBankEntry[]>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (parsed.questions && Array.isArray(parsed.questions)) {
+            return parsed.questions;
+          }
+        } catch(e) {}
+      }
+    }
+
     let qs = [...initialQuestions];
 
     if (mockTest.shuffleQuestions) {
@@ -97,18 +111,70 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
   });
 
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [timeLeft, setTimeLeft] = useState((mockTest.durationMin || 60) * 60);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, string>>({});
-  const [questionStates, setQuestionStates] = useState<Record<string, QuestionState>>({});
+
+  const getSavedState = (key: string, fallback: any) => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (parsed[key] !== undefined) return parsed[key];
+        } catch(e) {}
+      }
+    }
+    return fallback;
+  };
+
+  const [timeLeft, setTimeLeft] = useState(() => getSavedState('timeLeft', (mockTest.durationMin || 60) * 60));
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(() => getSavedState('currentQuestionIndex', 0));
+  const [answers, setAnswers] = useState<Record<string, string>>(() => getSavedState('answers', {}));
+  const [questionStates, setQuestionStates] = useState<Record<string, QuestionState>>(() => getSavedState('questionStates', {}));
+  const [hasStarted, setHasStarted] = useState(() => getSavedState('hasStarted', false));
 
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
   const [scoreData, setScoreData] = useState({ correct: 0, wrong: 0, skipped: 0, score: 0, total: 0 });
   const [isReviewMode, setIsReviewMode] = useState(false);
-  const [hasStarted, setHasStarted] = useState(false);
   const [wasKicked, setWasKicked] = useState(false);
   const [showMobileNav, setShowMobileNav] = useState(false);
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined' && hasStarted && !isSubmitted) {
+      // Save large unchanging data only once or when answers change
+      const stateToSave = {
+        questions,
+        timeLeft,
+        currentQuestionIndex,
+        answers,
+        questionStates,
+        hasStarted
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
+    }
+  }, [currentQuestionIndex, answers, questionStates, hasStarted, isSubmitted]);
+
+  // Save timeLeft separately to avoid heavy stringification every second
+  // Actually, stringifying a few questions isn't terribly slow, but if there are 200 questions, it might be.
+  // We'll just throttle the timer save to every 5 seconds to reduce load
+  useEffect(() => {
+      if (typeof window !== 'undefined' && hasStarted && !isSubmitted && timeLeft % 5 === 0) {
+        const stateToSave = {
+            questions,
+            timeLeft,
+            currentQuestionIndex,
+            answers,
+            questionStates,
+            hasStarted
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
+      }
+  }, [timeLeft]);
+
+  useEffect(() => {
+    if (isSubmitted && typeof window !== 'undefined') {
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  }, [isSubmitted]);
   const [showPresentationMode, setShowPresentationMode] = useState(false);
   const [autoSaveNext, setAutoSaveNext] = useState(false);
   const [optionsLayout, setOptionsLayout] = useState<'list' | 'grid'>('list');

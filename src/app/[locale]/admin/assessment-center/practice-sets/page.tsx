@@ -12,6 +12,8 @@ import { submitReview, bulkSubmitReviews } from '@/lib/firebase/reviews';
 import { getTaxonomyNodesByTrack, TaxonomyNode } from '@/lib/firebase/taxonomy';
 import { AssessmentEditor } from '@/components/admin/AssessmentEditor';
 import Link from 'next/link';
+import { collection, query, orderBy, limit, startAfter, getDocs } from 'firebase/firestore';
+import { db } from '@/lib/firebase/client';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Star, MessageSquare, Wand2, Copy as CopyIcon, CheckSquare, MoreVertical, Unlock, Lock, ImageIcon, LayoutGrid, List, Search, Printer } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -77,23 +79,50 @@ export default function PracticeSetsPage() {
     });
 
     useEffect(() => {
-        fetchPracticeSets();
+        fetchPracticeSets(true);
     }, []);
 
-    const fetchPracticeSets = async () => {
+    const [lastDoc, setLastDoc] = useState<any>(null);
+    const [hasMore, setHasMore] = useState(true);
+
+    const fetchPracticeSets = async (isInitial = false) => {
         setLoading(true);
         try {
-            const data = await getAssessments('practiceSets');
-            setPracticeSets(data as PracticeSet[]);
+            // Note: Since we are migrating to pagination, we can't easily filter all items on the client.
+            // For now, we fetch the latest 50 items. In a real system with complex search, we'd need Algolia.
+            const colRef = collection(db, 'practice_sets');
+            let q = query(colRef, orderBy('createdAt', 'desc'), limit(50));
+            
+            if (!isInitial && lastDoc) {
+                q = query(colRef, orderBy('createdAt', 'desc'), startAfter(lastDoc), limit(50));
+            }
 
-            // Fetch taxonomies
-            const allAcademic = await getTaxonomyNodesByTrack('academic');
-            setBoards(allAcademic.filter((n: any) => n.type === 'board'));
-            setClasses(allAcademic.filter((n: any) => n.type === 'class'));
-            setSubjects(allAcademic.filter((n: any) => n.type === 'subject'));
+            const snapshot = await getDocs(q);
+            const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-            const allCompetitive = await getTaxonomyNodesByTrack('competitive');
-            setExams(allCompetitive.filter((n: any) => n.type === 'exam'));
+            if (isInitial) {
+                setPracticeSets(data as PracticeSet[]);
+            } else {
+                setPracticeSets(prev => [...prev, ...(data as PracticeSet[])]);
+            }
+
+            if (snapshot.docs.length > 0) {
+                setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
+            }
+            if (snapshot.docs.length < 50) {
+                setHasMore(false);
+            }
+
+            // Fetch taxonomies only on initial load
+            if (isInitial) {
+                const allAcademic = await getTaxonomyNodesByTrack('academic');
+                setBoards(allAcademic.filter((n: any) => n.type === 'board'));
+                setClasses(allAcademic.filter((n: any) => n.type === 'class'));
+                setSubjects(allAcademic.filter((n: any) => n.type === 'subject'));
+
+                const allCompetitive = await getTaxonomyNodesByTrack('competitive');
+                setExams(allCompetitive.filter((n: any) => n.type === 'exam'));
+            }
         } catch (error) {
             console.error(error);
             toast({ title: 'Error fetching practice sets', variant: 'destructive' });
@@ -541,7 +570,7 @@ export default function PracticeSetsPage() {
                     
                     {displayMode === 'grid' && (
                         <div className="mt-4">
-                            {loading ? (
+                            {loading && !lastDoc ? (
                                 <div className="flex justify-center py-12"><Loader2 className="animate-spin text-indigo-500" /></div>
                             ) : filteredPracticeSets.length === 0 ? (
                                 <div className="text-center py-12 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50 dark:bg-slate-900/50">No practice sets found matching your filters.</div>
@@ -575,18 +604,21 @@ export default function PracticeSetsPage() {
 
                                             {/* Content Area */}
                                             <div className="p-4 flex-1 flex flex-col">
-                                                <h3 className="font-semibold text-slate-900 dark:text-slate-100 line-clamp-2 mb-2 pr-6">{test.title}</h3>
+                                                <h3 className="font-bold text-slate-800 dark:text-slate-200 mb-1 line-clamp-2">{test.title}</h3>
                                                 
-                                                {/* Meta Info */}
-                                                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-500 dark:text-slate-400 mb-4 mt-auto">
-                                                    <div><span className="font-medium text-slate-700 dark:text-slate-300">{(test as any).durationMin || '-'}</span> min</div>
-                                                    <div><span className="font-medium text-slate-700 dark:text-slate-300">{(test as any).totalMarks || '-'}</span> marks</div>
-                                                    <div><span className="font-medium text-slate-700 dark:text-slate-300">{test.questionIds?.length || 0}</span> Qs</div>
+                                                <div className="mt-4 grid grid-cols-2 gap-2 text-xs text-slate-500 dark:text-slate-400 mb-4">
+                                                    <div className="flex flex-col gap-1">
+                                                        <span className="font-medium text-slate-700 dark:text-slate-300">Marks</span>
+                                                        <span>{(test as any).totalMarks || '-'}</span>
+                                                    </div>
+                                                    <div className="flex flex-col gap-1">
+                                                        <span className="font-medium text-slate-700 dark:text-slate-300">Questions</span>
+                                                        <span>{test.questionIds?.length || 0}</span>
+                                                    </div>
                                                 </div>
 
-                                                {/* Footer Line: Price & Actions */}
-                                                <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800 mt-auto">
-                                                    <div className="flex items-center gap-1.5 font-medium text-slate-700 dark:text-slate-300 text-sm">
+                                                <div className="mt-auto flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800">
+                                                    <div className="flex items-center gap-1.5 font-medium text-sm text-slate-700 dark:text-slate-300">
                                                         {test.accessType === 'free' ? (
                                                             <Unlock className="w-4 h-4 text-emerald-600" />
                                                         ) : (
@@ -594,53 +626,62 @@ export default function PracticeSetsPage() {
                                                         )}
                                                         <span>₹ {test.accessType === 'free' ? '0' : (test.price || 0)}</span>
                                                     </div>
-                                                    <div className="flex items-center gap-1 text-sm font-medium ml-3">
-                                                        <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-                                                        {test.reviewStats?.averageRating || 0}
-                                                        <span className="text-[10px] text-slate-400 font-normal ml-0.5">({test.reviewStats?.totalReviews || 0})</span>
+                                                    
+                                                    <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <DropdownMenu>
+                                                            <DropdownMenuTrigger asChild>
+                                                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700">
+                                                                    <MoreVertical className="h-4 w-4" />
+                                                                </Button>
+                                                            </DropdownMenuTrigger>
+                                                            <DropdownMenuContent align="end" className="w-48">
+                                                                <DropdownMenuItem asChild>
+                                                                    <Link href={`/practice/${test.slug}`} target="_blank" className="cursor-pointer">
+                                                                        <Eye className="mr-2 h-4 w-4" /> View on Site
+                                                                    </Link>
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem onClick={() => handleEdit(test)} className="cursor-pointer">
+                                                                    <Pencil className="mr-2 h-4 w-4" /> Edit
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem onClick={() => handleClone(test)} className="cursor-pointer">
+                                                                    <Copy className="mr-2 h-4 w-4" /> Clone
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem onClick={() => window.open(`/admin/assessment-center/practice-sets/${test.id}/answer-sheet`, '_blank')} className="cursor-pointer">
+                                                                    <Printer className="mr-2 h-4 w-4" /> Print Answer Sheet
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuSeparator />
+                                                                <DropdownMenuItem onClick={() => setReviewTest(test)} className="cursor-pointer">
+                                                                    <MessageSquare className="mr-2 h-4 w-4 text-indigo-500" /> Add Review
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem onClick={() => setBulkImportTest(test)} className="cursor-pointer">
+                                                                    <Wand2 className="mr-2 h-4 w-4 text-purple-500" /> AI Bulk Import
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuSeparator />
+                                                                <DropdownMenuItem onClick={() => handleDelete(test.id)} className="cursor-pointer text-red-600 focus:text-red-600">
+                                                                    <Trash2 className="mr-2 h-4 w-4" /> Delete
+                                                                </DropdownMenuItem>
+                                                            </DropdownMenuContent>
+                                                        </DropdownMenu>
                                                     </div>
-
-                                                    <DropdownMenu>
-                                                        <DropdownMenuTrigger asChild>
-                                                            <Button variant="ghost" className="h-8 w-8 p-0">
-                                                                <span className="sr-only">Open menu</span>
-                                                                <MoreVertical className="h-4 w-4" />
-                                                            </Button>
-                                                        </DropdownMenuTrigger>
-                                                        <DropdownMenuContent align="end" className="w-48">
-                                                            <DropdownMenuItem asChild>
-                                                                <Link href={`/practice/${test.slug}`} target="_blank" className="cursor-pointer">
-                                                                    <Eye className="mr-2 h-4 w-4" /> View on Site
-                                                                </Link>
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuItem onClick={() => handleEdit(test)} className="cursor-pointer">
-                                                                <Pencil className="mr-2 h-4 w-4" /> Edit
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuItem onClick={() => handleClone(test)} className="cursor-pointer">
-                                                                <Copy className="mr-2 h-4 w-4" /> Clone
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuItem onClick={() => window.open(`/admin/assessment-center/practice-sets/${test.id}/answer-sheet`, '_blank')} className="cursor-pointer">
-                                                                <Printer className="mr-2 h-4 w-4" /> Print Answer Sheet
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuSeparator />
-                                                            <DropdownMenuItem onClick={() => setReviewTest(test)} className="cursor-pointer">
-                                                                <MessageSquare className="mr-2 h-4 w-4 text-indigo-500" /> Add Review
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuItem onClick={() => setBulkImportTest(test)} className="cursor-pointer">
-                                                                <Wand2 className="mr-2 h-4 w-4 text-purple-500" /> AI Bulk Import
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuSeparator />
-                                                            <DropdownMenuItem onClick={() => handleDelete(test.id)} className="cursor-pointer text-red-600 focus:text-red-600">
-                                                                <Trash2 className="mr-2 h-4 w-4" /> Delete
-                                                            </DropdownMenuItem>
-                                                        </DropdownMenuContent>
-                                                    </DropdownMenu>
                                                 </div>
                                             </div>
                                         </div>
                                     ))}
                                 </div>
                             )}
+                        </div>
+                    )}
+                    
+                    {hasMore && !loading && (
+                        <div className="flex justify-center mt-6">
+                            <Button variant="outline" onClick={() => fetchPracticeSets(false)}>
+                                Load More Practice Sets
+                            </Button>
+                        </div>
+                    )}
+                    {loading && lastDoc && (
+                        <div className="flex justify-center mt-6">
+                            <Loader2 className="animate-spin text-indigo-500" />
                         </div>
                     )}
                 </CardContent>
