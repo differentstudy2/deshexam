@@ -47,11 +47,14 @@ export const FirebaseProvider = ({ children }: { children: ReactNode }) => {
     const auth = getAuth(app);
     let db: Firestore;
     try {
-      db = initializeFirestore(app, {
-        localCache: persistentLocalCache({tabManager: persistentMultipleTabManager()})
-      });
+      if (typeof window !== 'undefined') {
+        db = initializeFirestore(app, {
+          localCache: persistentLocalCache({tabManager: persistentMultipleTabManager()})
+        });
+      } else {
+        db = getFirestore(app);
+      }
     } catch (e) {
-      // Fallback if already initialized (e.g. from client.ts)
       db = getFirestore(app);
     }
     const storage = getStorage(app);

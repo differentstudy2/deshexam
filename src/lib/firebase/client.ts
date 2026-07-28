@@ -25,9 +25,13 @@ const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const auth = getAuth(app);
 let db: any;
 try {
-  db = initializeFirestore(app, {
-    localCache: persistentLocalCache({tabManager: persistentMultipleTabManager()})
-  });
+  if (typeof window !== 'undefined') {
+    db = initializeFirestore(app, {
+      localCache: persistentLocalCache({tabManager: persistentMultipleTabManager()})
+    });
+  } else {
+    db = getFirestore(app);
+  }
 } catch (e) {
   db = getFirestore(app);
 }

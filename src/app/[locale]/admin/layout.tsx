@@ -22,6 +22,7 @@ import {
 
 import Link from "next/link";
 import { useTheme } from "next-themes";
+import { ClearCacheButton } from "@/components/layout/header";
 import { AdminMobileBottomNav } from '@/components/layout/admin-mobile-bottom-nav';
 import { AdminLoadingScreen } from '@/components/admin/AdminLoadingScreen';
 
@@ -117,6 +118,7 @@ export default function AdminLayout({
                     </div>
                     <div className="ml-auto flex items-center space-x-2 md:space-x-4">
                         <ThemeToggle />
+                        <ClearCacheButton />
                         <NotificationBell />
                         
                         <DropdownMenu>
