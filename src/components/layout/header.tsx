@@ -479,32 +479,36 @@ export const AdminSidebar = ({ onLinkClick, logOut }: { onLinkClick?: () => void
     };
 
     return (
-        <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-900/95 text-slate-800 dark:text-slate-300 border-r border-slate-200/60 dark:border-slate-800/60 overflow-hidden">
-            <div className="p-4 group-data-[collapsible=icon]:p-2 flex items-center h-16 shrink-0 border-b border-slate-200/60 dark:border-slate-800/60 bg-white dark:bg-slate-950">
+        <div className="flex flex-col h-full bg-slate-50 text-slate-700 border-r border-slate-200/60 shadow-[4px_0_24px_rgba(0,0,0,0.02)] overflow-hidden relative selection:bg-indigo-500/30 dark:bg-slate-900/95 dark:border-slate-800/60 dark:text-slate-300">
+            {/* Subtle premium background glow */}
+            <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-br from-indigo-50 via-white to-transparent dark:from-indigo-900/20 dark:via-transparent dark:to-transparent pointer-events-none" />
+            <div className="absolute bottom-0 right-0 w-full h-[300px] bg-gradient-to-tl from-teal-50 to-transparent dark:from-teal-900/10 dark:to-transparent pointer-events-none" />
+            
+            <div className="p-4 group-data-[collapsible=icon]:p-2 flex items-center h-16 shrink-0 border-b border-slate-200/50 dark:border-white/5 bg-transparent relative z-10">
                 <Link href="/admin" onClick={onLinkClick} className="flex items-center gap-3 group-data-[collapsible=icon]:gap-0 w-full group-data-[collapsible=icon]:justify-center">
-                    <img src="/icons/icon-192x192.png" alt="DeshExam Logo" className="h-8 w-8 object-contain shrink-0" />
+                    <img src="/icons/icon-192x192.png" alt="DeshExam Logo" className="h-8 w-8 object-contain shrink-0 drop-shadow-md" />
                     <div className="font-extrabold text-xl tracking-tighter flex items-baseline group-data-[collapsible=icon]:hidden whitespace-nowrap">
-                        <span className="bg-gradient-to-r from-[#00a651] to-teal-400 bg-clip-text text-transparent drop-shadow-sm">DESH</span>
-                        <span className="text-inherit">EXAM</span>
-                        <span className="ml-1.5 text-xs font-semibold text-slate-500 uppercase tracking-widest">Admin</span>
+                        <span className="bg-gradient-to-r from-emerald-500 to-teal-400 bg-clip-text text-transparent drop-shadow-sm">DESH</span>
+                        <span className="text-slate-800 dark:text-white drop-shadow-sm">EXAM</span>
+                        <span className="ml-2 text-[9px] font-bold text-indigo-600 dark:text-indigo-300 uppercase tracking-widest bg-indigo-100/50 dark:bg-indigo-500/20 px-1.5 py-0.5 rounded border border-indigo-200/50 dark:border-indigo-500/30 shadow-sm">Admin</span>
                     </div>
                 </Link>
             </div>
-            <ScrollArea className="flex-1 bg-slate-50 dark:bg-slate-900">
-                <div className="space-y-4 px-3 py-4 group-data-[collapsible=icon]:px-2">
+            <ScrollArea className="flex-1 bg-transparent relative z-10">
+                <div className="space-y-6 px-3 py-6 group-data-[collapsible=icon]:px-2">
                     {adminNavGroups.map((group, idx) => {
                         const isOpen = openGroups[group.title];
                         return (
-                        <div key={idx} className="space-y-1">
+                        <div key={idx} className="space-y-2">
                             <button 
                                 onClick={() => toggleGroup(group.title)}
-                                className="w-full flex items-center justify-between px-3 py-2 text-[12px] font-bold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors uppercase tracking-wider group-data-[collapsible=icon]:hidden"
+                                className="w-full flex items-center justify-between px-3 py-1 text-[13px] font-bold text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-slate-200 transition-colors uppercase tracking-[0.2em] group-data-[collapsible=icon]:hidden focus:outline-none"
                             >
                                 <span>{group.title}</span>
-                                {isOpen ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+                                {isOpen ? <ChevronDown className="w-4 h-4 opacity-70" /> : <ChevronRight className="w-4 h-4 opacity-70" />}
                             </button>
-                            <div className={`overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'} group-data-[collapsible=icon]:max-h-none group-data-[collapsible=icon]:opacity-100`}>
-                            <ul className="space-y-0.5 mt-1 group-data-[collapsible=icon]:px-0">
+                            <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'} group-data-[collapsible=icon]:max-h-none group-data-[collapsible=icon]:opacity-100`}>
+                            <ul className="space-y-1 mt-1 group-data-[collapsible=icon]:px-0">
                                 {group.items.map((item) => {
                                     const isActive = pathname === item.href || (item.href !== "/admin" && pathname.startsWith(item.href));
                                     return (
@@ -513,15 +517,17 @@ export const AdminSidebar = ({ onLinkClick, logOut }: { onLinkClick?: () => void
                                                 asChild
                                                 variant="ghost"
                                                 className={cn(
-                                                    "justify-start w-full h-9 px-3 py-2 text-sm rounded-lg transition-all duration-200 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0",
+                                                    "justify-start w-full h-11 px-3 py-2 text-[15px] rounded-xl transition-all duration-300 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 border",
                                                     isActive 
-                                                        ? "bg-green-600 text-white dark:bg-green-700 dark:text-white font-medium shadow-sm hover:bg-green-700 hover:text-white" 
-                                                        : "hover:bg-slate-200/50 dark:hover:bg-slate-800/50 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 font-medium"
+                                                        ? "bg-white dark:bg-slate-800 text-indigo-700 dark:text-indigo-300 font-semibold shadow-sm border-indigo-100 dark:border-indigo-500/30 hover:bg-indigo-50 dark:hover:bg-indigo-900/50" 
+                                                        : "bg-transparent text-slate-600 dark:text-slate-400 border-transparent hover:bg-white/60 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-slate-100 font-medium"
                                                 )}
                                             >
                                                 <Link href={item.href} onClick={onLinkClick}>
-                                                    <span className={cn("transition-colors flex-shrink-0", isActive ? "text-white" : "text-slate-400 dark:text-slate-500", "group-data-[collapsible=icon]:mx-auto")}>{item.icon}</span>
-                                                    <span className="ml-3 group-data-[collapsible=icon]:hidden whitespace-nowrap">{item.label}</span>
+                                                    <span className={cn("transition-colors flex-shrink-0 drop-shadow-sm", isActive ? "text-indigo-600 dark:text-indigo-400" : "text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300", "group-data-[collapsible=icon]:mx-auto")}>
+                                                        {React.cloneElement(item.icon as React.ReactElement, { className: "w-5 h-5" })}
+                                                    </span>
+                                                    <span className="ml-3 group-data-[collapsible=icon]:hidden whitespace-nowrap tracking-wide">{item.label}</span>
                                                 </Link>
                                             </Button>
                                         </li>
@@ -532,22 +538,22 @@ export const AdminSidebar = ({ onLinkClick, logOut }: { onLinkClick?: () => void
                         </div>
                     )})}
                     
-                    <div className="pt-4 mt-4 border-t border-slate-200 dark:border-slate-800/60 space-y-2 px-1 group-data-[collapsible=icon]:px-0">
+                    <div className="pt-6 mt-6 border-t border-slate-200/50 dark:border-white/10 space-y-2 px-1 group-data-[collapsible=icon]:px-0">
                         <Button
                             asChild
                             variant="ghost"
-                            className="justify-start w-full h-9 px-3 py-2 text-sm font-medium rounded-lg hover:bg-slate-200/50 dark:hover:bg-slate-800/50 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-all duration-200 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0"
+                            className="justify-start w-full h-10 px-3 py-2 text-sm font-medium rounded-xl border border-transparent bg-transparent hover:bg-white/60 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-all duration-300 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0"
                         >
                             <Link href="/dashboard" onClick={onLinkClick}>
                                 <LayoutGrid className="h-4 w-4 text-slate-400 dark:text-slate-500 flex-shrink-0 group-data-[collapsible=icon]:mx-auto" />
-                                <span className="ml-3 group-data-[collapsible=icon]:hidden whitespace-nowrap">Exit Admin</span>
+                                <span className="ml-3 group-data-[collapsible=icon]:hidden whitespace-nowrap tracking-wide">Exit Admin</span>
                             </Link>
                         </Button>
                     </div>
                 </div>
             </ScrollArea>
-            <div className="p-4 border-t border-slate-200/60 dark:border-slate-800/60 bg-white dark:bg-slate-950 shrink-0 group-data-[collapsible=icon]:p-2 flex flex-col items-center">
-                <Button variant="ghost" className="w-full justify-start text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-all duration-200 h-9 px-3 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0" onClick={logOut}>
+            <div className="p-4 border-t border-slate-200/50 dark:border-white/10 bg-white/50 dark:bg-slate-950/50 backdrop-blur-md shrink-0 group-data-[collapsible=icon]:p-2 flex flex-col items-center relative z-10">
+                <Button variant="ghost" className="w-full justify-start text-rose-500 dark:text-rose-400 hover:text-rose-600 dark:hover:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:border-rose-100 dark:hover:border-rose-500/20 border border-transparent rounded-xl transition-all duration-300 h-10 px-3 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 font-medium tracking-wide" onClick={logOut}>
                     <LogOut className="mr-3 h-4 w-4 flex-shrink-0 group-data-[collapsible=icon]:mr-0"/>
                     <span className="group-data-[collapsible=icon]:hidden whitespace-nowrap">Logout</span>
                 </Button>

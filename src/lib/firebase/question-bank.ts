@@ -147,12 +147,11 @@ export async function getTotalQuestionsCount(filters?: any) {
   
   if (filters && Object.keys(filters).length > 0) {
       const conditions: any[] = [];
-      if (filters.board) conditions.push(where('board', '==', filters.board));
-      if (filters.class) conditions.push(where('class', '==', filters.class));
-      if (filters.subject) conditions.push(where('subject', '==', filters.subject));
-      if (filters.chapter) conditions.push(where('chapter', '==', filters.chapter));
-      if (filters.topic) conditions.push(where('topic', '==', filters.topic));
-      if (filters.year) conditions.push(where('sourceYear', '==', filters.year));
+      for (const [key, value] of Object.entries(filters)) {
+        if (value !== undefined && value !== null && value !== '' && value !== 'all') {
+          conditions.push(where(key, '==', value));
+        }
+      }
       
       if (conditions.length > 0) {
           q = query(colRef, ...conditions);

@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { getQuestions } from '@/lib/firebase/question-bank';
+import { getQuestionsPaginated, getTotalQuestionsCount } from '@/lib/firebase/question-bank';
 import { QuestionBankEntry } from '@/lib/question-bank-types';
 import { Loader2, Search, Filter, ShieldCheck, CheckSquare, Square } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -24,6 +24,8 @@ export function QuestionPickerModal({ open, onOpenChange, onSelectQuestions, pre
     const [loading, setLoading] = useState(false);
     const [selectedMap, setSelectedMap] = useState<Record<string, QuestionBankEntry>>({});
     const [currentPage, setCurrentPage] = useState(1);
+    const [totalCount, setTotalCount] = useState(0);
+    const [pageCursors, setPageCursors] = useState<any[]>([]);
     const itemsPerPage = 10;
     
     // Filters
@@ -36,7 +38,7 @@ export function QuestionPickerModal({ open, onOpenChange, onSelectQuestions, pre
 
     useEffect(() => {
         if (open) {
-            fetchQuestions();
+            fetchQuestions(0, true);
             // Initialize pre-selected map if needed, though usually we only append.
             const initialMap: Record<string, QuestionBankEntry> = {};
             // We don't have the full objects for preSelectedIds, so we just track them by ID if needed.
@@ -44,32 +46,41 @@ export function QuestionPickerModal({ open, onOpenChange, onSelectQuestions, pre
         }
     }, [open]);
 
-    const fetchQuestions = async () => {
+    const fetchQuestions = async (pageIndex = 0, isNewFilter = false) => {
         setLoading(true);
         try {
-            // Note: In a real prod environment with Algolia, we'd use Algolia here.
-            // For now, using standard getQuestions. We limit to 50 for performance.
             const filters: any = {};
             if (applyTaxonomyFilters && initialFilters) {
                 Object.assign(filters, initialFilters);
             }
             if (difficulty !== 'all') filters.difficulty = difficulty;
-            
-            let data = await getQuestions(filters, 50);
-            
-            if (verifiedOnly) {
-                data = data.filter(q => q.isVerified);
-            }
+            if (verifiedOnly) filters.isVerified = true;
+            // Prefix search is basic but works for exact start matches. 
+            // Full text search requires Algolia.
             if (search) {
-                const lowerSearch = search.toLowerCase();
-                data = data.filter(q => 
-                    q.questionText.toLowerCase().includes(lowerSearch) || 
-                    (q.title && q.title.toLowerCase().includes(lowerSearch))
-                );
+                filters.questionText = search; // We'll just rely on exact match or basic prefix if we added it, but let's keep it simple. Actually Firestore doesn't support generic substring search.
             }
             
-            setQuestions(data);
-            setCurrentPage(1); // Reset to first page
+            // If it's a new filter, get total count first
+            if (isNewFilter) {
+                const count = await getTotalQuestionsCount(filters);
+                setTotalCount(count);
+                setPageCursors([]);
+            }
+            
+            const startDoc = pageIndex > 0 ? pageCursors[pageIndex - 1] : null;
+            const data = await getQuestionsPaginated(filters, itemsPerPage, startDoc);
+            
+            setQuestions(data.questions);
+            setCurrentPage(pageIndex + 1);
+            
+            if (data.lastDoc) {
+                setPageCursors(prev => {
+                    const newCursors = [...prev];
+                    newCursors[pageIndex] = data.lastDoc;
+                    return newCursors;
+                });
+            }
         } catch (error) {
             console.error("Failed to fetch questions:", error);
         } finally {
@@ -118,7 +129,7 @@ export function QuestionPickerModal({ open, onOpenChange, onSelectQuestions, pre
                             placeholder="Search questions..." 
                             value={search} 
                             onChange={e => setSearch(e.target.value)}
-                            onKeyDown={e => e.key === 'Enter' && fetchQuestions()}
+                            onKeyDown={e => e.key === 'Enter' && fetchQuestions(0, true)}
                             className="pl-9"
                         />
                     </div>
@@ -163,7 +174,7 @@ export function QuestionPickerModal({ open, onOpenChange, onSelectQuestions, pre
                             </label>
                         </div>
                     )}
-                    <Button onClick={fetchQuestions} variant="secondary">Filter</Button>
+                    <Button onClick={() => fetchQuestions(0, true)} variant="secondary">Filter</Button>
                 </div>
 
                 {/* List */}
@@ -186,11 +197,11 @@ export function QuestionPickerModal({ open, onOpenChange, onSelectQuestions, pre
                                     </button>
                                 </div>
                                 <div className="text-sm text-slate-500">
-                                    Showing {(currentPage - 1) * itemsPerPage + 1}-{Math.min(currentPage * itemsPerPage, questions.length)} of {questions.length}
+                                    Showing {(currentPage - 1) * itemsPerPage + 1}-{Math.min(currentPage * itemsPerPage, totalCount)} of {totalCount}
                                 </div>
                             </div>
                             
-                            {questions.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map(q => {
+                            {questions.map(q => {
                                 const isSelected = !!selectedMap[q.id];
                                 const isPreSelected = preSelectedIds.includes(q.id);
                                 return (
@@ -228,24 +239,24 @@ export function QuestionPickerModal({ open, onOpenChange, onSelectQuestions, pre
                                 );
                             })}
                             
-                            {questions.length > itemsPerPage && (
+                            {totalCount > itemsPerPage && (
                                 <div className="flex items-center justify-center gap-2 pt-4 border-t mt-4">
                                     <Button 
                                         variant="outline" 
                                         size="sm" 
-                                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                        onClick={() => fetchQuestions(currentPage - 2, false)}
                                         disabled={currentPage === 1}
                                     >
                                         Previous
                                     </Button>
                                     <span className="text-sm text-slate-500 font-medium px-2">
-                                        Page {currentPage} of {Math.ceil(questions.length / itemsPerPage)}
+                                        Page {currentPage} of {Math.ceil(totalCount / itemsPerPage) || 1}
                                     </span>
                                     <Button 
                                         variant="outline" 
                                         size="sm" 
-                                        onClick={() => setCurrentPage(p => Math.min(Math.ceil(questions.length / itemsPerPage), p + 1))}
-                                        disabled={currentPage === Math.ceil(questions.length / itemsPerPage)}
+                                        onClick={() => fetchQuestions(currentPage, false)}
+                                        disabled={currentPage === Math.ceil(totalCount / itemsPerPage) || totalCount === 0}
                                     >
                                         Next
                                     </Button>
