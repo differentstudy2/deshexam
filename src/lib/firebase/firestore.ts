@@ -631,11 +631,18 @@ export const addTestSubmission = async (submissionData: any) => {
             xp: increment(10)
         });
 
-        if (submissionData.testId) {
-            const assessmentRef = doc(db, "assessments", submissionData.testId);
-            await updateDoc(assessmentRef, {
-                attemptCount: increment(1)
-            });
+        if (submissionData.testId && submissionData.testType) {
+            let colName = '';
+            if (submissionData.testType === 'Quiz') colName = 'quizzes';
+            else if (submissionData.testType === 'Mock Test') colName = 'mock_tests';
+            else if (submissionData.testType === 'Practice Set') colName = 'practice_sets';
+            
+            if (colName) {
+                const assessmentRef = doc(db, colName, submissionData.testId);
+                await updateDoc(assessmentRef, {
+                    attemptCount: increment(1)
+                });
+            }
         }
 
         return docRef.id;
@@ -681,7 +688,7 @@ export const addPracticeSetSubmission = async (submissionData: any) => {
 
         const assessmentId = submissionData.practiceSetId || submissionData.testId;
         if (assessmentId) {
-            const assessmentRef = doc(db, "assessments", assessmentId);
+            const assessmentRef = doc(db, "practice_sets", assessmentId);
             await updateDoc(assessmentRef, {
                 attemptCount: increment(1)
             });
