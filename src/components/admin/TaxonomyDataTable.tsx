@@ -960,11 +960,11 @@ export function TaxonomyDataTable({ type, title }: Props) {
               <Table>
                 <TableHeader className="bg-gray-50/50 dark:bg-slate-800/50">
                   <TableRow>
-                    <TableHead className="w-12 text-center"></TableHead>
-                    <TableHead>TITLE</TableHead>
+                    <TableHead className="w-8 sm:w-12 text-center hidden sm:table-cell"></TableHead>
+                    <TableHead className="pl-3 sm:pl-4">TITLE</TableHead>
                     <TableHead className="hidden sm:table-cell text-center">COUNT</TableHead>
                     <TableHead className="hidden md:table-cell">AVAILABLE IN (CONTEXTS)</TableHead>
-                    <TableHead className="text-right pr-4">ACTIONS</TableHead>
+                    <TableHead className="text-right pr-3 sm:pr-4">ACTIONS</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -980,8 +980,8 @@ export function TaxonomyDataTable({ type, title }: Props) {
                   .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
                   .map((group, idx) => (
                     <TableRow key={idx} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/50 border-b border-gray-100 dark:border-slate-700/50">
-                      <TableCell className="text-center py-2 text-slate-400 text-xs">{idx + 1}</TableCell>
-                      <TableCell className="py-3 font-semibold text-gray-900 dark:text-slate-200">
+                      <TableCell className="text-center py-2 text-slate-400 text-xs hidden sm:table-cell">{idx + 1}</TableCell>
+                      <TableCell className="py-3 pl-3 sm:pl-4 font-semibold text-gray-900 dark:text-slate-200">
                         {group.title}
                         {/* Mobile inline count */}
                         <span className="sm:hidden ml-2 text-xs font-normal text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 dark:text-indigo-400 px-1.5 py-0.5 rounded">
@@ -1006,11 +1006,11 @@ export function TaxonomyDataTable({ type, title }: Props) {
                           {group.nodes.length > 5 && <span className="bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-600">+{group.nodes.length - 5} more</span>}
                         </div>
                       </TableCell>
-                      <TableCell className="py-3 text-right pr-4">
+                      <TableCell className="py-3 text-right pr-3 sm:pr-4">
                         <Button 
                           variant="outline" 
                           size="sm" 
-                          className="h-7 text-xs border-indigo-200 text-indigo-700 hover:bg-indigo-50"
+                          className="h-7 text-xs border-indigo-200 text-indigo-700 hover:bg-indigo-50 whitespace-nowrap"
                           onClick={() => {
                             setSearchQuery(group.title);
                             setGroupByName(false);

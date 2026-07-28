@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { getTaxonomyNodeById, getTaxonomyNodesByParent, TaxonomyNode } from '@/lib/firebase/taxonomy';
+import { getAssessmentsByNode } from '@/lib/firebase/assessment';
 import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -20,11 +21,19 @@ import { Plus, Edit2, Trash2 } from 'lucide-react';
 interface TopicData extends TaxonomyNode {
   contentsCount: number;
   questionCount: number;
+  practiceSetCount: number;
+  quizCount: number;
+  mockTestCount: number;
   clientUrl: string;
 }
 
 interface ChapterData extends TaxonomyNode {
   topics: TopicData[];
+  contentsCount: number;
+  questionCount: number;
+  practiceSetCount: number;
+  quizCount: number;
+  mockTestCount: number;
   clientUrl: string;
 }
 
@@ -63,6 +72,14 @@ export default function TextbookDetailsPage() {
     faqs: { question: string; answer: string }[];
   } | null>(null);
   const [isSavingTb, setIsSavingTb] = useState(false);
+
+  // Stats State
+  const [stats, setStats] = useState({
+    totalQuestions: 0,
+    practiceSets: 0,
+    quizzes: 0,
+    mockTests: 0,
+  });
 
   const loadData = async () => {
       if (!textbookId) return;
@@ -125,44 +142,62 @@ export default function TextbookDetailsPage() {
             });
           };
 
+          // Fetch ALL assessments, questions, and contents for the textbook to avoid n+1 query problems
+          const tbqQuery = query(collection(db, 'question_bank'), where('textbookId', '==', textbookId));
+          const tbqSnap = await getDocs(tbqQuery);
+          const tbqDocs = tbqSnap.docs.map(d => d.data());
+
+          const tbcQuery = query(collection(db, 'content'), where('textbookId', '==', textbookId));
+          const tbcSnap = await getDocs(tbcQuery);
+          const tbcDocs = tbcSnap.docs.map(d => d.data());
+
+          const pSets = await getAssessmentsByNode('practiceSets', 'textbook', textbookId) as any[];
+          const qSets = await getAssessmentsByNode('quizzes', 'textbook', textbookId) as any[];
+          const mTests = await getAssessmentsByNode('mockTests', 'textbook', textbookId) as any[];
+
           // 2. Fetch all chapters for this textbook
           const chapterNodes = await getTaxonomyNodesByParent(textbookId);
           const sortedChapters = sortNodes(chapterNodes);
           
-          // 3. For each chapter, fetch topics and their content counts
+          // 3. For each chapter, fetch topics and calculate counts in memory
           const fullChapters: ChapterData[] = await Promise.all(
             sortedChapters.map(async (chap) => {
               const topicNodes = await getTaxonomyNodesByParent(chap.id);
               const sortedTopics = sortNodes(topicNodes);
               
-              const fullTopics: TopicData[] = await Promise.all(
-                sortedTopics.map(async (top) => {
-                  // Fetch question count for this topic
-                  const qQuery = query(collection(db, 'questions'), where('topicId', '==', top.id));
-                  const qSnap = await getDocs(qQuery);
-                  
-                  // Fetch content (resources/videos/etc) count for this topic
-                  const cQuery = query(collection(db, 'content'), where('topicId', '==', top.id));
-                  const cSnap = await getDocs(cQuery);
-
-                  return {
-                    ...top,
-                    questionCount: qSnap.size,
-                    contentsCount: cSnap.size,
-                    clientUrl: `/guide/${baseTextbookSlugPath}/${chap.slug || chap.id}/${top.slug || top.id}`
-                  };
-                })
-              );
+              const fullTopics: TopicData[] = sortedTopics.map(top => {
+                return {
+                  ...top,
+                  questionCount: tbqDocs.filter(q => q.topicId === top.id).length,
+                  contentsCount: tbcDocs.filter(c => c.topicId === top.id).length,
+                  practiceSetCount: pSets.filter(p => p.topicId === top.id).length,
+                  quizCount: qSets.filter(q => q.topicId === top.id).length,
+                  mockTestCount: mTests.filter(m => m.topicId === top.id).length,
+                  clientUrl: `/guide/${baseTextbookSlugPath}/${chap.slug || chap.id}/${top.slug || top.id}`
+                };
+              });
 
               return {
                 ...chap,
                 topics: fullTopics,
+                questionCount: tbqDocs.filter(q => q.chapterId === chap.id).length,
+                contentsCount: tbcDocs.filter(c => c.chapterId === chap.id).length,
+                practiceSetCount: pSets.filter(p => p.chapterId === chap.id).length,
+                quizCount: qSets.filter(q => q.chapterId === chap.id).length,
+                mockTestCount: mTests.filter(m => m.chapterId === chap.id).length,
                 clientUrl: `/guide/${baseTextbookSlugPath}/${chap.slug || chap.id}`
               };
             })
           );
 
           setChapters(fullChapters);
+
+          setStats({
+            totalQuestions: tbqDocs.length,
+            practiceSets: pSets.length,
+            quizzes: qSets.length,
+            mockTests: mTests.length,
+          });
         }
       } catch (error) {
         console.error("Error fetching textbook details:", error);
@@ -340,6 +375,57 @@ export default function TextbookDetailsPage() {
         </div>
       </div>
 
+      {/* Stats Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="bg-white dark:bg-slate-800 border-indigo-100 dark:border-slate-700 shadow-sm transition-all hover:shadow-md">
+          <CardContent className="p-5 flex items-center justify-between">
+            <div>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wider mb-1">Total Questions</p>
+              <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-100">{stats.totalQuestions}</h3>
+            </div>
+            <div className="p-3 bg-indigo-50 dark:bg-indigo-500/20 rounded-xl text-indigo-600 dark:text-indigo-400">
+              <FileText className="w-5 h-5" />
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-white dark:bg-slate-800 border-blue-100 dark:border-slate-700 shadow-sm transition-all hover:shadow-md cursor-pointer" onClick={() => window.location.href = `/admin/assessment-center/mock-tests?textbook=${textbookId}`}>
+          <CardContent className="p-5 flex items-center justify-between">
+            <div>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wider mb-1">Mock Tests</p>
+              <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-100">{stats.mockTests}</h3>
+            </div>
+            <div className="p-3 bg-blue-50 dark:bg-blue-500/20 rounded-xl text-blue-600 dark:text-blue-400">
+              <Layers className="w-5 h-5" />
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-white dark:bg-slate-800 border-emerald-100 dark:border-slate-700 shadow-sm transition-all hover:shadow-md cursor-pointer" onClick={() => window.location.href = `/admin/assessment-center/practice-sets?textbook=${textbookId}`}>
+          <CardContent className="p-5 flex items-center justify-between">
+            <div>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wider mb-1">Practice Sets</p>
+              <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-100">{stats.practiceSets}</h3>
+            </div>
+            <div className="p-3 bg-emerald-50 dark:bg-emerald-500/20 rounded-xl text-emerald-600 dark:text-emerald-400">
+              <Target className="w-5 h-5" />
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-white dark:bg-slate-800 border-amber-100 dark:border-slate-700 shadow-sm transition-all hover:shadow-md cursor-pointer" onClick={() => window.location.href = `/admin/assessment-center/quizzes?textbook=${textbookId}`}>
+          <CardContent className="p-5 flex items-center justify-between">
+            <div>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wider mb-1">Quizzes</p>
+              <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-100">{stats.quizzes}</h3>
+            </div>
+            <div className="p-3 bg-amber-50 dark:bg-amber-500/20 rounded-xl text-amber-600 dark:text-amber-400">
+              <Activity className="w-5 h-5" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Edit Textbook Info Form */}
       {editTbData && (
         <Card className="border-indigo-100 shadow-sm">
@@ -494,9 +580,31 @@ export default function TextbookDetailsPage() {
                     <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-red-100 hover:text-red-600 z-10" onClick={(e) => { e.stopPropagation(); setDeleteNodeData({ id: chapter.id, title: chapter.title, type: 'chapter' }); setIsDeleteDialogOpen(true); }}>
                       <Trash2 className="h-4 w-4 text-gray-500 hover:text-red-600" />
                     </Button>
-                    <Badge variant="secondary" className="bg-gray-100 text-gray-600 z-10">
-                      {chapter.topics.length} Topics
-                    </Badge>
+                    <div className="flex gap-1 overflow-x-auto max-w-[200px] md:max-w-none no-scrollbar">
+                      <Badge variant="secondary" className="bg-gray-100 text-gray-600 z-10 shrink-0">
+                        {chapter.topics.length} Topics
+                      </Badge>
+                      {chapter.questionCount > 0 && (
+                        <Badge variant="secondary" className="bg-amber-50 text-amber-700 border-amber-200 z-10 shrink-0">
+                          {chapter.questionCount} Qs
+                        </Badge>
+                      )}
+                      {chapter.mockTestCount > 0 && (
+                        <Badge variant="secondary" className="bg-sky-50 text-sky-700 border-sky-200 z-10 shrink-0">
+                          {chapter.mockTestCount} Mocks
+                        </Badge>
+                      )}
+                      {chapter.practiceSetCount > 0 && (
+                        <Badge variant="secondary" className="bg-emerald-50 text-emerald-700 border-emerald-200 z-10 shrink-0">
+                          {chapter.practiceSetCount} Prac
+                        </Badge>
+                      )}
+                      {chapter.quizCount > 0 && (
+                        <Badge variant="secondary" className="bg-purple-50 text-purple-700 border-purple-200 z-10 shrink-0">
+                          {chapter.quizCount} Quiz
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                   
                   <AccordionContent className="pt-0 pb-0">
@@ -513,7 +621,7 @@ export default function TextbookDetailsPage() {
                               </div>
                               
                               {/* Contents Types & Counts */}
-                              <div className="flex items-center gap-2 mt-auto pb-4 border-b border-gray-100">
+                              <div className="flex flex-wrap items-center gap-2 mt-auto pb-4 border-b border-gray-100">
                                 <Badge 
                                   variant="outline" 
                                   className={`flex items-center gap-1 font-normal text-[10.5px] px-2 py-0.5 ${topic.contentsCount > 0 ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-gray-50 text-gray-500 border-gray-200'}`}
@@ -529,6 +637,22 @@ export default function TextbookDetailsPage() {
                                   <Activity className="h-3 w-3" />
                                   {topic.questionCount} Qs
                                 </Badge>
+                                
+                                {topic.mockTestCount > 0 && (
+                                  <Badge variant="outline" className="flex items-center gap-1 font-normal text-[10.5px] px-2 py-0.5 bg-sky-50 text-sky-700 border-sky-200">
+                                    {topic.mockTestCount} Mocks
+                                  </Badge>
+                                )}
+                                {topic.practiceSetCount > 0 && (
+                                  <Badge variant="outline" className="flex items-center gap-1 font-normal text-[10.5px] px-2 py-0.5 bg-emerald-50 text-emerald-700 border-emerald-200">
+                                    {topic.practiceSetCount} Prac
+                                  </Badge>
+                                )}
+                                {topic.quizCount > 0 && (
+                                  <Badge variant="outline" className="flex items-center gap-1 font-normal text-[10.5px] px-2 py-0.5 bg-purple-50 text-purple-700 border-purple-200">
+                                    {topic.quizCount} Quiz
+                                  </Badge>
+                                )}
                               </div>
 
                               <div className="flex items-center justify-between pt-3">
@@ -588,13 +712,13 @@ export default function TextbookDetailsPage() {
                               </div>
                               
                               {/* Contents Types & Counts */}
-                              <div className="flex items-center gap-3">
+                              <div className="flex items-center flex-wrap gap-2">
                                 <Badge 
                                   variant="outline" 
                                   className={`flex items-center gap-1 font-normal ${topic.contentsCount > 0 ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-gray-50 text-gray-400 border-gray-200'}`}
                                 >
                                   <FileText className="h-3 w-3" />
-                                  {topic.contentsCount} Resources
+                                  {topic.contentsCount} Res
                                 </Badge>
                                 
                                 <Badge 
@@ -602,8 +726,24 @@ export default function TextbookDetailsPage() {
                                   className={`flex items-center gap-1 font-normal ${topic.questionCount > 0 ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-gray-50 text-gray-400 border-gray-200'}`}
                                 >
                                   <Activity className="h-3 w-3" />
-                                  {topic.questionCount} Questions
+                                  {topic.questionCount} Qs
                                 </Badge>
+
+                                {topic.mockTestCount > 0 && (
+                                  <Badge variant="outline" className="flex items-center gap-1 font-normal bg-sky-50 text-sky-700 border-sky-200">
+                                    {topic.mockTestCount} Mocks
+                                  </Badge>
+                                )}
+                                {topic.practiceSetCount > 0 && (
+                                  <Badge variant="outline" className="flex items-center gap-1 font-normal bg-emerald-50 text-emerald-700 border-emerald-200">
+                                    {topic.practiceSetCount} Prac
+                                  </Badge>
+                                )}
+                                {topic.quizCount > 0 && (
+                                  <Badge variant="outline" className="flex items-center gap-1 font-normal bg-purple-50 text-purple-700 border-purple-200">
+                                    {topic.quizCount} Quiz
+                                  </Badge>
+                                )}
                               </div>
                             </li>
                           ))}
