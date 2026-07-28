@@ -4,7 +4,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
 import { getAuth, Auth } from 'firebase/auth';
-import { getFirestore, Firestore } from 'firebase/firestore';
+import { getFirestore, Firestore, initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from 'firebase/firestore';
 import { getStorage, FirebaseStorage } from 'firebase/storage';
 import { getMessaging, Messaging } from 'firebase/messaging';
 
@@ -45,7 +45,15 @@ export const FirebaseProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
     const auth = getAuth(app);
-    const db = getFirestore(app);
+    let db: Firestore;
+    try {
+      db = initializeFirestore(app, {
+        localCache: persistentLocalCache({tabManager: persistentMultipleTabManager()})
+      });
+    } catch (e) {
+      // Fallback if already initialized (e.g. from client.ts)
+      db = getFirestore(app);
+    }
     const storage = getStorage(app);
     const messaging = typeof window !== 'undefined' ? getMessaging(app) : null;
     
