@@ -1534,10 +1534,10 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                         animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
                         exit={{ opacity: 0, y: 10, scale: 0.95, filter: 'blur(2px)' }}
                         transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                        className="absolute bottom-[calc(100%+16px)] right-0 w-[90vw] sm:w-[360px] bg-white/80 dark:bg-[#0f172a]/80 backdrop-blur-2xl rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)] border border-white/60 dark:border-slate-700/50 p-1 z-50 overflow-hidden flex flex-col max-h-[75vh]"
+                        className="absolute bottom-[calc(100%+16px)] right-0 w-[90vw] sm:w-[360px] bg-white dark:bg-[#0f172a] rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)] border border-slate-200 dark:border-slate-700/50 p-1 z-50 overflow-hidden flex flex-col max-h-[75vh]"
                       >
-                        <div className="bg-white/50 dark:bg-slate-900/50 backdrop-blur-md rounded-[22px] p-3.5 h-full flex flex-col min-h-0">
-                          <div className="flex justify-between items-center mb-3 pb-3 border-b border-slate-200/50 dark:border-slate-700/50 shrink-0">
+                        <div className="bg-white dark:bg-slate-900 rounded-[22px] p-3.5 h-full flex flex-col min-h-0">
+                          <div className="flex justify-between items-center mb-3 pb-3 border-b border-slate-200 dark:border-slate-700 shrink-0">
                             <h3 className="font-extrabold text-slate-800 dark:text-slate-100 text-lg flex items-center gap-2.5 tracking-tight">
                               <div className="p-1.5 rounded-lg bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400">
                                 <Settings className="w-5 h-5" />

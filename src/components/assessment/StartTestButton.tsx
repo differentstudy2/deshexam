@@ -198,6 +198,7 @@ export function StartTestButton({ slug, accessType = 'free', price = 0, allowedS
       return (
         <Button 
           onClick={handleStart} 
+          onMouseEnter={() => router.prefetch(`${basePath}/${slug}/take`)}
           disabled={isStarting}
           className="w-full bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-700 hover:to-violet-700 h-14 text-lg rounded-xl transition-all font-bold shadow-lg shadow-blue-600/25 text-white"
         >
