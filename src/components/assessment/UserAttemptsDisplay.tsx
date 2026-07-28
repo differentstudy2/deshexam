@@ -54,7 +54,7 @@ export function UserAttemptsDisplay({ assessmentId }: UserAttemptsDisplayProps) 
         </div>
         <h2 className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400">Your Previous Attempts</h2>
         <span className="ml-auto bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 text-xs font-bold px-2.5 py-1 rounded-full shadow-sm">
-          {attempts.length} {attempts.length === 1 ? 'Attempt' : 'Attempts'}
+          {Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 }).format(attempts.length)} {attempts.length === 1 ? 'Attempt' : 'Attempts'}
         </span>
       </div>
       

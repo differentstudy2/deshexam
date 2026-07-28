@@ -320,10 +320,20 @@ export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock 
 
     return (
         <div className="p-6 max-w-5xl mx-auto space-y-6">
-            <div className="flex items-center gap-4">
-                <Button variant="ghost" onClick={onCancel}><ArrowLeft className="h-4 w-4 mr-2" /> Back</Button>
-                <h1 className="text-2xl font-bold">{editData.id ? `Edit ${title}` : `Create ${title}`}</h1>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
+                <div className="flex items-center gap-4">
+                    <Button variant="ghost" onClick={onCancel}><ArrowLeft className="h-4 w-4 mr-2" /> Back</Button>
+                    <div className="flex items-center gap-3">
+                        <h1 className="text-2xl font-bold">{editData.id ? `Edit ${title}` : `Create ${title}`}</h1>
+                        {editData.id && editData.attemptCount !== undefined && (
+                            <div className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-3 py-1 rounded-full text-sm font-medium border border-slate-200 dark:border-slate-700 flex items-center gap-2">
+                                <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                {Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 }).format(editData.attemptCount)} Attempts
+                            </div>
+                        )}
+                    </div>
                 </div>
+            </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="md:col-span-2 space-y-6">
