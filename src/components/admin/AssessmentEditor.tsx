@@ -357,7 +357,7 @@ export function AssessmentEditor({ initialData, onSave, onCancel, title = 'Mock 
                                 </div>
                                 <div>
                                     <label className="text-sm font-medium">Description</label>
-                                    <Textarea value={editData.description || ''} onChange={e => setEditData({...editData, description: e.target.value})} rows={2} />
+                                    <Textarea value={editData.description || ''} onChange={e => setEditData({...editData, description: e.target.value})} rows={2} className="resize-y" />
                                 </div>
                                 <div>
                                     <label className="text-sm font-medium">Instructions for Students</label>
