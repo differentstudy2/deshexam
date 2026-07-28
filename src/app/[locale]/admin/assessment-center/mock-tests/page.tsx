@@ -436,6 +436,7 @@ export default function MockTestsPage() {
                                 <TableHead className="whitespace-nowrap">Duration</TableHead>
                                 <TableHead className="whitespace-nowrap">Marks</TableHead>
                                 <TableHead className="whitespace-nowrap">Questions</TableHead>
+                                <TableHead className="whitespace-nowrap">Attempts</TableHead>
                                 <TableHead className="whitespace-nowrap">Status</TableHead>
                                 <TableHead className="whitespace-nowrap">Pricing</TableHead>
                                 <TableHead className="whitespace-nowrap">Reviews</TableHead>
@@ -444,9 +445,9 @@ export default function MockTestsPage() {
                         </TableHeader>
                         <TableBody>
                             {loading ? (
-                                <TableRow><TableCell colSpan={9}><Loader2 className="animate-spin mx-auto" /></TableCell></TableRow>
+                                <TableRow><TableCell colSpan={10}><Loader2 className="animate-spin mx-auto" /></TableCell></TableRow>
                             ) : filteredMockTests.length === 0 ? (
-                                <TableRow><TableCell colSpan={9} className="text-center">No mock tests found matching your filters.</TableCell></TableRow>
+                                <TableRow><TableCell colSpan={10} className="text-center">No mock tests found matching your filters.</TableCell></TableRow>
                             ) : (
                                 filteredMockTests.map(test => (
                                     <TableRow key={test.id} className={selectedIds.includes(test.id) ? "bg-indigo-50/50 dark:bg-indigo-900/10" : ""}>
@@ -469,6 +470,7 @@ export default function MockTestsPage() {
                                         <TableCell>{test.durationMin} min</TableCell>
                                         <TableCell>{test.totalMarks}</TableCell>
                                         <TableCell>{test.questionIds?.length || 0}</TableCell>
+                                        <TableCell>{test.attemptCount || 0}</TableCell>
                                         <TableCell>
                                             <span className={`px-2 py-1 text-xs font-medium rounded-full ${test.status === 'Published' ? 'bg-emerald-100 text-emerald-700' : test.status === 'Archived' ? 'bg-slate-100 text-slate-700' : 'bg-amber-100 text-amber-700'}`}>
                                                 {test.status}

@@ -564,6 +564,11 @@ ${test.negativeMarking && test.negativeMarking > 0 ? `* প্রতিটি �
                 testLanguage={test.language}
               />
 
+              {/* Mobile Top Scorers */}
+              <div className="mt-8 lg:hidden">
+                <TopScorersWidget assessmentId={test.id} />
+              </div>
+
             </div>
 
             {/* Desktop sticky sidebar (repeats CTA below the hero card on scroll) */}
