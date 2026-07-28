@@ -308,29 +308,31 @@ export default function TextbookDetailsPage() {
   return (
     <div className="space-y-6 max-w-5xl mx-auto pb-12">
       {/* Header */}
-      <div className="flex items-center gap-4">
-        <Button asChild variant="outline" size="icon" className="h-10 w-10 rounded-full">
-          <Link href="/admin/textbook">
-            <ArrowLeft className="h-5 w-5" />
-          </Link>
-        </Button>
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
-            <BookOpen className="h-8 w-8 text-indigo-600" />
-            {textbook.title}
-          </h1>
-          <div className="text-gray-500 flex items-center gap-2 mt-1">
-            <Badge variant="outline">{textbook.track} Track</Badge>
-            {textbook.status === 'active' || textbook.status === 'published' ? (
-               <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-100">Published</Badge>
-            ) : (
-               <Badge variant="secondary">Draft</Badge>
-            )}
-            <span className="text-sm border-l pl-2 border-gray-300">ID: {textbook.id}</span>
+      <div className="flex flex-col md:flex-row md:items-center gap-4">
+        <div className="flex items-start gap-4">
+          <Button asChild variant="outline" size="icon" className="h-10 w-10 rounded-full shrink-0 mt-1 md:mt-0">
+            <Link href="/admin/textbook">
+              <ArrowLeft className="h-5 w-5" />
+            </Link>
+          </Button>
+          <div className="flex-1 min-w-0">
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-2 flex-wrap">
+              <BookOpen className="h-6 w-6 md:h-8 md:w-8 text-indigo-600 shrink-0" />
+              <span className="truncate">{textbook.title}</span>
+            </h1>
+            <div className="text-gray-500 flex flex-wrap items-center gap-2 mt-1">
+              <Badge variant="outline">{textbook.track} Track</Badge>
+              {textbook.status === 'active' || textbook.status === 'published' ? (
+                 <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-100">Published</Badge>
+              ) : (
+                 <Badge variant="secondary">Draft</Badge>
+              )}
+              <span className="text-sm border-l pl-2 border-gray-300 truncate max-w-[150px] sm:max-w-none">ID: {textbook.id}</span>
+            </div>
           </div>
         </div>
-        <div className="ml-auto flex items-center gap-2">
-          <Button asChild variant="outline" className="gap-2">
+        <div className="md:ml-auto flex items-center gap-2 w-full md:w-auto">
+          <Button asChild variant="outline" className="gap-2 w-full md:w-auto">
             <Link href={clientUrl || `/guide/${textbook.boardSlug}/${textbook.classSlug}/${textbook.subjectSlug}/${textbook.slug || textbook.id}`} target="_blank">
               <Eye className="w-4 h-4" /> View Client Page
             </Link>
@@ -349,7 +351,7 @@ export default function TextbookDetailsPage() {
           </CardHeader>
           <CardContent className="p-6">
             <div className="space-y-6">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Title</Label>
                   <Input value={editTbData.title} onChange={(e) => setEditTbData({...editTbData, title: e.target.value})} />
@@ -363,7 +365,7 @@ export default function TextbookDetailsPage() {
                 <Label>Description / SEO Content (Markdown supported)</Label>
                 <Textarea rows={6} value={editTbData.seoContent} onChange={(e) => setEditTbData({...editTbData, seoContent: e.target.value})} />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Tags (Comma separated)</Label>
                   <Input value={editTbData.tags} onChange={(e) => setEditTbData({...editTbData, tags: e.target.value})} placeholder="e.g. math, science" />
@@ -423,13 +425,13 @@ export default function TextbookDetailsPage() {
       {/* Chapters & Topics Accordion */}
       <Card>
         <CardHeader className="bg-gray-50/50 border-b border-gray-100">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <CardTitle className="text-xl flex items-center gap-2">
-              <Layers className="h-5 w-5 text-indigo-500" />
-              Chapters & Topics Content Map
+              <Layers className="h-5 w-5 text-indigo-500 shrink-0" />
+              <span className="leading-tight">Chapters & Topics Content Map</span>
             </CardTitle>
-            <div className="flex items-center gap-3">
-              <div className="flex bg-gray-100/80 p-1 rounded-lg border border-gray-200">
+            <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
+              <div className="flex bg-gray-100/80 p-1 rounded-lg border border-gray-200 shrink-0">
                  <button onClick={() => setViewMode('grid')} className={`p-1.5 rounded-md transition-all ${viewMode === 'grid' ? 'bg-white shadow-sm text-indigo-600' : 'text-gray-500 hover:text-gray-700'}`} title="Grid View">
                     <LayoutGrid className="w-4 h-4" />
                  </button>
@@ -459,17 +461,17 @@ export default function TextbookDetailsPage() {
                   value={chapter.id} 
                   className="border border-gray-200 rounded-lg bg-white overflow-hidden shadow-sm relative"
                 >
-                  <AccordionTrigger className="px-5 py-4 hover:bg-gray-50 hover:no-underline transition-colors data-[state=open]:bg-indigo-50/30 pr-64">
-                    <div className="flex items-center gap-3">
-                      <div className="bg-indigo-100 p-2 rounded-md text-indigo-600">
+                  <AccordionTrigger className="px-4 md:px-5 py-4 hover:bg-gray-50 hover:no-underline transition-colors data-[state=open]:bg-indigo-50/30 md:pr-[300px]">
+                    <div className="flex items-center gap-3 w-full">
+                      <div className="bg-indigo-100 p-2 rounded-md text-indigo-600 shrink-0">
                         <BookOpen className="h-5 w-5" />
                       </div>
-                      <span className="font-semibold text-lg text-gray-900 text-left line-clamp-1">{chapter.title}</span>
+                      <span className="font-semibold text-base md:text-lg text-gray-900 text-left line-clamp-2 pr-2">{chapter.title}</span>
                     </div>
                   </AccordionTrigger>
                   
                   {/* Action buttons extracted outside the button element to fix hydration error */}
-                  <div className="absolute right-12 top-0 flex items-center gap-3 h-[60px] pointer-events-auto">
+                  <div className="relative md:absolute right-0 md:right-6 top-0 flex flex-wrap md:flex-nowrap items-center justify-end gap-2 md:gap-3 h-auto md:h-[60px] pointer-events-auto px-4 pb-3 md:px-0 md:pb-0 bg-white md:bg-transparent rounded-b-lg md:rounded-none z-10 border-b border-gray-100 md:border-none">
                     <Button asChild variant="ghost" size="icon" className="h-8 w-8 hover:bg-gray-200 z-10" onClick={(e) => e.stopPropagation()}>
                       <Link href={chapter.clientUrl} target="_blank">
                         <ExternalLink className="h-4 w-4 text-gray-500" />
