@@ -334,7 +334,7 @@ export default function TextbookDetailsPage() {
         <div className="md:ml-auto flex items-center gap-2 w-full md:w-auto">
           <Button asChild variant="outline" className="gap-2 w-full md:w-auto">
             <Link href={clientUrl || `/guide/${textbook.boardSlug}/${textbook.classSlug}/${textbook.subjectSlug}/${textbook.slug || textbook.id}`} target="_blank">
-              <Eye className="w-4 h-4" /> View Client Page
+              <Eye className="w-4 h-4" /> <span className="hidden md:inline">View Client Page</span>
             </Link>
           </Button>
         </div>
@@ -343,10 +343,13 @@ export default function TextbookDetailsPage() {
       {/* Edit Textbook Info Form */}
       {editTbData && (
         <Card className="border-indigo-100 shadow-sm">
-          <CardHeader className="bg-indigo-50/50 border-b border-indigo-100">
-            <CardTitle className="text-xl flex items-center gap-2">
-              <FileText className="h-5 w-5 text-indigo-500" />
-              Textbook Info & SEO
+          <CardHeader className="bg-gradient-to-r from-blue-50 via-indigo-50/50 to-white border-b border-indigo-100 relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-blue-500 to-indigo-600"></div>
+            <CardTitle className="text-xl flex items-center gap-3 text-indigo-950">
+              <div className="bg-white p-2 rounded-xl shadow-sm border border-indigo-50">
+                <FileText className="h-5 w-5 text-indigo-600" />
+              </div>
+              <span className="font-semibold bg-clip-text text-transparent bg-gradient-to-r from-indigo-900 to-slate-800">Textbook Info & SEO</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="p-6">
@@ -382,8 +385,8 @@ export default function TextbookDetailsPage() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between mt-6 border-t pt-4">
                   <Label className="text-lg">FAQs</Label>
-                  <Button type="button" variant="outline" size="sm" onClick={() => setEditTbData({...editTbData, faqs: [...editTbData.faqs, {question: '', answer: ''}]})}>
-                    <Plus className="w-4 h-4 mr-2" /> Add FAQ
+                  <Button type="button" variant="outline" size="sm" onClick={() => setEditTbData({...editTbData, faqs: [...editTbData.faqs, {question: '', answer: ''}]})} className="flex items-center">
+                    <Plus className="w-4 h-4 md:mr-2" /> <span className="hidden md:inline">Add FAQ</span>
                   </Button>
                 </div>
                 <div className="space-y-3 mt-2">
@@ -424,11 +427,14 @@ export default function TextbookDetailsPage() {
 
       {/* Chapters & Topics Accordion */}
       <Card>
-        <CardHeader className="bg-gray-50/50 border-b border-gray-100">
+        <CardHeader className="bg-gradient-to-r from-violet-50 via-purple-50/50 to-white border-b border-violet-100 relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-violet-500 to-purple-600"></div>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <CardTitle className="text-xl flex items-center gap-2">
-              <Layers className="h-5 w-5 text-indigo-500 shrink-0" />
-              <span className="leading-tight">Chapters & Topics Content Map</span>
+            <CardTitle className="text-xl flex items-center gap-3 text-violet-950">
+              <div className="bg-white p-2 rounded-xl shadow-sm border border-violet-50 shrink-0">
+                <Layers className="h-5 w-5 text-violet-600" />
+              </div>
+              <span className="leading-tight font-semibold bg-clip-text text-transparent bg-gradient-to-r from-violet-900 to-slate-800">Chapters & Topics Content Map</span>
             </CardTitle>
             <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
               <div className="flex bg-gray-100/80 p-1 rounded-lg border border-gray-200 shrink-0">
@@ -440,7 +446,7 @@ export default function TextbookDetailsPage() {
                  </button>
               </div>
               <Button onClick={() => setIsAddChapterOpen(true)} size="sm" className="gap-2">
-                <Plus className="w-4 h-4" /> Add Chapter
+                <Plus className="w-4 h-4" /> <span className="hidden md:inline">Add Chapter</span>
               </Button>
             </div>
           </div>
