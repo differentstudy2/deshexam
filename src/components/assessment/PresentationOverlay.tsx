@@ -1555,7 +1555,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                     {/* Footer */}
                     <div className="shrink-0 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-800 dark:via-gray-800 dark:to-gray-800 border-t border-indigo-100 dark:border-gray-700 py-2 px-2 md:pl-12 md:pr-8 flex justify-between items-center w-full z-30 shadow-[0_-2px_10px_rgba(0,0,0,0.02)] relative transition-colors duration-500 overflow-visible">
-                        <div className="flex items-center text-indigo-900/70 dark:text-gray-400 font-semibold text-sm md:text-lg whitespace-nowrap mr-2 md:mr-4">
+                        <div className="hidden md:flex items-center text-indigo-900/70 dark:text-gray-400 font-semibold text-sm md:text-lg whitespace-nowrap mr-2 md:mr-4">
                             © DeshExam
                         </div>
                         <div className="hidden lg:flex items-center text-indigo-900/70 dark:text-gray-400 font-semibold text-lg tracking-wide whitespace-nowrap">
