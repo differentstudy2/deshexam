@@ -474,7 +474,7 @@ export default function QuizzesPage() {
                                             <span className="font-medium text-slate-600 dark:text-slate-400">{test.questionIds?.length || 0}</span>
                                         </TableCell>
                                         <TableCell>
-                                            <span className="font-medium text-slate-600 dark:text-slate-400">{test.attemptCount || 0}</span>
+                                            <span className="font-medium text-slate-600 dark:text-slate-400">{Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 }).format(test.attemptCount || 0)}</span>
                                         </TableCell>
                                         <TableCell>
                                             <span className={`px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider rounded-md border ${test.status === 'Published' ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800/30' : test.status === 'Archived' ? 'bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700' : 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800/30'}`}>
