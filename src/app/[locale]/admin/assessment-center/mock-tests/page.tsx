@@ -402,52 +402,51 @@ export default function MockTestsPage() {
                 </div>
             </div>
 
-            <Card>
-                <CardHeader>
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                        <CardTitle>All Mock Tests</CardTitle>
-                        {selectedIds.length > 0 && (
-                            <div className="flex flex-wrap items-center gap-2 bg-indigo-50 dark:bg-indigo-900/20 px-4 py-2 rounded-lg border border-indigo-100 dark:border-indigo-800/30">
-                                <span className="text-sm font-medium text-indigo-800 dark:text-indigo-300">{selectedIds.length} selected</span>
-                                <Button size="sm" variant="outline" className="bg-white dark:bg-slate-800 border-indigo-200 dark:border-indigo-700 text-indigo-700 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/50" onClick={() => setIsBulkEditModalOpen(true)}>
-                                    <CheckSquare className="w-4 h-4 mr-2" /> Bulk Edit
-                                </Button>
-                            </div>
-                        )}
-                    </div>
-                </CardHeader>
-                <CardContent>
+            <div className={`mt-6 ${displayMode === 'list' ? 'bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/70 dark:border-slate-800 shadow-[0_2px_20px_-5px_rgba(0,0,0,0.05)] overflow-hidden' : ''}`}>
+                <div className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${displayMode === 'list' ? 'p-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50' : 'mb-6'}`}>
+                    <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">All Mock Tests</h2>
+                    {selectedIds.length > 0 && (
+                        <div className="flex flex-wrap items-center gap-2 bg-indigo-50 dark:bg-indigo-900/20 px-4 py-2 rounded-lg border border-indigo-100 dark:border-indigo-800/30 shadow-sm">
+                            <span className="text-sm font-semibold text-indigo-800 dark:text-indigo-300">{selectedIds.length} selected</span>
+                            <Button size="sm" variant="outline" className="bg-white dark:bg-slate-800 border-indigo-200 dark:border-indigo-700 text-indigo-700 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 shadow-sm" onClick={() => setIsBulkEditModalOpen(true)}>
+                                <CheckSquare className="w-4 h-4 mr-2" /> Bulk Edit
+                            </Button>
+                        </div>
+                    )}
+                </div>
+
+                <div className={displayMode === 'list' ? 'p-0' : ''}>
                     {displayMode === 'list' && (
                     <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead className="w-[50px]">
+                        <TableHeader className="bg-slate-50/80 dark:bg-slate-800/50">
+                            <TableRow className="border-b border-slate-100 dark:border-slate-800 hover:bg-transparent">
+                                <TableHead className="w-[50px] pl-5">
                                     <Checkbox 
                                         checked={mockTests.length > 0 && selectedIds.length === mockTests.length}
                                         onCheckedChange={(checked) => handleToggleSelectAll(!!checked)}
                                     />
                                 </TableHead>
-                                <TableHead className="w-[60px]">Image</TableHead>
-                                <TableHead className="min-w-[200px]">Title</TableHead>
-                                <TableHead className="whitespace-nowrap">Duration</TableHead>
-                                <TableHead className="whitespace-nowrap">Marks</TableHead>
-                                <TableHead className="whitespace-nowrap">Questions</TableHead>
-                                <TableHead className="whitespace-nowrap">Attempts</TableHead>
-                                <TableHead className="whitespace-nowrap">Status</TableHead>
-                                <TableHead className="whitespace-nowrap">Pricing</TableHead>
-                                <TableHead className="whitespace-nowrap">Reviews</TableHead>
-                                <TableHead className="whitespace-nowrap">Actions</TableHead>
+                                <TableHead className="w-[60px] font-semibold text-slate-500 uppercase tracking-wider text-[10px]">Image</TableHead>
+                                <TableHead className="min-w-[200px] font-semibold text-slate-500 uppercase tracking-wider text-[10px]">Title</TableHead>
+                                <TableHead className="whitespace-nowrap font-semibold text-slate-500 uppercase tracking-wider text-[10px]">Duration</TableHead>
+                                <TableHead className="whitespace-nowrap font-semibold text-slate-500 uppercase tracking-wider text-[10px]">Marks</TableHead>
+                                <TableHead className="whitespace-nowrap font-semibold text-slate-500 uppercase tracking-wider text-[10px]">Questions</TableHead>
+                                <TableHead className="whitespace-nowrap font-semibold text-slate-500 uppercase tracking-wider text-[10px]">Attempts</TableHead>
+                                <TableHead className="whitespace-nowrap font-semibold text-slate-500 uppercase tracking-wider text-[10px]">Status</TableHead>
+                                <TableHead className="whitespace-nowrap font-semibold text-slate-500 uppercase tracking-wider text-[10px]">Pricing</TableHead>
+                                <TableHead className="whitespace-nowrap font-semibold text-slate-500 uppercase tracking-wider text-[10px]">Reviews</TableHead>
+                                <TableHead className="whitespace-nowrap font-semibold text-slate-500 uppercase tracking-wider text-[10px] text-right pr-5">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {loading ? (
-                                <TableRow><TableCell colSpan={10}><Loader2 className="animate-spin mx-auto" /></TableCell></TableRow>
+                                <TableRow><TableCell colSpan={11}><Loader2 className="animate-spin mx-auto my-10 text-indigo-500" /></TableCell></TableRow>
                             ) : filteredMockTests.length === 0 ? (
-                                <TableRow><TableCell colSpan={10} className="text-center">No mock tests found matching your filters.</TableCell></TableRow>
+                                <TableRow><TableCell colSpan={11} className="text-center py-10 text-slate-500">No mock tests found matching your filters.</TableCell></TableRow>
                             ) : (
                                 filteredMockTests.map(test => (
-                                    <TableRow key={test.id} className={selectedIds.includes(test.id) ? "bg-indigo-50/50 dark:bg-indigo-900/10" : ""}>
-                                        <TableCell>
+                                    <TableRow key={test.id} className={`group hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors border-b border-slate-100/80 dark:border-slate-800/80 ${selectedIds.includes(test.id) ? "bg-indigo-50/30 dark:bg-indigo-900/10" : ""}`}>
+                                        <TableCell className="pl-5">
                                             <Checkbox 
                                                 checked={selectedIds.includes(test.id)}
                                                 onCheckedChange={(checked) => handleToggleSelect(test.id, !!checked)}
@@ -455,43 +454,56 @@ export default function MockTestsPage() {
                                         </TableCell>
                                         <TableCell>
                                             {test.thumbnail && (!Array.isArray(test.thumbnail) || test.thumbnail.length > 0) ? (
-                                                <img src={Array.isArray(test.thumbnail) ? test.thumbnail[0] : test.thumbnail} alt={test.title} className="w-10 h-10 object-cover rounded-md border border-slate-200 dark:border-slate-700" />
+                                                <img src={Array.isArray(test.thumbnail) ? test.thumbnail[0] : test.thumbnail} alt={test.title} className="w-12 h-12 object-cover rounded-xl shadow-sm border border-slate-200/50 dark:border-slate-700" />
                                             ) : (
-                                                <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-md border border-slate-200 dark:border-slate-700 flex items-center justify-center">
+                                                <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200/50 dark:border-slate-700 flex items-center justify-center shadow-sm">
                                                     <ImageIcon className="w-5 h-5 text-slate-400 dark:text-slate-500" />
                                                 </div>
                                             )}
                                         </TableCell>
-                                        <TableCell className="font-medium">{test.title}</TableCell>
-                                        <TableCell>{test.durationMin} min</TableCell>
-                                        <TableCell>{test.totalMarks}</TableCell>
-                                        <TableCell>{test.questionIds?.length || 0}</TableCell>
-                                        <TableCell>{test.attemptCount || 0}</TableCell>
                                         <TableCell>
-                                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${test.status === 'Published' ? 'bg-emerald-100 text-emerald-700' : test.status === 'Archived' ? 'bg-slate-100 text-slate-700' : 'bg-amber-100 text-amber-700'}`}>
+                                            <span className="font-bold text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-2 leading-snug">{test.title}</span>
+                                        </TableCell>
+                                        <TableCell>
+                                            <span className="font-medium text-slate-600 dark:text-slate-400">{(test as any).durationMin || '-'} min</span>
+                                        </TableCell>
+                                        <TableCell>
+                                            <span className="font-medium text-slate-600 dark:text-slate-400">{(test as any).totalMarks || '-'}</span>
+                                        </TableCell>
+                                        <TableCell>
+                                            <span className="font-medium text-slate-600 dark:text-slate-400">{test.questionIds?.length || 0}</span>
+                                        </TableCell>
+                                        <TableCell>
+                                            <span className="font-medium text-slate-600 dark:text-slate-400">{test.attemptCount || 0}</span>
+                                        </TableCell>
+                                        <TableCell>
+                                            <span className={`px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider rounded-md border ${test.status === 'Published' ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800/30' : test.status === 'Archived' ? 'bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700' : 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800/30'}`}>
                                                 {test.status}
                                             </span>
                                         </TableCell>
                                         <TableCell>
-                                            <div className="flex items-center gap-1.5 font-medium text-slate-700 dark:text-slate-300">
+                                            <div className="flex items-center gap-1.5 font-semibold text-sm text-slate-700 dark:text-slate-300">
                                                 {test.accessType === 'free' ? (
-                                                    <Unlock className="w-3.5 h-3.5 text-emerald-600" />
+                                                    <div className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-0.5 rounded border border-emerald-100 dark:border-emerald-800/30">
+                                                        <Unlock className="w-3.5 h-3.5" /> Free
+                                                    </div>
                                                 ) : (
-                                                    <Lock className="w-3.5 h-3.5 text-amber-600" />
+                                                    <div className="flex items-center gap-1 text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20 px-2 py-0.5 rounded border border-indigo-100 dark:border-indigo-800/30">
+                                                        <Lock className="w-3.5 h-3.5" /> ₹ {test.price || 0}
+                                                    </div>
                                                 )}
-                                                <span>₹ {test.accessType === 'free' ? '0' : (test.price || 0)}</span>
                                             </div>
                                         </TableCell>
                                         <TableCell>
                                             <div className="flex flex-col">
-                                                <div className="flex items-center gap-1 text-sm font-medium">
+                                                <div className="flex items-center gap-1 text-sm font-semibold text-slate-700 dark:text-slate-300">
                                                     <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
                                                     {test.reviewStats?.averageRating || 0}
                                                 </div>
-                                                <span className="text-xs text-slate-500">{test.reviewStats?.totalReviews || 0} reviews</span>
+                                                <span className="text-[11px] text-slate-400 font-medium">{test.reviewStats?.totalReviews || 0} reviews</span>
                                             </div>
                                         </TableCell>
-                                        <TableCell>
+                                        <TableCell className="text-right pr-5">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
                                                     <Button variant="ghost" className="h-8 w-8 p-0">
@@ -609,8 +621,8 @@ export default function MockTestsPage() {
                                                     </div>
                                                     <div className="flex items-center gap-1 text-sm font-medium ml-3">
                                                         <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-                                                        {test.reviewStats?.averageRating || 0}
-                                                        <span className="text-[10px] text-slate-400 font-normal ml-0.5">({test.reviewStats?.totalReviews || 0})</span>
+                                                        <span className="text-slate-700 dark:text-slate-300">{test.reviewStats?.averageRating || 0}</span>
+                                                        <span className="text-slate-400 dark:text-slate-500 text-xs ml-0.5">({test.reviewStats?.totalReviews || 0})</span>
                                                     </div>
 
                                                     <DropdownMenu>
@@ -656,8 +668,8 @@ export default function MockTestsPage() {
                             )}
                         </div>
                     )}
-                </CardContent>
-            </Card>
+                </div>
+            </div>
 
             {/* Add Custom Review Modal */}
             <Dialog open={!!reviewTest} onOpenChange={(open) => !open && setReviewTest(null)}>
