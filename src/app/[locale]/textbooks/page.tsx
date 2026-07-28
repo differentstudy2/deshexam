@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { db } from '@/lib/firebase/client';
 import { deleteTextbook } from '@/lib/firebase/firestore';
 import type { Textbook } from '@/lib/types';
-import { collection, getDocs, query, orderBy } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, getCountFromServer, where } from 'firebase/firestore';
 import { Book, Edit, Trash2, PlusCircle, Layers, FileText, CheckSquare, Eye } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -41,20 +41,17 @@ const TextbookStats = ({ textbookId }: { textbookId: string }) => {
             let topicCount = 0;
             let practiceSetCount = 0;
             
-            const chaptersRef = collection(db, 'textbooks', textbookId, 'chapters');
-            const chaptersSnapshot = await getDocs(chaptersRef);
+            const [chaptersSnapshot, psCountSnap] = await Promise.all([
+                getDocs(collection(db, 'textbooks', textbookId, 'chapters')),
+                getCountFromServer(query(collection(db, 'content'), where('textbookId', '==', textbookId), where('testType', '==', 'Practice Set')))
+            ]);
             chapterCount = chaptersSnapshot.size;
+            practiceSetCount = psCountSnap.data().count;
 
             for (const chapterDoc of chaptersSnapshot.docs) {
                 const topicsRef = collection(chapterDoc.ref, "topics");
-                const topicsSnapshot = await getDocs(topicsRef);
-                topicCount += topicsSnapshot.size;
-
-                 for (const topicDoc of topicsSnapshot.docs) {
-                    const practiceSetsRef = collection(topicDoc.ref, "practiceSets");
-                    const practiceSetsSnapshot = await getDocs(practiceSetsRef);
-                    practiceSetCount += practiceSetsSnapshot.size;
-                }
+                const topicsSnap = await getCountFromServer(topicsRef);
+                topicCount += topicsSnap.data().count;
             }
             setStats({ chapterCount, topicCount, practiceSetCount });
             setLoading(false);
