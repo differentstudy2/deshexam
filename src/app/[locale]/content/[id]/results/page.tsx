@@ -21,6 +21,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { ScoreCircle } from '@/components/feature/score-circle';
 import { Badge } from '@/components/ui/badge';
+import { UserAttemptsDisplay } from '@/components/assessment/UserAttemptsDisplay';
 
 type Submission = { id: string; testId: string; userId: string; score: number; totalQuestions: number; answers: { [key: string]: string }, testType: string; submittedAt: any;};
 type Test = { id: string; title: string; testType: string; board: string; subject: string; exam: string; chapter: string; duration: number; difficulty: string;};
@@ -190,6 +191,9 @@ function ResultsDisplay() {
             </div>
         </CardContent>
       </Card>
+      <div className="max-w-4xl mx-auto mt-8">
+         <UserAttemptsDisplay assessmentId={test.id} />
+      </div>
     </>
   );
 }
