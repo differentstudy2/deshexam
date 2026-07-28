@@ -25,7 +25,8 @@ export async function generateMetadata({ params }: Props, parent: ResolvingMetad
   };
 }
 
-export const revalidate = 3600;
+import { CACHE_SETTINGS } from '@/lib/cache-settings';
+export const revalidate = CACHE_SETTINGS.ASSESSMENT_TAKE_PAGE;
 
 const getCachedQuestions = unstable_cache(
   async (ids: string[]) => getQuestionsByIds(ids),
