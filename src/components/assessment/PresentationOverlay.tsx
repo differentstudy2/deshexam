@@ -1562,7 +1562,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             www.deshexam.com
                         </div>
 
-                        <div className="flex items-center gap-2 md:gap-4 lg:gap-8 ml-auto w-full md:w-auto justify-between md:justify-end">
+                        <div className="flex items-center gap-2 md:gap-4 lg:gap-8 ml-auto w-full md:w-auto justify-center md:justify-end">
                             <div className="flex items-center gap-2 md:gap-4">
                                 {/* Read Aloud Toggle Button (Footer) */}
                                 <button
@@ -1637,9 +1637,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     </button>
 
                                     {isShortcutsOpen && (
-                                        <div className="fixed bottom-[80px] left-1/2 -translate-x-1/2 md:absolute md:bottom-full md:left-auto md:right-0 md:translate-x-0 md:mb-4 bg-white/95 backdrop-blur-xl border border-white/40 rounded-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] ring-1 ring-gray-900/5 p-5 w-[90vw] sm:w-[400px] z-50 animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[70vh] md:max-h-[60vh]">
+                                        <div className="fixed bottom-[80px] left-1/2 -translate-x-1/2 md:absolute md:bottom-full md:left-auto md:right-0 md:translate-x-0 md:mb-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.2)] p-5 w-[90vw] sm:w-[400px] z-[70] animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[70vh] md:max-h-[60vh]">
                                             <div className="flex justify-between items-center mb-4 pb-3 border-b border-gray-100 shrink-0">
-                                                <h3 className="font-bold text-gray-800 text-lg flex items-center gap-2">
+                                                <h3 className="font-bold text-gray-800 dark:text-gray-200 text-lg flex items-center gap-2">
                                                     <Keyboard className="w-5 h-5 text-gray-500" /> Keyboard Shortcuts
                                                 </h3>
                                                 <button onClick={() => setIsShortcutsOpen(false)} className="p-1 text-gray-400 hover:bg-gray-100 rounded-full hover:text-gray-700 transition-colors">
@@ -1677,11 +1677,11 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     </button>
 
                                     {isSettingsOpen && (
-                                        <div className="fixed bottom-[80px] left-1/2 -translate-x-1/2 md:absolute md:bottom-full md:left-auto md:right-0 md:translate-x-0 md:mb-4 bg-white/95 backdrop-blur-xl border border-white/40 rounded-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] ring-1 ring-gray-900/5 p-5 w-[90vw] sm:w-[340px] z-50 animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[70vh] md:max-h-[60vh]">
+                                        <div className="fixed bottom-[80px] left-1/2 -translate-x-1/2 md:absolute md:bottom-full md:left-auto md:right-0 md:translate-x-0 md:mb-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.2)] p-5 w-[90vw] sm:w-[340px] z-[70] animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[70vh] md:max-h-[60vh]">
                                             <div className="flex justify-between items-center mb-4 pb-3 border-b border-gray-100 shrink-0">
-                                                <h3 className="font-bold text-gray-800 text-lg flex items-center gap-2">
+                                                <h3 className="font-bold text-gray-800 dark:text-gray-200 text-lg flex items-center gap-2">
                                                     <Settings className="w-5 h-5 text-gray-500" /> Settings
-                                                    <kbd className="ml-1 text-[10px] bg-gray-100 border border-gray-200 px-1.5 py-0.5 rounded text-gray-500 font-mono shadow-sm">S</kbd>
+                                                    <kbd className="ml-1 text-[10px] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-1.5 py-0.5 rounded text-gray-500 font-mono shadow-sm">S</kbd>
                                                 </h3>
                                                 <button onClick={() => setIsSettingsOpen(false)} className="p-1 text-gray-400 hover:bg-gray-100 rounded-full hover:text-gray-700 transition-colors">
                                                     <X className="w-5 h-5" />
