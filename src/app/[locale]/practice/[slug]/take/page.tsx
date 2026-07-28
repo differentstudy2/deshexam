@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: Props, parent: ResolvingMetad
   };
 }
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
 
 const getCachedQuestions = unstable_cache(
   async (ids: string[]) => getQuestionsByIds(ids),

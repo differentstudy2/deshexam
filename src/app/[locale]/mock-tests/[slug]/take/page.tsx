@@ -8,6 +8,8 @@ import { MockTest } from '@/lib/assessment-types';
 import { Metadata, ResolvingMetadata } from 'next';
 import { formatTitleForBrowser } from '@/lib/utils';
 
+export const revalidate = 3600;
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }, parent: ResolvingMetadata): Promise<Metadata> {
   const { slug } = await params;
   const test = await getAssessmentBySlug('mockTests', slug) as MockTest | null;

@@ -22,7 +22,7 @@ import remarkGfm from 'remark-gfm';
 
 type Props = { params: Promise<{ slug: string }> };
 
-export const revalidate = 0;
+export const revalidate = 3600;
 
 export async function generateMetadata({ params }: Props, parent: ResolvingMetadata): Promise<Metadata> {
   const { slug } = await params;
