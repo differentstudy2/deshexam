@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { PlusCircle, Pencil, Trash2, Loader2, Copy, Eye } from 'lucide-react';
+import { PlusCircle, Plus, Pencil, Trash2, Loader2, Copy, Eye } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { PracticeSet } from '@/lib/assessment-types';
 import { getAssessments, saveAssessment, deleteAssessment } from '@/lib/firebase/assessment';
@@ -350,8 +350,8 @@ export default function PracticeSetsPage() {
                             <LayoutGrid className="w-4 h-4" />
                         </button>
                     </div>
-                    <Button onClick={() => { setEditData({}); setView('editor'); }} className="shrink-0">
-                        <PlusCircle className="mr-2 h-4 w-4" /> Create Practice Set
+                    <Button onClick={() => { setEditData({}); setView('editor'); }} className="shrink-0 w-10 h-10 p-0 rounded-xl bg-indigo-600 hover:bg-indigo-700 shadow-sm transition-transform hover:scale-105" title="Create Practice Set">
+                        <Plus className="h-5 w-5" />
                     </Button>
                 </div>
             </div>
