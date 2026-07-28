@@ -358,8 +358,8 @@ export default function PracticeSetsPage() {
 
             {/* Filters */}
             <div className="flex flex-col gap-4 bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                <div className="flex flex-wrap items-center gap-4">
-                    <div className="relative flex-1 min-w-[200px]">
+                <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-700">
+                    <div className="relative flex-none min-w-[220px]">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                         <Input 
                             placeholder="Search practice sets by title..." 
@@ -369,7 +369,7 @@ export default function PracticeSetsPage() {
                         />
                     </div>
                     <Select value={statusFilter} onValueChange={setStatusFilter}>
-                        <SelectTrigger className="w-[140px] bg-slate-50 dark:bg-slate-800/50">
+                        <SelectTrigger className="w-[130px] shrink-0 bg-slate-50 dark:bg-slate-800/50">
                             <SelectValue placeholder="Status" />
                         </SelectTrigger>
                         <SelectContent>
@@ -380,7 +380,7 @@ export default function PracticeSetsPage() {
                         </SelectContent>
                     </Select>
                     <Select value={accessFilter} onValueChange={setAccessFilter}>
-                        <SelectTrigger className="w-[140px] bg-slate-50 dark:bg-slate-800/50">
+                        <SelectTrigger className="w-[130px] shrink-0 bg-slate-50 dark:bg-slate-800/50">
                             <SelectValue placeholder="Access" />
                         </SelectTrigger>
                         <SelectContent>
@@ -393,7 +393,7 @@ export default function PracticeSetsPage() {
                         </SelectContent>
                     </Select>
                     <Select value={boardFilter} onValueChange={setBoardFilter}>
-                        <SelectTrigger className="w-[140px] bg-slate-50 dark:bg-slate-800/50">
+                        <SelectTrigger className="w-[130px] shrink-0 bg-slate-50 dark:bg-slate-800/50">
                             <SelectValue placeholder="Board" />
                         </SelectTrigger>
                         <SelectContent>
@@ -402,7 +402,7 @@ export default function PracticeSetsPage() {
                         </SelectContent>
                     </Select>
                     <Select value={classFilter} onValueChange={setClassFilter}>
-                        <SelectTrigger className="w-[140px] bg-slate-50 dark:bg-slate-800/50">
+                        <SelectTrigger className="w-[130px] shrink-0 bg-slate-50 dark:bg-slate-800/50">
                             <SelectValue placeholder="Class" />
                         </SelectTrigger>
                         <SelectContent>
@@ -411,7 +411,7 @@ export default function PracticeSetsPage() {
                         </SelectContent>
                     </Select>
                     <Select value={subjectFilter} onValueChange={setSubjectFilter}>
-                        <SelectTrigger className="w-[140px] bg-slate-50 dark:bg-slate-800/50">
+                        <SelectTrigger className="w-[130px] shrink-0 bg-slate-50 dark:bg-slate-800/50">
                             <SelectValue placeholder="Subject" />
                         </SelectTrigger>
                         <SelectContent>
@@ -420,7 +420,7 @@ export default function PracticeSetsPage() {
                         </SelectContent>
                     </Select>
                     <Select value={examFilter} onValueChange={setExamFilter}>
-                        <SelectTrigger className="w-[140px] bg-slate-50 dark:bg-slate-800/50">
+                        <SelectTrigger className="w-[130px] shrink-0 bg-slate-50 dark:bg-slate-800/50">
                             <SelectValue placeholder="Exam" />
                         </SelectTrigger>
                         <SelectContent>
