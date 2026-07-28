@@ -15,7 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetHeader } from "@/components/ui/sheet";
-import { Menu, LogOut, LayoutDashboard, User as UserIcon, ShieldCheck, Gem, Trophy, Sparkles, BookOpen, ShoppingCart, PlusCircle, LogIn, UserPlus, LayoutGrid, Library, FileText, Settings, BookUser, ClipboardList, Send, Ticket, DollarSign, Users, Book, ToyBrick, Award, Activity, Zap, FilePlus, Printer, MessageSquare, Bell, Heart, Bookmark, Gift, Share2, Briefcase, Package, HelpCircle, ChevronRight, ChevronDown, BarChart2, Compass, Upload, Search, GraduationCap, School, Play, Headphones } from "lucide-react";
+import { Menu, LogOut, LayoutDashboard, User as UserIcon, ShieldCheck, Gem, Trophy, Sparkles, BookOpen, ShoppingCart, PlusCircle, LogIn, UserPlus, LayoutGrid, Library, FileText, Settings, BookUser, ClipboardList, Send, Ticket, DollarSign, Users, Book, ToyBrick, Award, Activity, Zap, FilePlus, Printer, MessageSquare, Bell, Heart, Bookmark, Gift, Share2, Briefcase, Package, HelpCircle, ChevronRight, ChevronDown, BarChart2, Compass, Upload, Search, GraduationCap, School, Play, Headphones, Trash2 } from "lucide-react";
 import { DeshExamLogo } from "@/components/icons";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
@@ -26,6 +26,8 @@ import { ScrollArea } from "../ui/scroll-area";
 import { useAuthDialog } from "@/hooks/use-auth-dialog";
 import { useFcm } from "@/hooks/use-fcm";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { useToast } from "@/hooks/use-toast";
+import { clearAllCache } from "@/lib/actions/cache";
 
 const mainNavLinks = [
     { href: "/academy", label: "Academy", icon: <BookOpen className="h-5 w-5" /> },
@@ -684,6 +686,32 @@ export const DashboardSidebar = ({ onLinkClick, user, logOut }: { onLinkClick?: 
   );
 };
 
+export const ClearCacheButton = () => {
+  const { toast } = useToast();
+  const [isClearing, setIsClearing] = useState(false);
+
+  const handleClearCache = async () => {
+    setIsClearing(true);
+    try {
+      const res = await clearAllCache();
+      if (res.success) {
+         toast({ title: 'Success', description: res.message });
+      } else {
+         toast({ title: 'Error', description: res.message, variant: 'destructive' });
+      }
+    } catch (e) {
+      console.error(e);
+      toast({ title: 'Error', description: 'Failed to clear cache.', variant: 'destructive' });
+    }
+    setIsClearing(false);
+  };
+
+  return (
+    <Button variant="ghost" size="icon" onClick={handleClearCache} disabled={isClearing} title="Clear Global Cache">
+      <Trash2 className={`h-4 w-4 ${isClearing ? 'animate-spin' : ''}`} />
+    </Button>
+  );
+};
 
 export function Header() {
   const { user, loading, logOut } = useAuth();
@@ -729,6 +757,7 @@ export function Header() {
           </Button>
           <LanguageSwitcher />
           <ThemeToggle />
+          {pathname?.startsWith('/admin') && <ClearCacheButton />}
           <NotificationBell />
           <div className="hidden md:flex">
              <UserNav />
