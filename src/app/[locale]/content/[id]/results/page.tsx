@@ -206,8 +206,8 @@ export default function TestResultsPage() {
     const getTestType = async () => {
         const submissionId = searchParams.get('submissionId');
         if(submissionId) {
-            const sub = await getSubmissionById(submissionId);
-            if(sub) {
+            const sub = (await getSubmissionById(submissionId)) as Submission;
+            if(sub && sub.testType) {
                 setTestType(sub.testType);
             }
         }
