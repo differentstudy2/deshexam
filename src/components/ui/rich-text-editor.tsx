@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { Markdown } from 'tiptap-markdown';
-import { Bold, Italic, List, Heading2 } from 'lucide-react';
+import { Bold, Italic, List, Heading2, Heading3, ListOrdered } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export interface RichTextEditorProps {
@@ -16,8 +16,8 @@ export interface RichTextEditorProps {
 export function RichTextEditor({ content, onChange, minHeight = '150px', maxHeight }: RichTextEditorProps) {
   const editor = useEditor({
     extensions: [
-      StarterKit,
-      Markdown,
+      StarterKit as any,
+      Markdown as any,
     ],
     content: content || '',
     onUpdate: ({ editor }) => {
