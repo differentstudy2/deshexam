@@ -11,12 +11,12 @@ import { notFound } from 'next/navigation';
 import { formatTitleForBrowser } from '@/lib/utils';
 
 type PageProps = {
-  params: {
+  params: Promise<{
     practiceSetId: string;
     bookId: string;
     chapterId: string;
     topicId: string;
-  };
+  }>;
 };
 
 // Helper function to serialize Firestore Timestamps
@@ -68,59 +68,61 @@ async function getPageData(params: PageProps['params']) {
     }
 }
 
-export async function generateMetadata({ params, searchParams }: PageProps, parent: ResolvingMetadata): Promise<Metadata> {
-  const awaitedParams = await params;
-  const { textbook, chapter, topic, practiceSet } = await getPageData(awaitedParams);
+export async function generateMetadata(props: PageProps, parent: ResolvingMetadata): Promise<Metadata> {
+    const params = await props.params;
+    const awaitedParams = await params;
+    const { textbook, chapter, topic, practiceSet } = await getPageData(awaitedParams);
 
-  if (!practiceSet || !textbook || !chapter) {
+    if (!practiceSet || !textbook || !chapter) {
+      return {
+        title: 'Practice Set Not Found',
+      };
+    }
+
+    const title = `${formatTitleForBrowser(practiceSet.title)} | ${topic?.title || chapter.title} | DeshExam`;
+    const description = `Take the interactive practice set "${formatTitleForBrowser(practiceSet.title)}" for the topic "${topic?.title || chapter.title}" from the ${textbook.title} textbook. Check your knowledge and prepare for your exams.`;
+    const keywords = [
+      practiceSet.title,
+      topic?.title || '',
+      chapter.title,
+      textbook.title,
+      (textbook as any).subject,
+      'practice set',
+      'online quiz',
+    ].filter(Boolean);
+
+    const imageUrl = (textbook as any).featureImage || `https://picsum.photos/seed/${params.practiceSetId}/1200/630`;
+
     return {
-      title: 'Practice Set Not Found',
+      title,
+      description,
+      keywords,
+      openGraph: {
+          title,
+          description,
+          url: `https://deshexam.com/textbook-solutions/practice-set/${params.practiceSetId}/textbook/${params.bookId}/chapter/${params.chapterId}/topic/${params.topicId}`,
+          images: [{ url: imageUrl, width: 1200, height: 630, alt: title }],
+          type: 'website',
+      },
+      twitter: {
+          card: 'summary_large_image',
+          title,
+          description,
+          images: [imageUrl],
+      },
     };
-  }
-
-  const title = `${formatTitleForBrowser(practiceSet.title)} | ${topic?.title || chapter.title} | DeshExam`;
-  const description = `Take the interactive practice set "${formatTitleForBrowser(practiceSet.title)}" for the topic "${topic?.title || chapter.title}" from the ${textbook.title} textbook. Check your knowledge and prepare for your exams.`;
-  const keywords = [
-    practiceSet.title,
-    topic?.title || '',
-    chapter.title,
-    textbook.title,
-    (textbook as any).subject,
-    'practice set',
-    'online quiz',
-  ].filter(Boolean);
-  
-  const imageUrl = (textbook as any).featureImage || `https://picsum.photos/seed/${params.practiceSetId}/1200/630`;
-
-  return {
-    title,
-    description,
-    keywords,
-    openGraph: {
-        title,
-        description,
-        url: `https://deshexam.com/textbook-solutions/practice-set/${params.practiceSetId}/textbook/${params.bookId}/chapter/${params.chapterId}/topic/${params.topicId}`,
-        images: [{ url: imageUrl, width: 1200, height: 630, alt: title }],
-        type: 'website',
-    },
-    twitter: {
-        card: 'summary_large_image',
-        title,
-        description,
-        images: [imageUrl],
-    },
-  };
 }
 
 
-export default async function PracticeSetPage({ params }: PageProps) {
+export default async function PracticeSetPage(props: PageProps) {
+    const params = await props.params;
     const awaitedParams = await params;
     const { practiceSet, textbook, chapter, topic } = await getPageData(awaitedParams);
-    
+
     if (!practiceSet || !textbook || !chapter) {
         notFound();
     }
-    
+
     const questionsData = await getQuestionsByPracticeSet(awaitedParams.bookId, awaitedParams.chapterId, awaitedParams.topicId === 'null' ? null : awaitedParams.topicId, awaitedParams.practiceSetId);
     const questions = serializeFirestoreTimestamps(questionsData);
 

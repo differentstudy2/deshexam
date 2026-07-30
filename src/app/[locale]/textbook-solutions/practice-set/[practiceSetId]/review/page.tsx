@@ -10,8 +10,8 @@ import ReviewClientPage from './review-client-page';
 import { notFound } from 'next/navigation';
 
 type PageProps = {
-    params: { practiceSetId: string; };
-    searchParams: { [key: string]: string | string[] | undefined };
+    params: Promise<{ practiceSetId: string; }>;
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
 async function getPageData(submissionId: string | undefined) {
@@ -33,7 +33,8 @@ async function getPageData(submissionId: string | undefined) {
 }
 
 
-export async function generateMetadata({ params, searchParams }: PageProps): Promise<Metadata> {
+export async function generateMetadata(props: PageProps): Promise<Metadata> {
+    const searchParams = await props.searchParams;
     const submissionId = searchParams.submissionId as string | undefined;
     const { submission, textbook } = await getPageData(submissionId);
 
@@ -55,13 +56,14 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
 }
 
 
-export default async function PracticeSetReviewPage({ params, searchParams }: PageProps) {
+export default async function PracticeSetReviewPage(props: PageProps) {
+    const searchParams = await props.searchParams;
     const submissionId = searchParams.submissionId as string | undefined;
 
     if (!submissionId) {
         notFound();
     }
-    
+
     return (
         <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><Loader2 className="animate-spin w-8 h-8" /></div>}>
             <ReviewClientPage submissionId={submissionId} />

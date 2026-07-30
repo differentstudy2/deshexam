@@ -6,60 +6,59 @@ import { notFound } from 'next/navigation';
 import { formatTitleForBrowser } from '@/lib/utils';
 
 type Props = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
-export async function generateMetadata(
-  { params }: Props,
-  parent: ResolvingMetadata
-): Promise<Metadata> {
-  const { id } = params;
-  const article = await getContentById(id) as any;
+export async function generateMetadata(props: Props, parent: ResolvingMetadata): Promise<Metadata> {
+    const params = await props.params;
+    const { id } = params;
+    const article = await getContentById(id) as any;
 
-  if (!article || article.testType !== 'Learn') {
+    if (!article || article.testType !== 'Learn') {
+      return {
+        title: 'Article Not Found',
+      };
+    }
+
+    const previousImages = (await parent).openGraph?.images || [];
+
+    // Ensure createdAt is a string for metadata
+    const publishedTime = article.createdAt && typeof article.createdAt.toDate === 'function' 
+      ? article.createdAt.toDate().toISOString() 
+      : new Date().toISOString();
+
+
     return {
-      title: 'Article Not Found',
+      title: formatTitleForBrowser(article.title),
+      description: formatTitleForBrowser(article.description),
+      keywords: [article.subject, article.title, 'learn', 'tutorial', 'study guide'],
+      openGraph: {
+        title: formatTitleForBrowser(article.title),
+        description: formatTitleForBrowser(article.description),
+        images: [article.featureImage || `https://picsum.photos/seed/${id}/800/450`, ...previousImages],
+        type: 'article',
+        publishedTime: publishedTime,
+        authors: [article.authorName],
+      },
+       twitter: {
+        card: 'summary_large_image',
+        title: formatTitleForBrowser(article.title),
+        description: formatTitleForBrowser(article.description),
+        images: [article.featureImage || `https://picsum.photos/seed/${id}/800/450`],
+      },
     };
-  }
-
-  const previousImages = (await parent).openGraph?.images || [];
-  
-  // Ensure createdAt is a string for metadata
-  const publishedTime = article.createdAt && typeof article.createdAt.toDate === 'function' 
-    ? article.createdAt.toDate().toISOString() 
-    : new Date().toISOString();
-
-
-  return {
-    title: formatTitleForBrowser(article.title),
-    description: formatTitleForBrowser(article.description),
-    keywords: [article.subject, article.title, 'learn', 'tutorial', 'study guide'],
-    openGraph: {
-      title: formatTitleForBrowser(article.title),
-      description: formatTitleForBrowser(article.description),
-      images: [article.featureImage || `https://picsum.photos/seed/${id}/800/450`, ...previousImages],
-      type: 'article',
-      publishedTime: publishedTime,
-      authors: [article.authorName],
-    },
-     twitter: {
-      card: 'summary_large_image',
-      title: formatTitleForBrowser(article.title),
-      description: formatTitleForBrowser(article.description),
-      images: [article.featureImage || `https://picsum.photos/seed/${id}/800/450`],
-    },
-  };
 }
 
 
-export default async function LearnArticlePage({ params }: Props) {
+export default async function LearnArticlePage(props: Props) {
+    const params = await props.params;
     const { id } = params;
     const articleData = await getContentById(id);
 
     if (!articleData || articleData.testType !== 'Learn') {
         notFound();
     }
-    
+
     // Serialize the article object to make it a "plain object"
     const article = {
       ...articleData,

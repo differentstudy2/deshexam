@@ -5,13 +5,11 @@ import TextbookClientPage from './textbook-client-page';
 import { notFound } from 'next/navigation';
 
 type PageProps = {
-    params: { bookId: string };
+    params: Promise<{ bookId: string }>;
 };
 
-export async function generateMetadata(
-  { params }: PageProps,
-  parent: ResolvingMetadata
-): Promise<Metadata> {
+export async function generateMetadata(props: PageProps, parent: ResolvingMetadata): Promise<Metadata> {
+  const params = await props.params;
   const { bookId } = params;
   const textbook = (await getContentById(bookId)) as any;
 
@@ -20,7 +18,7 @@ export async function generateMetadata(
       title: 'Textbook Not Found',
     };
   }
-  
+
   const keywords = [
     textbook.title,
     textbook.subject,
@@ -49,21 +47,22 @@ export async function generateMetadata(
 }
 
 
-export default async function TextbookSolutionsPage({ params }: PageProps) {
-    const { bookId } = params;
-    const textbookData = await getContentById(bookId);
+export default async function TextbookSolutionsPage(props: PageProps) {
+  const params = await props.params;
+  const { bookId } = params;
+  const textbookData = await getContentById(bookId);
 
-    if (!textbookData) {
-        notFound();
-    }
+  if (!textbookData) {
+      notFound();
+  }
 
-    // Serialize the textbook object to make it a "plain object"
-    const textbook = {
-      ...textbookData,
-      // Convert Firestore Timestamps to simple strings.
-      createdAt: textbookData.createdAt?.toDate ? textbookData.createdAt.toDate().toLocaleDateString() : null,
-      updatedAt: textbookData.updatedAt?.toDate ? textbookData.updatedAt.toDate().toLocaleDateString() : null,
-    };
+  // Serialize the textbook object to make it a "plain object"
+  const textbook = {
+    ...textbookData,
+    // Convert Firestore Timestamps to simple strings.
+    createdAt: textbookData.createdAt?.toDate ? textbookData.createdAt.toDate().toLocaleDateString() : null,
+    updatedAt: textbookData.updatedAt?.toDate ? textbookData.updatedAt.toDate().toLocaleDateString() : null,
+  };
 
-    return <TextbookClientPage textbook={textbook as any} />;
+  return <TextbookClientPage textbook={textbook as any} />;
 }

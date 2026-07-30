@@ -29,7 +29,8 @@ const bnOptionsMap: Record<string, string> = {
     e: 'ঙ'
 };
 
-export async function generateMetadata({ params }: { params: { locale: string, type: string, slug: string } }): Promise<Metadata> {
+export async function generateMetadata(props: { params: Promise<{ locale: string, type: string, slug: string }> }): Promise<Metadata> {
+    const params = await props.params;
     const typeToCollection: Record<string, AssessmentCollectionType> = {
         'mock-tests': 'mockTests',
         'quizzes': 'quizzes',
@@ -50,11 +51,12 @@ export async function generateMetadata({ params }: { params: { locale: string, t
     };
 }
 
-export default async function AnswerSheetPage({
-    params
-}: {
-    params: { locale: string, type: string, slug: string }
-}) {
+export default async function AnswerSheetPage(
+    props: {
+        params: Promise<{ locale: string, type: string, slug: string }>
+    }
+) {
+    const params = await props.params;
     // 1. Map route type to collection name
     const typeToCollection: Record<string, AssessmentCollectionType> = {
         'mock-tests': 'mockTests',

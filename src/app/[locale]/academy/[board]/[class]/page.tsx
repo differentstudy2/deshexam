@@ -3,10 +3,11 @@ import Script from 'next/script';
 import AcademyClient from '../../AcademyClient';
 
 type Props = {
-  params: { board: string; class: string };
+  params: Promise<{ board: string; class: string }>;
 };
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const params = await props.params;
   const boardSlug = params.board.toUpperCase(); // e.g. "wbbse" -> "WBBSE"
   const classSlug = params.class;
   const formattedClass = classSlug
@@ -68,7 +69,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default function BoardClassAcademyPage({ params }: Props) {
+export default async function BoardClassAcademyPage(props: Props) {
+  const params = await props.params;
   const boardSlug = params.board.toUpperCase();
   const classSlug = params.class;
   const formattedClass = classSlug

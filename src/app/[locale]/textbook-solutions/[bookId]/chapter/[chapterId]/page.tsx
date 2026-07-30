@@ -9,8 +9,8 @@ import ChapterClientPage from './chapter-client-page';
 import { notFound } from 'next/navigation';
 
 type PageProps = {
-    params: { bookId: string; chapterId: string };
-    searchParams: { [key: string]: string | string[] | undefined };
+    params: Promise<{ bookId: string; chapterId: string }>;
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
 async function getPageData(bookId: string, chapterId: string, topicId?: string) {
@@ -42,7 +42,9 @@ async function getPageData(bookId: string, chapterId: string, topicId?: string) 
     }
 }
 
-export async function generateMetadata({ params, searchParams }: PageProps, parent: ResolvingMetadata): Promise<Metadata> {
+export async function generateMetadata(props: PageProps, parent: ResolvingMetadata): Promise<Metadata> {
+    const searchParams = await props.searchParams;
+    const params = await props.params;
     const { bookId, chapterId } = params;
     const topicId = searchParams.topic as string | undefined;
     const { textbook, chapter, topic } = await getPageData(bookId, chapterId, topicId);
@@ -62,7 +64,7 @@ export async function generateMetadata({ params, searchParams }: PageProps, pare
         description = `Detailed explanation and practice sets for the topic "${topic.title}" from Chapter ${chapter.title} of the ${textbook.title} textbook.`;
         keywords.push(topic.title);
     }
-    
+
     const previousImages = (await parent).openGraph?.images || [];
     const featureImage = textbook.featureImage || `https://picsum.photos/seed/${params.bookId}/1200/630`;
 
@@ -78,12 +80,13 @@ export async function generateMetadata({ params, searchParams }: PageProps, pare
     };
 }
 
-export default async function TextbookChapterPage({ params }: PageProps) {
+export default async function TextbookChapterPage(props: PageProps) {
+    const params = await props.params;
     const { bookId, chapterId } = params;
     const { textbook, chapter, topic } = await getPageData(bookId, chapterId);
-     if (!textbook || !chapter) {
-        notFound();
-    }
+    if (!textbook || !chapter) {
+       notFound();
+   }
 
     return (
         <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><Loader2 className="animate-spin"/></div>}>

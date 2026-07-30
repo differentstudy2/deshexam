@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, use } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { getUserByUsername, getContentByAuthor, getSubmissionsByUserId, toggleFollowUser } from '@/lib/firebase/firestore';
@@ -53,7 +53,8 @@ type Submission = {
 };
 
 
-export default function UserProfilePage({ params }: { params: { username: string } }) {
+export default function UserProfilePage(props: { params: Promise<{ username: string }> }) {
+  const params = use(props.params);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [createdContent, setCreatedContent] = useState<Content[]>([]);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
@@ -153,7 +154,7 @@ export default function UserProfilePage({ params }: { params: { username: string
     const typeSlug = (testType || 'content').toLowerCase().replace(/\s+/g, '-');
     return `/${typeSlug}/${testId}`;
   }
-  
+
   const getUrlForResults = (testType: string, testId: string, submissionId: string) => {
     const typeSlug = (testType || 'content').toLowerCase().replace(/\s+/g, '-');
     return `/${typeSlug}/${testId}/results?submissionId=${submissionId}`;

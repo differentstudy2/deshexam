@@ -12,12 +12,12 @@ import { notFound } from 'next/navigation';
 import { formatTitleForBrowser } from '@/lib/utils';
 
 type PageProps = {
-  params: {
+  params: Promise<{
     quizId: string;
     bookId: string;
     chapterId: string;
     topicId: string;
-  };
+  }>;
 };
 
 const serializeFirestoreTimestamps = (data: any): any => {
@@ -68,62 +68,64 @@ async function getPageData(params: PageProps['params']) {
     }
 }
 
-export async function generateMetadata({ params }: PageProps, parent: ResolvingMetadata): Promise<Metadata> {
-  const { textbook, chapter, topic, quiz } = await getPageData(params);
+export async function generateMetadata(props: PageProps, parent: ResolvingMetadata): Promise<Metadata> {
+    const params = await props.params;
+    const { textbook, chapter, topic, quiz } = await getPageData(params);
 
-  if (!quiz || !textbook || !chapter) {
+    if (!quiz || !textbook || !chapter) {
+      return {
+        title: 'Quiz Not Found',
+      };
+    }
+
+    const title = `${formatTitleForBrowser((quiz as any).title)} | ${topic?.title || chapter.title} | DeshExam`;
+    const description = `Take the interactive quiz "${formatTitleForBrowser((quiz as any).title)}" for the topic "${topic?.title || chapter.title}" from the ${textbook.title} textbook. Check your knowledge and prepare for your exams.`;
+    const keywords = [
+      (quiz as any).title,
+      topic?.title || '',
+      chapter.title,
+      textbook.title,
+      (textbook as any).subject,
+      'quiz',
+      'online practice',
+    ].filter(Boolean);
+
+    const imageUrl = (textbook as any).featureImage || `https://picsum.photos/seed/${params.quizId}/1200/630`;
+
     return {
-      title: 'Quiz Not Found',
+      title,
+      description,
+      keywords,
+      openGraph: {
+          title,
+          description,
+          url: `https://deshexam.com/textbook-solutions/quiz/${params.quizId}/textbook/${params.bookId}/chapter/${params.chapterId}/topic/${params.topicId}`,
+          images: [{ url: imageUrl, width: 1200, height: 630, alt: title }],
+          type: 'website',
+      },
+      twitter: {
+          card: 'summary_large_image',
+          title,
+          description,
+          images: [imageUrl],
+      },
     };
-  }
-
-  const title = `${formatTitleForBrowser((quiz as any).title)} | ${topic?.title || chapter.title} | DeshExam`;
-  const description = `Take the interactive quiz "${formatTitleForBrowser((quiz as any).title)}" for the topic "${topic?.title || chapter.title}" from the ${textbook.title} textbook. Check your knowledge and prepare for your exams.`;
-  const keywords = [
-    (quiz as any).title,
-    topic?.title || '',
-    chapter.title,
-    textbook.title,
-    (textbook as any).subject,
-    'quiz',
-    'online practice',
-  ].filter(Boolean);
-
-  const imageUrl = (textbook as any).featureImage || `https://picsum.photos/seed/${params.quizId}/1200/630`;
-
-  return {
-    title,
-    description,
-    keywords,
-    openGraph: {
-        title,
-        description,
-        url: `https://deshexam.com/textbook-solutions/quiz/${params.quizId}/textbook/${params.bookId}/chapter/${params.chapterId}/topic/${params.topicId}`,
-        images: [{ url: imageUrl, width: 1200, height: 630, alt: title }],
-        type: 'website',
-    },
-    twitter: {
-        card: 'summary_large_image',
-        title,
-        description,
-        images: [imageUrl],
-    },
-  };
 }
 
 
-export default async function QuizPage({ params }: PageProps) {
+export default async function QuizPage(props: PageProps) {
+    const params = await props.params;
     const { quiz, textbook, chapter, topic } = await getPageData(params);
-    
+
     if (!quiz || !textbook || !chapter) {
         notFound();
     }
-    
+
     const initialTest = {
         ...(quiz as any),
         testType: 'Quiz'
     };
-    
+
     const jsonLd = {
       "@context": "https://schema.org",
       "@type": "WebPage",

@@ -11,10 +11,10 @@ import { notFound } from 'next/navigation';
 import { formatTitleForBrowser } from '@/lib/utils';
 
 type PageProps = {
-  params: {
+  params: Promise<{
     quizId: string;
     bookId: string;
-  };
+  }>;
 };
 
 const serializeFirestoreTimestamps = (data: any): any => {
@@ -51,61 +51,63 @@ async function getPageData(params: PageProps['params']) {
     }
 }
 
-export async function generateMetadata({ params }: PageProps, parent: ResolvingMetadata): Promise<Metadata> {
-  const { textbook, quiz } = await getPageData(params);
+export async function generateMetadata(props: PageProps, parent: ResolvingMetadata): Promise<Metadata> {
+    const params = await props.params;
+    const { textbook, quiz } = await getPageData(params);
 
-  if (!quiz || !textbook) {
+    if (!quiz || !textbook) {
+      return {
+        title: 'Quiz Not Found',
+      };
+    }
+
+    const quizTitle = formatTitleForBrowser((quiz as any).title);
+    const textbookTitle = formatTitleForBrowser((textbook as any).title);
+
+    const title = `${quizTitle} | ${textbookTitle} | DeshExam`;
+    const description = `Take the quiz "${quizTitle}" for the ${textbookTitle} textbook. Test your knowledge and prepare for your exams with DeshExam.`;
+    const keywords = [
+      (quiz as any).title,
+      textbook.title,
+      (textbook as any).subject,
+      'quiz',
+      'online test',
+      'practice quiz',
+      `${textbook.title} solutions`,
+      `${textbook.subject} quiz`,
+    ].filter(Boolean);
+
+    const imageUrl = (textbook as any).featureImage || `https://picsum.photos/seed/${params.quizId}/1200/630`;
+
     return {
-      title: 'Quiz Not Found',
+      title,
+      description,
+      keywords,
+      openGraph: {
+          title,
+          description,
+          url: `https://deshexam.com/textbook-solutions/quiz/${params.quizId}/textbook/${params.bookId}`,
+          images: [{ url: imageUrl, width: 1200, height: 630, alt: title }],
+          type: 'website',
+      },
+      twitter: {
+          card: 'summary_large_image',
+          title,
+          description,
+          images: [imageUrl],
+      },
     };
-  }
-
-  const quizTitle = formatTitleForBrowser((quiz as any).title);
-  const textbookTitle = formatTitleForBrowser((textbook as any).title);
-
-  const title = `${quizTitle} | ${textbookTitle} | DeshExam`;
-  const description = `Take the quiz "${quizTitle}" for the ${textbookTitle} textbook. Test your knowledge and prepare for your exams with DeshExam.`;
-  const keywords = [
-    (quiz as any).title,
-    textbook.title,
-    (textbook as any).subject,
-    'quiz',
-    'online test',
-    'practice quiz',
-    `${textbook.title} solutions`,
-    `${textbook.subject} quiz`,
-  ].filter(Boolean);
-
-   const imageUrl = (textbook as any).featureImage || `https://picsum.photos/seed/${params.quizId}/1200/630`;
-
-  return {
-    title,
-    description,
-    keywords,
-    openGraph: {
-        title,
-        description,
-        url: `https://deshexam.com/textbook-solutions/quiz/${params.quizId}/textbook/${params.bookId}`,
-        images: [{ url: imageUrl, width: 1200, height: 630, alt: title }],
-        type: 'website',
-    },
-    twitter: {
-        card: 'summary_large_image',
-        title,
-        description,
-        images: [imageUrl],
-    },
-  };
 }
 
 
-export default async function TextbookQuizPage({ params }: PageProps) {
+export default async function TextbookQuizPage(props: PageProps) {
+    const params = await props.params;
     const { quiz, textbook } = await getPageData(params);
-    
+
     if (!quiz || !textbook) {
         notFound();
     }
-    
+
     const initialTest = {
         ...(quiz as any),
         testType: 'Quiz'
@@ -114,7 +116,7 @@ export default async function TextbookQuizPage({ params }: PageProps) {
     const mockChapter: Chapter = { id: 'null', title: 'Full Textbook', topics: [] , access: 'free'};
     const mockTopic: null = null;
     const cleanTitle = formatTitleForBrowser(initialTest.title);
-    
+
     const jsonLd = [
       {
         "@context": "https://schema.org",

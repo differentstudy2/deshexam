@@ -130,7 +130,7 @@ const preExistingContent: ContentItem[] = [
 
 
 type PageProps = {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 };
 
 const serializeFirestoreTimestamps = (data: any): any => {
@@ -172,76 +172,78 @@ async function getCategoryData(slug: string) {
     return { category, categoryName };
 }
 
-export async function generateMetadata({ params }: PageProps, parent: ResolvingMetadata): Promise<Metadata> {
-  const { slug: rawSlug } = params;
-  const slug = rawSlug ? decodeURIComponent(rawSlug) : '';
-  const { category, categoryName } = await getCategoryData(slug);
-  
-  if (!categoryName) {
-    return { title: 'Category Not Found' };
-  }
-  
-  const description = category?.description || `Explore fun activities and games in the ${categoryName} category for kids on DeshExam.`;
-  const keywords = ['kids learning', categoryName, 'educational games', 'fun activities for children', 'DeshExam Kids'];
-  const previousImages = (await parent).openGraph?.images || [];
-  
-  return {
-    title: `${categoryName} | Kids Zone`,
-    description,
-    keywords,
-    openGraph: {
-        images: [`https://picsum.photos/seed/${slug}/1200/630`, ...previousImages],
+export async function generateMetadata(props: PageProps, parent: ResolvingMetadata): Promise<Metadata> {
+    const params = await props.params;
+    const { slug: rawSlug } = params;
+    const slug = rawSlug ? decodeURIComponent(rawSlug) : '';
+    const { category, categoryName } = await getCategoryData(slug);
+
+    if (!categoryName) {
+      return { title: 'Category Not Found' };
     }
-  };
+
+    const description = category?.description || `Explore fun activities and games in the ${categoryName} category for kids on DeshExam.`;
+    const keywords = ['kids learning', categoryName, 'educational games', 'fun activities for children', 'DeshExam Kids'];
+    const previousImages = (await parent).openGraph?.images || [];
+
+    return {
+      title: `${categoryName} | Kids Zone`,
+      description,
+      keywords,
+      openGraph: {
+          images: [`https://picsum.photos/seed/${slug}/1200/630`, ...previousImages],
+      }
+    };
 }
 
-export default async function KidsZoneCategoryServerPage({ params }: PageProps) {
-  const { slug: rawSlug } = params;
-  const slug = rawSlug ? decodeURIComponent(rawSlug) : '';
-  const { category, categoryName } = await getCategoryData(slug);
-  
-  if (!categoryName) {
-    notFound();
-  }
+export default async function KidsZoneCategoryServerPage(props: PageProps) {
+    const params = await props.params;
+    const { slug: rawSlug } = params;
+    const slug = rawSlug ? decodeURIComponent(rawSlug) : '';
+    const { category, categoryName } = await getCategoryData(slug);
 
-  let initialContent: ContentItem[] = [];
-  try {
-      const queries = [];
-      const contentCollection = collection(db, "content");
+    if (!categoryName) {
+      notFound();
+    }
 
-      queries.push(query(contentCollection, where("category", "==", categoryName)));
-      if (categoryName === "Fun Quizzes") {
-          queries.push(query(contentCollection, where("testType", "==", "Quiz")));
-          queries.push(query(contentCollection, where("testType", "array-contains", "Quiz")));
-      }
-      
-      const querySnapshots = await Promise.all(queries.map(q => getDocs(q)));
-      
-      const contentMap = new Map<string, ContentItem>();
-      querySnapshots.forEach(snapshot => {
-          snapshot.docs.forEach(doc => {
-              if (!contentMap.has(doc.id)) {
-                  const serializedData = serializeFirestoreTimestamps(doc.data());
-                  contentMap.set(doc.id, { id: doc.id, ...serializedData } as ContentItem);
-              }
-          });
-      });
+    let initialContent: ContentItem[] = [];
+    try {
+        const queries = [];
+        const contentCollection = collection(db, "content");
 
-      const fetchedContent = Array.from(contentMap.values());
-      const itemsForCategory = preExistingContent.filter(item => item.category === categoryName);
-      
-      const combinedContent = [...fetchedContent];
-      itemsForCategory.forEach(preExistingItem => {
-          if (!combinedContent.some(dbItem => dbItem.title === preExistingItem.title)) {
-              combinedContent.push(preExistingItem);
-          }
-      });
-      initialContent = combinedContent;
+        queries.push(query(contentCollection, where("category", "==", categoryName)));
+        if (categoryName === "Fun Quizzes") {
+            queries.push(query(contentCollection, where("testType", "==", "Quiz")));
+            queries.push(query(contentCollection, where("testType", "array-contains", "Quiz")));
+        }
+        
+        const querySnapshots = await Promise.all(queries.map(q => getDocs(q)));
+        
+        const contentMap = new Map<string, ContentItem>();
+        querySnapshots.forEach(snapshot => {
+            snapshot.docs.forEach(doc => {
+                if (!contentMap.has(doc.id)) {
+                    const serializedData = serializeFirestoreTimestamps(doc.data());
+                    contentMap.set(doc.id, { id: doc.id, ...serializedData } as ContentItem);
+                }
+            });
+        });
 
-  } catch(error) {
-      console.error("Failed to fetch initial content for category page:", error);
-      // We can proceed with an empty array and let the client show a message
-  }
+        const fetchedContent = Array.from(contentMap.values());
+        const itemsForCategory = preExistingContent.filter(item => item.category === categoryName);
+        
+        const combinedContent = [...fetchedContent];
+        itemsForCategory.forEach(preExistingItem => {
+            if (!combinedContent.some(dbItem => dbItem.title === preExistingItem.title)) {
+                combinedContent.push(preExistingItem);
+            }
+        });
+        initialContent = combinedContent;
 
-  return <CategoryClientPage initialContent={initialContent} initialCategoryName={categoryName} />;
+    } catch(error) {
+        console.error("Failed to fetch initial content for category page:", error);
+        // We can proceed with an empty array and let the client show a message
+    }
+
+    return <CategoryClientPage initialContent={initialContent} initialCategoryName={categoryName} />;
 }

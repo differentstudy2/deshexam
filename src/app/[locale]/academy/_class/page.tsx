@@ -3,10 +3,11 @@ import Script from 'next/script';
 import AcademyClient from '../AcademyClient';
 
 type Props = {
-  params: { class: string };
+  params: Promise<{ class: string }>;
 };
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const params = await props.params;
   const classSlug = params.class;
   const formattedClass = classSlug
     .split('-')
@@ -67,7 +68,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default function ClassAcademyPage({ params }: Props) {
+export default async function ClassAcademyPage(props: Props) {
+  const params = await props.params;
   const classSlug = params.class;
   const formattedClass = classSlug
     .split('-')

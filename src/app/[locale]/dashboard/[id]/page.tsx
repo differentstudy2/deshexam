@@ -1,7 +1,8 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Hammer } from "lucide-react";
 
-export default function ComingSoonPage({ params }: { params: { id: string } }) {
+export default async function ComingSoonPage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const pageName = params.id.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 
   return (

@@ -11,10 +11,10 @@ import { notFound } from 'next/navigation';
 import { formatTitleForBrowser } from '@/lib/utils';
 
 type PageProps = {
-  params: {
+  params: Promise<{
     mockTestId: string;
     bookId: string;
-  };
+  }>;
 };
 
 const serializeFirestoreTimestamps = (data: any): any => {
@@ -51,54 +51,56 @@ async function getPageData(params: PageProps['params']) {
     }
 }
 
-export async function generateMetadata({ params }: PageProps, parent: ResolvingMetadata): Promise<Metadata> {
-  const { textbook, mockTest } = await getPageData(params);
+export async function generateMetadata(props: PageProps, parent: ResolvingMetadata): Promise<Metadata> {
+    const params = await props.params;
+    const { textbook, mockTest } = await getPageData(params);
 
-  if (!mockTest || !textbook) {
+    if (!mockTest || !textbook) {
+      return {
+        title: 'Mock Test Not Found',
+      };
+    }
+
+    const mockTestTitle = formatTitleForBrowser((mockTest as any).title);
+    const textbookTitle = formatTitleForBrowser((textbook as any).title);
+
+    const title = `${mockTestTitle} | ${textbookTitle} | DeshExam`;
+    const description = `Take the interactive mock test "${mockTestTitle}" for the ${textbookTitle} textbook. Check your knowledge and prepare for your exams.`;
+    const keywords = [
+      (mockTest as any).title,
+      textbook.title,
+      (textbook as any).subject,
+      'mock test',
+      'online test',
+    ].filter(Boolean);
+
+    const imageUrl = (textbook as any).featureImage || `https://picsum.photos/seed/${params.mockTestId}/1200/630`;
+
     return {
-      title: 'Mock Test Not Found',
+      title,
+      description,
+      keywords,
+      openGraph: {
+          title,
+          description,
+          url: `https://deshexam.com/textbook-solutions/mock-test/${params.mockTestId}/textbook/${params.bookId}`,
+          images: [{ url: imageUrl, width: 1200, height: 630, alt: title }],
+          type: 'website',
+      },
+      twitter: {
+          card: 'summary_large_image',
+          title,
+          description,
+          images: [imageUrl],
+      },
     };
-  }
-
-  const mockTestTitle = formatTitleForBrowser((mockTest as any).title);
-  const textbookTitle = formatTitleForBrowser((textbook as any).title);
-  
-  const title = `${mockTestTitle} | ${textbookTitle} | DeshExam`;
-  const description = `Take the interactive mock test "${mockTestTitle}" for the ${textbookTitle} textbook. Check your knowledge and prepare for your exams.`;
-  const keywords = [
-    (mockTest as any).title,
-    textbook.title,
-    (textbook as any).subject,
-    'mock test',
-    'online test',
-  ].filter(Boolean);
-
-  const imageUrl = (textbook as any).featureImage || `https://picsum.photos/seed/${params.mockTestId}/1200/630`;
-
-  return {
-    title,
-    description,
-    keywords,
-    openGraph: {
-        title,
-        description,
-        url: `https://deshexam.com/textbook-solutions/mock-test/${params.mockTestId}/textbook/${params.bookId}`,
-        images: [{ url: imageUrl, width: 1200, height: 630, alt: title }],
-        type: 'website',
-    },
-    twitter: {
-        card: 'summary_large_image',
-        title,
-        description,
-        images: [imageUrl],
-    },
-  };
 }
 
 
-export default async function TextbookMockTestPage({ params }: PageProps) {
+export default async function TextbookMockTestPage(props: PageProps) {
+    const params = await props.params;
     const { mockTest, textbook } = await getPageData(params);
-    
+
     if (!mockTest || !textbook) {
         notFound();
     }
@@ -111,7 +113,7 @@ export default async function TextbookMockTestPage({ params }: PageProps) {
     const mockChapter: Chapter = { id: 'null', title: 'Full Textbook', topics: [] , access: 'free'};
     const mockTopic: null = null;
     const cleanTitle = formatTitleForBrowser(initialTest.title);
-    
+
     const jsonLd = [
       {
         "@context": "https://schema.org",

@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, use } from 'react';
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -30,7 +30,8 @@ function getUrlForTest(testType: string, testId: string) {
   return `/${typeSlug}/${testId}`;
 }
 
-export default function ClassPage({ params }: { params: { slug: string } }) {
+export default function ClassPage(props: { params: Promise<{ slug: string }> }) {
+  const params = use(props.params);
   const [content, setContent] = useState<ContentItem[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();

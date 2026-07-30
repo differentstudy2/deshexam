@@ -10,10 +10,10 @@ import MockTestClientPage from './mock-test-client-page';
 import { notFound } from 'next/navigation';
 
 type PageProps = {
-  params: {
+  params: Promise<{
     mockTestId: string;
     bookId: string;
-  };
+  }>;
 };
 
 const serializeFirestoreTimestamps = (data: any): any => {
@@ -50,36 +50,38 @@ async function getPageData(params: PageProps['params']) {
     }
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { textbook, mockTest } = await getPageData(params);
+export async function generateMetadata(props: PageProps): Promise<Metadata> {
+    const params = await props.params;
+    const { textbook, mockTest } = await getPageData(params);
 
-  if (!mockTest || !textbook) {
+    if (!mockTest || !textbook) {
+      return {
+        title: 'Mock Test Not Found',
+      };
+    }
+
+    const title = `Manage: ${(mockTest as any).title} | ${(textbook as any).title} | DeshExam`;
+    const description = `Manage questions for the mock test "${(mockTest as any).title}".`;
+
     return {
-      title: 'Mock Test Not Found',
+      title,
+      description,
+      robots: {
+          index: false,
+          follow: false,
+      },
     };
-  }
-
-  const title = `Manage: ${(mockTest as any).title} | ${(textbook as any).title} | DeshExam`;
-  const description = `Manage questions for the mock test "${(mockTest as any).title}".`;
-
-  return {
-    title,
-    description,
-    robots: {
-        index: false,
-        follow: false,
-    },
-  };
 }
 
 
-export default async function MockTestPage({ params }: PageProps) {
+export default async function MockTestPage(props: PageProps) {
+    const params = await props.params;
     const { mockTest, textbook } = await getPageData(params);
-    
+
     if (!mockTest || !textbook) {
         notFound();
     }
-    
+
     return (
         <Suspense fallback={
             <div className="flex items-center justify-center min-h-screen">

@@ -11,12 +11,12 @@ import MockTestClientPage from './mock-test-client-page';
 import { notFound } from 'next/navigation';
 
 type PageProps = {
-  params: {
+  params: Promise<{
     mockTestId: string;
     bookId: string;
     chapterId: string;
     topicId: string;
-  };
+  }>;
 };
 
 const serializeFirestoreTimestamps = (data: any): any => {
@@ -67,36 +67,38 @@ async function getPageData(params: PageProps['params']) {
     }
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { textbook, chapter, topic, mockTest } = await getPageData(params);
+export async function generateMetadata(props: PageProps): Promise<Metadata> {
+    const params = await props.params;
+    const { textbook, chapter, topic, mockTest } = await getPageData(params);
 
-  if (!mockTest || !textbook || !chapter) {
+    if (!mockTest || !textbook || !chapter) {
+      return {
+        title: 'Mock Test Not Found',
+      };
+    }
+
+    const title = `Manage: ${(mockTest as any).title} | ${topic?.title || chapter.title} | DeshExam`;
+    const description = `Manage questions for the mock test "${(mockTest as any).title}".`;
+
     return {
-      title: 'Mock Test Not Found',
+      title,
+      description,
+      robots: {
+          index: false,
+          follow: false,
+      },
     };
-  }
-
-  const title = `Manage: ${(mockTest as any).title} | ${topic?.title || chapter.title} | DeshExam`;
-  const description = `Manage questions for the mock test "${(mockTest as any).title}".`;
-
-  return {
-    title,
-    description,
-    robots: {
-        index: false,
-        follow: false,
-    },
-  };
 }
 
 
-export default async function MockTestPage({ params }: PageProps) {
+export default async function MockTestPage(props: PageProps) {
+    const params = await props.params;
     const { mockTest, textbook, chapter, topic } = await getPageData(params);
-    
+
     if (!mockTest || !textbook || !chapter) {
         notFound();
     }
-    
+
     // Since questions are part of the mockTest object, we can just use it.
     const initialTest = {
         ...(mockTest as any),

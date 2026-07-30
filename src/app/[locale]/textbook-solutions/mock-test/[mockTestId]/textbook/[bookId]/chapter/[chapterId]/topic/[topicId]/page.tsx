@@ -11,12 +11,12 @@ import { notFound } from 'next/navigation';
 import { formatTitleForBrowser } from '@/lib/utils';
 
 type PageProps = {
-  params: {
+  params: Promise<{
     mockTestId: string;
     bookId: string;
     chapterId: string;
     topicId: string;
-  };
+  }>;
 };
 
 const serializeFirestoreTimestamps = (data: any): any => {
@@ -67,55 +67,57 @@ async function getPageData(params: PageProps['params']) {
     }
 }
 
-export async function generateMetadata({ params }: PageProps, parent: ResolvingMetadata): Promise<Metadata> {
-  const awaitedParams = await params;
-  const { textbook, chapter, topic, mockTest } = await getPageData(awaitedParams);
+export async function generateMetadata(props: PageProps, parent: ResolvingMetadata): Promise<Metadata> {
+    const params = await props.params;
+    const awaitedParams = await params;
+    const { textbook, chapter, topic, mockTest } = await getPageData(awaitedParams);
 
-  if (!mockTest || !textbook || !chapter) {
+    if (!mockTest || !textbook || !chapter) {
+      return {
+        title: 'Mock Test Not Found',
+      };
+    }
+
+    const title = `${formatTitleForBrowser((mockTest as any).title)} | ${topic?.title || chapter.title} | DeshExam`;
+    const description = `Take the interactive mock test "${formatTitleForBrowser((mockTest as any).title)}" for the topic "${topic?.title || chapter.title}" from the ${textbook.title} textbook. Check your knowledge and prepare for your exams.`;
+    const keywords = [
+      (mockTest as any).title,
+      topic?.title || '',
+      chapter.title,
+      textbook.title,
+      (textbook as any).subject,
+      'mock test',
+      'online quiz',
+    ].filter(Boolean);
+
+    const imageUrl = (textbook as any).featureImage || `https://picsum.photos/seed/${params.mockTestId}/1200/630`;
+
     return {
-      title: 'Mock Test Not Found',
+      title,
+      description,
+      keywords,
+      openGraph: {
+          title,
+          description,
+          url: `https://deshexam.com/textbook-solutions/mock-test/${params.mockTestId}/textbook/${params.bookId}/chapter/${params.chapterId}/topic/${params.topicId}`,
+          images: [{ url: imageUrl, width: 1200, height: 630, alt: title }],
+          type: 'website',
+      },
+      twitter: {
+          card: 'summary_large_image',
+          title,
+          description,
+          images: [imageUrl],
+      },
     };
-  }
-
-  const title = `${formatTitleForBrowser((mockTest as any).title)} | ${topic?.title || chapter.title} | DeshExam`;
-  const description = `Take the interactive mock test "${formatTitleForBrowser((mockTest as any).title)}" for the topic "${topic?.title || chapter.title}" from the ${textbook.title} textbook. Check your knowledge and prepare for your exams.`;
-  const keywords = [
-    (mockTest as any).title,
-    topic?.title || '',
-    chapter.title,
-    textbook.title,
-    (textbook as any).subject,
-    'mock test',
-    'online quiz',
-  ].filter(Boolean);
-
-  const imageUrl = (textbook as any).featureImage || `https://picsum.photos/seed/${params.mockTestId}/1200/630`;
-
-  return {
-    title,
-    description,
-    keywords,
-    openGraph: {
-        title,
-        description,
-        url: `https://deshexam.com/textbook-solutions/mock-test/${params.mockTestId}/textbook/${params.bookId}/chapter/${params.chapterId}/topic/${params.topicId}`,
-        images: [{ url: imageUrl, width: 1200, height: 630, alt: title }],
-        type: 'website',
-    },
-    twitter: {
-        card: 'summary_large_image',
-        title,
-        description,
-        images: [imageUrl],
-    },
-  };
 }
 
 
-export default async function MockTestPage({ params }: PageProps) {
+export default async function MockTestPage(props: PageProps) {
+    const params = await props.params;
     const awaitedParams = await params;
     const { mockTest, textbook, chapter, topic } = await getPageData(awaitedParams);
-    
+
     if (!mockTest || !textbook || !chapter) {
         notFound();
     }
@@ -124,7 +126,7 @@ export default async function MockTestPage({ params }: PageProps) {
         ...(mockTest as any),
         testType: 'Mock Test'
     };
-    
+
     const cleanTitle = formatTitleForBrowser(initialTest.title);
 
     const jsonLd = [

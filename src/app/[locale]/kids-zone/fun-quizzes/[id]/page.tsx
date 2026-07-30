@@ -6,7 +6,7 @@ import { notFound } from 'next/navigation';
 import { formatTitleForBrowser } from '@/lib/utils';
 
 type Props = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
 const serializeTimestamps = (data: any): any => {
@@ -27,7 +27,8 @@ const serializeTimestamps = (data: any): any => {
     return data;
 };
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const params = await props.params;
   const quiz = await getContentById(params.id) as any;
   if (!quiz) {
     return { title: 'Quiz Not Found' };
@@ -38,12 +39,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function FunQuizPage({ params }: Props) {
+export default async function FunQuizPage(props: Props) {
+  const params = await props.params;
   const quizData = await getContentById(params.id);
   if (!quizData || quizData.testType !== 'Quiz' || quizData.category !== 'Fun Quizzes') {
     notFound();
   }
-  
+
   const quiz = serializeTimestamps(quizData);
   const cleanTitle = formatTitleForBrowser(quiz.title);
 

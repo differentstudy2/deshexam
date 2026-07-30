@@ -6,6 +6,7 @@ import { useForm, SubmitHandler, useFieldArray, Controller } from 'react-hook-fo
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import {
   Card,
   CardContent,
@@ -622,7 +623,7 @@ function AddContentForm() {
 
       let chapterName = data.chapter;
       if (data.chapter === 'add_new_chapter' && data.newChapterName && subjectId) {
-        await addChapter(subjectId, { chapterName: data.newChapterName });
+        await addChapter(subjectId, { chapterNo: '', chapterName: data.newChapterName });
         chapterName = data.newChapterName;
         setIsAddingNewChapter(false);
       }
@@ -711,7 +712,7 @@ function AddContentForm() {
          });
       }
       
-      fetchFormData();
+      // fetchFormData();
 
     } catch (error) {
        toast({
@@ -1475,7 +1476,7 @@ function AddContentForm() {
                                                       {[0, 1, 2, 3].map(optionIndex => (
                                                           <div key={optionIndex} className="flex items-start gap-4">
                                                               <FormControl>
-                                                                  <RadioGroupItem value={form.getValues(`questions.${index}.options.${optionIndex}.text`)} className="mt-2.5" />
+                                                                  <RadioGroupItem value={form.getValues(`questions.${index}.options.${optionIndex}.text`) || ""} className="mt-2.5" />
                                                               </FormControl>
                                                                <div className="space-y-2 flex-1">
                                                                   <FormField
@@ -1491,7 +1492,7 @@ function AddContentForm() {
                                                   </RadioGroup>
                                               )}
                                           />
-                                          <FormMessage>{form.formState.errors.questions?.[index]?.correctAnswer?.message}</FormMessage>
+                                          <FormMessage>{String(form.formState.errors.questions?.[index]?.correctAnswer?.message || "")}</FormMessage>
 
                                       </div>
                                   )}

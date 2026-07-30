@@ -10,10 +10,10 @@ import PracticeSetClientPage from '@/app/[locale]/textbook-solutions/practice-se
 import { notFound } from 'next/navigation';
 
 type PageProps = {
-  params: {
+  params: Promise<{
     practiceSetId: string;
     bookId: string;
-  };
+  }>;
 };
 
 const serializeFirestoreTimestamps = (data: any): any => {
@@ -51,40 +51,42 @@ async function getPageData(params: PageProps['params']) {
     }
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { textbook, practiceSet } = await getPageData(params);
+export async function generateMetadata(props: PageProps): Promise<Metadata> {
+    const params = await props.params;
+    const { textbook, practiceSet } = await getPageData(params);
 
-  if (!practiceSet || !textbook) {
+    if (!practiceSet || !textbook) {
+      return {
+        title: 'Practice Set Not Found',
+      };
+    }
+
+    const title = `${(practiceSet as any).title} | ${(textbook as any).title} | DeshExam`;
+    const description = `Take the practice set "${(practiceSet as any).title}" for the ${textbook.title} textbook. Check your knowledge and prepare for your exams.`;
+    const keywords = [
+      (practiceSet as any).title,
+      textbook.title,
+      (textbook as any).subject,
+      'practice set',
+      'online test',
+    ].filter(Boolean);
+
     return {
-      title: 'Practice Set Not Found',
+      title,
+      description,
+      keywords,
     };
-  }
-
-  const title = `${(practiceSet as any).title} | ${(textbook as any).title} | DeshExam`;
-  const description = `Take the practice set "${(practiceSet as any).title}" for the ${textbook.title} textbook. Check your knowledge and prepare for your exams.`;
-  const keywords = [
-    (practiceSet as any).title,
-    textbook.title,
-    (textbook as any).subject,
-    'practice set',
-    'online test',
-  ].filter(Boolean);
-
-  return {
-    title,
-    description,
-    keywords,
-  };
 }
 
 
-export default async function TextbookPracticeSetPage({ params }: PageProps) {
+export default async function TextbookPracticeSetPage(props: PageProps) {
+    const params = await props.params;
     const { practiceSet, textbook } = await getPageData(params);
-    
+
     if (!practiceSet || !textbook) {
         notFound();
     }
-    
+
     const questionsData = await getQuestionsByPracticeSet(params.bookId, 'null', 'null', params.practiceSetId);
     const questions = serializeFirestoreTimestamps(questionsData);
 

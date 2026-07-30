@@ -7,14 +7,12 @@ import { notFound } from 'next/navigation';
 import { formatTitleForBrowser } from '@/lib/utils';
 
 type Props = {
-  params: { id: string };
-  searchParams: { [key: string]: string | string[] | undefined };
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
-export async function generateMetadata(
-  { params }: Props,
-  parent: ResolvingMetadata
-): Promise<Metadata> {
+export async function generateMetadata(props: Props, parent: ResolvingMetadata): Promise<Metadata> {
+  const params = await props.params;
   const { id } = params;
   const test: any = await getContentById(id);
 
@@ -37,14 +35,15 @@ export async function generateMetadata(
   };
 }
 
-export default async function TestPage({ params }: Props) {
+export default async function TestPage(props: Props) {
+  const params = await props.params;
   const { id } = params;
   const testData: any = await getContentById(id);
 
   if (!testData) {
     notFound();
   }
-  
+
   // Serialize Firestore Timestamps
   const test: any = {
       ...testData,

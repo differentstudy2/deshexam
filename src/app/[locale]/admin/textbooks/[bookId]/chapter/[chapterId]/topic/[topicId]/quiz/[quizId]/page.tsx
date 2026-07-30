@@ -10,12 +10,12 @@ import QuizClientPage from './quiz-client-page';
 import { notFound } from 'next/navigation';
 
 type PageProps = {
-  params: {
+  params: Promise<{
     quizId: string;
     bookId: string;
     chapterId: string;
     topicId: string;
-  };
+  }>;
 };
 
 const serializeFirestoreTimestamps = (data: any): any => {
@@ -66,36 +66,38 @@ async function getPageData(params: PageProps['params']) {
     }
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { textbook, chapter, topic, quiz } = await getPageData(params);
+export async function generateMetadata(props: PageProps): Promise<Metadata> {
+    const params = await props.params;
+    const { textbook, chapter, topic, quiz } = await getPageData(params);
 
-  if (!quiz || !textbook || !chapter) {
+    if (!quiz || !textbook || !chapter) {
+      return {
+        title: 'Quiz Not Found',
+      };
+    }
+
+    const title = `Manage: ${(quiz as any).title} | ${topic?.title || chapter.title} | DeshExam`;
+    const description = `Manage questions for the quiz "${(quiz as any).title}".`;
+
     return {
-      title: 'Quiz Not Found',
+      title,
+      description,
+      robots: {
+          index: false,
+          follow: false,
+      },
     };
-  }
-
-  const title = `Manage: ${(quiz as any).title} | ${topic?.title || chapter.title} | DeshExam`;
-  const description = `Manage questions for the quiz "${(quiz as any).title}".`;
-
-  return {
-    title,
-    description,
-    robots: {
-        index: false,
-        follow: false,
-    },
-  };
 }
 
 
-export default async function QuizPage({ params }: PageProps) {
+export default async function QuizPage(props: PageProps) {
+    const params = await props.params;
     const { quiz, textbook, chapter, topic } = await getPageData(params);
-    
+
     if (!quiz || !textbook || !chapter) {
         notFound();
     }
-    
+
     return (
         <Suspense fallback={
             <div className="flex items-center justify-center min-h-screen">

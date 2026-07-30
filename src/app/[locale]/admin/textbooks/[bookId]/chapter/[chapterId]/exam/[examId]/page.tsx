@@ -10,11 +10,11 @@ import ExamClientPage from './exam-client-page';
 import { notFound } from 'next/navigation';
 
 type PageProps = {
-  params: {
+  params: Promise<{
     examId: string;
     bookId: string;
     chapterId: string;
-  };
+  }>;
 };
 
 const serializeFirestoreTimestamps = (data: any): any => {
@@ -61,36 +61,38 @@ async function getPageData(params: PageProps['params']) {
     }
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { textbook, chapter, exam } = await getPageData(params);
+export async function generateMetadata(props: PageProps): Promise<Metadata> {
+    const params = await props.params;
+    const { textbook, chapter, exam } = await getPageData(params);
 
-  if (!exam || !textbook) {
+    if (!exam || !textbook) {
+      return {
+        title: 'Exam Not Found',
+      };
+    }
+
+    const title = `Manage: ${(exam as any).title} | ${chapter?.title || textbook.title} | DeshExam`;
+    const description = `Manage questions for the exam "${(exam as any).title}".`;
+
     return {
-      title: 'Exam Not Found',
+      title,
+      description,
+      robots: {
+          index: false,
+          follow: false,
+      },
     };
-  }
-
-  const title = `Manage: ${(exam as any).title} | ${chapter?.title || textbook.title} | DeshExam`;
-  const description = `Manage questions for the exam "${(exam as any).title}".`;
-
-  return {
-    title,
-    description,
-    robots: {
-        index: false,
-        follow: false,
-    },
-  };
 }
 
 
-export default async function ChapterExamPage({ params }: PageProps) {
+export default async function ChapterExamPage(props: PageProps) {
+    const params = await props.params;
     const { exam, textbook, chapter } = await getPageData(params);
-    
+
     if (!exam || !textbook) {
         notFound();
     }
-    
+
     return (
         <Suspense fallback={
             <div className="flex items-center justify-center min-h-screen">

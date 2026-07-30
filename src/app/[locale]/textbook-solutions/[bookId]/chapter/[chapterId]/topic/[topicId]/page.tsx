@@ -9,7 +9,10 @@ import TopicClientPage from './topic-client-page';
 
 // Although this is now mainly a client-side route,
 // keeping a lightweight metadata function can still be beneficial.
-export async function generateMetadata({ params }: { params: { bookId: string; chapterId: string; topicId: string } }) {
+export async function generateMetadata(
+    props: { params: Promise<{ bookId: string; chapterId: string; topicId: string }> }
+) {
+    const params = await props.params;
     try {
         const topicRef = doc(db, `textbooks/${params.bookId}/chapters/${params.chapterId}/topics`, params.topicId);
         const topicSnap = await getDoc(topicRef);
@@ -27,10 +30,10 @@ export async function generateMetadata({ params }: { params: { bookId: string; c
             description: "Learn more about this topic.",
         };
     }
-     return {
-        title: "Topic",
-        description: "Learn more about this topic.",
-    };
+    return {
+       title: "Topic",
+       description: "Learn more about this topic.",
+   };
 }
 
 

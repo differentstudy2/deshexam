@@ -7,22 +7,24 @@ import { ArrowLeft, Star, MessageSquare } from 'lucide-react';
 import { AllReviewsList } from './AllReviewsList';
 
 interface PageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata(props: PageProps): Promise<Metadata> {
+  const params = await props.params;
   const test = await getAssessmentBySlug('mockTests', params.slug) as MockTest | null;
   if (!test) return { title: 'Not Found' };
-  
+
   return {
     title: `All Reviews - ${test.title} | DeshExam`,
     description: `Read all student reviews and ratings for the ${test.title} mock test.`,
   };
 }
 
-export default async function AllReviewsPage({ params }: PageProps) {
+export default async function AllReviewsPage(props: PageProps) {
+  const params = await props.params;
   const test = await getAssessmentBySlug('mockTests', params.slug) as MockTest;
 
   if (!test) {

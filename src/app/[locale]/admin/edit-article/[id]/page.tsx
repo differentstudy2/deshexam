@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, use } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -41,7 +41,8 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-export default function EditArticlePage({ params }: { params: { id: string } }) {
+export default function EditArticlePage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params);
   const { toast } = useToast();
   const router = useRouter();
   const { id: contentId } = params;
@@ -119,7 +120,7 @@ export default function EditArticlePage({ params }: { params: { id: string } }) 
       });
     }
   }
-  
+
   if (loading) {
     return (
         <div className="flex h-full items-center justify-center">
