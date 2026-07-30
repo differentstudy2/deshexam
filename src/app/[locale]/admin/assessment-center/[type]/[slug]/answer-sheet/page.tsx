@@ -19,7 +19,7 @@ import PresentationOverlay from '@/components/assessment/PresentationOverlay';
 import { QRCodeSVG } from 'qrcode.react';
 import { CACHE_SETTINGS } from '@/lib/cache-settings';
 
-export const revalidate = CACHE_SETTINGS.ASSESSMENT_TAKE_PAGE;
+export const revalidate = 3600;
 
 const bnOptionsMap: Record<string, string> = {
     a: 'ক',

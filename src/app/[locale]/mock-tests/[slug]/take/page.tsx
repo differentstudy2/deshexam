@@ -9,7 +9,7 @@ import { Metadata, ResolvingMetadata } from 'next';
 import { formatTitleForBrowser } from '@/lib/utils';
 
 import { CACHE_SETTINGS } from '@/lib/cache-settings';
-export const revalidate = CACHE_SETTINGS.ASSESSMENT_TAKE_PAGE;
+export const revalidate = 3600;
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }, parent: ResolvingMetadata): Promise<Metadata> {
   const { slug } = await params;
