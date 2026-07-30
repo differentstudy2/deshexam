@@ -23,7 +23,7 @@ import remarkGfm from 'remark-gfm';
 type Props = { params: Promise<{ slug: string }> };
 
 import { CACHE_SETTINGS } from '@/lib/cache-settings';
-export const revalidate = CACHE_SETTINGS.ASSESSMENT_DETAIL_PAGE;
+export const revalidate = 2592000;
 
 export async function generateMetadata({ params }: Props, parent: ResolvingMetadata): Promise<Metadata> {
   const { slug } = await params;
