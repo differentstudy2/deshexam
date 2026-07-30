@@ -34,6 +34,8 @@ if (!getApps().some(app => app.name === adminAppName)) {
 
 const db = getFirestore(adminApp);
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     let successCount = 0;

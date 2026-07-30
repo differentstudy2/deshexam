@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { collection, getDocs, writeBatch, query, where } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const testsSnap = await getDocs(collection(db, 'mock_tests'));

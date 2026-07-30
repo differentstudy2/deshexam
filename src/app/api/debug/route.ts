@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getAssessments } from '@/lib/firebase/assessment';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const quizzes = await getAssessments('quizzes');
