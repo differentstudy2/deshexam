@@ -31,7 +31,6 @@ export interface Challenge {
   rewardXp: number;
   createdAt: any;
   expiresAt: any;
-  classId?: string;
   topicIds?: string[]; // Optional for backwards compatibility
 }
 

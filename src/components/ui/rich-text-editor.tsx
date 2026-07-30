@@ -52,26 +52,34 @@ export function RichTextEditor({ content, onChange, minHeight = '150px', maxHeig
       <div className="bg-gray-50 border-b border-gray-300 p-2 flex items-center gap-1 flex-wrap">
         <Button 
           type="button" variant="ghost" size="sm" className={`h-8 w-8 p-0 ${editor.isActive('bold') ? 'bg-gray-200' : ''}`}
-          onClick={() => editor.chain().focus().toggleBold().run()}
+          onClick={() => (editor.chain().focus() as any).toggleBold().run()}
         ><Bold className="w-4 h-4" /></Button>
         <Button 
           type="button" variant="ghost" size="sm" className={`h-8 w-8 p-0 ${editor.isActive('italic') ? 'bg-gray-200' : ''}`}
-          onClick={() => editor.chain().focus().toggleItalic().run()}
+          onClick={() => (editor.chain().focus() as any).toggleItalic().run()}
         ><Italic className="w-4 h-4" /></Button>
         
         <div className="w-px h-4 bg-gray-300 mx-1" />
         
         <Button 
           type="button" variant="ghost" size="sm" className={`h-8 w-8 p-0 ${editor.isActive('heading', { level: 2 }) ? 'bg-gray-200' : ''}`}
-          onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+          onClick={() => (editor.chain().focus() as any).toggleHeading({ level: 2 }).run()}
         ><Heading2 className="w-4 h-4" /></Button>
+        <Button 
+          type="button" variant="ghost" size="sm" className={`h-8 w-8 p-0 ${editor.isActive('heading', { level: 3 }) ? 'bg-gray-200' : ''}`}
+          onClick={() => (editor.chain().focus() as any).toggleHeading({ level: 3 }).run()}
+        ><Heading3 className="w-4 h-4" /></Button>
         
         <div className="w-px h-4 bg-gray-300 mx-1" />
         
         <Button 
           type="button" variant="ghost" size="sm" className={`h-8 w-8 p-0 ${editor.isActive('bulletList') ? 'bg-gray-200' : ''}`}
-          onClick={() => editor.chain().focus().toggleBulletList().run()}
+          onClick={() => (editor.chain().focus() as any).toggleBulletList().run()}
         ><List className="w-4 h-4" /></Button>
+        <Button 
+          type="button" variant="ghost" size="sm" className={`h-8 w-8 p-0 ${editor.isActive('orderedList') ? 'bg-gray-200' : ''}`}
+          onClick={() => (editor.chain().focus() as any).toggleOrderedList().run()}
+        ><ListOrdered className="w-4 h-4" /></Button>
       </div>
 
       {/* Editor Content */}
