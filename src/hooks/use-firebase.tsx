@@ -9,12 +9,12 @@ import { getStorage, FirebaseStorage } from 'firebase/storage';
 import { getMessaging, Messaging } from 'firebase/messaging';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAzSss2t5UoydcGRh4CJ41VvE4x-t0Ikrc",
-  authDomain: "studio-8356746366-699c1.firebaseapp.com",
-  projectId: "studio-8356746366-699c1",
-  storageBucket: "studio-8356746366-699c1.firebasestorage.app",
-  messagingSenderId: "643911224795",
-  appId: "1:643911224795:web:ea10a865635776d4932bfe"
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
 };
 
 interface FirebaseContextType {
