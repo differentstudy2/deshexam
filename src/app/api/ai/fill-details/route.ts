@@ -1,3 +1,4 @@
+import { verifyAuthToken } from '@/lib/firebase/auth-server';
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
@@ -51,6 +52,11 @@ You MUST respond with ONLY a raw JSON object — no markdown, no code fences, no
 
 export async function POST(request: Request) {
   try {
+    const decodedToken = await verifyAuthToken(request as any);
+    if (!decodedToken) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { name, address } = await request.json();
 
     if (!name) {

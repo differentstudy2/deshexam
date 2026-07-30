@@ -1,5 +1,6 @@
 'use client';
 
+import { fetchWithAuth } from '@/lib/fetch-with-auth';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Star, ThumbsUp, ThumbsDown, MessageSquare, Loader2, BadgeCheck, Sparkles } from 'lucide-react';
@@ -162,7 +163,7 @@ export function MockTestReviews({ testId, slug, stats, testTitle, testType, test
         prompt += 'The review should be critical, mentioning issues like confusing questions, bad explanations, or technical glitches.';
       }
 
-      const res = await fetch('/api/ai/generate', {
+      const res = await fetchWithAuth('/api/ai/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt })

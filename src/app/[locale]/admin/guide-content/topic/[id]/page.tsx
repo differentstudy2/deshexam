@@ -1,5 +1,6 @@
 'use client';
 
+import { fetchWithAuth } from '@/lib/fetch-with-auth';
 import React, { useState, useEffect, use } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -257,7 +258,7 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
     
     setIsTranslating(true);
     try {
-      const res = await fetch('/api/admin/translate', {
+      const res = await fetchWithAuth('/api/admin/translate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: sourceContent, targetLanguage: 'English' })

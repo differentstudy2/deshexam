@@ -1,5 +1,6 @@
 'use client';
 
+import { fetchWithAuth } from '@/lib/fetch-with-auth';
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { getTaxonomyNodeById, updateTaxonomyNode, TaxonomyNode } from '@/lib/firebase/taxonomy';
@@ -281,7 +282,7 @@ export default function InstitutionEditPage() {
     toast({ title: 'AI is searching...', description: 'Please wait while AI gathers data from the web.' });
     
     try {
-      const res = await fetch('/api/ai/fill-details', {
+      const res = await fetchWithAuth('/api/ai/fill-details', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: formData.title, address: formData.address || formData.headquarters }),
@@ -324,7 +325,7 @@ export default function InstitutionEditPage() {
     if (!formData.reviews || formData.reviews.length === 0) return;
     setIsSummarizing(true);
     try {
-      const response = await fetch('/api/ai/summarize-reviews', {
+      const response = await fetchWithAuth('/api/ai/summarize-reviews', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ reviews: formData.reviews, institutionName: formData.title || formData.acronym }),
@@ -344,7 +345,7 @@ export default function InstitutionEditPage() {
   const handleGenerateReviews = async (count: number) => {
     setIsGeneratingReviews(true);
     try {
-      const response = await fetch('/api/ai/generate-reviews', {
+      const response = await fetchWithAuth('/api/ai/generate-reviews', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ institutionName: formData.title || formData.acronym, count, language: reviewLanguage }),

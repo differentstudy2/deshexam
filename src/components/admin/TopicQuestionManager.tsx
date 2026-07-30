@@ -1,5 +1,6 @@
 'use client';
 
+import { fetchWithAuth } from '@/lib/fetch-with-auth';
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -307,7 +308,7 @@ Language: ${aiSettings.language}
 Additional Instructions / Context:
 ${aiPrompt}`;
 
-          const res = await fetch('/api/ai/generate-mcq', {
+          const res = await fetchWithAuth('/api/ai/generate-mcq', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ prompt: finalPrompt })

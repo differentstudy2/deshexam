@@ -1,5 +1,6 @@
 'use client';
 
+import { fetchWithAuth } from '@/lib/fetch-with-auth';
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -499,7 +500,7 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
       }
       setIsGeneratingAI(true);
       try {
-          const res = await fetch('/api/ai/generate-explanation', {
+          const res = await fetchWithAuth('/api/ai/generate-explanation', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
@@ -579,7 +580,7 @@ Output the result as a strict JSON object with NO markdown formatting, NO markdo
   }
 If the Question Type is not MCQ, you can omit the options and optionExplanations objects or leave them empty. For T/F, use options 'a': 'True', 'b': 'False'.`;
 
-          const res = await fetch('/api/ai/generate', {
+          const res = await fetchWithAuth('/api/ai/generate', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ prompt })

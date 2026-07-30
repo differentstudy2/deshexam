@@ -1,4 +1,5 @@
 'use client';
+import { fetchWithAuth } from '@/lib/fetch-with-auth';
 import React, { useCallback } from 'react';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage } from '@/lib/firebase/client';
@@ -513,7 +514,7 @@ export function TiptapEditor({ content, onChange, maxHeight }: { content: string
         const snapshot = await uploadBytes(storageRef, aiFile);
         const url = await getDownloadURL(snapshot.ref);
 
-        response = await fetch('/api/ai/generate-from-file', {
+        response = await fetchWithAuth('/api/ai/generate-from-file', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -523,7 +524,7 @@ export function TiptapEditor({ content, onChange, maxHeight }: { content: string
           }),
         });
       } else {
-        response = await fetch('/api/ai/generate', {
+        response = await fetchWithAuth('/api/ai/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

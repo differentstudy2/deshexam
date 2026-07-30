@@ -1,7 +1,13 @@
+import { verifyAuthToken } from '@/lib/firebase/auth-server';
 import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
   try {
+    const decodedToken = await verifyAuthToken(req as any);
+    if (!decodedToken) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { text, targetLanguage = 'English' } = await req.json();
 
     if (!text) {

@@ -1,3 +1,4 @@
+import { verifyAuthToken } from '@/lib/firebase/auth-server';
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
@@ -5,6 +6,11 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
 export async function POST(req: NextRequest) {
   try {
+    const decodedToken = await verifyAuthToken(req as any);
+    if (!decodedToken) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { institutionName, count, language = 'English' } = await req.json();
 
     if (!institutionName || !count) {

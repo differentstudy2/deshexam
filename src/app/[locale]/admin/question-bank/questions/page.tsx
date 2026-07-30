@@ -1,5 +1,6 @@
 'use client';
 
+import { fetchWithAuth } from '@/lib/fetch-with-auth';
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -349,7 +350,7 @@ export default function QuestionBankQuestionsPage() {
       }
       setIsGeneratingAI(true);
       try {
-          const res = await fetch('/api/ai/generate-explanation', {
+          const res = await fetchWithAuth('/api/ai/generate-explanation', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({

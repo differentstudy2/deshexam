@@ -1,5 +1,6 @@
 "use client";
 
+import { fetchWithAuth } from '@/lib/fetch-with-auth';
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -121,7 +122,7 @@ export const FAQForm = ({ initialData, onSubmit, isSubmitting, title }: FAQFormP
     if (!aiTopic.trim()) return;
     try {
       setIsGenerating(true);
-      const res = await fetch("/api/ai/generate-faq", {
+      const res = await fetchWithAuth("/api/ai/generate-faq", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ topic: aiTopic }),

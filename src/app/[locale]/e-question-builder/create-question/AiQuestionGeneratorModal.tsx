@@ -1,3 +1,4 @@
+import { fetchWithAuth } from '@/lib/fetch-with-auth';
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -34,7 +35,7 @@ export function AiQuestionGeneratorModal({ isOpen, onClose, onAdd, appLanguage }
       // Append language instruction to the prompt
       const finalPrompt = `${prompt}\n\nPlease generate the questions in the following language: ${language === 'bn' ? 'Bengali' : language === 'hi' ? 'Hindi' : 'English'}.`;
 
-      const response = await fetch('/api/ai/generate-mcq', {
+      const response = await fetchWithAuth('/api/ai/generate-mcq', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt: finalPrompt })
