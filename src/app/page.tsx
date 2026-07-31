@@ -15,7 +15,13 @@ import {
   FileQuestion,
   GraduationCap,
   MonitorPlay,
-  ClipboardList
+  ClipboardList,
+  Timer,
+  Activity,
+  Trophy,
+  Target,
+  Sparkles,
+  BookMarked
 } from "lucide-react";
 import type { Metadata } from 'next';
 import { getSearchActionSchema, getOrganizationSchema, getFAQSchema } from '@/lib/seo/json-ld';
@@ -68,79 +74,122 @@ const smartFeatures = [
 
 const trendingCourses = [
   {
-    title: "Basic Accounting Course",
-    instructor: "Md. Hasan Mahmud",
-    rating: 4.8,
-    reviews: 120,
-    students: "12,000+",
-    price: "₹ 1000",
-    image: "https://picsum.photos/seed/course1/400/250"
-  },
-  {
-    title: "English Grammar Mastery",
-    instructor: "Sarah Rahman",
+    title: "BCS Preliminary Complete Preparation",
+    instructor: "Md. Hasan Mahmud (BCS Cadre)",
     rating: 4.9,
-    reviews: 250,
-    students: "15,000+",
+    reviews: 1250,
+    students: "25,000+",
     price: "₹ 1500",
-    image: "https://picsum.photos/seed/course2/400/250"
+    image: "https://images.unsplash.com/photo-1501504905252-473c47e087f8?w=500&q=80"
   },
   {
-    title: "Advanced Mathematics",
-    instructor: "Dr. Ahmed",
-    rating: 4.7,
-    reviews: 80,
-    students: "8,000+",
-    price: "₹ 2000",
-    image: "https://picsum.photos/seed/course3/400/250"
+    title: "HSC English 2nd Paper Masterclass",
+    instructor: "Sarah Rahman",
+    rating: 4.8,
+    reviews: 850,
+    students: "18,000+",
+    price: "₹ 1000",
+    image: "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=500&q=80"
   },
   {
-    title: "Physics for HSC",
+    title: "Medical Admission Crash Course",
+    instructor: "Dr. Ahmed & Team",
+    rating: 4.9,
+    reviews: 2100,
+    students: "12,000+",
+    price: "₹ 3000",
+    image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=500&q=80"
+  },
+  {
+    title: "Bank Job Math Magic Course",
     instructor: "Prof. Kabir",
-    rating: 4.6,
-    reviews: 95,
-    students: "10,000+",
+    rating: 4.7,
+    reviews: 650,
+    students: "9,000+",
     price: "₹ 1200",
-    image: "https://picsum.photos/seed/course4/400/250"
+    image: "https://images.unsplash.com/photo-1596495578065-6e0763fa1178?w=500&q=80"
+  }
+];
+
+const mockTestsData = [
+  {
+    title: "46th BCS Preliminary Mega Model Test",
+    category: "BCS",
+    questions: 100,
+    time: "120 Min",
+    difficulty: "Hard",
+    enrolled: "5.2k+",
+    price: "₹ 50",
+    image: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=500&q=80"
+  },
+  {
+    title: "HSC Physics Final Quiz Contest",
+    category: "HSC / Alim",
+    questions: 50,
+    time: "60 Min",
+    difficulty: "Medium",
+    enrolled: "12k+",
+    price: "Free",
+    image: "https://images.unsplash.com/photo-1632571401005-458e9d244591?w=500&q=80"
+  },
+  {
+    title: "Primary Assistant Teacher Exam - Set A",
+    category: "Job Preparation",
+    questions: 80,
+    time: "90 Min",
+    difficulty: "Medium",
+    enrolled: "8.5k+",
+    price: "₹ 30",
+    image: "https://images.unsplash.com/photo-1577563908411-5077b6dc7624?w=500&q=80"
+  },
+  {
+    title: "DU Ka-Unit Admission Mock Test",
+    category: "Admission",
+    questions: 100,
+    time: "100 Min",
+    difficulty: "Hard",
+    enrolled: "15k+",
+    price: "₹ 100",
+    image: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=500&q=80"
   }
 ];
 
 const bookCollection = [
   {
-    title: "Previous Year Question Solutions (SSC)",
-    author: "DeshExam",
-    rating: 4.5,
-    reviews: 45,
-    price: "₹ 150",
-    oldPrice: "₹ 200",
-    image: "https://picsum.photos/seed/book1/300/400"
-  },
-  {
-    title: "Model Test Papers (HSC)",
-    author: "DeshExam",
+    title: "45th BCS Question Bank Solution",
+    author: "DeshExam Publication",
     rating: 4.8,
-    reviews: 112,
+    reviews: 445,
     price: "₹ 250",
     oldPrice: "₹ 300",
-    image: "https://picsum.photos/seed/book2/300/400"
+    image: "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=500&q=80"
   },
   {
-    title: "Admission Guide - English",
-    author: "DeshExam",
+    title: "HSC Physics 1st Paper Note",
+    author: "DeshExam Academics",
     rating: 4.9,
-    reviews: 300,
-    price: "₹ 350",
-    oldPrice: "₹ 400",
-    image: "https://picsum.photos/seed/book3/300/400"
+    reviews: 812,
+    price: "₹ 150",
+    oldPrice: "₹ 200",
+    image: "https://images.unsplash.com/photo-1532012197267-da84d127e765?w=500&q=80"
   },
   {
-    title: "Admission Guide - Physics",
-    author: "DeshExam",
+    title: "DU Admission Master Guide",
+    author: "DeshExam University Team",
     rating: 4.7,
-    reviews: 150,
-    price: "₹ 300",
-    oldPrice: "₹ 350",
-    image: "https://picsum.photos/seed/book4/300/400"
+    reviews: 630,
+    price: "₹ 450",
+    oldPrice: "₹ 600",
+    image: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=500&q=80"
+  },
+  {
+    title: "Primary Teacher Exam Suggestion",
+    author: "DeshExam Job Prep",
+    rating: 4.6,
+    reviews: 350,
+    price: "₹ 120",
+    oldPrice: "₹ 180",
+    image: "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=500&q=80"
   }
 ];
 
@@ -207,34 +256,34 @@ export default function Home() {
           </h1>
           <p className="text-lg md:text-xl text-[#00a651] mb-12">The Largest Online Learning Platform in Bangladesh</p>
           
-          <div className="flex flex-wrap justify-center gap-6 md:gap-12">
-            <div className="flex items-center gap-3 text-white">
-              <div className="bg-blue-600 p-3 rounded-full">
-                <FileQuestion className="w-6 h-6" />
+          <div className="flex flex-wrap justify-center gap-6 md:gap-10 mt-12 relative z-10">
+            <div className="flex items-center gap-4 text-white bg-white/10 backdrop-blur-lg border border-white/20 px-6 py-4 rounded-3xl hover:bg-white/20 hover:-translate-y-2 transition-all duration-300 shadow-2xl">
+              <div className="bg-gradient-to-br from-green-400 to-[#00a651] p-4 rounded-full shadow-lg border border-white/20">
+                <FileQuestion className="w-7 h-7 text-white drop-shadow-sm" />
               </div>
               <div className="text-left">
-                <h3 className="text-xl md:text-2xl font-bold">2M+</h3>
-                <p className="text-sm text-gray-300">Questions</p>
+                <h3 className="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-green-200">2M+</h3>
+                <p className="text-xs md:text-sm font-semibold text-blue-100 uppercase tracking-widest mt-0.5">Questions</p>
               </div>
             </div>
             
-            <div className="flex items-center gap-3 text-white">
-              <div className="bg-blue-500 p-3 rounded-full">
-                <Users className="w-6 h-6" />
+            <div className="flex items-center gap-4 text-white bg-white/10 backdrop-blur-lg border border-white/20 px-6 py-4 rounded-3xl hover:bg-white/20 hover:-translate-y-2 transition-all duration-300 shadow-2xl">
+              <div className="bg-gradient-to-br from-[#FF9933] to-orange-500 p-4 rounded-full shadow-lg border border-white/20">
+                <Users className="w-7 h-7 text-white drop-shadow-sm" />
               </div>
               <div className="text-left">
-                <h3 className="text-xl md:text-2xl font-bold">6M+</h3>
-                <p className="text-sm text-gray-300">Students</p>
+                <h3 className="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-orange-100">6M+</h3>
+                <p className="text-xs md:text-sm font-semibold text-blue-100 uppercase tracking-widest mt-0.5">Students</p>
               </div>
             </div>
             
-            <div className="flex items-center gap-3 text-white">
-              <div className="bg-blue-400 p-3 rounded-full">
-                <BookOpen className="w-6 h-6" />
+            <div className="flex items-center gap-4 text-white bg-white/10 backdrop-blur-lg border border-white/20 px-6 py-4 rounded-3xl hover:bg-white/20 hover:-translate-y-2 transition-all duration-300 shadow-2xl">
+              <div className="bg-gradient-to-br from-blue-400 to-blue-600 p-4 rounded-full shadow-lg border border-white/20">
+                <BookOpen className="w-7 h-7 text-white drop-shadow-sm" />
               </div>
               <div className="text-left">
-                <h3 className="text-xl md:text-2xl font-bold">100K+</h3>
-                <p className="text-sm text-gray-300">Contents</p>
+                <h3 className="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-blue-200">100K+</h3>
+                <p className="text-xs md:text-sm font-semibold text-blue-100 uppercase tracking-widest mt-0.5">Contents</p>
               </div>
             </div>
           </div>
@@ -335,8 +384,65 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Trending Courses */}
+      {/* Mock Tests & Quizzes */}
       <section className="py-12 md:py-20 container mx-auto px-4 max-w-6xl">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+          <div>
+            <h2 className="text-3xl font-bold text-[#00a651] flex items-center gap-2">
+              <Target className="w-8 h-8" /> Mock Tests & Quizzes
+            </h2>
+            <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Assess your preparation with realistic model tests</p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+             <Badge variant="outline" className="bg-[#00a651] text-white border-none cursor-pointer px-4 py-1 text-xs">All Exams</Badge>
+             <Badge variant="outline" className="bg-[#e8f5e9] dark:bg-slate-800 text-[#00a651] border-none hover:bg-green-100 cursor-pointer px-4 py-1 text-xs">BCS</Badge>
+             <Badge variant="outline" className="bg-[#e8f5e9] dark:bg-slate-800 text-[#00a651] border-none hover:bg-green-100 cursor-pointer px-4 py-1 text-xs">Admission</Badge>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {mockTestsData.map((test, idx) => (
+            <Card key={idx} className="group overflow-hidden hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800 relative">
+              <div className="absolute top-3 right-3 z-10">
+                 <Badge className={`${test.difficulty === 'Hard' ? 'bg-red-500 hover:bg-red-600' : 'bg-orange-500 hover:bg-orange-600'} text-[10px] border-none px-2 shadow-md`}>
+                   {test.difficulty}
+                 </Badge>
+              </div>
+              <div className="relative h-40 w-full overflow-hidden">
+                <Image src={test.image} alt={test.title} fill className="object-cover group-hover:scale-110 transition-transform duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
+                <div className="absolute bottom-3 left-3 text-white flex items-center gap-1.5">
+                  <Badge variant="outline" className="bg-white/20 backdrop-blur-sm border-white/30 text-white text-[10px] px-2">{test.category}</Badge>
+                </div>
+              </div>
+              <CardContent className="p-5">
+                <h3 className="font-bold text-gray-800 dark:text-gray-100 line-clamp-2 mb-3 min-h-[2.75rem] leading-snug">{test.title}</h3>
+                
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-slate-900/50 p-2 rounded-lg">
+                    <FileQuestion className="w-4 h-4 text-blue-500" /> {test.questions} Qs
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-slate-900/50 p-2 rounded-lg">
+                    <Timer className="w-4 h-4 text-orange-500" /> {test.time}
+                  </div>
+                </div>
+
+                <div className="flex justify-between items-center pt-3 border-t border-gray-100 dark:border-slate-700">
+                  <span className="font-bold text-xl text-[#00a651]">{test.price}</span>
+                  <Button size="sm" className="bg-[#00a651] hover:bg-green-700 shadow-md hover:shadow-lg transition-all text-xs h-8 px-4 rounded-full">Enroll Now</Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        <div className="text-center mt-10">
+             <Button variant="outline" className="border-[#00a651] text-[#00a651] hover:bg-[#00a651] hover:text-white rounded-full px-8 py-2 h-auto text-sm font-semibold transition-colors">View All Tests</Button>
+        </div>
+      </section>
+
+      {/* Trending Courses */}
+      <section className="py-12 md:py-20 bg-gray-50 dark:bg-transparent border-t border-gray-100 dark:border-slate-800">
+        <div className="container mx-auto px-4 max-w-6xl">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
             <h2 className="text-3xl font-bold text-[#00a651]">Trending Courses</h2>
@@ -354,44 +460,54 @@ export default function Home() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {trendingCourses.map((course, idx) => (
-            <Card key={idx} className="overflow-hidden hover:shadow-lg transition-shadow border-none shadow-md dark:bg-slate-800">
-              <div className="relative h-40 w-full">
-                <Image src={course.image} alt={course.title} fill className="object-cover" />
-                <Badge className="absolute top-2 right-2 bg-pink-500 hover:bg-pink-600 border-none text-[10px]">Popular</Badge>
+            <Card key={idx} className="group overflow-hidden hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800 relative">
+              <div className="relative h-40 w-full overflow-hidden">
+                <Image src={course.image} alt={course.title} fill className="object-cover group-hover:scale-110 transition-transform duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <Badge className="absolute top-3 right-3 bg-pink-500 hover:bg-pink-600 border-none text-[10px] px-2 shadow-md">Best Seller</Badge>
               </div>
-              <CardContent className="p-4 bg-white dark:bg-slate-800">
-                <h3 className="font-bold text-gray-800 dark:text-white line-clamp-2 mb-2 min-h-[2.5rem] leading-tight text-sm">{course.title}</h3>
-                <div className="flex items-center gap-1 mb-2">
-                  <div className="flex text-yellow-400">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className={`w-3 h-3 ${i < Math.floor(course.rating) ? 'fill-current' : ''}`} />
-                    ))}
+              <CardContent className="p-5">
+                <h3 className="font-bold text-gray-800 dark:text-gray-100 line-clamp-2 mb-3 min-h-[2.75rem] leading-snug">{course.title}</h3>
+                
+                <div className="flex items-center justify-between mb-3 border-b border-gray-100 dark:border-slate-700 pb-3">
+                  <div className="flex items-center gap-1.5">
+                    <div className="flex text-amber-400">
+                      <Star className="w-4 h-4 fill-current" />
+                    </div>
+                    <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{course.rating} <span className="text-gray-400 text-xs font-normal">({course.reviews})</span></span>
                   </div>
-                  <span className="text-[10px] text-gray-500 dark:text-gray-400">({course.reviews})</span>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1 bg-gray-50 dark:bg-slate-900/50 p-1.5 rounded-lg">
+                    <Users className="w-3.5 h-3.5 text-[#00a651]" /> {course.students}
+                  </div>
                 </div>
-                <div className="text-[11px] text-gray-500 dark:text-gray-400 mb-1 flex items-center gap-1 border-b border-gray-100 dark:border-slate-700 pb-2">
-                  <Users className="w-3 h-3 text-[#00a651]" /> {course.students} Students
-                </div>
-                <div className="flex justify-between items-center mt-3">
-                  <span className="font-bold text-[#00a651] text-sm">{course.price}</span>
-                  <Button size="sm" variant="outline" className="text-[10px] h-7 px-2 border-[#00a651] text-[#00a651] hover:bg-green-50 dark:hover:bg-green-900/20 rounded-full">View Details</Button>
+                
+                <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-4 flex items-center gap-1.5">
+                  <GraduationCap className="w-3.5 h-3.5 text-blue-500" /> By {course.instructor}
+                </p>
+
+                <div className="flex justify-between items-center">
+                  <span className="font-extrabold text-lg text-[#00a651]">{course.price}</span>
+                  <Button size="sm" variant="outline" className="text-xs h-8 px-4 border-[#00a651] text-[#00a651] hover:bg-green-50 dark:hover:bg-green-900/20 rounded-full transition-colors">Details</Button>
                 </div>
               </CardContent>
             </Card>
           ))}
         </div>
-         <div className="text-center mt-8">
-             <Button className="bg-[#00a651] hover:bg-green-700">View All Courses</Button>
-          </div>
+        <div className="text-center mt-10">
+             <Button className="bg-[#00a651] hover:bg-green-700 rounded-full px-8 py-2 h-auto text-sm font-semibold shadow-md hover:shadow-lg transition-all">Explore All Courses</Button>
+        </div>
+        </div>
       </section>
 
       {/* Book Collection */}
       <section className="py-12 md:py-20 bg-white dark:bg-transparent border-t border-gray-100 dark:border-slate-800">
         <div className="container mx-auto px-4 max-w-6xl">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
             <div>
-              <h2 className="text-3xl font-bold text-[#00a651]">Book Collection</h2>
-              <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Collect your necessary books</p>
+              <h2 className="text-3xl font-bold text-[#00a651] flex items-center gap-2">
+                <BookMarked className="w-8 h-8" /> Book Collection
+              </h2>
+              <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Collect your necessary exam preparation books</p>
             </div>
             <div className="flex flex-wrap gap-2">
               <Badge variant="outline" className="bg-[#00a651] text-white border-none hover:bg-[#00a651] cursor-pointer">All</Badge>
@@ -405,38 +521,41 @@ export default function Home() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {bookCollection.map((book, idx) => (
-              <Card key={idx} className="overflow-hidden hover:shadow-lg transition-shadow border-none shadow-md dark:bg-slate-800">
-                <div className="relative h-60 w-full bg-gray-50 dark:bg-slate-900 p-4 flex items-center justify-center">
-                  <div className="relative w-full h-full shadow-lg rounded-sm overflow-hidden">
+              <Card key={idx} className="group overflow-hidden hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800 relative">
+                <div className="relative h-60 w-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-slate-800 dark:to-slate-900 p-6 flex items-center justify-center overflow-hidden">
+                  <div className="absolute inset-0 bg-[#00a651]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="relative w-full h-full shadow-[0_10px_30px_rgba(0,0,0,0.15)] rounded-md overflow-hidden group-hover:scale-105 transition-transform duration-500">
                      <Image src={book.image} alt={book.title} fill className="object-cover" />
                   </div>
                 </div>
-                <CardContent className="p-4 bg-white dark:bg-slate-800">
-                  <h3 className="font-bold text-gray-800 dark:text-white line-clamp-2 mb-2 min-h-[2.5rem] leading-tight text-sm">{book.title}</h3>
-                  <div className="flex items-center gap-1 mb-2">
-                    <div className="flex text-yellow-400">
-                      {[...Array(5)].map((_, i) => (
-                        <Star key={i} className={`w-3 h-3 ${i < Math.floor(book.rating) ? 'fill-current' : ''}`} />
-                      ))}
+                <CardContent className="p-5 bg-white dark:bg-slate-800">
+                  <h3 className="font-bold text-gray-800 dark:text-gray-100 line-clamp-2 mb-3 min-h-[2.75rem] leading-snug">{book.title}</h3>
+                  
+                  <div className="flex items-center justify-between mb-3 border-b border-gray-100 dark:border-slate-700 pb-3">
+                    <div className="flex items-center gap-1.5">
+                      <div className="flex text-amber-400">
+                        <Star className="w-4 h-4 fill-current" />
+                      </div>
+                      <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{book.rating} <span className="text-gray-400 text-xs font-normal">({book.reviews})</span></span>
                     </div>
-                    <span className="text-[10px] text-gray-500 dark:text-gray-400">({book.reviews})</span>
                   </div>
-                  <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-3 border-b border-gray-100 dark:border-slate-700 pb-2 flex items-center gap-1">
-                    <Users className="w-3 h-3 text-[#00a651]" /> {book.author}
+                  <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-4 flex items-center gap-1.5">
+                    <Users className="w-3.5 h-3.5 text-[#00a651]" /> {book.author}
                   </p>
-                  <div className="flex justify-between items-center mt-2">
+                  
+                  <div className="flex justify-between items-center">
                     <div className="flex flex-col">
-                      <span className="line-through text-red-500 text-[10px]">{book.oldPrice}</span>
-                      <span className="font-bold text-[#00a651] text-sm">{book.price}</span>
+                      <span className="line-through text-gray-400 text-[10px] decoration-red-500">{book.oldPrice}</span>
+                      <span className="font-extrabold text-[#00a651] text-lg leading-none">{book.price}</span>
                     </div>
-                    <Button size="sm" variant="outline" className="text-[10px] h-7 px-2 border-[#00a651] text-[#00a651] hover:bg-green-50 dark:hover:bg-green-900/20 rounded-full">View Details</Button>
+                    <Button size="sm" variant="outline" className="text-xs h-8 px-4 border-[#00a651] text-[#00a651] hover:bg-green-50 dark:hover:bg-green-900/20 rounded-full transition-colors">Details</Button>
                   </div>
                 </CardContent>
               </Card>
             ))}
           </div>
-          <div className="text-center mt-8">
-             <Button className="bg-[#00a651] hover:bg-green-700">View All Books</Button>
+          <div className="text-center mt-10">
+             <Button variant="outline" className="border-[#00a651] text-[#00a651] hover:bg-[#00a651] hover:text-white rounded-full px-8 py-2 h-auto text-sm font-semibold transition-colors">Explore Library</Button>
           </div>
         </div>
       </section>

@@ -39,7 +39,6 @@ const mainNavLinks = [
     { href: "/book", label: "Book", icon: <Library className="h-5 w-5" /> },
     { href: "/exams", label: "Exams", icon: <Award className="h-5 w-5" /> },
     { href: "/pricing", label: "Pricing", icon: <ShoppingCart className="h-5 w-5" /> },
-    { href: "/others", label: "Others", icon: <PlusCircle className="h-5 w-5" /> },
 ];
 
 const dashboardNavGroups = [
@@ -432,38 +431,9 @@ const MainNav = ({ isMobile = false, onLinkClick, isScrolled = false }: { isMobi
         isMobile ? "flex flex-col items-start space-x-0 space-y-4 pt-4 w-full" : "hidden md:flex"
       )}
     >
-      {mainNavLinks.map((link) => {
-        if (link.label === "Others") {
-          const othersMenuItems = dashboardNavGroups.find(g => g.title === "OTHERS")?.items || [];
-          const isActive = othersMenuItems.some(i => pathname === i.href) || pathname === link.href;
-          return (
-            <DropdownMenu key={link.href}>
-              <DropdownMenuTrigger className={cn(
-                "transition-colors flex items-center gap-1 hover:text-[#00a651] outline-none cursor-pointer text-sm font-medium",
-                isActive
-                    ? "text-[#00a651] font-bold"
-                    : "text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white",
-                isMobile && cn("text-lg py-2 gap-4 w-full justify-start", !isActive && "font-normal")
-              )}>
-                {isMobile && link.icon}
-                <span>{link.label}</span>
-                <ChevronDown className="h-4 w-4" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-56">
-                {othersMenuItems.map(item => (
-                  <DropdownMenuItem key={item.href} asChild>
-                    <Link href={item.href} onClick={onLinkClick} className="cursor-pointer flex items-center w-full">
-                      {item.icon}
-                      <span className="ml-2">{item.label}</span>
-                    </Link>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          );
-        }
-        return <NavLink key={link.href} {...link} />;
-      })}
+      {mainNavLinks.map((link) => (
+        <NavLink key={link.href} {...link} />
+      ))}
     </nav>
   );
 };
