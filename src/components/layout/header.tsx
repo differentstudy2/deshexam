@@ -413,11 +413,11 @@ const MainNav = ({ isMobile = false, onLinkClick, isScrolled = false }: { isMobi
       href={href}
       onClick={onLinkClick}
       className={cn(
-        "transition-colors flex items-center gap-4 nav-link-style hover:text-[#00a651]",
+        "transition-colors flex items-center hover:text-[#00a651] text-sm font-medium",
         pathname === href 
             ? "text-[#00a651] font-bold" 
             : "text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white",
-        isMobile && "text-lg py-2"
+        isMobile && "text-lg py-2 gap-4"
       )}
     >
       {isMobile && icon}
@@ -428,7 +428,7 @@ const MainNav = ({ isMobile = false, onLinkClick, isScrolled = false }: { isMobi
   return (
     <nav
       className={cn(
-        "items-center space-x-4 lg:space-x-6",
+        "items-center space-x-2 lg:space-x-4",
         isMobile ? "flex flex-col items-start space-x-0 space-y-4 pt-4 w-full" : "hidden md:flex"
       )}
     >
@@ -439,7 +439,7 @@ const MainNav = ({ isMobile = false, onLinkClick, isScrolled = false }: { isMobi
           return (
             <DropdownMenu key={link.href}>
               <DropdownMenuTrigger className={cn(
-                "transition-colors flex items-center gap-1 nav-link-style hover:text-[#00a651] outline-none cursor-pointer",
+                "transition-colors flex items-center gap-1 hover:text-[#00a651] outline-none cursor-pointer text-sm font-medium",
                 isActive
                     ? "text-[#00a651] font-bold"
                     : "text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white",

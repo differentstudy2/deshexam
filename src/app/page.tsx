@@ -194,15 +194,16 @@ export default function Home() {
     <div className="flex flex-col min-h-screen bg-slate-50 dark:bg-[#0f172a] font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemas) }} />
       {/* Hero Section */}
-      <section className="relative w-full bg-[#0f172a] pt-24 pb-32 overflow-hidden">
+      <section className="relative w-full bg-gradient-to-r from-[#0f172a] via-[#1e1b4b] to-[#0f172a] bg-[length:200%_200%] animate-gradient-x pt-24 pb-32 overflow-hidden">
         {/* Abstract Clouds/Shapes in background (simulated with absolute divs) */}
         <div className="absolute top-10 left-10 w-32 h-16 bg-white/5 rounded-full blur-xl"></div>
         <div className="absolute top-20 right-20 w-40 h-20 bg-white/5 rounded-full blur-xl"></div>
         
         <div className="container relative z-10 px-4 mx-auto text-center">
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tighter uppercase mb-4 flex justify-center items-center">
-            <span className="bg-gradient-to-r from-[#00a651] to-teal-400 bg-clip-text text-transparent drop-shadow-lg">DESH</span>
-            <span className="ml-3 text-white">EXAM</span>
+            <span className="bg-gradient-to-r from-[#FF9933] via-gray-100 to-[#138808] bg-clip-text text-transparent drop-shadow-lg">
+                DESH EXAM
+            </span>
           </h1>
           <p className="text-lg md:text-xl text-[#00a651] mb-12">The Largest Online Learning Platform in Bangladesh</p>
           
