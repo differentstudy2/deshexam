@@ -538,8 +538,8 @@ export default function QuestionCard({ question, index, testMode = false, isList
             </div>
 
             <div className="flex flex-col gap-2 mb-5">
-                <div className="flex items-start gap-2">
-                    {index !== undefined && <span className="text-lg font-bold text-slate-800 dark:text-slate-200 mt-0.5">{index}.</span>}
+                <div className="flex items-baseline gap-2">
+                    {index !== undefined && <span className="text-lg font-bold text-slate-800 dark:text-slate-200">{index}.</span>}
                     {isFillInTheBlank ? (
                         <div className="flex-1 w-full min-w-0">
                             <InteractiveFillInTheBlank 
