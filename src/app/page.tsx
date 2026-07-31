@@ -49,21 +49,21 @@ export const metadata: Metadata = {
 };
 
 const smartFeatures = [
-  { icon: <MonitorPlay className="w-6 h-6 text-[#00a651]" />, title: "লাইভ ক্লাস (Live Class)" },
-  { icon: <FileText className="w-6 h-6 text-red-600" />, title: "স্মার্ট পিডিএফ (Smart PDF)" },
-  { icon: <ClipboardList className="w-6 h-6 text-[#00a651]" />, title: "মডেল টেস্ট (Model Test)" },
-  { icon: <FileQuestion className="w-6 h-6 text-blue-500" />, title: "প্রশ্নব্যাংক (Question Bank)", badge: "New" },
-  { icon: <BookOpen className="w-6 h-6 text-purple-600" />, title: "বই ও লেকচার (Books & Lectures)" },
-  { icon: <CheckCircle2 className="w-6 h-6 text-[#00a651]" />, title: "সমাধান (Solution)" },
-  { icon: <PlayCircle className="w-6 h-6 text-red-500" />, title: "ভিডিও (Video)" },
-  { icon: <FileText className="w-6 h-6 text-red-700" />, title: "ম্যাগাজিন (Magazine)" },
-  { icon: <HelpCircle className="w-6 h-6 text-blue-600" />, title: "সাজেশন (Suggestion)", badge: "New" },
-  { icon: <GraduationCap className="w-6 h-6 text-blue-700" />, title: "কোর্স (Course)" },
-  { icon: <Users className="w-6 h-6 text-red-500" />, title: "শিক্ষক (Teachers)" },
+  { icon: <MonitorPlay className="w-6 h-6 text-[#00a651]" />, title: "Live Class" },
+  { icon: <FileText className="w-6 h-6 text-red-600" />, title: "Smart PDF" },
+  { icon: <ClipboardList className="w-6 h-6 text-[#00a651]" />, title: "Model Test" },
+  { icon: <FileQuestion className="w-6 h-6 text-blue-500" />, title: "Question Bank", badge: "New" },
+  { icon: <BookOpen className="w-6 h-6 text-purple-600" />, title: "Books & Lectures" },
+  { icon: <CheckCircle2 className="w-6 h-6 text-[#00a651]" />, title: "Solution" },
+  { icon: <PlayCircle className="w-6 h-6 text-red-500" />, title: "Video" },
+  { icon: <FileText className="w-6 h-6 text-red-700" />, title: "Magazine" },
+  { icon: <HelpCircle className="w-6 h-6 text-blue-600" />, title: "Suggestion", badge: "New" },
+  { icon: <GraduationCap className="w-6 h-6 text-blue-700" />, title: "Course" },
+  { icon: <Users className="w-6 h-6 text-red-500" />, title: "Teachers" },
   { icon: <HelpCircle className="w-6 h-6 text-cyan-600" />, title: "FAQs" },
-  { icon: <ClipboardList className="w-6 h-6 text-[#00a651]" />, title: "স্টাডি প্ল্যান (Study Plan)" },
-  { icon: <CheckCircle2 className="w-6 h-6 text-[#00a651]" />, title: "সফলতা (Success)" },
-  { icon: <FileText className="w-6 h-6 text-blue-600" />, title: "নোটিশ (Notice)" },
+  { icon: <ClipboardList className="w-6 h-6 text-[#00a651]" />, title: "Study Plan" },
+  { icon: <CheckCircle2 className="w-6 h-6 text-[#00a651]" />, title: "Success" },
+  { icon: <FileText className="w-6 h-6 text-blue-600" />, title: "Notice" },
 ];
 
 const trendingCourses = [
@@ -107,7 +107,7 @@ const trendingCourses = [
 
 const bookCollection = [
   {
-    title: "বিগত বছরের প্রশ্ন সমাধান (SSC)",
+    title: "Previous Year Question Solutions (SSC)",
     author: "DeshExam",
     rating: 4.5,
     reviews: 45,
@@ -116,7 +116,7 @@ const bookCollection = [
     image: "https://picsum.photos/seed/book1/300/400"
   },
   {
-    title: "মডেল টেস্ট পেপারস (HSC)",
+    title: "Model Test Papers (HSC)",
     author: "DeshExam",
     rating: 4.8,
     reviews: 112,
@@ -201,10 +201,10 @@ export default function Home() {
         
         <div className="container relative z-10 px-4 mx-auto text-center">
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tighter uppercase mb-4 flex justify-center items-center">
-            <span className="bg-gradient-to-r from-[#00a651] to-teal-400 bg-clip-text text-transparent drop-shadow-lg">দেশ</span>
-            <span className="ml-3 text-white">এক্সাম</span>
+            <span className="bg-gradient-to-r from-[#00a651] to-teal-400 bg-clip-text text-transparent drop-shadow-lg">DESH</span>
+            <span className="ml-3 text-white">EXAM</span>
           </h1>
-          <p className="text-lg md:text-xl text-[#00a651] mb-12">বাংলাদেশের সর্ববৃহৎ অনলাইন লার্নিং প্ল্যাটফর্ম</p>
+          <p className="text-lg md:text-xl text-[#00a651] mb-12">The Largest Online Learning Platform in Bangladesh</p>
           
           <div className="flex flex-wrap justify-center gap-6 md:gap-12">
             <div className="flex items-center gap-3 text-white">
@@ -250,7 +250,7 @@ export default function Home() {
       {/* Smart Features */}
       <section className="py-12 md:py-20 container mx-auto px-4 max-w-6xl">
         <div className="text-center mb-10">
-          <h2 className="text-3xl font-bold text-[#00a651] inline-block border-b-2 border-[#00a651] pb-2">স্মার্ট ফিচারস</h2>
+          <h2 className="text-3xl font-bold text-[#00a651] inline-block border-b-2 border-[#00a651] pb-2">Smart Features</h2>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
@@ -338,8 +338,8 @@ export default function Home() {
       <section className="py-12 md:py-20 container mx-auto px-4 max-w-6xl">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
-            <h2 className="text-3xl font-bold text-[#00a651]">ট্রেন্ডিং কোর্স</h2>
-            <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">সবচেয়ে জনপ্রিয় কোর্সগুলো ঘুরে দেখুন</p>
+            <h2 className="text-3xl font-bold text-[#00a651]">Trending Courses</h2>
+            <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Explore our most popular courses</p>
           </div>
           <div className="flex flex-wrap gap-2">
             <Badge variant="outline" className="bg-[#00a651] text-white border-none hover:bg-[#00a651] cursor-pointer">All</Badge>
@@ -389,8 +389,8 @@ export default function Home() {
         <div className="container mx-auto px-4 max-w-6xl">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
             <div>
-              <h2 className="text-3xl font-bold text-[#00a651]">বই কালেকশন</h2>
-              <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">আপনার প্রয়োজনীয় বইগুলো সংগ্রহ করুন</p>
+              <h2 className="text-3xl font-bold text-[#00a651]">Book Collection</h2>
+              <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Collect your necessary books</p>
             </div>
             <div className="flex flex-wrap gap-2">
               <Badge variant="outline" className="bg-[#00a651] text-white border-none hover:bg-[#00a651] cursor-pointer">All</Badge>
