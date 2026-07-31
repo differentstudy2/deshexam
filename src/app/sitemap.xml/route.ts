@@ -117,16 +117,6 @@ export async function GET() {
       };
     }));
 
-    // 5. Questions
-    const allQuestions = await getAllQuestionBankEntries();
-    allRoutes.push(...allQuestions.map((q: any) => {
-      const date = q.createdAt?.toDate?.() || new Date();
-      return {
-        url: `${baseUrl}/question/${q.slug || q.id}`,
-        lastModified: date.toISOString(),
-      };
-    }));
-
     // 6. Textbooks, Chapters, Topics
     const allTextbooks = await getAllTextbooks();
     for (const book of allTextbooks) {

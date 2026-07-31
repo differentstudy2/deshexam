@@ -13,6 +13,8 @@ import Link from 'next/link';
 import { Home, ChevronRight, Share2 } from 'lucide-react';
 import { getFAQSchema, getBreadcrumbSchema, getQuestionSchema } from '@/lib/seo/json-ld';
 
+export const revalidate = 2592000; // Cache for 30 days for optimal SEO performance
+
 type Props = {
     params: Promise<{ slug: string[] }>
 }
