@@ -155,31 +155,6 @@ export async function GET() {
       };
     }));
 
-    // 8. Assessments
-    const collections = [
-      { name: 'mockTests', prefix: '/mock-tests' },
-      { name: 'practiceSets', prefix: '/practice-sets' },
-      { name: 'quizzes', prefix: '/quizzes' },
-      { name: 'examSeries', prefix: '/exams' },
-      { name: 'examPapers', prefix: '/exam-papers' },
-    ] as const;
-    
-    for (const { name, prefix } of collections) {
-      try {
-        const items = await getAssessments(name) as any[];
-        for (const item of items) {
-          if (item.status === 'Published') {
-            const date = item.updatedAt ? new Date(item.updatedAt) : new Date();
-            allRoutes.push({
-              url: `${baseUrl}${prefix}/${item.slug || item.id}`,
-              lastModified: date.toISOString(),
-            });
-          }
-        }
-      } catch (e) {
-        console.error(`Error fetching ${name} for sitemap:`, e);
-      }
-    }
   } catch (err) {
     console.error('Error generating some sitemaps:', err);
   }
