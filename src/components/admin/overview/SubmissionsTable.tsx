@@ -8,7 +8,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Eye, Trash2, FileText, ChevronRight, ChevronLeft } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { ScoreCircle } from '@/components/feature/score-circle';
-import { Link } from '@/i18n/routing';
+import { format } from 'date-fns';
+import Link from 'next/link';
 
 type Submission = {
   id: string;

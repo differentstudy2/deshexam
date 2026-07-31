@@ -25,7 +25,7 @@ import { getUserProfile } from "@/lib/firebase/firestore";
 import { ScrollArea } from "../ui/scroll-area";
 import { useAuthDialog } from "@/hooks/use-auth-dialog";
 import { useFcm } from "@/hooks/use-fcm";
-import LanguageSwitcher from "@/components/LanguageSwitcher";
+
 import { useToast } from "@/hooks/use-toast";
 import { clearAllCache } from "@/lib/actions/cache";
 
@@ -755,7 +755,6 @@ export function Header() {
               <Sparkles className="h-4 w-4 text-amber-600 dark:text-amber-400" />
             </Link>
           </Button>
-          <LanguageSwitcher />
           <ThemeToggle />
           {pathname?.startsWith('/admin') && <ClearCacheButton />}
           <NotificationBell />

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { SidebarSubject } from '@/app/[locale]/guide/guide-data';
+import { SidebarSubject } from '@/app/guide/guide-data';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/use-auth';

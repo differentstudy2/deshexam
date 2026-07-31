@@ -10,7 +10,7 @@ import { ReadingArticle } from '@/components/guide/ReadingArticle';
 import { AssessmentTabs } from '@/components/guide/AssessmentTabs';
 import { TopicSectionsSidebar } from '@/components/guide/TopicSectionsSidebar';
 import { GuideSidebar } from '@/components/guide/GuideSidebar';
-import { Chapter } from '@/app/[locale]/guide/guide-data';
+import { Chapter } from '@/app/guide/guide-data';
 import { NodeQuestionsPage } from '@/components/guide/NodeQuestionsPage';
 
 export function ReadingLayout({

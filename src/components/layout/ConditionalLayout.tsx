@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname } from '@/i18n/routing';
+import { usePathname } from 'next/navigation';
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 
