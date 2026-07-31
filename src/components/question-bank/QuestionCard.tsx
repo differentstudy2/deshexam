@@ -9,7 +9,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { recordQuestionAttempt } from '@/lib/firebase/student-analytics';
 import { toggleInteraction, getQuestionInteraction, incrementQuestionView } from '@/lib/firebase/question-bank';
 import { trackQuestionEvent } from '@/lib/analytics/question-events';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import { useToast } from '@/hooks/use-toast';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
@@ -79,23 +79,25 @@ export default function QuestionCard({ question, index, testMode = false, isList
         views: (question as any).viewsCount || 0,
     });
 
-    // Fetch real-time interaction state
+    // Fetch interaction state (Once on mount)
     useEffect(() => {
+        let isMounted = true;
         if (user) {
             const interactionId = `${user.uid}_${question.id}`;
-            const unsubscribe = onSnapshot(doc(db, 'question_interactions', interactionId), (snap) => {
-                if (snap.exists()) {
+            getDoc(doc(db, 'question_interactions', interactionId)).then((snap) => {
+                if (isMounted && snap.exists()) {
                     setInteraction(snap.data() as any);
                 }
-            });
-            return () => unsubscribe();
+            }).catch(console.error);
         }
+        return () => { isMounted = false; };
     }, [user, question.id]);
 
-    // Fetch real-time counts
+    // Fetch counts (Once on mount)
     useEffect(() => {
-        const unsubscribe = onSnapshot(doc(db, 'question_bank', question.id), (snap) => {
-            if (snap.exists()) {
+        let isMounted = true;
+        getDoc(doc(db, 'question_bank', question.id)).then((snap) => {
+            if (isMounted && snap.exists()) {
                 const data = snap.data();
                 setCounts(prev => ({
                     ...prev,
@@ -105,8 +107,9 @@ export default function QuestionCard({ question, index, testMode = false, isList
                     views: data.viewsCount || 0
                 }));
             }
-        });
-        return () => unsubscribe();
+        }).catch(console.error);
+        
+        return () => { isMounted = false; };
     }, [question.id]);
 
     // Increment View Count once per session (simple implementation)
