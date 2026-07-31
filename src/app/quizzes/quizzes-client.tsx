@@ -11,7 +11,7 @@ import { ContentBadge } from "@/components/content-badge";
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MockTestFilters } from "@/components/mock-test-filters";
-import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 
 type Quiz = {
@@ -62,28 +62,26 @@ export default function QuizzesClientPage() {
         setLoading(false);
     };
 
-    const arrayQuery = query(collection(db, "content"), where("testType", "array-contains", "Quiz"));
-    const unsubscribeArray = onSnapshot(arrayQuery, (snapshot) => {
-      snapshot.docs.forEach(doc => quizzesMap.set(doc.id, { id: doc.id, ...doc.data() } as Quiz));
-      updateState();
-    }, (error) => {
-      console.error("Error on array-contains snapshot:", error);
-      toast({ variant: "destructive", title: "Error loading quizzes." });
-    });
-
-    const stringQuery = query(collection(db, "content"), where("testType", "==", "Quiz"));
-    const unsubscribeString = onSnapshot(stringQuery, (snapshot) => {
-      snapshot.docs.forEach(doc => quizzesMap.set(doc.id, { id: doc.id, ...doc.data() } as Quiz));
-      updateState();
-    }, (error) => {
-      console.error("Error on string-equals snapshot:", error);
-      toast({ variant: "destructive", title: "Error loading quizzes." });
-    });
-
-    return () => {
-      unsubscribeArray();
-      unsubscribeString();
+    const fetchData = async () => {
+        try {
+            const arrayQuery = query(collection(db, "content"), where("testType", "array-contains", "Quiz"));
+            const stringQuery = query(collection(db, "content"), where("testType", "==", "Quiz"));
+            
+            const [arraySnap, stringSnap] = await Promise.all([
+                getDocs(arrayQuery),
+                getDocs(stringQuery)
+            ]);
+            
+            arraySnap.docs.forEach(doc => quizzesMap.set(doc.id, { id: doc.id, ...doc.data() } as Quiz));
+            stringSnap.docs.forEach(doc => quizzesMap.set(doc.id, { id: doc.id, ...doc.data() } as Quiz));
+            updateState();
+        } catch (error) {
+            console.error("Error fetching quizzes:", error);
+            toast({ variant: "destructive", title: "Error loading quizzes." });
+        }
     };
+    
+    fetchData();
   }, [toast]);
 
 
