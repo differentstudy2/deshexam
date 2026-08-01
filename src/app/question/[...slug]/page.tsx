@@ -90,19 +90,34 @@ export default async function DynamicQuestionPage({ params }: Props) {
       // 1. Fetch Taxonomies
       const leafId = question.topicId || question.chapterId || question.textbookId || question.subjectId || question.classId || question.boardId;
       
+      const titleCache = new Map<string, string | null>();
       const tryFetchTitle = async (id: string, col1: string, col2: string) => {
           if (!id) return null;
+          if (titleCache.has(id)) return titleCache.get(id);
           try {
               // First try the new taxonomy_nodes collection
               let snap = await getDoc(doc(db, 'taxonomy_nodes', id));
-              if (snap.exists()) return snap.data().title || snap.data().name;
+              if (snap.exists()) {
+                  const val = snap.data().title || snap.data().name;
+                  titleCache.set(id, val);
+                  return val;
+              }
               
               // Fallback to legacy collections
               snap = await getDoc(doc(db, col1, id));
-              if (snap.exists()) return snap.data().title || snap.data().name;
+              if (snap.exists()) {
+                  const val = snap.data().title || snap.data().name;
+                  titleCache.set(id, val);
+                  return val;
+              }
               snap = await getDoc(doc(db, col2, id));
-              if (snap.exists()) return snap.data().title || snap.data().name;
+              if (snap.exists()) {
+                  const val = snap.data().title || snap.data().name;
+                  titleCache.set(id, val);
+                  return val;
+              }
           } catch(e) {}
+          titleCache.set(id, null);
           return null;
       };
 
@@ -139,11 +154,11 @@ export default async function DynamicQuestionPage({ params }: Props) {
           };
 
           const promises = [];
-          if (question.topicId) promises.push(fetchAndMerge({ topicId: question.topicId }));
-          if (question.chapterId) promises.push(fetchAndMerge({ chapterId: question.chapterId }));
-          if (question.subjectId) promises.push(fetchAndMerge({ subjectId: question.subjectId }));
-          if (question.classId) promises.push(fetchAndMerge({ classId: question.classId }));
-          if (question.tags && question.tags.length > 0) promises.push(fetchAndMerge({ tags: question.tags[0] }));
+          if (question.topicId) { promises.push(fetchAndMerge({ topicId: question.topicId })); }
+          else if (question.chapterId) { promises.push(fetchAndMerge({ chapterId: question.chapterId })); }
+          else if (question.subjectId) { promises.push(fetchAndMerge({ subjectId: question.subjectId })); }
+          else if (question.classId) { promises.push(fetchAndMerge({ classId: question.classId })); }
+          else if (question.tags && question.tags.length > 0) { promises.push(fetchAndMerge({ tags: question.tags[0] })); }
 
           const results = await Promise.all(promises);
           let allRelated: any[] = [];
