@@ -243,10 +243,14 @@ export default function Home() {
     <div className="flex flex-col min-h-screen bg-slate-50 dark:bg-[#0f172a] font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemas) }} />
       {/* Hero Section */}
-      <section className="relative w-full bg-gradient-to-r from-[#0f172a] via-[#1e1b4b] to-[#0f172a] bg-[length:200%_200%] animate-gradient-x pt-24 pb-32 overflow-hidden">
-        {/* Abstract Clouds/Shapes in background (simulated with absolute divs) */}
-        <div className="absolute top-10 left-10 w-32 h-16 bg-white/5 rounded-full blur-xl"></div>
-        <div className="absolute top-20 right-20 w-40 h-20 bg-white/5 rounded-full blur-xl"></div>
+      <section className="relative w-full bg-[#0f172a] pt-24 pb-32 overflow-hidden">
+        {/* Animated Indian Flag Wave Background */}
+        <div className="absolute inset-0 z-0 bg-gradient-to-r from-[#FF9933]/15 via-white/5 to-[#12D000]/15 bg-[length:200%_200%] animate-gradient-x"></div>
+        
+        {/* Floating Tricolor Clouds/Shapes for Wave Effect */}
+        <div className="absolute -top-20 -left-20 w-[400px] h-[400px] bg-[#FF9933]/20 rounded-full blur-[100px] animate-pulse pointer-events-none"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[200px] bg-white/5 rounded-[100%] blur-[80px] pointer-events-none"></div>
+        <div className="absolute -bottom-20 -right-20 w-[400px] h-[400px] bg-[#12D000]/20 rounded-full blur-[100px] animate-pulse pointer-events-none" style={{ animationDelay: '2s' }}></div>
         
         <div className="container relative z-10 px-4 mx-auto text-center">
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tighter uppercase mb-4 flex justify-center items-center">
