@@ -103,7 +103,7 @@ export default async function AllQuestionsPage(props: { searchParams: Promise<{ 
             
             <QuestionsHeader />
             
-            <div className="container max-w-[1200px] mx-auto py-10 px-4">
+            <div className="container max-w-[1400px] mx-auto py-10 px-4">
                 <div className="flex flex-col lg:flex-row gap-8 items-start">
                     
                     {/* Main Content (Left) */}

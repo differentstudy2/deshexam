@@ -229,7 +229,7 @@ export default async function DynamicQuestionPage({ params }: Props) {
     ];
 
     return (
-      <div className="container max-w-7xl mx-auto py-12 px-4 flex flex-col lg:flex-row gap-6 xl:gap-8">
+      <div className="container max-w-[1400px] mx-auto py-12 px-4 flex flex-col lg:flex-row gap-6 xl:gap-8">
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemas) }} />
         
         {/* Left Sidebar */}
@@ -319,7 +319,7 @@ export default async function DynamicQuestionPage({ params }: Props) {
       const safeQuestionsList = JSON.parse(JSON.stringify(questionsList));
       const formattedTitle = lastSlug.replace(/-/g, ' ');
       return (
-          <div className="container max-w-7xl mx-auto py-12 px-4 flex flex-col lg:flex-row gap-6 xl:gap-8">
+          <div className="container max-w-[1400px] mx-auto py-12 px-4 flex flex-col lg:flex-row gap-6 xl:gap-8">
             {/* Left Sidebar */}
             <div className="lg:w-1/4 xl:w-[22%] hidden lg:block shrink-0">
                 <QuestionsSidebar />

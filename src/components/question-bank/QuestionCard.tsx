@@ -466,25 +466,27 @@ export default function QuestionCard({ question, index, testMode = false, isList
     };
 
     return (
-        <div id={`question-card-${question.id}`} className="w-full bg-white dark:bg-slate-900 p-5 md:p-6 rounded-xl border border-slate-200/60 dark:border-slate-800/60 shadow-sm mb-5 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 relative overflow-hidden">
+        <div id={`question-card-${question.id}`} className="w-full bg-gradient-to-br from-white to-slate-50/50 dark:from-slate-900 dark:to-slate-900 p-5 md:p-6 rounded-[24px] border border-slate-200/60 dark:border-slate-800/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] mb-5 transition-all duration-300 hover:shadow-[0_12px_40px_rgb(0,0,0,0.08)] hover:-translate-y-1 relative overflow-hidden group">
             
+            {/* Soft decorative top border */}
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500/0 via-blue-500/20 to-blue-500/0 dark:via-blue-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             {/* Top row: Taxonomy chips and Link */}
-            <div className="flex items-start justify-between mb-4 gap-4">
+            <div className="flex items-start justify-between mb-5 gap-4 relative z-10">
                 <div className="flex flex-wrap items-center gap-2">
                     {question.marks && (
-                        <span className="bg-amber-100 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 font-bold rounded-md px-2.5 py-0.5 text-[12px] uppercase tracking-wide shadow-sm">
+                        <span className="bg-amber-500/10 dark:bg-amber-500/20 border border-amber-500/20 dark:border-amber-500/30 text-amber-700 dark:text-amber-400 font-bold rounded-full px-3 py-1 text-[11px] uppercase tracking-widest shadow-sm backdrop-blur-md">
                             {question.marks} Marks
                         </span>
                     )}
                     
-                    {question.sourceYear ? (
-                        <span className="bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium rounded-md px-2.5 py-0.5 text-[11px] uppercase tracking-wide">{question.sourceYear}</span>
-                    ) : null}
-
                     {question.questionType && (
-                        <span className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800/50 text-indigo-700 dark:text-indigo-300 font-bold rounded-md px-2.5 py-0.5 text-[11px] uppercase tracking-wide shadow-sm">
+                        <span className="bg-purple-500/10 dark:bg-purple-500/20 border border-purple-500/20 dark:border-purple-500/30 text-purple-700 dark:text-purple-400 font-bold rounded-full px-3 py-1 text-[11px] uppercase tracking-widest shadow-sm backdrop-blur-md">
                             {question.questionType}
                         </span>
+                    )}
+
+                    {question.sourceYear && (
+                        <span className="bg-slate-100 dark:bg-slate-800 border border-slate-200/50 dark:border-slate-700/50 text-slate-600 dark:text-slate-300 font-semibold rounded-full px-3 py-1 text-[11px] uppercase tracking-wider">{question.sourceYear}</span>
                     )}
                     
                     {/* Real tags */}
@@ -496,50 +498,48 @@ export default function QuestionCard({ question, index, testMode = false, isList
                             if (acronym.length > 1) displayTag = acronym;
                         }
                         return (
-                            <span key={`tax-${idx}`} className="bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium rounded-md px-2.5 py-0.5 text-[11px] uppercase tracking-wide">{displayTag}</span>
+                            <span key={`tax-${idx}`} className="bg-blue-500/5 dark:bg-blue-500/10 border border-blue-500/10 text-blue-700 dark:text-blue-400 font-semibold rounded-full px-3 py-1 text-[11px] uppercase tracking-wider">{displayTag}</span>
                         );
                     })}
                     {question.tags?.map((tag: string, idx: number) => (
-                        <span key={`tag-${idx}`} className="bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium rounded-md px-2.5 py-0.5 text-[11px] uppercase tracking-wide">{tag}</span>
+                        <span key={`tag-${idx}`} className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200/50 text-slate-500 dark:text-slate-400 font-medium rounded-full px-3 py-1 text-[11px] tracking-wide">{tag}</span>
                     ))}
-
-
                     
                     {question.isVerified && (
-                        <div className="flex items-center gap-1 text-[10px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-100 dark:border-indigo-500/20 uppercase tracking-wide">
-                            <ShieldCheck className="w-3 h-3" />
+                        <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 dark:bg-emerald-500/20 px-3 py-1 rounded-full border border-emerald-500/20 uppercase tracking-widest">
+                            <ShieldCheck className="w-3.5 h-3.5" />
                             VERIFIED
                         </div>
                     )}
                 </div>
                 
-                <div className="flex items-center gap-1">
-                    <Link href={`/question/${question.slug || question.id}`} className="text-slate-400 hover:text-blue-500 transition-colors p-1 shrink-0" title="Open Question Page">
-                        <ExternalLink className="h-4 w-4" />
+                <div className="flex items-center gap-1 opacity-60 group-hover:opacity-100 transition-opacity duration-300">
+                    <Link href={`/question/${question.slug || question.id}`} className="flex items-center justify-center w-8 h-8 rounded-full bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-all shrink-0" title="Open Question Page">
+                        <ExternalLink className="h-3.5 w-3.5" />
                     </Link>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <button className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors p-1 shrink-0 outline-none" title="More Options">
+                            <button className="flex items-center justify-center w-8 h-8 rounded-full bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all shrink-0 outline-none" title="More Options">
                                 <MoreVertical className="h-4 w-4" />
                             </button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={handlePrint} className="flex items-center gap-2 cursor-pointer">
-                                <Printer className="h-4 w-4" />
-                                <span>Print Question</span>
+                        <DropdownMenuContent align="end" className="rounded-xl shadow-lg border-slate-200/60 dark:border-slate-700/60 p-2">
+                            <DropdownMenuItem onClick={handlePrint} className="flex items-center gap-3 cursor-pointer rounded-lg p-2.5">
+                                <Printer className="h-4 w-4 text-slate-400" />
+                                <span className="font-medium text-slate-700 dark:text-slate-300">Print Question</span>
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleDownloadImage('square')} className="flex items-center gap-2 cursor-pointer">
-                                <Download className="h-4 w-4" />
-                                <span>Download as Image</span>
+                            <DropdownMenuItem onClick={() => handleDownloadImage('square')} className="flex items-center gap-3 cursor-pointer rounded-lg p-2.5 mt-1">
+                                <Download className="h-4 w-4 text-slate-400" />
+                                <span className="font-medium text-slate-700 dark:text-slate-300">Download as Image</span>
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
             </div>
 
-            <div className="flex flex-col gap-2 mb-5">
-                <div className="flex items-baseline gap-2">
-                    {index !== undefined && <span className="text-lg font-bold text-slate-800 dark:text-slate-200">{index}.</span>}
+            <div className="flex flex-col gap-2 mb-6">
+                <div className="flex items-baseline gap-3 relative z-10">
+                    {index !== undefined && <span className="text-xl font-extrabold text-[#FF9933]/90 shrink-0">{index}.</span>}
                     {isFillInTheBlank ? (
                         <div className="flex-1 w-full min-w-0">
                             <InteractiveFillInTheBlank 
@@ -558,10 +558,10 @@ export default function QuestionCard({ question, index, testMode = false, isList
                         </div>
                     ) : (
                         isDetailView ? (
-                            <h1 className="text-[1.3rem] md:text-[1.5rem] font-extrabold text-slate-800 dark:text-slate-200 leading-snug whitespace-pre-wrap mb-1 mt-0" dangerouslySetInnerHTML={{__html: renderMathInHtml(question.questionText)}} />
+                            <h1 className="text-[1.4rem] md:text-[1.6rem] font-[800] text-slate-800 dark:text-slate-100 leading-[1.5] tracking-tight whitespace-pre-wrap mb-1 mt-0" dangerouslySetInnerHTML={{__html: renderMathInHtml(question.questionText)}} />
                         ) : (
-                            <div className="text-[1rem] font-bold text-slate-800 dark:text-slate-200 leading-snug whitespace-pre-wrap">
-                                <Link href={`/question/${question.slug || question.id}`} className="hover:text-blue-600 transition-colors" dangerouslySetInnerHTML={{__html: renderMathInHtml(question.questionText)}} />
+                            <div className="text-[1.1rem] font-[700] text-slate-800 dark:text-slate-200 leading-[1.6] tracking-tight whitespace-pre-wrap">
+                                <Link href={`/question/${question.slug || question.id}`} className="hover:text-blue-600 transition-colors duration-200" dangerouslySetInnerHTML={{__html: renderMathInHtml(question.questionText)}} />
                             </div>
                         )
                     )}
