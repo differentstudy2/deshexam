@@ -13,8 +13,8 @@ export const DeshExamLogo = () => (
       height={32}
     />
     <div className="font-extrabold text-2xl tracking-tighter flex items-center">
-        <span className="bg-gradient-to-r from-[#FF9933] via-gray-100 to-[#138808] bg-clip-text text-transparent drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
-            DESH EXAM
+        <span>
+            <span className="text-[#FF9933]">DESH</span> <span className="text-[rgb(18,208,0)]">EXAM</span>
         </span>
     </div>
   </div>

@@ -6,6 +6,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import QuestionCard from '@/components/question-bank/QuestionCard';
 import QuestionListViewer from '@/components/question-bank/QuestionListViewer';
 import QuestionSidebar from '@/components/question-bank/QuestionSidebar';
+import QuestionsSidebar from '@/components/question-bank/QuestionsSidebar';
 import QuestionComments from '@/components/question-bank/QuestionComments';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
@@ -228,9 +229,15 @@ export default async function DynamicQuestionPage({ params }: Props) {
     ];
 
     return (
-      <div className="container max-w-6xl mx-auto py-12 px-4 flex flex-col lg:flex-row gap-8">
+      <div className="container max-w-7xl mx-auto py-12 px-4 flex flex-col lg:flex-row gap-6 xl:gap-8">
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemas) }} />
-        <div className="lg:w-3/4 w-full">
+        
+        {/* Left Sidebar */}
+        <div className="lg:w-1/4 xl:w-[22%] hidden lg:block shrink-0">
+            <QuestionsSidebar />
+        </div>
+
+        <div className="lg:w-1/2 xl:w-[56%] w-full min-w-0">
             {/* Breadcrumb */}
             <nav className="flex items-center text-xs md:text-sm text-slate-500 mb-6 md:mb-8 overflow-x-auto whitespace-nowrap scrollbar-hide py-2">
             <Link href="/" className="hover:text-[#107c41] flex items-center shrink-0">
@@ -296,7 +303,7 @@ export default async function DynamicQuestionPage({ params }: Props) {
             <QuestionComments questionId={question.id} />
 
         </div>
-        <div className="lg:w-1/4 w-full hidden lg:block">
+        <div className="lg:w-1/4 xl:w-[22%] w-full hidden lg:block shrink-0">
             <QuestionSidebar />
         </div>
       </div>
@@ -312,8 +319,13 @@ export default async function DynamicQuestionPage({ params }: Props) {
       const safeQuestionsList = JSON.parse(JSON.stringify(questionsList));
       const formattedTitle = lastSlug.replace(/-/g, ' ');
       return (
-          <div className="container max-w-6xl mx-auto py-12 px-4 flex flex-col lg:flex-row gap-8">
-            <div className="lg:w-3/4 w-full">
+          <div className="container max-w-7xl mx-auto py-12 px-4 flex flex-col lg:flex-row gap-6 xl:gap-8">
+            {/* Left Sidebar */}
+            <div className="lg:w-1/4 xl:w-[22%] hidden lg:block shrink-0">
+                <QuestionsSidebar />
+            </div>
+
+            <div className="lg:w-1/2 xl:w-[56%] w-full min-w-0">
                 {/* Breadcrumb */}
                 <nav className="flex items-center text-xs md:text-sm text-slate-500 mb-6 md:mb-8 overflow-x-auto whitespace-nowrap scrollbar-hide py-2">
                 <Link href="/" className="hover:text-[#107c41] flex items-center shrink-0">
@@ -330,7 +342,7 @@ export default async function DynamicQuestionPage({ params }: Props) {
                 <h1 className="text-3xl font-bold mb-8 capitalize">{formattedTitle} Questions</h1>
                 <QuestionListViewer questions={safeQuestionsList} />
             </div>
-            <div className="lg:w-1/4 w-full hidden lg:block">
+            <div className="lg:w-1/4 xl:w-[22%] w-full hidden lg:block shrink-0">
                 <QuestionSidebar />
             </div>
           </div>

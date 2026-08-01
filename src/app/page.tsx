@@ -250,11 +250,11 @@ export default function Home() {
         
         <div className="container relative z-10 px-4 mx-auto text-center">
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tighter uppercase mb-4 flex justify-center items-center">
-            <span className="bg-gradient-to-r from-[#FF9933] via-gray-100 to-[#138808] bg-clip-text text-transparent drop-shadow-lg">
-                DESH EXAM
+            <span className="drop-shadow-lg">
+                <span className="text-[#FF9933]">DESH</span> <span className="text-[rgb(18,208,0)]">EXAM</span>
             </span>
           </h1>
-          <p className="text-lg md:text-xl text-[#00a651] mb-12">The Largest Online Learning Platform in Bangladesh</p>
+          <p className="text-lg md:text-xl text-[#00a651] mb-12">The Largest Online Learning Platform in India</p>
           
           <div className="flex flex-wrap justify-center gap-6 md:gap-10 mt-12 relative z-10">
             <div className="flex items-center gap-4 text-white bg-white/10 backdrop-blur-lg border border-white/20 px-6 py-4 rounded-3xl hover:bg-white/20 hover:-translate-y-2 transition-all duration-300 shadow-2xl">
