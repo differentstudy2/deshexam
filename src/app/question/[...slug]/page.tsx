@@ -30,13 +30,27 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             question = await getQuestion(lastSlug);
         }
         if (question) {
-            const title = `${question.title || question.questionText.substring(0, 60)} | Answer & Explanation | DeshExam`;
-            const description = `Find the answer and explanation for "${question.questionText.substring(0, 100)}..." on DeshExam. Practice exam questions with detailed solutions and explanations.`;
+            const cleanQuestion = (question.questionText || '').replace(/(<([^>]+)>)/gi, "").trim();
+            const title = `${question.title || cleanQuestion.substring(0, 60)}${cleanQuestion.length > 60 && !question.title ? '...' : ''} | DeshExam`;
+            
+            let answerText = "";
+            if (question.options && question.correctAnswer) {
+                const optKey = String(question.correctAnswer).toLowerCase() as keyof typeof question.options;
+                answerText = question.options[optKey] || "";
+            }
+            if (!answerText) {
+                answerText = question.correctAnswer || "";
+            }
+            const cleanAnswer = typeof answerText === 'string' ? answerText.replace(/(<([^>]+)>)/gi, "").trim() : "";
+
+            const description = cleanAnswer
+                ? `Question: ${cleanQuestion.substring(0, 100)}${cleanQuestion.length > 100 ? '...' : ''} Answer: ${cleanAnswer.substring(0, 100)}. Find detailed explanations on DeshExam.`
+                : `Find the answer and explanation for "${cleanQuestion.substring(0, 100)}..." on DeshExam. Practice exam questions with detailed solutions.`;
             
             return {
                 title,
                 description,
-                keywords: [question.questionText.substring(0, 50), 'question answer', 'solution', 'explanation', question.subjectId || '', question.topicId || ''],
+                keywords: [cleanQuestion.substring(0, 50), 'question answer', 'solution', 'explanation', question.subjectId || '', question.topicId || ''],
                 alternates: {
                     canonical: `https://deshexam.com/question/${lastSlug}`
                 },
