@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getAssessments } from '@/lib/firebase/assessment';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
 export const revalidate = 86400; // Cache for 24 hours (1 day)
 
 export async function GET() {
