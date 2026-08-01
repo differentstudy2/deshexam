@@ -86,12 +86,13 @@ export default async function DynamicQuestionPage({ params }: Props) {
 
   let relatedQuestions: any[] = [];
   let taxonomyTags: string[] = [];
+  let breadcrumbTags: {title: string, slug: string}[] = [];
 
   if (question) {
       // 1. Fetch Taxonomies
       const leafId = question.topicId || question.chapterId || question.textbookId || question.subjectId || question.classId || question.boardId;
       
-      const titleCache = new Map<string, string | null>();
+      const titleCache = new Map<string, {title: string, slug: string} | null>();
       const tryFetchTitle = async (id: string, col1: string, col2: string) => {
           if (!id) return null;
           if (titleCache.has(id)) return titleCache.get(id);
@@ -100,39 +101,45 @@ export default async function DynamicQuestionPage({ params }: Props) {
               let snap = await getDoc(doc(db, 'taxonomy_nodes', id));
               if (snap.exists()) {
                   const val = snap.data().title || snap.data().name;
-                  titleCache.set(id, val);
-                  return val;
+                  const slug = snap.data().slug || id;
+                  const res = {title: val, slug};
+                  titleCache.set(id, res);
+                  return res;
               }
               
               // Fallback to legacy collections
               snap = await getDoc(doc(db, col1, id));
               if (snap.exists()) {
                   const val = snap.data().title || snap.data().name;
-                  titleCache.set(id, val);
-                  return val;
+                  const slug = snap.data().slug || id;
+                  const res = {title: val, slug};
+                  titleCache.set(id, res);
+                  return res;
               }
               snap = await getDoc(doc(db, col2, id));
               if (snap.exists()) {
                   const val = snap.data().title || snap.data().name;
-                  titleCache.set(id, val);
-                  return val;
+                  const slug = snap.data().slug || id;
+                  const res = {title: val, slug};
+                  titleCache.set(id, res);
+                  return res;
               }
           } catch(e) {}
           titleCache.set(id, null);
           return null;
       };
 
-      if (question.boardId) { const t = await tryFetchTitle(question.boardId, 'guide_boards', 'question_boards'); if (t && t !== 'Board') taxonomyTags.push(t); }
-      if (question.classId) { const t = await tryFetchTitle(question.classId, 'guide_classes', 'question_classes'); if (t && t !== 'Class') taxonomyTags.push(t); }
-      if (question.subjectId) { const t = await tryFetchTitle(question.subjectId, 'guide_subjects', 'question_subjects'); if (t && t !== 'Subject') taxonomyTags.push(t); }
-      if (question.textbookId) { const t = await tryFetchTitle(question.textbookId, 'guide_textbooks', 'question_textbooks'); if (t && t !== 'Textbook') taxonomyTags.push(t); }
-      if (question.chapterId) { const t = await tryFetchTitle(question.chapterId, 'guide_chapters', 'question_chapters'); if (t && t !== 'Chapter') taxonomyTags.push(t); }
-      if (question.topicId) { const t = await tryFetchTitle(question.topicId, 'guide_topics', 'question_topics'); if (t && t !== 'Topic') taxonomyTags.push(t); }
-      if (question.yearId) { const t = await tryFetchTitle(question.yearId, 'question_years', 'question_years'); if (t) taxonomyTags.push(t); }
+      if (question.boardId) { const t = await tryFetchTitle(question.boardId, 'guide_boards', 'question_boards'); if (t && t.title !== 'Board') { taxonomyTags.push(t.title); breadcrumbTags.push(t); } }
+      if (question.classId) { const t = await tryFetchTitle(question.classId, 'guide_classes', 'question_classes'); if (t && t.title !== 'Class') { taxonomyTags.push(t.title); breadcrumbTags.push(t); } }
+      if (question.subjectId) { const t = await tryFetchTitle(question.subjectId, 'guide_subjects', 'question_subjects'); if (t && t.title !== 'Subject') { taxonomyTags.push(t.title); breadcrumbTags.push(t); } }
+      if (question.textbookId) { const t = await tryFetchTitle(question.textbookId, 'guide_textbooks', 'question_textbooks'); if (t && t.title !== 'Textbook') { taxonomyTags.push(t.title); breadcrumbTags.push(t); } }
+      if (question.chapterId) { const t = await tryFetchTitle(question.chapterId, 'guide_chapters', 'question_chapters'); if (t && t.title !== 'Chapter') { taxonomyTags.push(t.title); breadcrumbTags.push(t); } }
+      if (question.topicId) { const t = await tryFetchTitle(question.topicId, 'guide_topics', 'question_topics'); if (t && t.title !== 'Topic') { taxonomyTags.push(t.title); breadcrumbTags.push(t); } }
+      if (question.yearId) { const t = await tryFetchTitle(question.yearId, 'question_years', 'question_years'); if (t) { taxonomyTags.push(t.title); breadcrumbTags.push(t); } }
       if (question.examIds && question.examIds.length > 0) {
           for (const examId of question.examIds) {
               const t = await tryFetchTitle(examId, 'question_exams', 'question_exams');
-              if (t) taxonomyTags.push(t);
+              if (t) { taxonomyTags.push(t.title); breadcrumbTags.push(t); }
           }
       }
 
@@ -140,10 +147,10 @@ export default async function DynamicQuestionPage({ params }: Props) {
           try {
               const hierarchy = await getTopicHierarchy(leafId);
               if (hierarchy) {
-                  if (hierarchy.boardTitle && hierarchy.boardTitle !== 'Board') taxonomyTags.push(hierarchy.boardTitle);
-                  if (hierarchy.classTitle && hierarchy.classTitle !== 'Class') taxonomyTags.push(hierarchy.classTitle);
-                  if (hierarchy.subjectTitle && hierarchy.subjectTitle !== 'Subject') taxonomyTags.push(hierarchy.subjectTitle);
-                  if (hierarchy.chapterTitle && hierarchy.chapterTitle !== 'Chapter') taxonomyTags.push(hierarchy.chapterTitle);
+                  if (hierarchy.boardTitle && hierarchy.boardTitle !== 'Board') { taxonomyTags.push(hierarchy.boardTitle); breadcrumbTags.push({title: hierarchy.boardTitle, slug: hierarchy.boardTitle.toLowerCase().replace(/ /g, '-')}); }
+                  if (hierarchy.classTitle && hierarchy.classTitle !== 'Class') { taxonomyTags.push(hierarchy.classTitle); breadcrumbTags.push({title: hierarchy.classTitle, slug: hierarchy.classTitle.toLowerCase().replace(/ /g, '-')}); }
+                  if (hierarchy.subjectTitle && hierarchy.subjectTitle !== 'Subject') { taxonomyTags.push(hierarchy.subjectTitle); breadcrumbTags.push({title: hierarchy.subjectTitle, slug: hierarchy.subjectTitle.toLowerCase().replace(/ /g, '-')}); }
+                  if (hierarchy.chapterTitle && hierarchy.chapterTitle !== 'Chapter') { taxonomyTags.push(hierarchy.chapterTitle); breadcrumbTags.push({title: hierarchy.chapterTitle, slug: hierarchy.chapterTitle.toLowerCase().replace(/ /g, '-')}); }
               }
           } catch(e) {}
       }
@@ -178,13 +185,13 @@ export default async function DynamicQuestionPage({ params }: Props) {
           // Hydrate tags for related questions
           await Promise.all(relatedQuestions.map(async (rq) => {
               let rTags: string[] = [];
-              if (rq.boardId) { const t = await tryFetchTitle(rq.boardId, 'guide_boards', 'question_boards'); if (t && t !== 'Board') rTags.push(t); }
-              if (rq.classId) { const t = await tryFetchTitle(rq.classId, 'guide_classes', 'question_classes'); if (t && t !== 'Class') rTags.push(t); }
-              if (rq.subjectId) { const t = await tryFetchTitle(rq.subjectId, 'guide_subjects', 'question_subjects'); if (t && t !== 'Subject') rTags.push(t); }
-              if (rq.textbookId) { const t = await tryFetchTitle(rq.textbookId, 'guide_textbooks', 'question_textbooks'); if (t && t !== 'Textbook') rTags.push(t); }
-              if (rq.chapterId) { const t = await tryFetchTitle(rq.chapterId, 'guide_chapters', 'question_chapters'); if (t && t !== 'Chapter') rTags.push(t); }
-              if (rq.topicId) { const t = await tryFetchTitle(rq.topicId, 'guide_topics', 'question_topics'); if (t && t !== 'Topic') rTags.push(t); }
-              if (rq.yearId) { const t = await tryFetchTitle(rq.yearId, 'question_years', 'question_years'); if (t) rTags.push(t); }
+              if (rq.boardId) { const t = await tryFetchTitle(rq.boardId, 'guide_boards', 'question_boards'); if (t && t.title !== 'Board') rTags.push(t.title); }
+              if (rq.classId) { const t = await tryFetchTitle(rq.classId, 'guide_classes', 'question_classes'); if (t && t.title !== 'Class') rTags.push(t.title); }
+              if (rq.subjectId) { const t = await tryFetchTitle(rq.subjectId, 'guide_subjects', 'question_subjects'); if (t && t.title !== 'Subject') rTags.push(t.title); }
+              if (rq.textbookId) { const t = await tryFetchTitle(rq.textbookId, 'guide_textbooks', 'question_textbooks'); if (t && t.title !== 'Textbook') rTags.push(t.title); }
+              if (rq.chapterId) { const t = await tryFetchTitle(rq.chapterId, 'guide_chapters', 'question_chapters'); if (t && t.title !== 'Chapter') rTags.push(t.title); }
+              if (rq.topicId) { const t = await tryFetchTitle(rq.topicId, 'guide_topics', 'question_topics'); if (t && t.title !== 'Topic') rTags.push(t.title); }
+              if (rq.yearId) { const t = await tryFetchTitle(rq.yearId, 'question_years', 'question_years'); if (t) rTags.push(t.title); }
               rq.taxonomyTags = Array.from(new Set(rTags));
           }));
       } catch(e) {}
@@ -199,8 +206,8 @@ export default async function DynamicQuestionPage({ params }: Props) {
         { name: 'Home', url: 'https://deshexam.com' },
         { name: 'Questions', url: 'https://deshexam.com/questions' }
     ];
-    if (safeQuestion.taxonomyTags.length > 0) {
-        safeQuestion.taxonomyTags.forEach((t: string) => breadcrumbItems.push({ name: t, url: `https://deshexam.com/questions/${t.toLowerCase().replace(/ /g, '-')}` }));
+    if (breadcrumbTags.length > 0) {
+        breadcrumbTags.forEach((t: {title: string, slug: string}) => breadcrumbItems.push({ name: t.title, url: `https://deshexam.com/question/${t.slug}` }));
     }
     breadcrumbItems.push({ name: question.title || lastSlug, url: `https://deshexam.com/question/${lastSlug}` });
 
@@ -246,15 +253,15 @@ export default async function DynamicQuestionPage({ params }: Props) {
             <ChevronRight className="w-3 h-3 md:w-4 md:h-4 mx-1 md:mx-2 shrink-0" />
             <Link href="/questions" className="hover:text-[#107c41] shrink-0">Question Bank</Link>
             
-            {safeQuestion.taxonomyTags.length > 0 ? (
-                safeQuestion.taxonomyTags.map((tag: string, i: number) => {
-                    let displayTag = tag;
-                    if (i === 0 && tag.length > 12) {
+            {breadcrumbTags.length > 0 ? (
+                breadcrumbTags.map((tag: {title: string, slug: string}, i: number) => {
+                    let displayTag = tag.title;
+                    if (i === 0 && tag.title.length > 12) {
                         const ignoreWords = ['of', 'and', 'for', 'the', '&', 'in', 'on', 'at'];
-                        const acronym = tag.split(/[\s-]+/).filter(w => w && !ignoreWords.includes(w.toLowerCase())).map(w => w[0]?.toUpperCase()).join('');
+                        const acronym = tag.title.split(/[\s-]+/).filter(w => w && !ignoreWords.includes(w.toLowerCase())).map(w => w[0]?.toUpperCase()).join('');
                         if (acronym.length > 1) displayTag = acronym;
                     }
-                    const href = `/guide/${slugArray.slice(0, i + 1).join('/')}`;
+                    const href = `/question/${tag.slug}`;
                     return (
                         <React.Fragment key={`tag-${i}`}>
                             <ChevronRight className="w-3 h-3 md:w-4 md:h-4 mx-1 md:mx-2 shrink-0 text-slate-400" />
@@ -270,7 +277,7 @@ export default async function DynamicQuestionPage({ params }: Props) {
                         const acronym = displayTag.split(/[\s-]+/).filter(w => w && !ignoreWords.includes(w.toLowerCase())).map(w => w[0]?.toUpperCase()).join('');
                         if (acronym.length > 1) displayTag = acronym;
                     }
-                    const href = `/guide/${slugArray.slice(0, i + 1).join('/')}`;
+                    const href = `/question/${slugArray.slice(0, i + 1).join('/')}`;
                     return (
                         <React.Fragment key={`slug-${i}`}>
                             <ChevronRight className="w-3 h-3 md:w-4 md:h-4 mx-1 md:mx-2 shrink-0 text-slate-400" />

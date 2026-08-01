@@ -28,9 +28,9 @@ export default async function QuestionSidebar() {
     return (
         <div className="w-full space-y-6">
             <div className="bg-gradient-to-br from-white to-slate-50/50 dark:from-slate-900 dark:to-slate-900 rounded-[24px] border border-slate-200/60 dark:border-slate-800/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] hover:shadow-[0_12px_40px_rgb(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 overflow-hidden">
-                <div className="bg-slate-50/80 dark:bg-slate-800/50 border-b border-slate-100/80 dark:border-slate-800/80 px-6 py-4">
-                    <h3 className="text-lg font-extrabold text-slate-800 dark:text-slate-200 flex items-center gap-2.5 tracking-tight">
-                        <BookOpen className="w-5 h-5 text-[#107c41]" /> Exam Categories
+                <div className="bg-[#107c41] px-6 py-4">
+                    <h3 className="text-lg font-extrabold text-white flex items-center gap-2.5 tracking-tight">
+                        <BookOpen className="w-5 h-5 text-white/90" /> Exam Categories
                     </h3>
                 </div>
                 <div className="flex flex-col space-y-1 p-6 pt-5">
@@ -48,9 +48,9 @@ export default async function QuestionSidebar() {
 
             {popularQuestions.length > 0 && (
                 <div className="bg-gradient-to-br from-white to-slate-50/50 dark:from-slate-900 dark:to-slate-900 rounded-[24px] border border-slate-200/60 dark:border-slate-800/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] hover:shadow-[0_12px_40px_rgb(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 overflow-hidden">
-                    <div className="bg-orange-50/50 dark:bg-orange-950/20 border-b border-slate-100/80 dark:border-slate-800/80 px-6 py-4">
-                        <h3 className="text-lg font-extrabold text-slate-800 dark:text-slate-200 flex items-center gap-2.5 tracking-tight">
-                            <Flame className="w-5 h-5 text-orange-500" /> Popular Questions
+                    <div className="bg-orange-500 px-6 py-4">
+                        <h3 className="text-lg font-extrabold text-white flex items-center gap-2.5 tracking-tight">
+                            <Flame className="w-5 h-5 text-white/90" /> Popular Questions
                         </h3>
                     </div>
                     <div className="flex flex-col space-y-3 p-6 pt-5">
@@ -68,9 +68,9 @@ export default async function QuestionSidebar() {
 
             {recentQuestions.length > 0 && (
                 <div className="bg-gradient-to-br from-white to-slate-50/50 dark:from-slate-900 dark:to-slate-900 rounded-[24px] border border-slate-200/60 dark:border-slate-800/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] hover:shadow-[0_12px_40px_rgb(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 overflow-hidden">
-                    <div className="bg-blue-50/50 dark:bg-blue-950/20 border-b border-slate-100/80 dark:border-slate-800/80 px-6 py-4">
-                        <h3 className="text-lg font-extrabold text-slate-800 dark:text-slate-200 flex items-center gap-2.5 tracking-tight">
-                            <Clock className="w-5 h-5 text-blue-500" /> Recent Questions
+                    <div className="bg-blue-600 px-6 py-4">
+                        <h3 className="text-lg font-extrabold text-white flex items-center gap-2.5 tracking-tight">
+                            <Clock className="w-5 h-5 text-white/90" /> Recent Questions
                         </h3>
                     </div>
                     <div className="flex flex-col space-y-3 p-6 pt-5">
@@ -86,9 +86,9 @@ export default async function QuestionSidebar() {
             )}
 
             <div className="bg-gradient-to-br from-white to-slate-50/50 dark:from-slate-900 dark:to-slate-900 rounded-[24px] border border-slate-200/60 dark:border-slate-800/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] hover:shadow-[0_12px_40px_rgb(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 overflow-hidden">
-                <div className="bg-indigo-50/50 dark:bg-indigo-950/20 border-b border-slate-100/80 dark:border-slate-800/80 px-6 py-4">
-                    <h3 className="text-lg font-extrabold text-slate-800 dark:text-slate-200 flex items-center gap-2.5 tracking-tight">
-                        <ExternalLink className="w-5 h-5 text-indigo-500" /> Study Resources
+                <div className="bg-indigo-600 px-6 py-4">
+                    <h3 className="text-lg font-extrabold text-white flex items-center gap-2.5 tracking-tight">
+                        <ExternalLink className="w-5 h-5 text-white/90" /> Study Resources
                     </h3>
                 </div>
                 <div className="flex flex-col space-y-2 p-6 pt-5">
