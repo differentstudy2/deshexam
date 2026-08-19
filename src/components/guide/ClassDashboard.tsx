@@ -398,7 +398,7 @@ export function ClassDashboard({ classes }: { classes: any[] }) {
                 <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
                   <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Study Materials</h3>
                   <ul className="space-y-3">
-                    <li><Link href="/textbooks" className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium transition-colors flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>Textbooks & PDF Notes</Link></li>
+
                     <li><Link href="/practice" className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium transition-colors flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>Chapter-wise MCQ Practice</Link></li>
                     <li><Link href="/previous-year-papers" className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium transition-colors flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>Previous Year Questions (PYQ)</Link></li>
                     <li><Link href="/textbook-solutions" className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium transition-colors flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>Subject-wise Solutions</Link></li>

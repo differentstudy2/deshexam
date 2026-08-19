@@ -44,7 +44,7 @@ export function Footer() {
               <li><Link href="/questions" className="hover:text-white transition-colors">Question Bank</Link></li>
               <li><Link href="/previous-year-papers" className="hover:text-white transition-colors">Previous Papers</Link></li>
               <li><Link href="/course" className="hover:text-white transition-colors">Courses</Link></li>
-              <li><Link href="/textbooks" className="hover:text-white transition-colors">Books & Textbooks</Link></li>
+
               <li><Link href="/textbook-solutions" className="hover:text-white transition-colors">Textbook Solutions</Link></li>
             </ul>
           </div>
