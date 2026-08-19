@@ -32,7 +32,7 @@ if (!getApps().some(app => app.name === adminAppName)) {
   adminApp = getApps().find(app => app.name === adminAppName)!;
 }
 
-const db = getFirestore(adminApp);
+const db = getFirestore(adminApp, "deshexam");
 
 export const dynamic = 'force-dynamic';
 
