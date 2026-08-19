@@ -247,11 +247,8 @@ export const NotificationBell = () => {
       }
     };
     
-    // Poll for notifications every 10 seconds just to keep it somewhat updated, 
-    // or rely on a simple load. For now just fetch once on mount/user change.
+    // Fetch once on mount/user change. Push notifications should ideally handle live updates.
     fetchProfile();
-    const interval = setInterval(fetchProfile, 10000);
-    return () => clearInterval(interval);
   }, [user]);
 
   if (!user) return null;
