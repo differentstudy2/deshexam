@@ -1229,9 +1229,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             <div className="flex items-center w-full md:w-auto justify-between md:justify-start">
                                 {showLogo && (
                                     <div className="flex items-center gap-2 md:gap-3">
-                                        <img src="/image/logo.png" alt="DeshExam" style={{ height: `${2.25 * headerScale}rem` }} className="w-auto object-contain drop-shadow-sm" />
+                                        <img src="/icons/icon-192x192.png" alt="DeshExam" style={{ height: `${2.25 * headerScale}rem` }} className="w-auto object-contain drop-shadow-sm rounded-full bg-white p-1" />
                                         <div className="flex flex-col justify-center">
-                                            <span className="font-extrabold text-indigo-950 dark:text-gray-100 leading-tight" style={{ fontSize: `${1.1 * headerScale}rem` }}>Desh Exam Academy</span>
+                                            <span className="font-extrabold text-indigo-950 dark:text-gray-100 leading-tight" style={{ fontSize: `${1.1 * headerScale}rem` }}>DESH EXAM</span>
                                             <span className="text-indigo-800/80 dark:text-gray-400 font-bold tracking-widest uppercase mt-0.5" style={{ fontSize: `${0.55 * headerScale}rem` }}>Learn • Practice • Succeed</span>
                                         </div>
                                     </div>
@@ -1637,7 +1637,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     </button>
 
                                     {isShortcutsOpen && (
-                                        <div className="fixed bottom-[80px] left-1/2 -translate-x-1/2 md:absolute md:bottom-full md:left-auto md:right-0 md:translate-x-0 md:mb-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.2)] p-5 w-[90vw] sm:w-[400px] z-[70] animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[70vh] md:max-h-[60vh]">
+                                        <div className="fixed bottom-[80px] left-1/2 -translate-x-1/2 md:absolute md:bottom-full md:left-auto md:right-0 md:translate-x-0 md:mb-4 bg-white dark:bg-gray-900 !bg-opacity-100 !opacity-100 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)] p-5 w-[90vw] sm:w-[400px] z-[70] animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[70vh] md:max-h-[60vh]">
                                             <div className="flex justify-between items-center mb-4 pb-3 border-b border-gray-100 shrink-0">
                                                 <h3 className="font-bold text-gray-800 dark:text-gray-200 text-lg flex items-center gap-2">
                                                     <Keyboard className="w-5 h-5 text-gray-500" /> Keyboard Shortcuts
@@ -1677,7 +1677,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     </button>
 
                                     {isSettingsOpen && (
-                                        <div className="fixed bottom-[80px] left-1/2 -translate-x-1/2 md:absolute md:bottom-full md:left-auto md:right-0 md:translate-x-0 md:mb-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.2)] p-5 w-[90vw] sm:w-[340px] z-[70] animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[70vh] md:max-h-[60vh]">
+                                        <div className="fixed bottom-[80px] left-1/2 -translate-x-1/2 md:absolute md:bottom-full md:left-auto md:right-0 md:translate-x-0 md:mb-4 bg-white dark:bg-gray-900 !bg-opacity-100 !opacity-100 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)] p-5 w-[90vw] sm:w-[340px] z-[70] animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[70vh] md:max-h-[60vh]">
                                             <div className="flex justify-between items-center mb-4 pb-3 border-b border-gray-100 shrink-0">
                                                 <h3 className="font-bold text-gray-800 dark:text-gray-200 text-lg flex items-center gap-2">
                                                     <Settings className="w-5 h-5 text-gray-500" /> Settings
@@ -2455,9 +2455,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                         className="shrink-0 bg-gradient-to-r from-indigo-50 via-white to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 border-b border-indigo-100/50 dark:border-gray-700/50 flex flex-row justify-between items-center w-full z-30 shadow-sm relative px-6 py-4"
                                     >
                                         <div className="flex items-center gap-3 w-1/3">
-                                            {showLogo && <img src="/image/logo.png" alt="DeshExam" className="h-10 w-auto object-contain drop-shadow-sm" />}
+                                            {showLogo && <img src="/icons/icon-192x192.png" alt="DeshExam" className="h-10 w-auto object-contain drop-shadow-sm rounded-full bg-white p-1" />}
                                             <div className="flex flex-col justify-center">
-                                                <span className="font-extrabold text-indigo-950 dark:text-gray-100 leading-tight text-lg">Desh Exam Academy</span>
+                                                <span className="font-extrabold text-indigo-950 dark:text-gray-100 leading-tight text-lg">DESH EXAM</span>
                                                 <span className="text-indigo-800/80 dark:text-gray-400 font-bold tracking-widest uppercase mt-0.5 text-[10px]">Learn • Practice • Succeed</span>
                                             </div>
                                         </div>
