@@ -13,7 +13,7 @@ interface GlobalTakePageProps {
 const getCachedQuestions = unstable_cache(
   async (ids: string[]) => getQuestionsByIds(ids),
   ['questions-by-ids'],
-  { revalidate: 86400, tags: ['questions'] }
+  { revalidate: 2592000, tags: ['questions'] } // 30 days cache
 );
 
 export async function GlobalTakePage({ collectionName, slug }: GlobalTakePageProps) {
