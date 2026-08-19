@@ -47,13 +47,7 @@ export const FirebaseProvider = ({ children }: { children: ReactNode }) => {
     const auth = getAuth(app);
     let db: Firestore;
     try {
-      if (typeof window !== 'undefined') {
-        db = initializeFirestore(app, {
-          localCache: persistentLocalCache({tabManager: persistentMultipleTabManager()})
-        }, "deshexam");
-      } else {
-        db = getFirestore(app, "deshexam");
-      }
+      db = getFirestore(app, "deshexam");
     } catch (e) {
       console.error("Error getting Firestore instance", e);
       db = getFirestore(app, "deshexam");
