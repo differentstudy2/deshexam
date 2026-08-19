@@ -459,12 +459,11 @@ export const AdminSidebar = ({ onLinkClick, logOut }: { onLinkClick?: () => void
                     <div className="font-extrabold text-xl tracking-tighter flex items-baseline group-data-[collapsible=icon]:hidden whitespace-nowrap">
                         <span className="bg-gradient-to-r from-emerald-500 to-teal-400 bg-clip-text text-transparent drop-shadow-sm">DESH</span>
                         <span className="text-slate-800 dark:text-white drop-shadow-sm">EXAM</span>
-                        <span className="ml-2 text-[9px] font-bold text-indigo-600 dark:text-indigo-300 uppercase tracking-widest bg-indigo-100/50 dark:bg-indigo-500/20 px-1.5 py-0.5 rounded border border-indigo-200/50 dark:border-indigo-500/30 shadow-sm">Admin</span>
                     </div>
                 </Link>
             </div>
             <ScrollArea className="flex-1 bg-transparent relative z-10">
-                <div className="space-y-6 px-3 py-6 group-data-[collapsible=icon]:px-2">
+                <div className="space-y-4 px-3 py-4 group-data-[collapsible=icon]:px-2">
                     {adminNavGroups.map((group, idx) => {
                         const isOpen = openGroups[group.title];
                         return (
@@ -486,7 +485,7 @@ export const AdminSidebar = ({ onLinkClick, logOut }: { onLinkClick?: () => void
                                                 asChild
                                                 variant="ghost"
                                                 className={cn(
-                                                    "justify-start w-full h-11 px-3 py-2 text-[15px] rounded-xl transition-all duration-300 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 border",
+                                                    "justify-start w-full h-9 px-3 py-1.5 text-sm rounded-lg transition-all duration-300 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 border",
                                                     isActive 
                                                         ? "bg-white dark:bg-slate-800 text-indigo-700 dark:text-indigo-300 font-semibold shadow-sm border-indigo-100 dark:border-indigo-500/30 hover:bg-indigo-50 dark:hover:bg-indigo-900/50" 
                                                         : "bg-transparent text-slate-600 dark:text-slate-400 border-transparent hover:bg-white/60 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-slate-100 font-medium"
@@ -494,7 +493,7 @@ export const AdminSidebar = ({ onLinkClick, logOut }: { onLinkClick?: () => void
                                             >
                                                 <Link href={item.href} onClick={onLinkClick}>
                                                     <span className={cn("transition-colors flex-shrink-0 drop-shadow-sm", isActive ? "text-indigo-600 dark:text-indigo-400" : "text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300", "group-data-[collapsible=icon]:mx-auto")}>
-                                                        {React.cloneElement(item.icon as React.ReactElement, { className: "w-5 h-5" })}
+                                                        {React.cloneElement(item.icon as React.ReactElement, { className: "w-4 h-4" })}
                                                     </span>
                                                     <span className="ml-3 group-data-[collapsible=icon]:hidden whitespace-nowrap tracking-wide">{item.label}</span>
                                                 </Link>
@@ -511,7 +510,7 @@ export const AdminSidebar = ({ onLinkClick, logOut }: { onLinkClick?: () => void
                         <Button
                             asChild
                             variant="ghost"
-                            className="justify-start w-full h-10 px-3 py-2 text-sm font-medium rounded-xl border border-transparent bg-transparent hover:bg-white/60 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-all duration-300 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0"
+                            className="justify-start w-full h-9 px-3 py-1.5 text-sm font-medium rounded-lg border border-transparent bg-transparent hover:bg-white/60 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-all duration-300 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0"
                         >
                             <Link href="/dashboard" onClick={onLinkClick}>
                                 <LayoutGrid className="h-4 w-4 text-slate-400 dark:text-slate-500 flex-shrink-0 group-data-[collapsible=icon]:mx-auto" />
@@ -522,7 +521,7 @@ export const AdminSidebar = ({ onLinkClick, logOut }: { onLinkClick?: () => void
                 </div>
             </ScrollArea>
             <div className="p-4 border-t border-slate-200/50 dark:border-white/10 bg-white/50 dark:bg-slate-950/50 backdrop-blur-md shrink-0 group-data-[collapsible=icon]:p-2 flex flex-col items-center relative z-10">
-                <Button variant="ghost" className="w-full justify-start text-rose-500 dark:text-rose-400 hover:text-rose-600 dark:hover:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:border-rose-100 dark:hover:border-rose-500/20 border border-transparent rounded-xl transition-all duration-300 h-10 px-3 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 font-medium tracking-wide" onClick={logOut}>
+                <Button variant="ghost" className="w-full justify-start text-rose-500 dark:text-rose-400 hover:text-rose-600 dark:hover:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:border-rose-100 dark:hover:border-rose-500/20 border border-transparent rounded-lg transition-all duration-300 h-9 px-3 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 font-medium tracking-wide" onClick={logOut}>
                     <LogOut className="mr-3 h-4 w-4 flex-shrink-0 group-data-[collapsible=icon]:mr-0"/>
                     <span className="group-data-[collapsible=icon]:hidden whitespace-nowrap">Logout</span>
                 </Button>
