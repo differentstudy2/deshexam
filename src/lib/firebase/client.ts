@@ -28,12 +28,12 @@ try {
   if (typeof window !== 'undefined') {
     db = initializeFirestore(app, {
       localCache: persistentLocalCache({tabManager: persistentMultipleTabManager()})
-    });
+    }, "deshexam");
   } else {
-    db = getFirestore(app);
+    db = getFirestore(app, "deshexam");
   }
 } catch (e) {
-  db = getFirestore(app);
+  db = getFirestore(app, "deshexam");
 }
 const storage = getStorage(app);
 const googleProvider = new GoogleAuthProvider();

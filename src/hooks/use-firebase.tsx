@@ -50,12 +50,13 @@ export const FirebaseProvider = ({ children }: { children: ReactNode }) => {
       if (typeof window !== 'undefined') {
         db = initializeFirestore(app, {
           localCache: persistentLocalCache({tabManager: persistentMultipleTabManager()})
-        });
+        }, "deshexam");
       } else {
-        db = getFirestore(app);
+        db = getFirestore(app, "deshexam");
       }
     } catch (e) {
-      db = getFirestore(app);
+      console.error("Error getting Firestore instance", e);
+      db = getFirestore(app, "deshexam");
     }
     const storage = getStorage(app);
     const messaging = typeof window !== 'undefined' ? getMessaging(app) : null;
