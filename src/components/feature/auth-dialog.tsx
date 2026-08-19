@@ -353,6 +353,13 @@ const SignUpForm = () => {
 // Main Auth Dialog
 export function AuthDialog() {
   const { isOpen, variant, closeAuthDialog } = useAuthDialog();
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (user && isOpen) {
+      closeAuthDialog();
+    }
+  }, [user, isOpen, closeAuthDialog]);
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && closeAuthDialog()}>
