@@ -294,7 +294,7 @@ const ContentTypeNavigation = () => {
       { name: 'Practice Questions', href: '/admin/add-practice-questions' },
       { name: 'Exam', href: '/admin/add-exam' },
       { name: 'Learn Article', href: '/admin/add-article' },
-      { name: 'Textbook', href: '/admin/textbooks/add' },
+
     ];
 
     return (
