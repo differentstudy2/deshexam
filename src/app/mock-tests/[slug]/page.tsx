@@ -55,7 +55,7 @@ export default async function MockTestLandingPage({ params }: Props) {
   const { slug } = await params;
   const test = await getAssessmentBySlug('mockTests', slug) as MockTest | null;
 
-  if (!test || test.status !== 'Published') notFound();
+  if (!test) notFound();
 
   const allTests = await getAssessments('mockTests') as MockTest[];
   const rawRelated = allTests.filter(a => a.id !== test.id && a.status === 'Published').slice(0, 4);

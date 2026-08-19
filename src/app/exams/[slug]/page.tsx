@@ -34,7 +34,7 @@ export default async function ExamPaperLandingPage({ params }: Props) {
 
   const test = await getAssessmentBySlug('examPapers', slug) as ExamPaper | null;
 
-  if (!test || test.status !== 'Published') {
+  if (!test) {
     notFound();
   }
 

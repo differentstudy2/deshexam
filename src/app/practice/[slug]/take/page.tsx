@@ -27,45 +27,9 @@ export async function generateMetadata({ params }: Props, parent: ResolvingMetad
 import { CACHE_SETTINGS } from '@/lib/cache-settings';
 export const revalidate = 3600;
 
-const getCachedQuestions = unstable_cache(
-  async (ids: string[]) => getQuestionsByIds(ids),
-  ['questions-by-ids'],
-  { revalidate: 86400, tags: ['questions'] }
-);
+import { GlobalTakePage } from '@/components/assessment/GlobalTakePage';
 
 export default async function PracticeTakePage({ params }: Props) {
   const resolvedParams = await params;
-  const slug = resolvedParams.slug;
-
-  let set = await getAssessmentBySlug('practiceSets', slug) as PracticeSet | null;
-
-  if (!set) {
-    set = await getAssessment('practiceSets', slug) as PracticeSet | null;
-  }
-
-  if (!set || set.status !== 'Published') {
-    notFound();
-  }
-
-  const questionIds = set.questionIds || [];
-  const rawQuestions = await getCachedQuestions(questionIds);
-
-  const examConfig: ExamConfig = {
-    id: set.id,
-    slug: set.slug,
-    title: set.title,
-    durationMin: set.estimatedTimeMin || 60,
-    totalMarks: rawQuestions.reduce((sum, q) => sum + (q.marks || 1), 0),
-    negativeMarking: 0,
-    attemptsAllowed: 0,
-    isStrictMode: false,
-    shuffleQuestions: false,
-    shuffleOptions: false,
-    accessType: set.accessType,
-    allowedSubscriptionPlans: set.allowedSubscriptionPlans
-  };
-
-  const serializedQuestions = JSON.parse(JSON.stringify(rawQuestions));
-
-  return <ExamClient mockTest={examConfig} initialQuestions={serializedQuestions} />;
+  return <GlobalTakePage collectionName="practiceSets" slug={resolvedParams.slug} />;
 }

@@ -113,7 +113,7 @@ export default async function PracticeLandingPage({ params }: Props) {
     }
   }
 
-  if (!test || test.status !== 'Published') notFound();
+  if (!test) notFound();
 
   const allTests = await getAssessments('practiceSets') as MockTest[];
   const rawRelated = allTests.filter(a => a.id !== test.id && a.status === 'Published').slice(0, 4);
