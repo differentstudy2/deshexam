@@ -134,7 +134,7 @@ const adminNavGroups = [
       { href: '/admin/guide-content', label: 'Guide Manager', icon: <Compass className="h-4 w-4" /> },
       { href: '/admin/kids-zone/manage', label: 'Kids Zone', icon: <ToyBrick className="h-4 w-4" /> },
       { href: '/admin/guide', label: 'Guides', icon: <Compass className="h-4 w-4" /> },
-      { href: '/admin/content', label: 'Content Manager', icon: <FileText className="h-4 w-4" /> },
+
     ]
   },
   {

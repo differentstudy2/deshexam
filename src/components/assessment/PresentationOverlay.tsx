@@ -1283,7 +1283,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                         {/* Floating Controls (Timer & Read Aloud) */}
                         <div
-                            className={`absolute bottom-20 right-4 md:bottom-28 md:right-10 flex items-stretch gap-2 md:gap-3 z-[60]`}
+                            className={`absolute top-24 right-4 md:top-28 md:right-10 flex items-stretch gap-2 md:gap-3 z-[60]`}
                             style={{ transform: `translate(${timerPos.x}px, ${timerPos.y}px)` }}
                         >
                             {isTimerEnabled && (
