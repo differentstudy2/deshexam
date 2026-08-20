@@ -146,7 +146,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [videoOpacity, setVideoOpacity] = useState(40);
     const [bgOpacity, setBgOpacity] = useState(100);
     const [qBgColor, setQBgColor] = useState('bg-white/90 dark:bg-gray-800/90');
-    const [qTextColor, setQTextColor] = useState('#000000');
+    const [qTextColor, setQTextColor] = useState('default');
     const [animSpeed, setAnimSpeed] = useState(0.8);
 
     const getBgThemeClasses = () => {
@@ -1349,8 +1349,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                             })
                                         } as unknown as React.CSSProperties}
                                     >
-                                        <span className={`font-extrabold leading-normal shrink-0 ${bgTheme === 'video' ? 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]' : 'text-indigo-600 dark:text-indigo-400 drop-shadow-sm'}`} style={{ fontSize: 'var(--q-size)' }}>Q{currentSlide + 1}.</span>
-                                        <div className={`prose max-w-none prose-p:font-extrabold text-[length:var(--q-size)] leading-normal text-left font-extrabold capitalize [&_*]:!text-[length:var(--q-size)] [&_*]:!leading-normal [&_*]:!m-0 ${qTextColor !== 'default' ? 'text-[var(--q-color)] [&_*]:!text-[var(--q-color)] drop-shadow-sm [&_*]:!drop-shadow-sm' : (bgTheme === 'video' ? 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] [&_*]:!text-white [&_*]:!drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]' : 'text-black dark:text-gray-100 [&_*]:!text-black dark:[&_*]:!text-gray-100')}`}>
+                                        <span className={`font-extrabold leading-normal shrink-0 ${bgTheme === 'video' ? 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]' : 'text-indigo-600 dark:text-blue-400 drop-shadow-sm'}`} style={{ fontSize: 'var(--q-size)' }}>Q{currentSlide + 1}.</span>
+                                        <div className={`prose dark:prose-invert max-w-none prose-p:font-extrabold text-[length:var(--q-size)] leading-normal text-left font-extrabold capitalize [&_*]:!text-[length:var(--q-size)] [&_*]:!leading-normal [&_*]:!m-0 ${qTextColor !== 'default' ? 'text-[var(--q-color)] [&_*]:!text-[var(--q-color)] drop-shadow-sm [&_*]:!drop-shadow-sm' : (bgTheme === 'video' ? 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] [&_*]:!text-white [&_*]:!drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]' : 'text-slate-900 dark:text-white [&_*]:!text-slate-900 dark:[&_*]:!text-white')}`}>
                                             <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
                                                 {q.questionText}
                                             </ReactMarkdown>
@@ -1481,7 +1481,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                         <div className={letterClasses}>
                                                             {optLetter}
                                                         </div>
-                                                        <div className={`prose dark:prose-invert max-w-none text-black dark:text-gray-100 [&>p]:m-0 [&>p]:text-[length:var(--opt-size)] [&>p]:font-semibold [&>p]:leading-snug flex-1 capitalize ${eliminatedOptions.includes(opt.key) && step === 0 ? 'line-through opacity-50' : ''}`}>
+                                                        <div className={`prose dark:prose-invert max-w-none text-slate-900 dark:text-white [&_*]:!text-slate-900 dark:[&_*]:!text-white [&>p]:m-0 [&>p]:text-[length:var(--opt-size)] [&>p]:font-semibold [&>p]:leading-snug flex-1 capitalize ${eliminatedOptions.includes(opt.key) && step === 0 ? 'line-through opacity-50' : ''}`}>
                                                             <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
                                                                 {opt.text}
                                                             </ReactMarkdown>
@@ -1584,7 +1584,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 {/* Fullscreen Toggle Button */}
                                 <button
                                     onClick={toggleFullscreen}
-                                    className="p-2 md:p-3 rounded-full transition-all shadow-sm bg-white/60 hover:bg-white text-indigo-600 shrink-0"
+                                    className="p-2 md:p-3 rounded-full transition-all shadow-sm bg-white/60 hover:bg-white text-indigo-600 dark:bg-gray-700/60 dark:hover:bg-gray-700 dark:text-gray-300 shrink-0"
                                     title="Toggle Fullscreen (F11)"
                                 >
                                     {isFullscreen ? <Minimize className="w-5 h-5 md:w-6 md:h-6" /> : <Maximize className="w-5 h-5 md:w-6 md:h-6" />}
@@ -1593,7 +1593,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 {/* Print Button */}
                                 <button
                                     onClick={() => window.print()}
-                                    className="hidden md:block p-2 md:p-3 rounded-full transition-all shadow-sm bg-white/60 hover:bg-white text-indigo-600 shrink-0"
+                                    className="hidden md:block p-2 md:p-3 rounded-full transition-all shadow-sm bg-white/60 hover:bg-white text-indigo-600 dark:bg-gray-700/60 dark:hover:bg-gray-700 dark:text-gray-300 shrink-0"
                                     title="Print Slides (Ctrl+P)"
                                 >
                                     <Printer className="w-5 h-5 md:w-6 md:h-6" />
@@ -1602,7 +1602,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 {/* Spotlight Toggle Button */}
                                 <button
                                     onClick={() => setIsSpotlightActive(!isSpotlightActive)}
-                                    className={`hidden sm:block p-2 md:p-3 rounded-full transition-all shadow-sm shrink-0 ${isSpotlightActive ? 'bg-yellow-500 text-white ring-2 ring-yellow-300' : 'bg-white/60 hover:bg-white text-indigo-600'}`}
+                                    className={`hidden sm:block p-2 md:p-3 rounded-full transition-all shadow-sm shrink-0 ${isSpotlightActive ? 'bg-yellow-500 text-white ring-2 ring-yellow-300' : 'bg-white/60 hover:bg-white text-indigo-600 dark:bg-gray-700/60 dark:hover:bg-gray-700 dark:text-gray-300'}`}
                                     title="Toggle Spotlight (Shift+F)"
                                 >
                                     <Focus className="w-5 h-5 md:w-6 md:h-6" />
@@ -1611,7 +1611,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 {/* Whiteboard Toggle Button */}
                                 <button
                                     onClick={() => setIsWhiteboardMode(!isWhiteboardMode)}
-                                    className={`hidden md:block p-2 md:p-3 rounded-full transition-all shadow-sm shrink-0 ${isWhiteboardMode ? 'bg-indigo-600 text-white ring-2 ring-indigo-300' : 'bg-white/60 hover:bg-white text-indigo-600'}`}
+                                    className={`hidden md:block p-2 md:p-3 rounded-full transition-all shadow-sm shrink-0 ${isWhiteboardMode ? 'bg-indigo-600 text-white ring-2 ring-indigo-300' : 'bg-white/60 hover:bg-white text-indigo-600 dark:bg-gray-700/60 dark:hover:bg-gray-700 dark:text-gray-300'}`}
                                     title="Toggle Whiteboard Mode (Shift+W)"
                                 >
                                     <Presentation className="w-5 h-5 md:w-6 md:h-6" />
@@ -1620,7 +1620,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 {/* Pen Toggle Button */}
                                 <button
                                     onClick={() => setIsPenActive(!isPenActive)}
-                                    className={`p-2 md:p-3 rounded-full transition-all shadow-sm shrink-0 ${isPenActive ? 'bg-red-500 text-white ring-2 ring-red-300' : 'bg-white/60 hover:bg-white text-indigo-600'}`}
+                                    className={`p-2 md:p-3 rounded-full transition-all shadow-sm shrink-0 ${isPenActive ? 'bg-red-500 text-white ring-2 ring-red-300' : 'bg-white/60 hover:bg-white text-indigo-600 dark:bg-gray-700/60 dark:hover:bg-gray-700 dark:text-gray-300'}`}
                                     title="Toggle Pen Tool (Shift+D)"
                                 >
                                     <Pen className="w-5 h-5 md:w-6 md:h-6" />
@@ -1636,31 +1636,31 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                         <Keyboard className="w-5 h-5 md:w-6 md:h-6" />
                                     </button>
 
-                                    {isShortcutsOpen && (
+                                     {isShortcutsOpen && (
                                         <div className="fixed bottom-[80px] left-1/2 -translate-x-1/2 md:absolute md:bottom-full md:left-auto md:right-0 md:translate-x-0 md:mb-4 bg-white dark:bg-gray-900 !bg-opacity-100 !opacity-100 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)] p-5 w-[90vw] sm:w-[400px] z-[70] animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[70vh] md:max-h-[60vh]">
-                                            <div className="flex justify-between items-center mb-4 pb-3 border-b border-gray-100 shrink-0">
+                                            <div className="flex justify-between items-center mb-4 pb-3 border-b border-gray-100 dark:border-gray-800 shrink-0">
                                                 <h3 className="font-bold text-gray-800 dark:text-gray-200 text-lg flex items-center gap-2">
-                                                    <Keyboard className="w-5 h-5 text-gray-500" /> Keyboard Shortcuts
+                                                    <Keyboard className="w-5 h-5 text-gray-500 dark:text-gray-400" /> Keyboard Shortcuts
                                                 </h3>
-                                                <button onClick={() => setIsShortcutsOpen(false)} className="p-1 text-gray-400 hover:bg-gray-100 rounded-full hover:text-gray-700 transition-colors">
+                                                <button onClick={() => setIsShortcutsOpen(false)} className="p-1 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
                                                     <X className="w-5 h-5" />
                                                 </button>
                                             </div>
-                                            <div className="space-y-3 overflow-y-auto custom-scrollbar pr-2 pb-2 text-sm text-gray-700">
-                                                <div className="flex justify-between items-center border-b border-gray-50 pb-2"><span className="font-medium">Toggle Shortcuts</span><kbd className="bg-gray-100 border border-gray-200 px-2 py-0.5 rounded font-mono text-xs">Shift + ?</kbd></div>
-                                                <div className="flex justify-between items-center border-b border-gray-50 pb-2"><span className="font-medium">Next / Previous</span><kbd className="bg-gray-100 border border-gray-200 px-2 py-0.5 rounded font-mono text-xs">← / →</kbd></div>
-                                                <div className="flex justify-between items-center border-b border-gray-50 pb-2"><span className="font-medium">Select Option A-E</span><kbd className="bg-gray-100 border border-gray-200 px-2 py-0.5 rounded font-mono text-xs">A - E</kbd></div>
-                                                <div className="flex justify-between items-center border-b border-gray-50 pb-2"><span className="font-medium">Read Aloud</span><kbd className="bg-gray-100 border border-gray-200 px-2 py-0.5 rounded font-mono text-xs">Shift + R</kbd></div>
-                                                <div className="flex justify-between items-center border-b border-gray-50 pb-2"><span className="font-medium">Auto-Play Read Aloud</span><kbd className="bg-gray-100 border border-gray-200 px-2 py-0.5 rounded font-mono text-xs">Shift + A</kbd></div>
-                                                <div className="flex justify-between items-center border-b border-gray-50 pb-2"><span className="font-medium">Toggle Timer</span><kbd className="bg-gray-100 border border-gray-200 px-2 py-0.5 rounded font-mono text-xs">T</kbd></div>
-                                                <div className="flex justify-between items-center border-b border-gray-50 pb-2"><span className="font-medium">Toggle Dark Mode</span><kbd className="bg-gray-100 border border-gray-200 px-2 py-0.5 rounded font-mono text-xs">Shift + N</kbd></div>
-                                                <div className="flex justify-between items-center border-b border-gray-50 pb-2"><span className="font-medium">Toggle Fullscreen</span><kbd className="bg-gray-100 border border-gray-200 px-2 py-0.5 rounded font-mono text-xs">F11</kbd></div>
-                                                <div className="flex justify-between items-center border-b border-gray-50 pb-2"><span className="font-medium">Toggle Settings</span><kbd className="bg-gray-100 border border-gray-200 px-2 py-0.5 rounded font-mono text-xs">S</kbd></div>
-                                                <div className="flex justify-between items-center border-b border-gray-50 pb-2"><span className="font-medium">Toggle Spotlight</span><kbd className="bg-gray-100 border border-gray-200 px-2 py-0.5 rounded font-mono text-xs">Shift + F</kbd></div>
-                                                <div className="flex justify-between items-center border-b border-gray-50 pb-2"><span className="font-medium">Whiteboard Mode</span><kbd className="bg-gray-100 border border-gray-200 px-2 py-0.5 rounded font-mono text-xs">Shift + W</kbd></div>
-                                                <div className="flex justify-between items-center border-b border-gray-50 pb-2"><span className="font-medium">Toggle Pen Tool</span><kbd className="bg-gray-100 border border-gray-200 px-2 py-0.5 rounded font-mono text-xs">Shift + D</kbd></div>
-                                                <div className="flex justify-between items-center border-b border-gray-50 pb-2"><span className="font-medium">Show Explanation</span><kbd className="bg-gray-100 border border-gray-200 px-2 py-0.5 rounded font-mono text-xs">Shift + X</kbd></div>
-                                                <div className="flex justify-between items-center pb-2"><span className="font-medium">Show Option Explanations</span><kbd className="bg-gray-100 border border-gray-200 px-2 py-0.5 rounded font-mono text-xs">Shift + O</kbd></div>
+                                            <div className="space-y-3 overflow-y-auto custom-scrollbar pr-2 pb-2 text-sm text-gray-700 dark:text-gray-300">
+                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Toggle Shortcuts</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Shift + ?</kbd></div>
+                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Next / Previous</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">← / →</kbd></div>
+                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Select Option A-E</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">A - E</kbd></div>
+                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Read Aloud</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Shift + R</kbd></div>
+                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Auto-Play Read Aloud</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Shift + A</kbd></div>
+                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Toggle Timer</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">T</kbd></div>
+                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Toggle Dark Mode</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Shift + N</kbd></div>
+                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Toggle Fullscreen</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">F11</kbd></div>
+                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Toggle Settings</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">S</kbd></div>
+                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Toggle Spotlight</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Shift + F</kbd></div>
+                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Whiteboard Mode</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Shift + W</kbd></div>
+                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Toggle Pen Tool</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Shift + D</kbd></div>
+                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Show Explanation</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Shift + X</kbd></div>
+                                                <div className="flex justify-between items-center pb-2"><span className="font-medium">Show Option Explanations</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Shift + O</kbd></div>
                                             </div>
                                         </div>
                                     )}
@@ -1670,7 +1670,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 <div className="relative shrink-0">
                                     <button
                                         onClick={() => setIsSettingsOpen(!isSettingsOpen)}
-                                        className={`p-2 md:p-3 rounded-full transition-all shadow-sm ${isSettingsOpen ? 'bg-indigo-600 text-white ring-2 ring-indigo-300' : 'bg-white/60 hover:bg-white text-indigo-600'}`}
+                                        className={`p-2 md:p-3 rounded-full transition-all shadow-sm ${isSettingsOpen ? 'bg-indigo-600 text-white ring-2 ring-indigo-300' : 'bg-white/60 hover:bg-white text-indigo-600 dark:bg-gray-700/60 dark:hover:bg-gray-700 dark:text-gray-300'}`}
                                         title="Display Settings"
                                     >
                                         <Settings className={`w-5 h-5 md:w-6 md:h-6 transition-transform duration-300 ${isSettingsOpen ? 'rotate-90' : ''}`} />
@@ -1678,32 +1678,32 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                                     {isSettingsOpen && (
                                         <div className="fixed bottom-[80px] left-1/2 -translate-x-1/2 md:absolute md:bottom-full md:left-auto md:right-0 md:translate-x-0 md:mb-4 bg-white dark:bg-gray-900 !bg-opacity-100 !opacity-100 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)] p-5 w-[90vw] sm:w-[340px] z-[70] animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[70vh] md:max-h-[60vh]">
-                                            <div className="flex justify-between items-center mb-4 pb-3 border-b border-gray-100 shrink-0">
+                                            <div className="flex justify-between items-center mb-4 pb-3 border-b border-gray-100 dark:border-gray-800 shrink-0">
                                                 <h3 className="font-bold text-gray-800 dark:text-gray-200 text-lg flex items-center gap-2">
-                                                    <Settings className="w-5 h-5 text-gray-500" /> Settings
-                                                    <kbd className="ml-1 text-[10px] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-1.5 py-0.5 rounded text-gray-500 font-mono shadow-sm">S</kbd>
+                                                    <Settings className="w-5 h-5 text-gray-500 dark:text-gray-400" /> Settings
+                                                    <kbd className="ml-1 text-[10px] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-1.5 py-0.5 rounded text-gray-500 dark:text-gray-400 font-mono shadow-sm">S</kbd>
                                                 </h3>
-                                                <button onClick={() => setIsSettingsOpen(false)} className="p-1 text-gray-400 hover:bg-gray-100 rounded-full hover:text-gray-700 transition-colors">
+                                                <button onClick={() => setIsSettingsOpen(false)} className="p-1 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
                                                     <X className="w-5 h-5" />
                                                 </button>
                                             </div>
 
                                             <div className="space-y-5 overflow-y-auto custom-scrollbar pr-2 pb-2">
                                                 <div>
-                                                    <div className="text-sm font-bold text-gray-700 mb-2 flex justify-between items-center">
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
                                                         <span className="flex items-center gap-2"><MonitorPlay className="w-4 h-4 text-indigo-500" /> Presentation Mode</span>
-                                                        <kbd className="text-[10px] bg-gray-100 border border-gray-200 px-1.5 py-0.5 rounded text-gray-500 font-mono shadow-sm">M</kbd>
+                                                        <kbd className="text-[10px] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-1.5 py-0.5 rounded text-gray-500 dark:text-gray-400 font-mono shadow-sm">M</kbd>
                                                     </div>
-                                                    <div className="flex bg-gray-100 p-1 rounded-xl">
+                                                    <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl">
                                                         <button
                                                             onClick={() => setMode('test')}
-                                                            className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-colors ${mode === 'test' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                                            className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-colors ${mode === 'test' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
                                                         >
                                                             Test Mode
                                                         </button>
                                                         <button
                                                             onClick={() => setMode('read')}
-                                                            className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-colors ${mode === 'read' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                                            className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-colors ${mode === 'read' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
                                                         >
                                                             Read Mode
                                                         </button>
@@ -1711,70 +1711,70 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                 </div>
 
                                                 <div>
-                                                    <div className="text-sm font-bold text-gray-700 mb-2 flex justify-between items-center">
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
                                                         <span className="flex items-center gap-2"><LayoutGrid className="w-4 h-4 text-indigo-500" /> Options Layout</span>
                                                     </div>
-                                                    <div className="flex bg-gray-100 p-1 rounded-xl">
+                                                    <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl">
                                                         <button
                                                             onClick={() => setOptionsLayout('grid')}
-                                                            className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-colors ${optionsLayout === 'grid' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                                            className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-colors ${optionsLayout === 'grid' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
                                                         >
                                                             Grid
                                                         </button>
                                                         <button
                                                             onClick={() => setOptionsLayout('list')}
-                                                            className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-colors ${optionsLayout === 'list' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                                            className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-colors ${optionsLayout === 'list' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
                                                         >
                                                             List
                                                         </button>
                                                     </div>
                                                 </div>
 
-                                                <hr className="border-gray-100" />
+                                                <hr className="border-gray-100 dark:border-gray-800" />
 
                                                 <div>
-                                                    <div className="text-sm font-bold text-gray-700 mb-2 flex justify-between items-center">
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
                                                         <span className="flex items-center gap-2"><LayoutGrid className="w-4 h-4 text-indigo-500" /> Header Settings</span>
                                                     </div>
                                                     <div className="space-y-3">
                                                         <div className="flex items-center justify-between">
-                                                            <span className="text-xs font-bold text-gray-500">Show Header</span>
-                                                            <button onClick={() => setShowHeader(!showHeader)} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${showHeader ? 'bg-blue-600' : 'bg-gray-300'}`}>
+                                                            <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Show Header</span>
+                                                            <button onClick={() => setShowHeader(!showHeader)} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${showHeader ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}>
                                                                 <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${showHeader ? 'translate-x-5' : 'translate-x-1'}`} />
                                                             </button>
                                                         </div>
                                                         {showHeader && (
                                                             <>
                                                                 <div className="flex items-center justify-between">
-                                                                    <span className="text-xs font-bold text-gray-500">Show Logo</span>
-                                                                    <button onClick={() => setShowLogo(!showLogo)} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${showLogo ? 'bg-blue-600' : 'bg-gray-300'}`}>
+                                                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Show Logo</span>
+                                                                    <button onClick={() => setShowLogo(!showLogo)} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${showLogo ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}>
                                                                         <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${showLogo ? 'translate-x-5' : 'translate-x-1'}`} />
                                                                     </button>
                                                                 </div>
-                                                                <div className="flex items-center gap-3 bg-gray-50 px-2 py-1.5 rounded-lg border border-gray-200">
-                                                                    <span className="text-xs font-bold text-gray-500 min-w-[50px]">Scale</span>
+                                                                <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400 min-w-[50px]">Scale</span>
                                                                     <input
                                                                         type="range" min="0.5" max="1.5" step="0.1"
                                                                         value={headerScale} onChange={(e) => setHeaderScale(Number(e.target.value))}
-                                                                        className="flex-1 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                                                        className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
                                                                     />
-                                                                    <span className="text-xs font-bold text-gray-500 w-8 text-right">{(headerScale * 100).toFixed(0)}%</span>
+                                                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-8 text-right">{(headerScale * 100).toFixed(0)}%</span>
                                                                 </div>
-                                                                <div className="flex items-center gap-3 bg-gray-50 px-2 py-1.5 rounded-lg border border-gray-200">
-                                                                    <span className="text-xs font-bold text-gray-500 min-w-[50px]">Text Size</span>
+                                                                <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400 min-w-[50px]">Text Size</span>
                                                                     <input
                                                                         type="range" min="0.5" max="2.5" step="0.1"
                                                                         value={headerTitleScale} onChange={(e) => setHeaderTitleScale(Number(e.target.value))}
-                                                                        className="flex-1 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                                                        className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
                                                                     />
-                                                                    <span className="text-xs font-bold text-gray-500 w-8 text-right">{(headerTitleScale * 100).toFixed(0)}%</span>
+                                                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-8 text-right">{(headerTitleScale * 100).toFixed(0)}%</span>
                                                                 </div>
-                                                                <div className="flex flex-col gap-1.5 bg-gray-50 px-2 py-1.5 rounded-lg border border-gray-200">
-                                                                    <span className="text-xs font-bold text-gray-500">Text Alignment</span>
+                                                                <div className="flex flex-col gap-1.5 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Text Alignment</span>
                                                                     <div className="flex items-center justify-between gap-2">
-                                                                        <button onClick={() => setHeaderTitleAlign('left')} className={`flex-1 py-1 rounded text-xs font-bold transition-colors ${headerTitleAlign === 'left' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}`}>Left</button>
-                                                                        <button onClick={() => setHeaderTitleAlign('center')} className={`flex-1 py-1 rounded text-xs font-bold transition-colors ${headerTitleAlign === 'center' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}`}>Center</button>
-                                                                        <button onClick={() => setHeaderTitleAlign('right')} className={`flex-1 py-1 rounded text-xs font-bold transition-colors ${headerTitleAlign === 'right' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}`}>Right</button>
+                                                                        <button onClick={() => setHeaderTitleAlign('left')} className={`flex-1 py-1 rounded text-xs font-bold transition-colors ${headerTitleAlign === 'left' ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}`}>Left</button>
+                                                                        <button onClick={() => setHeaderTitleAlign('center')} className={`flex-1 py-1 rounded text-xs font-bold transition-colors ${headerTitleAlign === 'center' ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}`}>Center</button>
+                                                                        <button onClick={() => setHeaderTitleAlign('right')} className={`flex-1 py-1 rounded text-xs font-bold transition-colors ${headerTitleAlign === 'right' ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}`}>Right</button>
                                                                     </div>
                                                                 </div>
                                                             </>
@@ -1782,13 +1782,13 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     </div>
                                                 </div>
 
-                                                <hr className="border-gray-100" />
+                                                <hr className="border-gray-100 dark:border-gray-800" />
 
                                                 <div>
-                                                    <div className="text-sm font-bold text-gray-700 mb-2 flex justify-between items-center">
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
                                                         <span className="flex items-center gap-2"><Play className="w-4 h-4 text-indigo-500" /> Animation Speed</span>
                                                     </div>
-                                                    <div className="flex items-center gap-3 bg-gray-50 px-2 py-1.5 rounded-lg border border-gray-200">
+                                                    <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
                                                         <input
                                                             type="range"
                                                             min="0.1"
@@ -1796,37 +1796,37 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                             step="0.1"
                                                             value={animSpeed}
                                                             onChange={(e) => setAnimSpeed(Number(e.target.value))}
-                                                            className="flex-1 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                                            className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
                                                         />
-                                                        <span className="text-xs font-bold text-gray-500 w-8 text-right">{animSpeed.toFixed(1)}s</span>
+                                                        <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-8 text-right">{animSpeed.toFixed(1)}s</span>
                                                     </div>
                                                 </div>
 
-                                                <hr className="border-gray-100" />
+                                                <hr className="border-gray-100 dark:border-gray-800" />
 
                                                 <div>
-                                                    <div className="text-sm font-bold text-gray-700 mb-2 flex justify-between items-center">
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
                                                         <span className="flex items-center gap-2"><LayoutGrid className="w-4 h-4 text-indigo-500" /> Background Theme</span>
                                                     </div>
-                                                    <div className="flex bg-gray-100 p-1 rounded-xl flex-wrap gap-1">
-                                                        <button onClick={() => setBgTheme('default')} className={`flex-1 py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'default' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Default</button>
-                                                        <button onClick={() => setBgTheme('mesh')} className={`flex-1 py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'mesh' ? 'bg-white text-purple-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Mesh</button>
-                                                        <button onClick={() => setBgTheme('grid')} className={`flex-1 py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'grid' ? 'bg-white text-emerald-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Grid</button>
-                                                        <button onClick={() => setBgTheme('dots')} className={`flex-1 py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'dots' ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Dots</button>
-                                                        <button onClick={() => setBgTheme('video')} className={`flex-1 py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'video' ? 'bg-white text-rose-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Video</button>
+                                                    <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl flex-wrap gap-1">
+                                                        <button onClick={() => setBgTheme('default')} className={`flex-1 py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'default' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Default</button>
+                                                        <button onClick={() => setBgTheme('mesh')} className={`flex-1 py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'mesh' ? 'bg-white dark:bg-gray-700 text-purple-600 dark:text-purple-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Mesh</button>
+                                                        <button onClick={() => setBgTheme('grid')} className={`flex-1 py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'grid' ? 'bg-white dark:bg-gray-700 text-emerald-600 dark:text-emerald-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Grid</button>
+                                                        <button onClick={() => setBgTheme('dots')} className={`flex-1 py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'dots' ? 'bg-white dark:bg-gray-700 text-orange-600 dark:text-orange-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Dots</button>
+                                                        <button onClick={() => setBgTheme('video')} className={`flex-1 py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'video' ? 'bg-white dark:bg-gray-700 text-rose-600 dark:text-rose-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Video</button>
                                                     </div>
                                                     {bgTheme === 'video' && (
                                                         <div className="mt-2 space-y-2">
                                                             <select
                                                                 value={selectedVideo}
                                                                 onChange={(e) => setSelectedVideo(e.target.value)}
-                                                                className="w-full text-sm bg-gray-50 border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:border-blue-500 text-gray-700 font-semibold"
+                                                                className="w-full text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 focus:outline-none focus:border-blue-500 text-gray-700 dark:text-gray-200 font-semibold"
                                                             >
                                                                 {VIDEO_OPTIONS.map(opt => (
                                                                     <option key={opt.id} value={opt.url}>{opt.name}</option>
                                                                 ))}
                                                             </select>
-                                                            <div className="flex items-center gap-3 bg-gray-50 px-2 py-1.5 rounded-lg border border-gray-200">
+                                                            <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
                                                                 <Sun className="w-4 h-4 text-gray-400 shrink-0" />
                                                                 <input
                                                                     type="range"
@@ -1834,14 +1834,14 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                                     max="100"
                                                                     value={videoOpacity}
                                                                     onChange={(e) => setVideoOpacity(Number(e.target.value))}
-                                                                    className="flex-1 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                                                    className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
                                                                 />
-                                                                <span className="text-xs font-bold text-gray-500 w-8 text-right">{videoOpacity}%</span>
+                                                                <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-8 text-right">{videoOpacity}%</span>
                                                             </div>
                                                         </div>
                                                     )}
                                                     {bgTheme !== 'video' && (
-                                                        <div className="mt-2 flex items-center gap-3 bg-gray-50 px-2 py-1.5 rounded-lg border border-gray-200">
+                                                        <div className="mt-2 flex items-center gap-3 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
                                                             <Sun className="w-4 h-4 text-gray-400 shrink-0" />
                                                             <input
                                                                 type="range"
@@ -1849,41 +1849,41 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                                 max="100"
                                                                 value={bgOpacity}
                                                                 onChange={(e) => setBgOpacity(Number(e.target.value))}
-                                                                className="flex-1 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                                                className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
                                                             />
-                                                            <span className="text-xs font-bold text-gray-500 w-8 text-right">{bgOpacity}%</span>
+                                                            <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-8 text-right">{bgOpacity}%</span>
                                                         </div>
                                                     )}
                                                 </div>
 
-                                                <hr className="border-gray-100" />
+                                                <hr className="border-gray-100 dark:border-gray-800" />
 
                                                 <div>
-                                                    <div className="text-sm font-bold text-gray-700 mb-2 flex justify-between items-center">
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
                                                         <span className="flex items-center gap-2"><Highlighter className="w-4 h-4 text-indigo-500" /> Question Styling</span>
                                                     </div>
                                                     <div className="space-y-3">
                                                         {/* Background Color */}
-                                                        <div className="flex items-center gap-2 bg-gray-50 px-2 py-1.5 rounded-lg border border-gray-200">
-                                                            <span className="text-[10px] font-bold text-gray-500 min-w-[50px] uppercase">Bg Color:</span>
+                                                        <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                            <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400 min-w-[50px] uppercase">Bg Color:</span>
                                                             <div className="flex gap-1.5 flex-1 justify-end">
                                                                 <button onClick={() => setQBgColor('transparent')} className={`w-5 h-5 rounded-full border-2 ${qBgColor === 'transparent' ? 'border-blue-500' : 'border-transparent'} relative`} title="Transparent">
                                                                     <div className="absolute inset-0 rounded-full bg-transparent overflow-hidden border border-gray-300">
                                                                         <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200" style={{ backgroundImage: 'repeating-linear-gradient(45deg, #e5e7eb 25%, transparent 25%, transparent 75%, #e5e7eb 75%, #e5e7eb), repeating-linear-gradient(45deg, #e5e7eb 25%, transparent 25%, transparent 75%, #e5e7eb 75%, #e5e7eb)', backgroundPosition: '0 0, 3px 3px', backgroundSize: '6px 6px' }}></div>
                                                                     </div>
                                                                 </button>
-                                                                <button onClick={() => setQBgColor('bg-white/90 dark:bg-gray-800/90')} className={`w-5 h-5 rounded-full border border-gray-300 bg-white shadow-sm ring-2 ${qBgColor === 'bg-white/90 dark:bg-gray-800/90' ? 'ring-blue-500' : 'ring-transparent'}`} title="White/Dark"></button>
-                                                                <button onClick={() => setQBgColor('bg-blue-50/90 dark:bg-blue-900/50')} className={`w-5 h-5 rounded-full border border-blue-200 bg-blue-100 shadow-sm ring-2 ${qBgColor === 'bg-blue-50/90 dark:bg-blue-900/50' ? 'ring-blue-500' : 'ring-transparent'}`} title="Blue"></button>
-                                                                <button onClick={() => setQBgColor('bg-indigo-50/90 dark:bg-indigo-900/50')} className={`w-5 h-5 rounded-full border border-indigo-200 bg-indigo-100 shadow-sm ring-2 ${qBgColor === 'bg-indigo-50/90 dark:bg-indigo-900/50' ? 'ring-blue-500' : 'ring-transparent'}`} title="Indigo"></button>
-                                                                <button onClick={() => setQBgColor('bg-black/50 dark:bg-black/80')} className={`w-5 h-5 rounded-full border border-gray-700 bg-gray-900 shadow-sm ring-2 ${qBgColor === 'bg-black/50 dark:bg-black/80' ? 'ring-blue-500' : 'ring-transparent'}`} title="Black/Dark"></button>
+                                                                <button onClick={() => setQBgColor('bg-white/90 dark:bg-gray-800/90')} className={`w-5 h-5 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 shadow-sm ring-2 ${qBgColor === 'bg-white/90 dark:bg-gray-800/90' ? 'ring-blue-500' : 'ring-transparent'}`} title="White/Dark"></button>
+                                                                <button onClick={() => setQBgColor('bg-blue-50/90 dark:bg-blue-900/50')} className={`w-5 h-5 rounded-full border border-blue-200 dark:border-blue-700 bg-blue-100 dark:bg-blue-900 shadow-sm ring-2 ${qBgColor === 'bg-blue-50/90 dark:bg-blue-900/50' ? 'ring-blue-500' : 'ring-transparent'}`} title="Blue"></button>
+                                                                <button onClick={() => setQBgColor('bg-indigo-50/90 dark:bg-indigo-900/50')} className={`w-5 h-5 rounded-full border border-indigo-200 dark:border-indigo-700 bg-indigo-100 dark:bg-indigo-900 shadow-sm ring-2 ${qBgColor === 'bg-indigo-50/90 dark:bg-indigo-900/50' ? 'ring-blue-500' : 'ring-transparent'}`} title="Indigo"></button>
+                                                                <button onClick={() => setQBgColor('bg-black/50 dark:bg-black/80')} className={`w-5 h-5 rounded-full border border-gray-700 dark:border-gray-600 bg-gray-900 shadow-sm ring-2 ${qBgColor === 'bg-black/50 dark:bg-black/80' ? 'ring-blue-500' : 'ring-transparent'}`} title="Black/Dark"></button>
                                                             </div>
                                                         </div>
 
                                                         {/* Text Color */}
-                                                        <div className="flex items-center gap-2 bg-gray-50 px-2 py-1.5 rounded-lg border border-gray-200">
-                                                            <span className="text-[10px] font-bold text-gray-500 min-w-[50px] uppercase">Text Color:</span>
+                                                        <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                            <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400 min-w-[50px] uppercase">Text Color:</span>
                                                             <div className="flex gap-1.5 flex-1 justify-end">
-                                                                <button onClick={() => setQTextColor('default')} className={`w-5 h-5 rounded-full border border-gray-300 shadow-sm text-[9px] font-bold flex items-center justify-center bg-gray-100 text-gray-500 ring-2 ${qTextColor === 'default' ? 'ring-blue-500' : 'ring-transparent'}`} title="Auto">A</button>
+                                                                <button onClick={() => setQTextColor('default')} className={`w-5 h-5 rounded-full border border-gray-300 dark:border-gray-600 shadow-sm text-[9px] font-bold flex items-center justify-center bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300 ring-2 ${qTextColor === 'default' ? 'ring-blue-500' : 'ring-transparent'}`} title="Auto">A</button>
                                                                 <button onClick={() => setQTextColor('#000000')} className={`w-5 h-5 rounded-full border border-gray-800 shadow-sm bg-black ring-2 ${qTextColor === '#000000' ? 'ring-blue-500' : 'ring-transparent'}`} title="Black"></button>
                                                                 <button onClick={() => setQTextColor('#ffffff')} className={`w-5 h-5 rounded-full border border-gray-300 shadow-sm bg-white ring-2 ${qTextColor === '#ffffff' ? 'ring-blue-500' : 'ring-transparent'}`} title="White"></button>
                                                                 <button onClick={() => setQTextColor('#ef4444')} className={`w-5 h-5 rounded-full border border-red-500 shadow-sm bg-red-500 ring-2 ${qTextColor === '#ef4444' ? 'ring-blue-500' : 'ring-transparent'}`} title="Red"></button>
@@ -1894,49 +1894,49 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     </div>
                                                 </div>
 
-                                                <hr className="border-gray-100" />
+                                                <hr className="border-gray-100 dark:border-gray-800" />
 
                                                 <div className="flex items-center justify-between">
-                                                    <div className="text-sm font-bold text-gray-700 flex items-center gap-2">
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
                                                         <Clock className="w-4 h-4 text-indigo-500" />
                                                         Question Timer
-                                                        <kbd className="ml-auto text-[10px] bg-gray-100 border border-gray-200 px-1.5 py-0.5 rounded text-gray-500 font-mono shadow-sm">T</kbd>
+                                                        <kbd className="ml-auto text-[10px] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-1.5 py-0.5 rounded text-gray-500 dark:text-gray-400 font-mono shadow-sm">T</kbd>
                                                     </div>
                                                     <button
                                                         onClick={() => setIsTimerEnabled(!isTimerEnabled)}
-                                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isTimerEnabled ? 'bg-blue-600' : 'bg-gray-300'}`}
+                                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isTimerEnabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}
                                                     >
                                                         <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isTimerEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
                                                     </button>
                                                 </div>
 
-                                                <hr className="border-gray-100" />
+                                                <hr className="border-gray-100 dark:border-gray-800" />
 
                                                 <div className="flex items-center justify-between">
-                                                    <div className="text-sm font-bold text-gray-700 flex items-center gap-2">
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
                                                         <Volume2 className="w-4 h-4 text-indigo-500" />
                                                         Auto Play Read Aloud
-                                                        <kbd className="ml-auto text-[10px] bg-gray-100 border border-gray-200 px-1.5 py-0.5 rounded text-gray-500 font-mono shadow-sm">Shift+A</kbd>
+                                                        <kbd className="ml-auto text-[10px] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-1.5 py-0.5 rounded text-gray-500 dark:text-gray-400 font-mono shadow-sm">Shift+A</kbd>
                                                     </div>
                                                     <button
                                                         onClick={() => setIsAutoPlayReadAloud(!isAutoPlayReadAloud)}
-                                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isAutoPlayReadAloud ? 'bg-blue-600' : 'bg-gray-300'}`}
+                                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isAutoPlayReadAloud ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}
                                                     >
                                                         <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isAutoPlayReadAloud ? 'translate-x-6' : 'translate-x-1'}`} />
                                                     </button>
                                                 </div>
 
-                                                <hr className="border-gray-100" />
+                                                <hr className="border-gray-100 dark:border-gray-800" />
 
                                                 <div className="flex flex-col gap-2">
                                                     <div className="flex items-center justify-between">
-                                                        <div className="text-sm font-bold text-gray-700 flex items-center gap-2">
+                                                        <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
                                                             <Music className="w-4 h-4 text-indigo-500" />
                                                             Focus Mode (Music)
                                                         </div>
                                                         <button
                                                             onClick={() => setIsLofiEnabled(!isLofiEnabled)}
-                                                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isLofiEnabled ? 'bg-blue-600' : 'bg-gray-300'}`}
+                                                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isLofiEnabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}
                                                         >
                                                             <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isLofiEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
                                                         </button>
@@ -1953,7 +1953,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                                         lofiAudioRef.current.play().catch(console.warn);
                                                                     }
                                                                 }}
-                                                                className="w-full text-sm bg-gray-50 border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:border-blue-500 text-gray-700 font-semibold"
+                                                                className="w-full text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 focus:outline-none focus:border-blue-500 text-gray-700 dark:text-gray-200 font-semibold"
                                                             >
                                                                 {MUSIC_OPTIONS.map(opt => (
                                                                     <option key={opt.id} value={opt.url}>{opt.name}</option>
@@ -1968,186 +1968,186 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                                     step="0.05"
                                                                     value={musicVolume}
                                                                     onChange={(e) => setMusicVolume(parseFloat(e.target.value))}
-                                                                    className="flex-1 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                                                    className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
                                                                 />
                                                                 <div className="flex items-center gap-1 min-w-[3.5rem]">
                                                                     <Volume2 className="w-4 h-4 text-gray-400" />
-                                                                    <span className="text-xs font-semibold text-gray-500">{Math.round(musicVolume * 100)}%</span>
+                                                                    <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">{Math.round(musicVolume * 100)}%</span>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     )}
                                                 </div>
 
-                                                <hr className="border-gray-100" />
+                                                <hr className="border-gray-100 dark:border-gray-800" />
 
                                                 <div className="flex items-center justify-between">
-                                                    <div className="text-sm font-bold text-gray-700 flex items-center gap-2">
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
                                                         <Lightbulb className="w-4 h-4 text-indigo-500" /> Show Explanation
-                                                        <kbd className="ml-auto text-[10px] bg-gray-100 border border-gray-200 px-1.5 py-0.5 rounded text-gray-500 font-mono shadow-sm">Shift+X</kbd>
+                                                        <kbd className="ml-auto text-[10px] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-1.5 py-0.5 rounded text-gray-500 dark:text-gray-400 font-mono shadow-sm">Shift+X</kbd>
                                                     </div>
                                                     <button
                                                         onClick={() => setIsExpEnabled(!isExpEnabled)}
-                                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isExpEnabled ? 'bg-blue-600' : 'bg-gray-300'}`}
+                                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isExpEnabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}
                                                     >
                                                         <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isExpEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
                                                     </button>
                                                 </div>
 
                                                 <div className="flex items-center justify-between">
-                                                    <div className="text-sm font-bold text-gray-700 flex items-center gap-2">
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
                                                         <MessageCircle className="w-4 h-4 text-indigo-500" /> Show Options Explanation
-                                                        <kbd className="ml-auto text-[10px] bg-gray-100 border border-gray-200 px-1.5 py-0.5 rounded text-gray-500 font-mono shadow-sm">Shift+O</kbd>
+                                                        <kbd className="ml-auto text-[10px] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-1.5 py-0.5 rounded text-gray-500 dark:text-gray-400 font-mono shadow-sm">Shift+O</kbd>
                                                     </div>
                                                     <button
                                                         onClick={() => setIsOptionExpEnabled(!isOptionExpEnabled)}
-                                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isOptionExpEnabled ? 'bg-blue-600' : 'bg-gray-300'}`}
+                                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isOptionExpEnabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}
                                                     >
                                                         <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isOptionExpEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
                                                     </button>
                                                 </div>
 
-                                                <hr className="border-gray-100" />
+                                                <hr className="border-gray-100 dark:border-gray-800" />
 
                                                 <div>
-                                                    <div className="text-sm font-bold text-gray-700 mb-2 flex justify-between">
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between">
                                                         <span className="flex items-center gap-2"><Type className="w-4 h-4 text-indigo-500" /> Question Font Size</span>
-                                                        <span className="text-blue-600 bg-blue-50 px-2 rounded text-xs py-0.5">{Math.round(qFontScale * 100)}%</span>
+                                                        <span className="text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 rounded text-xs py-0.5">{Math.round(qFontScale * 100)}%</span>
                                                     </div>
-                                                    <div className="flex items-center bg-gray-50 rounded-xl border border-gray-200 w-full overflow-hidden shadow-inner">
-                                                        <button onClick={() => setQFontScale(s => Math.max(0.6, s - 0.1))} className="flex-1 py-2 flex justify-center items-center gap-2 text-gray-700 hover:bg-gray-200 font-bold border-r border-gray-200 transition-colors">
-                                                            A- <kbd className="text-[10px] bg-white border border-gray-300 px-1.5 py-0.5 rounded text-gray-500 font-mono shadow-sm">Q</kbd>
+                                                    <div className="flex items-center bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 w-full overflow-hidden shadow-inner">
+                                                        <button onClick={() => setQFontScale(s => Math.max(0.6, s - 0.1))} className="flex-1 py-2 flex justify-center items-center gap-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 font-bold border-r border-gray-200 dark:border-gray-700 transition-colors">
+                                                            A- <kbd className="text-[10px] bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 px-1.5 py-0.5 rounded text-gray-500 dark:text-gray-400 font-mono shadow-sm">Q</kbd>
                                                         </button>
-                                                        <button onClick={() => setQFontScale(s => Math.min(2.0, s + 0.1))} className="flex-1 py-2 flex justify-center items-center gap-2 text-gray-700 hover:bg-gray-200 font-bold transition-colors">
-                                                            A+ <kbd className="text-[10px] bg-white border border-gray-300 px-1.5 py-0.5 rounded text-gray-500 font-mono shadow-sm">W</kbd>
+                                                        <button onClick={() => setQFontScale(s => Math.min(2.0, s + 0.1))} className="flex-1 py-2 flex justify-center items-center gap-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 font-bold transition-colors">
+                                                            A+ <kbd className="text-[10px] bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 px-1.5 py-0.5 rounded text-gray-500 dark:text-gray-400 font-mono shadow-sm">W</kbd>
                                                         </button>
                                                     </div>
                                                 </div>
 
                                                 <div>
-                                                    <div className="text-sm font-bold text-gray-700 mb-2 flex justify-between">
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between">
                                                         <span className="flex items-center gap-2"><Type className="w-4 h-4 text-green-500" /> Options Font Size</span>
-                                                        <span className="text-green-600 bg-green-50 px-2 rounded text-xs py-0.5">{Math.round(optFontScale * 100)}%</span>
+                                                        <span className="text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/30 px-2 rounded text-xs py-0.5">{Math.round(optFontScale * 100)}%</span>
                                                     </div>
-                                                    <div className="flex items-center bg-gray-50 rounded-xl border border-gray-200 w-full overflow-hidden shadow-inner">
-                                                        <button onClick={() => setOptFontScale(s => Math.max(0.6, s - 0.1))} className="flex-1 py-2 flex justify-center items-center gap-2 text-gray-700 hover:bg-gray-200 font-bold border-r border-gray-200 transition-colors">
-                                                            A- <kbd className="text-[10px] bg-white border border-gray-300 px-1.5 py-0.5 rounded text-gray-500 font-mono shadow-sm">O</kbd>
+                                                    <div className="flex items-center bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 w-full overflow-hidden shadow-inner">
+                                                        <button onClick={() => setOptFontScale(s => Math.max(0.6, s - 0.1))} className="flex-1 py-2 flex justify-center items-center gap-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 font-bold border-r border-gray-200 dark:border-gray-700 transition-colors">
+                                                            A- <kbd className="text-[10px] bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 px-1.5 py-0.5 rounded text-gray-500 dark:text-gray-400 font-mono shadow-sm">O</kbd>
                                                         </button>
-                                                        <button onClick={() => setOptFontScale(s => Math.min(2.0, s + 0.1))} className="flex-1 py-2 flex justify-center items-center gap-2 text-gray-700 hover:bg-gray-200 font-bold transition-colors">
-                                                            A+ <kbd className="text-[10px] bg-white border border-gray-300 px-1.5 py-0.5 rounded text-gray-500 font-mono shadow-sm">P</kbd>
+                                                        <button onClick={() => setOptFontScale(s => Math.min(2.0, s + 0.1))} className="flex-1 py-2 flex justify-center items-center gap-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 font-bold transition-colors">
+                                                            A+ <kbd className="text-[10px] bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 px-1.5 py-0.5 rounded text-gray-500 dark:text-gray-400 font-mono shadow-sm">P</kbd>
                                                         </button>
                                                     </div>
                                                 </div>
 
                                                 <div>
-                                                    <div className="text-sm font-bold text-gray-700 mb-2 flex justify-between">
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between">
                                                         <span className="flex items-center gap-2"><Type className="w-4 h-4 text-purple-500" /> Explanation Font Size</span>
-                                                        <span className="text-purple-600 bg-purple-50 px-2 rounded text-xs py-0.5">{Math.round(expFontScale * 100)}%</span>
+                                                        <span className="text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/30 px-2 rounded text-xs py-0.5">{Math.round(expFontScale * 100)}%</span>
                                                     </div>
-                                                    <div className="flex items-center bg-gray-50 rounded-xl border border-gray-200 w-full overflow-hidden shadow-inner">
-                                                        <button onClick={() => setExpFontScale(s => Math.max(0.6, s - 0.1))} className="flex-1 py-2 flex justify-center items-center gap-2 text-gray-700 hover:bg-gray-200 font-bold border-r border-gray-200 transition-colors">
-                                                            A- <kbd className="text-[10px] bg-white border border-gray-300 px-1.5 py-0.5 rounded text-gray-500 font-mono shadow-sm">[</kbd>
+                                                    <div className="flex items-center bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 w-full overflow-hidden shadow-inner">
+                                                        <button onClick={() => setExpFontScale(s => Math.max(0.6, s - 0.1))} className="flex-1 py-2 flex justify-center items-center gap-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 font-bold border-r border-gray-200 dark:border-gray-700 transition-colors">
+                                                            A- <kbd className="text-[10px] bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 px-1.5 py-0.5 rounded text-gray-500 dark:text-gray-400 font-mono shadow-sm">[</kbd>
                                                         </button>
-                                                        <button onClick={() => setExpFontScale(s => Math.min(2.0, s + 0.1))} className="flex-1 py-2 flex justify-center items-center gap-2 text-gray-700 hover:bg-gray-200 font-bold transition-colors">
-                                                            A+ <kbd className="text-[10px] bg-white border border-gray-300 px-1.5 py-0.5 rounded text-gray-500 font-mono shadow-sm">]</kbd>
+                                                        <button onClick={() => setExpFontScale(s => Math.min(2.0, s + 0.1))} className="flex-1 py-2 flex justify-center items-center gap-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 font-bold transition-colors">
+                                                            A+ <kbd className="text-[10px] bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 px-1.5 py-0.5 rounded text-gray-500 dark:text-gray-400 font-mono shadow-sm">]</kbd>
                                                         </button>
                                                     </div>
                                                 </div>
 
-                                                <hr className="border-gray-100" />
+                                                <hr className="border-gray-100 dark:border-gray-800" />
 
                                                 <div className="flex items-center justify-between">
-                                                    <div className="text-sm font-bold text-gray-700 flex items-center gap-2">
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
                                                         <Focus className="w-4 h-4 text-yellow-500" />
                                                         Spotlight Mode
-                                                        <kbd className="ml-auto text-[10px] bg-gray-100 border border-gray-200 px-1.5 py-0.5 rounded text-gray-500 font-mono shadow-sm">Shift+F</kbd>
+                                                        <kbd className="ml-auto text-[10px] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-1.5 py-0.5 rounded text-gray-500 dark:text-gray-400 font-mono shadow-sm">Shift+F</kbd>
                                                     </div>
                                                     <button
                                                         onClick={() => setIsSpotlightActive(!isSpotlightActive)}
-                                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isSpotlightActive ? 'bg-yellow-500' : 'bg-gray-300'}`}
+                                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isSpotlightActive ? 'bg-yellow-500' : 'bg-gray-300 dark:bg-gray-700'}`}
                                                     >
                                                         <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isSpotlightActive ? 'translate-x-6' : 'translate-x-1'}`} />
                                                     </button>
                                                 </div>
 
-                                                <hr className="border-gray-100" />
+                                                <hr className="border-gray-100 dark:border-gray-800" />
 
                                                 <div>
-                                                    <div className="text-sm font-bold text-gray-700 mb-3 flex items-center justify-between">
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 flex items-center justify-between">
                                                         <span className="flex items-center gap-2"><Pen className="w-4 h-4 text-indigo-500" /> Presentation Tools</span>
                                                         <div className="flex items-center gap-2">
-                                                            <kbd className="text-[10px] bg-gray-100 border border-gray-200 px-1.5 py-0.5 rounded text-gray-500 font-mono shadow-sm">Shift+D</kbd>
-                                                            <button onClick={() => setIsPenActive(!isPenActive)} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${isPenActive ? 'bg-blue-600' : 'bg-gray-300'}`}>
+                                                            <kbd className="text-[10px] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-1.5 py-0.5 rounded text-gray-500 dark:text-gray-400 font-mono shadow-sm">Shift+D</kbd>
+                                                            <button onClick={() => setIsPenActive(!isPenActive)} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${isPenActive ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}>
                                                                 <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${isPenActive ? 'translate-x-5' : 'translate-x-1'}`} />
                                                             </button>
                                                         </div>
                                                     </div>
                                                     {isPenActive && (
-                                                        <div className="space-y-4 bg-gray-50 p-3 rounded-xl border border-gray-100 shadow-inner mb-4">
+                                                        <div className="space-y-4 bg-gray-50 dark:bg-gray-800/80 p-3 rounded-xl border border-gray-100 dark:border-gray-700 shadow-inner mb-4">
 
                                                             {/* Tool Selector */}
-                                                            <div className="flex gap-2 p-1.5 bg-gray-200/50 rounded-lg flex-wrap">
+                                                            <div className="flex gap-2 p-1.5 bg-gray-200/50 dark:bg-gray-700/50 rounded-lg flex-wrap">
                                                                 <button
                                                                     onClick={() => setDrawingTool('pen')}
-                                                                    className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'pen' ? 'bg-white text-blue-600 shadow-sm border border-gray-200/50' : 'text-gray-500 hover:text-gray-700'}`}
+                                                                    className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'pen' ? 'bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm border border-gray-200/50 dark:border-gray-500' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
                                                                     title="Pen (Shift+P)"
                                                                 >
                                                                     <Pen className="w-3.5 h-3.5" /> Pen
                                                                 </button>
                                                                 <button
                                                                     onClick={() => setDrawingTool('highlighter')}
-                                                                    className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'highlighter' ? 'bg-white text-yellow-600 shadow-sm border border-gray-200/50' : 'text-gray-500 hover:text-gray-700'}`}
+                                                                    className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'highlighter' ? 'bg-white dark:bg-gray-600 text-yellow-600 dark:text-yellow-400 shadow-sm border border-gray-200/50 dark:border-gray-500' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
                                                                     title="Marker (Shift+M)"
                                                                 >
                                                                     <Highlighter className="w-3.5 h-3.5" /> Marker
                                                                 </button>
                                                                 <button
                                                                     onClick={() => setDrawingTool('laser')}
-                                                                    className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'laser' ? 'bg-white text-red-500 shadow-sm border border-gray-200/50' : 'text-gray-500 hover:text-gray-700'}`}
+                                                                    className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'laser' ? 'bg-white dark:bg-gray-600 text-red-500 dark:text-red-400 shadow-sm border border-gray-200/50 dark:border-gray-500' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
                                                                     title="Laser (Shift+L)"
                                                                 >
                                                                     <MousePointer2 className="w-3.5 h-3.5" /> Laser
                                                                 </button>
                                                                 <button
                                                                     onClick={() => setDrawingTool('eraser')}
-                                                                    className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'eraser' ? 'bg-white text-gray-800 shadow-sm border border-gray-200/50' : 'text-gray-500 hover:text-gray-700'}`}
+                                                                    className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'eraser' ? 'bg-white dark:bg-gray-600 text-gray-800 dark:text-gray-200 shadow-sm border border-gray-200/50 dark:border-gray-500' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
                                                                     title="Eraser (Shift+E)"
                                                                 >
                                                                     <Eraser className="w-3.5 h-3.5" /> Eraser
                                                                 </button>
                                                             </div>
-                                                            <div className="flex gap-2 p-1.5 bg-gray-200/50 rounded-lg flex-wrap mt-2">
+                                                            <div className="flex gap-2 p-1.5 bg-gray-200/50 dark:bg-gray-700/50 rounded-lg flex-wrap mt-2">
                                                                 <button
                                                                     onClick={() => setDrawingTool('rectangle')}
-                                                                    className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'rectangle' ? 'bg-white text-indigo-600 shadow-sm border border-gray-200/50' : 'text-gray-500 hover:text-gray-700'}`}
+                                                                    className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'rectangle' ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm border border-gray-200/50 dark:border-gray-500' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
                                                                     title="Rect (Shift+B)"
                                                                 >
                                                                     <Square className="w-3.5 h-3.5" /> Rect
                                                                 </button>
                                                                 <button
                                                                     onClick={() => setDrawingTool('circle')}
-                                                                    className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'circle' ? 'bg-white text-indigo-600 shadow-sm border border-gray-200/50' : 'text-gray-500 hover:text-gray-700'}`}
+                                                                    className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'circle' ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm border border-gray-200/50 dark:border-gray-500' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
                                                                     title="Circle (Shift+C)"
                                                                 >
                                                                     <Circle className="w-3.5 h-3.5" /> Circle
                                                                 </button>
                                                                 <button
                                                                     onClick={() => setDrawingTool('arrow')}
-                                                                    className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'arrow' ? 'bg-white text-indigo-600 shadow-sm border border-gray-200/50' : 'text-gray-500 hover:text-gray-700'}`}
+                                                                    className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'arrow' ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm border border-gray-200/50 dark:border-gray-500' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
                                                                     title="Arrow (Shift+V)"
                                                                 >
                                                                     <ArrowUpRight className="w-3.5 h-3.5" /> Arrow
                                                                 </button>
                                                                 <button
                                                                     onClick={() => setDrawingTool('text')}
-                                                                    className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'text' ? 'bg-white text-indigo-600 shadow-sm border border-gray-200/50' : 'text-gray-500 hover:text-gray-700'}`}
+                                                                    className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'text' ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm border border-gray-200/50 dark:border-gray-500' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
                                                                     title="Text (Shift+T)"
                                                                 >
                                                                     <Type className="w-3.5 h-3.5" /> Text
                                                                 </button>
                                                                 <button
                                                                     onClick={() => setDrawingTool('magnifier')}
-                                                                    className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'magnifier' ? 'bg-white text-indigo-600 shadow-sm border border-gray-200/50' : 'text-gray-500 hover:text-gray-700'}`}
+                                                                    className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'magnifier' ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm border border-gray-200/50 dark:border-gray-500' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
                                                                     title="Zoom (Shift+Z)"
                                                                 >
                                                                     <ZoomIn className="w-3.5 h-3.5" /> Zoom
@@ -2156,15 +2156,15 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                                                             <div className={drawingTool === 'laser' || drawingTool === 'text' || drawingTool === 'magnifier' ? 'opacity-50 pointer-events-none transition-opacity flex flex-col gap-4 mt-2' : 'transition-opacity flex flex-col gap-4 mt-2'}>
                                                                 <div>
-                                                                    <div className="flex justify-between text-xs font-semibold text-gray-500 mb-2">
+                                                                    <div className="flex justify-between text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">
                                                                         <span>Color</span>
                                                                     </div>
                                                                     <div className="flex gap-2 items-center flex-wrap">
-                                                                        {['#ef4444', '#3b82f6', '#22c55e', '#facc15', '#000000'].map(c => (
+                                                                        {['#ef4444', '#3b82f6', '#22c55e', '#facc15', '#000000', '#ffffff'].map(c => (
                                                                             <button
                                                                                 key={c}
                                                                                 onClick={() => setPenColor(c)}
-                                                                                className={`w-5 h-5 rounded-full border-2 ${penColor === c ? 'border-gray-900 scale-110' : 'border-transparent hover:scale-110'} transition-all`}
+                                                                                className={`w-5 h-5 rounded-full border-2 ${penColor === c ? 'border-gray-900 dark:border-white scale-110' : 'border-transparent hover:scale-110'} transition-all shadow-sm`}
                                                                                 style={{ backgroundColor: c }}
                                                                             />
                                                                         ))}
@@ -2172,82 +2172,82 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                                             type="color"
                                                                             value={penColor}
                                                                             onChange={e => setPenColor(e.target.value)}
-                                                                            className="w-6 h-6 ml-1 cursor-pointer border-0 rounded overflow-hidden"
+                                                                            className="w-6 h-6 ml-1 cursor-pointer border-0 rounded overflow-hidden bg-transparent"
                                                                             title="Custom Color"
                                                                         />
                                                                     </div>
                                                                 </div>
                                                                 <div>
-                                                                    <div className="flex justify-between text-xs font-semibold text-gray-500 mb-2">
+                                                                    <div className="flex justify-between text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">
                                                                         <span>Size</span>
-                                                                        <span className="text-blue-600">{penSize}px</span>
+                                                                        <span className="text-blue-600 dark:text-blue-400 font-bold">{penSize}px</span>
                                                                     </div>
-                                                                    <input type="range" min="2" max="24" value={penSize} onChange={(e) => setPenSize(Number(e.target.value))} className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600" />
+                                                                    <input type="range" min="2" max="24" value={penSize} onChange={(e) => setPenSize(Number(e.target.value))} className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600" />
                                                                 </div>
                                                             </div>
                                                             <button
                                                                 onClick={clearCanvas}
-                                                                className="w-full py-2 text-red-500 bg-red-50 hover:bg-red-100 rounded-lg transition-colors flex items-center justify-center gap-1.5 text-xs font-bold"
+                                                                className="w-full py-2 text-red-500 dark:text-red-400 bg-red-50 dark:bg-red-950/40 hover:bg-red-100 dark:hover:bg-red-900/40 rounded-lg border border-red-200/50 dark:border-red-900/50 transition-colors flex items-center justify-center gap-1.5 text-xs font-bold"
                                                             >
-                                                                <Trash2 className="w-4 h-4" /> Clear Canvas <kbd className="ml-1 text-[10px] bg-white border border-red-200 px-1.5 py-0.5 rounded text-red-500 font-mono shadow-sm">Shift+C</kbd>
+                                                                <Trash2 className="w-4 h-4" /> Clear Canvas <kbd className="ml-1 text-[10px] bg-white dark:bg-gray-900 border border-red-200 dark:border-red-900 px-1.5 py-0.5 rounded text-red-500 dark:text-red-400 font-mono shadow-sm">Shift+C</kbd>
                                                             </button>
                                                         </div>
                                                     )}
                                                 </div>
 
-                                                <hr className="border-gray-100" />
+                                                <hr className="border-gray-100 dark:border-gray-800" />
 
                                                 <div>
                                                     <div className="relative">
                                                         {!isPremiumUser && (
-                                                            <div className="absolute inset-0 z-10 bg-gray-50/40 backdrop-blur-[1.5px] rounded-xl flex items-center justify-center mt-6">
+                                                            <div className="absolute inset-0 z-10 bg-gray-50/40 dark:bg-gray-900/60 backdrop-blur-[1.5px] rounded-xl flex items-center justify-center mt-6">
                                                                 <a href="/pricing" className="bg-gradient-to-r from-amber-500 to-orange-600 text-white text-[10px] font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 hover:scale-105 transition-transform cursor-pointer">
                                                                     <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                                                                     Premium Only
                                                                 </a>
                                                             </div>
                                                         )}
-                                                        <div className={`text-sm font-bold text-gray-700 mb-3 flex items-center justify-between ${!isPremiumUser ? 'opacity-50' : ''}`}>
+                                                        <div className={`text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 flex items-center justify-between ${!isPremiumUser ? 'opacity-50' : ''}`}>
                                                             <span className="flex items-center gap-2"><Stamp className="w-4 h-4 text-indigo-500" /> Watermark</span>
-                                                            <button onClick={() => setWmVisible(!wmVisible)} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${wmVisible ? 'bg-blue-600' : 'bg-gray-300'}`}>
+                                                            <button onClick={() => setWmVisible(!wmVisible)} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${wmVisible ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}>
                                                                 <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${wmVisible ? 'translate-x-5' : 'translate-x-1'}`} />
                                                             </button>
                                                         </div>
                                                         {wmVisible && (
-                                                            <div className={`flex flex-col gap-3 bg-gray-50 p-2.5 rounded-xl border border-gray-100 shadow-inner ${!isPremiumUser ? 'opacity-50 pointer-events-none select-none' : ''}`}>
+                                                            <div className={`flex flex-col gap-3 bg-gray-50 dark:bg-gray-800/80 p-2.5 rounded-xl border border-gray-100 dark:border-gray-700 shadow-inner ${!isPremiumUser ? 'opacity-50 pointer-events-none select-none' : ''}`}>
                                                                 <input
                                                                     type="text"
                                                                     value={wmText}
                                                                     onChange={(e) => setWmText(e.target.value)}
                                                                     placeholder="Watermark Text"
-                                                                    className="w-full text-sm bg-white border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-gray-700 font-semibold"
+                                                                    className="w-full text-sm bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-gray-700 dark:text-gray-200 font-semibold"
                                                                 />
                                                                 <div className="flex items-center gap-3">
-                                                                    <span className="text-xs font-bold text-gray-500 w-16 whitespace-nowrap">Opacity</span>
+                                                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-16 whitespace-nowrap">Opacity</span>
                                                                     <input
                                                                         type="range" min="0" max="0.3" step="0.01"
                                                                         value={wmOpacity} onChange={(e) => setWmOpacity(Number(e.target.value))}
-                                                                        className="flex-1 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                                                                        className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
                                                                     />
-                                                                    <span className="text-xs font-bold text-blue-600 w-10 text-right bg-blue-50 px-1 py-0.5 rounded">{Math.round(wmOpacity * 100)}%</span>
+                                                                    <span className="text-xs font-bold text-blue-600 dark:text-blue-400 w-10 text-right bg-blue-50 dark:bg-blue-900/30 px-1 py-0.5 rounded">{Math.round(wmOpacity * 100)}%</span>
                                                                 </div>
                                                                 <div className="flex items-center gap-3">
-                                                                    <span className="text-xs font-bold text-gray-500 w-16 whitespace-nowrap">Size</span>
+                                                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-16 whitespace-nowrap">Size</span>
                                                                     <input
                                                                         type="range" min="10" max="100" step="1"
                                                                         value={wmSize} onChange={(e) => setWmSize(Number(e.target.value))}
-                                                                        className="flex-1 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                                                                        className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
                                                                     />
-                                                                    <span className="text-xs font-bold text-blue-600 w-10 text-right bg-blue-50 px-1 py-0.5 rounded">{wmSize}</span>
+                                                                    <span className="text-xs font-bold text-blue-600 dark:text-blue-400 w-10 text-right bg-blue-50 dark:bg-blue-900/30 px-1 py-0.5 rounded">{wmSize}</span>
                                                                 </div>
                                                                 <div className="flex items-center gap-3">
-                                                                    <span className="text-xs font-bold text-gray-500 w-16 whitespace-nowrap">Spacing</span>
+                                                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-16 whitespace-nowrap">Spacing</span>
                                                                     <input
                                                                         type="range" min="100" max="1000" step="10"
                                                                         value={wmSpacing} onChange={(e) => setWmSpacing(Number(e.target.value))}
-                                                                        className="flex-1 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                                                                        className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
                                                                     />
-                                                                    <span className="text-xs font-bold text-blue-600 w-10 text-right bg-blue-50 px-1 py-0.5 rounded">{wmSpacing}</span>
+                                                                    <span className="text-xs font-bold text-blue-600 dark:text-blue-400 w-10 text-right bg-blue-50 dark:bg-blue-900/30 px-1 py-0.5 rounded">{wmSpacing}</span>
                                                                 </div>
                                                             </div>
                                                         )}
@@ -2263,7 +2263,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             <div className="relative hidden md:flex items-center justify-center shrink-0 ml-auto md:ml-0">
                                 <button
                                     onClick={() => setIsNavigatorOpen(!isNavigatorOpen)}
-                                    className={`flex items-center gap-1.5 md:gap-2 px-2.5 py-1.5 md:px-4 md:py-2 rounded-xl transition-all shadow-sm font-semibold text-xs md:text-lg ${isNavigatorOpen ? 'bg-indigo-600 text-white ring-2 ring-indigo-300' : 'bg-white/60 hover:bg-white text-indigo-700'}`}
+                                    className={`flex items-center gap-1.5 md:gap-2 px-2.5 py-1.5 md:px-4 md:py-2 rounded-xl transition-all shadow-sm font-semibold text-xs md:text-lg ${isNavigatorOpen ? 'bg-indigo-600 text-white ring-2 ring-indigo-300' : 'bg-white/60 hover:bg-white text-indigo-700 dark:bg-gray-700/60 dark:hover:bg-gray-700 dark:text-gray-200'}`}
                                     title="Slide Navigator"
                                 >
                                     <LayoutGrid className="w-4 h-4 md:w-5 md:h-5" />
@@ -2271,12 +2271,12 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 </button>
 
                                 {isNavigatorOpen && (
-                                    <div className="absolute bottom-[calc(100%+10px)] right-0 md:left-1/2 md:-translate-x-1/2 bg-white border border-gray-200 rounded-2xl shadow-2xl p-4 md:p-5 w-[280px] sm:w-[320px] z-50 animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[50vh]">
-                                        <div className="flex justify-between items-center mb-3 pb-3 border-b border-gray-100 shrink-0">
-                                            <h3 className="font-bold text-gray-800 text-sm md:text-base flex items-center gap-2">
-                                                <LayoutGrid className="w-4 h-4 md:w-5 md:h-5 text-gray-500" /> Slide Navigator
+                                    <div className="absolute bottom-[calc(100%+10px)] right-0 md:left-1/2 md:-translate-x-1/2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-2xl p-4 md:p-5 w-[280px] sm:w-[320px] z-50 animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[50vh]">
+                                        <div className="flex justify-between items-center mb-3 pb-3 border-b border-gray-100 dark:border-gray-800 shrink-0">
+                                            <h3 className="font-bold text-gray-800 dark:text-gray-200 text-sm md:text-base flex items-center gap-2">
+                                                <LayoutGrid className="w-4 h-4 md:w-5 md:h-5 text-gray-500 dark:text-gray-400" /> Slide Navigator
                                             </h3>
-                                            <button onClick={() => setIsNavigatorOpen(false)} className="p-1 text-gray-400 hover:bg-gray-100 rounded-full hover:text-gray-700 transition-colors">
+                                            <button onClick={() => setIsNavigatorOpen(false)} className="p-1 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
                                                 <X className="w-4 h-4 md:w-5 md:h-5" />
                                             </button>
                                         </div>
@@ -2293,7 +2293,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                             setTimerSeconds(0);
                                                             setIsNavigatorOpen(false);
                                                         }}
-                                                        className={`w-full aspect-square rounded-lg flex items-center justify-center text-xs md:text-sm font-bold transition-all ${currentSlide === idx ? 'bg-blue-600 text-white shadow-md scale-105' : 'bg-gray-100 text-gray-600 hover:bg-blue-100 hover:text-blue-600'}`}
+                                                        className={`w-full aspect-square rounded-lg flex items-center justify-center text-xs md:text-sm font-bold transition-all ${currentSlide === idx ? 'bg-blue-600 text-white shadow-md scale-105' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-blue-900/50 hover:text-blue-600 dark:hover:text-blue-400'}`}
                                                     >
                                                         {idx + 1}
                                                     </button>
@@ -2306,7 +2306,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                             {/* Controls */}
                             <div className="flex gap-2 md:gap-3 shrink-0">
-                                <button onClick={prevStep} className="p-2 md:p-3 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-700 transition-all active:scale-95">
+                                <button onClick={prevStep} className="p-2 md:p-3 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full text-gray-700 dark:text-gray-200 transition-all active:scale-95">
                                     <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
                                 </button>
                                 <button onClick={nextStep} className="p-2 md:p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-md transition-all active:scale-95">
