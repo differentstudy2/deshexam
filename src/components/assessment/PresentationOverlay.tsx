@@ -1180,7 +1180,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                         <div 
                             className="absolute inset-0 pointer-events-none z-[60] overflow-hidden" 
                             style={{ 
-                                backgroundImage: `url("data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${wmSpacing}" height="${wmSpacing}"><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="${wmSize}" font-family="sans-serif" font-weight="900" fill="${isDarkMode ? '%23ffffff' : '%23000000'}" fill-opacity="${wmOpacity}" transform="rotate(-35 ${wmSpacing/2} ${wmSpacing/2})">${wmText}</text></svg>`)}")`,
+                                backgroundImage: `url("data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${wmSpacing}" height="${wmSpacing}"><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="${wmSize}" font-family="sans-serif" font-weight="900" fill="${isDarkMode ? '%23ffffff' : '%23000000'}" fill-opacity="${isDarkMode ? Math.max(wmOpacity, 0.15) : wmOpacity}" transform="rotate(-35 ${wmSpacing/2} ${wmSpacing/2})">${wmText}</text></svg>`)}")`,
                                 backgroundRepeat: 'repeat'
                             }} 
                         />
@@ -2443,7 +2443,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     <div 
                                         className="absolute inset-0 pointer-events-none z-[60] overflow-hidden" 
                                         style={{ 
-                                            backgroundImage: `url("data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${wmSpacing}" height="${wmSpacing}"><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="${wmSize}" font-family="sans-serif" font-weight="900" fill="${isDarkMode ? '%23ffffff' : '%23000000'}" fill-opacity="${wmOpacity}" transform="rotate(-35 ${wmSpacing/2} ${wmSpacing/2})">${wmText}</text></svg>`)}")`,
+                                            backgroundImage: `url("data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${wmSpacing}" height="${wmSpacing}"><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="${wmSize}" font-family="sans-serif" font-weight="900" fill="${isDarkMode ? '%23ffffff' : '%23000000'}" fill-opacity="${isDarkMode ? Math.max(wmOpacity, 0.15) : wmOpacity}" transform="rotate(-35 ${wmSpacing/2} ${wmSpacing/2})">${wmText}</text></svg>`)}")`,
                                             backgroundRepeat: 'repeat'
                                         }} 
                                     />
