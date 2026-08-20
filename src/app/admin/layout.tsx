@@ -39,13 +39,13 @@ export default function AdminLayout({
   const { user, loading: authLoading, logOut } = useAuth();
   const { setTheme } = useTheme();
   const router = useRouter();
-  const [verifying, setVerifying] = useState(true);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined' && sessionStorage.getItem('deshexam_is_admin') === 'true') {
-      setVerifying(false);
+  // Initialize directly from sessionStorage so already-verified sessions never show the loading screen
+  const [verifying, setVerifying] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return sessionStorage.getItem('deshexam_is_admin') !== 'true';
     }
-  }, []);
+    return true;
+  });
 
   useEffect(() => {
     // Wait until authentication status is determined
