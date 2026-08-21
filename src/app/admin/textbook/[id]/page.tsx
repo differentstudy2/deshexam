@@ -8,7 +8,7 @@ import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firesto
 import { db, storage } from '@/lib/firebase/client';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, BookOpen, Layers, Target, FileText, Activity, Eye, ExternalLink, LayoutGrid, List, UploadCloud, Loader2, User, Languages } from 'lucide-react';
+import { ArrowLeft, BookOpen, Layers, Target, FileText, Activity, Eye, ExternalLink, LayoutGrid, List, UploadCloud, Loader2, User, Languages, Type, Tag, Search, HelpCircle, Save } from 'lucide-react';
 import Link from 'next/link';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
@@ -517,151 +517,261 @@ export default function TextbookDetailsPage() {
 
       {/* Edit Textbook Info Form */}
       {editTbData && (
-        <Card className="border-indigo-100 shadow-sm">
-          <CardHeader className="bg-gradient-to-r from-blue-50 via-indigo-50/50 to-white border-b border-indigo-100 relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-blue-500 to-indigo-600"></div>
-            <CardTitle className="text-xl flex items-center gap-3 text-indigo-950">
-              <div className="bg-white p-2 rounded-xl shadow-sm border border-indigo-50">
-                <FileText className="h-5 w-5 text-indigo-600" />
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm bg-white dark:bg-slate-900">
+
+          {/* Gradient Header */}
+          <div className="bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 px-6 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="bg-white/20 p-2 rounded-xl backdrop-blur-sm shrink-0">
+                <FileText className="h-5 w-5 text-white" />
               </div>
-              <span className="font-semibold bg-clip-text text-transparent bg-gradient-to-r from-indigo-900 to-slate-800">Textbook Info & SEO</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-6">
-            <div className="space-y-6">
-              {/* Status, Author row */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label>Status</Label>
-                  <Select value={editTbData.status} onValueChange={(val) => setEditTbData({...editTbData, status: val as any})}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="published">Published</SelectItem>
-                      <SelectItem value="draft">Draft</SelectItem>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="inactive">Inactive</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2 md:col-span-2">
-                  <Label className="flex items-center gap-1"><User className="w-3.5 h-3.5" /> Author / Publisher</Label>
-                  <Input value={editTbData.author} onChange={(e) => setEditTbData({...editTbData, author: e.target.value})} placeholder="e.g. Dr. Jafar Iqbal, NCTB" />
-                </div>
+              <div>
+                <h2 className="text-white font-bold text-lg leading-tight">Textbook Info & SEO</h2>
+                <p className="text-indigo-200 text-xs">Manage metadata, SEO content, and cover image</p>
               </div>
-              {/* Title & Slug */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Title</Label>
-                  <Input value={editTbData.title} onChange={(e) => setEditTbData({...editTbData, title: e.target.value})} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Slug</Label>
-                  <Input value={editTbData.slug} onChange={(e) => setEditTbData({...editTbData, slug: e.target.value})} />
-                </div>
-              </div>
-              {/* Short Description */}
-              <div className="space-y-2">
-                <Label>Short Description / Excerpt</Label>
-                <Textarea rows={2} value={editTbData.description} onChange={(e) => setEditTbData({...editTbData, description: e.target.value})} placeholder="Brief 1-2 sentence summary shown in search results and cards..." />
-              </div>
-              {/* SEO Content */}
-              <div className="space-y-2">
-                <Label>Detailed Content / SEO (Markdown supported)</Label>
-                <Textarea rows={6} value={editTbData.seoContent} onChange={(e) => setEditTbData({...editTbData, seoContent: e.target.value})} />
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Tags (Comma separated)</Label>
-                  <Input value={editTbData.tags} onChange={(e) => setEditTbData({...editTbData, tags: e.target.value})} placeholder="e.g. math, science" />
-                </div>
-                <div className="space-y-2">
-                  <Label>Keywords (Comma separated)</Label>
-                  <Input value={editTbData.keywords} onChange={(e) => setEditTbData({...editTbData, keywords: e.target.value})} placeholder="e.g. class 10 math, board exam" />
-                </div>
-              </div>
-              {/* Language / Medium */}
-              <div className="space-y-2">
-                <Label className="flex items-center gap-1"><Languages className="w-3.5 h-3.5" /> Language / Medium of Instruction (Comma separated)</Label>
-                <Input value={editTbData.mediumOfInstruction} onChange={(e) => setEditTbData({...editTbData, mediumOfInstruction: e.target.value})} placeholder="e.g. Bangla, English" />
-              </div>
-              {/* Cover Image with upload + preview */}
-              <div className="space-y-2">
-                <Label>Cover Image</Label>
+            </div>
+            <span className={`hidden sm:flex px-3 py-1.5 rounded-full text-xs font-bold border items-center gap-1.5 ${
+              editTbData.status === 'published' || editTbData.status === 'active'
+                ? 'bg-emerald-500/20 text-emerald-200 border-emerald-400/30'
+                : 'bg-amber-500/20 text-amber-200 border-amber-400/30'
+            }`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${editTbData.status === 'published' || editTbData.status === 'active' ? 'bg-emerald-400' : 'bg-amber-400'}`}></span>
+              {editTbData.status.charAt(0).toUpperCase() + editTbData.status.slice(1)}
+            </span>
+          </div>
+
+          {/* Two-column body */}
+          <div className="flex flex-col lg:flex-row divide-y lg:divide-y-0 lg:divide-x divide-slate-100 dark:divide-slate-800">
+
+            {/* ── Left Sidebar ── */}
+            <div className="lg:w-[240px] xl:w-[260px] shrink-0 p-5 space-y-5 bg-slate-50/60 dark:bg-slate-800/30">
+
+              {/* Cover Image */}
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-2.5">Cover Image</p>
                 {editTbData.featureImage ? (
-                  <div className="flex items-start gap-4">
-                    <div className="relative w-28 h-40 rounded-lg overflow-hidden border border-slate-200 bg-slate-50 group shadow-sm shrink-0">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={editTbData.featureImage} alt="Cover preview" className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <Button type="button" variant="destructive" size="sm" className="h-7 px-3 text-xs rounded-full" onClick={() => setEditTbData({...editTbData, featureImage: ''})}>Remove</Button>
+                  <div className="relative w-full aspect-[3/4] rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 group shadow-md">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={editTbData.featureImage} alt="Cover" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-end pb-4 gap-2">
+                      <label className="cursor-pointer bg-white/95 text-slate-800 text-[11px] font-bold px-4 py-2 rounded-full hover:bg-white transition-colors flex items-center gap-1.5 shadow-lg">
+                        <UploadCloud className="w-3 h-3" /> Change
+                        <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={isUploadingImage} />
+                      </label>
+                      <button onClick={() => setEditTbData({...editTbData, featureImage: ''})} className="bg-red-500 text-white text-[11px] font-bold px-4 py-2 rounded-full hover:bg-red-600 transition-colors flex items-center gap-1.5 shadow-lg">
+                        <Trash2 className="w-3 h-3" /> Remove
+                      </button>
+                    </div>
+                    {isUploadingImage && (
+                      <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                        <Loader2 className="w-8 h-8 text-white animate-spin" />
                       </div>
-                    </div>
-                    <div className="flex-1 space-y-2 pt-1">
-                      <p className="text-xs text-slate-500">Cover image set. Hover to remove, or update the URL below.</p>
-                      <Input value={editTbData.featureImage} onChange={(e) => setEditTbData({...editTbData, featureImage: e.target.value})} placeholder="https://..." />
-                    </div>
+                    )}
                   </div>
                 ) : (
-                  <div className="flex items-start gap-4">
-                    <div className="relative w-28 h-40 border-2 border-dashed border-slate-200 rounded-lg hover:border-indigo-300 hover:bg-indigo-50/30 transition-all cursor-pointer flex flex-col items-center justify-center text-slate-400 group shrink-0">
-                      <input type="file" accept="image/*" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onChange={handleImageUpload} disabled={isUploadingImage} />
-                      {isUploadingImage ? (
-                        <Loader2 className="w-6 h-6 animate-spin text-indigo-500 mb-1" />
-                      ) : (
-                        <UploadCloud className="w-6 h-6 mb-1 group-hover:text-indigo-500 transition-colors" />
-                      )}
-                      <span className="text-[11px] font-medium text-center px-2 leading-tight">{isUploadingImage ? 'Uploading...' : 'Upload Image'}</span>
-                    </div>
-                    <div className="flex-1 space-y-2 pt-1">
-                      <p className="text-xs text-slate-500">Upload a cover image or paste a URL directly.</p>
-                      <Input value={editTbData.featureImage} onChange={(e) => setEditTbData({...editTbData, featureImage: e.target.value})} placeholder="Or paste image URL..." />
-                    </div>
+                  <div className="relative w-full aspect-[3/4] border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl hover:border-indigo-400 hover:bg-indigo-50/40 dark:hover:bg-indigo-900/20 transition-all cursor-pointer flex flex-col items-center justify-center text-slate-400 group">
+                    <input type="file" accept="image/*" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onChange={handleImageUpload} disabled={isUploadingImage} />
+                    {isUploadingImage ? (
+                      <Loader2 className="w-8 h-8 animate-spin text-indigo-500 mb-3" />
+                    ) : (
+                      <div className="w-12 h-12 rounded-full bg-white dark:bg-slate-700 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/40 border border-slate-200 dark:border-slate-600 flex items-center justify-center mb-3 shadow-sm transition-colors">
+                        <UploadCloud className="w-5 h-5 group-hover:text-indigo-500 transition-colors" />
+                      </div>
+                    )}
+                    <p className="text-xs font-bold text-slate-600 dark:text-slate-400">{isUploadingImage ? 'Uploading...' : 'Upload Cover'}</p>
+                    <p className="text-[10px] text-slate-400 mt-1 text-center px-3 leading-relaxed">Click or drag & drop<br/>Recommended: 3:4 ratio</p>
                   </div>
                 )}
+                <Input className="mt-2.5 text-xs h-8 bg-white dark:bg-slate-900 placeholder:text-slate-400" value={editTbData.featureImage} onChange={(e) => setEditTbData({...editTbData, featureImage: e.target.value})} placeholder="Or paste image URL..." />
               </div>
+
+              {/* Divider */}
+              <div className="border-t border-slate-200 dark:border-slate-700" />
+
+              {/* Publish Status */}
               <div className="space-y-2">
-                <div className="flex items-center justify-between mt-6 border-t pt-4">
-                  <Label className="text-lg">FAQs</Label>
-                  <Button type="button" variant="outline" size="sm" onClick={() => setEditTbData({...editTbData, faqs: [...editTbData.faqs, {question: '', answer: ''}]})} className="flex items-center">
-                    <Plus className="w-4 h-4 md:mr-2" /> <span className="hidden md:inline">Add FAQ</span>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">Publish Status</p>
+                <Select value={editTbData.status} onValueChange={(val) => setEditTbData({...editTbData, status: val as any})}>
+                  <SelectTrigger className="bg-white dark:bg-slate-900 h-9 text-sm font-medium">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="published">
+                      <span className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />Published</span>
+                    </SelectItem>
+                    <SelectItem value="draft">
+                      <span className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-amber-400 shrink-0" />Draft</span>
+                    </SelectItem>
+                    <SelectItem value="active">
+                      <span className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-blue-500 shrink-0" />Active</span>
+                    </SelectItem>
+                    <SelectItem value="inactive">
+                      <span className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-slate-400 shrink-0" />Inactive</span>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Author */}
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 flex items-center gap-1">
+                  <User className="w-3 h-3" /> Author / Publisher
+                </label>
+                <Input className="bg-white dark:bg-slate-900 h-9 text-sm" value={editTbData.author} onChange={(e) => setEditTbData({...editTbData, author: e.target.value})} placeholder="e.g. NCTB, Dr. Jafar" />
+              </div>
+
+              {/* Medium */}
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 flex items-center gap-1">
+                  <Languages className="w-3 h-3" /> Language / Medium
+                </label>
+                <Input className="bg-white dark:bg-slate-900 h-9 text-sm" value={editTbData.mediumOfInstruction} onChange={(e) => setEditTbData({...editTbData, mediumOfInstruction: e.target.value})} placeholder="e.g. Bangla, English" />
+              </div>
+            </div>
+
+            {/* ── Right Main Panel ── */}
+            <div className="flex-1 p-6 space-y-8 min-w-0">
+
+              {/* Section: Core Info */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100 dark:border-slate-800">
+                  <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center shrink-0 shadow-sm shadow-indigo-200">
+                    <Type className="w-3.5 h-3.5 text-white" />
+                  </div>
+                  <h3 className="text-sm font-bold text-slate-700 dark:text-slate-300">Core Information</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-semibold text-slate-600 dark:text-slate-400">Title <span className="text-red-500">*</span></Label>
+                    <Input value={editTbData.title} onChange={(e) => setEditTbData({...editTbData, title: e.target.value})} className="bg-slate-50/50 dark:bg-slate-800/50 focus:bg-white dark:focus:bg-slate-900 transition-colors h-10" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-semibold text-slate-600 dark:text-slate-400">URL Slug</Label>
+                    <Input value={editTbData.slug} onChange={(e) => setEditTbData({...editTbData, slug: e.target.value})} className="bg-slate-50/50 dark:bg-slate-800/50 focus:bg-white dark:focus:bg-slate-900 transition-colors font-mono text-sm h-10" placeholder="auto-generated-from-title" />
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-semibold text-slate-600 dark:text-slate-400">Short Description / Excerpt</Label>
+                  <Textarea rows={2} value={editTbData.description} onChange={(e) => setEditTbData({...editTbData, description: e.target.value})} placeholder="Brief 1-2 sentence summary shown in search results and cards..." className="bg-slate-50/50 dark:bg-slate-800/50 focus:bg-white dark:focus:bg-slate-900 transition-colors resize-none text-sm" />
+                </div>
+              </div>
+
+              {/* Section: Content & SEO */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100 dark:border-slate-800">
+                  <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shrink-0 shadow-sm shadow-violet-200">
+                    <FileText className="w-3.5 h-3.5 text-white" />
+                  </div>
+                  <h3 className="text-sm font-bold text-slate-700 dark:text-slate-300">Content & SEO</h3>
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-semibold text-slate-600 dark:text-slate-400">Detailed Content <span className="font-normal text-slate-400">(Markdown supported)</span></Label>
+                  <Textarea rows={6} value={editTbData.seoContent} onChange={(e) => setEditTbData({...editTbData, seoContent: e.target.value})} className="bg-slate-50/50 dark:bg-slate-800/50 focus:bg-white dark:focus:bg-slate-900 transition-colors font-mono text-sm resize-y" />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-semibold text-slate-600 dark:text-slate-400 flex items-center gap-1.5">
+                      <Tag className="w-3 h-3 text-slate-400" /> Tags <span className="font-normal text-slate-400">(comma separated)</span>
+                    </Label>
+                    <Input value={editTbData.tags} onChange={(e) => setEditTbData({...editTbData, tags: e.target.value})} placeholder="math, science, class 10" className="bg-slate-50/50 dark:bg-slate-800/50 focus:bg-white dark:focus:bg-slate-900 transition-colors h-10" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-semibold text-slate-600 dark:text-slate-400 flex items-center gap-1.5">
+                      <Search className="w-3 h-3 text-slate-400" /> Keywords <span className="font-normal text-slate-400">(comma separated)</span>
+                    </Label>
+                    <Input value={editTbData.keywords} onChange={(e) => setEditTbData({...editTbData, keywords: e.target.value})} placeholder="class 10 math, board exam" className="bg-slate-50/50 dark:bg-slate-800/50 focus:bg-white dark:focus:bg-slate-900 transition-colors h-10" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Section: FAQs */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shrink-0 shadow-sm shadow-amber-200">
+                      <HelpCircle className="w-3.5 h-3.5 text-white" />
+                    </div>
+                    <h3 className="text-sm font-bold text-slate-700 dark:text-slate-300">FAQs</h3>
+                    {editTbData.faqs.length > 0 && (
+                      <span className="text-[10px] bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-full font-bold border border-amber-200 dark:border-amber-700">
+                        {editTbData.faqs.length}
+                      </span>
+                    )}
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setEditTbData({...editTbData, faqs: [...editTbData.faqs, {question: '', answer: ''}]})}
+                    className="h-7 text-xs gap-1.5 border-dashed hover:border-indigo-400 hover:text-indigo-600 hover:bg-indigo-50"
+                  >
+                    <Plus className="w-3 h-3" /> Add FAQ
                   </Button>
                 </div>
-                <div className="space-y-3 mt-2">
+                <div className="space-y-3">
                   {editTbData.faqs.map((faq, idx) => (
-                    <div key={idx} className="flex gap-2 items-start border p-3 rounded-md bg-slate-50">
-                      <div className="flex-1 space-y-2">
-                        <Input placeholder="Question" value={faq.question} onChange={(e) => {
-                          const newFaqs = [...editTbData.faqs];
-                          newFaqs[idx].question = e.target.value;
+                    <div key={idx} className="group relative bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4 border border-slate-200 dark:border-slate-700 hover:border-indigo-200 dark:hover:border-indigo-800 transition-colors">
+                      <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button type="button" variant="ghost" size="icon" className="h-7 w-7 text-red-400 hover:text-red-600 hover:bg-red-50" onClick={() => {
+                          const newFaqs = editTbData.faqs.filter((_, i) => i !== idx);
                           setEditTbData({...editTbData, faqs: newFaqs});
-                        }} />
-                        <Textarea placeholder="Answer" rows={2} value={faq.answer} onChange={(e) => {
-                          const newFaqs = [...editTbData.faqs];
-                          newFaqs[idx].answer = e.target.value;
-                          setEditTbData({...editTbData, faqs: newFaqs});
-                        }} />
+                        }}>
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
                       </div>
-                      <Button type="button" variant="ghost" size="icon" className="text-red-500 hover:bg-red-100" onClick={() => {
-                        const newFaqs = editTbData.faqs.filter((_, i) => i !== idx);
-                        setEditTbData({...editTbData, faqs: newFaqs});
-                      }}>
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      <div className="space-y-2 pr-8">
+                        <Input
+                          placeholder={`Q${idx + 1}. Enter question...`}
+                          value={faq.question}
+                          onChange={(e) => {
+                            const newFaqs = [...editTbData.faqs];
+                            newFaqs[idx].question = e.target.value;
+                            setEditTbData({...editTbData, faqs: newFaqs});
+                          }}
+                          className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-600 font-medium text-sm"
+                        />
+                        <Textarea
+                          placeholder="Answer..."
+                          rows={2}
+                          value={faq.answer}
+                          onChange={(e) => {
+                            const newFaqs = [...editTbData.faqs];
+                            newFaqs[idx].answer = e.target.value;
+                            setEditTbData({...editTbData, faqs: newFaqs});
+                          }}
+                          className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-600 text-sm resize-none"
+                        />
+                      </div>
                     </div>
                   ))}
-                  {editTbData.faqs.length === 0 && <p className="text-sm text-gray-500 italic">No FAQs added yet.</p>}
+                  {editTbData.faqs.length === 0 && (
+                    <div className="text-center py-8 text-slate-400 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl cursor-pointer hover:border-amber-300 hover:bg-amber-50/30 transition-colors group" onClick={() => setEditTbData({...editTbData, faqs: [{question: '', answer: ''}]})}>
+                      <HelpCircle className="w-8 h-8 mx-auto mb-2 opacity-30 group-hover:opacity-60 group-hover:text-amber-400 transition-all" />
+                      <p className="text-sm font-medium text-slate-500">No FAQs added yet</p>
+                      <p className="text-xs text-slate-400 mt-1">Click to add your first FAQ</p>
+                    </div>
+                  )}
                 </div>
               </div>
-              <div className="flex justify-end border-t pt-4">
-                <Button onClick={handleSaveTextbook} disabled={!editTbData?.title.trim() || isSavingTb} className="bg-indigo-600 hover:bg-indigo-700">
-                  {isSavingTb ? 'Saving...' : 'Save Textbook Info'}
+
+              {/* Save Footer */}
+              <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800">
+                <p className="text-xs text-slate-400 dark:text-slate-500 hidden sm:block">All changes are saved to Firestore database</p>
+                <Button
+                  onClick={handleSaveTextbook}
+                  disabled={!editTbData?.title.trim() || isSavingTb}
+                  className="ml-auto bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white shadow-lg shadow-indigo-500/25 px-6 h-10 rounded-xl font-semibold transition-all active:scale-95 gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSavingTb ? (
+                    <><Loader2 className="w-4 h-4 animate-spin" /> Saving...</>
+                  ) : (
+                    <><Save className="w-4 h-4" /> Save Changes</>
+                  )}
                 </Button>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
 
       {/* Chapters & Topics Accordion */}
