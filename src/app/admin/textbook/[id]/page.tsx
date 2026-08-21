@@ -5,10 +5,10 @@ import { useParams } from 'next/navigation';
 import { getTaxonomyNodeById, getTaxonomyNodesByParent, TaxonomyNode } from '@/lib/firebase/taxonomy';
 import { getAssessmentsByNode } from '@/lib/firebase/assessment';
 import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase/client';
+import { db, storage } from '@/lib/firebase/client';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, BookOpen, Layers, Target, FileText, Activity, Eye, ExternalLink, LayoutGrid, List } from 'lucide-react';
+import { ArrowLeft, BookOpen, Layers, Target, FileText, Activity, Eye, ExternalLink, LayoutGrid, List, UploadCloud, Loader2, User, Languages } from 'lucide-react';
 import Link from 'next/link';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
@@ -16,7 +16,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus, Edit2, Trash2 } from 'lucide-react';
+import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 interface TopicData extends TaxonomyNode {
   contentsCount: number;
@@ -70,12 +72,18 @@ export default function TextbookDetailsPage() {
     keywords: string;
     featureImage: string;
     faqs: { question: string; answer: string }[];
+    status: 'active' | 'inactive' | 'published' | 'draft';
+    author: string;
+    description: string;
+    mediumOfInstruction: string;
   } | null>(null);
   const [isSavingTb, setIsSavingTb] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
 
   // Stats State
   const [stats, setStats] = useState({
     totalQuestions: 0,
+    totalContents: 0,
     practiceSets: 0,
     quizzes: 0,
     mockTests: 0,
@@ -97,7 +105,11 @@ export default function TextbookDetailsPage() {
             tags: (tbNode.tags || []).join(', '),
             keywords: (tbNode.keywords || []).join(', '),
             featureImage: tbNode.featureImage || '',
-            faqs: tbNode.faqs || []
+            faqs: tbNode.faqs || [],
+            status: tbNode.status || 'draft',
+            author: tbNode.author || '',
+            description: tbNode.description || '',
+            mediumOfInstruction: (tbNode.mediumOfInstruction || []).join(', '),
           });
           // 2. Fetch Client URL base path for textbook by walking up the taxonomy tree
           let baseTextbookSlugPath = tbNode.fullSlug || tbNode.id;
@@ -194,6 +206,7 @@ export default function TextbookDetailsPage() {
 
           setStats({
             totalQuestions: tbqDocs.length,
+            totalContents: tbcDocs.length,
             practiceSets: pSets.length,
             quizzes: qSets.length,
             mockTests: mTests.length,
@@ -313,7 +326,11 @@ export default function TextbookDetailsPage() {
         tags: editTbData.tags.split(',').map(s => s.trim()).filter(Boolean),
         keywords: editTbData.keywords.split(',').map(s => s.trim()).filter(Boolean),
         featureImage: editTbData.featureImage.trim(),
-        faqs: editTbData.faqs.filter(f => f.question.trim() && f.answer.trim())
+        faqs: editTbData.faqs.filter(f => f.question.trim() && f.answer.trim()),
+        status: editTbData.status,
+        author: editTbData.author.trim(),
+        description: editTbData.description.trim(),
+        mediumOfInstruction: editTbData.mediumOfInstruction.split(',').map(s => s.trim()).filter(Boolean),
       });
       await loadData();
       alert('Textbook info updated successfully!');
@@ -322,6 +339,23 @@ export default function TextbookDetailsPage() {
       alert('Failed to update textbook info');
     } finally {
       setIsSavingTb(false);
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !editTbData) return;
+    setIsUploadingImage(true);
+    try {
+      const fileRef = storageRef(storage, `textbook_covers/${textbookId}_${Date.now()}`);
+      await uploadBytes(fileRef, file);
+      const url = await getDownloadURL(fileRef);
+      setEditTbData({ ...editTbData, featureImage: url });
+    } catch (err) {
+      console.error(err);
+      alert('Image upload failed');
+    } finally {
+      setIsUploadingImage(false);
     }
   };
 
@@ -419,7 +453,7 @@ export default function TextbookDetailsPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         <Card className="bg-white dark:bg-slate-800 border-indigo-100 dark:border-slate-700 shadow-sm transition-all hover:shadow-md">
           <CardContent className="p-5 flex items-center justify-between">
             <div>
@@ -428,6 +462,18 @@ export default function TextbookDetailsPage() {
             </div>
             <div className="p-3 bg-indigo-50 dark:bg-indigo-500/20 rounded-xl text-indigo-600 dark:text-indigo-400">
               <FileText className="w-5 h-5" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white dark:bg-slate-800 border-teal-100 dark:border-slate-700 shadow-sm transition-all hover:shadow-md">
+          <CardContent className="p-5 flex items-center justify-between">
+            <div>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wider mb-1">Contents</p>
+              <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-100">{stats.totalContents}</h3>
+            </div>
+            <div className="p-3 bg-teal-50 dark:bg-teal-500/20 rounded-xl text-teal-600 dark:text-teal-400">
+              <BookOpen className="w-5 h-5" />
             </div>
           </CardContent>
         </Card>
@@ -483,6 +529,28 @@ export default function TextbookDetailsPage() {
           </CardHeader>
           <CardContent className="p-6">
             <div className="space-y-6">
+              {/* Status, Author row */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label>Status</Label>
+                  <Select value={editTbData.status} onValueChange={(val) => setEditTbData({...editTbData, status: val as any})}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="published">Published</SelectItem>
+                      <SelectItem value="draft">Draft</SelectItem>
+                      <SelectItem value="active">Active</SelectItem>
+                      <SelectItem value="inactive">Inactive</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                  <Label className="flex items-center gap-1"><User className="w-3.5 h-3.5" /> Author / Publisher</Label>
+                  <Input value={editTbData.author} onChange={(e) => setEditTbData({...editTbData, author: e.target.value})} placeholder="e.g. Dr. Jafar Iqbal, NCTB" />
+                </div>
+              </div>
+              {/* Title & Slug */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Title</Label>
@@ -493,8 +561,14 @@ export default function TextbookDetailsPage() {
                   <Input value={editTbData.slug} onChange={(e) => setEditTbData({...editTbData, slug: e.target.value})} />
                 </div>
               </div>
+              {/* Short Description */}
               <div className="space-y-2">
-                <Label>Description / SEO Content (Markdown supported)</Label>
+                <Label>Short Description / Excerpt</Label>
+                <Textarea rows={2} value={editTbData.description} onChange={(e) => setEditTbData({...editTbData, description: e.target.value})} placeholder="Brief 1-2 sentence summary shown in search results and cards..." />
+              </div>
+              {/* SEO Content */}
+              <div className="space-y-2">
+                <Label>Detailed Content / SEO (Markdown supported)</Label>
                 <Textarea rows={6} value={editTbData.seoContent} onChange={(e) => setEditTbData({...editTbData, seoContent: e.target.value})} />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -507,9 +581,45 @@ export default function TextbookDetailsPage() {
                   <Input value={editTbData.keywords} onChange={(e) => setEditTbData({...editTbData, keywords: e.target.value})} placeholder="e.g. class 10 math, board exam" />
                 </div>
               </div>
+              {/* Language / Medium */}
               <div className="space-y-2">
-                <Label>Cover Image URL</Label>
-                <Input value={editTbData.featureImage} onChange={(e) => setEditTbData({...editTbData, featureImage: e.target.value})} placeholder="https://..." />
+                <Label className="flex items-center gap-1"><Languages className="w-3.5 h-3.5" /> Language / Medium of Instruction (Comma separated)</Label>
+                <Input value={editTbData.mediumOfInstruction} onChange={(e) => setEditTbData({...editTbData, mediumOfInstruction: e.target.value})} placeholder="e.g. Bangla, English" />
+              </div>
+              {/* Cover Image with upload + preview */}
+              <div className="space-y-2">
+                <Label>Cover Image</Label>
+                {editTbData.featureImage ? (
+                  <div className="flex items-start gap-4">
+                    <div className="relative w-28 h-40 rounded-lg overflow-hidden border border-slate-200 bg-slate-50 group shadow-sm shrink-0">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={editTbData.featureImage} alt="Cover preview" className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <Button type="button" variant="destructive" size="sm" className="h-7 px-3 text-xs rounded-full" onClick={() => setEditTbData({...editTbData, featureImage: ''})}>Remove</Button>
+                      </div>
+                    </div>
+                    <div className="flex-1 space-y-2 pt-1">
+                      <p className="text-xs text-slate-500">Cover image set. Hover to remove, or update the URL below.</p>
+                      <Input value={editTbData.featureImage} onChange={(e) => setEditTbData({...editTbData, featureImage: e.target.value})} placeholder="https://..." />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-start gap-4">
+                    <div className="relative w-28 h-40 border-2 border-dashed border-slate-200 rounded-lg hover:border-indigo-300 hover:bg-indigo-50/30 transition-all cursor-pointer flex flex-col items-center justify-center text-slate-400 group shrink-0">
+                      <input type="file" accept="image/*" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onChange={handleImageUpload} disabled={isUploadingImage} />
+                      {isUploadingImage ? (
+                        <Loader2 className="w-6 h-6 animate-spin text-indigo-500 mb-1" />
+                      ) : (
+                        <UploadCloud className="w-6 h-6 mb-1 group-hover:text-indigo-500 transition-colors" />
+                      )}
+                      <span className="text-[11px] font-medium text-center px-2 leading-tight">{isUploadingImage ? 'Uploading...' : 'Upload Image'}</span>
+                    </div>
+                    <div className="flex-1 space-y-2 pt-1">
+                      <p className="text-xs text-slate-500">Upload a cover image or paste a URL directly.</p>
+                      <Input value={editTbData.featureImage} onChange={(e) => setEditTbData({...editTbData, featureImage: e.target.value})} placeholder="Or paste image URL..." />
+                    </div>
+                  </div>
+                )}
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between mt-6 border-t pt-4">
@@ -628,6 +738,11 @@ export default function TextbookDetailsPage() {
                       <Badge variant="secondary" className="bg-gray-100 text-gray-600 z-10 shrink-0">
                         {chapter.topics.length} Topics
                       </Badge>
+                      {chapter.contentsCount > 0 && (
+                        <Badge variant="secondary" className="bg-teal-50 text-teal-700 border-teal-200 z-10 shrink-0">
+                          {chapter.contentsCount} Res
+                        </Badge>
+                      )}
                       {chapter.questionCount > 0 && (
                         <Badge variant="secondary" className="bg-amber-50 text-amber-700 border-amber-200 z-10 shrink-0">
                           {chapter.questionCount} Qs
