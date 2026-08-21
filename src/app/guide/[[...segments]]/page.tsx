@@ -188,6 +188,7 @@ export default async function GuidePage({ params }: { params: Promise<{ segments
 
   // Fetch curriculum for SubjectDashboard / ReadingLayout
   const subjectNode = node.ancestors?.find(a => a.type === 'subject') || (node.type === 'subject' ? node : null);
+  const textbookAncestorNode = node.ancestors?.find((a: any) => a.type === 'textbook') || (node.type === 'textbook' ? node : null);
   
   let fullCurriculum: any[] = [];
   
@@ -207,12 +208,24 @@ export default async function GuidePage({ params }: { params: Promise<{ segments
   if (contentType || node.type === 'topic' || node.type === 'chapter') {
     // Provide reading layout with the content
     const readingData = await getReadingContent(node.id);
-    // If it's a specific content type like MCQ, we might want to filter readingData or show a specific UI.
-    // For now, pass to ReadingLayout. ReadingLayout can handle the specific views.
     
-    const curriculum = textbookTitle 
-      ? fullCurriculum.filter(c => c.title === textbookTitle) // using title as a fallback match since we only have ancestor titles
-      : fullCurriculum;
+    // Filter curriculum to just the relevant textbook.
+    // Prefer ID-based match (via dbId), fall back to title match.
+    let curriculum: any[];
+    if (textbookAncestorNode) {
+      curriculum = fullCurriculum.filter(
+        (c: any) => c.dbId === textbookAncestorNode.id || c.id === textbookAncestorNode.id
+          || c.id === (textbookAncestorNode.fullSlug || textbookAncestorNode.id)
+      );
+      // If ID match found nothing, fall back to title
+      if (curriculum.length === 0 && textbookTitle) {
+        curriculum = fullCurriculum.filter((c: any) => c.title === textbookTitle);
+      }
+    } else if (textbookTitle) {
+      curriculum = fullCurriculum.filter((c: any) => c.title === textbookTitle);
+    } else {
+      curriculum = fullCurriculum;
+    }
 
     const readingBreadcrumbs = [...uiBreadcrumbs];
     if (readingData && readingData.title && readingData.title !== node.title && !contentType) {

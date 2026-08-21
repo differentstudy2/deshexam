@@ -48,57 +48,63 @@ export function ContentNavigationSidebar({ curriculum, activeId, subjectTitle }:
           </div>
 
           <div className="flex flex-col pb-4">
-            {(curriculum[0]?.topics || []).map((topic, index) => {
-              const isTopicActive = topic.id === activeId || topic.subtopics?.some((s: any) => s.id === activeId);
-              const displayTitle = topic.title.split(' (')[0];
-              const isClosed = closedTopics[topic.id];
-              
-              return (
-                <div key={`${topic.id}-${index}`} className="flex flex-col mb-1 border-b border-white dark:border-slate-900">
-                  
-                  {/* Topic Row (Chapter in DB layer) */}
-                  <Link href={`/guide/${topic.id}`} className="block">
-                    <div 
-                      className={cn(
-                        "px-4 py-2 text-[15.5px] transition-colors flex items-center justify-between cursor-pointer",
-                        isTopicActive
-                          ? "bg-[#e2e8f0] dark:bg-slate-800 text-[#0ea5e9] dark:text-blue-400 font-medium"
-                          : "bg-[#eaf5ef] dark:bg-emerald-900/20 text-slate-800 dark:text-slate-200 hover:bg-[#d1e8dc] dark:hover:bg-emerald-900/40"
-                      )}
-                    >
-                      <span>{displayTitle}</span>
-                      {topic.subtopics && topic.subtopics.length > 0 && (
-                        <div 
-                          onClick={(e) => toggleTopic(topic.id, e)}
-                          className="p-1 hover:bg-black/5 dark:hover:bg-white/10 rounded-sm transition-colors"
-                        >
-                          {isClosed ? (
-                            <ChevronRight className="w-4 h-4" />
-                          ) : (
-                            <ChevronDown className="w-4 h-4" />
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </Link>
+            {(curriculum[0]?.topics || []).map((chapter: any, chapterIndex: number) => {
+              const isChapterActive = chapter.id === activeId;
+              const isChapterGroupActive = isChapterActive || chapter.subtopics?.some((t: any) => t.id === activeId);
+              const isClosed = closedTopics[chapter.id];
 
-                  {/* Subtopics */}
+              return (
+                <div key={`${chapter.id}-${chapterIndex}`} className="flex flex-col border-b border-slate-100 dark:border-slate-800">
+
+                  {/* Chapter Row */}
+                  <div className="flex items-center justify-between">
+                    <Link href={`/guide/${chapter.id}`} className="flex-1 block">
+                      <div
+                        className={cn(
+                          "px-4 py-2.5 text-[14px] font-semibold transition-colors",
+                          isChapterActive
+                            ? "bg-[#e2e8f0] dark:bg-slate-800 text-[#0ea5e9] dark:text-blue-400"
+                            : isChapterGroupActive
+                              ? "bg-slate-100 dark:bg-slate-800/60 text-slate-700 dark:text-slate-300"
+                              : "bg-slate-50 dark:bg-slate-900/50 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/40"
+                        )}
+                      >
+                        {chapter.title.split(' (')[0]}
+                      </div>
+                    </Link>
+                    {chapter.subtopics && chapter.subtopics.length > 0 && (
+                      <div
+                        onClick={(e) => toggleTopic(chapter.id, e)}
+                        className={cn(
+                          "p-2 cursor-pointer hover:bg-black/5 dark:hover:bg-white/10 rounded-sm transition-colors shrink-0",
+                          isChapterGroupActive ? "bg-slate-100 dark:bg-slate-800/60" : "bg-slate-50 dark:bg-slate-900/50"
+                        )}
+                      >
+                        {isClosed ? (
+                          <ChevronRight className="w-4 h-4 text-slate-400" />
+                        ) : (
+                          <ChevronDown className="w-4 h-4 text-slate-400" />
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Topics under this chapter */}
                   {!isClosed && (
                     <div className="flex flex-col">
-                      {topic.subtopics?.map((subtopic: any, subIndex: number) => {
-                        const isSubActive = subtopic.id === activeId;
-                        
+                      {chapter.subtopics?.map((topic: any, topicIndex: number) => {
+                        const isTopicActive = topic.id === activeId;
                         return (
-                          <Link href={`/guide/${subtopic.id}`} key={`${subtopic.id}-${subIndex}`}>
-                            <div 
+                          <Link href={`/guide/${topic.id}`} key={`${topic.id}-${topicIndex}`}>
+                            <div
                               className={cn(
-                                "px-4 py-2 text-[14.5px] border-b border-dotted border-slate-200 dark:border-slate-800 transition-colors",
-                                isSubActive
-                                  ? "bg-slate-50 dark:bg-slate-800/50 text-[#0ea5e9] dark:text-blue-400 font-medium"
-                                  : "bg-white dark:bg-[#020817] text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                                "px-5 py-2 text-[14px] border-b border-dotted border-slate-200 dark:border-slate-800 transition-colors",
+                                isTopicActive
+                                  ? "bg-[#e2e8f0] dark:bg-slate-800 text-[#0ea5e9] dark:text-blue-400 font-medium"
+                                  : "bg-[#eaf5ef] dark:bg-emerald-900/20 text-slate-700 dark:text-slate-300 hover:bg-[#d1e8dc] dark:hover:bg-emerald-900/40"
                               )}
                             >
-                              {subtopic.title}
+                              {topic.title}
                             </div>
                           </Link>
                         );

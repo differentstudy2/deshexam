@@ -341,7 +341,50 @@ export default function TextbookDetailsPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto pb-12">
+    <div className="flex gap-6 pb-12 items-start">
+
+      {/* Left Sidebar - Chapters & Topics Navigator */}
+      {chapters.length > 0 && (
+        <div className="hidden xl:flex flex-col w-[260px] shrink-0 sticky top-6 self-start max-h-[calc(100vh-3rem)] overflow-y-auto rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm">
+          <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Chapters & Topics</p>
+            <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 mt-0.5 truncate">{textbook.title}</p>
+          </div>
+          <div className="flex flex-col py-2">
+            {chapters.map((chapter, idx) => (
+              <div key={chapter.id}>
+                {/* Chapter row */}
+                <button
+                  onClick={() => {
+                    const el = document.getElementById(`chapter-${chapter.id}`);
+                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }}
+                  className="w-full text-left px-4 py-2 text-[13px] font-semibold text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-slate-800/40 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 hover:text-indigo-700 dark:hover:text-indigo-400 transition-colors border-b border-slate-100 dark:border-slate-800 flex items-center gap-2"
+                >
+                  <span className="shrink-0 text-slate-400 dark:text-slate-500 text-[11px] font-bold">{idx + 1}.</span>
+                  <span className="truncate">{chapter.title}</span>
+                </button>
+                {/* Topics */}
+                {chapter.topics.map((topic) => (
+                  <button
+                    key={topic.id}
+                    onClick={() => {
+                      const el = document.getElementById(`topic-${topic.id}`);
+                      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }}
+                    className="w-full text-left px-4 pl-8 py-1.5 text-[12px] text-slate-600 dark:text-slate-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors border-b border-slate-100 dark:border-slate-800 truncate"
+                  >
+                    {topic.title}
+                  </button>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Main Content */}
+      <div className="flex-1 min-w-0 space-y-6">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center gap-4">
         <div className="flex items-start gap-4">
@@ -549,6 +592,7 @@ export default function TextbookDetailsPage() {
             <Accordion type="multiple" className="space-y-4" defaultValue={chapters.length > 0 ? [chapters[0].id] : []}>
               {chapters.map((chapter) => (
                 <AccordionItem 
+                  id={`chapter-${chapter.id}`}
                   key={chapter.id} 
                   value={chapter.id} 
                   className="border border-gray-200 rounded-lg bg-white overflow-hidden shadow-sm relative"
@@ -612,7 +656,7 @@ export default function TextbookDetailsPage() {
                       {viewMode === 'grid' ? (
                         <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 bg-slate-50/50">
                           {chapter.topics.map((topic) => (
-                            <div key={topic.id} className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition-all hover:border-indigo-300 group flex flex-col justify-between h-full relative overflow-hidden">
+                            <div key={topic.id} id={`topic-${topic.id}`} className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition-all hover:border-indigo-300 group flex flex-col justify-between h-full relative overflow-hidden">
                               <div className="flex items-start gap-3 mb-4">
                                 <div className="mt-1 bg-indigo-50 p-1.5 rounded-lg text-indigo-500 shrink-0">
                                    <Target className="h-4 w-4" />
@@ -689,7 +733,7 @@ export default function TextbookDetailsPage() {
                       ) : (
                         <ul className="divide-y divide-gray-100">
                           {chapter.topics.map((topic) => (
-                            <li key={topic.id} className="p-4 pl-12 hover:bg-gray-50 transition-colors flex items-center justify-between group">
+                            <li key={topic.id} id={`topic-${topic.id}`} className="p-4 pl-12 hover:bg-gray-50 transition-colors flex items-center justify-between group">
                               <div className="flex items-center gap-3">
                                 <Target className="h-4 w-4 text-gray-400 group-hover:text-indigo-500 transition-colors" />
                                 <span className="font-medium text-gray-800">{topic.title}</span>
@@ -870,6 +914,7 @@ export default function TextbookDetailsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+    </div>
     </div>
   );
 }
