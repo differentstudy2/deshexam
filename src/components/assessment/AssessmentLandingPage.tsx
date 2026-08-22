@@ -373,8 +373,6 @@ export default async function AssessmentLandingPage({
                 ))}
               </div>
 
-              {/* User Attempts */}
-              <UserAttemptsDisplay assessmentId={test.id} />
 
               {/* Instructions */}
               <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-colors duration-300">
@@ -619,6 +617,31 @@ ${test.negativeMarking && test.negativeMarking > 0 ? `* প্রতিটি �
 
                 <div className="mt-6">
                   <TopScorersWidget assessmentId={test.id} />
+                  {/* Grading Scale */}
+                  {test.totalMarks && test.totalMarks > 0 && (
+                    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden mt-4 transition-colors duration-300">
+                      <div className="px-5 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center gap-2">
+                        <BarChart3 className="w-4 h-4 text-violet-500" />
+                        <p className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">Grading Scale</p>
+                      </div>
+                      <div className="p-4 space-y-2">
+                        {[
+                          { label: 'Excellent', min: Math.round(test.totalMarks * 0.85), color: 'bg-emerald-500', textColor: 'text-emerald-700 dark:text-emerald-400', bgColor: 'bg-emerald-50 dark:bg-emerald-900/20' },
+                          { label: 'Good', min: Math.round(test.totalMarks * 0.70), color: 'bg-blue-500', textColor: 'text-blue-700 dark:text-blue-400', bgColor: 'bg-blue-50 dark:bg-blue-900/20' },
+                          { label: 'Pass', min: test.passingMarks ?? Math.round(test.totalMarks * 0.40), color: 'bg-amber-500', textColor: 'text-amber-700 dark:text-amber-400', bgColor: 'bg-amber-50 dark:bg-amber-900/20' },
+                          { label: 'Fail', min: 0, color: 'bg-red-400', textColor: 'text-red-700 dark:text-red-400', bgColor: 'bg-red-50 dark:bg-red-900/20' },
+                        ].map(({ label, min, color, textColor, bgColor }) => (
+                          <div key={label} className={`flex items-center justify-between px-3 py-1.5 rounded-lg ${bgColor}`}>
+                            <div className="flex items-center gap-2">
+                              <div className={`w-2 h-2 rounded-full ${color}`} />
+                              <span className={`text-xs font-semibold ${textColor}`}>{label}</span>
+                            </div>
+                            <span className={`text-xs font-bold ${textColor}`}>{min}+</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
