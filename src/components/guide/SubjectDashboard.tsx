@@ -4,7 +4,7 @@ import React, { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ChevronRight, Share2, MoreVertical, Search, Clock, Play, FileText, Library, BookOpen, ChevronDown, List, ChevronLeft, Eye } from 'lucide-react';
+import { ChevronRight, Share2, MoreVertical, Search, Clock, Play, FileText, Library, BookOpen, ChevronDown, List, ChevronLeft, Eye, User, Languages, BookMarked } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
@@ -199,6 +199,21 @@ Our study materials provide chapter-wise notes, summaries, and solutions designe
 At DeshExam, we provide high-quality MCQ, short answer questions (SAQ), long answer questions (LAQ), and previous year board questions. Whether you're doing a quick revision or deep diving into complex topics, this guide is your perfect companion. Regular practice with our question bank and mock tests will significantly boost your exam preparation.`;
   }
 
+  let uiBreadcrumbs = breadcrumbs;
+  
+  if (!uiBreadcrumbs && node) {
+    uiBreadcrumbs = [
+      { name: 'Home', url: '/' },
+      { name: 'Academy', url: '/guide/board' }
+    ];
+    let currentPath = '/guide';
+    node.ancestors?.forEach((anc: any) => {
+      currentPath += `/${anc.slug || anc.id}`;
+      uiBreadcrumbs!.push({ name: anc.title, url: currentPath });
+    });
+    uiBreadcrumbs.push({ name: node.title, url: `/guide/${node.fullSlug || node.id}` });
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#020817] text-slate-800 dark:text-slate-200 font-sans pb-20">
 
@@ -223,11 +238,11 @@ At DeshExam, we provide high-quality MCQ, short answer questions (SAQ), long ans
             <h1 className="font-bold text-[17px] text-slate-900 dark:text-white">Academy</h1>
 
             <div className="hidden sm:flex flex-wrap items-center text-[13px] text-slate-500 dark:text-slate-400 font-medium border-l border-slate-200 dark:border-slate-800 pl-6">
-              {breadcrumbs ? (
-                breadcrumbs.map((crumb, idx) => (
+              {uiBreadcrumbs ? (
+                uiBreadcrumbs.map((crumb, idx) => (
                   <React.Fragment key={idx}>
                     {idx > 0 && <ChevronRight className="w-3.5 h-3.5 mx-2" />}
-                    {idx === breadcrumbs.length - 1 ? (
+                    {idx === uiBreadcrumbs!.length - 1 ? (
                       <span className="text-slate-800 dark:text-slate-200">{crumb.name}</span>
                     ) : (
                       <Link href={crumb.url} className="hover:text-emerald-600 transition-colors">
@@ -244,29 +259,25 @@ At DeshExam, we provide high-quality MCQ, short answer questions (SAQ), long ans
                   {boardTitle && (
                     <>
                       <ChevronRight className="w-3.5 h-3.5 mx-2" />
-                      <span className="hover:text-emerald-600 transition-colors cursor-pointer">{boardTitle}</span>
+                      <span className="text-slate-800 dark:text-slate-200">{boardTitle}</span>
                     </>
                   )}
                   {classTitle && (
                     <>
                       <ChevronRight className="w-3.5 h-3.5 mx-2" />
-                      <Link href="/guide/class" className="hover:text-emerald-600 transition-colors">{classTitle}</Link>
+                      <span className="text-slate-800 dark:text-slate-200">{classTitle}</span>
                     </>
                   )}
                   {subjectTitle && (
                     <>
                       <ChevronRight className="w-3.5 h-3.5 mx-2" />
-                      <span className="hover:text-emerald-600 transition-colors cursor-pointer">{subjectTitle}</span>
+                      <span className="text-slate-800 dark:text-slate-200">{subjectTitle}</span>
                     </>
                   )}
                   {textbookTitle && (pageType === 'textbook' || pageType === 'chapter') && (
                     <>
                       <ChevronRight className="w-3.5 h-3.5 mx-2" />
-                      {pageType === 'textbook' ? (
-                        <span className="text-slate-800 dark:text-slate-200">{textbookTitle}</span>
-                      ) : (
-                        <span className="hover:text-emerald-600 transition-colors cursor-pointer">{textbookTitle}</span>
-                      )}
+                      <span className="text-slate-800 dark:text-slate-200">{textbookTitle}</span>
                     </>
                   )}
                   {pageType === 'chapter' && chapterTitle && (
@@ -316,9 +327,35 @@ At DeshExam, we provide high-quality MCQ, short answer questions (SAQ), long ans
               <h1 className="text-[22px] sm:text-[26px] font-bold text-[#1e293b] dark:text-slate-100 mb-1 leading-tight sm:pr-24">
                 {displayTitle}
               </h1>
-              <p className="text-[13px] sm:text-[14px] text-[#5c7a6b] dark:text-emerald-200/70 mb-4 sm:mb-8">
-                {pageType === 'board' ? 'All Classes & Curriculum' : pageType === 'class' ? `${boardTitle} Curriculum Guide` : `${classTitle} ${subjectTitle || ''} Guide`}
-              </p>
+
+              {/* Description */}
+              {pageType === 'textbook' && node?.description ? (
+                <p className="text-[13px] sm:text-[14px] text-[#3d6b52] dark:text-emerald-200/80 mb-3 leading-relaxed line-clamp-3">
+                  {node.description}
+                </p>
+              ) : (
+                <p className="text-[13px] sm:text-[14px] text-[#5c7a6b] dark:text-emerald-200/70 mb-3">
+                  {pageType === 'board' ? 'All Classes & Curriculum' : pageType === 'class' ? `${boardTitle} Curriculum Guide` : `${classTitle} ${subjectTitle || ''} Guide`}
+                </p>
+              )}
+
+              {/* Author + Medium badges — textbook only */}
+              {pageType === 'textbook' && (node?.author || (node?.mediumOfInstruction && node.mediumOfInstruction.length > 0)) && (
+                <div className="flex flex-wrap items-center gap-1.5 mb-3">
+                  {node.author && (
+                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#1b6b3e] dark:text-emerald-300 bg-white/80 dark:bg-emerald-900/40 px-2 py-0.5 rounded-full border border-[#a8d5bc] dark:border-emerald-700/50 shadow-sm">
+                      <User className="w-2.5 h-2.5 shrink-0" />
+                      {node.author}
+                    </span>
+                  )}
+                  {node.mediumOfInstruction && node.mediumOfInstruction.map((m: string) => (
+                    <span key={m} className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#1b6b3e] dark:text-emerald-300 bg-white/80 dark:bg-emerald-900/40 px-2 py-0.5 rounded-full border border-[#a8d5bc] dark:border-emerald-700/50 shadow-sm">
+                      <Languages className="w-2.5 h-2.5 shrink-0" />
+                      {m}
+                    </span>
+                  ))}
+                </div>
+              )}
 
               <div className="mt-auto flex items-center justify-between">
                 <p className="text-[11px] font-bold text-[#6a8b7a] dark:text-emerald-200/60">
@@ -353,6 +390,11 @@ At DeshExam, we provide high-quality MCQ, short answer questions (SAQ), long ans
             {cqCount > 0 && <span className="shrink-0 px-3 py-1.5 sm:py-1 bg-[#107c41] text-white text-[11px] sm:text-[12px] font-bold rounded-full">CQ: {cqCount}</span>}
             <span className="shrink-0 px-3 py-1.5 sm:py-1 bg-[#0b5c30] text-white text-[11px] sm:text-[12px] font-bold rounded-full">Chapters: {chapterCount}</span>
             <span className="shrink-0 px-3 py-1.5 sm:py-1 bg-[#0b5c30] text-white text-[11px] sm:text-[12px] font-bold rounded-full">Topics: {topicCount}</span>
+            {pageType === 'textbook' && node?.mediumOfInstruction && node.mediumOfInstruction.map((m: string) => (
+              <span key={m} className="shrink-0 px-3 py-1.5 sm:py-1 bg-sky-600 text-white text-[11px] sm:text-[12px] font-bold rounded-full flex items-center gap-1">
+                <Languages className="w-3 h-3" />{m}
+              </span>
+            ))}
             <button className="shrink-0 px-3 py-1.5 sm:py-1 bg-white dark:bg-slate-800 border-[1.5px] border-[#107c41] text-[#107c41] dark:text-emerald-400 text-[11px] sm:text-[12px] font-bold rounded-full flex items-center gap-1 hover:bg-[#f0f9f4] dark:hover:bg-emerald-900/20 transition-colors">
               <Play className="w-3 h-3 fill-current" /> Practice
             </button>
@@ -380,6 +422,54 @@ At DeshExam, we provide high-quality MCQ, short answer questions (SAQ), long ans
 
           {node && (
             <div className="p-4 sm:p-6 border-t border-slate-200 dark:border-slate-800">
+
+              {/* Textbook quick info card — author, medium, status */}
+              {pageType === 'textbook' && (node.author || (node.mediumOfInstruction && node.mediumOfInstruction.length > 0)) && (
+                <div className="mb-6 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 divide-y divide-slate-200 dark:divide-slate-700">
+                  {node.author && (
+                    <div className="flex items-center gap-3 px-4 py-3">
+                      <div className="w-7 h-7 rounded-lg bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center shrink-0">
+                        <User className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">Author / Publisher</p>
+                        <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 mt-0.5">{node.author}</p>
+                      </div>
+                    </div>
+                  )}
+                  {node.mediumOfInstruction && node.mediumOfInstruction.length > 0 && (
+                    <div className="flex items-center gap-3 px-4 py-3">
+                      <div className="w-7 h-7 rounded-lg bg-sky-100 dark:bg-sky-900/40 flex items-center justify-center shrink-0">
+                        <Languages className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">Language / Medium</p>
+                        <div className="flex flex-wrap gap-1.5 mt-1">
+                          {node.mediumOfInstruction.map((m: string) => (
+                            <span key={m} className="text-xs font-semibold bg-sky-100 dark:bg-sky-900/40 text-sky-700 dark:text-sky-300 px-2 py-0.5 rounded-full">{m}</span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  {node.tags && node.tags.length > 0 && (
+                    <div className="flex items-center gap-3 px-4 py-3">
+                      <div className="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center shrink-0">
+                        <BookMarked className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">Topics / Tags</p>
+                        <div className="flex flex-wrap gap-1.5 mt-1">
+                          {node.tags.slice(0, 8).map((t: string) => (
+                            <span key={t} className="text-xs font-medium bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded-full">{t}</span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
               <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">About {displayTitle}</h2>
               <div className="prose dark:prose-invert max-w-none text-slate-700 dark:text-slate-300 text-sm leading-relaxed">
                 <ReactMarkdown>{seoContent}</ReactMarkdown>
