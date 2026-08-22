@@ -83,8 +83,20 @@ export default function MockTestsPage() {
     const fetchMockTests = async () => {
         setLoading(true);
         try {
-            const data = await getAssessments('mockTests');
-            setMockTests(data as MockTest[]);
+            const firebaseData = await getAssessments('mockTests');
+            
+            let hardcodedData = [];
+            try {
+                const res = await fetch('/api/admin/hardcoded-assessments?type=mockTests');
+                if (res.ok) {
+                    const json = await res.json();
+                    hardcodedData = json.assessments || [];
+                }
+            } catch (e) {
+                console.error("Failed to fetch hardcoded mock tests", e);
+            }
+            
+            setMockTests([...hardcodedData, ...(firebaseData as MockTest[])]);
 
             // Fetch taxonomies
             const allAcademic = await getTaxonomyNodesByTrack('academic');
@@ -462,7 +474,12 @@ export default function MockTestsPage() {
                                             )}
                                         </TableCell>
                                         <TableCell>
-                                            <span className="font-bold text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-2 leading-snug">{test.title}</span>
+                                            <div className="flex items-start gap-2">
+                                                <span className="font-bold text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-2 leading-snug">{test.title}</span>
+                                                {(test as any).isHardcoded && (
+                                                    <span className="px-1.5 py-0.5 rounded-sm bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 text-[10px] font-bold uppercase tracking-wider flex-shrink-0 mt-0.5">Hardcoded</span>
+                                                )}
+                                            </div>
                                         </TableCell>
                                         <TableCell>
                                             <span className="font-medium text-slate-600 dark:text-slate-400">{(test as any).durationMin || '-'} min</span>
@@ -471,7 +488,7 @@ export default function MockTestsPage() {
                                             <span className="font-medium text-slate-600 dark:text-slate-400">{(test as any).totalMarks || '-'}</span>
                                         </TableCell>
                                         <TableCell>
-                                            <span className="font-medium text-slate-600 dark:text-slate-400">{test.questionIds?.length || 0}</span>
+                                            <span className="font-medium text-slate-600 dark:text-slate-400">{(test as any).questionCount ?? test.questionIds?.length ?? 0}</span>
                                         </TableCell>
                                         <TableCell>
                                             <span className="font-medium text-slate-600 dark:text-slate-400">{Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 }).format(test.attemptCount || 0)}</span>
@@ -517,12 +534,16 @@ export default function MockTestsPage() {
                                                             <Eye className="mr-2 h-4 w-4" /> View on Site
                                                         </Link>
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => handleEdit(test)} className="cursor-pointer">
-                                                        <Pencil className="mr-2 h-4 w-4" /> Edit
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => handleClone(test)} className="cursor-pointer">
-                                                        <Copy className="mr-2 h-4 w-4" /> Clone
-                                                    </DropdownMenuItem>
+                                                    {!(test as any).isHardcoded && (
+                                                        <>
+                                                            <DropdownMenuItem onClick={() => handleEdit(test)} className="cursor-pointer">
+                                                                <Pencil className="mr-2 h-4 w-4" /> Edit
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuItem onClick={() => handleClone(test)} className="cursor-pointer">
+                                                                <Copy className="mr-2 h-4 w-4" /> Clone
+                                                            </DropdownMenuItem>
+                                                        </>
+                                                    )}
                                                     <DropdownMenuItem onClick={() => window.open(`/admin/assessment-center/mock-tests/${test.id}/answer-sheet`, '_blank')} className="cursor-pointer">
                                                         <Printer className="mr-2 h-4 w-4" /> Print Answer Sheet
                                                     </DropdownMenuItem>
@@ -533,10 +554,14 @@ export default function MockTestsPage() {
                                                     <DropdownMenuItem onClick={() => setBulkImportTest(test)} className="cursor-pointer">
                                                         <Wand2 className="mr-2 h-4 w-4 text-purple-500" /> AI Bulk Import
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuSeparator />
-                                                    <DropdownMenuItem onClick={() => handleDelete(test.id)} className="cursor-pointer text-red-600 focus:text-red-600">
-                                                        <Trash2 className="mr-2 h-4 w-4" /> Delete
-                                                    </DropdownMenuItem>
+                                                    {!(test as any).isHardcoded && (
+                                                        <>
+                                                            <DropdownMenuSeparator />
+                                                            <DropdownMenuItem onClick={() => handleDelete(test.id)} className="cursor-pointer text-red-600 focus:text-red-600">
+                                                                <Trash2 className="mr-2 h-4 w-4" /> Delete
+                                                            </DropdownMenuItem>
+                                                        </>
+                                                    )}
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
                                         </TableCell>
@@ -588,7 +613,12 @@ export default function MockTestsPage() {
 
                                             {/* Content Area */}
                                             <div className="p-5 flex-1 flex flex-col bg-gradient-to-b from-transparent to-slate-50/50 dark:to-slate-900/50">
-                                                <h3 className="font-bold text-slate-800 dark:text-slate-100 mb-1.5 line-clamp-2 leading-tight group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{test.title}</h3>
+                                                <div className="flex items-start justify-between gap-2 mb-1.5">
+                                                    <h3 className="font-bold text-slate-800 dark:text-slate-100 line-clamp-2 leading-tight group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{test.title}</h3>
+                                                    {(test as any).isHardcoded && (
+                                                        <span className="px-1.5 py-0.5 rounded-sm bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 text-[10px] font-bold uppercase tracking-wider flex-shrink-0">Hardcoded</span>
+                                                    )}
+                                                </div>
                                                 
                                                 <div className="mt-3 grid grid-cols-3 gap-2 text-xs text-slate-500 dark:text-slate-400 mb-5">
                                                     <div className="flex flex-col gap-1 bg-slate-50 dark:bg-slate-800/50 p-2 rounded-lg border border-slate-100 dark:border-slate-800 text-center">
@@ -601,7 +631,7 @@ export default function MockTestsPage() {
                                                     </div>
                                                     <div className="flex flex-col gap-1 bg-slate-50 dark:bg-slate-800/50 p-2 rounded-lg border border-slate-100 dark:border-slate-800 text-center">
                                                         <span className="font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider text-[9px] sm:text-[10px]">Qs</span>
-                                                        <span className="font-semibold text-slate-700 dark:text-slate-300 text-xs sm:text-sm">{test.questionIds?.length || 0}</span>
+                                                        <span className="font-semibold text-slate-700 dark:text-slate-300 text-xs sm:text-sm">{(test as any).questionCount ?? test.questionIds?.length ?? 0}</span>
                                                     </div>
                                                 </div>
 
