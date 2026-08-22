@@ -19,7 +19,44 @@
   "averageScore": 72,
   "instructions": "* মোট ২০টি প্রশ্ন, সময় ১৫ মিনিট।\n* কোনো নেগেটিভ মার্কিং নেই।\n* Quiz শেষে সঠিক উত্তর দেখতে পাবেন।",
   "examRules": "",
-  "tags": ["GK", "General Knowledge", "Quiz"],
+  "tags": [
+    "GK",
+    "General Knowledge",
+    "Quiz"
+  ],
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2025-01-01T00:00:00Z"
+  "questions": [
+    {
+      "id": "q1",
+      "questionText": "<p>আলোর প্রতিফলনের সূত্র কয়টি?</p>",
+      "questionType": "MCQ",
+      "options": {
+        "a": "১টি",
+        "b": "২টি",
+        "c": "৩টি",
+        "d": "৪টি"
+      },
+      "correctAnswer": "b",
+      "explanation": "<p>আলোর প্রতিফলনের মূলত দুটি সূত্র রয়েছে। প্রথম সূত্র এবং দ্বিতীয় সূত্র (স্নেলের সূত্র)।</p>",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q10",
+      "questionText": "<p>ওজোন স্তর ধ্বংসের জন্য প্রধানত কোন গ্যাসটি দায়ী?</p>",
+      "questionType": "MCQ",
+      "options": {
+        "a": "ক্লোরোফ্লুরোকার্বন (CFC)",
+        "b": "কার্বন ডাই-অক্সাইড (CO2)",
+        "c": "মিথেন (CH4)",
+        "d": "সালফার ডাই-অক্সাইড (SO2)"
+      },
+      "correctAnswer": "a",
+      "explanation": "<p>CFC বা ক্লোরোফ্লুরোকার্বন গ্যাস স্ট্র্যাটোস্ফিয়ারে পৌঁছে ওজোন (O3) অণুকে ভেঙে দেয়, যা ওজোন স্তর ধ্বংসের প্রধান কারণ।</p>",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    }
+  ]
 }
