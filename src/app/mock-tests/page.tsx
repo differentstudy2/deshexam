@@ -5,6 +5,7 @@ import { getAssessments } from '@/lib/firebase/assessment';
 import { getTopLeaderboard, getDailyChallenges } from '@/lib/firebase/student-analytics';
 import { serializeTimestamps } from '@/lib/utils';
 import { MockTest } from '@/lib/assessment-types';
+import { getAllHardcodedMockTests } from '@/lib/hardcoded-loader';
 
 export const metadata: Metadata = {
   title: 'DeshExam Mock Tests – Free Online Practice Tests & Test Series',
@@ -157,7 +158,17 @@ export default async function MockTestsListingPage() {
   ]);
 
   const publishedMockTests = (data as MockTest[]).filter(a => a.status === 'Published');
-  const initialAssessments = serializeTimestamps(publishedMockTests);
+  const hardcodedMockTests = getAllHardcodedMockTests() as MockTest[];
+  
+  // Combine and remove duplicates by slug (preferring Firebase if slug matches)
+  const combinedMockTests = [...publishedMockTests];
+  for (const ht of hardcodedMockTests) {
+    if (!combinedMockTests.find(t => t.slug === ht.slug)) {
+      combinedMockTests.push(ht);
+    }
+  }
+
+  const initialAssessments = serializeTimestamps(combinedMockTests);
   const initialLeaderboard = serializeTimestamps(lbData);
   const initialChallenges = serializeTimestamps(chData);
 

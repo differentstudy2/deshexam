@@ -61,3 +61,15 @@ export function getHardcodedPracticeSet(slug: string): any | null {
   if (!found) console.log(`[hardcoded-loader] practice slug "${slug}" not found. Available:`, all.map(t => t.slug));
   return found;
 }
+
+export function getAllHardcodedMockTests(): any[] {
+  return loadAllFromFolder('mock-tests');
+}
+
+export function getAllHardcodedQuizzes(): any[] {
+  return loadAllFromFolder('quizzes');
+}
+
+export function getAllHardcodedPracticeSets(): any[] {
+  return loadAllFromFolder('practice');
+}

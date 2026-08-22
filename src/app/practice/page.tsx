@@ -4,6 +4,7 @@ import { getAssessments } from '@/lib/firebase/assessment';
 import { getTopLeaderboard, getDailyChallenges } from '@/lib/firebase/student-analytics';
 import { serializeTimestamps } from '@/lib/utils';
 import { MockTest } from '@/lib/assessment-types';
+import { getAllHardcodedPracticeSets } from '@/lib/hardcoded-loader';
 
 export const metadata: Metadata = {
   title: 'Free Practice Sets & Chapter-wise Questions | DeshExam',
@@ -46,7 +47,16 @@ export default async function PracticeListingPage() {
   ]);
 
   const publishedPracticeSets = (data as MockTest[]).filter(a => a.status === 'Published');
-  const initialAssessments = serializeTimestamps(publishedPracticeSets);
+  const hardcodedPracticeSets = getAllHardcodedPracticeSets() as MockTest[];
+
+  const combinedPracticeSets = [...publishedPracticeSets];
+  for (const ht of hardcodedPracticeSets) {
+    if (!combinedPracticeSets.find(t => t.slug === ht.slug)) {
+      combinedPracticeSets.push(ht);
+    }
+  }
+
+  const initialAssessments = serializeTimestamps(combinedPracticeSets);
   const initialLeaderboard = serializeTimestamps(lbData);
   const initialChallenges = serializeTimestamps(chData);
 

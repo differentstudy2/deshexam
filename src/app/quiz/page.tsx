@@ -4,6 +4,7 @@ import { getAssessments } from '@/lib/firebase/assessment';
 import { getTopLeaderboard, getDailyChallenges } from '@/lib/firebase/student-analytics';
 import { serializeTimestamps } from '@/lib/utils';
 import { MockTest } from '@/lib/assessment-types';
+import { getAllHardcodedQuizzes } from '@/lib/hardcoded-loader';
 
 export const metadata: Metadata = {
   title: 'Free Online Quizzes & MCQs for Govt Job Exams (WBCS, PSC, SSC) | DeshExam',
@@ -57,7 +58,16 @@ export default async function QuizListingPage() {
   ]);
 
   const publishedQuizzes = (data as MockTest[]).filter(a => a.status === 'Published');
-  const initialAssessments = serializeTimestamps(publishedQuizzes);
+  const hardcodedQuizzes = getAllHardcodedQuizzes() as MockTest[];
+
+  const combinedQuizzes = [...publishedQuizzes];
+  for (const ht of hardcodedQuizzes) {
+    if (!combinedQuizzes.find(t => t.slug === ht.slug)) {
+      combinedQuizzes.push(ht);
+    }
+  }
+
+  const initialAssessments = serializeTimestamps(combinedQuizzes);
   const initialLeaderboard = serializeTimestamps(lbData);
   const initialChallenges = serializeTimestamps(chData);
 
