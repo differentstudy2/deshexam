@@ -1,40 +1,9 @@
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import { db } from "@/lib/firebase/client";
-import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment, limit, startAfter, DocumentSnapshot,getCountFromServer } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment, limit, startAfter, DocumentSnapshot,getCountFromServer, onSnapshot } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { format } from 'date-fns';
+import { ACHIEVEMENTS, Achievement } from '@/lib/constants/achievements';
 
 
 export type Order = {
@@ -54,7 +23,7 @@ export type EarningStats = {
 };
 
 const generateUsername = async (displayName: string): Promise<string> => {
-    const baseUsername = displayName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '').slice(0, 30);
+    const baseUsername = displayName.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '').slice(0, 30);
     let username = baseUsername;
     let attempts = 0;
     
@@ -83,7 +52,7 @@ const cleanDataForFirebase = (data: any): any => {
         const cleanedData: { [key: string]: any } = {};
         for (const key in data) {
             const value = data[key];
-            if (value !== undefined && value !== null) {
+            if (value !== undefined) {
                 cleanedData[key] = cleanDataForFirebase(value);
             }
         }
@@ -127,19 +96,16 @@ export const getAllQuestions = async () => {
         const questions = querySnapshot.docs.map(doc => {
             const data = doc.data();
             const createdAt = data.createdAt;
-            let formattedDate = 'N/A';
-            if (createdAt && typeof createdAt.toDate === 'function') {
+             let formattedDate = 'Just now';
+             if (createdAt && typeof createdAt.toDate === 'function') {
                 formattedDate = createdAt.toDate().toLocaleDateString();
-            } else if (createdAt) {
-                const d = new Date(createdAt);
-                if (!isNaN(d.getTime())) {
-                    formattedDate = d.toLocaleDateString();
-                }
-            }
+             } else if(createdAt && !isNaN(new Date(createdAt).getTime())) {
+                 formattedDate = new Date(createdAt).toLocaleDateString();
+             }
             return {
                 id: doc.id,
-                ...data,
-                createdAt: formattedDate,
+                ...doc.data(),
+                createdAt: formattedDate
             };
         });
         return questions;
@@ -148,6 +114,39 @@ export const getAllQuestions = async () => {
         throw new Error("Failed to fetch questions.");
     }
 }
+
+export const getQuestionsByChapterId = async (chapterId: string) => {
+    if (!chapterId) return [];
+    try {
+        const q = query(collection(db, "questions"), where("chapterId", "==", chapterId));
+        const querySnapshot = await getDocs(q);
+        const questions = querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            const createdAt = data.createdAt;
+            const createdAtTimestamp = createdAt?.toDate ? createdAt.toDate().getTime() : (createdAt ? new Date(createdAt).getTime() : 0);
+            return {
+                id: doc.id,
+                ...data,
+                createdAtTimestamp: createdAtTimestamp
+            };
+        });
+
+        questions.sort((a, b) => b.createdAtTimestamp - a.createdAtTimestamp);
+        
+        return questions.map(q => {
+            const { createdAtTimestamp, ...rest } = q;
+            const createdAtDate = new Date(q.createdAtTimestamp);
+            return {
+                ...rest,
+                createdAt: !isNaN(createdAtDate.getTime()) ? createdAtDate.toLocaleDateString() : 'N/A'
+            };
+        });
+    } catch (e) {
+        console.error("Error getting questions by chapter: ", e);
+        throw new Error("Failed to fetch questions for the chapter.");
+    }
+};
+
 
 export const getPaginatedQuestions = async (itemsPerPage: number, startAfterDoc: DocumentSnapshot | null = null) => {
     try {
@@ -163,7 +162,6 @@ export const getPaginatedQuestions = async (itemsPerPage: number, startAfterDoc:
             const data = doc.data();
             const createdAt = data.createdAt;
             let formattedDate = 'N/A';
-            // Firestore timestamps have a toDate method, JS Dates do not.
             if (createdAt && typeof createdAt.toDate === 'function') {
                 formattedDate = createdAt.toDate().toLocaleDateString();
             } else if (createdAt instanceof Date) {
@@ -178,7 +176,6 @@ export const getPaginatedQuestions = async (itemsPerPage: number, startAfterDoc:
 
         const lastVisible = querySnapshot.docs[querySnapshot.docs.length-1];
         
-        // A simple way to check if there are more pages
         const nextQuery = query(collection(db, "questions"), orderBy("createdAt", "desc"), startAfter(lastVisible), limit(1));
         const nextSnapshot = await getDocs(nextQuery);
         const hasMore = !nextSnapshot.empty;
@@ -192,35 +189,62 @@ export const getPaginatedQuestions = async (itemsPerPage: number, startAfterDoc:
 
 export const getQuestionById = async (questionId: string) => {
     if (!questionId) {
-        throw new Error("Question ID is required to fetch a question.");
+        return null;
     }
     try {
         const questionDoc = await getDoc(doc(db, "questions", questionId));
         if (questionDoc.exists()) {
              const data = questionDoc.data();
              const createdAt = data.createdAt;
-             let formattedDate = new Date();
              if (createdAt && typeof createdAt.toDate === 'function') {
-                 formattedDate = createdAt.toDate();
+                 data.createdAt = createdAt.toDate();
              } else if (createdAt) {
                  const d = new Date(createdAt);
                  if (!isNaN(d.getTime())) {
-                     formattedDate = d;
+                     data.createdAt = d;
+                 }
+             }
+             const publishedAt = data.publishedAt;
+             if (publishedAt && typeof publishedAt.toDate === 'function') {
+                 data.publishedAt = publishedAt.toDate();
+             } else if (publishedAt) {
+                 const d = new Date(publishedAt);
+                 if (!isNaN(d.getTime())) {
+                     data.publishedAt = d;
                  }
              }
             return {
                 id: questionDoc.id,
                 ...data,
-                createdAt: formattedDate,
             };
-        } else {
-            return null;
         }
+        
+        const textbooksSnapshot = await getDocs(collection(db, "textbooks"));
+        for (const textbookDoc of textbooksSnapshot.docs) {
+            const chaptersSnapshot = await getDocs(collection(db, `textbooks/${textbookDoc.id}/chapters`));
+            for (const chapterDoc of chaptersSnapshot.docs) {
+                const chapterData = chapterDoc.data();
+                const question = chapterData.textbookQuestions?.find((q: any) => q.id === questionId);
+                if (question) {
+                    return {
+                        ...question,
+                        createdAt: new Date(),
+                        authorName: 'Textbook Author',
+                        subject: textbookDoc.data().subject,
+                        textbookId: textbookDoc.id,
+                        chapterId: chapterDoc.id,
+                    };
+                }
+            }
+        }
+        
+        return null;
+
     } catch (e) {
         console.error("Error getting document: ", e);
         throw new Error("Failed to fetch question.");
     }
-}
+};
 
 export const deleteQuestion = async (questionId: string) => {
     if (!questionId) {
@@ -239,14 +263,15 @@ export const updateQuestion = async (questionId: string, data: any) => {
         throw new Error("Question ID is required to update a question.");
     }
     try {
-        await updateDoc(doc(db, "questions", questionId), data);
+        const cleanedData = cleanDataForFirebase(data);
+        await updateDoc(doc(db, "questions", questionId), cleanedData);
     } catch (e) {
         console.error("Error updating document: ", e);
         throw new Error("Failed to update question.");
     }
 };
 
-export const handleQuestionVote = async (questionId: string, voteType: 'like' | 'dislike') => {
+export const handleQuestionVote = async (questionId: string, voteType: 'like') => {
     const auth = getAuth();
     const user = auth.currentUser;
     if (!user) {
@@ -264,39 +289,22 @@ export const handleQuestionVote = async (questionId: string, voteType: 'like' | 
 
             const data = questionDoc.data();
             const likedBy = data.likedBy || [];
-            const dislikedBy = data.dislikedBy || [];
-
+            
             const hasLiked = likedBy.includes(user.uid);
-            const hasDisliked = dislikedBy.includes(user.uid);
 
             let newLikedBy = [...likedBy];
-            let newDislikedBy = [...dislikedBy];
 
             if (voteType === 'like') {
-                if (hasLiked) { // User is un-liking
+                if (hasLiked) {
                     newLikedBy = newLikedBy.filter(uid => uid !== user.uid);
-                } else { // User is liking
+                } else {
                     newLikedBy.push(user.uid);
-                    if (hasDisliked) { // If they previously disliked, remove dislike
-                        newDislikedBy = newDislikedBy.filter(uid => uid !== user.uid);
-                    }
-                }
-            } else if (voteType === 'dislike') {
-                if (hasDisliked) { // User is un-disliking
-                    newDislikedBy = newDislikedBy.filter(uid => uid !== user.uid);
-                } else { // User is disliking
-                    newDislikedBy.push(user.uid);
-                    if (hasLiked) { // If they previously liked, remove like
-                        newLikedBy = newLikedBy.filter(uid => uid !== user.uid);
-                    }
                 }
             }
             
             transaction.update(questionRef, {
                 likedBy: newLikedBy,
-                dislikedBy: newDislikedBy,
                 likes: newLikedBy.length,
-                dislikes: newDislikedBy.length,
             });
         });
     } catch (e) {
@@ -426,36 +434,59 @@ export const addContent = async (contentData: any) => {
     try {
         const collectionName = cleanedContent.testType === 'Textbook' ? 'textbooks' : 'content';
         
-        let finalContentData: any = {
+        const finalContentData: any = {
             ...cleanedContent,
             authorId: user.uid,
             authorName: user.displayName || user.email,
-            createdAt: cleanedContent.publishedAt || new Date(),
+            createdAt: serverTimestamp(),
+            publishedAt: cleanedContent.publishedAt || new Date(),
         };
 
-        if (cleanedContent.testType !== 'Learn' && cleanedContent.testType !== 'Textbook' && cleanedContent.questions) {
-            const questionsWithIds = await Promise.all(cleanedContent.questions.map(async (question: any) => {
-                const questionId = await addQuestion(question);
-                return { ...question, id: questionId };
-            }));
-            finalContentData.questions = questionsWithIds;
+        if (['Mock Test', 'Quiz', 'Practice Questions', 'Exam'].includes(cleanedContent.testType) && cleanedContent.questions) {
+            finalContentData.questions = cleanedContent.questions.map((q: any) => ({ ...q, id: doc(collection(db, 'temp')).id }));
         }
 
-        delete finalContentData.publishedAt;
-        
-        // For textbooks, remove questions array if it exists as it's not a direct property
         if (collectionName === 'textbooks') {
             delete finalContentData.questions;
             delete finalContentData.duration;
             delete finalContentData.difficulty;
+        } else if (cleanedContent.testType === 'Learn') {
+             delete finalContentData.questions;
         }
 
         const docRef = await addDoc(collection(db, collectionName), finalContentData);
-        console.log("Document written with ID: ", docRef.id);
         return docRef.id;
     } catch (e) {
         console.error("Error adding document: ", e);
         throw new Error("Failed to create content.");
+    }
+};
+
+export const updateContent = async (contentId: string, data: any) => {
+    if (!contentId) {
+        throw new Error("Content ID is required to update content.");
+    }
+    try {
+        const cleanedData = cleanDataForFirebase(data);
+        
+        let contentRef = doc(db, "content", contentId);
+        let contentSnap = await getDoc(contentRef);
+        
+        if (!contentSnap.exists()) {
+            contentRef = doc(db, "textbooks", contentId);
+            contentSnap = await getDoc(contentRef);
+            if (!contentSnap.exists()) {
+                throw new Error("Content not found.");
+            }
+        }
+        
+        await updateDoc(contentRef, {
+            ...cleanedData,
+            updatedAt: serverTimestamp(),
+        });
+    } catch (e) {
+        console.error("Error updating content: ", e);
+        throw new Error("Failed to update content.");
     }
 };
 
@@ -497,117 +528,87 @@ export const deleteContent = async (contentId: string) => {
     }
 }
 
-export const getContentById = async (contentId: string) => {
-    if (!contentId) {
-        throw new Error("Content ID is required to fetch a content.");
-    }
-    try {
-        const contentDoc = await getDoc(doc(db, "content", contentId));
-        if (contentDoc.exists()) {
-            const data = contentDoc.data();
-            // Ensure timestamp is converted correctly if it exists
-            const createdAt = data.createdAt;
-            if (createdAt && typeof createdAt.toDate === 'function') {
-                data.createdAt = createdAt.toDate().toLocaleDateString();
-            } else if (createdAt) {
-                data.createdAt = new Date(createdAt).toLocaleDateString();
-            }
-            return { id: contentDoc.id, ...data };
-        } else {
-            // Check textbooks collection if not in content
-            const textbookDoc = await getDoc(doc(db, "textbooks", contentId));
-            if (textbookDoc.exists()) {
-                const data = textbookDoc.data();
-                 const createdAt = data.createdAt;
-                if (createdAt && typeof createdAt.toDate === 'function') {
-                    data.createdAt = createdAt.toDate().toLocaleDateString();
-                } else if (createdAt) {
-                    data.createdAt = new Date(createdAt).toLocaleDateString();
-                }
-                return { id: textbookDoc.id, ...data };
-            }
-            return null;
-        }
-    } catch (e) {
-        console.error("Error getting document: ", e);
-        throw new Error("Failed to fetch content.");
-    }
-};
-
-export const updateContent = async (contentId: string, contentData: any) => {
-    if (!contentId) {
-        throw new Error("Content ID is required to update content.");
-    }
-    
-    const collectionName = contentData.testType === 'Textbook' ? 'textbooks' : 'content';
-    const contentRef = doc(db, collectionName, contentId);
-    
-    const cleanedData = cleanDataForFirebase(contentData);
-    
-    const finalContentData = {
-        ...cleanedData,
-        updatedAt: serverTimestamp(),
-    };
-
-    try {
-        await updateDoc(contentRef, finalContentData);
-    } catch (e) {
-        console.error("Error updating document: ", e);
-        throw new Error("Failed to update content.");
-    }
-};
-
-export const addQuestionsToContent = async (contentId: string, questionsToAdd: any[]) => {
-    if (!contentId || !questionsToAdd || questionsToAdd.length === 0) {
-        throw new Error("Content ID and questions are required.");
-    }
-    const contentRef = doc(db, "content", contentId);
-    try {
-        await updateDoc(contentRef, {
-            questions: arrayUnion(...questionsToAdd)
-        });
-    } catch (e) {
-        console.error("Error adding questions to content: ", e);
-        throw new Error("Failed to add questions to content.");
-    }
-};
-
 export const getAllContent = async (type?: string) => {
     try {
-        let q;
+        let allContents: any[] = [];
+        const contentRef = collection(db, "content");
+
         if (type) {
-            q = query(collection(db, "content"), where("testType", "==", type));
+            const arrayQuery = query(contentRef, where("testType", "array-contains", type));
+            const stringQuery = query(contentRef, where("testType", "==", type));
+
+            const [arraySnapshot, stringSnapshot] = await Promise.all([
+                getDocs(arrayQuery),
+                getDocs(stringQuery),
+            ]);
+
+            const arrayContents = arraySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            const stringContents = stringSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+            const combined = [...arrayContents, ...stringContents];
+            const uniqueContents = Array.from(new Map(combined.map(item => [item.id, item])).values());
+            allContents = uniqueContents;
+
         } else {
-            q = query(collection(db, "content"));
+            const allContentQuery = query(contentRef);
+            const allContentSnapshot = await getDocs(allContentQuery);
+            allContents = allContentSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         }
-        
-        const querySnapshot = await getDocs(q);
-        const contents = querySnapshot.docs.map(doc => {
-            const data = doc.data();
-            const createdAt = data.createdAt;
-            let formattedDate = 'N/A';
-            if (createdAt && typeof createdAt.toDate === 'function') {
-                formattedDate = createdAt.toDate().toLocaleDateString();
-            } else if (createdAt) {
-                // Fallback for when it might be a string or number from previous incorrect saves
-                const d = new Date(createdAt);
-                if (!isNaN(d.getTime())) {
-                    formattedDate = d.toLocaleDateString();
+
+        const formattedContents = allContents.map(data => {
+            const dateField = data.publishedAt || data.createdAt;
+            let pubDate = 'N/A';
+            if (dateField) {
+                if (typeof dateField.toDate === 'function') {
+                    pubDate = format(dateField.toDate(), 'PPP');
+                } else if (dateField instanceof Date) {
+                    pubDate = format(dateField, 'PPP');
+                } else {
+                    const d = new Date(dateField);
+                    if (!isNaN(d.getTime())) {
+                        pubDate = format(d, 'PPP');
+                    }
                 }
             }
+            
             return {
-                id: doc.id,
                 ...data,
                 questions: data.questions || [],
-                createdAt: formattedDate,
+                publishedAt: pubDate
             };
         });
-        return contents;
+
+        return formattedContents;
     } catch (e) {
         console.error("Error getting documents: ", e);
         throw new Error("Failed to fetch content.");
     }
 }
+
+export const getContentById = async (contentId: string) => {
+    if (!contentId) {
+        return null;
+    }
+    try {
+        let docSnap = await getDoc(doc(db, "content", contentId));
+        
+        if (!docSnap.exists()) {
+            docSnap = await getDoc(doc(db, "textbooks", contentId));
+        }
+        
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            return {
+                id: docSnap.id,
+                ...data,
+            };
+        }
+        return null;
+    } catch (e) {
+        console.error(`Error getting document with id ${contentId}: `, e);
+        throw new Error("Failed to fetch content.");
+    }
+};
 
 export const addTestSubmission = async (submissionData: any) => {
     const auth = getAuth();
@@ -623,6 +624,27 @@ export const addTestSubmission = async (submissionData: any) => {
             userId: user.uid,
             submittedAt: serverTimestamp(),
         });
+        
+        // Add 10 XP to the user
+        const userRef = doc(db, "users", user.uid);
+        await updateDoc(userRef, {
+            xp: increment(10)
+        });
+
+        if (submissionData.testId && submissionData.testType) {
+            let colName = '';
+            if (submissionData.testType === 'Quiz') colName = 'quizzes';
+            else if (submissionData.testType === 'Mock Test') colName = 'mock_tests';
+            else if (submissionData.testType === 'Practice Set') colName = 'practice_sets';
+            
+            if (colName) {
+                const assessmentRef = doc(db, colName, submissionData.testId);
+                await updateDoc(assessmentRef, {
+                    attemptCount: increment(1)
+                });
+            }
+        }
+
         return docRef.id;
     } catch (e) {
         console.error("Error adding document: ", e);
@@ -639,7 +661,6 @@ export const addPracticeSetSubmission = async (submissionData: any) => {
     }
     
     try {
-        // Fetch textbook details to add to submission
         const textbookDoc = await getDoc(doc(db, 'textbooks', submissionData.textbookId));
         if (!textbookDoc.exists()) {
             throw new Error("Associated textbook not found.");
@@ -653,13 +674,30 @@ export const addPracticeSetSubmission = async (submissionData: any) => {
             board: textbookData.board || null,
             class: textbookData.class || null,
             subject: textbookData.subject || null,
+            chapterId: submissionData.chapterId || null,
         };
 
-        const docRef = await addDoc(collection(db, "practiceSetSubmissions"), dataToSave);
+        const cleanedData = cleanDataForFirebase(dataToSave);
+        const docRef = await addDoc(collection(db, "practiceSetSubmissions"), cleanedData);
+
+        // Add 5 XP to the user
+        const userRef = doc(db, "users", user.uid);
+        await updateDoc(userRef, {
+            xp: increment(5)
+        });
+
+        const assessmentId = submissionData.practiceSetId || submissionData.testId;
+        if (assessmentId) {
+            const assessmentRef = doc(db, "practice_sets", assessmentId);
+            await updateDoc(assessmentRef, {
+                attemptCount: increment(1)
+            });
+        }
+
         return docRef.id;
     } catch (e) {
         console.error("Error adding practice set submission: ", e);
-        throw new Error("Failed to submit practice set results.");
+        throw new Error("Failed to add practice set results.");
     }
 };
 
@@ -668,11 +706,9 @@ export const getSubmissionById = async (submissionId: string) => {
         throw new Error("Submission ID is required to fetch a submission.");
     }
     try {
-        // Try fetching from 'submissions' first
         let submissionDoc = await getDoc(doc(db, "submissions", submissionId));
 
         if (!submissionDoc.exists()) {
-            // If not found, try 'practiceSetSubmissions'
             submissionDoc = await getDoc(doc(db, "practiceSetSubmissions", submissionId));
         }
 
@@ -703,107 +739,109 @@ export const getSubmissionById = async (submissionId: string) => {
 };
 
 
-export const getSubmissionsByUserId = async (userId: string) => {
-    if (!userId) {
-        throw new Error("User ID is required to fetch submissions.");
+export const getSubmissionsByUserId = (
+  userId: string,
+  callback: (submissions: any[]) => void,
+  onError: (error: Error) => void
+) => {
+  if (!userId) {
+    onError(new Error("User ID is required."));
+    return () => {};
+  }
+
+  const formatSubmission = (doc: DocumentSnapshot) => {
+    const data = doc.data() as any;
+    if (!data) return null;
+
+    let dateValue = new Date();
+    if (data.submittedAt && typeof data.submittedAt.toDate === 'function') {
+      dateValue = data.submittedAt.toDate();
+    } else if (data.submittedAt instanceof Date) {
+      dateValue = data.submittedAt;
+    } else if (data.submittedAt && !isNaN(new Date(data.submittedAt).getTime())) {
+      dateValue = new Date(data.submittedAt);
     }
-    try {
-        const testSubsQuery = query(collection(db, "submissions"), where("userId", "==", userId));
-        const practiceSubsQuery = query(collection(db, "practiceSetSubmissions"), where("userId", "==", userId));
+    
+    const isPracticeSet = !!data.practiceSetId;
+    return {
+      id: doc.id,
+      ...data,
+      testId: isPracticeSet ? data.practiceSetId : data.testId,
+      testTitle: isPracticeSet ? data.practiceSetTitle : data.testTitle,
+      testType: isPracticeSet ? "Practice Set" : data.testType,
+      submittedAt: dateValue,
+    };
+  };
 
-        const [testSubsSnapshot, practiceSubsSnapshot] = await Promise.all([
-            getDocs(testSubsQuery),
-            getDocs(practiceSubsQuery),
-        ]);
-        
-        const formatSubmission = (doc: DocumentSnapshot) => {
-            const data = doc.data() as any; // Cast to any to handle potential missing fields gracefully
-            if (!data) return null;
+  const testSubsQuery = query(collection(db, "submissions"), where("userId", "==", userId));
+  const practiceSubsQuery = query(collection(db, "practiceSetSubmissions"), where("userId", "==", userId));
 
-            const submittedAt = data.submittedAt;
-            let formattedDate = new Date();
-            if (submittedAt && typeof submittedAt.toDate === 'function') {
-                formattedDate = submittedAt.toDate();
-            } else if (submittedAt) {
-                const d = new Date(submittedAt);
-                if (!isNaN(d.getTime())) {
-                    formattedDate = d;
-                }
-            }
-            
-            // Normalize the structure
-            const isPracticeSet = !!data.practiceSetId;
-            const normalizedData = {
-                id: doc.id,
-                userId: data.userId,
-                score: data.score,
-                totalQuestions: data.totalQuestions,
-                submittedAt: formattedDate,
-                testId: isPracticeSet ? data.practiceSetId : data.testId,
-                testTitle: isPracticeSet ? data.practiceSetTitle : data.testTitle,
-                testType: isPracticeSet ? "Practice Set" : data.testType,
-                // Include textbook/chapter/topic info for context if it's a practice set
-                ...(isPracticeSet && {
-                    textbookId: data.textbookId,
-                    chapterId: data.chapterId,
-                    topicId: data.topicId,
-                })
-            };
+  let testSubmissions: any[] = [];
+  let practiceSubmissions: any[] = [];
 
-            return normalizedData;
-        };
+  const updateAndSort = () => {
+    const combinedSubmissions = [...testSubmissions, ...practiceSubmissions];
+    combinedSubmissions.sort((a, b) => b.submittedAt.getTime() - a.submittedAt.getTime());
+    callback(combinedSubmissions);
+  };
+  
+  const unsubscribeTests = onSnapshot(testSubsQuery, (querySnapshot) => {
+      testSubmissions = querySnapshot.docs.map(formatSubmission).filter(Boolean);
+      updateAndSort();
+  }, onError);
 
-        const testSubmissions = testSubsSnapshot.docs.map(formatSubmission).filter(Boolean);
-        const practiceSubmissions = practiceSubsSnapshot.docs.map(formatSubmission).filter(Boolean);
-        
-        const allSubmissions = [...testSubmissions, ...practiceSubmissions];
-        
-        // Sort on the client-side
-        allSubmissions.sort((a, b) => b!.submittedAt.getTime() - a!.submittedAt.getTime());
-        
-        return allSubmissions;
+  const unsubscribePracticeSets = onSnapshot(practiceSubsQuery, (querySnapshot) => {
+      practiceSubmissions = querySnapshot.docs.map(formatSubmission).filter(Boolean);
+      updateAndSort();
+  }, onError);
 
-    } catch (e) {
-        console.error("Error getting documents: ", e);
-        throw new Error("Failed to fetch submissions.");
-    }
+  return () => {
+    unsubscribeTests();
+    unsubscribePracticeSets();
+  };
 };
 
 export const getPaginatedSubmissions = async (itemsPerPage: number, startAfterDoc: DocumentSnapshot | null = null) => {
     try {
-        const testSubsQuery = query(collection(db, "submissions"), orderBy("submittedAt", "desc"), limit(itemsPerPage));
-        const practiceSubsQuery = query(collection(db, "practiceSetSubmissions"), orderBy("submittedAt", "desc"), limit(itemsPerPage));
-
-        let queryToUse = testSubsQuery;
-        if(startAfterDoc) {
-            queryToUse = query(testSubsQuery, startAfter(startAfterDoc));
-        }
-
-        const testSubsSnapshot = await getDocs(queryToUse);
-        const practiceSubsSnapshot = await getDocs(practiceSubsQuery);
-
-
         const formatSubmission = (doc: DocumentSnapshot) => {
             const data = doc.data() as any;
             if (!data) return null;
+
+            let dateValue = new Date();
+            if (data.submittedAt && typeof data.submittedAt.toDate === 'function') {
+                dateValue = data.submittedAt.toDate();
+            } else if (data.submittedAt instanceof Date) {
+                dateValue = data.submittedAt;
+            } else if (data.submittedAt && !isNaN(new Date(data.submittedAt).getTime())) {
+                dateValue = new Date(data.submittedAt);
+            }
+            
             const isPracticeSet = !!data.practiceSetId;
             return {
                 id: doc.id,
                 userId: data.userId,
                 score: data.score,
                 totalQuestions: data.totalQuestions,
-                submittedAt: data.submittedAt.toDate(), // Keep as Date object for sorting
+                submittedAt: dateValue,
                 testId: isPracticeSet ? data.practiceSetId : data.testId,
                 testTitle: isPracticeSet ? data.practiceSetTitle : data.testTitle,
                 testType: isPracticeSet ? "Practice Set" : data.testType,
-                ...(isPracticeSet && {
-                    textbookId: data.textbookId,
-                    chapterId: data.chapterId,
-                    topicId: data.topicId,
-                })
             };
         };
 
+        const testSubsQuery = startAfterDoc 
+            ? query(collection(db, "submissions"), orderBy("submittedAt", "desc"), startAfter(startAfterDoc), limit(itemsPerPage))
+            : query(collection(db, "submissions"), orderBy("submittedAt", "desc"), limit(itemsPerPage));
+
+        const practiceSubsQuery = startAfterDoc
+            ? query(collection(db, "practiceSetSubmissions"), orderBy("submittedAt", "desc"), startAfter(startAfterDoc), limit(itemsPerPage))
+            : query(collection(db, "practiceSetSubmissions"), orderBy("submittedAt", "desc"), limit(itemsPerPage));
+
+        const [testSubsSnapshot, practiceSubsSnapshot] = await Promise.all([
+            getDocs(testSubsQuery),
+            getDocs(practiceSubsQuery),
+        ]);
+        
         const testSubmissions = testSubsSnapshot.docs.map(formatSubmission).filter(Boolean);
         const practiceSubmissions = practiceSubsSnapshot.docs.map(formatSubmission).filter(Boolean);
 
@@ -813,9 +851,16 @@ export const getPaginatedSubmissions = async (itemsPerPage: number, startAfterDo
 
         const hasMore = allSubmissions.length === itemsPerPage; 
         
-        const lastVisible = testSubsSnapshot.docs[testSubsSnapshot.docs.length - 1];
+        const lastVisible = allSubmissions.length > 0
+            ? testSubsSnapshot.docs.find(d => d.id === allSubmissions[allSubmissions.length-1]?.id) || practiceSubsSnapshot.docs.find(d => d.id === allSubmissions[allSubmissions.length-1]?.id)
+            : null;
 
-        return { submissions: allSubmissions, lastVisible: lastVisible, hasMore };
+        const submissionsWithFormattedDate = allSubmissions.map(sub => ({
+            ...sub,
+            submittedAt: sub!.submittedAt.toLocaleDateString(),
+        }));
+
+        return { submissions: submissionsWithFormattedDate, lastVisible: lastVisible || null, hasMore };
     } catch (e) {
         console.error("Error getting paginated submissions: ", e);
         throw new Error("Failed to fetch submissions.");
@@ -828,13 +873,17 @@ export const deleteSubmissions = async (submissionIds: string[]) => {
     }
     try {
         const deletePromises = submissionIds.map(async (id) => {
-            // Need to check both collections
             let docRef = doc(db, "submissions", id);
             let docSnap = await getDoc(docRef);
-            if (!docSnap.exists()) {
+            if (docSnap.exists()) {
+                return deleteDoc(docRef);
+            } else {
                 docRef = doc(db, "practiceSetSubmissions", id);
+                docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                   return deleteDoc(docRef);
+                }
             }
-            return deleteDoc(docRef);
         });
         await Promise.all(deletePromises);
     } catch (e) {
@@ -915,7 +964,7 @@ export const getBoards = async () => {
     try {
         const q = query(collection(db, "boards"), orderBy("name"));
         const querySnapshot = await getDocs(q);
-        const boards = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as { name: string } }));
+        const boards = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as { name: string, acronym?: string } }));
         return boards;
     } catch (e) {
         console.error("Error getting boards: ", e);
@@ -965,31 +1014,26 @@ export const deleteBoard = async (id: string) => {
     }
 };
 
-export const getSchools = async () => {
+export const getSchoolsByClass = async (classId: string) => {
+    if (!classId) return [];
     try {
-        const q = query(collection(db, "schools"), orderBy("name"));
+        const schoolsRef = collection(db, `classes/${classId}/schools`);
+        const q = query(schoolsRef, orderBy("name"));
         const querySnapshot = await getDocs(q);
-        const schools = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as { name: string } }));
-        return schools;
+        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as { name: string } }));
     } catch (e) {
-        console.error("Error getting schools: ", e);
+        console.error("Error getting schools by class: ", e);
         throw new Error("Failed to fetch schools.");
     }
 };
 
-export const addSchool = async (schoolName: string) => {
-    if (!schoolName?.trim()) {
-        throw new Error("School name cannot be empty.");
+export const addSchoolToClass = async (classId: string, schoolData: { name: string }) => {
+    if (!classId || !schoolData.name) {
+        throw new Error("Class ID and School Name are required.");
     }
-    const trimmedName = schoolName.trim();
     try {
-        const q = query(collection(db, "schools"), where("name", "==", trimmedName));
-        const querySnapshot = await getDocs(q);
-        if (!querySnapshot.empty) {
-            console.log("School already exists.");
-            return querySnapshot.docs[0].id;
-        }
-        const docRef = await addDoc(collection(db, "schools"), { name: trimmedName });
+        const schoolsRef = collection(db, `classes/${classId}/schools`);
+        const docRef = await addDoc(schoolsRef, schoolData);
         return docRef.id;
     } catch (e) {
         console.error("Error adding school: ", e);
@@ -997,20 +1041,20 @@ export const addSchool = async (schoolName: string) => {
     }
 };
 
-export const updateSchool = async (id: string, name: string) => {
-    if (!id || !name) throw new Error("ID and name are required.");
+export const updateSchoolInClass = async (classId: string, schoolId: string, data: { name: string }) => {
+    if (!classId || !schoolId || !data) throw new Error("IDs and data are required.");
     try {
-        await updateDoc(doc(db, "schools", id), { name });
+        await updateDoc(doc(db, `classes/${classId}/schools`, schoolId), data);
     } catch (e) {
         console.error("Error updating school: ", e);
         throw new Error("Failed to update school.");
     }
 };
 
-export const deleteSchool = async (id: string) => {
-    if (!id) throw new Error("ID is required.");
+export const deleteSchoolFromClass = async (classId: string, schoolId: string) => {
+    if (!classId || !schoolId) throw new Error("IDs are required.");
     try {
-        await deleteDoc(doc(db, "schools", id));
+        await deleteDoc(doc(db, `classes/${classId}/schools`, schoolId));
     } catch (e) {
         console.error("Error deleting school: ", e);
         throw new Error("Failed to delete school.");
@@ -1348,8 +1392,7 @@ export const getUserProfile = async (userId: string): Promise<any> => {
 export const getUserByUsername = async (username: string) => {
     if (!username) return null;
     try {
-        // Check if the passed value might be a UID instead of a username
-        if (username.length > 20 && !username.includes('-')) { // Simple heuristic for UID
+        if (username.length > 20 && !username.includes('-')) {
              return await getUserProfile(username);
         }
 
@@ -1371,34 +1414,32 @@ export const updateUserProfile = async (userId: string, data: any) => {
     if (!userId) throw new Error("User ID is required to update a profile.");
 
     const userDocRef = doc(db, "users", userId);
-
+    
     try {
         await runTransaction(db, async (transaction) => {
             const userDoc = await transaction.get(userDocRef);
             const currentData = userDoc.data() || {};
+            
             const isUsernameChanging = data.displayName && data.displayName !== currentData.displayName;
             
             let oldUsernameRef: any;
             if (isUsernameChanging && currentData.username) {
                 oldUsernameRef = doc(db, "usernames", currentData.username);
-                await transaction.get(oldUsernameRef); 
             }
 
-            const newData = { ...currentData, ...data };
-            if (!userDoc.exists()) {
-                newData.role = 'user';
-            }
-
-            if (data.school === 'add_new_school' && data.newSchool) {
-                const newSchoolId = await addSchool(data.newSchool);
-                newData.school = data.newSchool;
-            }
+            let newData = { ...data };
             delete newData.newSchool;
 
+            const newProfileData = {
+                ...currentData,
+                ...newData,
+                ...(userDoc.exists() ? {} : { role: 'user', createdAt: serverTimestamp() }),
+            };
+            transaction.set(userDocRef, newProfileData, { merge: true });
 
             if (isUsernameChanging || (!currentData.username && data.displayName)) {
                 const newUsername = await generateUsername(data.displayName);
-                newData.username = newUsername;
+                transaction.update(userDocRef, { username: newUsername });
                 
                 const newUsernameRef = doc(db, "usernames", newUsername);
                 transaction.set(newUsernameRef, { uid: userId });
@@ -1407,18 +1448,13 @@ export const updateUserProfile = async (userId: string, data: any) => {
                     transaction.delete(oldUsernameRef);
                 }
             }
-            
-            if (userDoc.exists()) {
-                transaction.update(userDocRef, newData);
-            } else {
-                transaction.set(userDocRef, newData);
-            }
         });
     } catch (error) {
-        console.error("Error updating user profile:", error);
+        console.error("Error updating user profile transaction:", error);
         throw new Error("Failed to update user profile.");
     }
 };
+
 
 export const toggleFollowUser = async (targetUserId: string) => {
     const auth = getAuth();
@@ -1447,7 +1483,6 @@ export const toggleFollowUser = async (targetUserId: string) => {
             const isFollowing = currentUserData.following?.includes(targetUserId);
 
             if (isFollowing) {
-                // Unfollow
                 transaction.update(currentUserRef, {
                     following: arrayRemove(targetUserId),
                     followingCount: increment(-1)
@@ -1457,7 +1492,6 @@ export const toggleFollowUser = async (targetUserId: string) => {
                     followersCount: increment(-1)
                 });
             } else {
-                // Follow
                 transaction.update(currentUserRef, {
                     following: arrayUnion(targetUserId),
                     followingCount: increment(1)
@@ -1550,7 +1584,6 @@ export const getCoupons = async () => {
 
 export const addCoupon = async (couponData: any) => {
     try {
-        // Convert expiresAt to Firestore Timestamp if it exists
         if (couponData.expiresAt) {
             couponData.expiresAt = new Date(couponData.expiresAt);
         } else {
@@ -1627,12 +1660,9 @@ export const deleteUser = async (userId: string) => {
     if (!userId) {
         throw new Error("User ID is required to delete a user.");
     }
-    // This is a placeholder. Deleting a user from Auth requires a backend (e.g., Cloud Function).
-    // This function will only delete the user's Firestore document.
     try {
         const userDocRef = doc(db, "users", userId);
         await deleteDoc(userDocRef);
-        // Also delete the username mapping
         const usernameQuery = query(collection(db, "usernames"), where("uid", "==", userId));
         const usernameSnapshot = await getDocs(usernameQuery);
         if(!usernameSnapshot.empty){
@@ -1656,7 +1686,7 @@ export const updateUserSubscription = async (userIds: string[], plan: 'pro' | 'p
             
             if (plan) {
                 const expiresAt = new Date();
-                expiresAt.setFullYear(expiresAt.getFullYear() + 1); // Example: 1 year subscription
+                expiresAt.setFullYear(expiresAt.getFullYear() + 1);
                 updateData.subscriptionExpiresAt = expiresAt;
             } else {
                 updateData.subscriptionExpiresAt = null;
@@ -1695,7 +1725,7 @@ export const updateSettings = async (data: any) => {
     }
 }
 
-export const addContactMessage = async (data: { name: string; email: string; subject: string; message: string; }) => {
+export const addContactMessage = async (data: { name: string; email: string; phone?: string; category?: string; subject: string; message: string; }) => {
     try {
         await addDoc(collection(db, "contactMessages"), {
             ...data,
@@ -1806,9 +1836,9 @@ export const getEarningStats = async (): Promise<EarningStats> => {
             getCountFromServer(usersCollection),
         ]);
 
-        const totalRevenue = allOrdersSnapshot.docs.reduce((sum, doc) => sum + (doc.data().amount || 0), 0);
-        const revenueToday = todayOrdersSnapshot.docs.reduce((sum, doc) => sum + (doc.data().amount || 0), 0);
-        const revenueThisMonth = monthOrdersSnapshot.docs.reduce((sum, doc) => sum + (doc.data().amount || 0), 0);
+        const totalRevenue = allOrdersSnapshot.docs.reduce((sum: number, doc: any) => sum + (doc.data().amount || 0), 0);
+        const revenueToday = todayOrdersSnapshot.docs.reduce((sum: number, doc: any) => sum + (doc.data().amount || 0), 0);
+        const revenueThisMonth = monthOrdersSnapshot.docs.reduce((sum: number, doc: any) => sum + (doc.data().amount || 0), 0);
 
         return {
             totalRevenue,
@@ -1819,7 +1849,6 @@ export const getEarningStats = async (): Promise<EarningStats> => {
         };
 
     } catch (error: any) {
-        // Firestore will suggest creating an index in the error message.
         if (error.code === 'failed-precondition') {
             console.error("Firestore error: ", error.message);
             throw new Error(`Query failed. Firestore likely requires a new index. Please check the console logs for a link to create it.`);
@@ -1840,14 +1869,53 @@ export const getAllTextbooks = async () => {
     }
 };
 
+export const getTextbookById = async (textbookId: string) => {
+    if (!textbookId) {
+        throw new Error("Textbook ID is required.");
+    }
+    try {
+        const textbookRef = doc(db, 'textbooks', textbookId);
+        const textbookSnap = await getDoc(textbookRef);
+        if (textbookSnap.exists()) {
+            return { id: textbookSnap.id, ...textbookSnap.data() };
+        }
+        return null;
+    } catch(e) {
+        console.error("Error getting textbook by ID: ", e);
+        throw new Error("Failed to fetch textbook.");
+    }
+};
+
 export const getChaptersByTextbookId = async (textbookId: string) => {
     try {
-        const q = query(collection(db, "textbooks", textbookId, "chapters"), orderBy("title"));
+        const chaptersRef = collection(db, "textbooks", textbookId, "chapters");
+        const q = query(chaptersRef);
         const querySnapshot = await getDocs(q);
-        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const chaptersData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as any }));
+
+        chaptersData.sort((a, b) => (a.title || "").localeCompare(b.title || "", undefined, { numeric: true }));
+
+        return chaptersData;
     } catch (e) {
         console.error("Error getting chapters: ", e);
         throw new Error("Failed to fetch chapters.");
+    }
+};
+
+export const getChapterById = async (textbookId: string, chapterId: string) => {
+    if (!textbookId || !chapterId) {
+        throw new Error("Textbook ID and Chapter ID are required.");
+    }
+    try {
+        const chapterRef = doc(db, `textbooks/${textbookId}/chapters`, chapterId);
+        const chapterSnap = await getDoc(chapterRef);
+        if (chapterSnap.exists()) {
+            return { id: chapterSnap.id, ...chapterSnap.data() };
+        }
+        return null;
+    } catch (e) {
+        console.error("Error getting chapter by ID: ", e);
+        throw new Error("Failed to fetch chapter.");
     }
 };
 
@@ -1902,13 +1970,47 @@ export const addPracticeSetToTopic = async (textbookId: string, chapterId: strin
     try {
         const practiceSetsRef = collection(db, `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets`);
         const docRef = await addDoc(practiceSetsRef, {
-            title: practiceSetData.title,
+            ...practiceSetData,
             createdAt: serverTimestamp(),
         });
         return docRef.id;
     } catch (e) {
         console.error("Error adding practice set: ", e);
         throw new Error("Failed to add practice set.");
+    }
+};
+
+export const updatePracticeSet = async (textbookId: string, chapterId: string, topicId: string, practiceSetId: string, practiceSetData: any) => {
+    if (!textbookId || !chapterId || !topicId || !practiceSetId) {
+        throw new Error("Missing required IDs to update a practice set.");
+    }
+    try {
+        const practiceSetRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets`, practiceSetId);
+        await updateDoc(practiceSetRef, {
+            ...practiceSetData,
+            updatedAt: serverTimestamp(),
+        });
+    } catch (e) {
+        console.error("Error updating practice set: ", e);
+        throw new Error("Failed to update practice set.");
+    }
+};
+
+export const deletePracticeSet = async (textbookId: string, chapterId: string, topicId: string, practiceSetId: string) => {
+    if (!textbookId || !chapterId || !topicId || !practiceSetId) {
+        throw new Error("Missing required IDs to delete a practice set.");
+    }
+    try {
+        const practiceSetRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets`, practiceSetId);
+        const questionsRef = collection(practiceSetRef, 'questions');
+        const questionsSnap = await getDocs(questionsRef);
+        for (const qDoc of questionsSnap.docs) {
+             await deleteDoc(qDoc.ref);
+        }
+        await deleteDoc(practiceSetRef);
+    } catch (e) {
+        console.error("Error deleting practice set: ", e);
+        throw new Error("Failed to delete practice set.");
     }
 };
 
@@ -1919,7 +2021,7 @@ export const getPracticeSetsByTopicId = async (textbookId: string, chapterId: st
         const q = query(practiceSetsRef);
         const querySnapshot = await getDocs(q);
         
-        const practiceSets = [];
+        const practiceSets: any[] = [];
         for (const doc of querySnapshot.docs) {
             const questionsRef = collection(doc.ref, 'questions');
             const questionsSnapshot = await getDocs(questionsRef);
@@ -1929,6 +2031,9 @@ export const getPracticeSetsByTopicId = async (textbookId: string, chapterId: st
                 questionCount: questionsSnapshot.size
             });
         }
+        
+        practiceSets.sort((a, b) => (a.title || "").localeCompare(b.title || "", undefined, { numeric: true }));
+        
         return practiceSets;
     } catch (e) {
         console.error("Error getting practice sets: ", e);
@@ -1936,10 +2041,27 @@ export const getPracticeSetsByTopicId = async (textbookId: string, chapterId: st
     }
 };
 
-export const getPracticeSetById = async (textbookId: string, chapterId: string, topicId: string, practiceSetId: string) => {
-    if (!textbookId || !chapterId || !topicId || !practiceSetId) return null;
+export const getPracticeSetById = async (textbookId: string, chapterId: string | null, topicId: string | null, practiceSetId: string) => {
+    if (chapterId === null || chapterId === 'null') {
+        try {
+            const practiceSetRef = doc(db, 'content', practiceSetId);
+            const docSnap = await getDoc(practiceSetRef);
+            if(docSnap.exists()){
+                return { id: docSnap.id, ...docSnap.data() };
+            }
+            return null;
+        } catch(e) {
+             console.error("Error getting content by ID: ", e);
+             throw new Error("Failed to fetch practice set.");
+        }
+
+    }
+    if (!textbookId || !chapterId || !practiceSetId) return null;
     try {
-        const practiceSetRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets`, practiceSetId);
+        const path = (topicId && topicId !== 'null')
+            ? `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets/${practiceSetId}`
+            : `textbooks/${textbookId}/chapters/${chapterId}/practiceSets/${practiceSetId}`;
+        const practiceSetRef = doc(db, path);
         const docSnap = await getDoc(practiceSetRef);
         if (docSnap.exists()) {
             return { id: docSnap.id, ...docSnap.data() };
@@ -1951,7 +2073,8 @@ export const getPracticeSetById = async (textbookId: string, chapterId: string, 
     }
 };
 
-export const addQuestionToPracticeSet = async (textbookId: string, chapterId: string, topicId: string, practiceSetId: string, questionData: any) => {
+
+export const addQuestionToPracticeSet = async (textbookId: string, chapterId: string | null, topicId: string | null, practiceSetId: string, questionData: any) => {
     const auth = getAuth();
     const user = auth.currentUser;
     if (!user) throw new Error("Authentication required.");
@@ -1964,7 +2087,15 @@ export const addQuestionToPracticeSet = async (textbookId: string, chapterId: st
     });
 
     try {
-        const questionsRef = collection(db, `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets/${practiceSetId}/questions`);
+        let path = '';
+        if (textbookId && chapterId && chapterId !== 'null' && topicId && topicId !== 'null') {
+             path = `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets/${practiceSetId}/questions`;
+        } else if (textbookId && chapterId && chapterId !== 'null' && (!topicId || topicId === 'null')) {
+            path = `textbooks/${textbookId}/chapters/${chapterId}/practiceSets/${practiceSetId}/questions`;
+        } else {
+             throw new Error("Invalid path to add question.");
+        }
+        const questionsRef = collection(db, path);
         const docRef = await addDoc(questionsRef, dataToSave);
         return docRef.id;
     } catch (e) {
@@ -1973,21 +2104,43 @@ export const addQuestionToPracticeSet = async (textbookId: string, chapterId: st
     }
 };
 
-export const getQuestionsByPracticeSet = async (textbookId: string, chapterId: string, topicId: string, practiceSetId: string) => {
-    if (!textbookId || !chapterId || !topicId || !practiceSetId) return [];
+export const getQuestionsByPracticeSet = async (textbookId: string, chapterId: string | null, topicId: string | null, practiceSetId: string) => {
+    if (!practiceSetId) return [];
+
+    let path = '';
+    if (textbookId && chapterId && chapterId !== 'null' && topicId && topicId !== 'null') {
+        path = `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets/${practiceSetId}/questions`;
+    } else if (textbookId && chapterId && chapterId !== 'null' && (topicId === 'null' || !topicId)) {
+        path = `textbooks/${textbookId}/chapters/${chapterId}/practiceSets/${practiceSetId}/questions`;
+    } else if (textbookId && (chapterId === 'null' || !chapterId)) {
+        const contentDoc = await getDoc(doc(db, 'content', practiceSetId));
+        if(contentDoc.exists()) {
+             return contentDoc.data().questions || [];
+        }
+    }
+
+    if (!path) {
+        console.error("Could not determine a valid path for practice set questions.");
+        return [];
+    }
+
     try {
-        const questionsRef = collection(db, `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets/${practiceSetId}/questions`);
+        const questionsRef = collection(db, path);
         const q = query(questionsRef, orderBy("createdAt", "desc"));
         const querySnapshot = await getDocs(q);
         return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     } catch (e) {
-        console.error("Error getting questions by practice set: ", e);
-        throw new Error("Failed to fetch questions.");
+        console.error(`Error getting questions from path "${path}": `, e);
+        throw new Error("Failed to fetch questions for the practice set.");
     }
 };
 
-export const updateQuestionInPracticeSet = async (textbookId: string, chapterId: string, topicId: string, practiceSetId: string, questionId: string, questionData: any) => {
-    const questionRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets/${practiceSetId}/questions`, questionId);
+
+export const updateQuestionInPracticeSet = async (textbookId: string, chapterId: string, topicId: string | null, practiceSetId: string, questionId: string, questionData: any) => {
+    const path = (topicId && topicId !== 'null')
+        ? `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets/${practiceSetId}/questions`
+        : `textbooks/${textbookId}/chapters/${chapterId}/practiceSets/${practiceSetId}/questions`;
+    const questionRef = doc(db, path, questionId);
     try {
         await updateDoc(questionRef, cleanDataForFirebase(questionData));
     } catch (e) {
@@ -1996,8 +2149,11 @@ export const updateQuestionInPracticeSet = async (textbookId: string, chapterId:
     }
 };
 
-export const deleteQuestionFromPracticeSet = async (textbookId: string, chapterId: string, topicId: string, practiceSetId: string, questionId: string) => {
-    const questionRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets/${practiceSetId}/questions`, questionId);
+export const deleteQuestionFromPracticeSet = async (textbookId: string, chapterId: string, topicId: string | null, practiceSetId: string, questionId: string) => {
+    const path = (topicId && topicId !== 'null')
+        ? `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets/${practiceSetId}/questions`
+        : `textbooks/${textbookId}/chapters/${chapterId}/practiceSets/${practiceSetId}/questions`;
+    const questionRef = doc(db, path, questionId);
     try {
         await deleteDoc(questionRef);
     } catch (e) {
@@ -2013,25 +2169,19 @@ export const deleteTextbook = async (textbookId: string) => {
 
     const textbookRef = doc(db, "textbooks", textbookId);
 
-    // This is a simplified delete. For production, you'd want a more robust, recursive delete,
-    // possibly triggered by a Cloud Function to handle nested subcollections reliably.
     try {
-        // Get all chapters
         const chaptersRef = collection(db, `textbooks/${textbookId}/chapters`);
         const chaptersSnapshot = await getDocs(chaptersRef);
 
         for (const chapterDoc of chaptersSnapshot.docs) {
-            // Get all topics for each chapter
             const topicsRef = collection(chapterDoc.ref, "topics");
             const topicsSnapshot = await getDocs(topicsRef);
 
             for (const topicDoc of topicsSnapshot.docs) {
-                // Get all practice sets for each topic
                 const practiceSetsRef = collection(topicDoc.ref, "practiceSets");
                 const practiceSetsSnapshot = await getDocs(practiceSetsRef);
                 
                 for(const practiceSetDoc of practiceSetsSnapshot.docs) {
-                    // Delete questions within practice set
                     const questionsRef = collection(practiceSetDoc.ref, "questions");
                     const questionsSnapshot = await getDocs(questionsRef);
                     for (const qDoc of questionsSnapshot.docs) {
@@ -2046,7 +2196,6 @@ export const deleteTextbook = async (textbookId: string) => {
             await deleteDoc(chapterDoc.ref);
         }
 
-        // Finally, delete the textbook document
         await deleteDoc(textbookRef);
         
     } catch (error) {
@@ -2103,13 +2252,542 @@ export const updateTextbookProgress = async (userId: string, textbookId: string,
     }
 }
 
+export const getUserSubjectsProgress = async (userId: string, userProfile?: any) => {
+    if (!userId || !userProfile?.classId) return [];
+    
+    try {
+        const subjQ = query(
+            collection(db, 'taxonomy_nodes'),
+            where('parentId', '==', userProfile.classId),
+            where('type', '==', 'subject')
+        );
+        const subjSnap = await getDocs(subjQ);
+        const subjectIds = subjSnap.docs.map(d => d.id);
+
+        let fetchedTextbooks: any[] = [];
+        if (subjectIds.length > 0) {
+            const chunks = [];
+            for (let i = 0; i < subjectIds.length; i += 10) {
+                chunks.push(subjectIds.slice(i, i + 10));
+            }
+            
+            for (const chunk of chunks) {
+                const tbQ = query(
+                    collection(db, 'taxonomy_nodes'),
+                    where('parentId', 'in', chunk),
+                    where('type', '==', 'textbook')
+                );
+                const tbSnap = await getDocs(tbQ);
+                fetchedTextbooks.push(...tbSnap.docs.map(doc => ({ id: doc.id, ...doc.data() as any })));
+            }
+        }
+        
+        fetchedTextbooks.sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
+
+        // Fetch textbook progress subcollection for extra data
+        const progressColRef = collection(db, 'users', userId, 'textbookProgress');
+        const progressSnap = await getDocs(progressColRef);
+        
+        const progressMap: Record<string, any> = {};
+        progressSnap.forEach(doc => {
+            progressMap[doc.id] = doc.data();
+        });
+
+        return fetchedTextbooks.map(fs => {
+            const stat = userProfile.subjectStats?.[fs.title] || {};
+            const progData = progressMap[fs.id];
+            
+            const totalAssumedChapters = 12;
+            const completedChapters = progData ? Object.keys(progData).length : 0;
+            const progressPct = stat.progress || (completedChapters > 0 ? Math.min((completedChapters / totalAssumedChapters) * 100, 100) : 0);
+
+            return {
+                id: fs.id,
+                name: fs.title || 'Unknown Subject',
+                progress: progressPct,
+                mcq: stat.mcq || { current: completedChapters * 5, total: totalAssumedChapters * 5 },
+                cq: stat.cq || { current: completedChapters * 2, total: totalAssumedChapters * 2 },
+                content: stat.content || { current: completedChapters, total: totalAssumedChapters },
+                started: stat.started || (progData ? 'In progress' : '')
+            };
+        });
+    } catch (error) {
+        console.error("Error fetching subject progress:", error);
+        return [];
+    }
+}
+    
+export const deleteQuestionFromChapter = async (textbookId: string, chapterId: string, questionId: string) => {
+    const chapterRef = doc(db, `textbooks/${textbookId}/chapters`, chapterId);
+    try {
+        const chapterSnap = await getDoc(chapterRef);
+        if (!chapterSnap.exists()) {
+            throw new Error("Chapter not found.");
+        }
+        const chapterData = chapterSnap.data();
+        const questions = chapterData.textbookQuestions || [];
+        const questionToDelete = questions.find((q: any) => q.id === questionId);
+        
+        if (questionToDelete) {
+            await updateDoc(chapterRef, {
+                textbookQuestions: arrayRemove(questionToDelete)
+            });
+        }
+    } catch (e) {
+        console.error("Error deleting question from chapter: ", e);
+        throw new Error("Failed to delete question from chapter.");
+    }
+};
+
+export const getRelatedQuestions = async (currentQuestion: Partial<any>): Promise<any[]> => {
+    if (!currentQuestion.subject || !currentQuestion.id) {
+        return [];
+    }
+    try {
+        const q = query(
+            collection(db, "questions"),
+            where("subject", "==", currentQuestion.subject),
+            where("__name__", "!=", currentQuestion.id),
+            limit(5)
+        );
+
+        const querySnapshot = await getDocs(q);
+        const questions = querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            const createdAt = data.createdAt;
+            let formattedDate = 'N/A';
+            if (createdAt && typeof createdAt.toDate === 'function') {
+                formattedDate = createdAt.toDate().toLocaleDateString();
+            } else if (createdAt instanceof Date) {
+                formattedDate = createdAt.toLocaleDateString();
+            }
+            return {
+                id: doc.id,
+                ...data,
+                createdAt: formattedDate,
+            } as any;
+        });
+        return questions;
+    } catch (e) {
+        console.error("Error getting related questions: ", e);
+        throw new Error("Failed to fetch related questions.");
+    }
+};
+
+export const getKidsZoneCategories = async () => {
+    try {
+        const q = query(collection(db, "kidsZoneCategories"), orderBy("title"));
+        const querySnapshot = await getDocs(q);
+        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    } catch (e) {
+        console.error("Error getting Kids Zone categories: ", e);
+        throw new Error("Failed to fetch Kids Zone categories.");
+    }
+};
+
+export const addKidsZoneCategory = async (categoryData: { title: string, description: string, icon: string }) => {
+    if (!categoryData.title) {
+        throw new Error("Category title cannot be empty.");
+    }
+    try {
+        const slug = categoryData.title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+        const link = `/kids-zone/category/${slug}`;
+        const existingQuery = query(collection(db, "kidsZoneCategories"), where("slug", "==", slug));
+        const existingSnap = await getDocs(existingQuery);
+        if (!existingSnap.empty) {
+            throw new Error("A category with this name already exists.");
+        }
+
+        const docRef = await addDoc(collection(db, "kidsZoneCategories"), {
+            ...categoryData,
+            slug,
+            link,
+            image: `https://picsum.photos/seed/${slug}/400/300`,
+            imageHint: `${categoryData.title.toLowerCase().split(' ')[0]} learning`
+        });
+        return docRef.id;
+    } catch (e) {
+        console.error("Error adding Kids Zone category: ", e);
+        throw e;
+    }
+};
+
+export const updateKidsZoneCategory = async (id: string, data: any) => {
+    if (!id) throw new Error("Category ID is required.");
+    try {
+        const categoryRef = doc(db, "kidsZoneCategories", id);
+        const slug = data.title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+        const link = `/kids-zone/category/${slug}`;
+        await updateDoc(categoryRef, {...data, slug, link});
+    } catch (e) {
+        console.error("Error updating Kids Zone category: ", e);
+        throw new Error("Failed to update category.");
+    }
+};
+
+export const deleteKidsZoneCategory = async (id: string) => {
+    if (!id) throw new Error("Category ID is required.");
+    try {
+        await deleteDoc(doc(db, "kidsZoneCategories", id));
+    } catch (e) {
+        console.error("Error deleting Kids Zone category: ", e);
+        throw new Error("Failed to delete category.");
+    }
+};
+    
+
+export const getKidsCategoryBySlug = async (slug: string) => {
+    try {
+        const q = query(collection(db, "kidsZoneCategories"), where("slug", "==", slug), limit(1));
+        const querySnapshot = await getDocs(q);
+        if (querySnapshot.empty) {
+            return null;
+        }
+        const docSnap = querySnapshot.docs[0];
+        return { id: docSnap.id, ...docSnap.data() };
+    } catch (e) {
+        console.error("Error getting category by slug: ", e);
+        throw new Error("Failed to fetch category.");
+    }
+}
 
 
+export const addQuestionToContent = async (contentId: string, questionData: any) => {
+    if (!contentId) throw new Error("Content ID required.");
+    const auth = getAuth();
+    const user = auth.currentUser;
+    const dataToSave = cleanDataForFirebase({
+        ...questionData,
+        authorId: user?.uid || 'admin',
+        authorName: user?.displayName || user?.email || 'Admin',
+        createdAt: serverTimestamp(),
+    });
+    try {
+        const questionsRef = collection(db, `content/${contentId}/questions`);
+        const docRef = await addDoc(questionsRef, dataToSave);
+        return docRef.id;
+    } catch (e) {
+        console.error("Error adding question to content: ", e);
+        throw new Error("Failed to add question.");
+    }
+};
 
+export const deleteQuestionFromContent = async (contentId: string, questionId: string) => {
+    if (!contentId || !questionId) throw new Error("Content ID and Question ID required.");
+    try {
+        const questionRef = doc(db, `content/${contentId}/questions`, questionId);
+        await deleteDoc(questionRef);
+    } catch (e) {
+        console.error("Error deleting question from content: ", e);
+        throw new Error("Failed to delete question.");
+    }
+};
 
+export const addFaq = async (faqData: any) => {
+    try {
+        const docRef = await addDoc(collection(db, "faqs"), {
+            ...faqData,
+            createdAt: serverTimestamp(),
+        });
+        return docRef.id;
+    } catch (e) {
+        console.error("Error adding FAQ: ", e);
+        throw new Error("Failed to add FAQ.");
+    }
+};
 
+export const getFaqs = async () => {
+    try {
+        const q = query(collection(db, "faqs"), orderBy("createdAt", "desc"));
+        const querySnapshot = await getDocs(q);
+        return querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            let createdAt = 'N/A';
+            if (data.createdAt && typeof data.createdAt.toDate === 'function') {
+                createdAt = format(data.createdAt.toDate(), 'PPP');
+            }
+            return {
+                id: doc.id,
+                ...data,
+                createdAt
+            };
+        });
+    } catch (e) {
+        console.error("Error getting FAQs: ", e);
+        throw new Error("Failed to fetch FAQs.");
+    }
+};
 
+export const updateFaq = async (faqId: string, faqData: any) => {
+    if (!faqId) throw new Error("FAQ ID is required.");
+    try {
+        await updateDoc(doc(db, "faqs", faqId), {
+            ...faqData,
+            updatedAt: serverTimestamp()
+        });
+    } catch (e) {
+        console.error("Error updating FAQ: ", e);
+        throw new Error("Failed to update FAQ.");
+    }
+};
 
+export const deleteFaq = async (faqId: string) => {
+    if (!faqId) throw new Error("FAQ ID is required.");
+    try {
+        await deleteDoc(doc(db, "faqs", faqId));
+    } catch (e) {
+        console.error("Error deleting FAQ: ", e);
+        throw new Error("Failed to delete FAQ.");
+    }
+};
 
+export type XPActionType = 'MOCK_TEST_COMPLETE' | 'CHAPTER_PRACTICE_COMPLETE' | 'DAILY_LOGIN_STREAK' | 'WEEKLY_TARGET_COMPLETE' | 'MISTAKE_VAULT_SOLVE' | 'FORUM_HELP' | 'FORUM_UPVOTE' | 'CUSTOM';
 
+export const awardXP = async (userId: string, actionType: XPActionType, customAmount?: number, metadata?: any): Promise<{ xpAdded: number, unlockedAchievements: Achievement[] }> => {
+    if (!userId) return { xpAdded: 0, unlockedAchievements: [] };
+    
+    let xpAmount = 0;
+    switch (actionType) {
+        case 'MOCK_TEST_COMPLETE':
+            xpAmount = 20;
+            break;
+        case 'CHAPTER_PRACTICE_COMPLETE':
+            xpAmount = 30;
+            break;
+        case 'DAILY_LOGIN_STREAK':
+            xpAmount = customAmount || 5;
+            break;
+        case 'WEEKLY_TARGET_COMPLETE':
+            xpAmount = 100;
+            break;
+        case 'MISTAKE_VAULT_SOLVE':
+            xpAmount = 5;
+            break;
+        case 'FORUM_HELP':
+            xpAmount = 10;
+            break;
+        case 'FORUM_UPVOTE':
+            xpAmount = 2;
+            break;
+        case 'CUSTOM':
+            xpAmount = customAmount || 0;
+            break;
+        default:
+            xpAmount = 0;
+    }
 
+    if (xpAmount <= 0) return { xpAdded: 0, unlockedAchievements: [] };
+
+    try {
+        const userRef = doc(db, "users", userId);
+        
+        // We need to fetch the current user profile to check achievements
+        const userDoc = await getDoc(userRef);
+        if (!userDoc.exists()) return { xpAdded: 0, unlockedAchievements: [] };
+        
+        const userData = userDoc.data();
+        const currentXP = userData.xp || 0;
+        const currentAchievements = userData.achievements || [];
+        
+        const newTotalXP = currentXP + xpAmount;
+        let totalXPAwarded = xpAmount;
+        
+        // Build the updates object
+        const updates: any = {
+            xp: increment(totalXPAwarded),
+            xp_today: increment(totalXPAwarded),
+            xp_week: increment(totalXPAwarded),
+            xp_month: increment(totalXPAwarded)
+        };
+
+        // Update the user document
+        await updateDoc(userRef, updates);
+        
+        // Log transaction
+        await addDoc(collection(db, "xp_transactions"), {
+            userId,
+            actionType,
+            amount: xpAmount,
+            bonusFromAchievements: 0,
+            unlockedAchievements: [],
+            metadata: metadata || null,
+            createdAt: serverTimestamp()
+        });
+
+        return { xpAdded: totalXPAwarded, unlockedAchievements: [] };
+    } catch (e) {
+        console.error("Failed to award XP:", e);
+        return { xpAdded: 0, unlockedAchievements: [] };
+    }
+};
+
+/**
+ * Processes a referral code used by a new user during signup.
+ * @param newUserId The UID of the newly registered user
+ * @param referrerCode The referral code provided
+ * @returns boolean indicating success
+ */
+export const processReferral = async (newUserId: string, referrerCode: string): Promise<boolean> => {
+    if (!newUserId || !referrerCode) return false;
+    
+    try {
+        // Find referrer by referralCode
+        const q = query(collection(db, "users"), where("referralCode", "==", referrerCode), limit(1));
+        const querySnapshot = await getDocs(q);
+        
+        if (querySnapshot.empty) return false;
+        
+        const referrerDoc = querySnapshot.docs[0];
+        const referrerId = referrerDoc.id;
+        
+        // Prevent self-referral
+        if (referrerId === newUserId) return false;
+        
+        // Add to referrals collection for audit
+        await addDoc(collection(db, "referrals"), {
+            referrerId,
+            referredUserId: newUserId,
+            createdAt: serverTimestamp()
+        });
+        
+        // Update referrer's referralCount
+        await updateDoc(doc(db, "users", referrerId), {
+            referralCount: increment(1)
+        });
+        
+        // Update the new user's profile to mark who referred them
+        // Using setDoc with merge: true so that simulated dummy users don't cause an error
+        await setDoc(doc(db, "users", newUserId), {
+            referredBy: referrerId
+        }, { merge: true });
+        
+        // Award 100 XP to the referrer
+        // This will also trigger the achievement check for 'referrals' since we updated referralCount
+        await awardXP(referrerId, 'CUSTOM', 100, { description: `Successful Referral Bonus` });
+        
+        return true;
+    } catch (e) {
+        console.error("Failed to process referral:", e);
+        return false;
+    }
+};
+
+/**
+ * Checks and updates the user's daily login streak.
+ * Called automatically when the app loads or user signs in.
+ * @param userId The user ID
+ * @param simulateNextDay If true, simulates logging in tomorrow
+ * @returns Object with the updated streak info and any XP awarded
+ */
+export const checkDailyStreak = async (userId: string, simulateNextDay: boolean = false) => {
+    if (!userId) return null;
+    try {
+        const userRef = doc(db, "users", userId);
+        const userDoc = await getDoc(userRef);
+        
+        if (!userDoc.exists()) return null;
+        
+        const userData = userDoc.data();
+        let lastActive = userData.lastActiveDate?.toDate() || null;
+        let currentStreak = userData.currentStreak || 0;
+        let longestStreak = userData.longestStreak || 0;
+        
+        const now = new Date();
+        if (simulateNextDay) {
+            // For testing: Pretend today is the day AFTER their last active date, or tomorrow if they have no last active date
+            if (lastActive) {
+                now.setTime(lastActive.getTime() + 24 * 60 * 60 * 1000);
+            } else {
+                now.setTime(now.getTime() + 24 * 60 * 60 * 1000);
+            }
+        }
+        
+        const todayStr = format(now, 'yyyy-MM-dd');
+        const lastActiveStr = lastActive ? format(lastActive, 'yyyy-MM-dd') : null;
+        
+        if (lastActiveStr === todayStr) {
+            // Already logged in today, do nothing
+            return { currentStreak, longestStreak, xpAwarded: 0 };
+        }
+        
+        // Check if yesterday
+        const yesterday = new Date(now);
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayStr = format(yesterday, 'yyyy-MM-dd');
+        
+        if (lastActiveStr === yesterdayStr) {
+            // Logged in yesterday, increment streak
+            currentStreak += 1;
+        } else {
+            // Missed a day (or first time logging in), reset streak to 1
+            currentStreak = 1;
+        }
+        
+        if (currentStreak > longestStreak) {
+            longestStreak = currentStreak;
+        }
+        
+        // Update user document
+        await updateDoc(userRef, {
+            lastActiveDate: simulateNextDay ? now : serverTimestamp(),
+            currentStreak,
+            longestStreak
+        });
+        
+        // Award 10 XP for daily login
+        // This will also trigger the achievement check for 'streak_days' since we just updated currentStreak!
+        const xpResult = await awardXP(userId, 'DAILY_LOGIN_STREAK', 10, { description: `Daily Login Streak: ${currentStreak} days` });
+        
+        return { currentStreak, longestStreak, xpAwarded: xpResult.xpAdded };
+    } catch (e) {
+        console.error("Failed to check daily streak:", e);
+        return null;
+    }
+};
+
+/**
+ * Records a mock test attempt, updates stats, and checks time-based achievements.
+ * @param userId The user ID
+ * @param scorePct The percentage score (0-100)
+ * @param simulatedHour Optional simulated hour (0-23) for testing night_owl/early_bird
+ */
+export const recordMockTest = async (userId: string, scorePct: number, simulatedHour?: number) => {
+    if (!userId) return null;
+    try {
+        const userRef = doc(db, "users", userId);
+        
+        let hour = new Date().getHours();
+        if (typeof simulatedHour === 'number') {
+            hour = simulatedHour;
+        }
+
+        const updates: any = {
+            examsTaken: increment(1)
+        };
+
+        if (scorePct === 100) {
+            updates.perfectExams = increment(1);
+        }
+
+        // Night Owl (12 AM to 3 AM)
+        if (hour >= 0 && hour < 4) {
+            updates.nightOwlCount = increment(1);
+        }
+        
+        // Early Bird (4 AM to 6 AM)
+        if (hour >= 4 && hour < 7) {
+            updates.earlyBirdCount = increment(1);
+        }
+
+        await updateDoc(userRef, updates);
+
+        // Award base XP for completing a test
+        // This will trigger the checks for exams_taken, perfect_exams, etc.
+        const xpResult = await awardXP(userId, 'MOCK_TEST_COMPLETE', 50, { description: `Completed Mock Test (Score: ${scorePct}%)` });
+
+        return { success: true, xpAwarded: xpResult.xpAdded };
+    } catch (e) {
+        console.error("Failed to record mock test:", e);
+        return { success: false, xpAwarded: 0 };
+    }
+};

@@ -31,6 +31,7 @@ export async function aiContentRanker(input: AIContentRankerInput): Promise<AICo
 
 const prompt = ai.definePrompt({
   name: 'aiContentRankerPrompt',
+  model: 'googleai/gemini-2.5-flash',
   input: {schema: AIContentRankerInputSchema},
   output: {schema: AIContentRankerOutputSchema},
   prompt: `You are an AI content ranker that determines the usefulness of user-generated content based on its likes and dislikes.

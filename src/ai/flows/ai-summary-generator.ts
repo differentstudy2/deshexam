@@ -1,0 +1,65 @@
+
+'use server';
+/**
+ * @fileOverview Generates a summary for a given text content.
+ *
+ * - generateSummary - A function that generates a summary.
+ */
+
+import { ai } from '@/ai/genkit';
+import { z } from 'zod';
+
+const AISummaryGeneratorInputSchema = z.object({
+  content: z.string().describe('The text content to be summarized.'),
+});
+export type AISummaryGeneratorInput = z.infer<typeof AISummaryGeneratorInputSchema>;
+
+const AISummaryGeneratorOutputSchema = z.object({
+  summary: z.string().describe('The generated summary in Markdown format.'),
+  keyPoints: z.array(z.string()).describe('A list of key points from the content.'),
+});
+export type AISummaryGeneratorOutput = z.infer<typeof AISummaryGeneratorOutputSchema>;
+
+export async function generateSummary(input: AISummaryGeneratorInput): Promise<AISummaryGeneratorOutput> {
+  return generateSummaryFlow(input);
+}
+
+const prompt = ai.definePrompt({
+  name: 'aiSummaryGeneratorPrompt',
+  model: 'googleai/gemini-2.5-flash',
+  input: { schema: AISummaryGeneratorInputSchema },
+  output: { schema: AISummaryGeneratorOutputSchema },
+  prompt: `You are an expert at simplifying complex educational content. Your task is to analyze the following text and generate a clear, easy-to-understand summary and a list of key takeaways.
+
+**Formatting Rules**:
+1.  **LaTeX for Math**: For any mathematical expressions, formulas, or chemical equations, you MUST enclose them in LaTeX delimiters. Use a single dollar sign for inline math (e.g., $E=mc^2$) and double dollar signs for block-level math (e.g., $$\\sum_{i=1}^n i = \\frac{n(n+1)}{2}$$). For mathematical grouping, use parentheses () or square brackets [] inside the math delimiters, not curly braces {}, unless it is part of a specific LaTeX command like \\frac{a}{b}. For symbols, use their LaTeX commands, for instance \`\\therefore\` for the 'therefore' symbol (∴).
+2.  **Language**: You MUST generate all content (summary, key points) in the same language as the provided source material.
+
+Source Content:
+---
+{{content}}
+---
+
+**Instructions:**
+1.  **Summary:** Write a concise summary of the content. Explain the main concepts in a simple and straightforward way, as if you were explaining it to a beginner. The summary should be in well-formatted Markdown.
+2.  **Key Points:** Identify and list the most important points or facts from the text. This should be a bulleted list.
+
+Ensure the output is accurate and captures the essence of the original text.
+`,
+});
+
+const generateSummaryFlow = ai.defineFlow(
+  {
+    name: 'generateSummaryFlow',
+    inputSchema: AISummaryGeneratorInputSchema,
+    outputSchema: AISummaryGeneratorOutputSchema,
+  },
+  async (input) => {
+    const { output } = await prompt(input);
+    return output!;
+  }
+);
+
+    
+
+    

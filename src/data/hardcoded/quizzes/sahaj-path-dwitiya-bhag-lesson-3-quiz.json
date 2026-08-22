@@ -1,0 +1,516 @@
+{
+  "id": "sahaj-path-dwitiya-bhag-lesson-3",
+  "slug": "sahaj-path-dwitiya-bhag-lesson-3-quiz",
+  "title": "সহজ পাঠ দ্বিতীয় ভাগ: তৃতীয় পাঠ | আজ মঙ্গলবার Quiz",
+  "description": "রবীন্দ্রনাথ ঠাকুরের সহজ পাঠ দ্বিতীয় ভাগ বইয়ের তৃতীয় পাঠ আজ মঙ্গলবার-এর উপর ভিত্তি করে তৈরি এই Quiz-এ অংশ নিন।",
+  "status": "Published",
+  "difficulty": "Easy",
+  "language": "Bengali",
+  "questionType": "MCQ",
+  "questionCount": 30,
+  "questionIds": [],
+  "durationMin": 30,
+  "totalMarks": 30,
+  "passingMarks": 21,
+  "negativeMarking": 0,
+  "attemptsAllowed": 0,
+  "accessType": "subscription",
+  "attemptCount": 4200,
+  "averageScore": 75,
+  "examRules": "",
+  "verificationBadges": [
+    "WBBSE Verified"
+  ],
+  "tags": [
+    "সহজ পাঠ",
+    "দ্বিতীয় ভাগ",
+    "তৃতীয় পাঠ",
+    "রবীন্দ্রনাথ",
+    "Bengali Literature",
+    "Primary"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2025-01-01T00:00:00Z",
+  "questions": [
+    {
+      "id": "q1",
+      "questionText": "পাঠে আজ কী বার বলা হয়েছে?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "সোমবার",
+        "b": "মঙ্গলবার",
+        "c": "বুধবার",
+        "d": "শুক্রবার"
+      },
+      "correctAnswer": "b",
+      "explanation": "পাঠের প্রথম বাক্যেই বলা হয়েছে, 'আজ মঙ্গলবার'।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q2",
+      "questionText": "আজ কী করবার দিন?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "ফসল তোলার দিন",
+        "b": "বাজারে যাওয়ার দিন",
+        "c": "পাড়ার জঙ্গল সাফ করবার দিন",
+        "d": "বৃক্ষরোপণের দিন"
+      },
+      "correctAnswer": "c",
+      "explanation": "'আজ মঙ্গলবার। পাড়ার জঙ্গল সাফ করবার দিন।' — পাঠে স্পষ্ট বলা আছে।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q3",
+      "questionText": "কারা দঙ্গল বেঁধে যাবে?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "সব মেয়েরা",
+        "b": "সব বুড়োরা",
+        "c": "সব চাষীরা",
+        "d": "সব ছেলেরা"
+      },
+      "correctAnswer": "d",
+      "explanation": "পাঠে বলা হয়েছে, 'সব ছেলেরা দঙ্গল বেঁধে যাবে।'",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q4",
+      "questionText": "'দঙ্গল' শব্দের অর্থ কী?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "একা",
+        "b": "দল বা ঝাঁক",
+        "c": "বাড়ি",
+        "d": "রাস্তা"
+      },
+      "correctAnswer": "b",
+      "explanation": "'দঙ্গল' মানে দল বা ঝাঁক। 'দঙ্গল বেঁধে যাওয়া' মানে দল পাকিয়ে একসাথে যাওয়া।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q5",
+      "questionText": "কে এখনি আসবেন বলে পাঠে উল্লেখ আছে?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "বঙ্গবাবু",
+        "b": "ক্ষিতিবাবু",
+        "c": "রঙ্গলালবাবু",
+        "d": "অক্ষয়বাবু"
+      },
+      "correctAnswer": "c",
+      "explanation": "'রঙ্গলালবাবুও এখনি আসবেন।' — পাঠে সরাসরি বলা আছে।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q6",
+      "questionText": "রঙ্গলালবাবুর সাথে আর কে আসবেন?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "তাঁর ভাই ঈশানবাবু",
+        "b": "তাঁর দাদা বঙ্গবাবু",
+        "c": "তাঁর বন্ধু ক্ষিতিবাবু",
+        "d": "তাঁর ছেলে"
+      },
+      "correctAnswer": "b",
+      "explanation": "'আর আসবেন তাঁর দাদা বঙ্গবাবু।' — রঙ্গলালবাবুর দাদার নাম বঙ্গবাবু।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q7",
+      "questionText": "রঙ্গলালবাবুর দাদার নাম কী?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "ঈশানবাবু",
+        "b": "ক্ষিতিবাবু",
+        "c": "বঙ্গবাবু",
+        "d": "অক্ষয়বাবু"
+      },
+      "correctAnswer": "c",
+      "explanation": "রঙ্গলালবাবুর দাদার নাম বঙ্গবাবু।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q8",
+      "questionText": "'সিদ্ধি'কে কী করতে বলা হয়েছে?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "বাজারে যেতে",
+        "b": "ঘর ঝাড়ু দিতে",
+        "c": "দৌড়ে গিয়ে অনঙ্গদাদাকে ধরতে",
+        "d": "জল আনতে"
+      },
+      "correctAnswer": "c",
+      "explanation": "'সিদ্ধি, তুমি দৌড়ে যাও তো। অনঙ্গদাদাকে ধরো।' — সিদ্ধিকে অনঙ্গদাদার কাছে যেতে বলা হয়েছে।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q9",
+      "questionText": "অনঙ্গদাদা কীসে করে তাঁদের আনবেন?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "রিকশায়",
+        "b": "ঘোড়ার গাড়িতে",
+        "c": "সাইকেলে",
+        "d": "মোটরগাড়িতে"
+      },
+      "correctAnswer": "d",
+      "explanation": "'মোটরগাড়িতে তাঁদের আনবেন।' — অনঙ্গদাদা মোটরগাড়িতে নিয়ে আসবেন।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q10",
+      "questionText": "সঙ্গে নেওয়ার জিনিসের তালিকায় কোনটি নেই?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "কুড়ুল",
+        "b": "কোদাল",
+        "c": "ছাতা",
+        "d": "ঝুড়ি"
+      },
+      "correctAnswer": "c",
+      "explanation": "সঙ্গে নেওয়ার জিনিস হলো কুড়ুল, কোদাল, ঝাঁটা, ঝুড়ি। ছাতার কথা বলা নেই।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q11",
+      "questionText": "কুড়ুল কী কাজে ব্যবহার হয়?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "মাটি খোঁড়া",
+        "b": "গাছ কাটা",
+        "c": "ঘর ঝাড়া",
+        "d": "জিনিস বহন করা"
+      },
+      "correctAnswer": "b",
+      "explanation": "কুড়ুল হলো গাছ কাটার হাতিয়ার। জঙ্গল সাফ করতে গাছের ডাল কাটার জন্য কুড়ুল নেওয়া হবে।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q12",
+      "questionText": "কোদাল কী কাজে লাগে?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "গাছ কাটতে",
+        "b": "পাতা ঝাড়তে",
+        "c": "মাটি খুঁড়তে",
+        "d": "জিনিস বহন করতে"
+      },
+      "correctAnswer": "c",
+      "explanation": "কোদাল দিয়ে মাটি খোঁড়া হয়। জঙ্গল সাফ করতে গাছের শিকড় তোলার জন্য কোদাল দরকার।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q13",
+      "questionText": "ভিঙ্গি কে?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "একজন মালি",
+        "b": "একজন মেথর",
+        "c": "একজন চাষী",
+        "d": "একজন ছুতোর"
+      },
+      "correctAnswer": "b",
+      "explanation": "পাঠে বলা হয়েছে 'ভিঙ্গি মেথরকে' নেওয়া হবে। সুতরাং ভিঙ্গি একজন মেথর।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q14",
+      "questionText": "এবার কে বড়ো ক্ষতি করেছে?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "ঝড়",
+        "b": "বন্যা",
+        "c": "খরা",
+        "d": "পঙ্গপাল"
+      },
+      "correctAnswer": "d",
+      "explanation": "'এবার পঙ্গপাল এসে বড়ো ক্ষতি করেছে।' — পাঠে স্পষ্টভাবে পঙ্গপালের কথা বলা হয়েছে।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q15",
+      "questionText": "পঙ্গপাল কী ধরনের প্রাণী?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "একধরনের পাখি",
+        "b": "একধরনের ফড়িং-জাতীয় কীট",
+        "c": "একধরনের সাপ",
+        "d": "একধরনের ইঁদুর"
+      },
+      "correctAnswer": "b",
+      "explanation": "পঙ্গপাল হলো ফড়িং-জাতীয় একধরনের কীট যারা দলে দলে ফসলের ক্ষেতে হানা দিয়ে সব খেয়ে ফেলে।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q16",
+      "questionText": "ক্ষিতিবাবুর ক্ষেতে কী নেই?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "একটি ফুল নেই",
+        "b": "একটি ঘাস নেই",
+        "c": "একটি গাছ নেই",
+        "d": "একটি ফসল নেই"
+      },
+      "correctAnswer": "b",
+      "explanation": "'ক্ষিতিবাবুর ক্ষেতে একটি ঘাস নেই।'",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q17",
+      "questionText": "অক্ষয়বাবুর বাগানে পঙ্গপাল কী খেয়ে সাঙ্গ করেছে?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "ধানের শিষ",
+        "b": "আমের পাতা",
+        "c": "কপির পাতা",
+        "d": "লাউয়ের পাতা"
+      },
+      "correctAnswer": "c",
+      "explanation": "'অক্ষয়বাবুর বাগানে কপির পাতাগুলো খেয়ে সাঙ্গ ক'রে দিয়েছে।'",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q18",
+      "questionText": "'সাঙ্গ করা' মানে কী?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "শুরু করা",
+        "b": "বৃদ্ধি পাওয়া",
+        "c": "শেষ করে দেওয়া",
+        "d": "জমা করা"
+      },
+      "correctAnswer": "c",
+      "explanation": "'সাঙ্গ করা' মানে শেষ করে দেওয়া।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q19",
+      "questionText": "পঙ্গপাল না তাড়াতে পারলে কী হবে?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "ফসল ভালো হবে",
+        "b": "বৃষ্টি হবে",
+        "c": "ক্ষেতে সার দিতে হবে",
+        "d": "কাজে ভঙ্গ দিতে হবে"
+      },
+      "correctAnswer": "d",
+      "explanation": "'পঙ্গপাল না তাড়াতে পারলে এবার কাজে ভঙ্গ দিতে হবে।'",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q20",
+      "questionText": "'কাজে ভঙ্গ দেওয়া' মানে কী?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "কাজ শুরু করা",
+        "b": "কাজ মেরামত করা",
+        "c": "কাজ বন্ধ করে দেওয়া",
+        "d": "কাজ বাড়ানো"
+      },
+      "correctAnswer": "c",
+      "explanation": "'ভঙ্গ দেওয়া' মানে ছেড়ে দেওয়া বা বন্ধ করা।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q21",
+      "questionText": "ঈশানবাবু কীভাবে দানের কথা জানিয়েছেন?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "চিঠিতে লিখে",
+        "b": "জোরে বলে",
+        "c": "ইঙ্গিতে",
+        "d": "ফোনে"
+      },
+      "correctAnswer": "c",
+      "explanation": "'ঈশানবাবু ইঙ্গিতে বলেছেন, তিনি কিছু দান করবেন।'",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q22",
+      "questionText": "ঈশানবাবু কী করবেন বলেছেন?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "নিজে এসে কাজ করবেন",
+        "b": "কিছু দান করবেন",
+        "c": "পঙ্গপাল তাড়াবেন",
+        "d": "মোটরগাড়ি পাঠাবেন"
+      },
+      "correctAnswer": "b",
+      "explanation": "'ঈশানবাবু ইঙ্গিতে বলেছেন, তিনি কিছু দান করবেন।'",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q23",
+      "questionText": "'ইঙ্গিত' শব্দের অর্থ কী?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "সরাসরি আদেশ",
+        "b": "চিৎকার করে জানানো",
+        "c": "ইশারা বা মৃদু আভাস",
+        "d": "লিখিত জানানো"
+      },
+      "correctAnswer": "c",
+      "explanation": "'ইঙ্গিত' মানে ইশারা বা মৃদু আভাস।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q24",
+      "questionText": "কোন দুজন মিলে মোটরগাড়িতে আসবেন?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "ক্ষিতিবাবু ও অক্ষয়বাবু",
+        "b": "ঈশানবাবু ও বঙ্গবাবু",
+        "c": "রঙ্গলালবাবু ও বঙ্গবাবু",
+        "d": "সিদ্ধি ও ভিঙ্গি"
+      },
+      "correctAnswer": "c",
+      "explanation": "রঙ্গলালবাবু ও তাঁর দাদা বঙ্গবাবু একসাথে মোটরগাড়িতে আসবেন।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q25",
+      "questionText": "ক্ষিতিবাবু কে?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "যার বাগানে কপির পাতা খেয়ে ফেলা হয়েছে",
+        "b": "যার ক্ষেতে একটি ঘাস নেই",
+        "c": "যিনি দান করবেন",
+        "d": "রঙ্গলালবাবুর দাদা"
+      },
+      "correctAnswer": "b",
+      "explanation": "ক্ষিতিবাবু সেই ব্যক্তি যার ক্ষেতে পঙ্গপালের আক্রমণে একটিও ঘাস নেই।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q26",
+      "questionText": "অক্ষয়বাবু কে?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "যার ক্ষেতে ঘাস নেই",
+        "b": "যিনি দান করবেন",
+        "c": "রঙ্গলালবাবুর দাদা",
+        "d": "যার বাগানে কপির পাতা খেয়ে ফেলা হয়েছে"
+      },
+      "correctAnswer": "d",
+      "explanation": "অক্ষয়বাবুর বাগানে পঙ্গপাল কপির পাতাগুলো খেয়ে শেষ করে দিয়েছে।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q27",
+      "questionText": "পাঠে মোট কতটি হাতিয়ার বা সরঞ্জাম নেওয়ার কথা বলা হয়েছে?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "২টি",
+        "b": "৩টি",
+        "c": "৪টি",
+        "d": "৫টি"
+      },
+      "correctAnswer": "c",
+      "explanation": "কুড়ুল, কোদাল, ঝাঁটা এবং ঝুড়ি — মোট ৪টি সরঞ্জাম নেওয়ার কথা বলা হয়েছে।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q28",
+      "questionText": "পাঠটিতে মূলত কী বিষয়ের কথা আলোচনা করা হয়েছে?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "একটি বিয়ের অনুষ্ঠান",
+        "b": "পাড়ার জঙ্গল পরিষ্কার ও পঙ্গপালের ক্ষতি",
+        "c": "নদীতে নৌকা চালানো",
+        "d": "স্কুলে যাওয়ার প্রস্তুতি"
+      },
+      "correctAnswer": "b",
+      "explanation": "পাঠটিতে মঙ্গলবারে পাড়ার জঙ্গল সাফ করতে যাওয়ার প্রস্তুতি এবং পঙ্গপালের আক্রমণে ফসলের ক্ষতির কথা বলা হয়েছে।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q29",
+      "questionText": "নিচের কোন নামটি এই পাঠে নেই?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "রঙ্গলালবাবু",
+        "b": "বঙ্গবাবু",
+        "c": "বৈদ্যনাথ",
+        "d": "ঈশানবাবু"
+      },
+      "correctAnswer": "c",
+      "explanation": "রঙ্গলালবাবু, বঙ্গবাবু, ঈশানবাবু এরা সবাই এই পাঠের চরিত্র। কিন্তু 'বৈদ্যনাথ' এই পাঠে নেই, সে ছিল দ্বিতীয় পাঠে।",
+      "marks": 1,
+      "difficulty": "Medium",
+      "status": "Published"
+    },
+    {
+      "id": "q30",
+      "questionText": "পাঠটিতে সব মিলিয়ে কতজন ব্যক্তির নাম উল্লেখ আছে?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "৫ জন",
+        "b": "৬ জন",
+        "c": "৭ জন",
+        "d": "৮ জন"
+      },
+      "correctAnswer": "d",
+      "explanation": "পাঠে উল্লিখিত ব্যক্তিরা: সিদ্ধি, রঙ্গলালবাবু, বঙ্গবাবু, অনঙ্গদাদা, ভিঙ্গি, ক্ষিতিবাবু, অক্ষয়বাবু, ঈশানবাবু — মোট ৮ জন।",
+      "marks": 1,
+      "difficulty": "Medium",
+      "status": "Published"
+    }
+  ]
+}

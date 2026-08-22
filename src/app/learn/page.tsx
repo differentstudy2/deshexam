@@ -1,80 +1,56 @@
 
-import Image from "next/image";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Clock, User, Calendar } from "lucide-react";
-import { ContentBadge } from "@/components/content-badge";
-import { getAllContent } from "@/lib/firebase/firestore";
-import type { Metadata } from 'next';
+import type { Metadata, ResolvingMetadata } from 'next';
+import LearnClientPage from './learn-client';
+import { getAllContent } from '@/lib/firebase/firestore';
 
-export const metadata: Metadata = {
-  title: 'Learn',
-  description: 'Expand your knowledge with our curated collection of in-depth articles and tutorials on a wide range of subjects. Perfect for building a strong foundation.',
-  keywords: ['learn', 'articles', 'tutorials', 'study guides', 'educational content'],
-};
+export async function generateMetadata(
+  {},
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const previousImages = (await parent).openGraph?.images || [];
 
-function getUrlForLearnArticle(articleId: string) {
-  return `/learn/${articleId}`;
+  return {
+    title: 'Learn - In-Depth Articles & Tutorials',
+    description: 'Expand your knowledge with our curated collection of in-depth articles and tutorials on a wide range of subjects. Perfect for building a strong foundation for your exam preparation.',
+    keywords: ['learn', 'articles', 'tutorials', 'study guides', 'educational content', 'exam concepts'],
+    openGraph: {
+      title: 'Learn - In-Depth Articles & Tutorials | DeshExam',
+      description: 'Expand your knowledge with expertly written articles and tutorials.',
+      images: ['https://picsum.photos/seed/learn-og/1200/630', ...previousImages],
+      type: 'website',
+      url: 'https://deshexam.com/learn',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: 'Learn - In-Depth Articles & Tutorials | DeshExam',
+      description: 'Expand your knowledge with expertly written articles and tutorials.',
+      images: ['https://picsum.photos/seed/learn-og/1200/630'],
+    },
+  };
 }
 
+// Helper to make Timestamps serializable
+const serializeTimestamps = (data: any): any => {
+    if (!data) return data;
+    if (Array.isArray(data)) {
+        return data.map(item => serializeTimestamps(item));
+    }
+    if (typeof data === 'object' && data !== null) {
+        if (data.hasOwnProperty('seconds') && data.hasOwnProperty('nanoseconds') && typeof (data as any).toDate === 'function') {
+            return (data as any).toDate().toISOString();
+        }
+        const newObj: { [key: string]: any } = {};
+        for (const key in data) {
+            newObj[key] = serializeTimestamps(data[key]);
+        }
+        return newObj;
+    }
+    return data;
+};
+
 export default async function LearnPage() {
-  const articles = await getAllContent("Learn");
+  const articlesData = await getAllContent("Learn");
+  const initialArticles = serializeTimestamps(articlesData);
 
-  return (
-    <div className="container py-12 md:py-16">
-      <header className="text-center mb-12">
-        <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tighter">Learn</h1>
-        <p className="text-lg text-muted-foreground mt-2 max-w-2xl mx-auto">
-          Expand your knowledge with our curated collection of articles and tutorials.
-        </p>
-      </header>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {articles.map((article) => (
-          <Card key={article.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow">
-            <CardHeader className="p-0 relative">
-              <Image
-                src={`https://picsum.photos/seed/${article.id}/400/225`}
-                alt={article.title}
-                width={400}
-                height={225}
-                className="w-full h-auto object-cover"
-                data-ai-hint={`${article.subject} abstract`}
-              />
-              <div className="absolute top-2 right-2">
-                <ContentBadge type={article.access as "free" | "premium" | "pro"} />
-              </div>
-            </CardHeader>
-            <CardContent className="flex-grow p-4">
-              <p className="text-sm font-medium text-primary">{article.subject}</p>
-              <CardTitle className="font-headline text-lg mt-1 mb-2 leading-snug">{article.title}</CardTitle>
-              <CardDescription>{article.description}</CardDescription>
-              <div className="flex items-center text-sm text-muted-foreground space-x-4 mt-2">
-                <div className="flex items-center gap-1.5">
-                  <User className="w-4 h-4" />
-                  <span>{article.authorName}</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <Calendar className="w-4 h-4" />
-                  <span>{article.createdAt}</span>
-                </div>
-              </div>
-            </CardContent>
-            <CardFooter className="p-4 pt-0">
-              <Button asChild className="w-full">
-                <Link href={getUrlForLearnArticle(article.id)}>Read More</Link>
-              </Button>
-            </CardFooter>
-          </Card>
-        ))}
-        {articles.length === 0 && (
-            <div className="col-span-full text-center py-16">
-                <h3 className="text-xl font-semibold">No articles yet</h3>
-                <p className="text-muted-foreground">Check back soon for new content!</p>
-            </div>
-        )}
-      </div>
-    </div>
-  );
+  return <LearnClientPage initialArticles={initialArticles as any[]} />;
 }

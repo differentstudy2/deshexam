@@ -22,7 +22,7 @@ type TextbookFiltersProps = {
     boards: MetafieldItem[];
     selectedBoard: string;
     onBoardChange: (board: string) => void;
-    schools: string[];
+    schools: MetafieldItem[];
     selectedSchool: string;
     onSchoolChange: (school: string) => void;
 }
@@ -48,19 +48,19 @@ export function TextbookFilters({
 }: TextbookFiltersProps) {
   return (
     <div className="mb-8 p-4 bg-card border rounded-lg">
-      <div className="space-y-4">
-        <div className="relative">
+      <div className="flex flex-wrap gap-4">
+        <div className="relative flex-grow min-w-[240px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input 
-            placeholder="Search by textbook title..." 
+            placeholder="Search textbooks..." 
             className="pl-10 h-10 w-full" 
             value={searchQuery}
             onChange={(e) => onSearchQueryChange(e.target.value)}
           />
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        <div className="flex-grow min-w-[150px]">
             <Select value={selectedBoard} onValueChange={onBoardChange}>
-              <SelectTrigger className="h-10">
+              <SelectTrigger className="h-10 w-full">
                 <SelectValue placeholder="Filter by board" />
               </SelectTrigger>
               <SelectContent>
@@ -70,21 +70,10 @@ export function TextbookFilters({
                 ))}
               </SelectContent>
             </Select>
-
-            <Select value={selectedSchool} onValueChange={onSchoolChange}>
-              <SelectTrigger className="h-10">
-                <SelectValue placeholder="Filter by school" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Schools</SelectItem>
-                {schools.map((school) => (
-                  <SelectItem key={school} value={school}>{school}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
+        </div>
+        <div className="flex-grow min-w-[150px]">
             <Select value={selectedClassCategory} onValueChange={onClassCategoryChange}>
-              <SelectTrigger className="h-10">
+              <SelectTrigger className="h-10 w-full">
                 <SelectValue placeholder="Filter by Class Category" />
               </SelectTrigger>
               <SelectContent>
@@ -94,9 +83,10 @@ export function TextbookFilters({
                 ))}
               </SelectContent>
             </Select>
-
+        </div>
+        <div className="flex-grow min-w-[150px]">
             <Select value={selectedGrade} onValueChange={onGradeChange} disabled={selectedClassCategory === 'all' || grades.length === 0}>
-                <SelectTrigger className="h-10">
+                <SelectTrigger className="h-10 w-full">
                     <SelectValue placeholder="Filter by Grade" />
                 </SelectTrigger>
                 <SelectContent>
@@ -106,9 +96,23 @@ export function TextbookFilters({
                     ))}
                 </SelectContent>
             </Select>
-
+        </div>
+        <div className="flex-grow min-w-[150px]">
+            <Select value={selectedSchool} onValueChange={onSchoolChange} disabled={selectedClassCategory === 'all' || schools.length === 0}>
+              <SelectTrigger className="h-10 w-full">
+                <SelectValue placeholder="Filter by school" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Schools</SelectItem>
+                {schools.map((school) => (
+                  <SelectItem key={school.id} value={school.name}>{school.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+        </div>
+        <div className="flex-grow min-w-[150px]">
             <Select value={selectedSubject} onValueChange={onSubjectChange}>
-              <SelectTrigger className="h-10">
+              <SelectTrigger className="h-10 w-full">
                 <SelectValue placeholder="Filter by subject" />
               </SelectTrigger>
               <SelectContent>

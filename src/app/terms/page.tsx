@@ -1,3 +1,26 @@
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Terms of Service | DeshExam',
+  description: 'Read the terms and conditions for using DeshExam, including user conduct, subscription terms, and intellectual property rights.',
+  keywords: ['terms of service', 'user agreement', 'DeshExam terms', 'legal terms'],
+  openGraph: {
+    title: 'Terms of Service | DeshExam',
+    description: 'Read the terms and conditions for using DeshExam, including user conduct, subscription terms, and intellectual property rights.',
+    url: 'https://deshexam.com/terms',
+    siteName: 'DeshExam',
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Terms of Service | DeshExam',
+    description: 'Read the terms and conditions for using DeshExam, including user conduct, subscription terms, and intellectual property rights.',
+  },
+  alternates: {
+    canonical: 'https://deshexam.com/terms',
+  }
+};
 
 export default function TermsOfServicePage() {
   return (
