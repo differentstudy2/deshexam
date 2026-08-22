@@ -185,18 +185,18 @@ export default async function AssessmentLandingPage({
           </div>
 
           <div className="relative container max-w-6xl mx-auto px-4 pt-6 pb-0">
-            {/* Breadcrumb */}
-            <nav className="flex items-center gap-1.5 text-xs text-slate-400 mb-8">
-              <Link href="/" className="hover:text-white transition-colors">Home</Link>
-              <ChevronRight className="w-3 h-3" />
-              <Link href={basePath} className="hover:text-white transition-colors">{titlePrefix}s</Link>
-              <ChevronRight className="w-3 h-3" />
-              <span className="text-slate-300 truncate max-w-[200px]">{test.title}</span>
-            </nav>
 
-            <div className="flex flex-col lg:flex-row gap-10 items-start">
+            <div className="flex flex-col lg:flex-row gap-10 items-stretch">
               {/* Left: title + meta */}
-              <div className="flex-1 space-y-6 pb-12">
+              <div className="flex-1 space-y-4 py-6">
+                {/* Breadcrumb */}
+                <nav className="flex items-center gap-1.5 text-xs text-slate-400 mb-2">
+                  <Link href="/" className="hover:text-white transition-colors">Home</Link>
+                  <ChevronRight className="w-3 h-3" />
+                  <Link href={basePath} className="hover:text-white transition-colors">{titlePrefix}s</Link>
+                  <ChevronRight className="w-3 h-3" />
+                  <span className="text-slate-300 truncate max-w-[200px]">{test.title}</span>
+                </nav>
                 {/* Badges row */}
                 <div className="flex flex-wrap gap-2">
                   <span className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-300 bg-blue-400/10 border border-blue-400/20 px-3 py-1 rounded-full">
@@ -233,32 +233,32 @@ export default async function AssessmentLandingPage({
                 {/* Academic Details */}
                 {(boardName || className || subjectName || textbookName || chapterName) && (
                   <div className="flex flex-wrap items-center gap-2 text-sm text-slate-300 bg-white/5 p-3 rounded-lg border border-white/10 mt-6 shadow-sm">
-                     <BookOpen className="w-4 h-4 text-emerald-400 mr-1" />
-                     {boardName && <span className="bg-white/10 hover:bg-white/20 transition-colors px-2.5 py-1 rounded-md text-xs font-medium">{boardName}</span>}
-                     {className && (
-                        <>
-                           <ChevronRight className="w-3 h-3 text-slate-500" />
-                           <span className="bg-white/10 hover:bg-white/20 transition-colors px-2.5 py-1 rounded-md text-xs font-medium">{className}</span>
-                        </>
-                     )}
-                     {subjectName && (
-                        <>
-                           <ChevronRight className="w-3 h-3 text-slate-500" />
-                           <span className="bg-white/10 hover:bg-white/20 transition-colors px-2.5 py-1 rounded-md text-xs font-medium">{subjectName}</span>
-                        </>
-                     )}
-                     {textbookName && (
-                        <>
-                           <ChevronRight className="w-3 h-3 text-slate-500" />
-                           <span className="bg-white/10 hover:bg-white/20 transition-colors px-2.5 py-1 rounded-md text-xs font-medium">{textbookName}</span>
-                        </>
-                     )}
-                     {chapterName && (
-                        <>
-                           <ChevronRight className="w-3 h-3 text-slate-500" />
-                           <span className="bg-white/10 hover:bg-white/20 transition-colors px-2.5 py-1 rounded-md text-xs font-medium">{chapterName}</span>
-                        </>
-                     )}
+                    <BookOpen className="w-4 h-4 text-emerald-400 mr-1" />
+                    {boardName && <span className="bg-white/10 hover:bg-white/20 transition-colors px-2.5 py-1 rounded-md text-xs font-medium">{boardName}</span>}
+                    {className && (
+                      <>
+                        <ChevronRight className="w-3 h-3 text-slate-500" />
+                        <span className="bg-white/10 hover:bg-white/20 transition-colors px-2.5 py-1 rounded-md text-xs font-medium">{className}</span>
+                      </>
+                    )}
+                    {subjectName && (
+                      <>
+                        <ChevronRight className="w-3 h-3 text-slate-500" />
+                        <span className="bg-white/10 hover:bg-white/20 transition-colors px-2.5 py-1 rounded-md text-xs font-medium">{subjectName}</span>
+                      </>
+                    )}
+                    {textbookName && (
+                      <>
+                        <ChevronRight className="w-3 h-3 text-slate-500" />
+                        <span className="bg-white/10 hover:bg-white/20 transition-colors px-2.5 py-1 rounded-md text-xs font-medium">{textbookName}</span>
+                      </>
+                    )}
+                    {chapterName && (
+                      <>
+                        <ChevronRight className="w-3 h-3 text-slate-500" />
+                        <span className="bg-white/10 hover:bg-white/20 transition-colors px-2.5 py-1 rounded-md text-xs font-medium">{chapterName}</span>
+                      </>
+                    )}
                   </div>
                 )}
 
@@ -284,17 +284,17 @@ export default async function AssessmentLandingPage({
               </div>
 
               {/* Right: CTA card (desktop — floats into content below) */}
-              <div className="hidden lg:block w-80 shrink-0 -mb-16 relative z-10 group">
+              <div className="hidden lg:block w-80 shrink-0 mb-4 relative z-10 group">
                 <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl shadow-indigo-500/10 dark:shadow-black/40 border border-slate-200/60 dark:border-slate-700/50 overflow-hidden transition-all duration-500 hover:shadow-indigo-500/20 hover:-translate-y-1.5 ring-1 ring-black/5 dark:ring-white/5">
                   {/* Card header */}
                   <div className="bg-gradient-to-br from-indigo-600 via-violet-600 to-purple-700 p-6 relative overflow-hidden">
                     {/* Background decorations */}
                     <div className="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
                     <div className="absolute bottom-0 left-0 -mb-8 -ml-8 w-32 h-32 bg-fuchsia-400/20 rounded-full blur-2xl pointer-events-none"></div>
-                    
+
                     {/* Header shine effect */}
                     <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out"></div>
-                    
+
                     <div className="relative flex items-center gap-4">
                       <div className="w-12 h-12 rounded-xl bg-white/10 border border-white/20 backdrop-blur-md flex items-center justify-center shadow-lg shrink-0">
                         <Brain className="w-6 h-6 text-white drop-shadow-sm" />
@@ -332,7 +332,7 @@ export default async function AssessmentLandingPage({
                   {/* Card Footer */}
                   <div className="px-6 pb-6 pt-4 bg-slate-50/50 dark:bg-slate-800/20 border-t border-slate-100/80 dark:border-slate-800/80">
                     <StartTestButton slug={test.slug} accessType={test.accessType} price={test.price} allowedSubscriptionPlans={test.allowedSubscriptionPlans} testType={collectionName === "mockTests" ? "mock-test" : "quiz"} basePath={basePath} />
-                    
+
                     <div className="mt-4 flex items-center justify-center gap-1.5 text-center text-[11px] font-medium text-slate-500 dark:text-slate-400">
                       <Lock className="w-3 h-3" />
                       <p>Strictly timed · Negative marking applies</p>
@@ -524,24 +524,25 @@ ${test.negativeMarking && test.negativeMarking > 0 ? `* প্রতিটি �
                     const colorClass = gradients[index % gradients.length];
 
                     return (
-                    <div key={index} className="flex items-start gap-3.5 group p-2 hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-xl transition-colors">
-                      <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${colorClass} flex items-center justify-center shadow-md shrink-0 transition-transform group-hover:scale-110 duration-300`}>
-                        <Icon className="w-5 h-5 text-white" />
+                      <div key={index} className="flex items-start gap-3.5 group p-2 hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-xl transition-colors">
+                        <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${colorClass} flex items-center justify-center shadow-md shrink-0 transition-transform group-hover:scale-110 duration-300`}>
+                          <Icon className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-slate-800 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{title}</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">{desc}</p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-sm font-bold text-slate-800 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{title}</p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">{desc}</p>
-                      </div>
-                    </div>
-                  )})}
+                    )
+                  })}
                 </div>
               </div>
 
               {/* Reviews Section */}
-              <MockTestReviews 
-                testId={test.id} 
-                slug={test.slug} 
-                stats={test.reviewStats} 
+              <MockTestReviews
+                testId={test.id}
+                slug={test.slug}
+                stats={test.reviewStats}
                 testTitle={test.title}
                 testType={test.questionType || 'Mock Test'}
                 testLanguage={test.language}
@@ -615,7 +616,7 @@ ${test.negativeMarking && test.negativeMarking > 0 ? `* প্রতিটি �
                     </div>
                   )}
                 </div>
-                
+
                 <div className="mt-6">
                   <TopScorersWidget assessmentId={test.id} />
                 </div>
