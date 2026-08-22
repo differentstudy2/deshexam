@@ -28,6 +28,7 @@ export interface AssessmentBase {
   averageScore?: number;
   questionType?: string;
   questionCount?: number; // Override for hardcoded data where questionIds is empty
+  questions?: any[]; // Full hardcoded questions array for demo tests
 
   questionIds: string[]; // Link to QuestionBankEntry
   difficulty: AssessmentDifficulty;

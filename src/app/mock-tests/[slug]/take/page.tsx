@@ -4,6 +4,7 @@ import { ExamClient } from '@/components/assessment/ExamClient';
 import { getAssessmentBySlug } from '@/lib/firebase/assessment';
 import { getQuestionsByIds } from '@/lib/firebase/question-bank';
 import { MockTest } from '@/lib/assessment-types';
+import { getHardcodedMockTest } from '@/lib/hardcoded-loader';
 
 import { Metadata, ResolvingMetadata } from 'next';
 import { formatTitleForBrowser } from '@/lib/utils';
@@ -13,7 +14,11 @@ export const revalidate = 3600;
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }, parent: ResolvingMetadata): Promise<Metadata> {
   const { slug } = await params;
-  const test = await getAssessmentBySlug('mockTests', slug) as MockTest | null;
+  let test = await getAssessmentBySlug('mockTests', slug) as MockTest | null;
+  
+  if (!test) {
+    test = getHardcodedMockTest(slug) as MockTest | null;
+  }
   
   if (!test) {
     return { title: 'Exam Environment - DeshExam' };

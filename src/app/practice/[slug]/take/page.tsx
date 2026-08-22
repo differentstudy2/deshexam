@@ -4,6 +4,7 @@ import { ExamClient, ExamConfig } from '@/components/assessment/ExamClient';
 import { getAssessmentBySlug, getAssessment } from '@/lib/firebase/assessment';
 import { getQuestionsByIds } from '@/lib/firebase/question-bank';
 import { PracticeSet } from '@/lib/assessment-types';
+import { getHardcodedPracticeSet } from '@/lib/hardcoded-loader';
 import { Metadata, ResolvingMetadata } from 'next';
 import { formatTitleForBrowser } from '@/lib/utils';
 
@@ -11,15 +12,19 @@ type Props = {
   params: Promise<{ slug: string }>;
 };
 
-export async function generateMetadata({ params }: Props, parent: ResolvingMetadata): Promise<Metadata> {
-  const resolvedParams = await params;
-  const slug = resolvedParams.slug;
-  const set = await getAssessmentBySlug('practiceSets', slug) as PracticeSet | null;
-  if (!set) {
-    return { title: 'Practice Set Not Found' };
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }, parent: ResolvingMetadata): Promise<Metadata> {
+  const { slug } = await params;
+  let test = await getAssessmentBySlug('practiceSets', slug) as PracticeSet | null;
+
+  if (!test) {
+    test = getHardcodedPracticeSet(slug) as PracticeSet | null;
+  }
+  
+  if (!test) {
+    return { title: 'Practice Environment - DeshExam' };
   }
   return {
-    title: `Taking: ${formatTitleForBrowser(set.title)} | DeshExam`,
+    title: `Taking: ${formatTitleForBrowser(test.title)} | DeshExam`,
     robots: { index: false, follow: false },
   };
 }

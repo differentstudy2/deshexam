@@ -4,6 +4,7 @@ import { ExamClient, ExamConfig } from '@/components/assessment/ExamClient';
 import { getAssessmentBySlug, getAssessment, AssessmentCollectionType } from '@/lib/firebase/assessment';
 import { getTaxonomyNodeById } from '@/lib/firebase/taxonomy';
 import { getQuestionsByIds } from '@/lib/firebase/question-bank';
+import { getHardcodedMockTest, getHardcodedQuiz, getHardcodedPracticeSet } from '@/lib/hardcoded-loader';
 
 interface GlobalTakePageProps {
   collectionName: AssessmentCollectionType;
@@ -25,12 +26,24 @@ export async function GlobalTakePage({ collectionName, slug }: GlobalTakePagePro
     assessment = await getAssessment(collectionName, slug);
   }
 
+  // If not found in Firebase, fallback to Hardcoded
+  if (!assessment) {
+    if (collectionName === 'mockTests') assessment = getHardcodedMockTest(slug);
+    else if (collectionName === 'quizzes') assessment = getHardcodedQuiz(slug);
+    else if (collectionName === 'practiceSets') assessment = getHardcodedPracticeSet(slug);
+  }
+
   if (!assessment) {
     notFound();
   }
 
-  const questionIds = assessment.questionIds || [];
-  const rawQuestions = await getCachedQuestions(questionIds);
+  let rawQuestions: any[] = [];
+  if (assessment.questions && Array.isArray(assessment.questions) && assessment.questions.length > 0) {
+    rawQuestions = assessment.questions;
+  } else {
+    const questionIds = assessment.questionIds || [];
+    rawQuestions = await getCachedQuestions(questionIds);
+  }
 
   let taxonomyParts: string[] = [];
   if (assessment.boardId) { const node = await getTaxonomyNodeById(assessment.boardId); if (node) taxonomyParts.push(node.acronym || node.title); }
