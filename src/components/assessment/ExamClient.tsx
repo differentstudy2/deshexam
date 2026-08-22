@@ -219,6 +219,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
 
     getUserProfile(user.uid).then(profile => {
       const userPlan = profile?.subscriptionPlan || null;
+      const isAdmin = profile?.role === 'admin' || profile?.isAdmin === true;
       setIsPremiumUser(userPlan === 'pro' || userPlan === 'pass');
 
       if (mockTest.accessType === 'free' || !mockTest.accessType) {
@@ -229,6 +230,12 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
             if (count >= mockTest.attemptsAllowed!) setAttemptsExceeded(true);
           }).catch(console.error);
         }
+        return;
+      }
+
+      // Admin always has full access to all content
+      if (isAdmin) {
+        setHasAccess(true);
         return;
       }
 
@@ -246,6 +253,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
       }
 
       setHasAccess(accessGranted);
+
 
       if (accessGranted && mockTest.attemptsAllowed && mockTest.attemptsAllowed > 0) {
         // Enforce attempts for logged-in user
@@ -274,7 +282,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
   useEffect(() => {
     if (isSubmitted || !hasStarted) return;
     const timer = setInterval(() => {
-      setTimeLeft(prev => {
+      setTimeLeft((prev: number) => {
         if (prev <= 1) {
           clearInterval(timer);
           handleSubmit();
@@ -1362,7 +1370,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                         });
                       })()}
                     </div>
-                    <button onClick={() => { if (currentQuestionIndex < questions.length - 1) setCurrentQuestionIndex(prev => prev + 1); }} disabled={currentQuestionIndex === questions.length - 1} className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-30 shadow-sm border border-slate-200 dark:border-slate-600 transition-colors"><ArrowLeft className="w-4 h-4 rotate-180" /></button>
+                    <button onClick={() => { if (currentQuestionIndex < questions.length - 1) setCurrentQuestionIndex((prev: number) => prev + 1); }} disabled={currentQuestionIndex === questions.length - 1} className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-30 shadow-sm border border-slate-200 dark:border-slate-600 transition-colors"><ArrowLeft className="w-4 h-4 rotate-180" /></button>
                   </div>
                 </div>
               </div>
@@ -1560,7 +1568,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                         </button>
                       )}
                       <button
-                        onClick={() => { if (currentQuestionIndex < questions.length - 1) setCurrentQuestionIndex(prev => prev + 1); }}
+                        onClick={() => { if (currentQuestionIndex < questions.length - 1) setCurrentQuestionIndex((prev: number) => prev + 1); }}
                         disabled={currentQuestionIndex === questions.length - 1}
                         className="h-10 px-6 rounded-full bg-slate-800 hover:bg-slate-700 text-white font-bold flex items-center gap-1.5 whitespace-nowrap shadow-sm transition-colors text-sm disabled:opacity-50"
                       >

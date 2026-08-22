@@ -34,6 +34,7 @@ export function StartTestButton({ slug, accessType = 'free', price = 0, allowedS
   
   const [userPlan, setUserPlan] = useState<string | null>(null);
   const [purchasedTests, setPurchasedTests] = useState<string[]>([]);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [profileLoading, setProfileLoading] = useState(true);
   
   const [isStarting, setIsStarting] = useState(false);
@@ -49,6 +50,7 @@ export function StartTestButton({ slug, accessType = 'free', price = 0, allowedS
     getUserProfile(user.uid).then(profile => {
       setUserPlan(profile?.subscriptionPlan || null);
       setPurchasedTests(profile?.purchasedTests || []);
+      setIsAdmin(profile?.role === 'admin' || profile?.isAdmin === true);
     }).catch(console.error).finally(() => {
       setProfileLoading(false);
     });
@@ -56,6 +58,7 @@ export function StartTestButton({ slug, accessType = 'free', price = 0, allowedS
 
   const hasAccess = () => {
     if (accessType === 'free') return true;
+    if (isAdmin) return true; // Admin always has full access to all content
     if (userPlan === 'pro') return true;
     
     if (accessType === 'subscription' || accessType === 'both') {
