@@ -120,7 +120,7 @@ export function AssessmentCard({ assessment, type, href, taxonomyString }: Asses
         <div className="grid grid-cols-2 gap-2 text-sm w-full">
           <div className="flex items-center justify-center gap-1.5 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 px-2.5 py-1.5 rounded-md font-medium text-xs border border-indigo-100 dark:border-indigo-800/50">
             <ListChecks className="w-3.5 h-3.5 shrink-0" />
-            <span className="truncate">{assessment.questionIds?.length || 0} Qs</span>
+            <span className="truncate">{assessment.questionCount ?? assessment.questionIds?.length ?? 0} Qs</span>
           </div>
           {/* Unified Time display */}
           {((assessment as any).durationMin || (assessment as any).timeLimitMin || (assessment as any).estimatedTimeMin) && (

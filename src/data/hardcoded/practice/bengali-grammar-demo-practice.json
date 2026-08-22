@@ -7,6 +7,7 @@
   "difficulty": "Medium",
   "language": "Bengali",
   "questionType": "MCQ",
+  "questionCount": 30,
   "questionIds": [],
   "durationMin": 30,
   "totalMarks": 30,

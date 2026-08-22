@@ -27,6 +27,7 @@ export interface AssessmentBase {
   attemptCount?: number;
   averageScore?: number;
   questionType?: string;
+  questionCount?: number; // Override for hardcoded data where questionIds is empty
 
   questionIds: string[]; // Link to QuestionBankEntry
   difficulty: AssessmentDifficulty;

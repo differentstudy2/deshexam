@@ -12,7 +12,7 @@ interface FeaturedMockTestCardProps {
 
 export function FeaturedMockTestCard({ mockTest, baseHref }: FeaturedMockTestCardProps) {
   // Safe fallbacks for properties that might not exist in old data
-  const attemptsCount = (mockTest as any).attemptsCount || 0;
+  const attemptsCount = mockTest.attemptCount || (mockTest as any).attemptsCount || 0;
   const viewsCount = (mockTest as any).viewsCount || 0;
   
   // Real data popularity calculation
@@ -72,7 +72,7 @@ export function FeaturedMockTestCard({ mockTest, baseHref }: FeaturedMockTestCar
         <div className="grid grid-cols-2 gap-y-3 gap-x-2 mb-6">
           <div className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400 font-medium">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
-            <span>{mockTest.questionIds?.length || 0} Questions</span>
+            <span>{mockTest.questionCount ?? mockTest.questionIds?.length ?? 0} Questions</span>
           </div>
           <div className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400 font-medium">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>

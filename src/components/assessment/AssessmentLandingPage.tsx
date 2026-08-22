@@ -265,7 +265,7 @@ export default async function AssessmentLandingPage({
                 {/* Stats strip */}
                 <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-3">
                   {[
-                    { icon: HelpCircle, label: `${test.questionIds?.length ?? 0} Questions`, color: 'text-blue-400', borderHover: 'hover:border-blue-500/30', bgHover: 'hover:bg-blue-500/10', show: true },
+                    { icon: HelpCircle, label: `${test.questionCount ?? test.questionIds?.length ?? 0} Questions`, color: 'text-blue-400', borderHover: 'hover:border-blue-500/30', bgHover: 'hover:bg-blue-500/10', show: true },
                     { icon: Clock, label: `${test.durationMin ?? 0} Minutes`, color: 'text-violet-400', borderHover: 'hover:border-violet-500/30', bgHover: 'hover:bg-violet-500/10', show: true },
                     { icon: FileText, label: `${test.totalMarks ?? 0} Marks`, color: 'text-amber-400', borderHover: 'hover:border-amber-500/30', bgHover: 'hover:bg-amber-500/10', show: true },
                     { icon: AlertTriangle, label: `${test.negativeMarking ?? 0} Negative`, color: 'text-red-400', borderHover: 'hover:border-red-500/30', bgHover: 'hover:bg-red-500/10', show: !!test.negativeMarking && test.negativeMarking > 0 },
@@ -313,7 +313,7 @@ export default async function AssessmentLandingPage({
                   {/* Card body */}
                   <div className="px-6 py-5 space-y-3.5">
                     {[
-                      { icon: HelpCircle, label: 'Questions', value: `${test.questionIds?.length ?? 0}`, show: true },
+                      { icon: HelpCircle, label: 'Questions', value: `${test.questionCount ?? test.questionIds?.length ?? 0}`, show: true },
                       { icon: Clock, label: 'Duration', value: `${test.durationMin ?? 0} min`, show: true },
                       { icon: Target, label: 'Total Marks', value: `${test.totalMarks ?? 0}`, show: true },
                       { icon: CheckCircle2, label: 'Passing Marks', value: `${test.passingMarks ?? 0}`, show: true },
@@ -356,7 +356,7 @@ export default async function AssessmentLandingPage({
               {/* Quick facts strip */}
               <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-3">
                 {[
-                  { icon: HelpCircle, label: 'Questions', value: `${test.questionIds?.length ?? 0}`, color: 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-400' },
+                  { icon: HelpCircle, label: 'Questions', value: `${test.questionCount ?? test.questionIds?.length ?? 0}`, color: 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-400' },
                   { icon: Clock, label: 'Duration', value: `${test.durationMin ?? 0} min`, color: 'bg-violet-50 dark:bg-violet-900/20 border-violet-200 dark:border-violet-800 text-violet-700 dark:text-violet-400' },
                   { icon: Award, label: 'Total Marks', value: `${test.totalMarks ?? 0}`, color: 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400' },
                   { icon: Target, label: 'Pass Marks', value: `${test.passingMarks ?? 0}`, color: 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400' },
