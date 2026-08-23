@@ -75,7 +75,11 @@ export default function AddTextbookPage() {
 
   const availableBoards = allNodes.filter(n => n.type === 'board');
   const availableClasses = boardId && boardId !== 'none' ? allNodes.filter(n => n.type === 'class' && n.parentId === boardId) : allNodes.filter(n => n.type === 'class');
-  const availableSubjects = allNodes.filter(n => n.type === 'subject' && n.parentId === classId);
+  const availableSubjects = classId && classId !== 'none' 
+    ? allNodes.filter(n => n.type === 'subject' && n.parentId === classId)
+    : boardId && boardId !== 'none'
+      ? allNodes.filter(n => n.type === 'subject' && n.parentId === boardId)
+      : allNodes.filter(n => n.type === 'subject');
 
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -125,15 +129,11 @@ export default function AddTextbookPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-slate-950 -m-4 sm:-m-6 md:-m-8 pb-20 relative overflow-hidden font-sans">
-      {/* Decorative Background Elements */}
-      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-br from-indigo-500/10 to-purple-500/5 blur-[100px] rounded-full pointer-events-none transform translate-x-1/3 -translate-y-1/4"></div>
-      <div className="absolute top-40 left-0 w-[500px] h-[500px] bg-gradient-to-tr from-emerald-500/10 to-teal-500/5 blur-[100px] rounded-full pointer-events-none transform -translate-x-1/2 opacity-60"></div>
-
+    <div className="font-sans pb-10">
       {/* Top Navigation Bar */}
-      <div className="sticky top-0 z-50 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-800/50 px-4 sm:px-8 h-16 flex items-center justify-between shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div className="flex items-center gap-4">
-          <Button asChild variant="ghost" size="icon" className="h-9 w-9 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+          <Button asChild variant="outline" size="icon" className="h-9 w-9 rounded-full transition-colors">
             <Link href="/admin/textbook">
               <ArrowLeft className="h-4 w-4" />
             </Link>
@@ -142,11 +142,11 @@ export default function AddTextbookPage() {
             <div className="p-1.5 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg shadow-sm">
               <BookPlus className="w-4 h-4 text-white" />
             </div>
-            <span className="text-lg">Create Textbook</span>
+            <span className="text-xl">Create Textbook</span>
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <Button type="button" variant="ghost" asChild className="h-9 text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100">
+          <Button type="button" variant="ghost" asChild className="h-9 text-sm font-medium">
             <Link href="/admin/textbook">Cancel</Link>
           </Button>
           <Button onClick={handleSubmit} disabled={!title.trim() || isSaving} className="h-9 bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-500/20 text-sm font-medium rounded-lg px-6 transition-all active:scale-95">
@@ -156,8 +156,8 @@ export default function AddTextbookPage() {
         </div>
       </div>
 
-      <div className="p-4 sm:p-6 lg:p-8 max-w-[1200px] mx-auto mt-4">
-        <form onSubmit={handleSubmit} className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
+      <div className="w-full">
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-start">
           
           {/* Main Content (Left Column) */}
           <motion.div 
@@ -167,7 +167,7 @@ export default function AddTextbookPage() {
               hidden: { opacity: 0 },
               show: { opacity: 1, transition: { staggerChildren: 0.1 } }
             }}
-            className="w-full lg:w-[68%] space-y-6"
+            className="lg:col-span-2 space-y-6"
           >
             
             {/* Title & Permalink */}
@@ -233,24 +233,24 @@ export default function AddTextbookPage() {
             {/* SEO & Meta Settings */}
             <motion.div variants={FADE_UP_ANIMATION_VARIANTS}>
               <Card className="border-slate-200/60 dark:border-slate-800/60 shadow-sm rounded-2xl overflow-hidden bg-white dark:bg-slate-900">
-                <CardHeader className="border-b border-slate-100 dark:border-slate-800/50 bg-slate-50/50 dark:bg-slate-800/20 px-6 py-4">
+                <CardHeader className="border-b border-slate-100 dark:border-slate-800/50 bg-slate-50/50 dark:bg-slate-800/20 px-4 py-3">
                   <CardTitle className="text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2">
                     <Settings2 className="w-4 h-4 text-indigo-500" />
                     SEO & Meta Metadata
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="p-6 space-y-6">
+                <CardContent className="p-4 space-y-4">
                   <div className="space-y-2">
                     <Label className="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-400">
                       <Tag className="w-3.5 h-3.5" /> Tags
                     </Label>
-                    <Input value={tags} onChange={(e) => setTags(e.target.value)} placeholder="e.g. math, science (comma separated)" className="h-11 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800" />
+                    <Input value={tags} onChange={(e) => setTags(e.target.value)} placeholder="e.g. math, science (comma separated)" className="h-9 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800" />
                   </div>
                   <div className="space-y-2">
                     <Label className="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-400">
                       <Search className="w-3.5 h-3.5" /> Focus Keywords
                     </Label>
-                    <Input value={keywords} onChange={(e) => setKeywords(e.target.value)} placeholder="e.g. class 10 math, board exam (comma separated)" className="h-11 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800" />
+                    <Input value={keywords} onChange={(e) => setKeywords(e.target.value)} placeholder="e.g. class 10 math, board exam (comma separated)" className="h-9 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800" />
                   </div>
                 </CardContent>
               </Card>
@@ -265,30 +265,30 @@ export default function AddTextbookPage() {
               hidden: { opacity: 0 },
               show: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.2 } }
             }}
-            className="w-full lg:w-[32%] space-y-6 lg:sticky lg:top-24"
+            className="space-y-6 lg:sticky lg:top-8"
           >
             
             {/* Publish Status Card */}
             <motion.div variants={FADE_UP_ANIMATION_VARIANTS}>
               <Card className="border-slate-200/60 dark:border-slate-800/60 shadow-sm rounded-2xl overflow-hidden bg-white dark:bg-slate-900">
-                <CardHeader className="border-b border-slate-100 dark:border-slate-800/50 bg-slate-50/50 dark:bg-slate-800/20 px-6 py-4">
+                <CardHeader className="border-b border-slate-100 dark:border-slate-800/50 bg-slate-50/50 dark:bg-slate-800/20 px-4 py-3">
                   <CardTitle className="text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2">
                     <Save className="w-4 h-4 text-indigo-500" />
                     Publish
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="p-6 space-y-4">
+                <CardContent className="p-4 space-y-3">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-slate-600 dark:text-slate-400 font-medium">Status:</span>
-                    <span className="font-semibold text-amber-600 bg-amber-50 dark:bg-amber-900/30 px-2.5 py-1 rounded-md border border-amber-100 dark:border-amber-800/50">Draft</span>
+                    <span className="text-slate-600 dark:text-slate-400 font-medium text-xs">Status:</span>
+                    <span className="font-semibold text-amber-600 bg-amber-50 dark:bg-amber-900/30 px-2 py-0.5 text-xs rounded-md border border-amber-100 dark:border-amber-800/50">Draft</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-slate-600 dark:text-slate-400 font-medium">Visibility:</span>
-                    <span className="font-semibold text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 px-2.5 py-1 rounded-md border border-emerald-100 dark:border-emerald-800/50">Public</span>
+                    <span className="text-slate-600 dark:text-slate-400 font-medium text-xs">Visibility:</span>
+                    <span className="font-semibold text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-0.5 text-xs rounded-md border border-emerald-100 dark:border-emerald-800/50">Public</span>
                   </div>
                 </CardContent>
-                <div className="p-4 bg-slate-50/80 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex justify-end">
-                  <Button onClick={handleSubmit} disabled={!title.trim() || isSaving} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm font-medium h-10 rounded-lg">
+                <div className="p-3 bg-slate-50/80 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+                  <Button onClick={handleSubmit} disabled={!title.trim() || isSaving} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm font-medium h-9 rounded-lg text-sm">
                     {isSaving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                     {isSaving ? 'Publishing...' : 'Publish Textbook'}
                   </Button>
@@ -299,13 +299,13 @@ export default function AddTextbookPage() {
             {/* Feature Image */}
             <motion.div variants={FADE_UP_ANIMATION_VARIANTS}>
               <Card className="border-slate-200/60 dark:border-slate-800/60 shadow-sm rounded-2xl overflow-hidden bg-white dark:bg-slate-900">
-                <CardHeader className="border-b border-slate-100 dark:border-slate-800/50 bg-slate-50/50 dark:bg-slate-800/20 px-6 py-4">
+                <CardHeader className="border-b border-slate-100 dark:border-slate-800/50 bg-slate-50/50 dark:bg-slate-800/20 px-4 py-3">
                   <CardTitle className="text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2">
                     <ImageIcon className="w-4 h-4 text-indigo-500" />
                     Cover Image
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="p-5 space-y-4 text-center">
+                <CardContent className="p-4 space-y-3 text-center">
                   {featureImage ? (
                     <div className="relative rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 group shadow-sm">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -342,7 +342,7 @@ export default function AddTextbookPage() {
                   )}
                   <div className="space-y-1.5 text-left pt-3 border-t border-slate-100 dark:border-slate-800">
                     <Label className="text-xs font-semibold text-slate-500 dark:text-slate-400">Or Paste Image URL</Label>
-                    <Input value={featureImage} onChange={(e) => setFeatureImage(e.target.value)} placeholder="https://..." className="h-10 text-sm bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800" />
+                    <Input value={featureImage} onChange={(e) => setFeatureImage(e.target.value)} placeholder="https://..." className="h-9 text-sm bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800" />
                   </div>
                 </CardContent>
               </Card>
@@ -351,24 +351,24 @@ export default function AddTextbookPage() {
             {/* Book Details */}
             <motion.div variants={FADE_UP_ANIMATION_VARIANTS}>
               <Card className="border-slate-200/60 dark:border-slate-800/60 shadow-sm rounded-2xl overflow-hidden bg-white dark:bg-slate-900">
-                <CardHeader className="border-b border-slate-100 dark:border-slate-800/50 bg-slate-50/50 dark:bg-slate-800/20 px-6 py-4">
+                <CardHeader className="border-b border-slate-100 dark:border-slate-800/50 bg-slate-50/50 dark:bg-slate-800/20 px-4 py-3">
                   <CardTitle className="text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2">
                     <BookOpen className="w-4 h-4 text-indigo-500" />
                     Book Info
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="p-6 space-y-5">
+                <CardContent className="p-4 space-y-4">
                   <div className="space-y-2">
                     <Label className="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-400">
                       <User className="w-3.5 h-3.5" /> Author / Publisher
                     </Label>
-                    <Input value={author} onChange={(e) => setAuthor(e.target.value)} placeholder="e.g. Dr. Jafar Iqbal, NCTB" className="h-11 text-sm bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800" />
+                    <Input value={author} onChange={(e) => setAuthor(e.target.value)} placeholder="e.g. Dr. Jafar Iqbal, NCTB" className="h-9 text-sm bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800" />
                   </div>
                   <div className="space-y-2">
                     <Label className="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-400">
                       <Languages className="w-3.5 h-3.5" /> Language / Medium
                     </Label>
-                    <Input value={language} onChange={(e) => setLanguage(e.target.value)} placeholder="e.g. Bangla, English" className="h-11 text-sm bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800" />
+                    <Input value={language} onChange={(e) => setLanguage(e.target.value)} placeholder="e.g. Bangla, English" className="h-9 text-sm bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800" />
                   </div>
                 </CardContent>
               </Card>
@@ -377,17 +377,17 @@ export default function AddTextbookPage() {
             {/* Hierarchy Selection */}
             <motion.div variants={FADE_UP_ANIMATION_VARIANTS}>
               <Card className="border-slate-200/60 dark:border-slate-800/60 shadow-sm rounded-2xl overflow-hidden bg-white dark:bg-slate-900">
-                <CardHeader className="border-b border-slate-100 dark:border-slate-800/50 bg-slate-50/50 dark:bg-slate-800/20 px-6 py-4">
+                <CardHeader className="border-b border-slate-100 dark:border-slate-800/50 bg-slate-50/50 dark:bg-slate-800/20 px-4 py-3">
                   <CardTitle className="text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2">
                     <BookPlus className="w-4 h-4 text-indigo-500" />
                     Taxonomy Mapping
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="p-6 space-y-5">
+                <CardContent className="p-4 space-y-4">
                   <div className="space-y-2">
                     <Label className="text-xs font-semibold text-slate-600 dark:text-slate-400">Board / Curriculum</Label>
                     <Select value={boardId} onValueChange={(val) => { setBoardId(val); setClassId(''); setSubjectId(''); }}>
-                      <SelectTrigger className="h-11 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800">
+                      <SelectTrigger className="h-9 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800">
                         <SelectValue placeholder="Select Board (Optional)" />
                       </SelectTrigger>
                       <SelectContent>
@@ -404,7 +404,7 @@ export default function AddTextbookPage() {
                   <div className="space-y-2">
                     <Label className="text-xs font-semibold text-slate-600 dark:text-slate-400">Class / Level</Label>
                     <Select value={classId} onValueChange={(val) => { setClassId(val); setSubjectId(''); }}>
-                      <SelectTrigger className="h-11 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800">
+                      <SelectTrigger className="h-9 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800">
                         <SelectValue placeholder="Select Class (Optional)" />
                       </SelectTrigger>
                       <SelectContent>
@@ -418,8 +418,8 @@ export default function AddTextbookPage() {
 
                   <div className="space-y-2">
                     <Label className="text-xs font-semibold text-slate-600 dark:text-slate-400">Subject</Label>
-                    <Select disabled={!classId} value={subjectId} onValueChange={setSubjectId}>
-                      <SelectTrigger className="h-11 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800">
+                    <Select value={subjectId} onValueChange={setSubjectId}>
+                      <SelectTrigger className="h-9 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800">
                         <SelectValue placeholder="Select Subject (Optional)" />
                       </SelectTrigger>
                       <SelectContent>
