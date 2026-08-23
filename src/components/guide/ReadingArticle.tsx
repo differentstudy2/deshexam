@@ -83,7 +83,7 @@ export function ReadingArticle({ data, node, hierarchy, navigation, contentType 
 
   const renderLegacyContent = () => (
     <div className="bg-white dark:bg-slate-900 shadow-sm border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden">
-      <div className="bg-[#f2f9f6] dark:bg-emerald-900/10 px-6 py-4 sm:py-5 border-b border-emerald-100/50 dark:border-slate-800">
+      <div className="bg-[#f2f9f6] dark:bg-emerald-900/10 px-2 py-2 sm:py-2 border-b border-emerald-100/50 dark:border-slate-800">
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="flex-1 w-full">
             <div className="flex flex-wrap items-baseline gap-2 mb-1">
@@ -116,17 +116,17 @@ export function ReadingArticle({ data, node, hierarchy, navigation, contentType 
               </p>
             )}
           </div>
-          <div className="flex items-center gap-4 text-[#6b8c80] print:hidden shrink-0">
-            <div className="flex items-center gap-1.5 text-[15px] font-medium mr-1">
+          <div className="flex items-center gap-1.5 text-[#6b8c80] print:hidden shrink-0">
+            <div className="flex items-center justify-center gap-1.5 text-[14px] font-medium px-2 h-8">
               <Eye className="w-[18px] h-[18px]" />
               {viewCount}
             </div>
             <button
               onClick={() => window.print()}
-              className="hover:text-[#1b3d36] transition-colors p-1.5"
+              className="w-8 h-8 flex items-center justify-center rounded-md hover:text-[#1b3d36] hover:bg-emerald-50 dark:hover:bg-slate-800 transition-colors"
               title="Print"
             >
-              <Printer className="w-[20px] h-[20px] stroke-[1.5]" />
+              <Printer className="w-[18px] h-[18px] stroke-[1.5]" />
             </button>
             <button
               onClick={() => {
@@ -137,15 +137,15 @@ export function ReadingArticle({ data, node, hierarchy, navigation, contentType 
                   alert('Link copied to clipboard!');
                 }
               }}
-              className="hover:text-[#1b3d36] transition-colors p-1.5"
+              className="w-8 h-8 flex items-center justify-center rounded-md hover:text-[#1b3d36] hover:bg-emerald-50 dark:hover:bg-slate-800 transition-colors"
               title="Share"
             >
-              <Share2 className="w-[20px] h-[20px] stroke-[1.5]" />
+              <Share2 className="w-[18px] h-[18px] stroke-[1.5]" />
             </button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="bg-white dark:bg-slate-800 rounded-md p-1.5 hover:text-[#1b3d36] hover:bg-slate-50 shadow-sm border border-slate-200/80 dark:border-slate-700 transition-colors ml-2">
-                  <MoreVertical className="w-5 h-5 stroke-[1.5]" />
+                <button className="w-8 h-8 flex items-center justify-center bg-white dark:bg-slate-800 rounded-md hover:text-[#1b3d36] hover:bg-emerald-50 shadow-sm border border-slate-200/80 dark:border-slate-700 transition-colors ml-1">
+                  <MoreVertical className="w-[18px] h-[18px] stroke-[1.5]" />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48 bg-white dark:bg-slate-900">
@@ -421,7 +421,7 @@ export function ReadingArticle({ data, node, hierarchy, navigation, contentType 
 
                 </div>
 
-                <div className="flex items-center gap-4 text-[#6b8c80] print:hidden shrink-0">
+                <div className="flex items-center text-[#6b8c80] print:hidden shrink-0">
                   <div className="flex items-center gap-1.5 text-[15px] font-medium mr-1">
                     <Eye className="w-[18px] h-[18px]" />
                     {viewCount}
@@ -510,13 +510,13 @@ export function ReadingArticle({ data, node, hierarchy, navigation, contentType 
               // Support both standard URL contentType and legacy ?section= params
               const sectionQuery = searchParams ? searchParams.get('section') : null;
               const contentSectionId = contentType ? contentType.replace(/-/g, '_') : null;
-              
+
               if (contentSectionId || sectionQuery) {
                 const activeId = contentSectionId || sectionQuery;
                 const sectionToRender = data.sections.find(s => s.id === activeId) || data.sections[0];
                 return sectionToRender ? renderSection(sectionToRender, 0) : null;
               }
-              
+
               return data.sections.map((sec, idx) => renderSection(sec, idx));
             })()}
 
