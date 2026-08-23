@@ -42,14 +42,14 @@ export function CurriculumTree({ curriculum }: CurriculumTreeProps) {
         return (
           <div key={`${chapter.id}-${cIdx}`} className="flex flex-col mb-0">
             {/* Chapter Row */}
-            <div 
+            <div
               className={cn(
-                "flex items-center justify-between py-3 px-2 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group border-b border-slate-100 dark:border-slate-800"
+                "flex items-center justify-between py-2 px-2 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group border-b border-slate-100 dark:border-slate-800"
               )}
             >
               <div className="flex items-center gap-2 flex-1">
-                <div 
-                  onClick={() => toggleChapter(chapter.id)} 
+                <div
+                  onClick={() => toggleChapter(chapter.id)}
                   className="cursor-pointer p-1 rounded-md hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-colors"
                 >
                   <ChevronsRight className={cn(
@@ -64,9 +64,9 @@ export function CurriculumTree({ curriculum }: CurriculumTreeProps) {
                 </Link>
               </div>
               <div className="flex items-center gap-2">
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
+                <Button
+                  variant="ghost"
+                  size="icon"
                   className="h-8 w-8 text-blue-500 hover:text-blue-600 hover:bg-blue-50 bg-blue-50/50 dark:bg-blue-900/20 dark:hover:bg-blue-900/40 rounded-sm"
                   onClick={() => toggleChapter(chapter.id)}
                 >
@@ -94,9 +94,9 @@ export function CurriculumTree({ curriculum }: CurriculumTreeProps) {
                 {chapter.topics.map((topic, tIdx) => {
                   return (
                     <div key={`${topic.id}-${cIdx}-${tIdx}`} className="flex flex-col">
-                      
+
                       {/* Topic Row */}
-                      <div 
+                      <div
                         className="flex items-center justify-between py-3 pl-8 pr-2 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border-b border-dashed border-slate-200 dark:border-slate-800 group"
                       >
                         {(!topic.subtopics || topic.subtopics.length === 0) ? (
@@ -135,12 +135,12 @@ export function CurriculumTree({ curriculum }: CurriculumTreeProps) {
                       {topic.subtopics && topic.subtopics.length > 0 && (
                         <div className="flex flex-col">
                           {topic.subtopics.map((subtopic, sIdx) => (
-                            <div 
-                              key={`${subtopic.id}-${cIdx}-${tIdx}-${sIdx}`} 
+                            <div
+                              key={`${subtopic.id}-${cIdx}-${tIdx}-${sIdx}`}
                               className="flex items-center justify-between py-3 pl-16 pr-2 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border-b border-dashed border-slate-200 dark:border-slate-800 group"
                             >
-                              <Link 
-                                href={`/guide/${subtopic.id}`} 
+                              <Link
+                                href={`/guide/${subtopic.id}`}
                                 className="flex items-center gap-3 cursor-pointer hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
                               >
                                 <CircleDot className="w-[14px] h-[14px] text-slate-600 dark:text-slate-400" strokeWidth={3} />
@@ -167,7 +167,7 @@ export function CurriculumTree({ curriculum }: CurriculumTreeProps) {
                           ))}
                         </div>
                       )}
-                      
+
                     </div>
                   );
                 })}
