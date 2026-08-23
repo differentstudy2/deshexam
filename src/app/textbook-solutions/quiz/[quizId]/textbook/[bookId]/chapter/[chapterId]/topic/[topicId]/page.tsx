@@ -38,26 +38,26 @@ const serializeFirestoreTimestamps = (data: any): any => {
     return data;
 };
 
-async function getPageData(params: PageProps['params']) {
-    const { quizId, bookId, chapterId, topicId } = await params;
+async function getPageData(params: { quizId: string; bookId: string; chapterId: string; topicId: string; }) {
+    const { quizId, bookId, chapterId, topicId } = params;
     try {
         const quiz = await getContentById(quizId);
         const textbook = await getContentById(bookId);
         const chapterRef = doc(db, `textbooks/${bookId}/chapters`, chapterId);
         const chapterSnap = await getDoc(chapterRef);
-        const chapter = chapterSnap.exists() ? { id: chapterSnap.id, ...chapterSnap.data() as Chapter } : null;
+        const chapter = chapterSnap.exists() ? ({ ...chapterSnap.data(), id: chapterSnap.id } as unknown as Chapter) : null;
 
         let topic: Topic | null = null;
         if(topicId !== 'null') {
             const topicRef = doc(db, `textbooks/${bookId}/chapters/${chapterId}/topics`, topicId);
             const topicSnap = await getDoc(topicRef);
             if(topicSnap.exists()) {
-                topic = { id: topicSnap.id, ...topicSnap.data() as Topic };
+                topic = ({ ...topicSnap.data(), id: topicSnap.id } as unknown as Topic);
             }
         }
         
         return { 
-            quiz: serializeFirestoreTimestamps(quiz),
+            quiz: serializeFirestoreTimestamps(quiz), 
             textbook: serializeFirestoreTimestamps(textbook), 
             chapter: serializeFirestoreTimestamps(chapter), 
             topic: serializeFirestoreTimestamps(topic) 
@@ -70,7 +70,7 @@ async function getPageData(params: PageProps['params']) {
 
 export async function generateMetadata(props: PageProps, parent: ResolvingMetadata): Promise<Metadata> {
     const params = await props.params;
-    const { textbook, chapter, topic, quiz } = await getPageData(props.params);
+    const { textbook, chapter, topic, quiz } = await getPageData(params);
 
     if (!quiz || !textbook || !chapter) {
       return {
@@ -115,7 +115,7 @@ export async function generateMetadata(props: PageProps, parent: ResolvingMetada
 
 export default async function QuizPage(props: PageProps) {
     const params = await props.params;
-    const { quiz, textbook, chapter, topic } = await getPageData(props.params);
+    const { quiz, textbook, chapter, topic } = await getPageData(params);
 
     if (!quiz || !textbook || !chapter) {
         notFound();

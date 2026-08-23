@@ -60,8 +60,8 @@ export default async function TextbookSolutionsPage(props: PageProps) {
   const textbook = {
     ...textbookData,
     // Convert Firestore Timestamps to simple strings.
-    createdAt: textbookData.createdAt?.toDate ? textbookData.createdAt.toDate().toLocaleDateString() : null,
-    updatedAt: textbookData.updatedAt?.toDate ? textbookData.updatedAt.toDate().toLocaleDateString() : null,
+    createdAt: (textbookData as any).createdAt?.toDate ? (textbookData as any).createdAt.toDate().toLocaleDateString() : null,
+    updatedAt: (textbookData as any).updatedAt?.toDate ? (textbookData as any).updatedAt.toDate().toLocaleDateString() : null,
   };
 
   return <TextbookClientPage textbook={textbook as any} />;

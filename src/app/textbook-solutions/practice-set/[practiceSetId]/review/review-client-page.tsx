@@ -87,7 +87,7 @@ export default function ReviewClientPage({ submissionId }: { submissionId: strin
           const promises: Promise<any>[] = [
              getDoc(textbookDocRef),
              getUserProfile(submissionData.userId) as Promise<UserProfile>,
-             getQuestionsByPracticeSet(submissionData.textbookId, submissionData.chapterId, submissionData.topicId, submissionData.practiceSetId)
+             getQuestionsByPracticeSet(submissionData.textbookId, submissionData.chapterId, submissionData.topicId || null, submissionData.practiceSetId)
           ];
           
           if (submissionData.topicId) {

@@ -90,7 +90,7 @@ export function SubjectDashboard({
       })) as any;
     }
   } else if (pageType === 'textbook') {
-    const textbook = curriculum.find(c => c.id === id);
+    const textbook = curriculum.find((c: any) => c.dbId === id || c.id === id) || curriculum[0];
     if (textbook) {
       treeData = textbook.topics.map((ch: any) => ({
         id: ch.id,
@@ -169,7 +169,7 @@ export function SubjectDashboard({
     
     let itemListElements = [];
     if (pageType === 'textbook') {
-      itemListElements = (curriculum.find(c => c.id === id)?.topics || []).map(t => ({
+      itemListElements = ((curriculum.find((c: any) => c.dbId === id || c.id === id) || curriculum[0])?.topics || []).map((t: any) => ({
         name: t.title,
         url: `https://deshexam.com/guide/${(t as any).fullSlug || t.id}`
       }));

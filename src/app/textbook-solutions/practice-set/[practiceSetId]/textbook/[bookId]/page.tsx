@@ -34,8 +34,8 @@ const serializeFirestoreTimestamps = (data: any): any => {
     return data;
 };
 
-async function getPageData(params: PageProps['params']) {
-    const { practiceSetId, bookId } = await params;
+async function getPageData(params: { practiceSetId: string; bookId: string; }) {
+    const { practiceSetId, bookId } = params;
     try {
         // This is a textbook-level practice set, so chapter and topic are null.
         const practiceSet = await getPracticeSetById(bookId, 'null', 'null', practiceSetId);

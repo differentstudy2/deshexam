@@ -366,6 +366,7 @@ export function DesktopExplorer({ className }: { className?: string }) {
 
   // Dialog States
   const [dialogState, setDialogState] = useState({ isOpen: false, parentId: '', typeName: '' as NodeType, onSuccess: () => {} });
+  const [addMode, setAddMode] = useState<'select' | 'create'>('select');
   const [titleInput, setTitleInput] = useState('');
   const [authorInput, setAuthorInput] = useState('');
   const [saving, setSaving] = useState(false);
@@ -456,14 +457,22 @@ export function DesktopExplorer({ className }: { className?: string }) {
     setTitleInput(''); setAuthorInput(''); setDialogState({ isOpen: true, parentId, typeName, onSuccess });
     setLoadingOptions(true);
     setExistingOptions([]);
+    setAddMode('select');
     try {
       // Fetching by track and filtering locally avoids potential missing composite index errors in Firestore
       const allNodes = await getTaxonomyNodesByTrack('academic');
       const filtered = allNodes.filter((n: any) => n.type === typeName);
-      const uniqueTitles = Array.from(new Set(filtered.map((n: any) => n.title).filter(Boolean)));
-      setExistingOptions(uniqueTitles.sort() as string[]);
+      const uniqueTitles = Array.from(new Set(filtered.map((n: any) => n.title).filter(Boolean))) as string[];
+      uniqueTitles.sort();
+      setExistingOptions(uniqueTitles);
+      if (uniqueTitles.length === 0) {
+        setAddMode('create');
+      } else {
+        setAddMode('select');
+      }
     } catch(e) {
       console.error("Failed to load options");
+      setAddMode('create');
     } finally {
       setLoadingOptions(false);
     }
@@ -823,35 +832,133 @@ export function DesktopExplorer({ className }: { className?: string }) {
 
       {/* Add Dialog */}
       <Dialog open={dialogState.isOpen} onOpenChange={(open) => !open && setDialogState(prev => ({ ...prev, isOpen: false }))}>
-        <DialogContent className="sm:max-w-[450px]">
-          <DialogHeader><DialogTitle>Add New {dialogState.typeName}</DialogTitle></DialogHeader>
-          <div className="py-4 space-y-4">
-            <Input value={titleInput} onChange={(e) => setTitleInput(e.target.value)} placeholder={`Enter ${dialogState.typeName} title`} autoFocus />
-            {['textbook', 'chapter', 'topic'].includes(dialogState.typeName) && <Input value={authorInput} onChange={(e) => setAuthorInput(e.target.value)} placeholder="Author (Optional)" />}
-            
-            {loadingOptions ? (
-               <div className="text-xs text-slate-400 animate-pulse mt-2">Loading existing options...</div>
-            ) : existingOptions.length > 0 ? (
-               <div className="space-y-2 pt-2 border-t border-slate-100">
-                 <Label className="text-xs text-slate-500 font-normal">Or select an existing one to reuse:</Label>
-                 <div className="flex flex-wrap gap-1.5 max-h-[160px] overflow-y-auto p-1">
-                   {existingOptions
-                     .filter(opt => opt.toLowerCase().includes(titleInput.toLowerCase()))
-                     .slice(0, 40)
-                     .map((opt, i) => (
-                     <span 
-                       key={i} 
-                       onClick={() => setTitleInput(opt)}
-                       className="text-xs px-2.5 py-1.5 bg-slate-50 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 rounded-md cursor-pointer border border-slate-200 hover:border-emerald-200 transition-colors"
-                     >
-                       {opt}
-                     </span>
-                   ))}
-                 </div>
-               </div>
-            ) : null}
+        <DialogContent className="sm:max-w-[480px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Plus className="w-5 h-5 text-indigo-600" />
+              Add {dialogState.typeName ? dialogState.typeName.charAt(0).toUpperCase() + dialogState.typeName.slice(1) : 'Item'}
+            </DialogTitle>
+            <DialogDescription>
+              Choose from existing predefined {dialogState.typeName}s or create a custom new one.
+            </DialogDescription>
+          </DialogHeader>
+
+          {/* Mode Switcher: Option A vs Option B */}
+          <div className="flex border rounded-lg p-1 bg-slate-50 gap-1 mt-1">
+            <button
+              type="button"
+              onClick={() => setAddMode('select')}
+              className={`flex-1 py-1.5 px-3 text-xs font-semibold rounded-md transition-all ${
+                addMode === 'select'
+                  ? 'bg-white text-indigo-600 shadow-sm border border-slate-200'
+                  : 'text-slate-500 hover:text-slate-900'
+              }`}
+            >
+              Option A: Select Existing ({existingOptions.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setAddMode('create')}
+              className={`flex-1 py-1.5 px-3 text-xs font-semibold rounded-md transition-all ${
+                addMode === 'create'
+                  ? 'bg-white text-indigo-600 shadow-sm border border-slate-200'
+                  : 'text-slate-500 hover:text-slate-900'
+              }`}
+            >
+              Option B: Create New
+            </button>
           </div>
-          <DialogFooter><Button onClick={handleSaveDialog} disabled={saving || !titleInput.trim()}>Create</Button></DialogFooter>
+
+          <div className="py-3 space-y-4">
+            {addMode === 'select' ? (
+              <div className="space-y-3">
+                <Label className="text-xs font-medium text-slate-700">Select Existing {dialogState.typeName}</Label>
+                {loadingOptions ? (
+                  <div className="p-4 text-xs text-center text-slate-500 flex items-center justify-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin text-indigo-600" />
+                    Loading available {dialogState.typeName}s...
+                  </div>
+                ) : existingOptions.length === 0 ? (
+                  <div className="p-4 text-center rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-xs">
+                    No existing {dialogState.typeName}s found. Please switch to <strong>Option B</strong> to create a new one.
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <Select value={titleInput} onValueChange={(val) => setTitleInput(val)}>
+                      <SelectTrigger className="w-full h-10 bg-white">
+                        <SelectValue placeholder={`-- Choose an existing ${dialogState.typeName} --`} />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-[260px]">
+                        {existingOptions.map((opt, i) => (
+                          <SelectItem key={i} value={opt}>
+                            {opt}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+
+                    <div className="mt-2">
+                      <Label className="text-[11px] text-slate-400">Quick suggestions / tags:</Label>
+                      <div className="flex flex-wrap gap-1.5 max-h-[120px] overflow-y-auto mt-1 p-1 bg-slate-50 rounded-lg border border-slate-100">
+                        {existingOptions.map((opt, i) => (
+                          <span
+                            key={i}
+                            onClick={() => setTitleInput(opt)}
+                            className={`text-xs px-2.5 py-1 rounded-md cursor-pointer border transition-all ${
+                              titleInput === opt
+                                ? 'bg-indigo-600 text-white border-indigo-600 font-medium'
+                                : 'bg-white hover:bg-indigo-50 text-slate-700 hover:text-indigo-700 border-slate-200'
+                            }`}
+                          >
+                            {opt}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <div>
+                  <Label className="text-xs font-medium text-slate-700">New {dialogState.typeName} Title</Label>
+                  <Input
+                    className="mt-1"
+                    value={titleInput}
+                    onChange={(e) => setTitleInput(e.target.value)}
+                    placeholder={`Enter new custom ${dialogState.typeName} title`}
+                    autoFocus
+                  />
+                </div>
+              </div>
+            )}
+
+            {['textbook', 'chapter', 'topic'].includes(dialogState.typeName) && (
+              <div>
+                <Label className="text-xs font-medium text-slate-700">Author (Optional)</Label>
+                <Input
+                  className="mt-1"
+                  value={authorInput}
+                  onChange={(e) => setAuthorInput(e.target.value)}
+                  placeholder="Author name"
+                />
+              </div>
+            )}
+          </div>
+
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setDialogState(prev => ({ ...prev, isOpen: false }))}>
+              Cancel
+            </Button>
+            <Button
+              className="bg-indigo-600 hover:bg-indigo-700 text-white"
+              onClick={handleSaveDialog}
+              disabled={saving || !titleInput.trim()}
+            >
+              {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+              {addMode === 'select' ? `Attach ${dialogState.typeName || 'Item'}` : `Create & Attach`}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 

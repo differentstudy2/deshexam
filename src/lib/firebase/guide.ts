@@ -46,23 +46,47 @@ const sortNodes = (nodes: any[]) => {
   });
 };
 
-const buildCurriculumFromTextbooks = (textbooks: any[], allNodes: any[]): Chapter[] => {
+export const buildCurriculumFromTextbooks = async (textbooks: any[], allNodes: any[]): Promise<Chapter[]> => {
   const sortedTextbooks = sortNodes(textbooks);
 
-  return sortedTextbooks.map(tb => {
-    const tbChapters = sortNodes(allNodes.filter(n => n.parentId === tb.id && n.type === 'chapter'))
-      .map(ch => {
-        const chTopics = sortNodes(allNodes.filter(n => n.parentId === ch.id && n.type === 'topic'))
-          .map(t => ({ id: t.fullSlug || t.id, dbId: t.id, title: t.title, type: 'topic' as const, subtopics: [] }));
+  const result = await Promise.all(sortedTextbooks.map(async tb => {
+    let chapters = allNodes.filter(n => n.parentId === tb.id && n.type === 'chapter');
+    
+    // Fallback to legacy collections if not migrated yet
+    if (chapters.length === 0) {
+      const q = query(collection(db, 'guide_chapters'), where('textbookId', '==', tb.id));
+      const snap = await getDocs(q);
+      chapters = snap.docs.map(doc => ({ id: doc.id, ...doc.data() as any, fullSlug: doc.data().slug || doc.id }));
+    }
+    
+    const sortedChapters = sortNodes(chapters);
 
-        return {
-          id: ch.fullSlug || ch.id,
-          dbId: ch.id,
-          title: ch.title,
-          type: 'chapter' as const,
-          subtopics: chTopics
-        };
-      });
+    const tbChapters = await Promise.all(sortedChapters.map(async ch => {
+      let topics = allNodes.filter(n => n.parentId === ch.id && n.type === 'topic');
+      
+      // Fallback to legacy collections
+      if (topics.length === 0) {
+        const q2 = query(collection(db, 'guide_topics'), where('chapterId', '==', ch.id));
+        const snap2 = await getDocs(q2);
+        topics = snap2.docs.map(doc => ({ id: doc.id, ...doc.data() as any, fullSlug: doc.data().slug || doc.id }));
+      }
+
+      const chTopics = sortNodes(topics).map(t => ({ 
+        id: t.fullSlug || t.id, 
+        dbId: t.id, 
+        title: t.title, 
+        type: 'topic' as const, 
+        subtopics: [] 
+      }));
+
+      return {
+        id: ch.fullSlug || ch.id,
+        dbId: ch.id,
+        title: ch.title,
+        type: 'chapter' as const,
+        subtopics: chTopics
+      };
+    }));
 
     return {
       id: tb.fullSlug || tb.id,
@@ -70,14 +94,16 @@ const buildCurriculumFromTextbooks = (textbooks: any[], allNodes: any[]): Chapte
       title: tb.title,
       topics: tbChapters
     };
-  }) as unknown as Chapter[];
+  }));
+
+  return result as unknown as Chapter[];
 };
 
 export const getCurriculumBySubject = async (subjectId: string): Promise<Chapter[]> => {
   try {
     const allNodes = await getTaxonomyNodesByTrack('academic');
     const textbooks = allNodes.filter(n => n.parentId === subjectId && n.type === 'textbook');
-    return buildCurriculumFromTextbooks(textbooks, allNodes);
+    return await buildCurriculumFromTextbooks(textbooks, allNodes);
   } catch (error) {
     console.error("Error fetching curriculum by subject:", error);
     return [];
@@ -90,7 +116,7 @@ export const getCurriculumByClass = async (classId: string): Promise<Chapter[]> 
     const subjects = allNodes.filter(n => n.parentId === classId && n.type === 'subject');
     const subjectIds = subjects.map(s => s.id);
     const textbooks = allNodes.filter(n => (subjectIds.includes(n.parentId as string) || n.parentId === classId) && n.type === 'textbook');
-    return buildCurriculumFromTextbooks(textbooks, allNodes);
+    return await buildCurriculumFromTextbooks(textbooks, allNodes);
   } catch (error) {
     console.error("Error fetching curriculum by class:", error);
     return [];

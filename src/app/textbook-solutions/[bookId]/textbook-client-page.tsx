@@ -323,17 +323,17 @@ export default function TextbookClientPage({ textbook: initialTextbook }: { text
                     </div>
                 </CardHeader>
                 <CardContent className="flex-grow p-4">
-                    <p className="text-sm font-medium text-primary">{item.subject}</p>
+                    <p className="text-sm font-medium text-primary">{(item as any).subject || (textbook as any).subject || ''}</p>
                     <CardTitle className="font-headline text-lg mt-1 mb-2 leading-snug">{item.title}</CardTitle>
                     <div className="flex items-center text-sm text-muted-foreground space-x-4">
-                    <div className="flex items-center gap-1.5"><HelpCircle className="w-4 h-4" /><span>{item.questions?.length || 0} Qs</span></div>
-                    <div className="flex items-center gap-1.5"><Clock className="w-4 h-4" /><span>{item.duration || item.questions?.length || 0} min</span></div>
-                    {item.difficulty && <div className="flex items-center gap-1.5"><BarChart className="w-4 h-4" /><span>{Array.isArray(item.difficulty) ? item.difficulty.join(', ') : item.difficulty}</span></div>}
+                    <div className="flex items-center gap-1.5"><HelpCircle className="w-4 h-4" /><span>{(item as any).questions?.length || 0} Qs</span></div>
+                    <div className="flex items-center gap-1.5"><Clock className="w-4 h-4" /><span>{(item as any).duration || (item as any).questions?.length || 0} min</span></div>
+                    {(item as any).difficulty && <div className="flex items-center gap-1.5"><BarChart className="w-4 h-4" /><span>{Array.isArray((item as any).difficulty) ? (item as any).difficulty.join(', ') : (item as any).difficulty}</span></div>}
                     </div>
                 </CardContent>
                 <CardFooter className="p-4 pt-0">
                     <Button asChild className="w-full">
-                    <Link href={getUrlForTest(item.testType, item.id)}>Start {type}</Link>
+                    <Link href={getUrlForTest((item as any).testType || type, item.id)}>Start {type}</Link>
                     </Button>
                 </CardFooter>
                 </Card>

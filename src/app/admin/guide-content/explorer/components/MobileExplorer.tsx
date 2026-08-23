@@ -66,9 +66,12 @@ export function MobileExplorer({ className }: { className?: string }) {
 
   // Add Dialog State
   const [dialogState, setDialogState] = useState({ isOpen: false, parentId: '', parentType: '', typeName: '', onSuccess: () => {} });
+  const [addMode, setAddMode] = useState<'select' | 'create'>('select');
   const [titleInput, setTitleInput] = useState('');
   const [authorInput, setAuthorInput] = useState('');
   const [saving, setSaving] = useState(false);
+  const [existingOptions, setExistingOptions] = useState<string[]>([]);
+  const [loadingOptions, setLoadingOptions] = useState(false);
 
   // Edit Dialog State
   const [editDialog, setEditDialog] = useState({ isOpen: false, nodeId: '', nodeType: '', nodeName: '', authorName: '', onSuccess: () => {} });
@@ -203,10 +206,38 @@ export function MobileExplorer({ className }: { className?: string }) {
   };
 
 
-  const handleOpenDialog = (parentId: string, parentType: string, typeName: string, onSuccess: () => void) => {
+  const handleOpenDialog = async (parentId: string, parentType: string, typeName: string, onSuccess: () => void) => {
     setTitleInput('');
     setAuthorInput('');
     setDialogState({ isOpen: true, parentId, parentType, typeName, onSuccess });
+    setLoadingOptions(true);
+    setExistingOptions([]);
+    setAddMode('select');
+
+    let targetNodeType: NodeType = 'board';
+    if (parentType === 'board') targetNodeType = 'class';
+    else if (parentType === 'class') targetNodeType = 'subject';
+    else if (parentType === 'subject') targetNodeType = 'textbook';
+    else if (parentType === 'textbook') targetNodeType = 'chapter';
+    else if (parentType === 'chapter') targetNodeType = 'topic';
+
+    try {
+      const allNodes = await getTaxonomyNodesByTrack('academic');
+      const filtered = allNodes.filter((n: any) => n.type === targetNodeType);
+      const uniqueTitles = Array.from(new Set(filtered.map((n: any) => n.title).filter(Boolean))) as string[];
+      uniqueTitles.sort();
+      setExistingOptions(uniqueTitles);
+      if (uniqueTitles.length === 0) {
+        setAddMode('create');
+      } else {
+        setAddMode('select');
+      }
+    } catch (e) {
+      console.error("Failed to load options", e);
+      setAddMode('create');
+    } finally {
+      setLoadingOptions(false);
+    }
   };
 
   const handleSaveDialog = async () => {
@@ -738,31 +769,114 @@ export function MobileExplorer({ className }: { className?: string }) {
 
       {/* Add Node Dialog */}
       <Dialog open={dialogState.isOpen} onOpenChange={(open) => !open && setDialogState(prev => ({ ...prev, isOpen: false }))}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[440px]">
           <DialogHeader>
-            <DialogTitle>Add New {dialogState.typeName}</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              <Plus className="w-5 h-5 text-[#107c41]" />
+              Add {dialogState.typeName ? dialogState.typeName.charAt(0).toUpperCase() + dialogState.typeName.slice(1) : 'Item'}
+            </DialogTitle>
             <DialogDescription>
-              Enter the title for the new {dialogState.typeName.toLowerCase()}.
+              Choose from existing predefined {dialogState.typeName.toLowerCase()}s or enter a new one.
             </DialogDescription>
           </DialogHeader>
-          <div className="py-4 space-y-4">
-            <Textarea 
-              value={titleInput}
-              onChange={(e) => {
-                setTitleInput(e.target.value);
-                e.target.style.height = 'auto';
-                e.target.style.height = e.target.scrollHeight + 'px';
-              }}
-              placeholder={`Enter ${dialogState.typeName.toLowerCase()} title(s)...\nSeparate multiple items by comma or new line.`}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSaveDialog();
-                }
-              }}
-              className="min-h-[60px] max-h-[300px] overflow-y-auto"
-              autoFocus
-            />
+
+          {/* Mode Switcher */}
+          <div className="flex border rounded-lg p-1 bg-slate-50 gap-1 mt-1">
+            <button
+              type="button"
+              onClick={() => setAddMode('select')}
+              className={`flex-1 py-1.5 px-2 text-xs font-semibold rounded-md transition-all ${
+                addMode === 'select'
+                  ? 'bg-white text-[#107c41] shadow-sm border border-slate-200'
+                  : 'text-slate-500 hover:text-slate-900'
+              }`}
+            >
+              Option A: Select ({existingOptions.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setAddMode('create')}
+              className={`flex-1 py-1.5 px-2 text-xs font-semibold rounded-md transition-all ${
+                addMode === 'create'
+                  ? 'bg-white text-[#107c41] shadow-sm border border-slate-200'
+                  : 'text-slate-500 hover:text-slate-900'
+              }`}
+            >
+              Option B: Create New
+            </button>
+          </div>
+
+          <div className="py-3 space-y-4">
+            {addMode === 'select' ? (
+              <div className="space-y-3">
+                <Label className="text-xs font-medium text-slate-700">Select Existing {dialogState.typeName}</Label>
+                {loadingOptions ? (
+                  <div className="p-4 text-xs text-center text-slate-500 flex items-center justify-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin text-[#107c41]" />
+                    Loading available {dialogState.typeName}s...
+                  </div>
+                ) : existingOptions.length === 0 ? (
+                  <div className="p-4 text-center rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-xs">
+                    No existing {dialogState.typeName}s found. Please switch to <strong>Option B</strong>.
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <Select value={titleInput} onValueChange={(val) => setTitleInput(val)}>
+                      <SelectTrigger className="w-full h-10 bg-white">
+                        <SelectValue placeholder={`-- Select an existing ${dialogState.typeName} --`} />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-[240px]">
+                        {existingOptions.map((opt, i) => (
+                          <SelectItem key={i} value={opt}>
+                            {opt}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+
+                    <div className="mt-2">
+                      <Label className="text-[11px] text-slate-400">Quick list:</Label>
+                      <div className="flex flex-wrap gap-1.5 max-h-[120px] overflow-y-auto mt-1 p-1 bg-slate-50 rounded-lg border border-slate-100">
+                        {existingOptions.map((opt, i) => (
+                          <span
+                            key={i}
+                            onClick={() => setTitleInput(opt)}
+                            className={`text-xs px-2.5 py-1 rounded-md cursor-pointer border transition-all ${
+                              titleInput === opt
+                                ? 'bg-[#107c41] text-white border-[#107c41] font-medium'
+                                : 'bg-white hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 border-slate-200'
+                            }`}
+                          >
+                            {opt}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <Textarea 
+                  value={titleInput}
+                  onChange={(e) => {
+                    setTitleInput(e.target.value);
+                    e.target.style.height = 'auto';
+                    e.target.style.height = e.target.scrollHeight + 'px';
+                  }}
+                  placeholder={`Enter ${dialogState.typeName.toLowerCase()} title(s)...\nSeparate multiple items by comma or new line.`}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSaveDialog();
+                    }
+                  }}
+                  className="min-h-[60px] max-h-[200px] overflow-y-auto"
+                  autoFocus
+                />
+              </div>
+            )}
+
             {['Textbook', 'Chapter', 'Topic'].includes(dialogState.typeName) && (
               <Input
                 value={authorInput}
@@ -774,13 +888,14 @@ export function MobileExplorer({ className }: { className?: string }) {
               />
             )}
           </div>
-          <DialogFooter>
+
+          <DialogFooter className="gap-2 sm:gap-0">
             <Button variant="outline" onClick={() => setDialogState(prev => ({ ...prev, isOpen: false }))}>
               Cancel
             </Button>
-            <Button className="bg-[#107c41] hover:bg-[#0b5c30]" onClick={handleSaveDialog} disabled={saving || !titleInput.trim()}>
+            <Button className="bg-[#107c41] hover:bg-[#0b5c30] text-white" onClick={handleSaveDialog} disabled={saving || !titleInput.trim()}>
               {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
-              Create
+              {addMode === 'select' ? `Attach ${dialogState.typeName || 'Item'}` : `Create & Attach`}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -72,26 +72,17 @@ function ResultsDisplay() {
 
         if (submissionData) {
           setSubmission(submissionData);
-          
           const textbookDocRef = doc(db, 'textbooks', submissionData.textbookId);
-          
-          const promises = [
+          const [textbookSnap, studentData, topicSnap] = await Promise.all([
              getDoc(textbookDocRef),
-             getUserProfile(submissionData.userId) as Promise<UserProfile>
-          ];
-
-          // Only fetch topic if topicId exists
-          if (submissionData.topicId) {
-              const topicDocRef = doc(db, `textbooks/${submissionData.textbookId}/chapters/${submissionData.chapterId}/topics`, submissionData.topicId);
-              promises.push(getDoc(topicDocRef));
-          }
+             getUserProfile(submissionData.userId),
+             submissionData.topicId ? getDoc(doc(db, `textbooks/${submissionData.textbookId}/chapters/${submissionData.chapterId}/topics`, submissionData.topicId)) : Promise.resolve(null)
+          ]);
            
-          const [textbookData, studentData, topicData] = await Promise.all(promises);
-           
-           if(textbookData.exists()) setTextbook({id: textbookData.id, ...textbookData.data()} as Textbook);
-           if(topicData && topicData.exists()) setTopic({id: topicData.id, ...topicData.data()} as Topic);
+          if(textbookSnap && (textbookSnap as any).exists()) setTextbook({id: (textbookSnap as any).id, ...(textbookSnap as any).data()} as Textbook);
+          if(topicSnap && (topicSnap as any).exists()) setTopic({id: (topicSnap as any).id, ...(topicSnap as any).data()} as Topic);
 
-           setStudent(studentData);
+          setStudent(studentData as UserProfile);
         } else {
           throw new Error("Submission not found.");
         }

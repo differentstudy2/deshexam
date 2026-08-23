@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { getTaxonomyNodeById, getTaxonomyNodesByParent, TaxonomyNode } from '@/lib/firebase/taxonomy';
+import { getTaxonomyNodeById, getTaxonomyNodesByParent, getTaxonomyNodesByTrack, TaxonomyNode } from '@/lib/firebase/taxonomy';
 import { getAssessmentsByNode } from '@/lib/firebase/assessment';
 import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db, storage } from '@/lib/firebase/client';
@@ -89,6 +89,12 @@ export default function TextbookDetailsPage() {
     mockTests: 0,
   });
 
+  // Taxonomy Mapping State
+  const [allNodes, setAllNodes] = useState<TaxonomyNode[]>([]);
+  const [boardId, setBoardId] = useState('');
+  const [classId, setClassId] = useState('');
+  const [subjectId, setSubjectId] = useState('');
+
   const loadData = async () => {
       if (!textbookId) return;
 
@@ -98,6 +104,25 @@ export default function TextbookDetailsPage() {
         setTextbook(tbNode);
 
         if (tbNode) {
+          const nodes = await getTaxonomyNodesByTrack('academic');
+          setAllNodes(nodes);
+          
+          let bId = '';
+          let cId = '';
+          let sId = '';
+          if (tbNode.ancestors) {
+            const b = tbNode.ancestors.find((a: any) => a.type === 'board');
+            const c = tbNode.ancestors.find((a: any) => a.type === 'class');
+            const s = tbNode.ancestors.find((a: any) => a.type === 'subject');
+            if (b) bId = b.id;
+            if (c) cId = c.id;
+            if (s) sId = s.id;
+          } else {
+            sId = tbNode.parentId || '';
+          }
+          setBoardId(bId);
+          setClassId(cId);
+          setSubjectId(sId);
           setEditTbData({
             title: tbNode.title || '',
             slug: tbNode.slug || '',
@@ -319,6 +344,10 @@ export default function TextbookDetailsPage() {
     setIsSavingTb(true);
     try {
       const { updateTaxonomyNode, generateSlug } = await import('@/lib/firebase/taxonomy');
+      
+      const getValidId = (id: string) => id && id !== 'none' ? id : null;
+      const finalParentId = getValidId(subjectId) || getValidId(classId) || getValidId(boardId) || null;
+
       await updateTaxonomyNode(textbookId, { 
         title: editTbData.title.trim(),
         slug: editTbData.slug.trim() || generateSlug(editTbData.title.trim()),
@@ -331,6 +360,7 @@ export default function TextbookDetailsPage() {
         author: editTbData.author.trim(),
         description: editTbData.description.trim(),
         mediumOfInstruction: editTbData.mediumOfInstruction.split(',').map(s => s.trim()).filter(Boolean),
+        parentId: finalParentId,
       });
       await loadData();
       alert('Textbook info updated successfully!');
@@ -626,6 +656,53 @@ export default function TextbookDetailsPage() {
                   <Languages className="w-3 h-3" /> Language / Medium
                 </label>
                 <Input className="bg-white dark:bg-slate-900 h-9 text-sm" value={editTbData.mediumOfInstruction} onChange={(e) => setEditTbData({...editTbData, mediumOfInstruction: e.target.value})} placeholder="e.g. Bangla, English" />
+              </div>
+
+              {/* Divider */}
+              <div className="border-t border-slate-200 dark:border-slate-700" />
+
+              {/* Taxonomy Mapping */}
+              <div className="space-y-3">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">Taxonomy Mapping</p>
+                <div className="space-y-2">
+                  <Select value={boardId} onValueChange={(val) => { setBoardId(val); setClassId(''); setSubjectId(''); }}>
+                    <SelectTrigger className="bg-white dark:bg-slate-900 h-9 text-xs">
+                      <SelectValue placeholder="Select Board" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none" className="italic text-slate-500 text-xs">None / All Boards</SelectItem>
+                      {allNodes.filter(n => n.type === 'board').map(b => (
+                        <SelectItem key={b.id} value={b.id} className="text-xs">{b.title}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Select value={classId} onValueChange={(val) => { setClassId(val); setSubjectId(''); }}>
+                    <SelectTrigger className="bg-white dark:bg-slate-900 h-9 text-xs">
+                      <SelectValue placeholder="Select Class" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none" className="italic text-slate-500 text-xs">None / Independent</SelectItem>
+                      {(boardId && boardId !== 'none' ? allNodes.filter(n => n.type === 'class' && n.parentId === boardId) : allNodes.filter(n => n.type === 'class')).map(c => (
+                        <SelectItem key={c.id} value={c.id} className="text-xs">{c.title}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Select disabled={!classId} value={subjectId} onValueChange={setSubjectId}>
+                    <SelectTrigger className="bg-white dark:bg-slate-900 h-9 text-xs">
+                      <SelectValue placeholder="Select Subject" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none" className="italic text-slate-500 text-xs">None / Independent</SelectItem>
+                      {allNodes.filter(n => n.type === 'subject' && n.parentId === classId).map(s => (
+                        <SelectItem key={s.id} value={s.id} className="text-xs">{s.title}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
 

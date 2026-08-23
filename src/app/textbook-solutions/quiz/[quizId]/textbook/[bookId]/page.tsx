@@ -35,8 +35,8 @@ const serializeFirestoreTimestamps = (data: any): any => {
     return data;
 };
 
-async function getPageData(params: PageProps['params']) {
-    const { quizId, bookId } = await params;
+async function getPageData(params: { quizId: string; bookId: string; }) {
+    const { quizId, bookId } = params;
     try {
         const quiz = await getContentById(quizId);
         const textbook = await getTextbookById(bookId);

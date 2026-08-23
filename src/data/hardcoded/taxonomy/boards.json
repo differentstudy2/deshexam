@@ -1,7 +1,7 @@
 [
   {
     "id": "hardcoded-board-test",
-    "title": "Hardcoded Test Board",
+    "title": "Test Board",
     "slug": "hardcoded-test-board",
     "type": "board",
     "track": "academic",

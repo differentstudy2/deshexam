@@ -1,8 +1,8 @@
 import React from 'react';
 import { redirect, notFound } from 'next/navigation';
 import { getTaxonomyNodeBySlug, getTaxonomyNodeById, VALID_CONTENT_TYPES, ContentType } from '@/lib/firebase/taxonomy';
-import { getReadingContent, getCurriculumBySubject, getCurriculumByClass, getCurriculumByBoard, getGuideSubjects, findGuideNodeAnyLevel } from '@/lib/firebase/guide';
-import { getTaxonomyNodesByParent } from '@/lib/firebase/taxonomy';
+import { getReadingContent, getCurriculumBySubject, getCurriculumByClass, getCurriculumByBoard, getGuideSubjects, findGuideNodeAnyLevel, buildCurriculumFromTextbooks } from '@/lib/firebase/guide';
+import { getTaxonomyNodesByParent, getTaxonomyNodesByTrack } from '@/lib/firebase/taxonomy';
 import { generateHybridSeo } from '@/lib/seo';
 import { ReadingLayout } from '@/components/guide/ReadingLayout';
 import { SubjectDashboard } from '@/components/guide/SubjectDashboard';
@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: { params: Promise<{ segments?
 
   if (!node) {
     const lastSegment = segments[segments.length - 1];
-    if (VALID_CONTENT_TYPES.includes(lastSegment as ContentType)) {
+    if ((VALID_CONTENT_TYPES as readonly string[]).includes(lastSegment)) {
       const parentPath = segments.slice(0, -1).join('/');
       node = await getTaxonomyNodeBySlug(parentPath);
       
@@ -100,7 +100,7 @@ export default async function GuidePage({ params }: { params: Promise<{ segments
 
   if (!node) {
     const lastSegment = segments[segments.length - 1];
-    if (VALID_CONTENT_TYPES.includes(lastSegment as ContentType)) {
+    if ((VALID_CONTENT_TYPES as readonly string[]).includes(lastSegment)) {
       const parentPath = segments.slice(0, -1).join('/');
       node = await getTaxonomyNodeBySlug(parentPath);
       
@@ -192,12 +192,20 @@ export default async function GuidePage({ params }: { params: Promise<{ segments
   
   let fullCurriculum: any[] = [];
   
-  if (subjectNode) {
+  if (node.type === 'textbook' || node.type === 'chapter' || node.type === 'topic') {
+    const textbookNodeToBuild = node.type === 'textbook' ? node : textbookAncestorNode;
+    if (textbookNodeToBuild) {
+      const allNodes = await getTaxonomyNodesByTrack('academic');
+      fullCurriculum = await buildCurriculumFromTextbooks([textbookNodeToBuild], allNodes);
+    } else {
+      fullCurriculum = [];
+    }
+  } else if (subjectNode) {
     fullCurriculum = await getCurriculumBySubject(subjectNode.id);
-  } else if (node.type === 'class') {
-    fullCurriculum = await getCurriculumByClass(node.id);
-  } else if (node.type?.toLowerCase() === 'board') {
-    fullCurriculum = await getCurriculumByBoard(node.id);
+  } else if (classNode) {
+    fullCurriculum = await getCurriculumByClass(classNode.id);
+  } else if (boardNode) {
+    fullCurriculum = await getCurriculumByBoard(boardNode.id);
   } else {
     // Fallback if somehow no subject or class or board is determined
     const fallbackId = subjects[0]?.dbId || subjects[0]?.id || 'sahitya-kanika';
@@ -215,7 +223,7 @@ export default async function GuidePage({ params }: { params: Promise<{ segments
     if (textbookAncestorNode) {
       curriculum = fullCurriculum.filter(
         (c: any) => c.dbId === textbookAncestorNode.id || c.id === textbookAncestorNode.id
-          || c.id === (textbookAncestorNode.fullSlug || textbookAncestorNode.id)
+          || c.id === ((textbookAncestorNode as any).fullSlug || textbookAncestorNode.id)
       );
       // If ID match found nothing, fall back to title
       if (curriculum.length === 0 && textbookTitle) {

@@ -38,21 +38,21 @@ const serializeFirestoreTimestamps = (data: any): any => {
     return data;
 };
 
-async function getPageData(params: PageProps['params']) {
-    const { practiceSetId, bookId, chapterId, topicId } = await params;
+async function getPageData(params: { practiceSetId: string; bookId: string; chapterId: string; topicId: string; }) {
+    const { practiceSetId, bookId, chapterId, topicId } = params;
     try {
         const practiceSet = await getPracticeSetById(bookId, chapterId, topicId === 'null' ? null : topicId, practiceSetId);
         const textbook = await getContentById(bookId);
         const chapterRef = doc(db, `textbooks/${bookId}/chapters`, chapterId);
         const chapterSnap = await getDoc(chapterRef);
-        const chapter = chapterSnap.exists() ? { id: chapterSnap.id, ...chapterSnap.data() as Chapter } : null;
+        const chapter = chapterSnap.exists() ? ({ ...chapterSnap.data(), id: chapterSnap.id } as unknown as Chapter) : null;
 
         let topic: Topic | null = null;
         if(topicId !== 'null') {
             const topicRef = doc(db, `textbooks/${bookId}/chapters/${chapterId}/topics`, topicId);
             const topicSnap = await getDoc(topicRef);
             if(topicSnap.exists()) {
-                topic = { id: topicSnap.id, ...topicSnap.data() as Topic };
+                topic = ({ ...topicSnap.data(), id: topicSnap.id } as unknown as Topic);
             }
         }
         
@@ -70,8 +70,7 @@ async function getPageData(params: PageProps['params']) {
 
 export async function generateMetadata(props: PageProps, parent: ResolvingMetadata): Promise<Metadata> {
     const params = await props.params;
-    const awaitedParams = await params;
-    const { textbook, chapter, topic, practiceSet } = await getPageData(awaitedParams);
+    const { textbook, chapter, topic, practiceSet } = await getPageData(params);
 
     if (!practiceSet || !textbook || !chapter) {
       return {
@@ -116,14 +115,13 @@ export async function generateMetadata(props: PageProps, parent: ResolvingMetada
 
 export default async function PracticeSetPage(props: PageProps) {
     const params = await props.params;
-    const awaitedParams = await params;
-    const { practiceSet, textbook, chapter, topic } = await getPageData(awaitedParams);
+    const { practiceSet, textbook, chapter, topic } = await getPageData(params);
 
     if (!practiceSet || !textbook || !chapter) {
         notFound();
     }
 
-    const questionsData = await getQuestionsByPracticeSet(awaitedParams.bookId, awaitedParams.chapterId, awaitedParams.topicId === 'null' ? null : awaitedParams.topicId, awaitedParams.practiceSetId);
+    const questionsData = await getQuestionsByPracticeSet(params.bookId, params.chapterId, params.topicId === 'null' ? null : params.topicId, params.practiceSetId);
     const questions = serializeFirestoreTimestamps(questionsData);
 
 

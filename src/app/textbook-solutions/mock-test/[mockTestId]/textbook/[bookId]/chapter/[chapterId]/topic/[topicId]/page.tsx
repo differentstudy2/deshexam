@@ -37,21 +37,21 @@ const serializeFirestoreTimestamps = (data: any): any => {
     return data;
 };
 
-async function getPageData(params: PageProps['params']) {
+async function getPageData(params: { mockTestId: string; bookId: string; chapterId: string; topicId: string; }) {
     const { mockTestId, bookId, chapterId, topicId } = params;
     try {
         const mockTest = await getContentById(mockTestId);
         const textbook = await getContentById(bookId);
         const chapterRef = doc(db, `textbooks/${bookId}/chapters`, chapterId);
         const chapterSnap = await getDoc(chapterRef);
-        const chapter = chapterSnap.exists() ? { id: chapterSnap.id, ...chapterSnap.data() as Chapter } : null;
+        const chapter = chapterSnap.exists() ? ({ ...chapterSnap.data(), id: chapterSnap.id } as unknown as Chapter) : null;
 
         let topic: Topic | null = null;
         if(topicId !== 'null') {
             const topicRef = doc(db, `textbooks/${bookId}/chapters/${chapterId}/topics`, topicId);
             const topicSnap = await getDoc(topicRef);
             if(topicSnap.exists()) {
-                topic = { id: topicSnap.id, ...topicSnap.data() as Topic };
+                topic = ({ ...topicSnap.data(), id: topicSnap.id } as unknown as Topic);
             }
         }
         
@@ -69,8 +69,7 @@ async function getPageData(params: PageProps['params']) {
 
 export async function generateMetadata(props: PageProps, parent: ResolvingMetadata): Promise<Metadata> {
     const params = await props.params;
-    const awaitedParams = await params;
-    const { textbook, chapter, topic, mockTest } = await getPageData(awaitedParams);
+    const { textbook, chapter, topic, mockTest } = await getPageData(params);
 
     if (!mockTest || !textbook || !chapter) {
       return {
@@ -115,8 +114,7 @@ export async function generateMetadata(props: PageProps, parent: ResolvingMetada
 
 export default async function MockTestPage(props: PageProps) {
     const params = await props.params;
-    const awaitedParams = await params;
-    const { mockTest, textbook, chapter, topic } = await getPageData(awaitedParams);
+    const { mockTest, textbook, chapter, topic } = await getPageData(params);
 
     if (!mockTest || !textbook || !chapter) {
         notFound();

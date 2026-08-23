@@ -18,11 +18,11 @@ async function getPageData(submissionId: string | undefined) {
     if (!submissionId) return { submission: null, textbook: null };
 
     try {
-        const submission = await getSubmissionById(submissionId);
+        const submission = await getSubmissionById(submissionId) as any;
         if (!submission) return { submission: null, textbook: null };
 
-        const textbookDoc = await getDoc(doc(db, 'textbooks', submission.textbookId));
-        const textbook = textbookDoc.exists() ? { id: textbookDoc.id, ...textbookDoc.data() as Textbook } : null;
+        const textbookDoc = submission.textbookId ? await getDoc(doc(db, 'textbooks', submission.textbookId)) : null;
+        const textbook = textbookDoc && textbookDoc.exists() ? ({ ...textbookDoc.data(), id: textbookDoc.id } as unknown as Textbook) : null;
 
         return { submission, textbook };
 
@@ -44,8 +44,8 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
         };
     }
 
-    const title = `Review: ${submission.practiceSetTitle} | ${textbook?.title || 'DeshExam'}`;
-    const description = `Review your answers for the practice set "${submission.practiceSetTitle}". See detailed explanations for each question.`;
+    const title = `Review: ${submission.practiceSetTitle || 'Practice Set'} | ${textbook?.title || 'DeshExam'}`;
+    const description = `Review your answers for the practice set "${submission.practiceSetTitle || ''}". See detailed explanations for each question.`;
     const keywords = ['answer review', submission.practiceSetTitle, textbook?.title].filter(Boolean) as string[];
 
     return {
