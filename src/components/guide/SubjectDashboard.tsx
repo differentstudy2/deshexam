@@ -218,7 +218,7 @@ At DeshExam, we provide high-quality MCQ, short answer questions (SAQ), long ans
     <div className="min-h-screen bg-slate-50 dark:bg-[#020817] text-slate-800 dark:text-slate-200 font-sans pb-20">
 
       {/* Top Header Bar (White) */}
-      <div className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 sticky top-0 sm:top-16 z-40">
+      <div className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between relative">
           
           {/* Mobile Back Button & Centered Title */}

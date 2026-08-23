@@ -40,7 +40,7 @@ export function CurriculumTree({ curriculum }: CurriculumTreeProps) {
         const isChapterExpanded = expandedChapters.has(chapter.id);
 
         return (
-          <div key={`${chapter.id}-${cIdx}`} className="flex flex-col mb-4 last:mb-0">
+          <div key={`${chapter.id}-${cIdx}`} className="flex flex-col mb-0">
             {/* Chapter Row */}
             <div 
               className={cn(

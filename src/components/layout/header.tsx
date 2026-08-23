@@ -702,8 +702,8 @@ export function Header() {
       className={cn(
         "sticky top-0 z-50 w-full transition-all duration-300 border-b",
         isScrolled 
-          ? "bg-white/95 backdrop-blur-xl border-slate-200 shadow-sm text-slate-800 dark:bg-slate-950/95 dark:border-slate-800 dark:text-slate-200" 
-          : "bg-transparent border-slate-200 text-slate-800 dark:border-slate-800 dark:text-slate-200"
+          ? "bg-white border-slate-200 shadow-sm text-slate-800 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-200" 
+          : "bg-white border-slate-200 text-slate-800 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-200"
       )}
     >
       <div className="container flex h-16 items-center">

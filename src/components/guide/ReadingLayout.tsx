@@ -66,7 +66,7 @@ export function ReadingLayout({
     <div className="min-h-screen bg-slate-50 dark:bg-[#020817] text-slate-800 dark:text-slate-200 font-sans pb-20">
 
       {/* Top Breadcrumb Navigation */}
-      <div className="border-b border-emerald-100/50 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-40 shadow-sm print:hidden">
+      <div className="border-b border-emerald-100/50 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-sm print:hidden">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 h-[48px] flex items-center justify-between">
           <div className="flex-1 overflow-hidden">
             <div className="flex items-center text-xs font-medium text-slate-500 dark:text-slate-400 whitespace-nowrap overflow-x-auto [&::-webkit-scrollbar]:hidden">

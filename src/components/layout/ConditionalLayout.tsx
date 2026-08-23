@@ -7,7 +7,7 @@ import { Footer } from "@/components/layout/footer";
 export const ConditionalHeader = () => {
   const pathname = usePathname();
   if (pathname?.startsWith('/admin') || pathname?.startsWith('/dashboard') || pathname?.includes('/take')) return null;
-  return <div className="print:hidden"><Header /></div>;
+  return <div className="print:hidden sticky top-0 z-50 w-full"><Header /></div>;
 };
 
 export const ConditionalFooter = () => {
