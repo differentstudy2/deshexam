@@ -1,0 +1,25 @@
+[
+  {
+    "id": "hardcoded-class-10",
+    "title": "Hardcoded Class 10",
+    "slug": "hardcoded-class-10",
+    "type": "class",
+    "track": "academic",
+    "parentId": "hardcoded-board-test",
+    "orderIndex": 10,
+    "status": "published",
+    "fullSlug": "hardcoded-test-board/hardcoded-class-10",
+    "boardSlug": "hardcoded-test-board",
+    "classSlug": "hardcoded-class-10",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "hardcoded-board-test",
+        "slug": "hardcoded-test-board",
+        "title": "Hardcoded Test Board",
+        "type": "board"
+      }
+    ]
+  }
+]

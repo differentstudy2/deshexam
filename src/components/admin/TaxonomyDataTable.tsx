@@ -899,6 +899,9 @@ export function TaxonomyDataTable({ type, title }: Props) {
                   <div className="p-4 flex-1 flex flex-col cursor-pointer overflow-hidden" onClick={() => handleToggleSelect(node.id, !selectedIds.includes(node.id))}>
                     <h3 className="font-semibold text-slate-800 dark:text-slate-200 text-lg leading-tight line-clamp-2 mb-1.5 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                       {node.title}
+                      {(node as any).isHardcoded && (
+                        <span className="ml-2 text-[10px] font-bold px-1.5 py-0.5 bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 rounded-md border border-purple-200 dark:border-purple-500/30 uppercase tracking-wider align-middle inline-block">Hardcoded</span>
+                      )}
                       {nodeAcronym && (
                         <span className="ml-2 text-xs font-semibold px-2 py-0.5 bg-indigo-50 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-300 rounded-md border border-indigo-200 dark:border-indigo-500/30 align-middle inline-block">{nodeAcronym}</span>
                       )}
@@ -933,22 +936,26 @@ export function TaxonomyDataTable({ type, title }: Props) {
                           <Link href={`/institutions/${node.slug}`} target="_blank"><Eye className="w-4 h-4" /></Link>
                         </Button>
                       )}
-                      {type === 'board' ? (
-                        <Button asChild variant="ghost" size="icon" className="h-8 w-8 text-indigo-500 hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-900/30" title="Edit">
-                          <Link href={`/admin/board/${node.id}`}><Edit2 className="w-4 h-4" /></Link>
-                        </Button>
-                      ) : type === 'institution' ? (
-                        <Button asChild variant="ghost" size="icon" className="h-8 w-8 text-indigo-500 hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-900/30" title="Edit">
-                          <Link href={`/admin/institution/${node.id}`}><Edit2 className="w-4 h-4" /></Link>
-                        </Button>
-                      ) : (
-                        <Button variant="ghost" size="icon" onClick={() => handleEditClick(node)} className="h-8 w-8 text-indigo-500 hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-900/30" title="Edit">
-                          <Edit2 className="w-4 h-4" />
-                        </Button>
+                      {!(node as any).isHardcoded && (
+                        <>
+                          {type === 'board' ? (
+                            <Button asChild variant="ghost" size="icon" className="h-8 w-8 text-indigo-500 hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-900/30" title="Edit">
+                              <Link href={`/admin/board/${node.id}`}><Edit2 className="w-4 h-4" /></Link>
+                            </Button>
+                          ) : type === 'institution' ? (
+                            <Button asChild variant="ghost" size="icon" className="h-8 w-8 text-indigo-500 hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-900/30" title="Edit">
+                              <Link href={`/admin/institution/${node.id}`}><Edit2 className="w-4 h-4" /></Link>
+                            </Button>
+                          ) : (
+                            <Button variant="ghost" size="icon" onClick={() => handleEditClick(node)} className="h-8 w-8 text-indigo-500 hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-900/30" title="Edit">
+                              <Edit2 className="w-4 h-4" />
+                            </Button>
+                          )}
+                          <Button variant="ghost" size="icon" onClick={() => handleDelete(node)} className="h-8 w-8 text-rose-500 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-900/30" title="Delete">
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </>
                       )}
-                      <Button variant="ghost" size="icon" onClick={() => handleDelete(node)} className="h-8 w-8 text-rose-500 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-900/30" title="Delete">
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
                     </div>
                   </div>
 
@@ -1060,6 +1067,9 @@ export function TaxonomyDataTable({ type, title }: Props) {
                       <TableCell className="py-2 pr-2">
                         <div className="font-medium text-sm text-gray-900 dark:text-slate-200 line-clamp-2 inline-flex items-center gap-2">
                           {node.title}
+                          {(node as any).isHardcoded && (
+                            <span className="text-[10px] font-bold px-1.5 py-0.5 bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 rounded border border-purple-200 dark:border-purple-500/30 whitespace-nowrap uppercase tracking-wider">Hardcoded</span>
+                          )}
                           {nodeAcronym && (
                             <span className="text-[10px] font-bold px-1.5 py-0.5 bg-indigo-50 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-300 rounded border border-indigo-200 dark:border-indigo-500/30 whitespace-nowrap">{nodeAcronym}</span>
                           )}
@@ -1107,22 +1117,26 @@ export function TaxonomyDataTable({ type, title }: Props) {
                               <Link href={`/institutions/${node.slug}`} target="_blank"><Eye className="w-3.5 h-3.5" /></Link>
                             </Button>
                           )}
-                          {type === 'board' ? (
-                            <Button asChild variant="ghost" size="icon" className="h-7 w-7 text-indigo-500 hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-900/30" title="Edit">
-                              <Link href={`/admin/board/${node.id}`}><Edit2 className="w-3.5 h-3.5" /></Link>
-                            </Button>
-                          ) : type === 'institution' ? (
-                            <Button asChild variant="ghost" size="icon" className="h-7 w-7 text-indigo-500 hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-900/30" title="Edit">
-                              <Link href={`/admin/institution/${node.id}`}><Edit2 className="w-3.5 h-3.5" /></Link>
-                            </Button>
-                          ) : (
-                            <Button variant="ghost" size="icon" onClick={() => handleEditClick(node)} className="h-7 w-7 text-indigo-500 hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-900/30">
-                              <Edit2 className="w-3.5 h-3.5" />
-                            </Button>
+                          {!(node as any).isHardcoded && (
+                            <>
+                              {type === 'board' ? (
+                                <Button asChild variant="ghost" size="icon" className="h-7 w-7 text-indigo-500 hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-900/30" title="Edit">
+                                  <Link href={`/admin/board/${node.id}`}><Edit2 className="w-3.5 h-3.5" /></Link>
+                                </Button>
+                              ) : type === 'institution' ? (
+                                <Button asChild variant="ghost" size="icon" className="h-7 w-7 text-indigo-500 hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-900/30" title="Edit">
+                                  <Link href={`/admin/institution/${node.id}`}><Edit2 className="w-3.5 h-3.5" /></Link>
+                                </Button>
+                              ) : (
+                                <Button variant="ghost" size="icon" onClick={() => handleEditClick(node)} className="h-7 w-7 text-indigo-500 hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-900/30">
+                                  <Edit2 className="w-3.5 h-3.5" />
+                                </Button>
+                              )}
+                              <Button variant="ghost" size="icon" onClick={() => handleDelete(node)} className="h-7 w-7 text-rose-500 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-900/30">
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </Button>
+                            </>
                           )}
-                          <Button variant="ghost" size="icon" onClick={() => handleDelete(node)} className="h-7 w-7 text-rose-500 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-900/30">
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </Button>
                         </div>
                       </TableCell>
                     </TableRow>

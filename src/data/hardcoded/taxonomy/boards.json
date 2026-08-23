@@ -1,0 +1,16 @@
+[
+  {
+    "id": "hardcoded-board-test",
+    "title": "Hardcoded Test Board",
+    "slug": "hardcoded-test-board",
+    "type": "board",
+    "track": "academic",
+    "parentId": null,
+    "orderIndex": 100,
+    "status": "published",
+    "fullSlug": "hardcoded-test-board",
+    "boardSlug": "hardcoded-test-board",
+    "isIndexable": true,
+    "isHardcoded": true
+  }
+]

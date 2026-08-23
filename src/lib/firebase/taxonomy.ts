@@ -1,5 +1,6 @@
 import { collection, query, orderBy, getDocs, doc, setDoc, deleteDoc, serverTimestamp, updateDoc, where, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
+import * as hardcodedRegistry from "@/data/hardcoded/taxonomy";
 
 export type TaxonomyTrack = 'academic' | 'competitive';
 export type AcademicNodeType = 'board' | 'institution' | 'class' | 'subject' | 'textbook' | 'chapter' | 'topic' | 'section';
@@ -176,12 +177,22 @@ export interface TaxonomyNode {
 export const getTaxonomyNodesByTrack = async (track: TaxonomyTrack): Promise<TaxonomyNode[]> => {
   const q = query(collection(db, 'taxonomy_nodes'), where('track', '==', track));
   const snap = await getDocs(q);
-  const nodes = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as TaxonomyNode));
+  let nodes = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as TaxonomyNode));
+  
+  // Merge hardcoded nodes
+  nodes = [...nodes, ...hardcodedRegistry.getHardcodedTaxonomyNodesByTrack(track)];
+  
   return nodes.sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
 };
 
 export const getTaxonomyNodeBySlug = async (fullSlug: string): Promise<TaxonomyNode | null> => {
   try {
+    // Check hardcoded nodes first
+    const parts = fullSlug.split('/');
+    const slug = parts[parts.length - 1]; // Naive check for hardcoded node by slug
+    const hardcodedNode = hardcodedRegistry.getHardcodedTaxonomyNodes().find(n => n.fullSlug === fullSlug || n.slug === slug);
+    if (hardcodedNode) return hardcodedNode;
+
     const q = query(collection(db, 'taxonomy_nodes'), where('fullSlug', '==', fullSlug));
     const snap = await getDocs(q);
     if (!snap.empty) {
@@ -198,18 +209,29 @@ export const getTaxonomyNodeBySlug = async (fullSlug: string): Promise<TaxonomyN
 export const getTaxonomyNodesByType = async (track: TaxonomyTrack, type: NodeType): Promise<TaxonomyNode[]> => {
   const q = query(collection(db, 'taxonomy_nodes'), where('track', '==', track), where('type', '==', type));
   const snap = await getDocs(q);
-  const nodes = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as TaxonomyNode));
+  let nodes = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as TaxonomyNode));
+  
+  // Merge hardcoded nodes
+  nodes = [...nodes, ...hardcodedRegistry.getHardcodedTaxonomyNodesByType(track, type)];
+  
   return nodes.sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
 };
 
 export const getTaxonomyNodesByParent = async (parentId: string): Promise<TaxonomyNode[]> => {
   const q = query(collection(db, 'taxonomy_nodes'), where('parentId', '==', parentId));
   const snap = await getDocs(q);
-  const nodes = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as TaxonomyNode));
+  let nodes = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as TaxonomyNode));
+  
+  // Merge hardcoded nodes
+  nodes = [...nodes, ...hardcodedRegistry.getHardcodedTaxonomyNodesByParent(parentId)];
+  
   return nodes.sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
 };
 
 export const getTaxonomyNodeById = async (id: string): Promise<TaxonomyNode | null> => {
+  const hardcodedNode = hardcodedRegistry.getHardcodedTaxonomyNodeById(id);
+  if (hardcodedNode) return hardcodedNode;
+
   const docSnap = await getDoc(doc(db, 'taxonomy_nodes', id));
   if (docSnap.exists()) {
     return { id: docSnap.id, ...docSnap.data() } as TaxonomyNode;
