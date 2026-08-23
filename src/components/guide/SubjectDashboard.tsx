@@ -49,12 +49,12 @@ export function SubjectDashboard({
 
 
 
-  const displayTitle = 
-    pageType === 'chapter' ? (chapterTitle || 'Chapter') : 
-    pageType === 'textbook' ? (textbookTitle || 'Textbook') : 
-    pageType === 'class' ? (classTitle || 'Class') : 
-    pageType === 'board' ? (boardTitle || 'Board') : 
-    (subjectTitle || 'Subject');
+  const displayTitle =
+    pageType === 'chapter' ? (chapterTitle || 'Chapter') :
+      pageType === 'textbook' ? (textbookTitle || 'Textbook') :
+        pageType === 'class' ? (classTitle || 'Class') :
+          pageType === 'board' ? (boardTitle || 'Board') :
+            (subjectTitle || 'Subject');
 
   let treeData = curriculum;
   if (pageType === 'chapter') {
@@ -94,7 +94,7 @@ export function SubjectDashboard({
       const filteredTopics = (chapter.topics || []).map((topic: any) => {
         const topicMatch = topic.title.toLowerCase().includes(lowerQ);
 
-        const filteredSubtopics = (topic.subtopics || []).filter((sub: any) => 
+        const filteredSubtopics = (topic.subtopics || []).filter((sub: any) =>
           sub.title.toLowerCase().includes(lowerQ)
         );
 
@@ -127,21 +127,21 @@ export function SubjectDashboard({
 
   treeData?.forEach((chapter: any) => {
     topicCount += (chapter.topics?.length || 0);
-    
+
     chapter.topics?.forEach((topic: any) => {
       const tTitle = (topic.title || '').toLowerCase();
       if (tTitle.includes('mcq') || tTitle.includes('বহুনির্বাচনি')) mcqCount++;
       if (tTitle.includes('cq') || tTitle.includes('সৃজনশীল')) cqCount++;
       if (tTitle.includes('mock') || tTitle.includes('মডেল')) mockTestCount++;
       if (tTitle.includes('quiz') || tTitle.includes('কুইজ')) quizCount++;
-      
+
       if (topic.metrics) {
-         mockTestCount += (topic.metrics.mockTestCount || 0);
-         quizCount += (topic.metrics.quizCount || 0);
-         mcqCount += (topic.metrics.mcqCount || 0);
-         cqCount += (topic.metrics.cqCount || 0);
+        mockTestCount += (topic.metrics.mockTestCount || 0);
+        quizCount += (topic.metrics.quizCount || 0);
+        mcqCount += (topic.metrics.mcqCount || 0);
+        cqCount += (topic.metrics.cqCount || 0);
       }
-      
+
       topic.subtopics?.forEach((sub: any) => {
         const sTitle = (sub.title || '').toLowerCase();
         if (sTitle.includes('mcq') || sTitle.includes('বহুনির্বাচনি')) mcqCount++;
@@ -161,22 +161,22 @@ export function SubjectDashboard({
   let schemas: any[] = [];
   let faqs: { question: string; answer: string }[] = [];
   let seoContent = '';
-  
+
   if (node) {
     const breadcrumbItems = [
       { name: 'Home', item: 'https://deshexam.com' },
       { name: 'Academy', item: 'https://deshexam.com/guide/board' }
     ];
     let currentUrl = 'https://deshexam.com/guide';
-    
+
     node.ancestors?.forEach((anc: any) => {
       currentUrl += `/${anc.slug || anc.id}`;
       breadcrumbItems.push({ name: anc.title, item: currentUrl });
     });
     breadcrumbItems.push({ name: node.title, item: `https://deshexam.com/guide/${node.fullSlug || node.id}` });
-    
+
     schemas.push(generateBreadcrumbSchema(breadcrumbItems));
-    
+
     if (pageType === 'textbook') {
       schemas.push(generateBookSchema({
         name: node.title,
@@ -189,7 +189,7 @@ export function SubjectDashboard({
       name: `${node.title} Guide`,
       educationalLevel: 'Secondary'
     }));
-    
+
     let itemListElements = [];
     if (pageType === 'textbook') {
       itemListElements = ((curriculum.find((c: any) => c.dbId === id || c.id === id) || curriculum[0])?.topics || []).map((t: any) => ({
@@ -202,11 +202,11 @@ export function SubjectDashboard({
         url: `https://deshexam.com/guide/${item.fullSlug || item.id}`
       }));
     }
-    
+
     if (itemListElements.length > 0) {
       schemas.push(generateItemListSchema(itemListElements));
     }
-    
+
     faqs = (node.faqs && node.faqs.length > 0) ? node.faqs : [
       { question: `Which class is ${node.title} for?`, answer: `This is an essential guide for ${classTitle ? classTitle : 'students'}${boardTitle ? ' under the ' + boardTitle + ' curriculum' : ''}.` },
       { question: `Does this guide contain chapter-wise notes?`, answer: `Yes, detailed notes, summaries, and questions-answers are provided for every chapter.` },
@@ -223,7 +223,7 @@ At DeshExam, we provide high-quality MCQ, short answer questions (SAQ), long ans
   }
 
   let uiBreadcrumbs = breadcrumbs;
-  
+
   if (!uiBreadcrumbs && node) {
     uiBreadcrumbs = [
       { name: 'Home', url: '/' },
@@ -243,7 +243,7 @@ At DeshExam, we provide high-quality MCQ, short answer questions (SAQ), long ans
       {/* Top Header Bar (White) */}
       <div className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between relative">
-          
+
           {/* Mobile Back Button & Centered Title */}
           <div className="flex items-center md:hidden w-full">
             <button onClick={() => router.back()} className="p-2 -ml-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
@@ -331,7 +331,7 @@ At DeshExam, we provide high-quality MCQ, short answer questions (SAQ), long ans
         <div className="flex-1 w-full flex flex-col bg-white dark:bg-slate-900 sm:rounded-xl shadow-sm sm:border border-slate-200 dark:border-slate-800 overflow-hidden">
 
           {/* Green Header Box */}
-          <div className="bg-[#dcefe2] dark:bg-emerald-900/20 px-4 py-5 sm:px-6 sm:py-5 relative flex items-start gap-4 sm:gap-6">
+          <div className="bg-[#dcefe2] dark:bg-emerald-900/20 p-2 relative flex items-start gap-4 sm:gap-6">
             {pageType === 'textbook' && node?.featureImage && (
               <div className="shrink-0 w-20 h-28 sm:w-24 sm:h-32 rounded-lg overflow-hidden shadow-md">
                 <Image src={node.featureImage} alt={`${displayTitle} textbook cover`} width={96} height={128} className="object-cover w-full h-full" priority />
@@ -358,10 +358,10 @@ At DeshExam, we provide high-quality MCQ, short answer questions (SAQ), long ans
                 </p>
               ) : (
                 <p className="text-[13px] sm:text-[14px] text-[#5c7a6b] dark:text-emerald-200/70 mb-3">
-                  {pageType === 'board' 
-                    ? 'All Classes & Curriculum' 
-                    : pageType === 'class' 
-                      ? `${boardTitle || ''} Curriculum Guide`.trim() 
+                  {pageType === 'board'
+                    ? 'All Classes & Curriculum'
+                    : pageType === 'class'
+                      ? `${boardTitle || ''} Curriculum Guide`.trim()
                       : pageType === 'textbook'
                         ? `${boardTitle || ''} ${classTitle || ''} ${subjectTitle || ''} Textbook Guide`.replace(/\s+/g, ' ').trim()
                         : `${classTitle || ''} ${subjectTitle || ''} Guide`.replace(/\s+/g, ' ').trim()}
@@ -424,11 +424,15 @@ At DeshExam, we provide high-quality MCQ, short answer questions (SAQ), long ans
                 <Languages className="w-3 h-3" />{m}
               </span>
             ))}
-            {mockTestCount > 0 && <span className="shrink-0 px-3 py-1.5 sm:py-1 bg-rose-600 text-white text-[11px] sm:text-[12px] font-bold rounded-full">Mock Tests: {mockTestCount}</span>}
-            {quizCount > 0 && <span className="shrink-0 px-3 py-1.5 sm:py-1 bg-amber-600 text-white text-[11px] sm:text-[12px] font-bold rounded-full">Quizzes: {quizCount}</span>}
-            <button className="shrink-0 px-3 py-1.5 sm:py-1 bg-white dark:bg-slate-800 border-[1.5px] border-[#107c41] text-[#107c41] dark:text-emerald-400 text-[11px] sm:text-[12px] font-bold rounded-full flex items-center gap-1 hover:bg-[#f0f9f4] dark:hover:bg-emerald-900/20 transition-colors">
+            <Link href={`/practice/${node?.fullSlug || node?.id || id}`} className="shrink-0 px-3 py-1.5 sm:py-1 bg-white dark:bg-slate-800 border-[1.5px] border-[#107c41] text-[#107c41] dark:text-emerald-400 text-[11px] sm:text-[12px] font-bold rounded-full flex items-center gap-1 hover:bg-[#f0f9f4] dark:hover:bg-emerald-900/20 transition-colors">
               <Play className="w-3 h-3 fill-current" /> Practice
-            </button>
+            </Link>
+            <Link href={`/mock-tests`} className="shrink-0 px-3 py-1.5 sm:py-1 bg-white dark:bg-slate-800 border-[1.5px] border-rose-600 text-rose-600 dark:text-rose-400 text-[11px] sm:text-[12px] font-bold rounded-full flex items-center gap-1 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors">
+              <FileText className="w-3 h-3" /> Mock Test {mockTestCount > 0 && `(${mockTestCount})`}
+            </Link>
+            <Link href={`/quiz`} className="shrink-0 px-3 py-1.5 sm:py-1 bg-white dark:bg-slate-800 border-[1.5px] border-amber-600 text-amber-600 dark:text-amber-400 text-[11px] sm:text-[12px] font-bold rounded-full flex items-center gap-1 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors">
+              <Clock className="w-3 h-3" /> Quiz {quizCount > 0 && `(${quizCount})`}
+            </Link>
             <div className="ml-auto shrink-0 pl-2 hidden sm:block">
               <Image
                 src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
@@ -542,7 +546,7 @@ At DeshExam, we provide high-quality MCQ, short answer questions (SAQ), long ans
           </div>
         )}
       </div>
-      
+
       {schemas.length > 0 && (
         <script
           type="application/ld+json"
