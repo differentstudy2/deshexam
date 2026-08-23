@@ -87,7 +87,7 @@ export function ReadingArticle({ data, node, hierarchy, navigation, contentType 
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="flex-1 w-full">
             <div className="flex flex-wrap items-baseline gap-2 mb-1">
-              <h1 className="text-[26px] sm:text-[28px] font-bold text-[#143d30] dark:text-slate-100 tracking-tight">
+              <h1 className="text-[18px] sm:text-[18px] font-bold text-[#143d30] dark:text-slate-100 tracking-tight">
                 {data.title}
               </h1>
               {data.author?.name && (
@@ -390,11 +390,11 @@ export function ReadingArticle({ data, node, hierarchy, navigation, contentType 
           <div className="flex flex-col">
 
             {/* Master Banner */}
-            <div className="bg-[#f2f9f6] dark:bg-emerald-900/10 px-6 py-4 sm:py-5 border-b border-emerald-100/50 dark:border-slate-800">
+            <div className="bg-[#f2f9f6] dark:bg-emerald-900/10 px-6 py-4 sm:py-2 border-b border-emerald-100/50 dark:border-slate-800">
               <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div className="flex-1 w-full">
                   <div className="flex flex-wrap items-baseline gap-2 mb-1">
-                    <h1 className="text-[26px] sm:text-[28px] font-bold text-[#143d30] dark:text-slate-100 tracking-tight">
+                    <h1 className="text-[18px] sm:text-[18px] font-bold text-[#143d30] dark:text-slate-100 tracking-tight">
                       {data.title}
                     </h1>
                     {data.author?.name && (
