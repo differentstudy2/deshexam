@@ -31,27 +31,13 @@ export default function QuestionBuilderFilters() {
     const fetchTaxonomies = async () => {
       setLoading(true);
       try {
-        const snap = await getDocs(collection(db, 'taxonomy_nodes'));
-        const allNodes = snap.docs.map(d => ({ id: d.id, ...d.data() as any }));
+        const { getHardcodedTaxonomyNodes } = await import('@/data/hardcoded/taxonomy');
+        const allNodes = getHardcodedTaxonomyNodes();
         
         let fetchedBoards = allNodes.filter(n => n.type === 'board' || n.type === 'category');
         
-        // Filter out boards with no questions
-        const { query, where, limit } = await import('firebase/firestore');
-        const activeBoardIds = new Set<string>();
-        
-        await Promise.all(fetchedBoards.map(async (b) => {
-          try {
-            const q = query(collection(db, 'question_bank'), where('boardId', '==', b.id), limit(1));
-            const qSnap = await getDocs(q);
-            if (!qSnap.empty) {
-              activeBoardIds.add(b.id);
-            }
-          } catch(e) {}
-        }));
-        
         setTaxonomies({
-          boards: fetchedBoards.filter(b => activeBoardIds.has(b.id)),
+          boards: fetchedBoards,
           classes: allNodes.filter(n => n.type === 'class' || n.type === 'subcategory'),
           subjects: allNodes.filter(n => n.type === 'subject'),
           textbooks: allNodes.filter(n => n.type === 'textbook' || n.type === 'exam'),

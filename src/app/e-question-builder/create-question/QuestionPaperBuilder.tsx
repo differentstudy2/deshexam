@@ -1949,7 +1949,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                                               </div>
 
                                               {/* Options */}
-                                              {(!q.questionType || q.questionType === 'MCQ') && q.options && (
+                                              {(!q.questionType || q.questionType.toUpperCase() === 'MCQ') && q.options && (
                                                 <div
                                                   className="grid gap-x-2 pl-6"
                                                   style={{

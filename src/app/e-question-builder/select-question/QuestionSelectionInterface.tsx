@@ -35,25 +35,24 @@ export default function QuestionSelectionInterface({ initialFilters }: { initial
   // Auto-fill paper name based on taxonomy
   useEffect(() => {
     const fetchDefaultPaperName = async () => {
-      const { doc, getDoc } = await import('firebase/firestore');
-      const { db } = await import('@/lib/firebase/client');
+      const { getHardcodedTaxonomyNodeById } = await import('@/data/hardcoded/taxonomy');
 
       let isAcademic = false;
 
-      const fetchNodeName = async (id: string | undefined) => {
+      const fetchNodeName = (id: string | undefined) => {
         if (!id || id === 'all') return null;
-        const d = await getDoc(doc(db, 'taxonomy_nodes', id));
-        if (d.exists()) {
-          if (d.data().track === 'academic') isAcademic = true;
-          return d.data().title || d.data().name || '';
+        const node = getHardcodedTaxonomyNodeById(id);
+        if (node) {
+          if (node.track === 'academic') isAcademic = true;
+          return node.title || (node as any).name || '';
         }
         return null;
       };
 
-      const boardName = await fetchNodeName(initialFilters.boardId);
-      const className = await fetchNodeName(initialFilters.classId);
-      const subName = await fetchNodeName(initialFilters.subjectId);
-      const chapName = await fetchNodeName(initialFilters.chapterId);
+      const boardName = fetchNodeName(initialFilters.boardId);
+      const className = fetchNodeName(initialFilters.classId);
+      const subName = fetchNodeName(initialFilters.subjectId);
+      const chapName = fetchNodeName(initialFilters.chapterId);
 
       const names: string[] = [];
       if (isAcademic) {

@@ -224,20 +224,27 @@ export async function getTotalQuestionsCount(filters?: any) {
 export async function getQuestionsByIds(ids: string[]) {
   if (!ids || ids.length === 0) return [];
   
-  // Firestore 'in' query supports up to 10 items.
-  // For larger arrays, we need to chunk them.
-  const chunks = [];
-  for (let i = 0; i < ids.length; i += 10) {
-    chunks.push(ids.slice(i, i + 10));
-  }
+  // First, get any matching questions from hardcoded data
+  const localMatches = hardcodedQuestions.filter(q => ids.includes(q.id));
+  const localMatchIds = new Set(localMatches.map(q => q.id));
   
-  const results: QuestionBankEntry[] = [];
-  const colRef = collection(db, QUESTIONS_COLLECTION);
+  // Get the remaining IDs that need to be fetched from Firebase
+  const remainingIds = ids.filter(id => !localMatchIds.has(id));
+  const results: QuestionBankEntry[] = [...localMatches];
   
-  for (const chunk of chunks) {
-    const q = query(colRef, where(documentId(), 'in', chunk));
-    const snapshot = await getDocs(q);
-    snapshot.docs.forEach(doc => results.push({ id: doc.id, ...doc.data() } as QuestionBankEntry));
+  if (remainingIds.length > 0) {
+    // Firestore 'in' query supports up to 10 items.
+    const chunks = [];
+    for (let i = 0; i < remainingIds.length; i += 10) {
+      chunks.push(remainingIds.slice(i, i + 10));
+    }
+    
+    const colRef = collection(db, QUESTIONS_COLLECTION);
+    for (const chunk of chunks) {
+      const q = query(colRef, where(documentId(), 'in', chunk));
+      const snapshot = await getDocs(q);
+      snapshot.docs.forEach(doc => results.push({ id: doc.id, ...doc.data() } as QuestionBankEntry));
+    }
   }
   
   // Sort back to original order of `ids` array
