@@ -62,8 +62,8 @@ export default function QuestionFeed({
                 <div className="text-center p-12 text-slate-500 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm">No questions available.</div>
             ) : (
                 <>
-                    {currentQuestions.map((q: any) => (
-                        <QuestionCard key={q.id} question={q} isListView={true} testMode={isTestMode} />
+                    {currentQuestions.map((q: any, i: number) => (
+                        <QuestionCard key={q.id || `q-feed-${i}`} question={q} isListView={true} testMode={isTestMode} />
                     ))}
                     <QuestionPagination
                         currentPage={currentPage}

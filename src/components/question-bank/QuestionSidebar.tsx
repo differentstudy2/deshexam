@@ -27,13 +27,13 @@ export default async function QuestionSidebar() {
 
     return (
         <div className="w-full space-y-6">
-            <div className="bg-gradient-to-br from-white to-slate-50/50 dark:from-slate-900 dark:to-slate-900 rounded-[24px] border border-slate-200/60 dark:border-slate-800/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] hover:shadow-[0_12px_40px_rgb(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 overflow-hidden">
-                <div className="bg-[#107c41] px-6 py-4">
+            <div className="bg-gradient-to-br from-white to-slate-50/50 dark:from-slate-900 dark:to-slate-900 rounded-[8px] border border-slate-200/60 dark:border-slate-800/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] hover:shadow-[0_12px_40px_rgb(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+                <div className="bg-[#107c41] px-2 py-2">
                     <h3 className="text-lg font-extrabold text-white flex items-center gap-2.5 tracking-tight">
                         <BookOpen className="w-5 h-5 text-white/90" /> Exam Categories
                     </h3>
                 </div>
-                <div className="flex flex-col space-y-1 p-6 pt-5">
+                <div className="flex flex-col space-y-1 p-2">
                     {categories.map((cat) => (
                         <Link
                             key={cat.slug}
@@ -47,13 +47,13 @@ export default async function QuestionSidebar() {
             </div>
 
             {popularQuestions.length > 0 && (
-                <div className="bg-gradient-to-br from-white to-slate-50/50 dark:from-slate-900 dark:to-slate-900 rounded-[24px] border border-slate-200/60 dark:border-slate-800/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] hover:shadow-[0_12px_40px_rgb(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 overflow-hidden">
-                    <div className="bg-orange-500 px-6 py-4">
+                <div className="bg-gradient-to-br from-white to-slate-50/50 dark:from-slate-900 dark:to-slate-900 rounded-[8px] border border-slate-200/60 dark:border-slate-800/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] hover:shadow-[0_12px_40px_rgb(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+                    <div className="bg-orange-500 px-2 py-2">
                         <h3 className="text-lg font-extrabold text-white flex items-center gap-2.5 tracking-tight">
                             <Flame className="w-5 h-5 text-white/90" /> Popular Questions
                         </h3>
                     </div>
-                    <div className="flex flex-col space-y-3 p-6 pt-5">
+                    <div className="flex flex-col space-y-3 p-2">
                         {popularQuestions.map((q) => (
                             <Link key={q.id} href={`/question/${q.slug || q.id}`} className="group">
                                 <p className="text-sm text-slate-700 dark:text-slate-300 font-medium line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
@@ -67,13 +67,13 @@ export default async function QuestionSidebar() {
             )}
 
             {recentQuestions.length > 0 && (
-                <div className="bg-gradient-to-br from-white to-slate-50/50 dark:from-slate-900 dark:to-slate-900 rounded-[24px] border border-slate-200/60 dark:border-slate-800/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] hover:shadow-[0_12px_40px_rgb(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 overflow-hidden">
-                    <div className="bg-blue-600 px-6 py-4">
+                <div className="bg-gradient-to-br from-white to-slate-50/50 dark:from-slate-900 dark:to-slate-900 rounded-[8px] border border-slate-200/60 dark:border-slate-800/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] hover:shadow-[0_12px_40px_rgb(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+                    <div className="bg-blue-600 px-2 py-2">
                         <h3 className="text-lg font-extrabold text-white flex items-center gap-2.5 tracking-tight">
                             <Clock className="w-5 h-5 text-white/90" /> Recent Questions
                         </h3>
                     </div>
-                    <div className="flex flex-col space-y-3 p-6 pt-5">
+                    <div className="flex flex-col space-y-3 p-2">
                         {recentQuestions.map((q) => (
                             <Link key={q.id} href={`/question/${q.slug || q.id}`} className="group">
                                 <p className="text-sm text-slate-700 dark:text-slate-300 font-medium line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
@@ -85,20 +85,20 @@ export default async function QuestionSidebar() {
                 </div>
             )}
 
-            <div className="bg-gradient-to-br from-white to-slate-50/50 dark:from-slate-900 dark:to-slate-900 rounded-[24px] border border-slate-200/60 dark:border-slate-800/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] hover:shadow-[0_12px_40px_rgb(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 overflow-hidden">
-                <div className="bg-indigo-600 px-6 py-4">
+            <div className="bg-gradient-to-br from-white to-slate-50/50 dark:from-slate-900 dark:to-slate-900 rounded-[8px] border border-slate-200/60 dark:border-slate-800/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] hover:shadow-[0_12px_40px_rgb(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+                <div className="bg-indigo-600 px-2 py-2">
                     <h3 className="text-lg font-extrabold text-white flex items-center gap-2.5 tracking-tight">
                         <ExternalLink className="w-5 h-5 text-white/90" /> Study Resources
                     </h3>
                 </div>
-                <div className="flex flex-col space-y-2 p-6 pt-5">
+                <div className="flex flex-col space-y-2 p-2">
                     <Link href="/guide" className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">Reading Materials & Guides</Link>
                     <Link href="/learn/video" className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">Video Classes</Link>
                     <Link href="/kids-zone" className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">Kids Zone / Quizzes</Link>
                 </div>
             </div>
 
-            <div className="bg-slate-50 dark:bg-slate-900 border border-dashed border-slate-300 dark:border-slate-700 rounded-[24px] p-6 flex flex-col items-center justify-center text-center min-h-[250px] transition-all hover:bg-slate-100 dark:hover:bg-slate-800">
+            <div className="bg-slate-50 dark:bg-slate-900 border border-dashed border-slate-300 dark:border-slate-700 rounded-[8px] p-2 flex flex-col items-center justify-center text-center min-h-[250px] transition-all hover:bg-slate-100 dark:hover:bg-slate-800">
                 <Speaker className="w-8 h-8 text-slate-300 dark:text-slate-600 mb-2" />
                 <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Advertisement</p>
                 <p className="text-sm text-slate-500 dark:text-slate-400 max-w-[200px]">Place your ad script here.</p>
@@ -116,3 +116,5 @@ export default async function QuestionSidebar() {
         </div>
     );
 }
+
+

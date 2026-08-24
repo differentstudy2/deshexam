@@ -14,7 +14,7 @@ export default function QuestionListViewer({ questions }: { questions: QuestionB
             {/* Questions List */}
             <div className="space-y-6">
                 {questions.map((q, i) => (
-                    <QuestionCard key={q.id} question={q} index={i + 1} testMode={isTestMode} />
+                    <QuestionCard key={q.id || `q-list-${i}`} question={q} index={i + 1} testMode={isTestMode} />
                 ))}
             </div>
 

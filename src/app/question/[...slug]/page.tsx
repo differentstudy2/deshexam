@@ -3,6 +3,7 @@ import { getQuestionBySlug, getQuestionsByTaxonomySlug, getQuestion, getQuestion
 import { getTopicHierarchy } from '@/lib/firebase/guide';
 import { db } from '@/lib/firebase/client';
 import { doc, getDoc } from 'firebase/firestore';
+import { getHardcodedTaxonomyNodeById } from '@/data/hardcoded/taxonomy';
 import QuestionCard from '@/components/question-bank/QuestionCard';
 import QuestionListViewer from '@/components/question-bank/QuestionListViewer';
 import QuestionSidebar from '@/components/question-bank/QuestionSidebar';
@@ -98,6 +99,15 @@ export default async function DynamicQuestionPage({ params }: Props) {
       const tryFetchTitle = async (id: string, col1: string, col2: string) => {
           if (!id) return null;
           if (titleCache.has(id)) return titleCache.get(id);
+
+          // Check hardcoded taxonomy first
+          const hardcodedNode = getHardcodedTaxonomyNodeById(id);
+          if (hardcodedNode) {
+              const res = { title: hardcodedNode.title || 'Unknown', slug: hardcodedNode.slug || id };
+              titleCache.set(id, res);
+              return res;
+          }
+
           try {
               // First try the new taxonomy_nodes collection
               let snap = await getDoc(doc(db, 'taxonomy_nodes', id));

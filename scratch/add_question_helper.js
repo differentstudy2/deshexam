@@ -66,8 +66,13 @@ function generateSlug(text) {
 
 const baseSlug = generateSlug(NEW_QUESTION.questionText);
 const timestamp = Date.now().toString().slice(-6); // last 6 digits of timestamp
-NEW_QUESTION.id = `q-${baseSlug}-${timestamp}`;
-NEW_QUESTION.slug = `${baseSlug}-${timestamp}`;
+
+const finalQuestion = {
+  id: `q-${baseSlug}-${timestamp}`,
+  slug: `${baseSlug}-${timestamp}`,
+  createdAt: new Date().toISOString(),
+  ...NEW_QUESTION
+};
 
 const questionsFile = path.join(__dirname, '../src/data/hardcoded/taxonomy/questions.json');
 let questions = [];
@@ -77,16 +82,16 @@ if (fs.existsSync(questionsFile)) {
 }
 
 // চেক করা হচ্ছে আগে থেকে এই ID-র কোনো প্রশ্ন আছে কিনা
-const index = questions.findIndex(q => q.id === NEW_QUESTION.id);
+const index = questions.findIndex(q => q.id === finalQuestion.id);
 
 if (index !== -1) {
   // থাকলে আপডেট করা হবে
-  questions[index] = { ...questions[index], ...NEW_QUESTION };
-  console.log(`Updated existing question: ${NEW_QUESTION.id}`);
+  questions[index] = { ...questions[index], ...finalQuestion };
+  console.log(`Updated existing question: ${finalQuestion.id}`);
 } else {
   // না থাকলে নতুন অ্যাড করা হবে
-  questions.push(NEW_QUESTION);
-  console.log(`Added new question: ${NEW_QUESTION.id}`);
+  questions.push(finalQuestion);
+  console.log(`Added new question: ${finalQuestion.id}`);
 }
 
 fs.writeFileSync(questionsFile, JSON.stringify(questions, null, 2), 'utf8');

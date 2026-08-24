@@ -468,7 +468,7 @@ export default function QuestionCard({ question, index, testMode = false, isList
     return (
         <div id={`question-card-${question.id}`} className={cn(
             "w-full bg-gradient-to-br from-white to-slate-50/50 dark:from-slate-900 dark:to-slate-900 border border-slate-200/60 dark:border-slate-800/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] transition-all duration-300 hover:shadow-[0_12px_40px_rgb(0,0,0,0.08)] hover:-translate-y-1 relative overflow-hidden group",
-            isListView ? "p-4 md:p-5 rounded-2xl" : "p-5 md:p-6 rounded-[24px] mb-5"
+            isListView ? "py-2 px-4 md:px-5 rounded-[9px]" : "py-2 px-5 md:px-6 rounded-[9px] mb-5"
         )}>
             
             {/* Soft decorative top border */}

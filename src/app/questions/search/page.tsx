@@ -55,8 +55,8 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                 ) : (
                     <>
                         <p className="text-sm text-slate-500 font-medium mb-4">Found {safeQuestions.length} matches</p>
-                        {safeQuestions.map((q: any) => (
-                            <QuestionCard key={q.id} question={q} />
+                        {safeQuestions.map((q: any, i: number) => (
+                            <QuestionCard key={q.id || `q-search-${q.slug || i}`} question={q} />
                         ))}
                     </>
                 )}

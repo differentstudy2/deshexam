@@ -131,7 +131,7 @@ export function NodeQuestionsPage({ node, contentType, breadcrumbs }: NodeQuesti
           </div>
           {questions.map((question, index) => (
             <QuestionCard 
-              key={question.id} 
+              key={question.id || `q-fallback-${index}`}
               question={question} 
               index={index}
               isListView={true}
