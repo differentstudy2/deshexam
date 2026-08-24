@@ -7,7 +7,7 @@ export type AcademicNodeType = 'board' | 'institution' | 'class' | 'subject' | '
 export type CompetitiveNodeType = 'category' | 'subcategory' | 'exam' | 'subject' | 'chapter' | 'topic';
 export type NodeType = AcademicNodeType | CompetitiveNodeType;
 
-export const VALID_CONTENT_TYPES = ['mcq', 'cq', 'questions', 'notes', 'summary', 'practice', 'practice-set', 'practice-sets', 'mock-test', 'mock-tests', 'model-test', 'quiz', 'quizzes', 'exam-papers', 'video', 'pdf', 'lesson', 'guide-content', 'word-meaning', 'objective', 'introduction', 'author', 'explanation', 'exercise', 'creative-question', 'descriptive', 'q-a', 'board-question', 'video-classes', 'solutions'] as const;
+export const VALID_CONTENT_TYPES = ['mcq', 'cq', 'questions', 'notes', 'summary', 'practice', 'practice-set', 'practice-sets', 'mock-test', 'mock-tests', 'model-test', 'quiz', 'quizzes', 'exam-papers', 'video', 'pdf', 'lesson', 'guide-content', 'word-meaning', 'objective', 'introduction', 'author', 'explanation', 'exercise', 'creative-question', 'descriptive', 'q-a', 'board-question', 'video-classes', 'solutions', 'true-false', 'fill-in-blanks', 'matching'] as const;
 export type ContentType = typeof VALID_CONTENT_TYPES[number] | string;
 
 export interface TaxonomyNode {

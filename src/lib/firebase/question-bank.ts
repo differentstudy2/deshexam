@@ -118,7 +118,11 @@ export async function getQuestionsPaginated(filters?: Record<string, any>, limit
     if (!filters) return true;
     for (const [key, value] of Object.entries(filters)) {
       if (value !== undefined && value !== null && value !== '' && value !== 'all') {
-        if (q[key as keyof QuestionBankEntry] !== value) return false;
+        if (Array.isArray(value)) {
+          if (!value.includes(q[key as keyof QuestionBankEntry])) return false;
+        } else {
+          if (q[key as keyof QuestionBankEntry] !== value) return false;
+        }
       }
     }
     return true;
@@ -129,7 +133,11 @@ export async function getQuestionsPaginated(filters?: Record<string, any>, limit
   if (filters) {
     for (const [key, value] of Object.entries(filters)) {
       if (value !== undefined && value !== null && value !== '' && value !== 'all') {
-        conditions.push(where(key, '==', value));
+        if (Array.isArray(value)) {
+          conditions.push(where(key, 'in', value));
+        } else {
+          conditions.push(where(key, '==', value));
+        }
       }
     }
   }

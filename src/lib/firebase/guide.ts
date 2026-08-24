@@ -396,6 +396,21 @@ export const getReadingContent = async (contentId: string): Promise<ReadingConte
             finalSections.push({ id: 'mcq', title: 'MCQ', type: 'mcq' });
           }
           
+          const hasTf = topicQs.some(q => (q as any).questionType?.toLowerCase() === 't/f');
+          if (hasTf && !finalSections.some(s => s.id === 'true-false')) {
+            finalSections.push({ id: 'true-false', title: 'True / False', type: 'true-false' });
+          }
+          
+          const hasFib = topicQs.some(q => (q as any).questionType?.toLowerCase() === 'fib');
+          if (hasFib && !finalSections.some(s => s.id === 'fill-in-blanks')) {
+            finalSections.push({ id: 'fill-in-blanks', title: 'Fill in the Blanks', type: 'fill-in-blanks' });
+          }
+          
+          const hasMatch = topicQs.some(q => (q as any).questionType?.toLowerCase() === 'match');
+          if (hasMatch && !finalSections.some(s => s.id === 'matching')) {
+            finalSections.push({ id: 'matching', title: 'Matching', type: 'matching' });
+          }
+
           const hasCq = topicQs.some(q => {
             const t = ((q as any).type || (q as any).questionType || '').toLowerCase();
             return t === 'cq' || t === 'descriptive';

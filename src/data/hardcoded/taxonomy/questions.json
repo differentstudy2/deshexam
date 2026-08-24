@@ -44,6 +44,7 @@
     "chapterId": "chapter-manabdeha-amader-paribesh",
     "topicId": "topic-shorirer-bormo-manabdeha",
     "questionType": "mcq",
+    "questionText": "ত্বকের নিচে প্রধানত কী কী থাকে?",
     "marks": 1,
     "difficulty": "medium",
     "status": "published",
@@ -51,7 +52,6 @@
       "মানবেদহ",
       "বর্ম"
     ],
-    "questionText": "ত্বকের নিচে প্রধানত কী কী থাকে?",
     "options": {
       "a": "শুধুমাত্র হাড়",
       "b": "রক্তনালী ও স্নায়ু",
@@ -78,6 +78,7 @@
     "chapterId": "chapter-manabdeha-amader-paribesh",
     "topicId": "topic-shorirer-bormo-manabdeha",
     "questionType": "mcq",
+    "questionText": "নিচের কোন প্রাণীর গা-ভর্তি শক্ত খোলস থাকে?",
     "marks": 1,
     "difficulty": "medium",
     "status": "published",
@@ -85,7 +86,6 @@
       "মানবেদহ",
       "বর্ম"
     ],
-    "questionText": "নিচের কোন প্রাণীর গা-ভর্তি শক্ত খোলস থাকে?",
     "options": {
       "a": "বাঘ",
       "b": "শামুক ও কচ্ছপ",
@@ -112,6 +112,7 @@
     "chapterId": "chapter-manabdeha-amader-paribesh",
     "topicId": "topic-shorirer-bormo-manabdeha",
     "questionType": "mcq",
+    "questionText": "সজারুর আত্মরক্ষার প্রধান উপায় কী?",
     "marks": 1,
     "difficulty": "medium",
     "status": "published",
@@ -119,7 +120,6 @@
       "মানবেদহ",
       "বর্ম"
     ],
-    "questionText": "সজারুর আত্মরক্ষার প্রধান উপায় কী?",
     "options": {
       "a": "শক্ত খোলস",
       "b": "মোটা চামড়া",
@@ -146,6 +146,7 @@
     "chapterId": "chapter-manabdeha-amader-paribesh",
     "topicId": "topic-shorirer-bormo-manabdeha",
     "questionType": "mcq",
+    "questionText": "আগেকার দিনে কোন প্রাণীর চামড়া দিয়ে যুদ্ধের ঢাল তৈরি হতো?",
     "marks": 1,
     "difficulty": "medium",
     "status": "published",
@@ -153,7 +154,6 @@
       "মানবেদহ",
       "বর্ম"
     ],
-    "questionText": "আগেকার দিনে কোন প্রাণীর চামড়া দিয়ে যুদ্ধের ঢাল তৈরি হতো?",
     "options": {
       "a": "হাতি",
       "b": "বাঘ",
@@ -180,6 +180,7 @@
     "chapterId": "chapter-manabdeha-amader-paribesh",
     "topicId": "topic-shorirer-bormo-manabdeha",
     "questionType": "mcq",
+    "questionText": "ঘামের মাধ্যমে আমাদের শরীর থেকে কী বেরিয়ে যায়?",
     "marks": 1,
     "difficulty": "medium",
     "status": "published",
@@ -187,7 +188,6 @@
       "মানবেদহ",
       "বর্ম"
     ],
-    "questionText": "ঘামের মাধ্যমে আমাদের শরীর থেকে কী বেরিয়ে যায়?",
     "options": {
       "a": "প্রয়োজনীয় ভিটামিন",
       "b": "দূষিত পদার্থ বা বর্জ্য",
@@ -214,6 +214,7 @@
     "chapterId": "chapter-manabdeha-amader-paribesh",
     "topicId": "topic-shorirer-bormo-manabdeha",
     "questionType": "mcq",
+    "questionText": "খুব বেশি ঘাম হলে শরীরে কীসের অভাব দেখা দিতে পারে?",
     "marks": 1,
     "difficulty": "medium",
     "status": "published",
@@ -221,7 +222,6 @@
       "মানবেদহ",
       "বর্ম"
     ],
-    "questionText": "খুব বেশি ঘাম হলে শরীরে কীসের অভাব দেখা দিতে পারে?",
     "options": {
       "a": "জল ও নুনের",
       "b": "প্রোটিনের",
@@ -248,6 +248,7 @@
     "chapterId": "chapter-manabdeha-amader-paribesh",
     "topicId": "topic-shorirer-bormo-manabdeha",
     "questionType": "mcq",
+    "questionText": "রোদে থাকলে আমাদের ত্বকে কোন ভিটামিন তৈরি হয়?",
     "marks": 1,
     "difficulty": "medium",
     "status": "published",
@@ -255,7 +256,6 @@
       "মানবেদহ",
       "বর্ম"
     ],
-    "questionText": "রোদে থাকলে আমাদের ত্বকে কোন ভিটামিন তৈরি হয়?",
     "options": {
       "a": "ভিটামিন এ",
       "b": "ভিটামিন বি",
@@ -282,6 +282,7 @@
     "chapterId": "chapter-manabdeha-amader-paribesh",
     "topicId": "topic-shorirer-bormo-manabdeha",
     "questionType": "mcq",
+    "questionText": "নিচের কোন উক্তিটি চামড়া বা ত্বকের কাজ সম্পর্কে সঠিক নয়?",
     "marks": 1,
     "difficulty": "medium",
     "status": "published",
@@ -289,7 +290,6 @@
       "মানবেদহ",
       "বর্ম"
     ],
-    "questionText": "নিচের কোন উক্তিটি চামড়া বা ত্বকের কাজ সম্পর্কে সঠিক নয়?",
     "options": {
       "a": "ত্বক শরীরকে বাইরের আঘাত থেকে বাঁচায়",
       "b": "ত্বক জীবাণুর হাত থেকে শরীরকে রক্ষা করে",
@@ -316,6 +316,7 @@
     "chapterId": "chapter-manabdeha-amader-paribesh",
     "topicId": "topic-shorirer-bormo-manabdeha",
     "questionType": "mcq",
+    "questionText": "আমাদের শরীরের সবচেয়ে বড় অঙ্গ কোনটি?",
     "marks": 1,
     "difficulty": "medium",
     "status": "published",
@@ -323,7 +324,6 @@
       "মানবেদহ",
       "বর্ম"
     ],
-    "questionText": "আমাদের শরীরের সবচেয়ে বড় অঙ্গ কোনটি?",
     "options": {
       "a": "যকৃৎ (Liver)",
       "b": "হৃৎপিণ্ড",
@@ -350,6 +350,7 @@
     "chapterId": "chapter-manabdeha-amader-paribesh",
     "topicId": "topic-shorirer-bormo-manabdeha",
     "questionType": "mcq",
+    "questionText": "কোথাও কেটে গেলে বা ছড়ে গেলে প্রথমে কোন স্তরের ক্ষতি হয়?",
     "marks": 1,
     "difficulty": "medium",
     "status": "published",
@@ -357,7 +358,6 @@
       "মানবেদহ",
       "বর্ম"
     ],
-    "questionText": "কোথাও কেটে গেলে বা ছড়ে গেলে প্রথমে কোন স্তরের ক্ষতি হয়?",
     "options": {
       "a": "মাংসপেশি",
       "b": "হাড়",
@@ -372,5 +372,500 @@
     },
     "correctAnswer": "c",
     "explanation": "ত্বক শরীরের সবচেয়ে বাইরের স্তর। তাই কোথাও ধাক্কা লাগলে, কেটে গেলে বা পুড়ে গেলে সবার প্রথমে ত্বকই আঘাতপ্রাপ্ত হয়।"
+  },
+  {
+    "id": "q-চামড়ার-আরেক-নাম-ত্বক-17875673830410",
+    "slug": "চামড়ার-আরেক-নাম-ত্বক-17875673830410",
+    "createdAt": "2026-08-24T10:29:43.042Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "T/F",
+    "questionText": "চামড়ার আরেক নাম ত্বক।",
+    "status": "published",
+    "difficulty": "medium",
+    "marks": 1,
+    "tags": [
+      "মানবেদহ",
+      "বর্ম"
+    ],
+    "correctAnswer": "True",
+    "explanation": "ত্বক এবং চামড়া একই অঙ্গের দুটি ভিন্ন নাম।"
+  },
+  {
+    "id": "q-হাড়-আমাদের-শরীরকে-বাইরের-আঘাত-থেকে-রক্ষা-করে-17875673830431",
+    "slug": "হাড়-আমাদের-শরীরকে-বাইরের-আঘাত-থেকে-রক্ষা-করে-17875673830431",
+    "createdAt": "2026-08-24T10:29:43.043Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "T/F",
+    "questionText": "হাড় আমাদের শরীরকে বাইরের আঘাত থেকে রক্ষা করে।",
+    "status": "published",
+    "difficulty": "medium",
+    "marks": 1,
+    "tags": [
+      "মানবেদহ",
+      "বর্ম"
+    ],
+    "correctAnswer": "False",
+    "explanation": "ত্বক বা চামড়া বাইরের আঘাত থেকে রক্ষা করে, হাড় নয়।"
+  },
+  {
+    "id": "q-ত্বকের-নিচে-শিরা-ও-ধমনী-জালের-মতো-ছড়িয়ে-থাকে-17875673830432",
+    "slug": "ত্বকের-নিচে-শিরা-ও-ধমনী-জালের-মতো-ছড়িয়ে-থাকে-17875673830432",
+    "createdAt": "2026-08-24T10:29:43.043Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "T/F",
+    "questionText": "ত্বকের নিচে শিরা ও ধমনী জালের মতো ছড়িয়ে থাকে।",
+    "status": "published",
+    "difficulty": "medium",
+    "marks": 1,
+    "tags": [
+      "মানবেদহ",
+      "বর্ম"
+    ],
+    "correctAnswer": "True",
+    "explanation": "ত্বকের ঠিক নিচেই অসংখ্য রক্তনালী (শিরা ও ধমনী) এবং স্নায়ু থাকে।"
+  },
+  {
+    "id": "q-কচ্ছপের-শরীরের-বাইরে-কোনো-শক্ত-খোলস-থাকে-না-17875673830433",
+    "slug": "কচ্ছপের-শরীরের-বাইরে-কোনো-শক্ত-খোলস-থাকে-না-17875673830433",
+    "createdAt": "2026-08-24T10:29:43.043Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "T/F",
+    "questionText": "কচ্ছপের শরীরের বাইরে কোনো শক্ত খোলস থাকে না।",
+    "status": "published",
+    "difficulty": "medium",
+    "marks": 1,
+    "tags": [
+      "মানবেদহ",
+      "বর্ম"
+    ],
+    "correctAnswer": "False",
+    "explanation": "কচ্ছপ এবং শামুকের শরীরের বাইরে আত্মরক্ষার জন্য শক্ত খোলস থাকে।"
+  },
+  {
+    "id": "q-চামড়া-শরীরের-মাংসপেশিগুলোকে-ঢেকে-রাখে-17875673830434",
+    "slug": "চামড়া-শরীরের-মাংসপেশিগুলোকে-ঢেকে-রাখে-17875673830434",
+    "createdAt": "2026-08-24T10:29:43.043Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "T/F",
+    "questionText": "চামড়া শরীরের মাংসপেশিগুলোকে ঢেকে রাখে।",
+    "status": "published",
+    "difficulty": "medium",
+    "marks": 1,
+    "tags": [
+      "মানবেদহ",
+      "বর্ম"
+    ],
+    "correctAnswer": "True",
+    "explanation": "চামড়া হলো শরীরের বর্ম, যা ভিতরের মাংসপেশি ও অন্যান্য অঙ্গকে ঢেকে রাখে।"
+  },
+  {
+    "id": "q-আমাদের-শরীরের-বর্ম-হলো-17875673830435",
+    "slug": "আমাদের-শরীরের-বর্ম-হলো-17875673830435",
+    "createdAt": "2026-08-24T10:29:43.043Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "FIB",
+    "questionText": "আমাদের শরীরের বর্ম হলো _________।",
+    "status": "published",
+    "difficulty": "medium",
+    "marks": 1,
+    "tags": [
+      "মানবেদহ",
+      "বর্ম"
+    ],
+    "correctAnswer": "চামড়া"
+  },
+  {
+    "id": "q-চামড়ার-নিচে-জালের-মতো-ছড়িয়ে-থাকে-অসংখ্য-17875673830436",
+    "slug": "চামড়ার-নিচে-জালের-মতো-ছড়িয়ে-থাকে-অসংখ্য-17875673830436",
+    "createdAt": "2026-08-24T10:29:43.043Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "FIB",
+    "questionText": "চামড়ার নিচে জালের মতো ছড়িয়ে থাকে অসংখ্য _________।",
+    "status": "published",
+    "difficulty": "medium",
+    "marks": 1,
+    "tags": [
+      "মানবেদহ",
+      "বর্ম"
+    ],
+    "correctAnswer": "রক্তনালী"
+  },
+  {
+    "id": "q-শামুক-ও-কচ্ছপের-শরীরের-বাইরের-দিকে-শক্ত-থাকে-17875673830437",
+    "slug": "শামুক-ও-কচ্ছপের-শরীরের-বাইরের-দিকে-শক্ত-থাকে-17875673830437",
+    "createdAt": "2026-08-24T10:29:43.043Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "FIB",
+    "questionText": "শামুক ও কচ্ছপের শরীরের বাইরের দিকে শক্ত _________ থাকে।",
+    "status": "published",
+    "difficulty": "medium",
+    "marks": 1,
+    "tags": [
+      "মানবেদহ",
+      "বর্ম"
+    ],
+    "correctAnswer": "খোলস"
+  },
+  {
+    "id": "q-আগেকার-দিনে-যুদ্ধে-আত্মরক্ষার-জন্য-মানুষ-ব্যবহার-ক-17875673830438",
+    "slug": "আগেকার-দিনে-যুদ্ধে-আত্মরক্ষার-জন্য-মানুষ-ব্যবহার-ক-17875673830438",
+    "createdAt": "2026-08-24T10:29:43.043Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "FIB",
+    "questionText": "আগেকার দিনে যুদ্ধে আত্মরক্ষার জন্য মানুষ _________ ব্যবহার করত।",
+    "status": "published",
+    "difficulty": "medium",
+    "marks": 1,
+    "tags": [
+      "মানবেদহ",
+      "বর্ম"
+    ],
+    "correctAnswer": "বর্ম"
+  },
+  {
+    "id": "q-ত্বকের-নিচে-থাকে-ও-স্নায়ু-17875673830439",
+    "slug": "ত্বকের-নিচে-থাকে-ও-স্নায়ু-17875673830439",
+    "createdAt": "2026-08-24T10:29:43.043Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "FIB",
+    "questionText": "ত্বকের নিচে থাকে _________ ও স্নায়ু।",
+    "status": "published",
+    "difficulty": "medium",
+    "marks": 1,
+    "tags": [
+      "মানবেদহ",
+      "বর্ম"
+    ],
+    "correctAnswer": "শিরা"
+  },
+  {
+    "id": "q-নিচের-অংশগুলোর-সাথে-সঠিক-কাজ-বা-প্রাণীর-মিল-করো-178756738304310",
+    "slug": "নিচের-অংশগুলোর-সাথে-সঠিক-কাজ-বা-প্রাণীর-মিল-করো-178756738304310",
+    "createdAt": "2026-08-24T10:29:43.043Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "Match",
+    "questionText": "নিচের অংশগুলোর সাথে সঠিক কাজ বা প্রাণীর মিল করো:",
+    "status": "published",
+    "difficulty": "medium",
+    "marks": 3,
+    "tags": [
+      "মানবেদহ",
+      "বর্ম"
+    ],
+    "matchingPairs": [
+      {
+        "left": "শরীরের বর্ম",
+        "right": "চামড়া"
+      },
+      {
+        "left": "শক্ত খোলস",
+        "right": "কচ্ছপ"
+      },
+      {
+        "left": "রক্তনালী",
+        "right": "ত্বকের নিচে থাকে"
+      }
+    ],
+    "correctAnswer": "1-চামড়া, 2-কচ্ছপ, 3-ত্বকের নিচে থাকে"
+  },
+  {
+    "id": "q-শব্দগুলোর-সাথে-সঠিক-অর্থ-মেলাও-178756738304311",
+    "slug": "শব্দগুলোর-সাথে-সঠিক-অর্থ-মেলাও-178756738304311",
+    "createdAt": "2026-08-24T10:29:43.043Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "Match",
+    "questionText": "শব্দগুলোর সাথে সঠিক অর্থ মেলাও:",
+    "status": "published",
+    "difficulty": "medium",
+    "marks": 3,
+    "tags": [
+      "মানবেদহ",
+      "বর্ম"
+    ],
+    "matchingPairs": [
+      {
+        "left": "বর্ম",
+        "right": "যুদ্ধে আত্মরক্ষার পোশাক"
+      },
+      {
+        "left": "ত্বক",
+        "right": "চামড়া"
+      },
+      {
+        "left": "স্নায়ু",
+        "right": "শরীরের বার্তা বাহক"
+      }
+    ],
+    "correctAnswer": "1-যুদ্ধে আত্মরক্ষার পোশাক, 2-চামড়া, 3-শরীরের বার্তা বাহক"
+  },
+  {
+    "id": "q-প্রাণী-ও-তাদের-আত্মরক্ষার-উপায়ের-মিল-করো-178756738304312",
+    "slug": "প্রাণী-ও-তাদের-আত্মরক্ষার-উপায়ের-মিল-করো-178756738304312",
+    "createdAt": "2026-08-24T10:29:43.043Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "Match",
+    "questionText": "প্রাণী ও তাদের আত্মরক্ষার উপায়ের মিল করো:",
+    "status": "published",
+    "difficulty": "medium",
+    "marks": 3,
+    "tags": [
+      "মানবেদহ",
+      "বর্ম"
+    ],
+    "matchingPairs": [
+      {
+        "left": "শামুক",
+        "right": "শক্ত খোলস"
+      },
+      {
+        "left": "বাঘ",
+        "right": "নখ ও দাঁত"
+      },
+      {
+        "left": "মানুষ",
+        "right": "চামড়া বা ত্বক"
+      }
+    ],
+    "correctAnswer": "1-শক্ত খোলস, 2-নখ ও দাঁত, 3-চামড়া বা ত্বক"
+  },
+  {
+    "id": "q-শরীরের-অংশ-ও-অবস্থানের-মিল-করো-178756738304313",
+    "slug": "শরীরের-অংশ-ও-অবস্থানের-মিল-করো-178756738304313",
+    "createdAt": "2026-08-24T10:29:43.043Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "Match",
+    "questionText": "শরীরের অংশ ও অবস্থানের মিল করো:",
+    "status": "published",
+    "difficulty": "medium",
+    "marks": 3,
+    "tags": [
+      "মানবেদহ",
+      "বর্ম"
+    ],
+    "matchingPairs": [
+      {
+        "left": "চামড়া",
+        "right": "শরীরের সবচেয়ে বাইরে"
+      },
+      {
+        "left": "মাংসপেশি",
+        "right": "চামড়ার নিচে"
+      },
+      {
+        "left": "হাড়",
+        "right": "মাংসপেশির নিচে"
+      }
+    ],
+    "correctAnswer": "1-শরীরের সবচেয়ে বাইরে, 2-চামড়ার নিচে, 3-মাংসপেশির নিচে"
+  },
+  {
+    "id": "q-বৈশিষ্ট্য-ও-অজের-মিল-করো-178756738304314",
+    "slug": "বৈশিষ্ট্য-ও-অজের-মিল-করো-178756738304314",
+    "createdAt": "2026-08-24T10:29:43.043Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "Match",
+    "questionText": "বৈশিষ্ট্য ও অজের মিল করো:",
+    "status": "published",
+    "difficulty": "medium",
+    "marks": 3,
+    "tags": [
+      "মানবেদহ",
+      "বর্ম"
+    ],
+    "matchingPairs": [
+      {
+        "left": "কাটা বা আঘাত থেকে বাঁচায়",
+        "right": "ত্বক বা বর্ম"
+      },
+      {
+        "left": "রক্ত চলাচলে সাহায্য করে",
+        "right": "ধমনী ও শিরা"
+      },
+      {
+        "left": "অনুভূতি জাগায়",
+        "right": "স্নায়ু"
+      }
+    ],
+    "correctAnswer": "1-ত্বক বা বর্ম, 2-ধমনী ও শিরা, 3-স্নায়ু"
+  },
+  {
+    "id": "q-চামড়াকে-শরীরের-বর্ম-বলা-হয়-কেন-178756738304315",
+    "slug": "চামড়াকে-শরীরের-বর্ম-বলা-হয়-কেন-178756738304315",
+    "createdAt": "2026-08-24T10:29:43.043Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "CQ",
+    "questionText": "চামড়াকে শরীরের বর্ম বলা হয় কেন?",
+    "status": "published",
+    "difficulty": "medium",
+    "marks": 5,
+    "tags": [
+      "মানবেদহ",
+      "বর্ম"
+    ],
+    "detailedExplanation": "যুদ্ধে আত্মরক্ষার জন্য মানুষ যেমন বর্ম পরে, তেমনি চামড়াও আমাদের শরীরকে বাইরের আঘাত, রোদের তাপ, ধুলোবালি এবং রোগজীবাণুর আক্রমণ থেকে রক্ষা করে। চামড়া শরীরের ভিতরের মাংসপেশি, রক্তনালী এবং অন্যান্য অঙ্গকে ঢেকে রাখে। এ কারণেই চামড়াকে শরীরের বর্ম বলা হয়।"
+  },
+  {
+    "id": "q-ত্বকের-নিচে-কী-কী-থাকে-তা-আলোচনা-করো-178756738304316",
+    "slug": "ত্বকের-নিচে-কী-কী-থাকে-তা-আলোচনা-করো-178756738304316",
+    "createdAt": "2026-08-24T10:29:43.043Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "CQ",
+    "questionText": "ত্বকের নিচে কী কী থাকে তা আলোচনা করো।",
+    "status": "published",
+    "difficulty": "medium",
+    "marks": 5,
+    "tags": [
+      "মানবেদহ",
+      "বর্ম"
+    ],
+    "detailedExplanation": "আমাদের ত্বকের ঠিক নিচেই জালের মতো ছড়িয়ে থাকে অসংখ্য রক্তনালী (শিরা ও ধমনী) এবং স্নায়ু। এগুলো ছাড়াও ত্বকের নিচে মাংসপেশি এবং তার নিচে হাড় থাকে। রক্তনালীর মাধ্যমে সারা শরীরে রক্ত চলাচল করে এবং স্নায়ুর সাহায্যে আমরা ব্যথা বা স্পর্শের অনুভূতি বুঝতে পারি।"
+  },
+  {
+    "id": "q-শামুক-ও-কচ্ছপের-শরীরের-বাইরের-আবরণ-কেমন-হয়-এবং-কেন-178756738304317",
+    "slug": "শামুক-ও-কচ্ছপের-শরীরের-বাইরের-আবরণ-কেমন-হয়-এবং-কেন-178756738304317",
+    "createdAt": "2026-08-24T10:29:43.043Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "CQ",
+    "questionText": "শামুক ও কচ্ছপের শরীরের বাইরের আবরণ কেমন হয় এবং কেন?",
+    "status": "published",
+    "difficulty": "medium",
+    "marks": 5,
+    "tags": [
+      "মানবেদহ",
+      "বর্ম"
+    ],
+    "detailedExplanation": "শামুক ও কচ্ছপের শরীরের বাইরের দিকে একটি শক্ত আবরণ বা খোলস থাকে। এরা খুব ধীরগতির প্রাণী হওয়ায় শত্রুর আক্রমণ থেকে দ্রুত পালিয়ে বাঁচতে পারে না। তাই আত্মরক্ষার জন্য প্রকৃতি এদের শরীরে এই শক্ত খোলস দিয়েছে, যার ভেতরে বিপদের সময় এরা গুটিয়ে লুকিয়ে পড়তে পারে।"
+  },
+  {
+    "id": "q-আগেকার-দিনে-মানুষ-কেন-গন্ডারের-চামড়া-দিয়ে-বর্ম-তৈর-178756738304318",
+    "slug": "আগেকার-দিনে-মানুষ-কেন-গন্ডারের-চামড়া-দিয়ে-বর্ম-তৈর-178756738304318",
+    "createdAt": "2026-08-24T10:29:43.043Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "CQ",
+    "questionText": "আগেকার দিনে মানুষ কেন গন্ডারের চামড়া দিয়ে বর্ম তৈরি করত?",
+    "status": "published",
+    "difficulty": "medium",
+    "marks": 5,
+    "tags": [
+      "মানবেদহ",
+      "বর্ম"
+    ],
+    "detailedExplanation": "গন্ডারের চামড়া অত্যন্ত পুরু ও শক্ত হয়। আগেকার দিনে মানুষ যখন যুদ্ধ করত, তখন তলোয়ার বা বল্লমের আঘাত থেকে শরীরকে বাঁচাতে এমন কিছুর প্রয়োজন ছিল যা সহজে কাটা যায় না। গন্ডারের শক্ত চামড়া সহজেই অস্ত্র ঠেকাতে পারত, তাই এটি দিয়ে বর্ম বা ঢাল তৈরি করা হতো।"
+  },
+  {
+    "id": "q-আমাদের-শরীরের-চামড়া-না-থাকলে-কী-কী-অসুবিধা-হতো-178756738304319",
+    "slug": "আমাদের-শরীরের-চামড়া-না-থাকলে-কী-কী-অসুবিধা-হতো-178756738304319",
+    "createdAt": "2026-08-24T10:29:43.043Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "CQ",
+    "questionText": "আমাদের শরীরের চামড়া না থাকলে কী কী অসুবিধা হতো?",
+    "status": "published",
+    "difficulty": "medium",
+    "marks": 5,
+    "tags": [
+      "মানবেদহ",
+      "বর্ম"
+    ],
+    "detailedExplanation": "শরীরে চামড়া না থাকলে ভিতরের মাংসপেশি, শিরা, ধমনী সবকিছু বাইরের পরিবেশে উন্মুক্ত থাকত। ফলে সামান্য আঘাতেই আমাদের অনেক ক্ষতি হতো। ধুলোবালি ও রোগজীবাণু সহজেই শরীরে প্রবেশ করে মারাত্মক ইনফেকশন তৈরি করত। এছাড়া রোদ ও তাপে শরীরের ভেতরের অঙ্গগুলোর ক্ষতি হতো।"
   }
 ]

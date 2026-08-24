@@ -32,9 +32,16 @@ export function NodeQuestionsPage({ node, contentType, breadcrumbs }: NodeQuesti
     else if (node.type === 'textbook') filters.textbookId = node.id;
 
     if (contentType === 'mcq') {
-      filters.type = 'mcq';
+      filters.questionType = 'mcq';
     } else if (contentType === 'cq') {
-      filters.type = 'descriptive';
+      // CQ tab might have questions labeled 'CQ' or 'descriptive'
+      filters.questionType = ['cq', 'CQ', 'descriptive', 'Desc'];
+    } else if (contentType === 'true-false') {
+      filters.questionType = ['T/F', 't/f'];
+    } else if (contentType === 'fill-in-blanks') {
+      filters.questionType = ['FIB', 'fib'];
+    } else if (contentType === 'matching') {
+      filters.questionType = ['Match', 'match'];
     }
     return filters;
   };
