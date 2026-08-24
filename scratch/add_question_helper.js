@@ -61,7 +61,7 @@ function generateSlug(text) {
   let cleanText = text.replace(/(<([^>]+)>)/gi, ""); // Remove HTML tags
   cleanText = cleanText.replace(/[?।.,!]/g, ''); // Remove punctuations
   cleanText = cleanText.trim().replace(/\s+/g, '-'); // Replace spaces with hyphens
-  return encodeURIComponent(cleanText.substring(0, 50));
+  return cleanText.substring(0, 50);
 }
 
 const baseSlug = generateSlug(NEW_QUESTION.questionText);
