@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
-import { Download, Settings, FileText, Shuffle, Save, ArrowLeft, Edit, Book, Monitor, Lightbulb, User, Tag, Star, Grid3X3, Columns, Barcode, Hash, LayoutGrid, FileDigit, Heading, MapPin, Landmark, Layers, HelpCircle, RefreshCw, Printer, Languages, QrCode, ImageIcon, Waves, PlusCircle, Plus, CheckCircle, CircleDot, Zap, Loader2, GripVertical, Trash2, Database, Sparkles, ZoomIn, ZoomOut, Lock, Copy } from 'lucide-react';
+import { Download, Settings, FileText, Shuffle, Save, ArrowLeft, Edit, Book, Monitor, Lightbulb, User, Tag, Star, Grid3X3, Columns, Barcode, Hash, LayoutGrid, FileDigit, Heading, MapPin, Landmark, Layers, HelpCircle, RefreshCw, Printer, Languages, QrCode, ImageIcon, Waves, PlusCircle, Plus, CheckCircle, CircleDot, Zap, Loader2, GripVertical, Trash2, Database, Sparkles, ZoomIn, ZoomOut, Lock, Copy, Eye } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { getQuestionsByIds, getTaxonomyNodes, saveQuestionPaperDraft, getQuestionPaperDraft } from '@/lib/firebase/question-bank';
 import { QuestionBankEntry } from '@/lib/question-bank-types';
@@ -421,6 +421,25 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
       pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
       pdf.save((paperName || 'Question_Paper') + '.pdf');
+    });
+  };
+
+  const handlePreviewPDF = async () => {
+    handleInterceptedExport(async () => {
+      const element = document.getElementById('printable-paper');
+      if (!element) return;
+      const canvas = await html2canvas(element, { scale: 2, useCORS: true });
+      const imgData = canvas.toDataURL('image/jpeg', 1.0);
+      const pdf = new jsPDF({
+        orientation: orientation === 'Landscape' ? 'landscape' : 'portrait',
+        unit: 'in',
+        format: paperSize === 'A4' ? 'a4' : paperSize === 'Letter' ? 'letter' : 'legal'
+      });
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+      const pdfUrl = pdf.output('bloburl');
+      window.open(pdfUrl, '_blank');
     });
   };
 
@@ -878,15 +897,18 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
             <RefreshCw className="w-3.5 h-3.5 mr-1 sm:mr-2 shrink-0" /> <span className="truncate">{t('loadTemplate', appLanguage)}</span>
           </Button>
         </div>
-        <div className="flex gap-2">
-          <Button onClick={handlePrint} className="flex-1 bg-[#c8e6c9] hover:bg-[#a5d6a7] text-green-800 border-transparent shadow-none px-2 h-9 text-[12px]">
-            <Download className="w-3.5 h-3.5 mr-1" /> {t('print', appLanguage)}
+        <div className="flex flex-wrap gap-2">
+          <Button onClick={handlePrint} className="flex-1 min-w-[70px] bg-[#c8e6c9] hover:bg-[#a5d6a7] text-green-800 border-transparent shadow-none px-2 h-9 text-[12px]">
+            <Printer className="w-3.5 h-3.5 mr-1" /> {t('print', appLanguage)}
           </Button>
-          <Button onClick={handleExportPDF} className="flex-1 bg-red-100 hover:bg-red-200 text-red-800 border-transparent shadow-none px-2 h-9 text-[12px]">
-            <FileText className="w-3.5 h-3.5 mr-1" /> PDF
+          <Button onClick={handlePreviewPDF} className="flex-1 min-w-[70px] bg-orange-100 hover:bg-orange-200 text-orange-800 border-transparent shadow-none px-2 h-9 text-[12px]">
+            <Eye className="w-3.5 h-3.5 mr-1" /> {appLanguage === 'bn' ? 'প্রিভিউ' : 'Preview'}
           </Button>
-          <Button onClick={handleExportWord} className="flex-1 bg-blue-100 hover:bg-blue-200 text-blue-800 border-transparent shadow-none px-2 h-9 text-[12px]">
-            <FileText className="w-3.5 h-3.5 mr-1" /> Word
+          <Button onClick={handleExportPDF} className="flex-1 min-w-[70px] bg-red-100 hover:bg-red-200 text-red-800 border-transparent shadow-none px-2 h-9 text-[12px]">
+            <Download className="w-3.5 h-3.5 mr-1" /> PDF
+          </Button>
+          <Button onClick={handleExportWord} className="flex-1 min-w-[70px] bg-blue-100 hover:bg-blue-200 text-blue-800 border-transparent shadow-none px-2 h-9 text-[12px]">
+            <Download className="w-3.5 h-3.5 mr-1" /> Word
           </Button>
         </div>
       </div>
@@ -1757,7 +1779,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                         </div>
                       ) : format === 'answer' ? (
                         <div
-                          className="text-justify mb-10"
+                          className="text-left mb-10"
                           style={{ columnCount: paperColumns, columnRule: showColumnDivider ? '1px solid #e5e7eb' : 'none', columnGap: `${colGap}px` }}
                         >
                           {questions.filter(q => !q.questionText.startsWith('[[SECTION_HEADER]]')).map((q, index) => {
@@ -1855,7 +1877,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
 
                                 {section.questions.length > 0 && (
                                   <div
-                                    className="text-justify"
+                                    className="text-left"
                                     style={{ columnCount: section.columns, columnRule: showColumnDivider ? '1px solid #e5e7eb' : 'none', columnGap: `${colGap}px` }}
                                   >
                                     {section.questions.map((q: any) => {
@@ -1891,44 +1913,39 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                                             </div>
                                           ) : (
                                             <>
-                                              <div className="flex items-start gap-1.5 mb-2">
-                                                <span className="font-bold min-w-[18px]">{localizeNumber(actualQuestionIndex + 1, appLanguage)}.</span>
-                                                <div className="flex-1 flex flex-col gap-1">
-                                                  {enableLatex && !editingMode ? (
-                                                    <div className="react-markdown-math-wrapper" style={{
-                                                      fontWeight: questionBold ? 'bold' : undefined,
-                                                      fontStyle: questionItalic ? 'italic' : undefined,
-                                                      textDecoration: questionUnderline ? 'underline' : undefined
-                                                    }}>
-                                                      <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
-                                                        {formatLatex(q.questionText)}
-                                                      </ReactMarkdown>
+                                              <div className="mb-2">
+                                                <div className="flex items-start gap-1.5">
+                                                  <span className="font-bold min-w-[18px]">{localizeNumber(actualQuestionIndex + 1, appLanguage)}.</span>
+                                                  <div className="flex-1 flex justify-between items-start gap-2">
+                                                    <div className="flex-1">
+                                                      {enableLatex && !editingMode ? (
+                                                        <div className="react-markdown-math-wrapper" style={{
+                                                          fontWeight: questionBold ? 'bold' : undefined,
+                                                          fontStyle: questionItalic ? 'italic' : undefined,
+                                                          textDecoration: questionUnderline ? 'underline' : undefined
+                                                        }}>
+                                                          <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
+                                                            {formatLatex(q.questionText)}
+                                                          </ReactMarkdown>
+                                                        </div>
+                                                      ) : (
+                                                        <div
+                                                          {...getEditableProps()}
+                                                          style={{
+                                                            fontWeight: questionBold ? 'bold' : undefined,
+                                                            fontStyle: questionItalic ? 'italic' : undefined,
+                                                            textDecoration: questionUnderline ? 'underline' : undefined
+                                                          }}
+                                                          dangerouslySetInnerHTML={{ __html: q.questionText.replace(/\n/g, '<br/>') }}
+                                                        />
+                                                      )}
                                                     </div>
-                                                  ) : (
-                                                    <div
-                                                      {...getEditableProps()}
-                                                      style={{
-                                                        fontWeight: questionBold ? 'bold' : undefined,
-                                                        fontStyle: questionItalic ? 'italic' : undefined,
-                                                        textDecoration: questionUnderline ? 'underline' : undefined
-                                                      }}
-                                                      dangerouslySetInnerHTML={{ __html: q.questionText.replace(/\n/g, '<br/>') }}
-                                                    />
-                                                  )}
-                                                  {(showQuestionTags && (q.questionType || q.tags || q.sourceExam || q.sourceYear || q.sourceBoard || q.difficulty || q.examIds?.length || q.yearId || q.boardId)) && (
-                                                    <div className="flex gap-1 flex-wrap mt-1">
-                                                      {q.questionType && <span className="px-1.5 py-0.5 bg-[#eef2ec] text-[#4a634a] font-bold text-[10px] uppercase rounded border border-[#c5e1a5]">[{q.questionType}]</span>}
-                                                      {q.difficulty && <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">[{q.difficulty}]</span>}
-                                                      {(q.sourceBoard || (q.boardId && boardMap[q.boardId])) && <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">[{q.sourceBoard || boardMap[q.boardId!]}]</span>}
-                                                      {(q.sourceYear || (q.yearId && yearMap[q.yearId])) && <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">[{q.sourceYear || yearMap[q.yearId!]}]</span>}
-                                                      {(q.sourceExam || (q.examIds?.length ? q.examIds.map((id: string) => examMap[id]).filter(Boolean).join(', ') : '')) && <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">[{q.sourceExam || (q.examIds?.length ? q.examIds.map((id: string) => examMap[id]).filter(Boolean).join(', ') : '')}]</span>}
-                                                      {q.tags && q.tags.length > 0 && q.tags.map((t: string) => <span key={t} className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">#{t}</span>)}
-                                                    </div>
-                                                  )}
+                                                    {showQuestionMarks && (
+                                                      <span className="text-[11px] font-bold text-gray-500 whitespace-nowrap mt-[2px]">[{localizeNumber(q.marks || 1, appLanguage)}]</span>
+                                                    )}
+                                                  </div>
                                                 </div>
-                                                {showQuestionMarks && (
-                                                  <span className="text-[11px] font-bold text-gray-500 whitespace-nowrap ml-2">[{localizeNumber(q.marks || 1, appLanguage)}]</span>
-                                                )}
+
                                               </div>
 
                                               {/* Options */}
@@ -1948,7 +1965,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                                                     const isCorrect = format === 'qa' && (q.correctAnswer || '').toLowerCase() === optKey;
 
                                                     return (
-                                                      <div key={optKey} className="flex items-start gap-1.5">
+                                                      <div key={optKey} className="flex items-center gap-1.5">
                                                         <span className="shrink-0 mt-[1px]">
                                                           {optionShape === 'circle' ? (
                                                             <span className={`inline-flex items-center justify-center w-[18px] h-[18px] rounded-full border border-gray-600 text-[11px] leading-none pb-[1px] ${isCorrect ? 'bg-gray-800 text-white border-transparent' : ''}`}>{marker}</span>
@@ -1982,7 +1999,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                                               )}
 
                                               {/* TRUE / FALSE */}
-                                              {q.questionType === 'T/F' && (
+                                              {q.questionType?.toUpperCase() === 'T/F' && (
                                                 <div className="flex gap-8 pl-6 mt-2">
                                                   <div className="flex items-center gap-2">
                                                     <span className={`inline-flex items-center justify-center w-[18px] h-[18px] rounded-full border border-gray-600 text-[11px] leading-none pb-[1px] ${format === 'qa' && q.correctAnswer?.toLowerCase() === 'true' ? 'bg-gray-800 text-white border-transparent' : ''}`}>
@@ -2000,7 +2017,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                                               )}
 
                                               {/* FILL IN THE BLANK (FIB) */}
-                                              {q.questionType === 'FIB' && (
+                                              {q.questionType?.toUpperCase() === 'FIB' && (
                                                 <div className="mt-2 pl-6">
                                                   {/* Show distractors (Word Bank) if any */}
                                                   {(q.options?.a || q.options?.b || q.options?.c || q.options?.d) && (
@@ -2025,7 +2042,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                                               )}
 
                                               {/* MATCHING PAIRS (If Matching) */}
-                                              {q.questionType === 'Match' && q.matchingPairs && q.matchingPairs.length > 0 && (
+                                              {q.questionType?.toUpperCase() === 'MATCH' && q.matchingPairs && q.matchingPairs.length > 0 && (
                                                 <div className="mt-3 pl-6">
                                                   <div className="grid grid-cols-2 gap-x-4 mb-2 font-bold text-gray-800 border-b border-gray-200 pb-2">
                                                     <div>Column A</div>
@@ -2047,9 +2064,9 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                                               )}
 
                                               {/* Fallback for Answers of Desc, CQ, etc. */}
-                                              {format === 'qa' && q.correctAnswer && !['MCQ', 'T/F', 'FIB', 'Match'].includes(q.questionType || 'MCQ') && (
+                                              {format === 'qa' && q.correctAnswer && !['MCQ', 'T/F', 'FIB', 'MATCH'].includes(q.questionType?.toUpperCase() || 'MCQ') && (
                                                 <div
-                                                  {...getEditableProps(`mt-2 ml-6 max-w-[95%] text-justify break-words border rounded ${ansBgStyle === 'colored' ? 'text-green-800 bg-green-50 px-3 py-2 border-green-200' : 'text-gray-800 bg-transparent px-0 py-0 border-transparent'}`)}
+                                                  {...getEditableProps(`mt-2 ml-6 max-w-[95%] text-left break-words border rounded ${ansBgStyle === 'colored' ? 'text-green-800 bg-green-50 px-3 py-2 border-green-200' : 'text-gray-800 bg-transparent px-0 py-0 border-transparent'}`)}
                                                   style={{ fontSize: `${explanationFontSize}px` }}
                                                 >
                                                   <span className="font-bold">{appLanguage === 'bn' ? 'উত্তর :' : 'Ans :'}</span> <span dangerouslySetInnerHTML={{ __html: q.correctAnswer.replace(/\n/g, '<br/>') }} />
@@ -2057,12 +2074,24 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                                               )}
 
                                               {/* Explanation */}
-                                              {showExplanations && q.explanation && (
+                                              {showExplanations && (q.explanation || q.detailedExplanation) && (
                                                 <div
                                                   {...getEditableProps(`mt-2 ml-6 font-normal pl-2 border rounded ${ansBgStyle === 'colored' ? 'text-gray-600 bg-blue-50/40 border-l-2 border-blue-300 border-t-transparent border-r-transparent border-b-transparent' : 'text-gray-600 bg-transparent border-gray-300 border-l-2 border-t-transparent border-r-transparent border-b-transparent'}`)}
                                                   style={{ fontSize: `${explanationFontSize}px` }}
                                                 >
-                                                  <span className="font-bold text-gray-700">{appLanguage === 'bn' ? 'ব্যাখ্যা :' : 'Explanation :'}</span> <span dangerouslySetInnerHTML={{ __html: q.explanation }} />
+                                                  <span className="font-bold text-gray-700">{appLanguage === 'bn' ? 'ব্যাখ্যা :' : 'Explanation :'}</span> <div dangerouslySetInnerHTML={{ __html: q.explanation || q.detailedExplanation || '' }} className="inline-block prose prose-sm max-w-none text-gray-600" />
+                                                </div>
+                                              )}
+
+                                              {/* Tags at the bottom */}
+                                              {(showQuestionTags && (q.questionType || q.tags || q.sourceExam || q.sourceYear || q.sourceBoard || q.difficulty || q.examIds?.length || q.yearId || q.boardId)) && (
+                                                <div className="flex gap-1 flex-wrap mt-2 ml-[24px]">
+                                                  {q.questionType && <span className="px-1.5 py-0.5 bg-[#eef2ec] text-[#4a634a] font-bold text-[10px] uppercase rounded border border-[#c5e1a5]">[{q.questionType}]</span>}
+                                                  {q.difficulty && <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">[{q.difficulty}]</span>}
+                                                  {(q.sourceBoard || (q.boardId && boardMap[q.boardId])) && <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">[{q.sourceBoard || boardMap[q.boardId!]}]</span>}
+                                                  {(q.sourceYear || (q.yearId && yearMap[q.yearId])) && <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">[{q.sourceYear || yearMap[q.yearId!]}]</span>}
+                                                  {(q.sourceExam || (q.examIds?.length ? q.examIds.map((id: string) => examMap[id]).filter(Boolean).join(', ') : '')) && <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">[{q.sourceExam || (q.examIds?.length ? q.examIds.map((id: string) => examMap[id]).filter(Boolean).join(', ') : '')}]</span>}
+                                                  {q.tags && q.tags.length > 0 && q.tags.map((t: string) => <span key={t} className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">#{t}</span>)}
                                                 </div>
                                               )}
                                             </>

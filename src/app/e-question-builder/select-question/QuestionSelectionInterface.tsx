@@ -209,6 +209,12 @@ export default function QuestionSelectionInterface({ initialFilters }: { initial
         qFilters.chapterId = activeFilters.chapterId;
       } else if (activeFilters.subjectId && activeFilters.subjectId !== 'all') {
         qFilters.subjectId = activeFilters.subjectId;
+      } else if (initialFilters.textbookId && initialFilters.textbookId !== 'all') {
+        qFilters.textbookId = initialFilters.textbookId;
+      } else if (initialFilters.classId && initialFilters.classId !== 'all') {
+        qFilters.classId = initialFilters.classId;
+      } else if (initialFilters.boardId && initialFilters.boardId !== 'all') {
+        qFilters.boardId = initialFilters.boardId;
       }
 
       if (activeFilters.difficulty !== 'all') qFilters.difficulty = activeFilters.difficulty;
@@ -218,7 +224,14 @@ export default function QuestionSelectionInterface({ initialFilters }: { initial
       const startAfterDoc = cursors[page - 1] || null;
       const res = await getQuestionsPaginated(qFilters, itemsPerPage, startAfterDoc);
 
-      setQuestions(res.questions);
+      const mappedResults = res.questions.map(q => ({
+        ...q,
+        correctAnswer: (q as any).correctOptionId || q.correctAnswer,
+        questionType: q.questionType?.toUpperCase(),
+        difficulty: q.difficulty ? q.difficulty.charAt(0).toUpperCase() + q.difficulty.slice(1) : 'Medium'
+      })) as QuestionBankEntry[];
+
+      setQuestions(mappedResults);
       setHasNextPage(res.questions.length === itemsPerPage);
 
       if (res.lastDoc) {
