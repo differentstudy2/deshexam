@@ -871,11 +871,11 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
 
       <div className="p-4 space-y-4 border-b border-gray-100">
         <div className="flex gap-2">
-          <Button variant="outline" className="flex-1 text-gray-600 border-gray-300" onClick={() => setIsPageSetupOpen(true)}>
-            <FileText className="w-4 h-4 mr-2" /> {t('pageSetup', appLanguage)}
+          <Button variant="outline" className="flex-1 text-gray-600 border-gray-300 h-9 px-2 text-xs sm:text-[13px] overflow-hidden" onClick={() => setIsPageSetupOpen(true)}>
+            <FileText className="w-3.5 h-3.5 mr-1 sm:mr-2 shrink-0" /> <span className="truncate">{t('pageSetup', appLanguage)}</span>
           </Button>
-          <Button variant="outline" className="flex-1 text-gray-600 border-gray-300" onClick={handleLoadTemplate}>
-            <RefreshCw className="w-4 h-4 mr-2" /> {t('loadTemplate', appLanguage)}
+          <Button variant="outline" className="flex-1 text-gray-600 border-gray-300 h-9 px-2 text-xs sm:text-[13px] overflow-hidden" onClick={handleLoadTemplate}>
+            <RefreshCw className="w-3.5 h-3.5 mr-1 sm:mr-2 shrink-0" /> <span className="truncate">{t('loadTemplate', appLanguage)}</span>
           </Button>
         </div>
         <div className="flex gap-2">
@@ -2079,7 +2079,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                       )}
 
                       {editingMode && (
-                        <div className="mt-8 flex gap-4 justify-center print:hidden border-t border-dashed border-gray-300 pt-6 flex-wrap">
+                        <div className="mt-auto flex gap-4 justify-center print:hidden border-t border-dashed border-gray-300 pt-6 flex-wrap">
                           <Button variant="outline" className="text-blue-600 border-blue-200 hover:bg-blue-50" onClick={() => setIsAddQuestionOpen(true)}>
                             <PlusCircle className="w-4 h-4 mr-2" /> {t('addCustomQuestion', appLanguage)}
                           </Button>
@@ -2399,12 +2399,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
 
           </div>
 
-          {/* Action button beneath paper (hidden in print) */}
-          <div className="bg-gray-50 border-t border-gray-200 p-6 text-center print:hidden rounded-b-lg">
-            <Button className="bg-[#c8e6c9] hover:bg-[#a5d6a7] text-green-800 border-transparent font-medium shadow-sm">
-              <Plus className="w-4 h-4 mr-2" /> {t('addCustomQuestion', appLanguage)}
-            </Button>
-          </div>
+
         </main>
       </div>
 
