@@ -183,5 +183,1559 @@
         "type": "subject"
       }
     ]
+  },
+  {
+    "id": "textbook-amader-prithibi-class-6-wb",
+    "title": "Amader Prithibi",
+    "slug": "amader-prithibi",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-geography-class-6-wb",
+    "orderIndex": 6,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/geography/amader-prithibi",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "geography",
+    "textbookSlug": "amader-prithibi",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-geography-class-6-wb",
+        "slug": "geography",
+        "title": "Geography",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-atit-o-aityaja-class-6-wb",
+    "title": "Atit O Aityaja",
+    "slug": "atit-o-aityaja",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-history-class-6-wb",
+    "orderIndex": 7,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/history/atit-o-aityaja",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "history",
+    "textbookSlug": "atit-o-aityaja",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-history-class-6-wb",
+        "slug": "history",
+        "title": "History",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-bhasa-charcha-class-6-wb",
+    "title": "Bhasa Charcha",
+    "slug": "bhasa-charcha",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-bengali-grammar-class-6-wb",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/bengali-grammar/bhasa-charcha",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "bengali-grammar",
+    "textbookSlug": "bhasa-charcha",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-grammar-class-6-wb",
+        "slug": "bengali-grammar",
+        "title": "Bengali Grammar",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-ganit-prabha-class-6-wb",
+    "title": "Ganit Prabha",
+    "slug": "ganit-prabha",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-mathematics-class-6-wb",
+    "orderIndex": 9,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/mathematics/ganit-prabha",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-6-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-ha-ja-ba-ra-la-class-6-wb",
+    "title": "Ha Ja Ba Ra La",
+    "slug": "ha-ja-ba-ra-la",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-rapid-reader-class-6-wb",
+    "orderIndex": 10,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/rapid-reader/ha-ja-ba-ra-la",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "rapid-reader",
+    "textbookSlug": "ha-ja-ba-ra-la",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-rapid-reader-class-6-wb",
+        "slug": "rapid-reader",
+        "title": "Rapid Reader",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-poribesh-o-bigyan-class-6-wb",
+    "title": "Poribesh O Bigyan",
+    "slug": "poribesh-o-bigyan",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-science-class-6-wb",
+    "orderIndex": 11,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/science/poribesh-o-bigyan",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "science",
+    "textbookSlug": "poribesh-o-bigyan",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-6-wb",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-sahityamela-class-6-wb",
+    "title": "Sahityamela",
+    "slug": "sahityamela",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-bengali-literature-class-6-wb",
+    "orderIndex": 12,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/bengali-literature/sahityamela",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-6-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-amader-prithibi-class-7-wb",
+    "title": "Amader Prithibi",
+    "slug": "amader-prithibi",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-geography-class-7-wb",
+    "orderIndex": 13,
+    "status": "published",
+    "fullSlug": "wb-board/class-7/geography/amader-prithibi",
+    "boardSlug": "wb-board",
+    "classSlug": "class-7",
+    "subjectSlug": "geography",
+    "textbookSlug": "amader-prithibi",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-7-wb",
+        "slug": "class-7",
+        "title": "Class 7",
+        "type": "class"
+      },
+      {
+        "id": "subject-geography-class-7-wb",
+        "slug": "geography",
+        "title": "Geography",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-atit-o-aityaja-class-7-wb",
+    "title": "Atit O Aityaja",
+    "slug": "atit-o-aityaja",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-history-class-7-wb",
+    "orderIndex": 14,
+    "status": "published",
+    "fullSlug": "wb-board/class-7/history/atit-o-aityaja",
+    "boardSlug": "wb-board",
+    "classSlug": "class-7",
+    "subjectSlug": "history",
+    "textbookSlug": "atit-o-aityaja",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-7-wb",
+        "slug": "class-7",
+        "title": "Class 7",
+        "type": "class"
+      },
+      {
+        "id": "subject-history-class-7-wb",
+        "slug": "history",
+        "title": "History",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-bhasa-charcha-class-7-wb",
+    "title": "Bhasa Charcha",
+    "slug": "bhasa-charcha",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-bengali-grammar-class-7-wb",
+    "orderIndex": 15,
+    "status": "published",
+    "fullSlug": "wb-board/class-7/bengali-grammar/bhasa-charcha",
+    "boardSlug": "wb-board",
+    "classSlug": "class-7",
+    "subjectSlug": "bengali-grammar",
+    "textbookSlug": "bhasa-charcha",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-7-wb",
+        "slug": "class-7",
+        "title": "Class 7",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-grammar-class-7-wb",
+        "slug": "bengali-grammar",
+        "title": "Bengali Grammar",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-ganit-prabha-class-7-wb",
+    "title": "Ganit Prabha",
+    "slug": "ganit-prabha",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-mathematics-class-7-wb",
+    "orderIndex": 16,
+    "status": "published",
+    "fullSlug": "wb-board/class-7/mathematics/ganit-prabha",
+    "boardSlug": "wb-board",
+    "classSlug": "class-7",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-7-wb",
+        "slug": "class-7",
+        "title": "Class 7",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-7-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-maku-class-7-wb",
+    "title": "Maku",
+    "slug": "maku",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-rapid-reader-class-7-wb",
+    "orderIndex": 17,
+    "status": "published",
+    "fullSlug": "wb-board/class-7/rapid-reader/maku",
+    "boardSlug": "wb-board",
+    "classSlug": "class-7",
+    "subjectSlug": "rapid-reader",
+    "textbookSlug": "maku",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-7-wb",
+        "slug": "class-7",
+        "title": "Class 7",
+        "type": "class"
+      },
+      {
+        "id": "subject-rapid-reader-class-7-wb",
+        "slug": "rapid-reader",
+        "title": "Rapid Reader",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-poribesh-o-bigyan-class-7-wb",
+    "title": "Poribesh O Bigyan",
+    "slug": "poribesh-o-bigyan",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-science-class-7-wb",
+    "orderIndex": 18,
+    "status": "published",
+    "fullSlug": "wb-board/class-7/science/poribesh-o-bigyan",
+    "boardSlug": "wb-board",
+    "classSlug": "class-7",
+    "subjectSlug": "science",
+    "textbookSlug": "poribesh-o-bigyan",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-7-wb",
+        "slug": "class-7",
+        "title": "Class 7",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-7-wb",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-sahityamela-class-7-wb",
+    "title": "Sahityamela",
+    "slug": "sahityamela",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-bengali-literature-class-7-wb",
+    "orderIndex": 19,
+    "status": "published",
+    "fullSlug": "wb-board/class-7/bengali-literature/sahityamela",
+    "boardSlug": "wb-board",
+    "classSlug": "class-7",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-7-wb",
+        "slug": "class-7",
+        "title": "Class 7",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-7-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-amader-prithibi-class-8-wb",
+    "title": "Amader Prithibi",
+    "slug": "amader-prithibi",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-geography-class-8-wb",
+    "orderIndex": 20,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/geography/amader-prithibi",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "geography",
+    "textbookSlug": "amader-prithibi",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-geography-class-8-wb",
+        "slug": "geography",
+        "title": "Geography",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-atit-o-aityaja-class-8-wb",
+    "title": "Atit O Aityaja",
+    "slug": "atit-o-aityaja",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-history-class-8-wb",
+    "orderIndex": 21,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/history/atit-o-aityaja",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "history",
+    "textbookSlug": "atit-o-aityaja",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-history-class-8-wb",
+        "slug": "history",
+        "title": "History",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-bhasa-charcha-class-8-wb",
+    "title": "Bhasa Charcha",
+    "slug": "bhasa-charcha",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-bengali-grammar-class-8-wb",
+    "orderIndex": 22,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-grammar/bhasa-charcha",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-grammar",
+    "textbookSlug": "bhasa-charcha",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-grammar-class-8-wb",
+        "slug": "bengali-grammar",
+        "title": "Bengali Grammar",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-ganit-prabha-class-8-wb",
+    "title": "Ganit Prabha",
+    "slug": "ganit-prabha",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-mathematics-class-8-wb",
+    "orderIndex": 23,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/mathematics/ganit-prabha",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-8-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-pather-panchali-rapid-class-8-wb",
+    "title": "Pather Panchali Rapid",
+    "slug": "pather-panchali-rapid",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-rapid-reader-class-8-wb",
+    "orderIndex": 24,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/rapid-reader/pather-panchali-rapid",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "rapid-reader",
+    "textbookSlug": "pather-panchali-rapid",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-rapid-reader-class-8-wb",
+        "slug": "rapid-reader",
+        "title": "Rapid Reader",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-poribesh-o-bigyan-class-8-wb",
+    "title": "Poribesh O Bigyan",
+    "slug": "poribesh-o-bigyan",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-science-class-8-wb",
+    "orderIndex": 25,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/science/poribesh-o-bigyan",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "science",
+    "textbookSlug": "poribesh-o-bigyan",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-8-wb",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-sahityamela-class-8-wb",
+    "title": "Sahityamela",
+    "slug": "sahityamela",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-bengali-literature-class-8-wb",
+    "orderIndex": 26,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-ganit-prakash-class-9-wb",
+    "title": "Ganit Prakash",
+    "slug": "ganit-prakash",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-mathematics-class-9-wb",
+    "orderIndex": 27,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/mathematics/ganit-prakash",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-9-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-professor-shankur-dairy-class-9-wb",
+    "title": "Professor Shankur Dairy",
+    "slug": "professor-shankur-dairy",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-rapid-reader-class-9-wb",
+    "orderIndex": 28,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/rapid-reader/professor-shankur-dairy",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "rapid-reader",
+    "textbookSlug": "professor-shankur-dairy",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-rapid-reader-class-9-wb",
+        "slug": "rapid-reader",
+        "title": "Rapid Reader",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-sahitya-sanchayan-class-9-wb",
+    "title": "Sahitya Sanchayan",
+    "slug": "sahitya-sanchayan",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-bengali-literature-class-9-wb",
+    "orderIndex": 29,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/bengali-literature/sahitya-sanchayan",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahitya-sanchayan",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-9-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-ganit-prakash-class-10-wb",
+    "title": "Ganit Prakash",
+    "slug": "ganit-prakash",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-mathematics-class-10-wb",
+    "orderIndex": 30,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/mathematics/ganit-prakash",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-10-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-koni-rapid-reader-class-10-wb",
+    "title": "Koni Rapid Reader",
+    "slug": "koni-rapid-reader",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-rapid-reader-class-10-wb",
+    "orderIndex": 31,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/rapid-reader/koni-rapid-reader",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "rapid-reader",
+    "textbookSlug": "koni-rapid-reader",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-rapid-reader-class-10-wb",
+        "slug": "rapid-reader",
+        "title": "Rapid Reader",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-sahitya-sanchayan-class-10-wb",
+    "title": "Sahitya Sanchayan",
+    "slug": "sahitya-sanchayan",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-bengali-literature-class-10-wb",
+    "orderIndex": 32,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/bengali-literature/sahitya-sanchayan",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahitya-sanchayan",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-10-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-amar-boi-class-1-wbbpe",
+    "title": "Amar Boi",
+    "slug": "amar-boi",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-bengali-language-class-1-wbbpe",
+    "orderIndex": 33,
+    "status": "published",
+    "fullSlug": "wbbpe-board/class-1/bengali-language/amar-boi",
+    "boardSlug": "wbbpe-board",
+    "classSlug": "class-1",
+    "subjectSlug": "bengali-language",
+    "textbookSlug": "amar-boi",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wbbpe",
+        "slug": "wbbpe-board",
+        "title": "WBBPE",
+        "type": "board"
+      },
+      {
+        "id": "class-1-wbbpe",
+        "slug": "class-1",
+        "title": "Class 1",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-language-class-1-wbbpe",
+        "slug": "bengali-language",
+        "title": "Bengali Language",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-health-physical-education-class-1-wbbpe",
+    "title": "Health & Physical Education",
+    "slug": "health-physical-education",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-health-physical-education-class-1-wbbpe",
+    "orderIndex": 34,
+    "status": "published",
+    "fullSlug": "wbbpe-board/class-1/health-physical-education/health-physical-education",
+    "boardSlug": "wbbpe-board",
+    "classSlug": "class-1",
+    "subjectSlug": "health-physical-education",
+    "textbookSlug": "health-physical-education",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wbbpe",
+        "slug": "wbbpe-board",
+        "title": "WBBPE",
+        "type": "board"
+      },
+      {
+        "id": "class-1-wbbpe",
+        "slug": "class-1",
+        "title": "Class 1",
+        "type": "class"
+      },
+      {
+        "id": "subject-health-physical-education-class-1-wbbpe",
+        "slug": "health-physical-education",
+        "title": "Health & Physical Education",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-sahaj-path-pratham-bhag-class-1-wbbpe",
+    "title": "Sahaj Path Pratham Bhag",
+    "slug": "sahaj-path-pratham-bhag",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-bengali-literature-class-1-wbbpe",
+    "orderIndex": 35,
+    "status": "published",
+    "fullSlug": "wbbpe-board/class-1/bengali-literature/sahaj-path-pratham-bhag",
+    "boardSlug": "wbbpe-board",
+    "classSlug": "class-1",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahaj-path-pratham-bhag",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wbbpe",
+        "slug": "wbbpe-board",
+        "title": "WBBPE",
+        "type": "board"
+      },
+      {
+        "id": "class-1-wbbpe",
+        "slug": "class-1",
+        "title": "Class 1",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-1-wbbpe",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-amar-boi-class-2-wbbpe",
+    "title": "Amar Boi",
+    "slug": "amar-boi",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-bengali-language-class-2-wbbpe",
+    "orderIndex": 36,
+    "status": "published",
+    "fullSlug": "wbbpe-board/class-2/bengali-language/amar-boi",
+    "boardSlug": "wbbpe-board",
+    "classSlug": "class-2",
+    "subjectSlug": "bengali-language",
+    "textbookSlug": "amar-boi",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wbbpe",
+        "slug": "wbbpe-board",
+        "title": "WBBPE",
+        "type": "board"
+      },
+      {
+        "id": "class-2-wbbpe",
+        "slug": "class-2",
+        "title": "Class 2",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-language-class-2-wbbpe",
+        "slug": "bengali-language",
+        "title": "Bengali Language",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-health-physical-education-class-2-wbbpe",
+    "title": "Health & Physical Education",
+    "slug": "health-physical-education",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-health-physical-education-class-2-wbbpe",
+    "orderIndex": 37,
+    "status": "published",
+    "fullSlug": "wbbpe-board/class-2/health-physical-education/health-physical-education",
+    "boardSlug": "wbbpe-board",
+    "classSlug": "class-2",
+    "subjectSlug": "health-physical-education",
+    "textbookSlug": "health-physical-education",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wbbpe",
+        "slug": "wbbpe-board",
+        "title": "WBBPE",
+        "type": "board"
+      },
+      {
+        "id": "class-2-wbbpe",
+        "slug": "class-2",
+        "title": "Class 2",
+        "type": "class"
+      },
+      {
+        "id": "subject-health-physical-education-class-2-wbbpe",
+        "slug": "health-physical-education",
+        "title": "Health & Physical Education",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-sahaj-path-dwitiyo-bhag-class-2-wbbpe",
+    "title": "Sahaj Path Dwitiyo Bhag",
+    "slug": "sahaj-path-dwitiyo-bhag",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-bengali-literature-class-2-wbbpe",
+    "orderIndex": 38,
+    "status": "published",
+    "fullSlug": "wbbpe-board/class-2/bengali-literature/sahaj-path-dwitiyo-bhag",
+    "boardSlug": "wbbpe-board",
+    "classSlug": "class-2",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahaj-path-dwitiyo-bhag",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wbbpe",
+        "slug": "wbbpe-board",
+        "title": "WBBPE",
+        "type": "board"
+      },
+      {
+        "id": "class-2-wbbpe",
+        "slug": "class-2",
+        "title": "Class 2",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-2-wbbpe",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-amader-paribesh-class-3-wbbpe",
+    "title": "Amader Paribesh",
+    "slug": "amader-paribesh",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-environmental-science-class-3-wbbpe",
+    "orderIndex": 39,
+    "status": "published",
+    "fullSlug": "wbbpe-board/class-3/environmental-science/amader-paribesh",
+    "boardSlug": "wbbpe-board",
+    "classSlug": "class-3",
+    "subjectSlug": "environmental-science",
+    "textbookSlug": "amader-paribesh",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wbbpe",
+        "slug": "wbbpe-board",
+        "title": "WBBPE",
+        "type": "board"
+      },
+      {
+        "id": "class-3-wbbpe",
+        "slug": "class-3",
+        "title": "Class 3",
+        "type": "class"
+      },
+      {
+        "id": "subject-environmental-science-class-3-wbbpe",
+        "slug": "environmental-science",
+        "title": "Environmental Science",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-amar-ganit-class-3-wbbpe",
+    "title": "Amar Ganit",
+    "slug": "amar-ganit",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-mathematics-class-3-wbbpe",
+    "orderIndex": 40,
+    "status": "published",
+    "fullSlug": "wbbpe-board/class-3/mathematics/amar-ganit",
+    "boardSlug": "wbbpe-board",
+    "classSlug": "class-3",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "amar-ganit",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wbbpe",
+        "slug": "wbbpe-board",
+        "title": "WBBPE",
+        "type": "board"
+      },
+      {
+        "id": "class-3-wbbpe",
+        "slug": "class-3",
+        "title": "Class 3",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-3-wbbpe",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-health-physical-education-class-3-wbbpe",
+    "title": "Health & Physical Education",
+    "slug": "health-physical-education",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-health-physical-education-class-3-wbbpe",
+    "orderIndex": 41,
+    "status": "published",
+    "fullSlug": "wbbpe-board/class-3/health-physical-education/health-physical-education",
+    "boardSlug": "wbbpe-board",
+    "classSlug": "class-3",
+    "subjectSlug": "health-physical-education",
+    "textbookSlug": "health-physical-education",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wbbpe",
+        "slug": "wbbpe-board",
+        "title": "WBBPE",
+        "type": "board"
+      },
+      {
+        "id": "class-3-wbbpe",
+        "slug": "class-3",
+        "title": "Class 3",
+        "type": "class"
+      },
+      {
+        "id": "subject-health-physical-education-class-3-wbbpe",
+        "slug": "health-physical-education",
+        "title": "Health & Physical Education",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-patabahar-class-3-wbbpe",
+    "title": "Patabahar",
+    "slug": "patabahar",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-bengali-literature-class-3-wbbpe",
+    "orderIndex": 42,
+    "status": "published",
+    "fullSlug": "wbbpe-board/class-3/bengali-literature/patabahar",
+    "boardSlug": "wbbpe-board",
+    "classSlug": "class-3",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "patabahar",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wbbpe",
+        "slug": "wbbpe-board",
+        "title": "WBBPE",
+        "type": "board"
+      },
+      {
+        "id": "class-3-wbbpe",
+        "slug": "class-3",
+        "title": "Class 3",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-3-wbbpe",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-amader-paribesh-class-4-wbbpe",
+    "title": "Amader Paribesh",
+    "slug": "amader-paribesh",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-environmental-science-class-4-wbbpe",
+    "orderIndex": 43,
+    "status": "published",
+    "fullSlug": "wbbpe-board/class-4/environmental-science/amader-paribesh",
+    "boardSlug": "wbbpe-board",
+    "classSlug": "class-4",
+    "subjectSlug": "environmental-science",
+    "textbookSlug": "amader-paribesh",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wbbpe",
+        "slug": "wbbpe-board",
+        "title": "WBBPE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-wbbpe",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-environmental-science-class-4-wbbpe",
+        "slug": "environmental-science",
+        "title": "Environmental Science",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-amar-ganit-class-4-wbbpe",
+    "title": "Amar Ganit",
+    "slug": "amar-ganit",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-mathematics-class-4-wbbpe",
+    "orderIndex": 44,
+    "status": "published",
+    "fullSlug": "wbbpe-board/class-4/mathematics/amar-ganit",
+    "boardSlug": "wbbpe-board",
+    "classSlug": "class-4",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "amar-ganit",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wbbpe",
+        "slug": "wbbpe-board",
+        "title": "WBBPE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-wbbpe",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-4-wbbpe",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-bhasha-path-class-4-wbbpe",
+    "title": "Bhasha Path",
+    "slug": "bhasha-path",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-bengali-grammar-class-4-wbbpe",
+    "orderIndex": 45,
+    "status": "published",
+    "fullSlug": "wbbpe-board/class-4/bengali-grammar/bhasha-path",
+    "boardSlug": "wbbpe-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali-grammar",
+    "textbookSlug": "bhasha-path",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wbbpe",
+        "slug": "wbbpe-board",
+        "title": "WBBPE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-wbbpe",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-grammar-class-4-wbbpe",
+        "slug": "bengali-grammar",
+        "title": "Bengali Grammar",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-health-physical-education-class-4-wbbpe",
+    "title": "Health & Physical Education",
+    "slug": "health-physical-education",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-health-physical-education-class-4-wbbpe",
+    "orderIndex": 46,
+    "status": "published",
+    "fullSlug": "wbbpe-board/class-4/health-physical-education/health-physical-education",
+    "boardSlug": "wbbpe-board",
+    "classSlug": "class-4",
+    "subjectSlug": "health-physical-education",
+    "textbookSlug": "health-physical-education",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wbbpe",
+        "slug": "wbbpe-board",
+        "title": "WBBPE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-wbbpe",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-health-physical-education-class-4-wbbpe",
+        "slug": "health-physical-education",
+        "title": "Health & Physical Education",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-patabahar-class-4-wbbpe",
+    "title": "Patabahar",
+    "slug": "patabahar",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-bengali-literature-class-4-wbbpe",
+    "orderIndex": 47,
+    "status": "published",
+    "fullSlug": "wbbpe-board/class-4/bengali-literature/patabahar",
+    "boardSlug": "wbbpe-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "patabahar",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wbbpe",
+        "slug": "wbbpe-board",
+        "title": "WBBPE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-wbbpe",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-4-wbbpe",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      }
+    ]
   }
 ]

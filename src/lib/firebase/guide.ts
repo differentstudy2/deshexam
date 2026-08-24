@@ -391,13 +391,13 @@ export const getReadingContent = async (contentId: string): Promise<ReadingConte
             finalSections = [{ id: 'guide_content', title: 'Lesson Content', type: 'article', body: topicData.content || '<p>No content added yet.</p>' }];
           }
           
-          const hasMcq = topicQs.some(q => q.type?.toLowerCase() === 'mcq' || (q as any).questionType?.toLowerCase() === 'mcq');
+          const hasMcq = topicQs.some(q => (q as any).type?.toLowerCase() === 'mcq' || (q as any).questionType?.toLowerCase() === 'mcq');
           if (hasMcq && !finalSections.some(s => s.id === 'mcq')) {
             finalSections.push({ id: 'mcq', title: 'MCQ', type: 'mcq' });
           }
           
           const hasCq = topicQs.some(q => {
-            const t = (q.type || (q as any).questionType || '').toLowerCase();
+            const t = ((q as any).type || (q as any).questionType || '').toLowerCase();
             return t === 'cq' || t === 'descriptive';
           });
           if (hasCq && !finalSections.some(s => s.id === 'creative_question')) {
