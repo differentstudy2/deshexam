@@ -466,12 +466,15 @@ export default function QuestionCard({ question, index, testMode = false, isList
     };
 
     return (
-        <div id={`question-card-${question.id}`} className="w-full bg-gradient-to-br from-white to-slate-50/50 dark:from-slate-900 dark:to-slate-900 p-5 md:p-6 rounded-[24px] border border-slate-200/60 dark:border-slate-800/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] mb-5 transition-all duration-300 hover:shadow-[0_12px_40px_rgb(0,0,0,0.08)] hover:-translate-y-1 relative overflow-hidden group">
+        <div id={`question-card-${question.id}`} className={cn(
+            "w-full bg-gradient-to-br from-white to-slate-50/50 dark:from-slate-900 dark:to-slate-900 border border-slate-200/60 dark:border-slate-800/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] transition-all duration-300 hover:shadow-[0_12px_40px_rgb(0,0,0,0.08)] hover:-translate-y-1 relative overflow-hidden group",
+            isListView ? "p-4 md:p-5 rounded-2xl" : "p-5 md:p-6 rounded-[24px] mb-5"
+        )}>
             
             {/* Soft decorative top border */}
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500/0 via-blue-500/20 to-blue-500/0 dark:via-blue-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             {/* Top row: Taxonomy chips and Link */}
-            <div className="flex items-start justify-between mb-5 gap-4 relative z-10">
+            <div className={cn("flex items-start justify-between gap-4 relative z-10", isListView ? "mb-3" : "mb-5")}>
                 <div className="flex flex-wrap items-center gap-2">
                     {question.marks && (
                         <span className="bg-amber-500/10 dark:bg-amber-500/20 border border-amber-500/20 dark:border-amber-500/30 text-amber-700 dark:text-amber-400 font-bold rounded-full px-3 py-1 text-[11px] uppercase tracking-widest shadow-sm backdrop-blur-md">
@@ -537,7 +540,7 @@ export default function QuestionCard({ question, index, testMode = false, isList
                 </div>
             </div>
 
-            <div className="flex flex-col gap-2 mb-6">
+            <div className={cn("flex flex-col gap-2", isListView ? "mb-4" : "mb-6")}>
                 <div className="flex items-baseline gap-3 relative z-10">
                     {index !== undefined && <span className="text-xl font-extrabold text-[#FF9933]/90 shrink-0">{index}.</span>}
                     {isFillInTheBlank ? (
@@ -764,7 +767,7 @@ export default function QuestionCard({ question, index, testMode = false, isList
 
             {/* Descriptive Answer Section */}
             {(isDetailView || isDescriptive) && showAnswer && question.correctAnswer && (
-                <div className="mt-4 mb-2 rounded-[16px] bg-green-50/50 dark:bg-green-900/10 !text-[0.8rem] text-slate-700 dark:text-slate-300 !leading-snug animate-in fade-in slide-in-from-top-2 duration-300 border border-green-200 dark:border-green-800/50 overflow-hidden shadow-sm">
+                <div className="mt-4 mb-2 rounded-t-xl rounded-b-none bg-green-50/50 dark:bg-green-900/10 !text-[0.8rem] text-slate-700 dark:text-slate-300 !leading-snug animate-in fade-in slide-in-from-top-2 duration-300 border border-green-200 dark:border-green-800/50 overflow-hidden shadow-sm">
                     <div className="font-bold text-white bg-gradient-to-r from-emerald-600 to-green-500 flex items-center gap-2 px-4 py-3 border-b border-green-200/50 dark:border-green-800/50">
                         <CheckCircle2 className="w-4 h-4 text-white" />
                         {isDetailView ? <h2 className="text-base m-0 text-white">Answer</h2> : "Answer"}
@@ -776,41 +779,40 @@ export default function QuestionCard({ question, index, testMode = false, isList
             )}
 
             {/* Explanation Section */}
-            {showAnswer && (question.explanation || question.optionExplanations) && (
-                <div className="mt-4 mb-2 rounded-[16px] bg-blue-50/50 dark:bg-blue-900/10 !text-[0.8rem] text-slate-700 dark:text-slate-300 !leading-snug animate-in fade-in slide-in-from-top-2 duration-300 border border-blue-200 dark:border-blue-800/50 overflow-hidden shadow-sm">
+            {showAnswer && question.explanation && (
+                <div className="mt-4 mb-2 rounded-t-xl rounded-b-none bg-blue-50/50 dark:bg-blue-900/10 !text-[0.8rem] text-slate-700 dark:text-slate-300 !leading-snug animate-in fade-in slide-in-from-top-2 duration-300 border border-blue-200 dark:border-blue-800/50 overflow-hidden shadow-sm">
                     <div className="font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-500 flex items-center gap-2 px-4 py-3 border-b border-blue-200/50 dark:border-blue-800/50">
                         <Lightbulb className="w-4 h-4 text-white" />
                         {isDetailView ? <h2 className="text-base m-0 text-white">Explanation</h2> : "Explanation"}
                     </div>
                     
                     <div className="p-4">
-                        {question.explanation && (
-                            <div className="prose dark:prose-invert max-w-none opacity-90 !text-[0.8rem] prose-p:!text-[0.8rem] prose-p:!my-0.5 prose-headings:!text-[0.85rem] prose-headings:!my-1 prose-li:!text-[0.8rem] prose-li:!my-0 mb-3" dangerouslySetInnerHTML={{ __html: renderMathInHtml(question.explanation) }} />
-                        )}
-
-                        {question.optionExplanations && Object.keys(question.optionExplanations).length > 0 && (
-                            <div className="space-y-3 mt-4 pt-4 border-t border-blue-200/30 dark:border-blue-800/30">
-                                {['a', 'b', 'c', 'd'].map(key => {
-                                    const exp = (question.optionExplanations as any)?.[key];
-                                    const opt = (question.options as any)?.[key];
-                                    if (!exp) return null;
-                                    const isCorrect = question.correctAnswer?.toLowerCase() === key.toLowerCase();
-                                    return (
-                                        <div key={key} className="flex flex-col text-[0.85rem] bg-white dark:bg-slate-900 overflow-hidden rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
-                                            <div className={`flex items-center gap-3 font-semibold px-4 py-2.5 text-white ${isCorrect ? 'bg-gradient-to-r from-emerald-600 to-green-500' : 'bg-gradient-to-r from-rose-500 to-red-500'}`}>
-                                                <span className="uppercase text-[12px] font-bold w-6 h-6 flex items-center justify-center rounded-full bg-white/20 shrink-0">
-                                                    {getOptionLabel(key, question.language)}
-                                                </span>
-                                                <span className="line-clamp-1 flex-1 text-[0.9rem]" dangerouslySetInnerHTML={{__html: renderMathInHtml(opt)}} />
-                                                {isCorrect ? <CheckCircle2 className="w-5 h-5 text-white shrink-0" /> : <XCircle className="w-5 h-5 text-white shrink-0" />}
-                                            </div>
-                                            <div className="p-4 opacity-90 text-slate-700 dark:text-slate-300 leading-relaxed" dangerouslySetInnerHTML={{__html: renderMathInHtml(exp)}} />
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        )}
+                        <div className="prose dark:prose-invert max-w-none opacity-90 !text-[0.8rem] prose-p:!text-[0.8rem] prose-p:!my-0.5 prose-headings:!text-[0.85rem] prose-headings:!my-1 prose-li:!text-[0.8rem] prose-li:!my-0 mb-1" dangerouslySetInnerHTML={{ __html: renderMathInHtml(question.explanation) }} />
                     </div>
+                </div>
+            )}
+
+            {/* Option Explanations Section */}
+            {showAnswer && question.optionExplanations && Object.keys(question.optionExplanations).length > 0 && (
+                <div className="mt-4 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                    {['a', 'b', 'c', 'd'].map(key => {
+                        const exp = (question.optionExplanations as any)?.[key];
+                        const opt = (question.options as any)?.[key];
+                        if (!exp) return null;
+                        const isCorrect = question.correctAnswer?.toLowerCase() === key.toLowerCase();
+                        return (
+                            <div key={key} className="flex flex-col text-[0.85rem] bg-white dark:bg-slate-900 overflow-hidden rounded-t-xl rounded-b-none border border-slate-200/80 dark:border-slate-800 shadow-sm">
+                                <div className={`flex items-center gap-3 font-semibold px-4 py-2.5 text-white ${isCorrect ? 'bg-gradient-to-r from-emerald-600 to-green-500' : 'bg-gradient-to-r from-rose-500 to-red-500'}`}>
+                                    <span className="uppercase text-[12px] font-bold w-6 h-6 flex items-center justify-center rounded-full bg-white/20 shrink-0">
+                                        {getOptionLabel(key, question.language)}
+                                    </span>
+                                    <span className="line-clamp-1 flex-1 text-[0.9rem]" dangerouslySetInnerHTML={{__html: renderMathInHtml(opt)}} />
+                                    {isCorrect ? <CheckCircle2 className="w-5 h-5 text-white shrink-0" /> : <XCircle className="w-5 h-5 text-white shrink-0" />}
+                                </div>
+                                <div className="p-4 opacity-90 text-slate-700 dark:text-slate-300 leading-relaxed" dangerouslySetInnerHTML={{__html: renderMathInHtml(exp)}} />
+                            </div>
+                        );
+                    })}
                 </div>
             )}
 

@@ -6,9 +6,6 @@ const path = require('path');
 // ==========================================
 
 const NEW_QUESTION = {
-  // প্রশ্নের একটি ইউনিক আইডি দিন
-  id: "q-mcq-manabdeha-1", 
-  
   // এটি কোন টপিকের প্রশ্ন? (Taxonomy IDs)
   boardId: "board-wb",
   classId: "class-5-wb",
@@ -20,10 +17,10 @@ const NEW_QUESTION = {
   // প্রশ্নের ধরন (Question Type)
   // 'mcq' (Multiple Choice), 'descriptive' বা 'CQ' (Creative Question/Written), 
   // 'T/F' (True/False), 'FIB' (Fill in the blanks), 'Match' (Matching)
-  type: "mcq",
+  questionType: "mcq",
   
   // প্রশ্নটি এখানে লিখুন
-  content: "আমাদের শরীরের বর্ম কাকে বলা হয়?",
+  questionText: "আমাদের শরীরের বর্ম কাকে বলা হয়?",
   
   // যদি MCQ হয়, তাহলে অপশনগুলো দিন
   options: {
@@ -58,6 +55,19 @@ const NEW_QUESTION = {
 // ==========================================
 // নিচের অংশে কিছু পরিবর্তন করার দরকার নেই
 // ==========================================
+
+// প্রশ্ন থেকে অটোমেটিক আইডি এবং স্লাগ তৈরি করা হচ্ছে
+function generateSlug(text) {
+  let cleanText = text.replace(/(<([^>]+)>)/gi, ""); // Remove HTML tags
+  cleanText = cleanText.replace(/[?।.,!]/g, ''); // Remove punctuations
+  cleanText = cleanText.trim().replace(/\s+/g, '-'); // Replace spaces with hyphens
+  return encodeURIComponent(cleanText.substring(0, 50));
+}
+
+const baseSlug = generateSlug(NEW_QUESTION.questionText);
+const timestamp = Date.now().toString().slice(-6); // last 6 digits of timestamp
+NEW_QUESTION.id = `q-${baseSlug}-${timestamp}`;
+NEW_QUESTION.slug = `${baseSlug}-${timestamp}`;
 
 const questionsFile = path.join(__dirname, '../src/data/hardcoded/taxonomy/questions.json');
 let questions = [];

@@ -74,7 +74,7 @@ export function NodeQuestionsPage({ node, contentType, breadcrumbs }: NodeQuesti
   };
 
   return (
-    <div className="max-w-[800px] mx-auto pb-10">
+    <div className="w-full pb-10">
       <div className="relative overflow-hidden bg-gradient-to-br from-emerald-500 to-teal-700 rounded-2xl p-6 sm:p-10 mb-8 shadow-sm text-white border border-emerald-400/20">
         <div className="absolute -top-12 -right-12 text-emerald-900/10 pointer-events-none">
           <HelpCircle className="w-64 h-64" strokeWidth={1} />
@@ -109,8 +109,8 @@ export function NodeQuestionsPage({ node, contentType, breadcrumbs }: NodeQuesti
           </p>
         </div>
       ) : (
-        <div className="space-y-6">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
             <span className="text-sm font-medium text-slate-500 dark:text-slate-400">
               Showing {questions.length} question{questions.length !== 1 ? 's' : ''}
             </span>

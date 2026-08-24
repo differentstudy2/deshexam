@@ -7,8 +7,8 @@
     "textbookId": "textbook-amader-paribesh",
     "chapterId": "chapter-manabdeha-amader-paribesh",
     "topicId": "topic-shorirer-bormo-manabdeha",
-    "type": "mcq",
-    "content": "আমাদের শরীরের বর্ম কাকে বলা হয়?",
+    "questionType": "mcq",
+    "questionText": "আমাদের শরীরের বর্ম কাকে বলা হয়?",
     "options": {
       "a": "চুল",
       "b": "ত্বক বা চামড়া",

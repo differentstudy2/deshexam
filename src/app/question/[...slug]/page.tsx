@@ -22,7 +22,8 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const resolvedParams = await params;
-    const slugArray = resolvedParams.slug;
+    const slugArray = resolvedParams?.slug || [];
+    if (slugArray.length === 0) return { title: 'Questions | DeshExam' };
     const lastSlug = decodeURIComponent(slugArray[slugArray.length - 1]);
     
     try {
@@ -73,7 +74,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function DynamicQuestionPage({ params }: Props) {
   const resolvedParams = await params;
-  const slugArray = resolvedParams.slug;
+  const slugArray = resolvedParams?.slug || [];
+  if (slugArray.length === 0) notFound();
   const lastSlug = decodeURIComponent(slugArray[slugArray.length - 1]);
 
   let question = null;
@@ -100,7 +102,7 @@ export default async function DynamicQuestionPage({ params }: Props) {
               // First try the new taxonomy_nodes collection
               let snap = await getDoc(doc(db, 'taxonomy_nodes', id));
               if (snap.exists()) {
-                  const val = snap.data().title || snap.data().name;
+                  const val = snap.data().title || snap.data().name || 'Unknown';
                   const slug = snap.data().slug || id;
                   const res = {title: val, slug};
                   titleCache.set(id, res);
@@ -110,7 +112,7 @@ export default async function DynamicQuestionPage({ params }: Props) {
               // Fallback to legacy collections
               snap = await getDoc(doc(db, col1, id));
               if (snap.exists()) {
-                  const val = snap.data().title || snap.data().name;
+                  const val = snap.data().title || snap.data().name || 'Unknown';
                   const slug = snap.data().slug || id;
                   const res = {title: val, slug};
                   titleCache.set(id, res);
@@ -118,7 +120,7 @@ export default async function DynamicQuestionPage({ params }: Props) {
               }
               snap = await getDoc(doc(db, col2, id));
               if (snap.exists()) {
-                  const val = snap.data().title || snap.data().name;
+                  const val = snap.data().title || snap.data().name || 'Unknown';
                   const slug = snap.data().slug || id;
                   const res = {title: val, slug};
                   titleCache.set(id, res);
@@ -255,8 +257,8 @@ export default async function DynamicQuestionPage({ params }: Props) {
             
             {breadcrumbTags.length > 0 ? (
                 breadcrumbTags.map((tag: {title: string, slug: string}, i: number) => {
-                    let displayTag = tag.title;
-                    if (i === 0 && tag.title.length > 12) {
+                    let displayTag = tag.title || 'Unknown';
+                    if (i === 0 && tag.title && tag.title.length > 12) {
                         const ignoreWords = ['of', 'and', 'for', 'the', '&', 'in', 'on', 'at'];
                         const acronym = tag.title.split(/[\s-]+/).filter(w => w && !ignoreWords.includes(w.toLowerCase())).map(w => w[0]?.toUpperCase()).join('');
                         if (acronym.length > 1) displayTag = acronym;
@@ -322,7 +324,7 @@ export default async function DynamicQuestionPage({ params }: Props) {
       questionsList = await getQuestionsByTaxonomySlug(lastSlug);
   } catch(e) {}
 
-  if (questionsList.length > 0) {
+  if (questionsList && questionsList.length > 0) {
       const safeQuestionsList = JSON.parse(JSON.stringify(questionsList));
       const formattedTitle = lastSlug.replace(/-/g, ' ');
       return (
