@@ -9,7 +9,7 @@ import { Search, ChevronDown, ChevronUp, ChevronRight, ExternalLink, Play, Arrow
 import { Progress } from '@/components/ui/progress';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { cn } from '@/lib/utils';
-import { getTaxonomyNodesByType, getTaxonomyNodeById, TaxonomyNode } from '@/lib/firebase/taxonomy';
+import { getTaxonomyNodesByType, getTaxonomyNodeById, getTaxonomyNodesByParent, TaxonomyNode } from '@/lib/firebase/taxonomy';
 import { useAuth } from "@/hooks/use-auth";
 import { collection, query, where, getDocs, getCountFromServer } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
@@ -65,13 +65,8 @@ function ChapterRow({ chapterId, chapterTitle, chapterLink }: { chapterId: strin
     if (!isOpen && !hasFetched) {
       setIsLoading(true);
       try {
-        const tpQ = query(
-          collection(db, 'taxonomy_nodes'), 
-          where('type', '==', 'topic'), 
-          where('parentId', '==', chapterId)
-        );
-        const tpSnap = await getDocs(tpQ);
-        let fetchedTopics = tpSnap.docs.map((d: any) => ({id: d.id, ...d.data()}));
+        const children = await getTaxonomyNodesByParent(chapterId);
+        let fetchedTopics = children.filter(n => n.type === 'topic');
         fetchedTopics = sortTaxonomyNodes(fetchedTopics);
         
         setTopics(fetchedTopics.map((t: any) => ({
@@ -204,13 +199,8 @@ function AcademyCard({ subject, index }: { subject: Subject, index: number }) {
     if (!isTopExpanded && !hasFetched && subject.id) {
       setIsLoading(true);
       try {
-        const chQ = query(
-          collection(db, 'taxonomy_nodes'), 
-          where('type', '==', 'chapter'), 
-          where('parentId', '==', subject.id)
-        );
-        const chSnap = await getDocs(chQ);
-        let fetchedChapters = chSnap.docs.map((d: any) => ({id: d.id, ...d.data()}));
+        const children = await getTaxonomyNodesByParent(subject.id);
+        let fetchedChapters = children.filter(n => n.type === 'chapter');
         fetchedChapters = sortTaxonomyNodes(fetchedChapters);
         
         setChapters(fetchedChapters.map((c: any) => ({
@@ -400,32 +390,24 @@ export default function AcademyClient({
     const fetchClassData = async () => {
       setLoading(true);
       try {
-        // Find subjects for this class
-        const subjectsQ = query(
-          collection(db, 'taxonomy_nodes'), 
-          where('parentId', '==', selectedClassId), 
-          where('type', '==', 'subject')
-        );
-        const subjectsSnap = await getDocs(subjectsQ);
-        const subjectIds = subjectsSnap.docs.map(d => d.id);
+        // Fetch all children of the selected class (which could be subjects or textbooks directly)
+        const classChildren = await getTaxonomyNodesByParent(selectedClassId);
         
-        let parentIdsToSearch = [selectedClassId];
-        if (subjectIds.length > 0) {
-           parentIdsToSearch = [...parentIdsToSearch, ...subjectIds];
-        }
+        // Find subjects
+        const subjects = classChildren.filter(n => n.type === 'subject');
+        
+        // Find textbooks that are direct children of the class
+        let allTextbooks = classChildren.filter(n => n.type === 'textbook');
 
-        // Firestore 'in' query allows up to 30 items. Chunking for safety.
-        let allTextbooks: any[] = [];
-        const chunkSize = 30;
-        for (let i = 0; i < parentIdsToSearch.length; i += chunkSize) {
-          const chunk = parentIdsToSearch.slice(i, i + chunkSize);
-          const tbQ = query(
-            collection(db, 'taxonomy_nodes'), 
-            where('type', '==', 'textbook'), 
-            where('parentId', 'in', chunk)
-          );
-          const tbSnap = await getDocs(tbQ);
-          allTextbooks = [...allTextbooks, ...tbSnap.docs.map((d: any) => ({id: d.id, ...d.data()}))];
+        // Fetch textbooks that are children of the subjects
+        if (subjects.length > 0) {
+          const subjectChildrenPromises = subjects.map(s => getTaxonomyNodesByParent(s.id));
+          const subjectsChildrenArrays = await Promise.all(subjectChildrenPromises);
+          
+          subjectsChildrenArrays.forEach(childrenArray => {
+            const subjectTextbooks = childrenArray.filter(n => n.type === 'textbook');
+            allTextbooks = [...allTextbooks, ...subjectTextbooks];
+          });
         }
 
         if (allTextbooks.length === 0) {

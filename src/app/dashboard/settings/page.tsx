@@ -26,7 +26,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/hooks/use-auth';
-import { getTaxonomyNodesByType, TaxonomyNode } from '@/lib/firebase/taxonomy';
+import { getTaxonomyNodesByType, getTaxonomyNodesByParent, getTaxonomyNodeById, TaxonomyNode } from '@/lib/firebase/taxonomy';
 import { updateUserProfile, uploadFile } from '@/lib/firebase/firestore';
 import { Loader2 } from 'lucide-react';
 import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from 'firebase/auth';
@@ -379,22 +379,64 @@ function ContactInfoTab() {
 
 function AcademicInfoTab() {
   const { user, userProfile } = useAuth();
+  
+  const [selectedBoardId, setSelectedBoardId] = useState<string | null>(null);
   const [selectedClassId, setSelectedClassId] = useState<string | null>(null);
+  
+  const [boards, setBoards] = useState<TaxonomyNode[]>([]);
   const [classes, setClasses] = useState<TaxonomyNode[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  
+  const [isLoadingBoards, setIsLoadingBoards] = useState(true);
+  const [isLoadingClasses, setIsLoadingClasses] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState('');
 
+  // Fetch Boards on mount
   useEffect(() => {
-    const fetchClasses = async () => {
+    const fetchInitialData = async () => {
       try {
-        const fetchedClasses = await getTaxonomyNodesByType('academic', 'class');
+        const academicBoards = await getTaxonomyNodesByType('academic', 'board');
         const competitiveCategories = await getTaxonomyNodesByType('competitive', 'category');
         
-        const allNodes = [...fetchedClasses, ...competitiveCategories];
+        const allBoards = [...academicBoards, ...competitiveCategories];
+        const sorted = allBoards.sort((a, b) => {
+          if (typeof a.orderIndex === 'number' && typeof b.orderIndex === 'number' && a.orderIndex !== b.orderIndex) {
+            return a.orderIndex - b.orderIndex;
+          }
+          return (a.title || '').localeCompare(b.title || '', undefined, { numeric: true, sensitivity: 'base' });
+        });
         
-        // Sort them similar to how we sort taxonomy nodes
-        const sorted = allNodes.sort((a, b) => {
+        setBoards(sorted);
+
+        // Pre-select logic if user has a class saved
+        if (userProfile?.classId) {
+          const userClass = await getTaxonomyNodeById(userProfile.classId);
+          if (userClass && userClass.parentId) {
+            setSelectedBoardId(userClass.parentId);
+          }
+          setSelectedClassId(userProfile.classId);
+        }
+      } catch (error) {
+        console.error("Error fetching boards:", error);
+      } finally {
+        setIsLoadingBoards(false);
+      }
+    };
+    fetchInitialData();
+  }, [userProfile]);
+
+  // Fetch Classes when Board changes
+  useEffect(() => {
+    const fetchClasses = async () => {
+      if (!selectedBoardId) {
+        setClasses([]);
+        return;
+      }
+      setIsLoadingClasses(true);
+      try {
+        const fetchedClasses = await getTaxonomyNodesByParent(selectedBoardId);
+        
+        const sorted = fetchedClasses.sort((a, b) => {
           if (typeof a.orderIndex === 'number' && typeof b.orderIndex === 'number' && a.orderIndex !== b.orderIndex) {
             return a.orderIndex - b.orderIndex;
           }
@@ -403,19 +445,22 @@ function AcademicInfoTab() {
         
         setClasses(sorted);
         
-        if (userProfile?.classId) {
-          setSelectedClassId(userProfile.classId);
-        } else if (sorted.length > 0) {
-          setSelectedClassId(sorted[0].id);
-        }
+        // If current selected class is not in the new list, clear it
+        setSelectedClassId(prev => {
+          if (prev && !sorted.some(c => c.id === prev)) {
+            return null;
+          }
+          return prev;
+        });
       } catch (error) {
         console.error("Error fetching classes:", error);
       } finally {
-        setIsLoading(false);
+        setIsLoadingClasses(false);
       }
     };
+    
     fetchClasses();
-  }, [userProfile]);
+  }, [selectedBoardId]);
 
   const handleSave = async () => {
     if (!user || !selectedClassId) return;
@@ -425,12 +470,12 @@ function AcademicInfoTab() {
       await updateUserProfile(user.uid, {
         classId: selectedClassId,
       });
-      setMessage('Class updated successfully!');
+      setMessage('Academic info updated successfully!');
       // Give the system a second to process and update the auth context
       setTimeout(() => setMessage(''), 3000);
     } catch (err) {
       console.error(err);
-      setMessage('Failed to update class. Please try again.');
+      setMessage('Failed to update. Please try again.');
     } finally {
       setIsSaving(false);
     }
@@ -440,33 +485,70 @@ function AcademicInfoTab() {
     <div className="space-y-8">
       <div>
         <h2 className="text-lg font-bold text-slate-900 dark:text-white">Academic Information</h2>
-        <p className="text-sm font-medium text-slate-500 mt-1">Select your class to personalize your experience</p>
+        <p className="text-sm font-medium text-slate-500 mt-1">Select your board and class to personalize your experience</p>
       </div>
 
-      {isLoading ? (
+      {isLoadingBoards ? (
         <div className="flex justify-center py-10">
           <Loader2 className="w-6 h-6 animate-spin text-[#00a651]" />
         </div>
       ) : (
-        <>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl">
-            {classes.map(c => {
-              const isActive = selectedClassId === c.id;
-              return (
-                <button
-                  key={c.id}
-                  onClick={() => setSelectedClassId(c.id)}
-                  className={`h-12 rounded-xl border text-sm font-bold transition-all ${
-                    isActive 
-                      ? 'border-[#00a651] bg-[#00a651]/10 dark:bg-[#00a651]/20 text-[#00a651] dark:text-[#00a651]' 
-                      : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600'
-                  }`}
-                >
-                  {c.title}
-                </button>
-              )
-            })}
+        <div className="space-y-6">
+          {/* Board Selection */}
+          <div className="space-y-3">
+            <label className="text-sm font-bold text-slate-700 dark:text-slate-300">1. Select Board / Category</label>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl">
+              {boards.map(b => {
+                const isActive = selectedBoardId === b.id;
+                return (
+                  <button
+                    key={b.id}
+                    onClick={() => setSelectedBoardId(b.id)}
+                    className={`h-12 rounded-xl border text-sm font-bold transition-all ${
+                      isActive 
+                        ? 'border-[#00a651] bg-[#00a651]/10 dark:bg-[#00a651]/20 text-[#00a651] dark:text-[#00a651]' 
+                        : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600'
+                    }`}
+                  >
+                    {b.title}
+                  </button>
+                )
+              })}
+            </div>
           </div>
+
+          {/* Class Selection */}
+          {selectedBoardId && (
+            <div className="space-y-3 pt-2">
+              <label className="text-sm font-bold text-slate-700 dark:text-slate-300">2. Select Class / Subcategory</label>
+              {isLoadingClasses ? (
+                <div className="flex justify-center py-6">
+                  <Loader2 className="w-5 h-5 animate-spin text-[#00a651]" />
+                </div>
+              ) : classes.length > 0 ? (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl">
+                  {classes.map(c => {
+                    const isActive = selectedClassId === c.id;
+                    return (
+                      <button
+                        key={c.id}
+                        onClick={() => setSelectedClassId(c.id)}
+                        className={`h-12 rounded-xl border text-sm font-bold transition-all ${
+                          isActive 
+                            ? 'border-[#00a651] bg-[#00a651]/10 dark:bg-[#00a651]/20 text-[#00a651] dark:text-[#00a651]' 
+                            : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600'
+                        }`}
+                      >
+                        {c.title}
+                      </button>
+                    )
+                  })}
+                </div>
+              ) : (
+                <p className="text-sm text-slate-500 italic">No classes found for the selected board.</p>
+              )}
+            </div>
+          )}
 
           <div className="pt-6 max-w-4xl flex flex-col gap-2">
             <Button 
@@ -475,7 +557,7 @@ function AcademicInfoTab() {
               className="w-full bg-[#00a651] hover:bg-[#008c44] text-white h-12 font-bold tracking-wider rounded-xl shadow-md shadow-green-500/20 disabled:opacity-50"
             >
               {isSaving ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
-              {isSaving ? 'SAVING...' : 'CHANGE'}
+              {isSaving ? 'SAVING...' : 'SAVE CHANGES'}
             </Button>
             {message && (
               <p className={`text-center text-sm font-semibold mt-2 ${message.includes('success') ? 'text-green-600' : 'text-red-600'}`}>
@@ -483,7 +565,7 @@ function AcademicInfoTab() {
               </p>
             )}
           </div>
-        </>
+        </div>
       )}
     </div>
   );

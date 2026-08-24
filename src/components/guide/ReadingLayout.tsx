@@ -131,19 +131,19 @@ export function ReadingLayout({
       <div className="max-w-[1400px] mx-auto flex items-stretch mt-[10px] px-4 sm:px-6 gap-4 xl:gap-5 print:block print:m-0 print:p-0">
 
         {/* Left Navigation Sidebar */}
-        <div className="w-[280px] shrink-0 hidden lg:flex flex-col gap-5 sticky top-6 self-start max-h-[calc(100vh-3rem)] overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-slate-300 dark:[&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full pr-1 print:hidden">
+        <div className="w-[280px] shrink-0 hidden lg:flex flex-col gap-5 sticky top-6 self-start h-[calc(100vh-3rem)] print:hidden">
           <ContentNavigationSidebar curriculum={curriculum} activeId={id} subjectTitle={textbookTitle || ''} />
         </div>
 
         {/* Main Content Area */}
         <div className="flex-1 min-w-0 print:w-full print:block">
-          {contentType === 'questions' || contentType === 'mcq' || contentType === 'cq' ? (
-            <div className="pt-4 px-0 pb-12 min-h-[600px] print:p-0">
-              <NodeQuestionsPage node={node} contentType={contentType} breadcrumbs={breadcrumbs || []} />
+          {['questions', 'mcq', 'cq', 'creative-question', 'true-false', 'fill-in-blanks', 'matching'].includes(contentType || '') ? (
+            <div className="pt-0 px-0 pb-12 min-h-[600px] print:p-0">
+              <NodeQuestionsPage node={node} contentType={contentType!} breadcrumbs={breadcrumbs || []} />
             </div>
           ) : (
-            <ReadingArticle 
-              data={data} 
+            <ReadingArticle
+              data={data}
               node={node}
               contentType={contentType}
               hierarchy={{
@@ -159,14 +159,14 @@ export function ReadingLayout({
               }}
             />
           )}
-          
+
           <div className="px-4 sm:px-6 xl:px-12 pb-12 print:hidden">
             <AssessmentTabs chapterId={id} />
           </div>
         </div>
 
         {/* Right Sections Sidebar */}
-        <div className="w-[300px] shrink-0 hidden lg:flex flex-col gap-6 sticky top-6 self-start max-h-[calc(100vh-3rem)] overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-slate-300 dark:[&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full pr-1 print:hidden">
+        <div className="w-[300px] shrink-0 hidden lg:flex flex-col gap-6 sticky top-6 self-start h-[calc(100vh-3rem)] overflow-y-auto custom-scrollbar pr-1 print:hidden">
           <TopicSectionsSidebar sections={data.sections} node={node} currentContentType={contentType} />
           <GuideSidebar subjects={subjects} activeId={id} classTitle={classTitle} />
         </div>

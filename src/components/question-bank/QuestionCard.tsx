@@ -63,7 +63,7 @@ const formatDate = (dateValue: any) => {
 };
 
 export default function QuestionCard({ question, index, testMode = false, isListView = false, isDetailView = false }: QuestionCardProps) {
-    const isDescriptive = ['desc', 'descriptive', 'creative question'].includes(question.questionType?.toLowerCase() || '');
+    const isDescriptive = ['desc', 'descriptive', 'creative question', 'creative-question', 'cq'].includes(question.questionType?.toLowerCase() || '');
     const [showAnswer, setShowAnswer] = useState(isDetailView || isDescriptive);
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
     const [fillBlankAnswer, setFillBlankAnswer] = useState<string>('');
@@ -455,8 +455,10 @@ export default function QuestionCard({ question, index, testMode = false, isList
     }
 
     const getFormattedAnswer = () => {
+        if (isDescriptive) {
+            return (question as any).detailedExplanation || question.correctAnswer || question.explanation || '';
+        }
         if (!question.correctAnswer) return '';
-        if (isDescriptive) return question.correctAnswer;
         if (question.options) {
             const key = question.correctAnswer.toLowerCase();
             const optionText = (question.options as any)[key];
@@ -766,7 +768,7 @@ export default function QuestionCard({ question, index, testMode = false, isList
             )}
 
             {/* Descriptive Answer Section */}
-            {(isDetailView || isDescriptive) && showAnswer && question.correctAnswer && (
+            {(isDetailView || isDescriptive) && showAnswer && (question.correctAnswer || (question as any).detailedExplanation) && (
                 <div className="mt-4 mb-2 rounded-t-xl rounded-b-none bg-green-50/50 dark:bg-green-900/10 !text-[0.8rem] text-slate-700 dark:text-slate-300 !leading-snug animate-in fade-in slide-in-from-top-2 duration-300 border border-green-200 dark:border-green-800/50 overflow-hidden shadow-sm">
                     <div className="font-bold text-white bg-gradient-to-r from-emerald-600 to-green-500 flex items-center gap-2 px-4 py-3 border-b border-green-200/50 dark:border-green-800/50">
                         <CheckCircle2 className="w-4 h-4 text-white" />

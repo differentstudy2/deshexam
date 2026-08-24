@@ -303,8 +303,16 @@ export async function getPopularQuestions(limitCount = 5) {
 // ----------------------------------------------------
 
 export async function incrementQuestionView(id: string) {
-  const docRef = doc(db, QUESTIONS_COLLECTION, id);
-  await updateDoc(docRef, { viewsCount: increment(1) });
+  try {
+    const docRef = doc(db, QUESTIONS_COLLECTION, id);
+    // Use getDoc first to prevent error on hardcoded questions that don't exist in DB
+    const snap = await getDoc(docRef);
+    if (snap.exists()) {
+      await updateDoc(docRef, { viewsCount: increment(1) });
+    }
+  } catch (e) {
+    console.warn("Could not update view count", e);
+  }
 }
 
 export async function toggleInteraction(questionId: string, userId: string, type: 'like' | 'dislike' | 'bookmark') {
@@ -338,8 +346,18 @@ export async function toggleInteraction(questionId: string, userId: string, type
 
   const batch = writeBatch(db);
   batch.set(docRef, { ...currentData, ...updateData, userId, questionId, updatedAt: serverTimestamp() }, { merge: true });
-  batch.update(qRef, qUpdate);
-  await batch.commit();
+  
+  try {
+    const qSnap = await getDoc(qRef);
+    if (qSnap.exists()) {
+      batch.update(qRef, qUpdate);
+    }
+    await batch.commit();
+  } catch (e) {
+    console.warn("Could not update question counts", e);
+    // Fallback to just saving the interaction if batch fails
+    await setDoc(docRef, { ...currentData, ...updateData, userId, questionId, updatedAt: serverTimestamp() }, { merge: true });
+  }
 
   return updateData;
 }

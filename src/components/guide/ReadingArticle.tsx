@@ -21,6 +21,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { NodeQuestionsPage } from '@/components/guide/NodeQuestionsPage';
 
 interface ReadingArticleProps {
   data: ReadingContentData;
@@ -270,6 +271,22 @@ export function ReadingArticle({ data, node, hierarchy, navigation, contentType 
                   margin-bottom: 0.5em !important;
                   color: inherit !important;
                 }
+
+                .custom-reading-font table {
+                  display: block;
+                  width: 100%;
+                  max-width: 100%;
+                  overflow-x: auto;
+                  -webkit-overflow-scrolling: touch;
+                }
+
+                .hide-scrollbar::-webkit-scrollbar {
+                  display: none;
+                }
+                .hide-scrollbar {
+                  -ms-overflow-style: none;
+                  scrollbar-width: none;
+                }
               `}} />
               <div className="prose dark:prose-invert max-w-none custom-reading-font">
                 <ReactMarkdown
@@ -282,9 +299,15 @@ export function ReadingArticle({ data, node, hierarchy, navigation, contentType 
             </>
           )}
 
-          {sec.type === 'mcq' && sec.questions && (
+          {['mcq', 'cq', 'true-false', 'fill-in-blanks', 'matching'].includes(sec.type) && !(sec as any).questions && (
+            <div className="mt-8 relative">
+               <NodeQuestionsPage node={node} contentType={sec.type} previewMode={true} />
+            </div>
+          )}
+
+          {sec.type === 'mcq' && (sec as any).questions && (
             <div className="flex flex-col gap-8">
-              {sec.questions.map((q: any, qIdx: number) => (
+              {(sec as any).questions.map((q: any, qIdx: number) => (
                 <div key={qIdx} className="flex flex-col">
                   <p className="text-[15px] font-semibold text-slate-800 dark:text-slate-200 mb-3">
                     {qIdx + 1}. {q.q}
@@ -474,32 +497,33 @@ export function ReadingArticle({ data, node, hierarchy, navigation, contentType 
 
             {/* Quick Action Badges */}
             {node && (
-              <div className="bg-slate-50 dark:bg-slate-900/40 px-2 sm:px-4 py-2 border-b border-slate-200/60 dark:border-slate-800 print:hidden">
-                <div className="flex flex-wrap items-center relative w-full">
-                  <div className="flex flex-wrap items-center justify-center gap-3 flex-1">
-                    <Link href={`/guide/${node.fullSlug || node.id}/questions`} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-800 border border-emerald-100 dark:border-slate-700 rounded-md text-[11px] font-bold text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-slate-700 transition-colors shadow-sm">
-                      <FileQuestion className="w-3.5 h-3.5" />
+              <div className="bg-slate-50 dark:bg-slate-900/40 px-3 sm:px-4 py-2.5 border-b border-slate-200/60 dark:border-slate-800 print:hidden overflow-hidden">
+                <div className="flex items-center gap-2 w-full overflow-x-auto hide-scrollbar pb-0.5">
+                  <div className="flex items-center gap-2 min-w-max">
+                    <Link href={`/guide/${node.fullSlug || node.id}/questions`} className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white dark:bg-slate-800 border border-emerald-100 dark:border-slate-700 rounded text-[10px] font-bold text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-slate-700 transition-colors shadow-sm whitespace-nowrap">
+                      <FileQuestion className="w-3 h-3" />
                       Questions
                     </Link>
-                    <Link href={`/guide/${node.fullSlug || node.id}/mock-test`} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-800 border border-indigo-100 dark:border-slate-700 rounded-md text-[11px] font-bold text-indigo-700 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-700 transition-colors shadow-sm">
-                      <Target className="w-3.5 h-3.5" />
+                    <Link href={`/guide/${node.fullSlug || node.id}/mock-test`} className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white dark:bg-slate-800 border border-indigo-100 dark:border-slate-700 rounded text-[10px] font-bold text-indigo-700 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-700 transition-colors shadow-sm whitespace-nowrap">
+                      <Target className="w-3 h-3" />
                       Mock
                     </Link>
-                    <Link href={`/guide/${node.fullSlug || node.id}/practice-set`} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-800 border border-amber-100 dark:border-slate-700 rounded-md text-[11px] font-bold text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-slate-700 transition-colors shadow-sm">
-                      <FileText className="w-3.5 h-3.5" />
-                      Prac
+                    <Link href={`/guide/${node.fullSlug || node.id}/practice-set`} className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white dark:bg-slate-800 border border-amber-100 dark:border-slate-700 rounded text-[10px] font-bold text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-slate-700 transition-colors shadow-sm whitespace-nowrap">
+                      <FileText className="w-3 h-3" />
+                      Practice
                     </Link>
-                    <Link href={`/guide/${node.fullSlug || node.id}/quiz`} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-800 border border-rose-100 dark:border-slate-700 rounded-md text-[11px] font-bold text-rose-700 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-slate-700 transition-colors shadow-sm">
-                      <Trophy className="w-3.5 h-3.5" />
+                    <Link href={`/guide/${node.fullSlug || node.id}/quiz`} className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white dark:bg-slate-800 border border-rose-100 dark:border-slate-700 rounded text-[10px] font-bold text-rose-700 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-slate-700 transition-colors shadow-sm whitespace-nowrap">
+                      <Trophy className="w-3 h-3" />
                       Quiz
                     </Link>
-                    <Link href={`/guide/${node.fullSlug || node.id}/cq`} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-800 border border-cyan-100 dark:border-slate-700 rounded-md text-[11px] font-bold text-cyan-700 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-slate-700 transition-colors shadow-sm">
-                      <HelpCircle className="w-3.5 h-3.5" />
+                    <Link href={`/guide/${node.fullSlug || node.id}/cq`} className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white dark:bg-slate-800 border border-cyan-100 dark:border-slate-700 rounded text-[10px] font-bold text-cyan-700 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-slate-700 transition-colors shadow-sm whitespace-nowrap">
+                      <HelpCircle className="w-3 h-3" />
                       Q/A
                     </Link>
                   </div>
-                  <Link href={`/admin/guide-content/topic/${node.id}`} title="Edit Content" className="absolute right-0 top-1/2 -translate-y-1/2 text-slate-400 hover:text-emerald-600 transition-colors p-1.5 rounded-md hover:bg-emerald-50 dark:hover:bg-slate-800">
-                    <Edit className="w-4 h-4" />
+                  <div className="flex-1"></div>
+                  <Link href={`/admin/guide-content/topic/${node.id}`} title="Edit Content" className="flex-shrink-0 text-slate-400 hover:text-emerald-600 transition-colors p-1.5 rounded-md hover:bg-emerald-100 dark:hover:bg-slate-800 ml-auto bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700">
+                    <Edit className="w-3.5 h-3.5" />
                   </Link>
                 </div>
               </div>

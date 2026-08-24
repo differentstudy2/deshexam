@@ -26,8 +26,8 @@ export function ContentNavigationSidebar({ curriculum, activeId, subjectTitle }:
   };
 
   return (
-    <div className="w-full shrink-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden flex flex-col shadow-sm">
-      <div className="flex flex-col pt-0">
+    <div className="w-full h-full shrink-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden flex flex-col shadow-sm min-h-0">
+      <div className="flex flex-col pt-0 h-full min-h-0">
         {/* Search Header */}
         <div className="bg-slate-100 dark:bg-slate-800/50 border-l-4 border-[#107c41] dark:border-emerald-500 p-2 shrink-0">
           <div className="relative">
@@ -39,15 +39,15 @@ export function ContentNavigationSidebar({ curriculum, activeId, subjectTitle }:
           </div>
         </div>
 
-        <div className="flex-1 w-full flex flex-col">
+        <div className="flex-1 w-full flex flex-col overflow-hidden min-h-0">
           {/* Subject Title */}
-          <div className="px-4 py-3 border-b border-dotted border-slate-300 dark:border-slate-700">
+          <div className="px-4 py-3 border-b border-dotted border-slate-300 dark:border-slate-700 shrink-0">
             <h2 className="font-semibold text-[19px] text-slate-800 dark:text-slate-100">
               {subjectTitle}
             </h2>
           </div>
 
-          <div className="flex flex-col pb-4">
+          <div className="flex flex-col flex-1 overflow-y-auto custom-scrollbar pb-4 min-h-0">
             {(curriculum[0]?.topics || []).map((chapter: any, chapterIndex: number) => {
               const isChapterActive = chapter.id === activeId;
               const isChapterGroupActive = isChapterActive || chapter.subtopics?.some((t: any) => t.id === activeId);
