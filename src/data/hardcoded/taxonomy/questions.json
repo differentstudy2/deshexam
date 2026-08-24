@@ -1,0 +1,36 @@
+[
+  {
+    "id": "q-mcq-manabdeha-1",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "type": "mcq",
+    "content": "আমাদের শরীরের বর্ম কাকে বলা হয়?",
+    "options": {
+      "a": "চুল",
+      "b": "ত্বক বা চামড়া",
+      "c": "নখ",
+      "d": "হাড়"
+    },
+    "correctOptionId": "b",
+    "explanation": "ত্বক বা চামড়া আমাদের শরীরের বর্ম হিসেবে কাজ করে, যা শরীরকে বাইরের আঘাত থেকে রক্ষা করে।",
+    "marks": 1,
+    "difficulty": "easy",
+    "status": "published",
+    "tags": [
+      "মানবেদহ",
+      "বর্ম"
+    ],
+    "createdAt": "2026-08-24T08:24:18.686Z",
+    "optionExplanations": {
+      "a": "চুল ত্বককে রক্ষা করে না, বরং ত্বকের উপরে থাকে।",
+      "b": "সঠিক উত্তর! চামড়াকে আমাদের শরীরের বর্ম বলা হয়।",
+      "c": "নখ আঙুলের ডগাকে রক্ষা করে, পুরো শরীরকে নয়।",
+      "d": "হাড় শরীরের কাঠামো তৈরি করে, কিন্তু বাইরের বর্ম নয়।"
+    },
+    "correctAnswer": "b"
+  }
+]

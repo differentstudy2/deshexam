@@ -1,0 +1,187 @@
+[
+  {
+    "id": "textbook-amader-paribesh",
+    "title": "Amader Paribesh",
+    "slug": "amader-paribesh",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-evs-class-5-wb",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/environmental-science/amader-paribesh",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "environmental-science",
+    "textbookSlug": "amader-paribesh",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-evs-class-5-wb",
+        "slug": "environmental-science",
+        "title": "Environmental Science",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-amar-ganit",
+    "title": "Amar Ganit",
+    "slug": "amar-ganit",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-math-class-5-wb",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/mathematics/amar-ganit",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "amar-ganit",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-math-class-5-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-bhasha-path",
+    "title": "Bhasha Path",
+    "slug": "bhasha-path",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-bengali-lang-class-5-wb",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/bengali-language/bhasha-path",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "bengali-language",
+    "textbookSlug": "bhasha-path",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-lang-class-5-wb",
+        "slug": "bengali-language",
+        "title": "Bengali Language",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-health",
+    "title": "Health & Physical Education",
+    "slug": "health-physical-education-book",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-health-class-5-wb",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/health-physical-education/health-physical-education-book",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "health-physical-education",
+    "textbookSlug": "health-physical-education-book",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-health-class-5-wb",
+        "slug": "health-physical-education",
+        "title": "Health & Physical Education",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-patabahar",
+    "title": "Patabahar",
+    "slug": "patabahar",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-bengali-lit-class-5-wb",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/bengali-literature/patabahar",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "patabahar",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-lit-class-5-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      }
+    ]
+  }
+]

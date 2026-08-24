@@ -34,14 +34,14 @@ const SECTION_ICONS: Record<string, any> = {
   'exams_papers': Award
 };
 
-export function TopicSectionsSidebar({ sections, node, currentContentType }: { sections: ContentSection[], node?: any, currentContentType?: string | null }) {
+export function TopicSectionsSidebar({ sections = [], node, currentContentType }: { sections?: ContentSection[], node?: any, currentContentType?: string | null }) {
   const pathname = usePathname();
   
   // Convert DB section ID to URL-friendly format (e.g. word_meaning -> word-meaning)
   const getUrlSegment = (id: string) => id.replace(/_/g, '-');
   
   // Default to first section if no query param is set and no content type
-  const activeId = currentContentType ? currentContentType.replace(/-/g, '_') : (sections.length > 0 ? sections[0].id : '');
+  const activeId = currentContentType ? currentContentType.replace(/-/g, '_') : (sections?.length > 0 ? sections[0].id : '');
 
   // Base URL for the topic
   const baseUrl = node ? `/guide/${node.fullSlug || node.id}` : pathname.replace(/\/[^\/]+$/, '');

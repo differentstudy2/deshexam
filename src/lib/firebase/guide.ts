@@ -2,6 +2,7 @@ import { collection, query, orderBy, getDocs, doc, getDoc, where, setDoc, delete
 import { db } from "@/lib/firebase/client";
 import { SidebarSubject, Chapter, ReadingContentData } from "@/app/guide/guide-data"; // Types
 import { getTaxonomyNodesByTrack } from "./taxonomy";
+import hardcodedQuestionsRaw from '@/data/hardcoded/taxonomy/questions.json';
 
 export const getGuideSubjects = async (): Promise<SidebarSubject[]> => {
   try {
@@ -186,7 +187,8 @@ export const getReadingContent = async (contentId: string): Promise<ReadingConte
         },
         createdAt: taxNode.createdAt,
         updatedAt: taxNode.updatedAt,
-        type: taxNode.type
+        type: taxNode.type,
+        content: (taxNode as any).content || ''
       };
     }
 
@@ -376,9 +378,33 @@ export const getReadingContent = async (contentId: string): Promise<ReadingConte
       const hasContentBlocks = topicData.contentBlocks && topicData.contentBlocks.length > 0;
       const hasLegacyContent = topicData.content;
       
-      const finalSections = hasSections ? sections : 
+      let finalSections = hasSections ? sections : 
                             (hasContentBlocks || hasLegacyContent) ? undefined : 
                             [{ title: 'Overview', type: 'article', body: '<p>No content added yet.</p>', author: { name: 'System', avatarUrl: 'https://i.pravatar.cc/150' } }];
+
+      // Inject hardcoded questions tabs
+      if (Array.isArray(hardcodedQuestionsRaw)) {
+        const topicQs = hardcodedQuestionsRaw.filter(q => q.topicId === contentId || q.chapterId === contentId);
+        if (topicQs.length > 0) {
+          if (!finalSections) {
+            // Prepend a reading content section if we are upgrading undefined to an array
+            finalSections = [{ id: 'guide_content', title: 'Lesson Content', type: 'article', body: topicData.content || '<p>No content added yet.</p>' }];
+          }
+          
+          const hasMcq = topicQs.some(q => q.type?.toLowerCase() === 'mcq' || (q as any).questionType?.toLowerCase() === 'mcq');
+          if (hasMcq && !finalSections.some(s => s.id === 'mcq')) {
+            finalSections.push({ id: 'mcq', title: 'MCQ', type: 'mcq' });
+          }
+          
+          const hasCq = topicQs.some(q => {
+            const t = (q.type || (q as any).questionType || '').toLowerCase();
+            return t === 'cq' || t === 'descriptive';
+          });
+          if (hasCq && !finalSections.some(s => s.id === 'creative_question')) {
+            finalSections.push({ id: 'creative_question', title: 'Creative Questions', type: 'cq' });
+          }
+        }
+      }
 
       // Sanitize topicData to remove Firestore Timestamp objects
       const safeTopicData = { ...topicData };

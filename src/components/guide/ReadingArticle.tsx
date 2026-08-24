@@ -282,9 +282,9 @@ export function ReadingArticle({ data, node, hierarchy, navigation, contentType 
             </>
           )}
 
-          {sec.type === 'mcq' && (
+          {sec.type === 'mcq' && sec.questions && (
             <div className="flex flex-col gap-8">
-              {sec.questions.map((q, qIdx) => (
+              {sec.questions.map((q: any, qIdx: number) => (
                 <div key={qIdx} className="flex flex-col">
                   <p className="text-[15px] font-semibold text-slate-800 dark:text-slate-200 mb-3">
                     {qIdx + 1}. {q.q}

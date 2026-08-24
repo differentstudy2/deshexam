@@ -115,13 +115,105 @@
     ]
   },
   {
+    "id": "class-5-wb",
+    "title": "Class 5",
+    "slug": "class-5",
+    "type": "class",
+    "track": "academic",
+    "parentId": "board-wb",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-5",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      }
+    ]
+  },
+  {
+    "id": "class-6-wb",
+    "title": "Class 6",
+    "slug": "class-6",
+    "type": "class",
+    "track": "academic",
+    "parentId": "board-wb",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "wb-board/class-6",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      }
+    ]
+  },
+  {
+    "id": "class-7-wb",
+    "title": "Class 7",
+    "slug": "class-7",
+    "type": "class",
+    "track": "academic",
+    "parentId": "board-wb",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "wb-board/class-7",
+    "boardSlug": "wb-board",
+    "classSlug": "class-7",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      }
+    ]
+  },
+  {
+    "id": "class-8-wb",
+    "title": "Class 8",
+    "slug": "class-8",
+    "type": "class",
+    "track": "academic",
+    "parentId": "board-wb",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "wb-board/class-8",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      }
+    ]
+  },
+  {
     "id": "class-9-wb",
     "title": "Class 9",
     "slug": "class-9",
     "type": "class",
     "track": "academic",
     "parentId": "board-wb",
-    "orderIndex": 1,
+    "orderIndex": 5,
     "status": "published",
     "fullSlug": "wb-board/class-9",
     "boardSlug": "wb-board",
@@ -132,7 +224,7 @@
       {
         "id": "board-wb",
         "slug": "wb-board",
-        "title": "West Bengal Board Secondary Education",
+        "title": "WBBSE",
         "type": "board"
       }
     ]
@@ -144,7 +236,7 @@
     "type": "class",
     "track": "academic",
     "parentId": "board-wb",
-    "orderIndex": 2,
+    "orderIndex": 6,
     "status": "published",
     "fullSlug": "wb-board/class-10",
     "boardSlug": "wb-board",
@@ -155,7 +247,306 @@
       {
         "id": "board-wb",
         "slug": "wb-board",
-        "title": "West Bengal Board Secondary Education",
+        "title": "WBBSE",
+        "type": "board"
+      }
+    ]
+  },
+  {
+    "id": "class-5-wbbme",
+    "title": "Class 5",
+    "slug": "class-5",
+    "type": "class",
+    "track": "academic",
+    "parentId": "board-wbbme",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wbbme/class-5",
+    "boardSlug": "wbbme",
+    "classSlug": "class-5",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wbbme",
+        "slug": "wbbme",
+        "title": "WBBME",
+        "type": "board"
+      }
+    ]
+  },
+  {
+    "id": "class-6-wbbme",
+    "title": "Class 6",
+    "slug": "class-6",
+    "type": "class",
+    "track": "academic",
+    "parentId": "board-wbbme",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "wbbme/class-6",
+    "boardSlug": "wbbme",
+    "classSlug": "class-6",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wbbme",
+        "slug": "wbbme",
+        "title": "WBBME",
+        "type": "board"
+      }
+    ]
+  },
+  {
+    "id": "class-7-wbbme",
+    "title": "Class 7",
+    "slug": "class-7",
+    "type": "class",
+    "track": "academic",
+    "parentId": "board-wbbme",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "wbbme/class-7",
+    "boardSlug": "wbbme",
+    "classSlug": "class-7",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wbbme",
+        "slug": "wbbme",
+        "title": "WBBME",
+        "type": "board"
+      }
+    ]
+  },
+  {
+    "id": "class-8-wbbme",
+    "title": "Class 8",
+    "slug": "class-8",
+    "type": "class",
+    "track": "academic",
+    "parentId": "board-wbbme",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "wbbme/class-8",
+    "boardSlug": "wbbme",
+    "classSlug": "class-8",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wbbme",
+        "slug": "wbbme",
+        "title": "WBBME",
+        "type": "board"
+      }
+    ]
+  },
+  {
+    "id": "class-9-wbbme",
+    "title": "Class 9",
+    "slug": "class-9",
+    "type": "class",
+    "track": "academic",
+    "parentId": "board-wbbme",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "wbbme/class-9",
+    "boardSlug": "wbbme",
+    "classSlug": "class-9",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wbbme",
+        "slug": "wbbme",
+        "title": "WBBME",
+        "type": "board"
+      }
+    ]
+  },
+  {
+    "id": "class-10-wbbme",
+    "title": "Class 10",
+    "slug": "class-10",
+    "type": "class",
+    "track": "academic",
+    "parentId": "board-wbbme",
+    "orderIndex": 6,
+    "status": "published",
+    "fullSlug": "wbbme/class-10",
+    "boardSlug": "wbbme",
+    "classSlug": "class-10",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wbbme",
+        "slug": "wbbme",
+        "title": "WBBME",
+        "type": "board"
+      }
+    ]
+  },
+  {
+    "id": "class-kg1-wbbpe",
+    "title": "KG 1",
+    "slug": "kg-1",
+    "type": "class",
+    "track": "academic",
+    "parentId": "board-wbbpe",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wbbpe/kg-1",
+    "boardSlug": "wbbpe",
+    "classSlug": "kg-1",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wbbpe",
+        "slug": "wbbpe",
+        "title": "WBBPE",
+        "type": "board"
+      }
+    ]
+  },
+  {
+    "id": "class-kg2-wbbpe",
+    "title": "KG 2",
+    "slug": "kg-2",
+    "type": "class",
+    "track": "academic",
+    "parentId": "board-wbbpe",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "wbbpe/kg-2",
+    "boardSlug": "wbbpe",
+    "classSlug": "kg-2",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wbbpe",
+        "slug": "wbbpe",
+        "title": "WBBPE",
+        "type": "board"
+      }
+    ]
+  },
+  {
+    "id": "class-1-wbbpe",
+    "title": "Class 1",
+    "slug": "class-1",
+    "type": "class",
+    "track": "academic",
+    "parentId": "board-wbbpe",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "wbbpe/class-1",
+    "boardSlug": "wbbpe",
+    "classSlug": "class-1",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wbbpe",
+        "slug": "wbbpe",
+        "title": "WBBPE",
+        "type": "board"
+      }
+    ]
+  },
+  {
+    "id": "class-2-wbbpe",
+    "title": "Class 2",
+    "slug": "class-2",
+    "type": "class",
+    "track": "academic",
+    "parentId": "board-wbbpe",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "wbbpe/class-2",
+    "boardSlug": "wbbpe",
+    "classSlug": "class-2",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wbbpe",
+        "slug": "wbbpe",
+        "title": "WBBPE",
+        "type": "board"
+      }
+    ]
+  },
+  {
+    "id": "class-3-wbbpe",
+    "title": "Class 3",
+    "slug": "class-3",
+    "type": "class",
+    "track": "academic",
+    "parentId": "board-wbbpe",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "wbbpe/class-3",
+    "boardSlug": "wbbpe",
+    "classSlug": "class-3",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wbbpe",
+        "slug": "wbbpe",
+        "title": "WBBPE",
+        "type": "board"
+      }
+    ]
+  },
+  {
+    "id": "class-4-wbbpe",
+    "title": "Class 4",
+    "slug": "class-4",
+    "type": "class",
+    "track": "academic",
+    "parentId": "board-wbbpe",
+    "orderIndex": 6,
+    "status": "published",
+    "fullSlug": "wbbpe/class-4",
+    "boardSlug": "wbbpe",
+    "classSlug": "class-4",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wbbpe",
+        "slug": "wbbpe",
+        "title": "WBBPE",
+        "type": "board"
+      }
+    ]
+  },
+  {
+    "id": "class-5-wbbpe",
+    "title": "Class 5",
+    "slug": "class-5",
+    "type": "class",
+    "track": "academic",
+    "parentId": "board-wbbpe",
+    "orderIndex": 7,
+    "status": "published",
+    "fullSlug": "wbbpe/class-5",
+    "boardSlug": "wbbpe",
+    "classSlug": "class-5",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wbbpe",
+        "slug": "wbbpe",
+        "title": "WBBPE",
         "type": "board"
       }
     ]
@@ -178,7 +569,7 @@
       {
         "id": "board-wbchse",
         "slug": "wbchse",
-        "title": "West Bengal Council of Higher Secondary Education",
+        "title": "WBCHSE",
         "type": "board"
       }
     ]
@@ -201,398 +592,7 @@
       {
         "id": "board-wbchse",
         "slug": "wbchse",
-        "title": "West Bengal Council of Higher Secondary Education",
-        "type": "board"
-      }
-    ]
-  },
-  {
-    "id": "class-9-wbbme",
-    "title": "Class 9",
-    "slug": "class-9",
-    "type": "class",
-    "track": "academic",
-    "parentId": "board-wbbme",
-    "orderIndex": 1,
-    "status": "published",
-    "fullSlug": "wbbme/class-9",
-    "boardSlug": "wbbme",
-    "classSlug": "class-9",
-    "isIndexable": true,
-    "isHardcoded": true,
-    "ancestors": [
-      {
-        "id": "board-wbbme",
-        "slug": "wbbme",
-        "title": "West Bengal Board of Madrasah Education",
-        "type": "board"
-      }
-    ]
-  },
-  {
-    "id": "class-10-wbbme",
-    "title": "Class 10",
-    "slug": "class-10",
-    "type": "class",
-    "track": "academic",
-    "parentId": "board-wbbme",
-    "orderIndex": 2,
-    "status": "published",
-    "fullSlug": "wbbme/class-10",
-    "boardSlug": "wbbme",
-    "classSlug": "class-10",
-    "isIndexable": true,
-    "isHardcoded": true,
-    "ancestors": [
-      {
-        "id": "board-wbbme",
-        "slug": "wbbme",
-        "title": "West Bengal Board of Madrasah Education",
-        "type": "board"
-      }
-    ]
-  },
-  {
-    "id": "class-4-wbbpe",
-    "title": "Class 4",
-    "slug": "class-4",
-    "type": "class",
-    "track": "academic",
-    "parentId": "board-wbbpe",
-    "orderIndex": 1,
-    "status": "published",
-    "fullSlug": "wbbpe/class-4",
-    "boardSlug": "wbbpe",
-    "classSlug": "class-4",
-    "isIndexable": true,
-    "isHardcoded": true,
-    "ancestors": [
-      {
-        "id": "board-wbbpe",
-        "slug": "wbbpe",
-        "title": "West Bengal Board of Primary Education",
-        "type": "board"
-      }
-    ]
-  },
-  {
-    "id": "class-5-wbbpe",
-    "title": "Class 5",
-    "slug": "class-5",
-    "type": "class",
-    "track": "academic",
-    "parentId": "board-wbbpe",
-    "orderIndex": 2,
-    "status": "published",
-    "fullSlug": "wbbpe/class-5",
-    "boardSlug": "wbbpe",
-    "classSlug": "class-5",
-    "isIndexable": true,
-    "isHardcoded": true,
-    "ancestors": [
-      {
-        "id": "board-wbbpe",
-        "slug": "wbbpe",
-        "title": "West Bengal Board of Primary Education",
-        "type": "board"
-      }
-    ]
-  },
-  {
-    "id": "class-kg1-wbbpe",
-    "title": "KG 1",
-    "slug": "kg-1",
-    "type": "class",
-    "track": "academic",
-    "parentId": "board-wbbpe",
-    "orderIndex": 3,
-    "status": "published",
-    "fullSlug": "wbbpe/kg-1",
-    "boardSlug": "wbbpe",
-    "classSlug": "kg-1",
-    "isIndexable": true,
-    "isHardcoded": true,
-    "ancestors": [
-      {
-        "id": "board-wbbpe",
-        "slug": "wbbpe",
-        "title": "West Bengal Board of Primary Education",
-        "type": "board"
-      }
-    ]
-  },
-  {
-    "id": "class-kg2-wbbpe",
-    "title": "KG 2",
-    "slug": "kg-2",
-    "type": "class",
-    "track": "academic",
-    "parentId": "board-wbbpe",
-    "orderIndex": 4,
-    "status": "published",
-    "fullSlug": "wbbpe/kg-2",
-    "boardSlug": "wbbpe",
-    "classSlug": "kg-2",
-    "isIndexable": true,
-    "isHardcoded": true,
-    "ancestors": [
-      {
-        "id": "board-wbbpe",
-        "slug": "wbbpe",
-        "title": "West Bengal Board of Primary Education",
-        "type": "board"
-      }
-    ]
-  },
-  {
-    "id": "class-1-wbbpe",
-    "title": "Class 1",
-    "slug": "class-1",
-    "type": "class",
-    "track": "academic",
-    "parentId": "board-wbbpe",
-    "orderIndex": 5,
-    "status": "published",
-    "fullSlug": "wbbpe/class-1",
-    "boardSlug": "wbbpe",
-    "classSlug": "class-1",
-    "isIndexable": true,
-    "isHardcoded": true,
-    "ancestors": [
-      {
-        "id": "board-wbbpe",
-        "slug": "wbbpe",
-        "title": "West Bengal Board of Primary Education",
-        "type": "board"
-      }
-    ]
-  },
-  {
-    "id": "class-2-wbbpe",
-    "title": "Class 2",
-    "slug": "class-2",
-    "type": "class",
-    "track": "academic",
-    "parentId": "board-wbbpe",
-    "orderIndex": 6,
-    "status": "published",
-    "fullSlug": "wbbpe/class-2",
-    "boardSlug": "wbbpe",
-    "classSlug": "class-2",
-    "isIndexable": true,
-    "isHardcoded": true,
-    "ancestors": [
-      {
-        "id": "board-wbbpe",
-        "slug": "wbbpe",
-        "title": "West Bengal Board of Primary Education",
-        "type": "board"
-      }
-    ]
-  },
-  {
-    "id": "class-3-wbbpe",
-    "title": "Class 3",
-    "slug": "class-3",
-    "type": "class",
-    "track": "academic",
-    "parentId": "board-wbbpe",
-    "orderIndex": 7,
-    "status": "published",
-    "fullSlug": "wbbpe/class-3",
-    "boardSlug": "wbbpe",
-    "classSlug": "class-3",
-    "isIndexable": true,
-    "isHardcoded": true,
-    "ancestors": [
-      {
-        "id": "board-wbbpe",
-        "slug": "wbbpe",
-        "title": "West Bengal Board of Primary Education",
-        "type": "board"
-      }
-    ]
-  },
-  {
-    "id": "class-5-wbbme",
-    "title": "Class 5",
-    "slug": "class-5",
-    "type": "class",
-    "track": "academic",
-    "parentId": "board-wbbme",
-    "orderIndex": 3,
-    "status": "published",
-    "fullSlug": "wbbme/class-5",
-    "boardSlug": "wbbme",
-    "classSlug": "class-5",
-    "isIndexable": true,
-    "isHardcoded": true,
-    "ancestors": [
-      {
-        "id": "board-wbbme",
-        "slug": "wbbme",
-        "title": "West Bengal Board of Madrasah Education",
-        "type": "board"
-      }
-    ]
-  },
-  {
-    "id": "class-6-wbbme",
-    "title": "Class 6",
-    "slug": "class-6",
-    "type": "class",
-    "track": "academic",
-    "parentId": "board-wbbme",
-    "orderIndex": 4,
-    "status": "published",
-    "fullSlug": "wbbme/class-6",
-    "boardSlug": "wbbme",
-    "classSlug": "class-6",
-    "isIndexable": true,
-    "isHardcoded": true,
-    "ancestors": [
-      {
-        "id": "board-wbbme",
-        "slug": "wbbme",
-        "title": "West Bengal Board of Madrasah Education",
-        "type": "board"
-      }
-    ]
-  },
-  {
-    "id": "class-7-wbbme",
-    "title": "Class 7",
-    "slug": "class-7",
-    "type": "class",
-    "track": "academic",
-    "parentId": "board-wbbme",
-    "orderIndex": 5,
-    "status": "published",
-    "fullSlug": "wbbme/class-7",
-    "boardSlug": "wbbme",
-    "classSlug": "class-7",
-    "isIndexable": true,
-    "isHardcoded": true,
-    "ancestors": [
-      {
-        "id": "board-wbbme",
-        "slug": "wbbme",
-        "title": "West Bengal Board of Madrasah Education",
-        "type": "board"
-      }
-    ]
-  },
-  {
-    "id": "class-8-wbbme",
-    "title": "Class 8",
-    "slug": "class-8",
-    "type": "class",
-    "track": "academic",
-    "parentId": "board-wbbme",
-    "orderIndex": 6,
-    "status": "published",
-    "fullSlug": "wbbme/class-8",
-    "boardSlug": "wbbme",
-    "classSlug": "class-8",
-    "isIndexable": true,
-    "isHardcoded": true,
-    "ancestors": [
-      {
-        "id": "board-wbbme",
-        "slug": "wbbme",
-        "title": "West Bengal Board of Madrasah Education",
-        "type": "board"
-      }
-    ]
-  },
-  {
-    "id": "class-5-wb",
-    "title": "Class 5",
-    "slug": "class-5",
-    "type": "class",
-    "track": "academic",
-    "parentId": "board-wb",
-    "orderIndex": 3,
-    "status": "published",
-    "fullSlug": "wb-board/class-5",
-    "boardSlug": "wb-board",
-    "classSlug": "class-5",
-    "isIndexable": true,
-    "isHardcoded": true,
-    "ancestors": [
-      {
-        "id": "board-wb",
-        "slug": "wb-board",
-        "title": "West Bengal Board Secondary Education",
-        "type": "board"
-      }
-    ]
-  },
-  {
-    "id": "class-6-wb",
-    "title": "Class 6",
-    "slug": "class-6",
-    "type": "class",
-    "track": "academic",
-    "parentId": "board-wb",
-    "orderIndex": 4,
-    "status": "published",
-    "fullSlug": "wb-board/class-6",
-    "boardSlug": "wb-board",
-    "classSlug": "class-6",
-    "isIndexable": true,
-    "isHardcoded": true,
-    "ancestors": [
-      {
-        "id": "board-wb",
-        "slug": "wb-board",
-        "title": "West Bengal Board Secondary Education",
-        "type": "board"
-      }
-    ]
-  },
-  {
-    "id": "class-7-wb",
-    "title": "Class 7",
-    "slug": "class-7",
-    "type": "class",
-    "track": "academic",
-    "parentId": "board-wb",
-    "orderIndex": 5,
-    "status": "published",
-    "fullSlug": "wb-board/class-7",
-    "boardSlug": "wb-board",
-    "classSlug": "class-7",
-    "isIndexable": true,
-    "isHardcoded": true,
-    "ancestors": [
-      {
-        "id": "board-wb",
-        "slug": "wb-board",
-        "title": "West Bengal Board Secondary Education",
-        "type": "board"
-      }
-    ]
-  },
-  {
-    "id": "class-8-wb",
-    "title": "Class 8",
-    "slug": "class-8",
-    "type": "class",
-    "track": "academic",
-    "parentId": "board-wb",
-    "orderIndex": 6,
-    "status": "published",
-    "fullSlug": "wb-board/class-8",
-    "boardSlug": "wb-board",
-    "classSlug": "class-8",
-    "isIndexable": true,
-    "isHardcoded": true,
-    "ancestors": [
-      {
-        "id": "board-wb",
-        "slug": "wb-board",
-        "title": "West Bengal Board Secondary Education",
+        "title": "WBCHSE",
         "type": "board"
       }
     ]

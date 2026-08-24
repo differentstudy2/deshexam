@@ -1,6 +1,9 @@
 import { db } from './client';
 import { collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, query, where, orderBy, serverTimestamp, limit, increment, writeBatch, addDoc, documentId, startAfter, getCountFromServer } from 'firebase/firestore';
 import { TaxonomyNode, QuestionBankEntry } from '@/lib/question-bank-types';
+import hardcodedQuestionsRaw from '@/data/hardcoded/taxonomy/questions.json';
+
+const hardcodedQuestions = hardcodedQuestionsRaw as unknown as QuestionBankEntry[];
 
 export const TAXONOMY_COLLECTIONS = {
   board: 'question_boards',
@@ -59,6 +62,16 @@ export async function deleteTaxonomyNode(type: TaxonomyType, id: string) {
 export const QUESTIONS_COLLECTION = 'question_bank';
 
 export async function getQuestions(filters?: Record<string, any>, limitCount = 50) {
+  let localQuestions = hardcodedQuestions.filter(q => {
+    if (!filters) return true;
+    for (const [key, value] of Object.entries(filters)) {
+      if (value !== undefined && value !== null && value !== '' && value !== 'all') {
+        if (q[key as keyof QuestionBankEntry] !== value) return false;
+      }
+    }
+    return true;
+  });
+
   const colRef = collection(db, QUESTIONS_COLLECTION);
   let q = query(colRef, orderBy('createdAt', 'desc'), limit(limitCount));
   
@@ -76,6 +89,9 @@ export async function getQuestions(filters?: Record<string, any>, limitCount = 5
   
   const snapshot = await getDocs(q);
   let results = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as QuestionBankEntry);
+  
+  results = [...localQuestions, ...results];
+  
   if (filters) {
       results.sort((a, b) => {
           const timeA = (a.createdAt as any)?.seconds || ((a.createdAt as any)?.getTime?.() / 1000) || 0;
@@ -98,6 +114,16 @@ export async function getAllQuestionBankEntries() {
 }
 
 export async function getQuestionsPaginated(filters?: Record<string, any>, limitCount = 50, startAfterDoc?: any) {
+  let localQuestions = hardcodedQuestions.filter(q => {
+    if (!filters) return true;
+    for (const [key, value] of Object.entries(filters)) {
+      if (value !== undefined && value !== null && value !== '' && value !== 'all') {
+        if (q[key as keyof QuestionBankEntry] !== value) return false;
+      }
+    }
+    return true;
+  });
+
   const colRef = collection(db, QUESTIONS_COLLECTION);
   let conditions = [];
   if (filters) {
@@ -126,13 +152,20 @@ export async function getQuestionsPaginated(filters?: Record<string, any>, limit
   const snapshot = await getDocs(q);
   let results = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as QuestionBankEntry);
 
+  if (!startAfterDoc) {
+      results = [...localQuestions, ...results];
+  }
+
   return {
-      questions: results,
+      questions: results.slice(0, limitCount),
       lastDoc: snapshot.docs.length > 0 ? snapshot.docs[snapshot.docs.length - 1] : null
   };
 }
 
 export async function getQuestion(id: string) {
+  const localMatch = hardcodedQuestions.find(q => q.id === id);
+  if (localMatch) return localMatch;
+
   const docRef = doc(db, QUESTIONS_COLLECTION, id);
   const snap = await getDoc(docRef);
   if (!snap.exists()) return null;
@@ -203,6 +236,9 @@ export async function deleteQuestion(id: string) {
 }
 
 export async function getQuestionBySlug(slug: string) {
+  const localMatch = hardcodedQuestions.find(q => q.slug === slug);
+  if (localMatch) return localMatch;
+
   const colRef = collection(db, QUESTIONS_COLLECTION);
   const q = query(colRef, where('slug', '==', slug), limit(1));
   const snapshot = await getDocs(q);

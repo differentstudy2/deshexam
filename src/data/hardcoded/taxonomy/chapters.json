@@ -1,0 +1,619 @@
+[
+  {
+    "id": "chapter-manabdeha-amader-paribesh",
+    "title": "মানবদেহ",
+    "slug": "manabdeha",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amader-paribesh",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/environmental-science/amader-paribesh/manabdeha",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "environmental-science",
+    "textbookSlug": "amader-paribesh",
+    "chapterSlug": "manabdeha",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-evs-class-5-wb",
+        "slug": "environmental-science",
+        "title": "Environmental Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amader-paribesh",
+        "slug": "amader-paribesh",
+        "title": "Amader Paribesh",
+        "type": "textbook"
+      }
+    ],
+    "content": "**ত্বক বা চামড়া**\n\n* ত্বক বা চামড়া আমাদের শরীরের বর্ম হিসেবে কাজ করে, যা শরীরের ভেতরের অংশকে বাইরের আঘাত এবং সূর্যের অতিবেগুনি রশ্মি থেকে বাঁচায়।\n\n* ত্বকের প্রধানত দুটি স্তর থাকে এবং শরীরের বিভিন্ন অংশে এর পুরুত্ব আলাদা হয় (যেমন গোড়ালি বা হাতের চেটো পুরু, কিন্তু গাল পাতলা)।\n\n* ত্বকে উপস্থিত 'মেলানিন' নামক উপাদানের কারণে চামড়ার রং কালো বা ফর্সা হয় এবং এটি ক্যানসার প্রতিরোধ করতে সাহায্য করে।\n\n* ত্বকে রোদ লাগলে ভিটামিন-ডি তৈরি হয় এবং ঘামের মাধ্যমে শরীরের বর্জ্য পদার্থ ও নুন বেরিয়ে যায়।\n\n**চুল, লোম ও নখ**\n\n* মানুষের চুল, পশুপাখির লোম, পালক বা মাছের আঁশ—এগুলোর গোড়া চামড়ার ভেতরের স্তরে আটকে থাকে।\n\n* গন্ডারের শক্ত খড়্গ আসলে জমাট বাঁধা চুল এবং শজারুর সূঁচালো কাঁটাও একধরনের শক্ত লোম।\n\n* নখ আঙুলকে রক্ষা করে এবং নখের ফ্যাকাশে রং বা চামচের মতো আকৃতি দেখে রক্তাল্পতা বোঝা যায়। শিকারি পশুপাখির নখ ধারালো ও বাঁকানো হয়, কিন্তু গোরু-ছাগলের মতো তৃণভোজী প্রাণীদের ভোঁতা খুর থাকে।\n\n**কঙ্কালতন্ত্র ও পেশি**\n\n* আমাদের শরীরে বিভিন্ন আকারের হাড় রয়েছে, যেমন—কাঁধ থেকে কনুই পর্যন্ত হিউমেরাস, কনুই থেকে কবজি পর্যন্ত আলনা ও রেডিয়াস এবং কোমর থেকে হাঁটু পর্যন্ত ফিমার।\n\n* হাড়ের জোড়কে অস্থিসন্ধি বলা হয় এবং এই হাড়গুলো দড়ির মতো 'লিগামেন্ট' দিয়ে যুক্ত থাকে।\n\n* পেশিগুলো হাড়ের নড়াচড়া ও কাজ করতে সাহায্য করে এবং জিভ বা হৃৎপিণ্ডও একধরনের পেশি।\n\n**হৃৎপিণ্ড ও রক্তচলাচল**\n\n* হৃৎপিণ্ড পাম্প হিসেবে কাজ করে এবং ধমনির মাধ্যমে সারা শরীরে রক্ত ছড়িয়ে দেয়।\n\n* রক্তের প্রধান কাজ হলো সারা শরীরে অক্সিজেন, প্রয়োজনীয় পুষ্টি ও রোগ প্রতিরোধের উপাদান বা ওষুধ পৌঁছে দেওয়া।\n\n**রোগজীবাণু ও চিকিৎসা**\n\n* বাতাসের মাধ্যমে যক্ষ্মা (TB) রোগের জীবাণু ছড়ায়, যা প্রধানত ফুসফুসকে আক্রান্ত করে। যক্ষ্মা প্রতিরোধের জন্য বিসিজি (BCG) টিকা দেওয়া হয় এবং রোগ হলে দীর্ঘমেয়াদি ডট (DOT) চিকিৎসা করাতে হয়।\n\n* দূষিত জল বা খাবার থেকে কলেরার মতো জলবাহিত রোগ হয়, যার চিকিৎসায় বাড়িতে ফোটানো জল, নুন ও চিনি দিয়ে তৈরি ওআরএস (ORS) পান করানো জরুরি।\n\n* প্রায় দুশো বছর আগে বিজ্ঞানী রেনে লিনেক বাচ্চাদের খেলা দেখে অনুপ্রাণিত হয়ে প্রথম কাগজের তৈরি একনলা স্টেথোস্কোপ আবিষ্কার করেছিলেন।"
+  },
+  {
+    "id": "chapter-bhouto-paribesh-amader-paribesh",
+    "title": "ভৌত পরিবেশ (মাটি, জল, জীববৈচিত্র্য)",
+    "slug": "bhouto-paribesh",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amader-paribesh",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/environmental-science/amader-paribesh/bhouto-paribesh",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "environmental-science",
+    "textbookSlug": "amader-paribesh",
+    "chapterSlug": "bhouto-paribesh",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-evs-class-5-wb",
+        "slug": "environmental-science",
+        "title": "Environmental Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amader-paribesh",
+        "slug": "amader-paribesh",
+        "title": "Amader Paribesh",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-poschimbonger-sadharon-porichiti-amader-paribesh",
+    "title": "পশ্চিমবঙ্গের সাধারণ পরিচিতি",
+    "slug": "poschimbonger-sadharon-porichiti",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amader-paribesh",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/environmental-science/amader-paribesh/poschimbonger-sadharon-porichiti",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "environmental-science",
+    "textbookSlug": "amader-paribesh",
+    "chapterSlug": "poschimbonger-sadharon-porichiti",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-evs-class-5-wb",
+        "slug": "environmental-science",
+        "title": "Environmental Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amader-paribesh",
+        "slug": "amader-paribesh",
+        "title": "Amader Paribesh",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-paribesh-o-sompod-amader-paribesh",
+    "title": "পরিবেশ ও সম্পদ",
+    "slug": "paribesh-o-sompod",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amader-paribesh",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/environmental-science/amader-paribesh/paribesh-o-sompod",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "environmental-science",
+    "textbookSlug": "amader-paribesh",
+    "chapterSlug": "paribesh-o-sompod",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-evs-class-5-wb",
+        "slug": "environmental-science",
+        "title": "Environmental Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amader-paribesh",
+        "slug": "amader-paribesh",
+        "title": "Amader Paribesh",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-paribesh-o-utpadon-amader-paribesh",
+    "title": "পরিবেশ ও উৎপাদন (কৃষি ও মৎস্য উৎপাদন)",
+    "slug": "paribesh-o-utpadon",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amader-paribesh",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/environmental-science/amader-paribesh/paribesh-o-utpadon",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "environmental-science",
+    "textbookSlug": "amader-paribesh",
+    "chapterSlug": "paribesh-o-utpadon",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-evs-class-5-wb",
+        "slug": "environmental-science",
+        "title": "Environmental Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amader-paribesh",
+        "slug": "amader-paribesh",
+        "title": "Amader Paribesh",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-paribesh-o-bonobhumi-amader-paribesh",
+    "title": "পরিবেশ ও বনভূমি",
+    "slug": "paribesh-o-bonobhumi",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amader-paribesh",
+    "orderIndex": 6,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/environmental-science/amader-paribesh/paribesh-o-bonobhumi",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "environmental-science",
+    "textbookSlug": "amader-paribesh",
+    "chapterSlug": "paribesh-o-bonobhumi",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-evs-class-5-wb",
+        "slug": "environmental-science",
+        "title": "Environmental Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amader-paribesh",
+        "slug": "amader-paribesh",
+        "title": "Amader Paribesh",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-paribesh-khonij-o-shokti-sompod-amader-paribesh",
+    "title": "পরিবেশ, খনিজ ও শক্তি সম্পদ",
+    "slug": "paribesh-khonij-o-shokti-sompod",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amader-paribesh",
+    "orderIndex": 7,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/environmental-science/amader-paribesh/paribesh-khonij-o-shokti-sompod",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "environmental-science",
+    "textbookSlug": "amader-paribesh",
+    "chapterSlug": "paribesh-khonij-o-shokti-sompod",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-evs-class-5-wb",
+        "slug": "environmental-science",
+        "title": "Environmental Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amader-paribesh",
+        "slug": "amader-paribesh",
+        "title": "Amader Paribesh",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-paribesh-o-poribohon-amader-paribesh",
+    "title": "পরিবেশ ও পরিবহণ",
+    "slug": "paribesh-o-poribohon",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amader-paribesh",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/environmental-science/amader-paribesh/paribesh-o-poribohon",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "environmental-science",
+    "textbookSlug": "amader-paribesh",
+    "chapterSlug": "paribesh-o-poribohon",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-evs-class-5-wb",
+        "slug": "environmental-science",
+        "title": "Environmental Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amader-paribesh",
+        "slug": "amader-paribesh",
+        "title": "Amader Paribesh",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-jonoboshoti-o-paribesh-amader-paribesh",
+    "title": "জনবসতি ও পরিবেশ",
+    "slug": "jonoboshoti-o-paribesh",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amader-paribesh",
+    "orderIndex": 9,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/environmental-science/amader-paribesh/jonoboshoti-o-paribesh",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "environmental-science",
+    "textbookSlug": "amader-paribesh",
+    "chapterSlug": "jonoboshoti-o-paribesh",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-evs-class-5-wb",
+        "slug": "environmental-science",
+        "title": "Environmental Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amader-paribesh",
+        "slug": "amader-paribesh",
+        "title": "Amader Paribesh",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-paribesh-o-akash-amader-paribesh",
+    "title": "পরিবেশ ও আকাশ",
+    "slug": "paribesh-o-akash",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amader-paribesh",
+    "orderIndex": 10,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/environmental-science/amader-paribesh/paribesh-o-akash",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "environmental-science",
+    "textbookSlug": "amader-paribesh",
+    "chapterSlug": "paribesh-o-akash",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-evs-class-5-wb",
+        "slug": "environmental-science",
+        "title": "Environmental Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amader-paribesh",
+        "slug": "amader-paribesh",
+        "title": "Amader Paribesh",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-manobadhikar-o-mulyobodh-amader-paribesh",
+    "title": "মানবাধিকার ও মূল্যবোধ",
+    "slug": "manobadhikar-o-mulyobodh",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amader-paribesh",
+    "orderIndex": 11,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/environmental-science/amader-paribesh/manobadhikar-o-mulyobodh",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "environmental-science",
+    "textbookSlug": "amader-paribesh",
+    "chapterSlug": "manobadhikar-o-mulyobodh",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-evs-class-5-wb",
+        "slug": "environmental-science",
+        "title": "Environmental Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amader-paribesh",
+        "slug": "amader-paribesh",
+        "title": "Amader Paribesh",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-amar-pata-amader-paribesh",
+    "title": "আমার পাতা",
+    "slug": "amar-pata",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amader-paribesh",
+    "orderIndex": 12,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/environmental-science/amader-paribesh/amar-pata",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "environmental-science",
+    "textbookSlug": "amader-paribesh",
+    "chapterSlug": "amar-pata",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-evs-class-5-wb",
+        "slug": "environmental-science",
+        "title": "Environmental Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amader-paribesh",
+        "slug": "amader-paribesh",
+        "title": "Amader Paribesh",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-pathyosuchi-o-nomuna-proshno-amader-paribesh",
+    "title": "পাঠ্যসূচি ও নমুনা প্রশ্ন",
+    "slug": "pathyosuchi-o-nomuna-proshno",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amader-paribesh",
+    "orderIndex": 13,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/environmental-science/amader-paribesh/pathyosuchi-o-nomuna-proshno",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "environmental-science",
+    "textbookSlug": "amader-paribesh",
+    "chapterSlug": "pathyosuchi-o-nomuna-proshno",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-evs-class-5-wb",
+        "slug": "environmental-science",
+        "title": "Environmental Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amader-paribesh",
+        "slug": "amader-paribesh",
+        "title": "Amader Paribesh",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-shikhon-poramorsho-amader-paribesh",
+    "title": "শিখন পরামর্শ",
+    "slug": "shikhon-poramorsho",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amader-paribesh",
+    "orderIndex": 14,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/environmental-science/amader-paribesh/shikhon-poramorsho",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "environmental-science",
+    "textbookSlug": "amader-paribesh",
+    "chapterSlug": "shikhon-poramorsho",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-evs-class-5-wb",
+        "slug": "environmental-science",
+        "title": "Environmental Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amader-paribesh",
+        "slug": "amader-paribesh",
+        "title": "Amader Paribesh",
+        "type": "textbook"
+      }
+    ]
+  }
+]
