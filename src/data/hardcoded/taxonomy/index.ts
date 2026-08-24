@@ -2,7 +2,7 @@ import { TaxonomyNode } from '@/lib/firebase/taxonomy';
 import boards from './boards.json';
 import classes from './classes.json';
 // Import other JSON files when needed:
-// import subjects from './subjects.json';
+import subjects from './subjects.json';
 // import textbooks from './textbooks.json';
 // import chapters from './chapters.json';
 // import topics from './topics.json';
@@ -11,7 +11,7 @@ import classes from './classes.json';
 const allHardcodedTaxonomyNodes: TaxonomyNode[] = [
   ...(boards as TaxonomyNode[]),
   ...(classes as TaxonomyNode[]),
-  // ...(subjects as TaxonomyNode[]),
+  ...(subjects as TaxonomyNode[]),
   // ...(textbooks as TaxonomyNode[]),
   // ...(chapters as TaxonomyNode[]),
   // ...(topics as TaxonomyNode[]),

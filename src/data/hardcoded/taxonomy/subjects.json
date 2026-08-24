@@ -1,0 +1,152 @@
+[
+  {
+    "id": "subject-math-class-10",
+    "title": "Mathematics",
+    "slug": "mathematics",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-10-cbse",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "cbse-board/class-10/mathematics",
+    "boardSlug": "cbse-board",
+    "classSlug": "class-10",
+    "subjectSlug": "mathematics",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-cbse",
+        "slug": "cbse-board",
+        "title": "CBSE Board",
+        "type": "board"
+      },
+      {
+        "id": "class-10-cbse",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-science-class-10",
+    "title": "Science",
+    "slug": "science",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-10-cbse",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "cbse-board/class-10/science",
+    "boardSlug": "cbse-board",
+    "classSlug": "class-10",
+    "subjectSlug": "science",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-cbse",
+        "slug": "cbse-board",
+        "title": "CBSE Board",
+        "type": "board"
+      },
+      {
+        "id": "class-10-cbse",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-english-class-10",
+    "title": "English",
+    "slug": "english",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-10-cbse",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "cbse-board/class-10/english",
+    "boardSlug": "cbse-board",
+    "classSlug": "class-10",
+    "subjectSlug": "english",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-cbse",
+        "slug": "cbse-board",
+        "title": "CBSE Board",
+        "type": "board"
+      },
+      {
+        "id": "class-10-cbse",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-social-class-10",
+    "title": "Social Science",
+    "slug": "social-science",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-10-cbse",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "cbse-board/class-10/social-science",
+    "boardSlug": "cbse-board",
+    "classSlug": "class-10",
+    "subjectSlug": "social-science",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-cbse",
+        "slug": "cbse-board",
+        "title": "CBSE Board",
+        "type": "board"
+      },
+      {
+        "id": "class-10-cbse",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-hindi-class-10",
+    "title": "Hindi",
+    "slug": "hindi",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-10-cbse",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "cbse-board/class-10/hindi",
+    "boardSlug": "cbse-board",
+    "classSlug": "class-10",
+    "subjectSlug": "hindi",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-cbse",
+        "slug": "cbse-board",
+        "title": "CBSE Board",
+        "type": "board"
+      },
+      {
+        "id": "class-10-cbse",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      }
+    ]
+  }
+]
