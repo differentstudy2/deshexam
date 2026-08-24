@@ -60,19 +60,19 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
 
   const [hasUsedAiGen, setHasUsedAiGen] = useState(false);
   const [hasUsedBulkImport, setHasUsedBulkImport] = useState(false);
-  const [paywallFeatures, setPaywallFeatures] = useState<{feature: string, tier: 'pass' | 'pro'}[]>([]);
+  const [paywallFeatures, setPaywallFeatures] = useState<{ feature: string, tier: 'pass' | 'pro' }[]>([]);
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
   const [loadedDraftTitle, setLoadedDraftTitle] = useState('');
 
   const checkExportPermissions = () => {
-    const premiumUsage: {feature: string, tier: 'pass' | 'pro'}[] = [];
-    if (questions.length > 20) premiumUsage.push({feature: 'More than 20 questions', tier: 'pass'});
-    if (watermarkText && watermarkText !== translations['bn']?.['defaultHeaderTitle'] && watermarkText !== translations['en']?.['defaultHeaderTitle']) premiumUsage.push({feature: 'Custom Watermark Text', tier: 'pass'});
-    if (watermarkImage) premiumUsage.push({feature: 'Custom Watermark Image', tier: 'pro'});
-    if (headerImage) premiumUsage.push({feature: 'Custom Header Image', tier: 'pro'});
-    if (showOMR || showOMRSheetAttachment) premiumUsage.push({feature: 'OMR Generator', tier: 'pass'});
-    if (hasUsedAiGen) premiumUsage.push({feature: 'AI Question Generator', tier: 'pro'});
-    if (hasUsedBulkImport) premiumUsage.push({feature: 'Bulk Question Import', tier: 'pass'});
+    const premiumUsage: { feature: string, tier: 'pass' | 'pro' }[] = [];
+    if (questions.length > 20) premiumUsage.push({ feature: 'More than 20 questions', tier: 'pass' });
+    if (watermarkText && watermarkText !== translations['bn']?.['defaultHeaderTitle'] && watermarkText !== translations['en']?.['defaultHeaderTitle']) premiumUsage.push({ feature: 'Custom Watermark Text', tier: 'pass' });
+    if (watermarkImage) premiumUsage.push({ feature: 'Custom Watermark Image', tier: 'pro' });
+    if (headerImage) premiumUsage.push({ feature: 'Custom Header Image', tier: 'pro' });
+    if (showOMR || showOMRSheetAttachment) premiumUsage.push({ feature: 'OMR Generator', tier: 'pass' });
+    if (hasUsedAiGen) premiumUsage.push({ feature: 'AI Question Generator', tier: 'pro' });
+    if (hasUsedBulkImport) premiumUsage.push({ feature: 'Bulk Question Import', tier: 'pass' });
 
     return premiumUsage;
   };
@@ -98,7 +98,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
     setShowOMRSheetAttachment(false);
     setHasUsedAiGen(false);
     setHasUsedBulkImport(false);
-    
+
     setIsPaywallOpen(false);
     toast({
       title: "Premium Features Removed",
@@ -234,7 +234,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
   const [forceNewColumn, setForceNewColumn] = useState(false);
   const [sectionHeaderText, setSectionHeaderText] = useState('');
   const [sectionHeaderCols, setSectionHeaderCols] = useState(1);
-  
+
   // Question Bank Modal
   const [isQuestionBankOpen, setIsQuestionBankOpen] = useState(false);
   const [isAiGeneratorOpen, setIsAiGeneratorOpen] = useState(false);
@@ -294,7 +294,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
         const currentYear = new Date().getFullYear().toString();
         const bnDigits: { [key: string]: string } = { '0': '০', '1': '১', '2': '২', '3': '৩', '4': '৪', '5': '৫', '6': '৬', '7': '৭', '8': '৮', '9': '৯' };
         const bnYear = currentYear.replace(/[0-9]/g, w => bnDigits[w] || w);
-        
+
         const combined = [boardName, classNameStr].filter(Boolean).join(' - ');
         setHeaderClassName(`${combined} - ${bnYear}`);
       }
@@ -401,7 +401,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
         if (s.watermarkOpacity !== undefined) setWatermarkOpacity(s.watermarkOpacity);
         if (s.footerText !== undefined) setFooterText(s.footerText);
         if (s.enableLatex !== undefined) setEnableLatex(s.enableLatex);
-      } catch (e) {};
+      } catch (e) { };
     }
   };
 
@@ -536,7 +536,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
         rawBlocks.forEach(rawBlock => {
           const lines = rawBlock.split('\n').map(l => l.trim()).filter(l => l);
           let currentBlockLines: string[] = [];
-          
+
           lines.forEach(line => {
             if (/^[\d০-৯]+[\.\)]/.test(line) && currentBlockLines.length > 0) {
               allBlocks.push([...currentBlockLines]);
@@ -554,12 +554,12 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
             let optA = '', optB = '', optC = '', optD = '';
             let correctAns = 'a';
             let qType = 'MCQ';
-            
+
             const optionRegex = /^([a-dক-ঘ])[\.\)]\s*(.*)/i;
             const answerRegex = /^(?:answer|উত্তর|সঠিক উত্তর|ans|ans\.)[\s:-]*(.*)/i;
             const typeRegex = /^(?:type|টাইপ|question type|ধরণ)[\s:-]*(mcq|t\/f|fib|match|cq|desc|short question|broad question|short|broad|true\/false|fill in the blanks|matching|সত্য\/মিথ্যা|সংক্ষিপ্ত|রচনামূলক|শূন্যস্থান)/i;
             const matchPairRegex = /^(?:[\d০-৯]+[\.\)]?|[-*])\s*(.+?)\s*(?:=|[-–—]+|->|\|)\s*(.+)/;
-            
+
             let matchingPairs: { left: string, right: string }[] = [];
 
             // Pre-pass to find question type
@@ -580,7 +580,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
 
             for (let i = 0; i < lines.length; i++) {
               const line = lines[i];
-              
+
               const typeMatch = line.match(typeRegex);
               if (typeMatch) {
                 continue;
@@ -679,7 +679,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
       openAuthDialog('sign-in');
       return;
     }
-    
+
     setIsSavingDraft(true);
     try {
       const settings = {
@@ -690,7 +690,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
         footerText, enableLatex,
         headerTime, headerMarks, qrCodeEnabled, qrCodeValue, activeSetCode, headerImageEnabled, headerImageFit
       };
-      
+
       const draftTitleToSave = loadedDraftTitle || paperName || (headerTitle !== translations[appLanguage]?.['defaultHeaderTitle'] ? headerTitle : 'Untitled Question Paper');
 
       const newDraftId = await saveQuestionPaperDraft(
@@ -700,9 +700,9 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
         settings,
         draftId
       );
-      
+
       toast({ title: 'Draft saved successfully!' });
-      
+
       if (!draftId && newDraftId) {
         // Update URL to include draftId without refreshing
         const url = new URL(window.location.href);
@@ -856,612 +856,612 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
   const renderSidebarSettings = () => (
     <>
 
-          <div className="bg-[#1e88e5] text-white p-3 rounded-t-lg flex flex-col gap-2 sticky top-0 z-20">
-            <h3 className="font-bold flex items-center gap-2"><Settings className="w-4 h-4" /> {t('quickActions', appLanguage)}</h3>
-            <div className="flex gap-2 w-full">
-              <Button size="sm" className="flex-1 bg-orange-500 hover:bg-orange-600 h-7 px-2 text-xs" onClick={handleSaveDraft} disabled={isSavingDraft}>
-                {isSavingDraft ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Save className="w-3 h-3 mr-1" />}
-                Save Draft
-              </Button>
-              <Button size="sm" className="flex-1 bg-[#5c6bc0] hover:bg-[#3f51b5] h-7 px-2 text-xs" onClick={handleSaveTemplate}>
-                <Save className="w-3 h-3 mr-1" /> {t('saveTemplate', appLanguage)}
-              </Button>
+      <div className="bg-[#1e88e5] text-white p-3 rounded-t-lg flex flex-col gap-2 sticky top-0 z-20">
+        <h3 className="font-bold flex items-center gap-2"><Settings className="w-4 h-4" /> {t('quickActions', appLanguage)}</h3>
+        <div className="flex gap-2 w-full">
+          <Button size="sm" className="flex-1 bg-orange-500 hover:bg-orange-600 h-7 px-2 text-xs" onClick={handleSaveDraft} disabled={isSavingDraft}>
+            {isSavingDraft ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Save className="w-3 h-3 mr-1" />}
+            Save Draft
+          </Button>
+          <Button size="sm" className="flex-1 bg-[#5c6bc0] hover:bg-[#3f51b5] h-7 px-2 text-xs" onClick={handleSaveTemplate}>
+            <Save className="w-3 h-3 mr-1" /> {t('saveTemplate', appLanguage)}
+          </Button>
+        </div>
+      </div>
+
+      <div className="p-4 space-y-4 border-b border-gray-100">
+        <div className="flex gap-2">
+          <Button variant="outline" className="flex-1 text-gray-600 border-gray-300" onClick={() => setIsPageSetupOpen(true)}>
+            <FileText className="w-4 h-4 mr-2" /> {t('pageSetup', appLanguage)}
+          </Button>
+          <Button variant="outline" className="flex-1 text-gray-600 border-gray-300" onClick={handleLoadTemplate}>
+            <RefreshCw className="w-4 h-4 mr-2" /> {t('loadTemplate', appLanguage)}
+          </Button>
+        </div>
+        <div className="flex gap-2">
+          <Button onClick={handlePrint} className="flex-1 bg-[#c8e6c9] hover:bg-[#a5d6a7] text-green-800 border-transparent shadow-none px-2 h-9 text-[12px]">
+            <Download className="w-3.5 h-3.5 mr-1" /> {t('print', appLanguage)}
+          </Button>
+          <Button onClick={handleExportPDF} className="flex-1 bg-red-100 hover:bg-red-200 text-red-800 border-transparent shadow-none px-2 h-9 text-[12px]">
+            <FileText className="w-3.5 h-3.5 mr-1" /> PDF
+          </Button>
+          <Button onClick={handleExportWord} className="flex-1 bg-blue-100 hover:bg-blue-200 text-blue-800 border-transparent shadow-none px-2 h-9 text-[12px]">
+            <FileText className="w-3.5 h-3.5 mr-1" /> Word
+          </Button>
+        </div>
+      </div>
+
+      <div className="p-4 border-b border-gray-100">
+        <h4 className="font-bold text-gray-700 flex items-center gap-2 mb-4 text-sm"><Settings className="w-4 h-4 text-gray-400" /> {t('basicSettings', appLanguage)}</h4>
+
+        <div className="mb-4">
+          <label className="text-xs text-gray-500 mb-2 block">{t('fileFormatting', appLanguage)}</label>
+          <RadioGroup value={format} onValueChange={setFormat} className="grid grid-cols-2 gap-2">
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="qa" id="fmt-qa" />
+              <label htmlFor="fmt-qa" className="text-sm text-gray-600 cursor-pointer">{t('qAndA', appLanguage)}</label>
             </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="question" id="fmt-q" />
+              <label htmlFor="fmt-q" className="text-sm text-gray-600 cursor-pointer">{t('questionOnly', appLanguage)}</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="answer" id="fmt-ans" />
+              <label htmlFor="fmt-ans" className="text-sm text-gray-600 cursor-pointer">{t('answerKeyOnly', appLanguage)}</label>
+            </div>
+          </RadioGroup>
+        </div>
+
+        <div className="mb-5 flex flex-wrap gap-2 justify-between">
+          {['ka', 'circle', 'u', 'ans', 'uttarmala'].map(opt => (
+            <div
+              key={opt}
+              onClick={() => setOptionStyle(opt)}
+              className={`px-2 py-1 rounded cursor-pointer text-xs border ${optionStyle === opt ? 'border-green-500 bg-green-50 text-green-700' : 'border-gray-200 text-gray-600'}`}
+            >
+              {opt === 'ka' && t('kaOptionPrefix', appLanguage)}
+              {opt === 'circle' && 'O'}
+              {opt === 'u' && t('answerPrefix', appLanguage)}
+              {opt === 'ans' && 'Ans:'}
+              {opt === 'uttarmala' && t('answerKeyTitle', appLanguage)}
+            </div>
+          ))}
+        </div>
+
+        <div className="flex justify-between items-center mb-4 bg-gray-50 p-2 rounded-md border border-gray-100">
+          <span className="text-sm font-medium text-gray-700 flex items-center gap-2"><Edit className="w-3.5 h-3.5 text-blue-500" /> {t('editingMode', appLanguage)}</span>
+          <Switch checked={editingMode} onCheckedChange={setEditingMode} />
+        </div>
+
+        <div className="flex justify-between items-center mb-4 bg-gray-50 p-2 rounded-md border border-gray-100">
+          <span className="text-sm font-medium text-gray-700 flex items-center gap-2"><Book className="w-3.5 h-3.5 text-green-600" /> {t('ansWithExplanation', appLanguage)}</span>
+          <Switch checked={showExplanations} onCheckedChange={setShowExplanations} />
+        </div>
+
+        <div className="flex gap-2">
+          <div
+            className="flex-1 bg-gray-50 hover:bg-gray-100 cursor-pointer p-2 rounded-md border border-gray-100 flex items-center justify-between text-gray-600 text-sm transition-colors"
+            onClick={handleShuffle}
+          >
+            {t('shuffle', appLanguage)} <Shuffle className="w-3.5 h-3.5" />
           </div>
+          <Button
+            size="sm"
+            className="bg-[#03a9f4] hover:bg-[#0288d1] text-white"
+            onClick={() => { setTempSetCode(activeSetCode); setIsSetCodeOpen(true); }}
+          >
+            {t('saveSet', appLanguage)}
+          </Button>
+        </div>
 
-          <div className="p-4 space-y-4 border-b border-gray-100">
-            <div className="flex gap-2">
-              <Button variant="outline" className="flex-1 text-gray-600 border-gray-300" onClick={() => setIsPageSetupOpen(true)}>
-                <FileText className="w-4 h-4 mr-2" /> {t('pageSetup', appLanguage)}
-              </Button>
-              <Button variant="outline" className="flex-1 text-gray-600 border-gray-300" onClick={handleLoadTemplate}>
-                <RefreshCw className="w-4 h-4 mr-2" /> {t('loadTemplate', appLanguage)}
-              </Button>
-            </div>
-            <div className="flex gap-2">
-              <Button onClick={handlePrint} className="flex-1 bg-[#c8e6c9] hover:bg-[#a5d6a7] text-green-800 border-transparent shadow-none px-2 h-9 text-[12px]">
-                <Download className="w-3.5 h-3.5 mr-1" /> {t('print', appLanguage)}
-              </Button>
-              <Button onClick={handleExportPDF} className="flex-1 bg-red-100 hover:bg-red-200 text-red-800 border-transparent shadow-none px-2 h-9 text-[12px]">
-                <FileText className="w-3.5 h-3.5 mr-1" /> PDF
-              </Button>
-              <Button onClick={handleExportWord} className="flex-1 bg-blue-100 hover:bg-blue-200 text-blue-800 border-transparent shadow-none px-2 h-9 text-[12px]">
-                <FileText className="w-3.5 h-3.5 mr-1" /> Word
-              </Button>
-            </div>
-          </div>
-
-          <div className="p-4 border-b border-gray-100">
-            <h4 className="font-bold text-gray-700 flex items-center gap-2 mb-4 text-sm"><Settings className="w-4 h-4 text-gray-400" /> {t('basicSettings', appLanguage)}</h4>
-
-            <div className="mb-4">
-              <label className="text-xs text-gray-500 mb-2 block">{t('fileFormatting', appLanguage)}</label>
-              <RadioGroup value={format} onValueChange={setFormat} className="grid grid-cols-2 gap-2">
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="qa" id="fmt-qa" />
-                  <label htmlFor="fmt-qa" className="text-sm text-gray-600 cursor-pointer">{t('qAndA', appLanguage)}</label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="question" id="fmt-q" />
-                  <label htmlFor="fmt-q" className="text-sm text-gray-600 cursor-pointer">{t('questionOnly', appLanguage)}</label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="answer" id="fmt-ans" />
-                  <label htmlFor="fmt-ans" className="text-sm text-gray-600 cursor-pointer">{t('answerKeyOnly', appLanguage)}</label>
-                </div>
-              </RadioGroup>
-            </div>
-
-            <div className="mb-5 flex flex-wrap gap-2 justify-between">
-              {['ka', 'circle', 'u', 'ans', 'uttarmala'].map(opt => (
-                <div
-                  key={opt}
-                  onClick={() => setOptionStyle(opt)}
-                  className={`px-2 py-1 rounded cursor-pointer text-xs border ${optionStyle === opt ? 'border-green-500 bg-green-50 text-green-700' : 'border-gray-200 text-gray-600'}`}
+        {savedSets.length > 0 && (
+          <div className="mt-4 pt-4 border-t border-gray-100">
+            <h5 className="font-bold text-gray-800 text-sm mb-2">{t('savedSets', appLanguage)}</h5>
+            <div className="flex flex-wrap gap-2 p-3 border border-dashed border-gray-300 rounded bg-gray-50/50 min-h-[30px]">
+              {savedSets.map((set) => (
+                <button
+                  key={set.code}
+                  onClick={() => {
+                    setActiveSetCode(set.code);
+                    setQuestions(set.questions);
+                  }}
+                  className={`px-3 py-1 text-[13px] font-medium border bg-[#f8fafc] rounded-sm ${activeSetCode === set.code ? 'border-[#0ea5e9] text-[#0284c7]' : 'border-gray-200 text-gray-700 hover:bg-gray-100'}`}
                 >
-                  {opt === 'ka' && t('kaOptionPrefix', appLanguage)}
-                  {opt === 'circle' && 'O'}
-                  {opt === 'u' && t('answerPrefix', appLanguage)}
-                  {opt === 'ans' && 'Ans:'}
-                  {opt === 'uttarmala' && t('answerKeyTitle', appLanguage)}
-                </div>
+                  {t('setPrefix', appLanguage)} {set.code}
+                </button>
               ))}
             </div>
+          </div>
+        )}
+      </div>
 
-            <div className="flex justify-between items-center mb-4 bg-gray-50 p-2 rounded-md border border-gray-100">
-              <span className="text-sm font-medium text-gray-700 flex items-center gap-2"><Edit className="w-3.5 h-3.5 text-blue-500" /> {t('editingMode', appLanguage)}</span>
-              <Switch checked={editingMode} onCheckedChange={setEditingMode} />
+      {/* Center & Exam Settings */}
+      <div className="p-4 bg-white border-b border-gray-100">
+        <div className="flex items-center justify-between mb-4">
+          <h4 className="font-bold text-gray-700 flex items-center gap-2 text-[15px]"><Landmark className="w-4 h-4 text-purple-500" /> {t('centerAndExamSettings', appLanguage)}</h4>
+          <Switch checked={headerSettingsEnabled} onCheckedChange={setHeaderSettingsEnabled} className="data-[state=checked]:bg-blue-600" />
+        </div>
+
+        {headerSettingsEnabled && (
+          <div className="space-y-4">
+            <div>
+              <label className="text-[13px] text-gray-700 mb-1.5 block">{t('instituteName', appLanguage)}</label>
+              <Input value={headerTitle} onChange={e => setHeaderTitle(e.target.value)} className="h-10 text-[14px] bg-white text-gray-700 border-gray-200" placeholder={t('defaultHeaderTitle', appLanguage)} />
+            </div>
+            <div>
+              <label className="text-[13px] text-gray-700 mb-1.5 block">{t('address', appLanguage)}</label>
+              <Input value={headerAddress} onChange={e => setHeaderAddress(e.target.value)} className="h-10 text-[14px] bg-white text-gray-700 border-gray-200" placeholder={t('defaultHeaderAddress', appLanguage)} />
+            </div>
+            <div>
+              <label className="text-[13px] text-gray-700 mb-1.5 block">{t('classAndYear', appLanguage)}</label>
+              <Input value={headerClassName} onChange={e => setHeaderClassName(e.target.value)} className="h-10 text-[14px] bg-white text-gray-700 border-gray-200" placeholder={t('defaultHeaderClass', appLanguage)} />
+            </div>
+            <div>
+              <label className="text-[13px] text-gray-700 mb-1.5 block">বইয়ের নাম</label>
+              <Input value={headerTextbookName} onChange={e => setHeaderTextbookName(e.target.value)} className="h-10 text-[14px] bg-white text-gray-700 border-gray-200" placeholder="Textbook Name" />
+            </div>
+            <div>
+              <label className="text-[13px] text-gray-700 mb-1.5 block">{t('subject', appLanguage)}</label>
+              <Input value={headerSubjectName} onChange={e => setHeaderSubjectName(e.target.value)} className="h-10 text-[14px] bg-white text-gray-700 border-gray-200" placeholder={t('defaultHeaderSubject', appLanguage)} />
+            </div>
+            <div>
+              <label className="text-[13px] text-gray-700 mb-1.5 block">{t('chapterName', appLanguage)}</label>
+              <Input value={headerChapterName} onChange={e => setHeaderChapterName(e.target.value)} className="h-10 text-[14px] bg-white text-gray-700 border-gray-200" placeholder={t('defaultHeaderChapter', appLanguage)} />
+            </div>
+            <div className="flex gap-3">
+              <div className="flex-1">
+                <label className="text-[13px] text-gray-700 mb-1.5 block">{t('timeMins', appLanguage)}</label>
+                <Input value={headerTime} onChange={e => setHeaderTime(e.target.value)} className="h-8 text-[13px]" placeholder={t('automatic', appLanguage)} />
+              </div>
+              <div className="flex-1">
+                <label className="text-[13px] text-gray-700 mb-1.5 block">{t('fullMarks', appLanguage)}</label>
+                <Input value={headerMarks} onChange={e => setHeaderMarks(e.target.value)} className="h-8 text-[13px]" placeholder={t('automatic', appLanguage)} />
+              </div>
             </div>
 
-            <div className="flex justify-between items-center mb-4 bg-gray-50 p-2 rounded-md border border-gray-100">
-              <span className="text-sm font-medium text-gray-700 flex items-center gap-2"><Book className="w-3.5 h-3.5 text-green-600" /> {t('ansWithExplanation', appLanguage)}</span>
-              <Switch checked={showExplanations} onCheckedChange={setShowExplanations} />
+            {/* QR Code Settings */}
+            <div className="pt-3 mt-4 border-t border-gray-100">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-[13px] text-gray-700 font-medium flex items-center gap-2"><QrCode className="w-4 h-4 text-blue-500" /> {t('qrCode', appLanguage)}</span>
+                <Switch checked={qrCodeEnabled} onCheckedChange={setQrCodeEnabled} className="data-[state=checked]:bg-blue-600 data-[state=unchecked]:bg-gray-200" />
+              </div>
+              {qrCodeEnabled && (
+                <div className="mt-2">
+                  <label className="text-[12px] text-gray-500 mb-1.5 block">{t('qrLink', appLanguage)}</label>
+                  <Input value={qrCodeValue} onChange={e => setQrCodeValue(e.target.value)} className="h-8 text-[13px]" placeholder="e.g.: https://yourwebsite.com" />
+                </div>
+              )}
             </div>
+          </div>
+        )}
+      </div>
 
+      {/* Content Display */}
+      <div className="p-4 bg-slate-50/50">
+        <h4 className="font-bold text-gray-700 flex items-center gap-2 mb-6 text-[15px]"><Layers className="w-4 h-4 text-gray-500" /> {t('contentDisplay', appLanguage)}</h4>
+
+        <div className="flex justify-between items-start mb-4 bg-white p-3 rounded-md border border-gray-100 shadow-sm">
+          <div>
+            <span className="text-[13px] text-gray-700 font-medium flex items-center gap-2">{t('enableLatex', appLanguage)}</span>
+            <p className="text-[10px] text-gray-500 mt-0.5">{t('enableLatexTip', appLanguage)}</p>
+          </div>
+          <Switch checked={enableLatex} onCheckedChange={setEnableLatex} className="data-[state=checked]:bg-blue-600 data-[state=unchecked]:bg-gray-200" />
+        </div>
+
+        <div className="space-y-4">
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-700 flex items-center gap-3"><Heading className="w-4 h-4 text-yellow-500" /> {t('titleToggle', appLanguage)}</span>
+            <Switch checked={showTitle} onCheckedChange={setShowTitle} />
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-700 flex items-center gap-3"><MapPin className="w-4 h-4 text-red-500" /> {t('addressToggle', appLanguage)}</span>
+            <Switch checked={showAddress} onCheckedChange={setShowAddress} />
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-700 flex items-center gap-3"><Landmark className="w-4 h-4 text-green-500" /> {t('classToggle', appLanguage)}</span>
+            <Switch checked={showClassName} onCheckedChange={setShowClassName} />
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-700 flex items-center gap-3"><Book className="w-4 h-4 text-green-500" /> বই টগল</span>
+            <Switch checked={showTextbookName} onCheckedChange={setShowTextbookName} />
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-700 flex items-center gap-3"><Book className="w-4 h-4 text-green-500" /> {t('subjectToggle', appLanguage)}</span>
+            <Switch checked={showSubjectName} onCheckedChange={setShowSubjectName} />
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-700 flex items-center gap-3"><Monitor className="w-4 h-4 text-green-500" /> {t('chapterToggle', appLanguage)}</span>
+            <Switch checked={showChapterName} onCheckedChange={setShowChapterName} />
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-700 flex items-center gap-3"><Lightbulb className="w-4 h-4 text-green-500" /> {t('instructionsToggle', appLanguage)}</span>
+            <Switch checked={showInstructions} onCheckedChange={setShowInstructions} />
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-700 flex items-center gap-3"><User className="w-4 h-4 text-green-500" /> {t('studentInfo', appLanguage)}</span>
+            <Switch checked={showCandidateInfo} onCheckedChange={setShowCandidateInfo} />
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-700 flex items-center gap-3"><Tag className="w-4 h-4 text-green-500" /> {t('questionTags', appLanguage)}</span>
+            <Switch checked={showQuestionTags} onCheckedChange={setShowQuestionTags} />
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-700 flex items-center gap-3"><Star className="w-4 h-4 text-green-500" /> {t('questionMarksToggle', appLanguage)}</span>
+            <Switch checked={showQuestionMarks} onCheckedChange={setShowQuestionMarks} />
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-700 flex items-center gap-3"><Grid3X3 className="w-4 h-4 text-green-500" /> {t('omrAttached', appLanguage)}</span>
+            <Switch checked={showOMR} onCheckedChange={setShowOMR} />
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-700 flex items-center gap-3"><Columns className="w-4 h-4 text-green-500" /> {t('columnDivider', appLanguage)}</span>
+            <Switch checked={showColumnDivider} onCheckedChange={setShowColumnDivider} />
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-700 flex items-center gap-3"><Barcode className="w-4 h-4 text-green-500" /> {t('subjectCodeToggle', appLanguage)}</span>
+            <Switch checked={showSubjectCode} onCheckedChange={setShowSubjectCode} />
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-700 flex items-center gap-3"><Hash className="w-4 h-4 text-green-500" /> {t('marksBox', appLanguage)}</span>
+            <Switch checked={showMarksBox} onCheckedChange={setShowMarksBox} />
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-700 flex items-center gap-3"><LayoutGrid className="w-4 h-4 text-green-500" /> {t('setCodeToggle', appLanguage)}</span>
+            <Switch checked={showSetCode} onCheckedChange={setShowSetCode} />
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-700 flex items-center gap-3"><FileDigit className="w-4 h-4 text-green-500" /> {t('pageNumberToggle', appLanguage)}</span>
+            <Switch checked={showPageNumber} onCheckedChange={setShowPageNumber} />
+          </div>
+          <div className="mt-4 pt-4 border-t border-gray-100">
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-gray-800 flex items-center gap-3 font-bold"><CheckCircle className="w-4 h-4 text-blue-500" /> {t('separateAnswerKey', appLanguage)}</span>
+              <Switch checked={showAnswerKeySheet} onCheckedChange={setShowAnswerKeySheet} className="data-[state=checked]:bg-blue-600" />
+            </div>
+            {showAnswerKeySheet && (
+              <div className="mt-3 pl-7 flex justify-between items-center">
+                <span className="text-[13px] text-gray-600">{t('columnCount', appLanguage)}</span>
+                <Select value={answerKeyColumns.toString()} onValueChange={v => setAnswerKeyColumns(Number(v))}>
+                  <SelectTrigger className="w-[80px] h-7 text-[12px] min-h-0"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="2">2 {t('columnsLabel', appLanguage)}</SelectItem>
+                    <SelectItem value="3">3 {t('columnsLabel', appLanguage)}</SelectItem>
+                    <SelectItem value="4">4 {t('columnsLabel', appLanguage)}</SelectItem>
+                    <SelectItem value="5">5 {t('columnsLabel', appLanguage)}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+            <div className="flex justify-between items-center mt-3 pt-3 border-t border-gray-100">
+              <span className="text-sm text-gray-800 flex items-center gap-3 font-bold"><CircleDot className="w-4 h-4 text-purple-500" /> {t('separateOMR', appLanguage)}</span>
+              <Switch checked={showOMRSheetAttachment} onCheckedChange={setShowOMRSheetAttachment} className="data-[state=checked]:bg-purple-600" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Question Format */}
+      <div className="p-4 bg-slate-50/50 mt-2 border-t border-gray-200/60">
+        <h4 className="font-bold text-gray-700 flex items-center gap-2 mb-6 text-[15px]">
+          <HelpCircle className="w-4 h-4 text-gray-400 fill-gray-200" /> {t('questionFormat', appLanguage)}
+        </h4>
+
+        {/* Column Count */}
+        <div className="mb-6">
+          <span className="text-sm text-gray-700 mb-3 block">{t('columnCount', appLanguage)}</span>
+          <div className="grid grid-cols-3 gap-2">
+            {[1, 2, 3].map(col => (
+              <button
+                key={col}
+                onClick={() => setPaperColumns(col)}
+                className={`flex flex-col items-center justify-center p-2 border rounded-md bg-white ${paperColumns === col ? 'border-green-600 ring-1 ring-green-600' : 'border-gray-200'}`}
+              >
+                <div className="flex gap-0.5 mb-1 opacity-20">
+                  {Array(col).fill(0).map((_, i) => <div key={i} className="w-2.5 h-4 bg-gray-600 rounded-sm"></div>)}
+                </div>
+                <span className="text-[11px] text-gray-600">{localizeNumber(col, appLanguage)} {t('columnLabel', appLanguage)}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Option Style */}
+        <div className="mb-6">
+          <span className="text-sm text-gray-700 mb-3 block">{t('optionStyleLabel', appLanguage)}</span>
+          <div className="grid grid-cols-4 gap-2">
+            {[
+              { id: 'circle', label: '⭕' },
+              { id: 'dot', label: '•' },
+              { id: 'parens', label: '()' },
+              { id: 'paren', label: ')' }
+            ].map(opt => (
+              <button
+                key={opt.id}
+                onClick={() => setOptionShape(opt.id)}
+                className={`h-9 flex items-center justify-center border rounded-md bg-white ${optionShape === opt.id ? 'border-green-600 ring-1 ring-green-600 font-bold' : 'border-gray-200 text-gray-500'}`}
+              >
+                {opt.id === 'circle' ? <div className="w-4 h-4 rounded-full border-[1.5px] border-gray-500"></div> : opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Option Label */}
+        <div className="mb-6">
+          <span className="text-sm text-gray-700 mb-3 block">{t('optionLabel', appLanguage)}</span>
+          <div className="grid grid-cols-4 gap-2">
+            {[
+              { id: 'bangla', label: t('banglaLabel', appLanguage) },
+              { id: 'english', label: t('englishLabel', appLanguage) },
+              { id: 'number', label: t('numberLabel', appLanguage) },
+              { id: 'roman', label: t('romanLabel', appLanguage) }
+            ].map(opt => (
+              <button
+                key={opt.id}
+                onClick={() => setOptionLabelType(opt.id)}
+                className={`h-9 flex items-center justify-center border rounded-md bg-white text-[12px] truncate px-1 ${optionLabelType === opt.id ? 'border-green-600 ring-1 ring-green-600 text-gray-800 font-medium' : 'border-gray-200 text-gray-600'}`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Option Column Count */}
+        <div className="mb-6">
+          <span className="text-sm text-gray-700 mb-3 block">{t('optionColumnCount', appLanguage)}</span>
+          <div className="grid grid-cols-4 gap-2">
+            {[1, 2, 3, 4].map(col => (
+              <button
+                key={col}
+                onClick={() => setOptionColumns(col)}
+                className={`h-9 flex items-center justify-center border rounded-md bg-white text-[13px] ${optionColumns === col ? 'border-green-600 ring-1 ring-green-600 text-gray-800 font-medium' : 'border-gray-200 text-gray-600'}`}
+              >
+                {localizeNumber(col, appLanguage)}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Option Auto Layout Box */}
+        <div className="mb-6 border border-green-500 rounded-sm p-3 bg-white relative">
+          <div className="absolute bottom-0 left-0 right-0 border-b-[1.5px] border-yellow-400"></div>
+          <div className="absolute top-0 right-0 bottom-0 border-r-[1.5px] border-yellow-400"></div>
+          <h5 className="font-bold text-gray-800 text-[13px] mb-3">{t('optionAutoLayout', appLanguage)}</h5>
+          <div className="flex items-center justify-between gap-3">
+            <button onClick={handleResetFormat} className="flex items-center gap-1 text-[13px] text-gray-700 hover:text-gray-900 p-1 border rounded bg-gray-50 border-gray-200">
+              <RefreshCw className="w-3.5 h-3.5 text-blue-600" /> {t('resetBtn', appLanguage)}
+            </button>
+            <button onClick={handleAutoLayout} className="flex-1 flex items-center justify-center gap-1.5 bg-[#4ade80] hover:bg-[#22c55e] text-white py-1.5 rounded-sm text-sm font-medium transition-colors shadow-sm">
+              <Zap className="w-3.5 h-3.5 text-yellow-300 fill-yellow-300" /> {t('autoLayoutBtn', appLanguage)}
+            </button>
+          </div>
+          <p className="text-[10px] text-gray-400 mt-3">{t('autoLayoutTip', appLanguage)}</p>
+        </div>
+
+        {/* Gaps */}
+        <div className="mb-6 space-y-4">
+          <div>
+            <span className="text-sm text-gray-700 mb-2 block">{t('rowGap', appLanguage)}</span>
+            <input type="range" min="0" max="40" value={rowGap} onChange={e => setRowGap(Number(e.target.value))} className="w-full accent-[#2563eb] h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer" />
+          </div>
+          <div>
+            <span className="text-sm text-gray-700 mb-2 block">{t('columnGap', appLanguage)}</span>
+            <input type="range" min="0" max="100" value={colGap} onChange={e => setColGap(Number(e.target.value))} className="w-full accent-[#2563eb] h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer" />
+          </div>
+          <div>
+            <span className="text-sm text-gray-700 mb-2 block">{t('questionOptionGap', appLanguage)}</span>
+            <input type="range" min="0" max="40" value={questionOptionGap} onChange={e => setQuestionOptionGap(Number(e.target.value))} className="w-full accent-[#2563eb] h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer" />
+          </div>
+        </div>
+
+        {/* Font Settings */}
+        <div className="mb-6">
+          <h5 className="font-bold text-gray-800 text-[14px] mb-4">{t('fontSettings', appLanguage)}</h5>
+          <div className="flex items-center gap-3 mb-3">
+            <span className="text-[13px] text-gray-700 w-16">{t('font', appLanguage)}</span>
+            <div className="flex-1">
+              <Select value={fontFamily} onValueChange={setFontFamily}>
+                <SelectTrigger className="h-8 text-[13px]">
+                  <SelectValue placeholder={t('banglaDefault', appLanguage)} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="bangla">{t('banglaDefault', appLanguage)}</SelectItem>
+                  <SelectItem value="solaimanlipi">{t('solaimanLipi', appLanguage)}</SelectItem>
+                  <SelectItem value="kalpurush">{t('kalpurush', appLanguage)}</SelectItem>
+                  <SelectItem value="nikosh">{t('nikosh', appLanguage)}</SelectItem>
+                  <SelectItem value="siyamrupali">{t('siyamRupali', appLanguage)}</SelectItem>
+                  <SelectItem value="sutonnymj">{t('sutonnyMj', appLanguage)}</SelectItem>
+                  <SelectItem value="timesnewroman">{t('timesNewRoman', appLanguage)}</SelectItem>
+                  <SelectItem value="arial">{t('arial', appLanguage)}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <span className="text-[13px] text-gray-700 w-16">{t('size', appLanguage)}</span>
+            <div className="flex items-center">
+              <button onClick={() => setFontSize(Math.max(8, fontSize - 1))} className="w-8 h-9 border border-gray-200 rounded-l-md bg-gray-50 flex items-center justify-center hover:bg-gray-100">-</button>
+              <div className="w-12 h-9 border-y border-gray-200 flex items-center justify-center text-[15px] font-bold bg-white text-gray-900">
+                {localizeNumber(fontSize, appLanguage)}
+              </div>
+              <button onClick={() => setFontSize(Math.min(32, fontSize + 1))} className="w-8 h-9 border border-gray-200 rounded-r-md bg-gray-50 flex items-center justify-center hover:bg-gray-100">+</button>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between mt-4">
+            <span className="text-[13px] text-gray-700 w-auto">{t('ansBg', appLanguage) || 'Ans/Exp BG Color'}</span>
+            <div className="flex items-center gap-2">
+              <Select value={ansBgStyle} onValueChange={setAnsBgStyle}>
+                <SelectTrigger className="w-[100px] h-9"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="plain">{t('plain', appLanguage) || 'Plain'}</SelectItem>
+                  <SelectItem value="colored">{t('colored', appLanguage) || 'Colored'}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between mt-4">
+            <span className="text-[13px] text-gray-700 w-auto">{t('expSize', appLanguage) || 'Ans/Exp Size'}</span>
+            <div className="flex items-center">
+              <button onClick={() => setExplanationFontSize(Math.max(8, explanationFontSize - 1))} className="w-8 h-9 border border-gray-200 rounded-l-md bg-gray-50 flex items-center justify-center hover:bg-gray-100">-</button>
+              <div className="w-12 h-9 border-y border-gray-200 flex items-center justify-center text-[15px] font-bold bg-white text-gray-900">
+                {localizeNumber(explanationFontSize, appLanguage)}
+              </div>
+              <button onClick={() => setExplanationFontSize(Math.min(32, explanationFontSize + 1))} className="w-8 h-9 border border-gray-200 rounded-r-md bg-gray-50 flex items-center justify-center hover:bg-gray-100">+</button>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between mt-4">
+            <span className="text-[13px] text-gray-700 w-auto">{t('qStyle', appLanguage) || 'Question Style'}</span>
             <div className="flex gap-2">
-              <div
-                className="flex-1 bg-gray-50 hover:bg-gray-100 cursor-pointer p-2 rounded-md border border-gray-100 flex items-center justify-between text-gray-600 text-sm transition-colors"
-                onClick={handleShuffle}
-              >
-                {t('shuffle', appLanguage)} <Shuffle className="w-3.5 h-3.5" />
-              </div>
-              <Button
-                size="sm"
-                className="bg-[#03a9f4] hover:bg-[#0288d1] text-white"
-                onClick={() => { setTempSetCode(activeSetCode); setIsSetCodeOpen(true); }}
-              >
-                {t('saveSet', appLanguage)}
-              </Button>
+              <button onClick={() => setQuestionBold(!questionBold)} className={`w-8 h-9 flex items-center justify-center border rounded ${questionBold ? 'bg-blue-100 border-blue-400 text-blue-700 font-bold' : 'bg-gray-50 border-gray-200 font-bold text-gray-700'}`}>B</button>
+              <button onClick={() => setQuestionItalic(!questionItalic)} className={`w-8 h-9 flex items-center justify-center border rounded italic ${questionItalic ? 'bg-blue-100 border-blue-400 text-blue-700' : 'bg-gray-50 border-gray-200 text-gray-700'}`}>I</button>
+              <button onClick={() => setQuestionUnderline(!questionUnderline)} className={`w-8 h-9 flex items-center justify-center border rounded underline ${questionUnderline ? 'bg-blue-100 border-blue-400 text-blue-700' : 'bg-gray-50 border-gray-200 text-gray-700'}`}>U</button>
             </div>
+          </div>
+        </div>
 
-            {savedSets.length > 0 && (
-              <div className="mt-4 pt-4 border-t border-gray-100">
-                <h5 className="font-bold text-gray-800 text-sm mb-2">{t('savedSets', appLanguage)}</h5>
-                <div className="flex flex-wrap gap-2 p-3 border border-dashed border-gray-300 rounded bg-gray-50/50 min-h-[30px]">
-                  {savedSets.map((set) => (
-                    <button
-                      key={set.code}
-                      onClick={() => {
-                        setActiveSetCode(set.code);
-                        setQuestions(set.questions);
-                      }}
-                      className={`px-3 py-1 text-[13px] font-medium border bg-[#f8fafc] rounded-sm ${activeSetCode === set.code ? 'border-[#0ea5e9] text-[#0284c7]' : 'border-gray-200 text-gray-700 hover:bg-gray-100'}`}
-                    >
-                      {t('setPrefix', appLanguage)} {set.code}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
+        {/* Branding Settings */}
+        <div className="p-4 border-t border-gray-100">
+          <div className="flex items-center justify-between mb-4">
+            <h4 className="font-bold text-[#3f51b5] flex items-center gap-2 text-[14px]">
+              <Waves className="w-4 h-4 text-[#3f51b5]" /> {t('brandingSettings', appLanguage)}
+            </h4>
+            <Switch checked={brandingEnabled} onCheckedChange={setBrandingEnabled} className="data-[state=checked]:bg-blue-600" />
           </div>
 
-          {/* Center & Exam Settings */}
-          <div className="p-4 bg-white border-b border-gray-100">
-            <div className="flex items-center justify-between mb-4">
-              <h4 className="font-bold text-gray-700 flex items-center gap-2 text-[15px]"><Landmark className="w-4 h-4 text-purple-500" /> {t('centerAndExamSettings', appLanguage)}</h4>
-              <Switch checked={headerSettingsEnabled} onCheckedChange={setHeaderSettingsEnabled} className="data-[state=checked]:bg-blue-600" />
-            </div>
-
-            {headerSettingsEnabled && (
-              <div className="space-y-4">
-                <div>
-                  <label className="text-[13px] text-gray-700 mb-1.5 block">{t('instituteName', appLanguage)}</label>
-                  <Input value={headerTitle} onChange={e => setHeaderTitle(e.target.value)} className="h-10 text-[14px] bg-white text-gray-700 border-gray-200" placeholder={t('defaultHeaderTitle', appLanguage)} />
-                </div>
-                <div>
-                  <label className="text-[13px] text-gray-700 mb-1.5 block">{t('address', appLanguage)}</label>
-                  <Input value={headerAddress} onChange={e => setHeaderAddress(e.target.value)} className="h-10 text-[14px] bg-white text-gray-700 border-gray-200" placeholder={t('defaultHeaderAddress', appLanguage)} />
-                </div>
-                <div>
-                  <label className="text-[13px] text-gray-700 mb-1.5 block">{t('classAndYear', appLanguage)}</label>
-                  <Input value={headerClassName} onChange={e => setHeaderClassName(e.target.value)} className="h-10 text-[14px] bg-white text-gray-700 border-gray-200" placeholder={t('defaultHeaderClass', appLanguage)} />
-                </div>
-                <div>
-                  <label className="text-[13px] text-gray-700 mb-1.5 block">বইয়ের নাম</label>
-                  <Input value={headerTextbookName} onChange={e => setHeaderTextbookName(e.target.value)} className="h-10 text-[14px] bg-white text-gray-700 border-gray-200" placeholder="Textbook Name" />
-                </div>
-                <div>
-                  <label className="text-[13px] text-gray-700 mb-1.5 block">{t('subject', appLanguage)}</label>
-                  <Input value={headerSubjectName} onChange={e => setHeaderSubjectName(e.target.value)} className="h-10 text-[14px] bg-white text-gray-700 border-gray-200" placeholder={t('defaultHeaderSubject', appLanguage)} />
-                </div>
-                <div>
-                  <label className="text-[13px] text-gray-700 mb-1.5 block">{t('chapterName', appLanguage)}</label>
-                  <Input value={headerChapterName} onChange={e => setHeaderChapterName(e.target.value)} className="h-10 text-[14px] bg-white text-gray-700 border-gray-200" placeholder={t('defaultHeaderChapter', appLanguage)} />
-                </div>
-                <div className="flex gap-3">
-                  <div className="flex-1">
-                    <label className="text-[13px] text-gray-700 mb-1.5 block">{t('timeMins', appLanguage)}</label>
-                    <Input value={headerTime} onChange={e => setHeaderTime(e.target.value)} className="h-8 text-[13px]" placeholder={t('automatic', appLanguage)} />
-                  </div>
-                  <div className="flex-1">
-                    <label className="text-[13px] text-gray-700 mb-1.5 block">{t('fullMarks', appLanguage)}</label>
-                    <Input value={headerMarks} onChange={e => setHeaderMarks(e.target.value)} className="h-8 text-[13px]" placeholder={t('automatic', appLanguage)} />
-                  </div>
-                </div>
-
-                {/* QR Code Settings */}
-                <div className="pt-3 mt-4 border-t border-gray-100">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-[13px] text-gray-700 font-medium flex items-center gap-2"><QrCode className="w-4 h-4 text-blue-500" /> {t('qrCode', appLanguage)}</span>
-                    <Switch checked={qrCodeEnabled} onCheckedChange={setQrCodeEnabled} className="data-[state=checked]:bg-blue-600 data-[state=unchecked]:bg-gray-200" />
-                  </div>
-                  {qrCodeEnabled && (
-                    <div className="mt-2">
-                      <label className="text-[12px] text-gray-500 mb-1.5 block">{t('qrLink', appLanguage)}</label>
-                      <Input value={qrCodeValue} onChange={e => setQrCodeValue(e.target.value)} className="h-8 text-[13px]" placeholder="e.g.: https://yourwebsite.com" />
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Content Display */}
-          <div className="p-4 bg-slate-50/50">
-            <h4 className="font-bold text-gray-700 flex items-center gap-2 mb-6 text-[15px]"><Layers className="w-4 h-4 text-gray-500" /> {t('contentDisplay', appLanguage)}</h4>
-            
-            <div className="flex justify-between items-start mb-4 bg-white p-3 rounded-md border border-gray-100 shadow-sm">
+          {brandingEnabled && (
+            <div className="space-y-5">
+              {/* Text */}
               <div>
-                <span className="text-[13px] text-gray-700 font-medium flex items-center gap-2">{t('enableLatex', appLanguage)}</span>
-                <p className="text-[10px] text-gray-500 mt-0.5">{t('enableLatexTip', appLanguage)}</p>
+                <label className="text-[13px] text-gray-700 mb-2 block">{t('footerTextLabel', appLanguage)}</label>
+                <Input
+                  value={footerText}
+                  onChange={e => setFooterText(e.target.value)}
+                  placeholder={t('defaultHeaderTitle', appLanguage)}
+                  className="h-10 text-[14px] bg-white text-gray-700 border-gray-200 mb-4"
+                />
+                <label className="text-[13px] text-gray-700 mb-2 block">{t('watermarkText', appLanguage)}</label>
+                <Input
+                  value={watermarkText}
+                  onChange={e => setWatermarkText(e.target.value)}
+                  placeholder={t('defaultHeaderTitle', appLanguage)}
+                  className="h-10 text-[14px] bg-white text-gray-700 border-gray-200"
+                />
               </div>
-              <Switch checked={enableLatex} onCheckedChange={setEnableLatex} className="data-[state=checked]:bg-blue-600 data-[state=unchecked]:bg-gray-200" />
-            </div>
 
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-700 flex items-center gap-3"><Heading className="w-4 h-4 text-yellow-500" /> {t('titleToggle', appLanguage)}</span>
-                <Switch checked={showTitle} onCheckedChange={setShowTitle} />
+              {/* Font */}
+              <div>
+                <label className="text-[13px] text-gray-700 mb-2 block">{t('watermarkFont', appLanguage)}</label>
+                <Select value={watermarkFont} onValueChange={setWatermarkFont}>
+                  <SelectTrigger className="h-10 text-[14px] bg-white text-gray-700 border-gray-200">
+                    <SelectValue placeholder={t('selectFont', appLanguage)} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="kalpurush">{t('kalpurush', appLanguage)}</SelectItem>
+                    <SelectItem value="siyamrupali">{t('siyamRupali', appLanguage)}</SelectItem>
+                    <SelectItem value="solaimanlipi">{t('solaimanLipi', appLanguage)}</SelectItem>
+                    <SelectItem value="sutonnymj">{t('sutonnyMj', appLanguage)}</SelectItem>
+                    <SelectItem value="nikosh">{t('nikosh', appLanguage)}</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-700 flex items-center gap-3"><MapPin className="w-4 h-4 text-red-500" /> {t('addressToggle', appLanguage)}</span>
-                <Switch checked={showAddress} onCheckedChange={setShowAddress} />
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-700 flex items-center gap-3"><Landmark className="w-4 h-4 text-green-500" /> {t('classToggle', appLanguage)}</span>
-                <Switch checked={showClassName} onCheckedChange={setShowClassName} />
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-700 flex items-center gap-3"><Book className="w-4 h-4 text-green-500" /> বই টগল</span>
-                <Switch checked={showTextbookName} onCheckedChange={setShowTextbookName} />
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-700 flex items-center gap-3"><Book className="w-4 h-4 text-green-500" /> {t('subjectToggle', appLanguage)}</span>
-                <Switch checked={showSubjectName} onCheckedChange={setShowSubjectName} />
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-700 flex items-center gap-3"><Monitor className="w-4 h-4 text-green-500" /> {t('chapterToggle', appLanguage)}</span>
-                <Switch checked={showChapterName} onCheckedChange={setShowChapterName} />
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-700 flex items-center gap-3"><Lightbulb className="w-4 h-4 text-green-500" /> {t('instructionsToggle', appLanguage)}</span>
-                <Switch checked={showInstructions} onCheckedChange={setShowInstructions} />
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-700 flex items-center gap-3"><User className="w-4 h-4 text-green-500" /> {t('studentInfo', appLanguage)}</span>
-                <Switch checked={showCandidateInfo} onCheckedChange={setShowCandidateInfo} />
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-700 flex items-center gap-3"><Tag className="w-4 h-4 text-green-500" /> {t('questionTags', appLanguage)}</span>
-                <Switch checked={showQuestionTags} onCheckedChange={setShowQuestionTags} />
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-700 flex items-center gap-3"><Star className="w-4 h-4 text-green-500" /> {t('questionMarksToggle', appLanguage)}</span>
-                <Switch checked={showQuestionMarks} onCheckedChange={setShowQuestionMarks} />
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-700 flex items-center gap-3"><Grid3X3 className="w-4 h-4 text-green-500" /> {t('omrAttached', appLanguage)}</span>
-                <Switch checked={showOMR} onCheckedChange={setShowOMR} />
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-700 flex items-center gap-3"><Columns className="w-4 h-4 text-green-500" /> {t('columnDivider', appLanguage)}</span>
-                <Switch checked={showColumnDivider} onCheckedChange={setShowColumnDivider} />
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-700 flex items-center gap-3"><Barcode className="w-4 h-4 text-green-500" /> {t('subjectCodeToggle', appLanguage)}</span>
-                <Switch checked={showSubjectCode} onCheckedChange={setShowSubjectCode} />
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-700 flex items-center gap-3"><Hash className="w-4 h-4 text-green-500" /> {t('marksBox', appLanguage)}</span>
-                <Switch checked={showMarksBox} onCheckedChange={setShowMarksBox} />
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-700 flex items-center gap-3"><LayoutGrid className="w-4 h-4 text-green-500" /> {t('setCodeToggle', appLanguage)}</span>
-                <Switch checked={showSetCode} onCheckedChange={setShowSetCode} />
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-700 flex items-center gap-3"><FileDigit className="w-4 h-4 text-green-500" /> {t('pageNumberToggle', appLanguage)}</span>
-                <Switch checked={showPageNumber} onCheckedChange={setShowPageNumber} />
-              </div>
-              <div className="mt-4 pt-4 border-t border-gray-100">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-800 flex items-center gap-3 font-bold"><CheckCircle className="w-4 h-4 text-blue-500" /> {t('separateAnswerKey', appLanguage)}</span>
-                  <Switch checked={showAnswerKeySheet} onCheckedChange={setShowAnswerKeySheet} className="data-[state=checked]:bg-blue-600" />
-                </div>
-                {showAnswerKeySheet && (
-                  <div className="mt-3 pl-7 flex justify-between items-center">
-                    <span className="text-[13px] text-gray-600">{t('columnCount', appLanguage)}</span>
-                    <Select value={answerKeyColumns.toString()} onValueChange={v => setAnswerKeyColumns(Number(v))}>
-                      <SelectTrigger className="w-[80px] h-7 text-[12px] min-h-0"><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="2">2 {t('columnsLabel', appLanguage)}</SelectItem>
-                        <SelectItem value="3">3 {t('columnsLabel', appLanguage)}</SelectItem>
-                        <SelectItem value="4">4 {t('columnsLabel', appLanguage)}</SelectItem>
-                        <SelectItem value="5">5 {t('columnsLabel', appLanguage)}</SelectItem>
-                      </SelectContent>
-                    </Select>
+
+              {/* Image */}
+              <div>
+                <label className="text-[13px] text-gray-700 mb-2 block">{t('watermarkIcon', appLanguage)}</label>
+                {!watermarkImage ? (
+                  <label className="border border-dashed border-gray-300 rounded-md p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 bg-white relative overflow-hidden transition-all h-20">
+                    <input type="file" accept="image/png, image/jpeg" className="hidden" onChange={handleWatermarkImageUpload} />
+                    <span className="text-[13px] text-gray-400 font-medium text-center">{t('uploadImageClick', appLanguage)}</span>
+                    <span className="text-[11px] text-gray-300 text-center mt-1">(Max size ~5MB, PNG/JPG)</span>
+                  </label>
+                ) : (
+                  <div className="flex flex-col items-center gap-3 border border-gray-200 rounded-md p-3 bg-white">
+                    <img src={watermarkImage} alt="Watermark Preview" className="w-12 h-12 object-contain" />
+                    <button onClick={() => setWatermarkImage(null)} className="flex items-center justify-center gap-1.5 w-full py-1.5 border border-red-200 text-red-600 rounded-sm hover:bg-red-50 text-[13px] transition-colors font-medium">
+                      <Trash2 className="w-3.5 h-3.5" /> {t('deleteIcon', appLanguage)}
+                    </button>
                   </div>
                 )}
-                <div className="flex justify-between items-center mt-3 pt-3 border-t border-gray-100">
-                  <span className="text-sm text-gray-800 flex items-center gap-3 font-bold"><CircleDot className="w-4 h-4 text-purple-500" /> {t('separateOMR', appLanguage)}</span>
-                  <Switch checked={showOMRSheetAttachment} onCheckedChange={setShowOMRSheetAttachment} className="data-[state=checked]:bg-purple-600" />
+              </div>
+
+              {/* Size */}
+              <div>
+                <span className="text-[13px] text-gray-700 mb-2 block">{t('size', appLanguage)}: {watermarkSize}px</span>
+                <input type="range" min="20" max="300" value={watermarkSize} onChange={e => setWatermarkSize(Number(e.target.value))} className="w-full accent-[#2563eb] h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer" />
+              </div>
+
+              {/* Opacity */}
+              <div>
+                <span className="text-[13px] text-gray-700 mb-2 block">{t('opacity', appLanguage)}: {watermarkOpacity}%</span>
+                <input type="range" min="0" max="100" value={watermarkOpacity} onChange={e => setWatermarkOpacity(Number(e.target.value))} className="w-full accent-[#2563eb] h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer" />
+              </div>
+
+              {/* Repeat */}
+              <div className="pt-2">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-[13px] text-gray-700">{t('watermarkRepeat', appLanguage)}</span>
+                  <Switch checked={watermarkRepeat} onCheckedChange={setWatermarkRepeat} className="data-[state=checked]:bg-blue-600 data-[state=unchecked]:bg-gray-200" />
                 </div>
+                {watermarkRepeat && (
+                  <div>
+                    <input type="range" min="1" max="20" value={watermarkRepeatCount} onChange={e => setWatermarkRepeatCount(Number(e.target.value))} className="w-full accent-[#2563eb] h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer mb-2" />
+                    <div className="text-[13px] text-gray-700">{watermarkRepeatCount} times</div>
+                  </div>
+                )}
               </div>
             </div>
-          </div>
+          )}
+        </div>
 
-          {/* Question Format */}
-          <div className="p-4 bg-slate-50/50 mt-2 border-t border-gray-200/60">
-            <h4 className="font-bold text-gray-700 flex items-center gap-2 mb-6 text-[15px]">
-              <HelpCircle className="w-4 h-4 text-gray-400 fill-gray-200" /> {t('questionFormat', appLanguage)}
+        {/* Header Image Settings */}
+        <div className="p-4 border-t border-gray-100">
+          <div className="flex items-center justify-between mb-4">
+            <h4 className="font-bold text-[#1e88e5] flex items-center gap-2 text-[14px]">
+              <ImageIcon className="w-4 h-4 text-[#1e88e5]" /> {t('headerImageSettings', appLanguage)}
             </h4>
-
-            {/* Column Count */}
-            <div className="mb-6">
-              <span className="text-sm text-gray-700 mb-3 block">{t('columnCount', appLanguage)}</span>
-              <div className="grid grid-cols-3 gap-2">
-                {[1, 2, 3].map(col => (
-                  <button
-                    key={col}
-                    onClick={() => setPaperColumns(col)}
-                    className={`flex flex-col items-center justify-center p-2 border rounded-md bg-white ${paperColumns === col ? 'border-green-600 ring-1 ring-green-600' : 'border-gray-200'}`}
-                  >
-                    <div className="flex gap-0.5 mb-1 opacity-20">
-                      {Array(col).fill(0).map((_, i) => <div key={i} className="w-2.5 h-4 bg-gray-600 rounded-sm"></div>)}
-                    </div>
-                    <span className="text-[11px] text-gray-600">{localizeNumber(col, appLanguage)} {t('columnLabel', appLanguage)}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Option Style */}
-            <div className="mb-6">
-              <span className="text-sm text-gray-700 mb-3 block">{t('optionStyleLabel', appLanguage)}</span>
-              <div className="grid grid-cols-4 gap-2">
-                {[
-                  { id: 'circle', label: '⭕' },
-                  { id: 'dot', label: '•' },
-                  { id: 'parens', label: '()' },
-                  { id: 'paren', label: ')' }
-                ].map(opt => (
-                  <button
-                    key={opt.id}
-                    onClick={() => setOptionShape(opt.id)}
-                    className={`h-9 flex items-center justify-center border rounded-md bg-white ${optionShape === opt.id ? 'border-green-600 ring-1 ring-green-600 font-bold' : 'border-gray-200 text-gray-500'}`}
-                  >
-                    {opt.id === 'circle' ? <div className="w-4 h-4 rounded-full border-[1.5px] border-gray-500"></div> : opt.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Option Label */}
-            <div className="mb-6">
-              <span className="text-sm text-gray-700 mb-3 block">{t('optionLabel', appLanguage)}</span>
-              <div className="grid grid-cols-4 gap-2">
-                {[
-                  { id: 'bangla', label: t('banglaLabel', appLanguage) },
-                  { id: 'english', label: t('englishLabel', appLanguage) },
-                  { id: 'number', label: t('numberLabel', appLanguage) },
-                  { id: 'roman', label: t('romanLabel', appLanguage) }
-                ].map(opt => (
-                  <button
-                    key={opt.id}
-                    onClick={() => setOptionLabelType(opt.id)}
-                    className={`h-9 flex items-center justify-center border rounded-md bg-white text-[12px] truncate px-1 ${optionLabelType === opt.id ? 'border-green-600 ring-1 ring-green-600 text-gray-800 font-medium' : 'border-gray-200 text-gray-600'}`}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Option Column Count */}
-            <div className="mb-6">
-              <span className="text-sm text-gray-700 mb-3 block">{t('optionColumnCount', appLanguage)}</span>
-              <div className="grid grid-cols-4 gap-2">
-                {[1, 2, 3, 4].map(col => (
-                  <button
-                    key={col}
-                    onClick={() => setOptionColumns(col)}
-                    className={`h-9 flex items-center justify-center border rounded-md bg-white text-[13px] ${optionColumns === col ? 'border-green-600 ring-1 ring-green-600 text-gray-800 font-medium' : 'border-gray-200 text-gray-600'}`}
-                  >
-                    {localizeNumber(col, appLanguage)}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Option Auto Layout Box */}
-            <div className="mb-6 border border-green-500 rounded-sm p-3 bg-white relative">
-              <div className="absolute bottom-0 left-0 right-0 border-b-[1.5px] border-yellow-400"></div>
-              <div className="absolute top-0 right-0 bottom-0 border-r-[1.5px] border-yellow-400"></div>
-              <h5 className="font-bold text-gray-800 text-[13px] mb-3">{t('optionAutoLayout', appLanguage)}</h5>
-              <div className="flex items-center justify-between gap-3">
-                <button onClick={handleResetFormat} className="flex items-center gap-1 text-[13px] text-gray-700 hover:text-gray-900 p-1 border rounded bg-gray-50 border-gray-200">
-                  <RefreshCw className="w-3.5 h-3.5 text-blue-600" /> {t('resetBtn', appLanguage)}
-                </button>
-                <button onClick={handleAutoLayout} className="flex-1 flex items-center justify-center gap-1.5 bg-[#4ade80] hover:bg-[#22c55e] text-white py-1.5 rounded-sm text-sm font-medium transition-colors shadow-sm">
-                  <Zap className="w-3.5 h-3.5 text-yellow-300 fill-yellow-300" /> {t('autoLayoutBtn', appLanguage)}
-                </button>
-              </div>
-              <p className="text-[10px] text-gray-400 mt-3">{t('autoLayoutTip', appLanguage)}</p>
-            </div>
-
-            {/* Gaps */}
-            <div className="mb-6 space-y-4">
-              <div>
-                <span className="text-sm text-gray-700 mb-2 block">{t('rowGap', appLanguage)}</span>
-                <input type="range" min="0" max="40" value={rowGap} onChange={e => setRowGap(Number(e.target.value))} className="w-full accent-[#2563eb] h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer" />
-              </div>
-              <div>
-                <span className="text-sm text-gray-700 mb-2 block">{t('columnGap', appLanguage)}</span>
-                <input type="range" min="0" max="100" value={colGap} onChange={e => setColGap(Number(e.target.value))} className="w-full accent-[#2563eb] h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer" />
-              </div>
-              <div>
-                <span className="text-sm text-gray-700 mb-2 block">{t('questionOptionGap', appLanguage)}</span>
-                <input type="range" min="0" max="40" value={questionOptionGap} onChange={e => setQuestionOptionGap(Number(e.target.value))} className="w-full accent-[#2563eb] h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer" />
-              </div>
-            </div>
-
-            {/* Font Settings */}
-            <div className="mb-6">
-              <h5 className="font-bold text-gray-800 text-[14px] mb-4">{t('fontSettings', appLanguage)}</h5>
-              <div className="flex items-center gap-3 mb-3">
-                <span className="text-[13px] text-gray-700 w-16">{t('font', appLanguage)}</span>
-                <div className="flex-1">
-                  <Select value={fontFamily} onValueChange={setFontFamily}>
-                    <SelectTrigger className="h-8 text-[13px]">
-                      <SelectValue placeholder={t('banglaDefault', appLanguage)} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="bangla">{t('banglaDefault', appLanguage)}</SelectItem>
-                      <SelectItem value="solaimanlipi">{t('solaimanLipi', appLanguage)}</SelectItem>
-                      <SelectItem value="kalpurush">{t('kalpurush', appLanguage)}</SelectItem>
-                      <SelectItem value="nikosh">{t('nikosh', appLanguage)}</SelectItem>
-                      <SelectItem value="siyamrupali">{t('siyamRupali', appLanguage)}</SelectItem>
-                      <SelectItem value="sutonnymj">{t('sutonnyMj', appLanguage)}</SelectItem>
-                      <SelectItem value="timesnewroman">{t('timesNewRoman', appLanguage)}</SelectItem>
-                      <SelectItem value="arial">{t('arial', appLanguage)}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <span className="text-[13px] text-gray-700 w-16">{t('size', appLanguage)}</span>
-                <div className="flex items-center">
-                  <button onClick={() => setFontSize(Math.max(8, fontSize - 1))} className="w-8 h-9 border border-gray-200 rounded-l-md bg-gray-50 flex items-center justify-center hover:bg-gray-100">-</button>
-                  <div className="w-12 h-9 border-y border-gray-200 flex items-center justify-center text-[15px] font-bold bg-white text-gray-900">
-                    {localizeNumber(fontSize, appLanguage)}
-                  </div>
-                  <button onClick={() => setFontSize(Math.min(32, fontSize + 1))} className="w-8 h-9 border border-gray-200 rounded-r-md bg-gray-50 flex items-center justify-center hover:bg-gray-100">+</button>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between mt-4">
-                <span className="text-[13px] text-gray-700 w-auto">{t('ansBg', appLanguage) || 'Ans/Exp BG Color'}</span>
-                <div className="flex items-center gap-2">
-                  <Select value={ansBgStyle} onValueChange={setAnsBgStyle}>
-                    <SelectTrigger className="w-[100px] h-9"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="plain">{t('plain', appLanguage) || 'Plain'}</SelectItem>
-                      <SelectItem value="colored">{t('colored', appLanguage) || 'Colored'}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between mt-4">
-                <span className="text-[13px] text-gray-700 w-auto">{t('expSize', appLanguage) || 'Ans/Exp Size'}</span>
-                <div className="flex items-center">
-                  <button onClick={() => setExplanationFontSize(Math.max(8, explanationFontSize - 1))} className="w-8 h-9 border border-gray-200 rounded-l-md bg-gray-50 flex items-center justify-center hover:bg-gray-100">-</button>
-                  <div className="w-12 h-9 border-y border-gray-200 flex items-center justify-center text-[15px] font-bold bg-white text-gray-900">
-                    {localizeNumber(explanationFontSize, appLanguage)}
-                  </div>
-                  <button onClick={() => setExplanationFontSize(Math.min(32, explanationFontSize + 1))} className="w-8 h-9 border border-gray-200 rounded-r-md bg-gray-50 flex items-center justify-center hover:bg-gray-100">+</button>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between mt-4">
-                <span className="text-[13px] text-gray-700 w-auto">{t('qStyle', appLanguage) || 'Question Style'}</span>
-                <div className="flex gap-2">
-                  <button onClick={() => setQuestionBold(!questionBold)} className={`w-8 h-9 flex items-center justify-center border rounded ${questionBold ? 'bg-blue-100 border-blue-400 text-blue-700 font-bold' : 'bg-gray-50 border-gray-200 font-bold text-gray-700'}`}>B</button>
-                  <button onClick={() => setQuestionItalic(!questionItalic)} className={`w-8 h-9 flex items-center justify-center border rounded italic ${questionItalic ? 'bg-blue-100 border-blue-400 text-blue-700' : 'bg-gray-50 border-gray-200 text-gray-700'}`}>I</button>
-                  <button onClick={() => setQuestionUnderline(!questionUnderline)} className={`w-8 h-9 flex items-center justify-center border rounded underline ${questionUnderline ? 'bg-blue-100 border-blue-400 text-blue-700' : 'bg-gray-50 border-gray-200 text-gray-700'}`}>U</button>
-                </div>
-              </div>
-            </div>
-
-            {/* Branding Settings */}
-            <div className="p-4 border-t border-gray-100">
-              <div className="flex items-center justify-between mb-4">
-                <h4 className="font-bold text-[#3f51b5] flex items-center gap-2 text-[14px]">
-                  <Waves className="w-4 h-4 text-[#3f51b5]" /> {t('brandingSettings', appLanguage)}
-                </h4>
-                <Switch checked={brandingEnabled} onCheckedChange={setBrandingEnabled} className="data-[state=checked]:bg-blue-600" />
-              </div>
-
-              {brandingEnabled && (
-                <div className="space-y-5">
-                  {/* Text */}
-                  <div>
-                    <label className="text-[13px] text-gray-700 mb-2 block">{t('footerTextLabel', appLanguage)}</label>
-                    <Input
-                      value={footerText}
-                      onChange={e => setFooterText(e.target.value)}
-                      placeholder={t('defaultHeaderTitle', appLanguage)}
-                      className="h-10 text-[14px] bg-white text-gray-700 border-gray-200 mb-4"
-                    />
-                    <label className="text-[13px] text-gray-700 mb-2 block">{t('watermarkText', appLanguage)}</label>
-                    <Input
-                      value={watermarkText}
-                      onChange={e => setWatermarkText(e.target.value)}
-                      placeholder={t('defaultHeaderTitle', appLanguage)}
-                      className="h-10 text-[14px] bg-white text-gray-700 border-gray-200"
-                    />
-                  </div>
-
-                  {/* Font */}
-                  <div>
-                    <label className="text-[13px] text-gray-700 mb-2 block">{t('watermarkFont', appLanguage)}</label>
-                    <Select value={watermarkFont} onValueChange={setWatermarkFont}>
-                      <SelectTrigger className="h-10 text-[14px] bg-white text-gray-700 border-gray-200">
-                        <SelectValue placeholder={t('selectFont', appLanguage)} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="kalpurush">{t('kalpurush', appLanguage)}</SelectItem>
-                        <SelectItem value="siyamrupali">{t('siyamRupali', appLanguage)}</SelectItem>
-                        <SelectItem value="solaimanlipi">{t('solaimanLipi', appLanguage)}</SelectItem>
-                        <SelectItem value="sutonnymj">{t('sutonnyMj', appLanguage)}</SelectItem>
-                        <SelectItem value="nikosh">{t('nikosh', appLanguage)}</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Image */}
-                  <div>
-                    <label className="text-[13px] text-gray-700 mb-2 block">{t('watermarkIcon', appLanguage)}</label>
-                    {!watermarkImage ? (
-                      <label className="border border-dashed border-gray-300 rounded-md p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 bg-white relative overflow-hidden transition-all h-20">
-                        <input type="file" accept="image/png, image/jpeg" className="hidden" onChange={handleWatermarkImageUpload} />
-                        <span className="text-[13px] text-gray-400 font-medium text-center">{t('uploadImageClick', appLanguage)}</span>
-                        <span className="text-[11px] text-gray-300 text-center mt-1">(Max size ~5MB, PNG/JPG)</span>
-                      </label>
-                    ) : (
-                      <div className="flex flex-col items-center gap-3 border border-gray-200 rounded-md p-3 bg-white">
-                        <img src={watermarkImage} alt="Watermark Preview" className="w-12 h-12 object-contain" />
-                        <button onClick={() => setWatermarkImage(null)} className="flex items-center justify-center gap-1.5 w-full py-1.5 border border-red-200 text-red-600 rounded-sm hover:bg-red-50 text-[13px] transition-colors font-medium">
-                          <Trash2 className="w-3.5 h-3.5" /> {t('deleteIcon', appLanguage)}
-                        </button>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Size */}
-                  <div>
-                    <span className="text-[13px] text-gray-700 mb-2 block">{t('size', appLanguage)}: {watermarkSize}px</span>
-                    <input type="range" min="20" max="300" value={watermarkSize} onChange={e => setWatermarkSize(Number(e.target.value))} className="w-full accent-[#2563eb] h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer" />
-                  </div>
-
-                  {/* Opacity */}
-                  <div>
-                    <span className="text-[13px] text-gray-700 mb-2 block">{t('opacity', appLanguage)}: {watermarkOpacity}%</span>
-                    <input type="range" min="0" max="100" value={watermarkOpacity} onChange={e => setWatermarkOpacity(Number(e.target.value))} className="w-full accent-[#2563eb] h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer" />
-                  </div>
-
-                  {/* Repeat */}
-                  <div className="pt-2">
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-[13px] text-gray-700">{t('watermarkRepeat', appLanguage)}</span>
-                      <Switch checked={watermarkRepeat} onCheckedChange={setWatermarkRepeat} className="data-[state=checked]:bg-blue-600 data-[state=unchecked]:bg-gray-200" />
-                    </div>
-                    {watermarkRepeat && (
-                      <div>
-                        <input type="range" min="1" max="20" value={watermarkRepeatCount} onChange={e => setWatermarkRepeatCount(Number(e.target.value))} className="w-full accent-[#2563eb] h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer mb-2" />
-                        <div className="text-[13px] text-gray-700">{watermarkRepeatCount} times</div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Header Image Settings */}
-            <div className="p-4 border-t border-gray-100">
-              <div className="flex items-center justify-between mb-4">
-                <h4 className="font-bold text-[#1e88e5] flex items-center gap-2 text-[14px]">
-                  <ImageIcon className="w-4 h-4 text-[#1e88e5]" /> {t('headerImageSettings', appLanguage)}
-                </h4>
-                <Switch checked={headerImageEnabled} onCheckedChange={setHeaderImageEnabled} className="data-[state=checked]:bg-blue-600" />
-              </div>
-
-              {headerImageEnabled && (
-                <div className="space-y-4">
-                  {/* Header Image */}
-                  <div>
-                    <label className="text-[13px] text-gray-700 mb-2 block">{t('headerImageLabel', appLanguage)}</label>
-                    <div className="border border-gray-200 rounded-md bg-white p-1 flex items-center">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleHeaderImageUpload}
-                        className="text-[13px] text-gray-600 file:mr-3 file:py-1.5 file:px-3 file:border-0 file:text-[13px] file:bg-gray-100 file:text-gray-800 hover:file:bg-gray-200 w-full"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Image Fit */}
-                  <div>
-                    <label className="text-[13px] text-gray-700 mb-2 block">{t('imageFitLabel', appLanguage)}</label>
-                    <Select value={headerImageFit} onValueChange={setHeaderImageFit}>
-                      <SelectTrigger className="h-10 text-[14px] bg-white text-gray-700 border-gray-200">
-                        <SelectValue placeholder={t('selectFit', appLanguage)} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="cover">{t('coverFit', appLanguage)}</SelectItem>
-                        <SelectItem value="contain">{t('containFit', appLanguage)}</SelectItem>
-                        <SelectItem value="fill">{t('fillFit', appLanguage)}</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              )}
-            </div>
-
+            <Switch checked={headerImageEnabled} onCheckedChange={setHeaderImageEnabled} className="data-[state=checked]:bg-blue-600" />
           </div>
-        </>
+
+          {headerImageEnabled && (
+            <div className="space-y-4">
+              {/* Header Image */}
+              <div>
+                <label className="text-[13px] text-gray-700 mb-2 block">{t('headerImageLabel', appLanguage)}</label>
+                <div className="border border-gray-200 rounded-md bg-white p-1 flex items-center">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleHeaderImageUpload}
+                    className="text-[13px] text-gray-600 file:mr-3 file:py-1.5 file:px-3 file:border-0 file:text-[13px] file:bg-gray-100 file:text-gray-800 hover:file:bg-gray-200 w-full"
+                  />
+                </div>
+              </div>
+
+              {/* Image Fit */}
+              <div>
+                <label className="text-[13px] text-gray-700 mb-2 block">{t('imageFitLabel', appLanguage)}</label>
+                <Select value={headerImageFit} onValueChange={setHeaderImageFit}>
+                  <SelectTrigger className="h-10 text-[14px] bg-white text-gray-700 border-gray-200">
+                    <SelectValue placeholder={t('selectFit', appLanguage)} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="cover">{t('coverFit', appLanguage)}</SelectItem>
+                    <SelectItem value="contain">{t('containFit', appLanguage)}</SelectItem>
+                    <SelectItem value="fill">{t('fillFit', appLanguage)}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          )}
+        </div>
+
+      </div>
+    </>
   );
 
   return (
@@ -1477,27 +1477,27 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
           </div>
         </div>
         <div className="flex gap-2 w-full sm:w-auto sm:justify-end">
-            <Select value={appLanguage} onValueChange={(v: AppLanguage) => setAppLanguage(v)}>
-              <SelectTrigger className="h-9 w-[130px] border-gray-200 bg-white">
-                <div className="flex items-center gap-2 text-sm text-gray-700">
-                  <Languages className="w-4 h-4 text-blue-600" />
-                  <span>{appLanguage === 'bn' ? 'বাংলা' : appLanguage === 'en' ? 'English' : 'हिंदी'}</span>
-                </div>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="bn">বাংলা (Bengali)</SelectItem>
-                <SelectItem value="en">English</SelectItem>
-                <SelectItem value="hi">हिंदी (Hindi)</SelectItem>
-              </SelectContent>
-            </Select>
+          <Select value={appLanguage} onValueChange={(v: AppLanguage) => setAppLanguage(v)}>
+            <SelectTrigger className="h-9 w-[130px] border-gray-200 bg-white">
+              <div className="flex items-center gap-2 text-sm text-gray-700">
+                <Languages className="w-4 h-4 text-blue-600" />
+                <span>{appLanguage === 'bn' ? 'বাংলা' : appLanguage === 'en' ? 'English' : 'हिंदी'}</span>
+              </div>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="bn">বাংলা</SelectItem>
+              <SelectItem value="en">English</SelectItem>
+              <SelectItem value="hi">हिंदी</SelectItem>
+            </SelectContent>
+          </Select>
 
-            <Button
-              className="bg-[#1e293b] hover:bg-[#0f172a] text-white shadow-sm flex items-center h-9 px-4 text-sm font-medium"
-              onClick={handlePrint}
-            >
-              <Printer className="w-4 h-4 mr-2" /> {t('printSavePdf', appLanguage)}
-            </Button>
-          </div>
+          <Button
+            className="bg-[#1e293b] hover:bg-[#0f172a] text-white shadow-sm flex items-center h-9 px-4 text-sm font-medium"
+            onClick={handlePrint}
+          >
+            <Printer className="w-4 h-4 mr-2" /> {t('printSavePdf', appLanguage)}
+          </Button>
+        </div>
       </header>
 
       <div className="flex flex-col lg:flex-row flex-1 max-w-[1400px] mx-auto w-full p-2 sm:p-4 gap-6 relative print:p-0 print:m-0 print:static">
@@ -1573,11 +1573,11 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
               }
             }
           `}} />
-                    <div id="printable-paper" style={{ zoom: zoom } as React.CSSProperties} className="flex flex-col gap-8 print:gap-0 print:block relative">
+          <div id="printable-paper" style={{ zoom: zoom } as React.CSSProperties} className="flex flex-col gap-8 print:gap-0 print:block relative">
             {showPageBorder && <div className="hidden print:block fixed top-0 bottom-0 left-0 right-0 border-[1.5px] border-gray-800 pointer-events-none z-50"></div>}
-            
-            
-            
+
+
+
 
             {/* Page 1: Main Paper */}
             <div
@@ -1604,7 +1604,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                     {brandingEnabled && (
                       <div
                         className="absolute print:fixed print:inset-0 inset-0 pointer-events-none overflow-hidden z-0"
-                        style={{ 
+                        style={{
                           opacity: watermarkOpacity / 100,
                           ...(watermarkRepeat ? {
                             backgroundImage: watermarkImage ? `url("${watermarkImage}")` : `url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' transform='rotate(-45 200 200)' fill='rgba(150,150,150,1)' font-size='${watermarkSize}' font-family='${getWatermarkFontFamily().replace(/"/g, "%27")}'%3E${encodeURIComponent(watermarkText || 'দেশ এক্সাম একাডেমী')}%3C/text%3E%3C/svg%3E")`,
@@ -1789,25 +1789,25 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                             const groupedSections: any[] = [];
                             let currentSection = { header: null as any, questions: [] as any[], columns: paperColumns };
                             questions.forEach((q, index) => {
-                                if (q.questionText.startsWith('[[SECTION_HEADER')) {
-                                    if (currentSection.questions.length > 0 || currentSection.header) {
-                                        groupedSections.push(currentSection);
-                                    }
-                                    const match = q.questionText.match(/^\[\[SECTION_HEADER(?:\|cols:(\d+))?\]\](.*)$/);
-                                    const cols = match && match[1] ? parseInt(match[1]) : paperColumns;
-                                    const title = match ? match[2] : q.questionText.replace('[[SECTION_HEADER]]', '');
-                                    
-                                    currentSection = {
-                                        header: { ...q, sectionTitle: title, originalIndex: index },
-                                        columns: cols,
-                                        questions: []
-                                    };
-                                } else {
-                                    currentSection.questions.push({ ...q, originalIndex: index });
+                              if (q.questionText.startsWith('[[SECTION_HEADER')) {
+                                if (currentSection.questions.length > 0 || currentSection.header) {
+                                  groupedSections.push(currentSection);
                                 }
+                                const match = q.questionText.match(/^\[\[SECTION_HEADER(?:\|cols:(\d+))?\]\](.*)$/);
+                                const cols = match && match[1] ? parseInt(match[1]) : paperColumns;
+                                const title = match ? match[2] : q.questionText.replace('[[SECTION_HEADER]]', '');
+
+                                currentSection = {
+                                  header: { ...q, sectionTitle: title, originalIndex: index },
+                                  columns: cols,
+                                  questions: []
+                                };
+                              } else {
+                                currentSection.questions.push({ ...q, originalIndex: index });
+                              }
                             });
                             if (currentSection.questions.length > 0 || currentSection.header) {
-                                groupedSections.push(currentSection);
+                              groupedSections.push(currentSection);
                             }
 
                             return groupedSections.map((section, sIdx) => (
@@ -1852,7 +1852,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                                     </div>
                                   </div>
                                 )}
-                                
+
                                 {section.questions.length > 0 && (
                                   <div
                                     className="text-justify"
@@ -1864,218 +1864,218 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                                       const isSectionHeader = false;
                                       const sectionTitle = '';
 
-                            return (
-                              <div
-                                key={q.id}
-                                className={`relative text-gray-900 leading-snug break-inside-avoid ${draggedIndex === index ? 'opacity-50' : ''}`}
-                                style={{
-                                  marginBottom: `${rowGap}px`,
-                                  fontSize: `${fontSize}px`,
-                                  ...((isSectionHeader || (q as any).breakBeforeColumn) ? { columnSpan: 'all', WebkitColumnSpan: 'all' } as any : {})
-                                }}
-                                draggable={editingMode}
-                                onDragStart={(e) => handleDragStart(e, index)}
-                                onDragEnd={handleDragEnd}
-                                onDragOver={(e) => handleDragOver(e, index)}
-                              >
-                                {editingMode && (
-                                  <div className="absolute -left-8 top-0 flex flex-col gap-1 print:hidden opacity-50 hover:opacity-100 transition-opacity">
-                                    <button className="cursor-grab hover:text-blue-500"><GripVertical className="w-4 h-4" /></button>
-                                    <button onClick={() => handleDeleteQuestion(index)} className="hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
-                                  </div>
-                                )}
-
-                                {isSectionHeader ? (
-                                  <div className="font-bold text-center my-4 pb-1 border-b-2 border-gray-800 text-[110%] print:break-after-avoid">
-                                    {sectionTitle}
-                                  </div>
-                                ) : (
-                                  <>
-                                    <div className="flex items-start gap-1.5 mb-2">
-                                      <span className="font-bold min-w-[18px]">{localizeNumber(actualQuestionIndex + 1, appLanguage)}.</span>
-                                      <div className="flex-1 flex flex-col gap-1">
-                                        {enableLatex && !editingMode ? (
-                                          <div className="react-markdown-math-wrapper" style={{
-                                              fontWeight: questionBold ? 'bold' : undefined,
-                                              fontStyle: questionItalic ? 'italic' : undefined,
-                                              textDecoration: questionUnderline ? 'underline' : undefined
-                                            }}>
-                                            <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
-                                              {formatLatex(q.questionText)}
-                                            </ReactMarkdown>
-                                          </div>
-                                        ) : (
-                                          <div
-                                            {...getEditableProps()}
-                                            style={{
-                                              fontWeight: questionBold ? 'bold' : undefined,
-                                              fontStyle: questionItalic ? 'italic' : undefined,
-                                              textDecoration: questionUnderline ? 'underline' : undefined
-                                            }}
-                                            dangerouslySetInnerHTML={{ __html: q.questionText.replace(/\n/g, '<br/>') }}
-                                          />
-                                        )}
-                                        {(showQuestionTags && (q.questionType || q.tags || q.sourceExam || q.sourceYear || q.sourceBoard || q.difficulty || q.examIds?.length || q.yearId || q.boardId)) && (
-                                          <div className="flex gap-1 flex-wrap mt-1">
-                                            {q.questionType && <span className="px-1.5 py-0.5 bg-[#eef2ec] text-[#4a634a] font-bold text-[10px] uppercase rounded border border-[#c5e1a5]">[{q.questionType}]</span>}
-                                            {q.difficulty && <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">[{q.difficulty}]</span>}
-                                            {(q.sourceBoard || (q.boardId && boardMap[q.boardId])) && <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">[{q.sourceBoard || boardMap[q.boardId!]}]</span>}
-                                            {(q.sourceYear || (q.yearId && yearMap[q.yearId])) && <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">[{q.sourceYear || yearMap[q.yearId!]}]</span>}
-                                            {(q.sourceExam || (q.examIds?.length ? q.examIds.map((id: string) => examMap[id]).filter(Boolean).join(', ') : '')) && <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">[{q.sourceExam || (q.examIds?.length ? q.examIds.map((id: string) => examMap[id]).filter(Boolean).join(', ') : '')}]</span>}
-                                            {q.tags && q.tags.length > 0 && q.tags.map((t: string) => <span key={t} className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">#{t}</span>)}
-                                          </div>
-                                        )}
-                                      </div>
-                                      {showQuestionMarks && (
-                                        <span className="text-[11px] font-bold text-gray-500 whitespace-nowrap ml-2">[{localizeNumber(q.marks || 1, appLanguage)}]</span>
-                                      )}
-                                    </div>
-
-                                    {/* Options */}
-                                    {(!q.questionType || q.questionType === 'MCQ') && q.options && (
-                                      <div
-                                        className="grid gap-x-2 pl-6"
-                                        style={{
-                                          gridTemplateColumns: `repeat(${optionColumns}, minmax(0, 1fr))`,
-                                          rowGap: `${questionOptionGap}px`
-                                        }}
-                                      >
-                                        {['a', 'b', 'c', 'd'].map((optKey, idx) => {
-                                          const optValue = (q.options as any)[optKey];
-                                          if (!optValue) return null;
-
-                                          const marker = localizeOptionLabel(idx, optionLabelType, appLanguage);
-                                          const isCorrect = format === 'qa' && (q.correctAnswer || '').toLowerCase() === optKey;
-
-                                          return (
-                                            <div key={optKey} className="flex items-start gap-1.5">
-                                              <span className="shrink-0 mt-[1px]">
-                                                {optionShape === 'circle' ? (
-                                                  <span className={`inline-flex items-center justify-center w-[18px] h-[18px] rounded-full border border-gray-600 text-[11px] leading-none pb-[1px] ${isCorrect ? 'bg-gray-800 text-white border-transparent' : ''}`}>{marker}</span>
-                                                ) : optionShape === 'parens' ? (
-                                                  <span className={isCorrect ? 'font-bold bg-gray-200 px-1 rounded' : ''}>({marker})</span>
-                                                ) : optionShape === 'paren' ? (
-                                                  <span className={isCorrect ? 'font-bold bg-gray-200 px-1 rounded' : ''}>{marker})</span>
-                                                ) : (
-                                                  <span className={isCorrect ? 'font-bold bg-gray-200 px-1 rounded' : ''}>{marker}.</span>
-                                                )}
-                                              </span>
-                                              <span {...getEditableProps(isCorrect ? 'font-bold' : '')} style={{ fontSize: `${fontSize - 1}px` }}>
-                                                {enableLatex && !editingMode ? (
-                                                  <span className="react-markdown-math-wrapper inline-math">
-                                                    <ReactMarkdown 
-                                                      remarkPlugins={[remarkMath]} 
-                                                      rehypePlugins={[rehypeKatex]}
-                                                      components={{ p: ({node, ...props}) => <span {...props} /> }}
-                                                    >
-                                                      {formatLatex(optValue)}
-                                                    </ReactMarkdown>
-                                                  </span>
-                                                ) : (
-                                                  optValue
-                                                )}
-                                              </span>
+                                      return (
+                                        <div
+                                          key={q.id}
+                                          className={`relative text-gray-900 leading-snug break-inside-avoid ${draggedIndex === index ? 'opacity-50' : ''}`}
+                                          style={{
+                                            marginBottom: `${rowGap}px`,
+                                            fontSize: `${fontSize}px`,
+                                            ...((isSectionHeader || (q as any).breakBeforeColumn) ? { columnSpan: 'all', WebkitColumnSpan: 'all' } as any : {})
+                                          }}
+                                          draggable={editingMode}
+                                          onDragStart={(e) => handleDragStart(e, index)}
+                                          onDragEnd={handleDragEnd}
+                                          onDragOver={(e) => handleDragOver(e, index)}
+                                        >
+                                          {editingMode && (
+                                            <div className="absolute -left-8 top-0 flex flex-col gap-1 print:hidden opacity-50 hover:opacity-100 transition-opacity">
+                                              <button className="cursor-grab hover:text-blue-500"><GripVertical className="w-4 h-4" /></button>
+                                              <button onClick={() => handleDeleteQuestion(index)} className="hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
                                             </div>
-                                          )
-                                        })}
-                                      </div>
-                                    )}
+                                          )}
 
-                                    {/* TRUE / FALSE */}
-                                    {q.questionType === 'T/F' && (
-                                      <div className="flex gap-8 pl-6 mt-2">
-                                        <div className="flex items-center gap-2">
-                                          <span className={`inline-flex items-center justify-center w-[18px] h-[18px] rounded-full border border-gray-600 text-[11px] leading-none pb-[1px] ${format === 'qa' && q.correctAnswer?.toLowerCase() === 'true' ? 'bg-gray-800 text-white border-transparent' : ''}`}>
-                                            {format === 'qa' && q.correctAnswer?.toLowerCase() === 'true' ? '✓' : ''}
-                                          </span>
-                                          <span className={format === 'qa' && q.correctAnswer?.toLowerCase() === 'true' ? 'font-bold' : ''}>True</span>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                          <span className={`inline-flex items-center justify-center w-[18px] h-[18px] rounded-full border border-gray-600 text-[11px] leading-none pb-[1px] ${format === 'qa' && q.correctAnswer?.toLowerCase() === 'false' ? 'bg-gray-800 text-white border-transparent' : ''}`}>
-                                            {format === 'qa' && q.correctAnswer?.toLowerCase() === 'false' ? '✓' : ''}
-                                          </span>
-                                          <span className={format === 'qa' && q.correctAnswer?.toLowerCase() === 'false' ? 'font-bold' : ''}>False</span>
-                                        </div>
-                                      </div>
-                                    )}
-
-                                    {/* FILL IN THE BLANK (FIB) */}
-                                    {q.questionType === 'FIB' && (
-                                      <div className="mt-2 pl-6">
-                                        {/* Show distractors (Word Bank) if any */}
-                                        {(q.options?.a || q.options?.b || q.options?.c || q.options?.d) && (
-                                          <div className="flex gap-4 flex-wrap text-sm mb-2 p-2 border border-dashed border-gray-300 bg-gray-50 rounded">
-                                            <span className="font-bold text-gray-700">Word Bank:</span>
-                                            {['a', 'b', 'c', 'd'].map(opt => q.options?.[opt as keyof typeof q.options] && (
-                                              <span key={opt} className="px-2">{q.options[opt as keyof typeof q.options]}</span>
-                                            ))}
-                                          </div>
-                                        )}
-                                        
-                                        {/* If qa format, show answers */}
-                                        {format === 'qa' && q.correctAnswer && (
-                                          <div 
-                                            {...getEditableProps(`mt-2 font-bold inline-block border rounded ${ansBgStyle === 'colored' ? 'text-green-700 bg-green-50 px-2 py-1 border-green-200' : 'text-gray-800 bg-transparent px-0 py-0 border-transparent'}`)}
-                                            style={{ fontSize: `${explanationFontSize}px` }}
-                                          >
-                                            {appLanguage === 'bn' ? 'উত্তর :' : 'Ans :'} {q.correctAnswer}
-                                          </div>
-                                        )}
-                                      </div>
-                                    )}
-
-                                    {/* MATCHING PAIRS (If Matching) */}
-                                    {q.questionType === 'Match' && q.matchingPairs && q.matchingPairs.length > 0 && (
-                                      <div className="mt-3 pl-6">
-                                        <div className="grid grid-cols-2 gap-x-4 mb-2 font-bold text-gray-800 border-b border-gray-200 pb-2">
-                                          <div>Column A</div>
-                                          <div>Column B</div>
-                                        </div>
-                                        <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-gray-700">
-                                          {q.matchingPairs.map((pair: any, idx: number) => (
-                                            <React.Fragment key={idx}>
-                                              <div className="font-medium flex items-start gap-2">
-                                                <span className="text-gray-500">{idx + 1}.</span> {pair.left}
+                                          {isSectionHeader ? (
+                                            <div className="font-bold text-center my-4 pb-1 border-b-2 border-gray-800 text-[110%] print:break-after-avoid">
+                                              {sectionTitle}
+                                            </div>
+                                          ) : (
+                                            <>
+                                              <div className="flex items-start gap-1.5 mb-2">
+                                                <span className="font-bold min-w-[18px]">{localizeNumber(actualQuestionIndex + 1, appLanguage)}.</span>
+                                                <div className="flex-1 flex flex-col gap-1">
+                                                  {enableLatex && !editingMode ? (
+                                                    <div className="react-markdown-math-wrapper" style={{
+                                                      fontWeight: questionBold ? 'bold' : undefined,
+                                                      fontStyle: questionItalic ? 'italic' : undefined,
+                                                      textDecoration: questionUnderline ? 'underline' : undefined
+                                                    }}>
+                                                      <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
+                                                        {formatLatex(q.questionText)}
+                                                      </ReactMarkdown>
+                                                    </div>
+                                                  ) : (
+                                                    <div
+                                                      {...getEditableProps()}
+                                                      style={{
+                                                        fontWeight: questionBold ? 'bold' : undefined,
+                                                        fontStyle: questionItalic ? 'italic' : undefined,
+                                                        textDecoration: questionUnderline ? 'underline' : undefined
+                                                      }}
+                                                      dangerouslySetInnerHTML={{ __html: q.questionText.replace(/\n/g, '<br/>') }}
+                                                    />
+                                                  )}
+                                                  {(showQuestionTags && (q.questionType || q.tags || q.sourceExam || q.sourceYear || q.sourceBoard || q.difficulty || q.examIds?.length || q.yearId || q.boardId)) && (
+                                                    <div className="flex gap-1 flex-wrap mt-1">
+                                                      {q.questionType && <span className="px-1.5 py-0.5 bg-[#eef2ec] text-[#4a634a] font-bold text-[10px] uppercase rounded border border-[#c5e1a5]">[{q.questionType}]</span>}
+                                                      {q.difficulty && <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">[{q.difficulty}]</span>}
+                                                      {(q.sourceBoard || (q.boardId && boardMap[q.boardId])) && <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">[{q.sourceBoard || boardMap[q.boardId!]}]</span>}
+                                                      {(q.sourceYear || (q.yearId && yearMap[q.yearId])) && <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">[{q.sourceYear || yearMap[q.yearId!]}]</span>}
+                                                      {(q.sourceExam || (q.examIds?.length ? q.examIds.map((id: string) => examMap[id]).filter(Boolean).join(', ') : '')) && <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">[{q.sourceExam || (q.examIds?.length ? q.examIds.map((id: string) => examMap[id]).filter(Boolean).join(', ') : '')}]</span>}
+                                                      {q.tags && q.tags.length > 0 && q.tags.map((t: string) => <span key={t} className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">#{t}</span>)}
+                                                    </div>
+                                                  )}
+                                                </div>
+                                                {showQuestionMarks && (
+                                                  <span className="text-[11px] font-bold text-gray-500 whitespace-nowrap ml-2">[{localizeNumber(q.marks || 1, appLanguage)}]</span>
+                                                )}
                                               </div>
-                                              <div className="flex items-start gap-2">
-                                                <span className="text-gray-500">{String.fromCharCode(65 + idx)}.</span> {pair.right}
-                                              </div>
-                                            </React.Fragment>
-                                          ))}
+
+                                              {/* Options */}
+                                              {(!q.questionType || q.questionType === 'MCQ') && q.options && (
+                                                <div
+                                                  className="grid gap-x-2 pl-6"
+                                                  style={{
+                                                    gridTemplateColumns: `repeat(${optionColumns}, minmax(0, 1fr))`,
+                                                    rowGap: `${questionOptionGap}px`
+                                                  }}
+                                                >
+                                                  {['a', 'b', 'c', 'd'].map((optKey, idx) => {
+                                                    const optValue = (q.options as any)[optKey];
+                                                    if (!optValue) return null;
+
+                                                    const marker = localizeOptionLabel(idx, optionLabelType, appLanguage);
+                                                    const isCorrect = format === 'qa' && (q.correctAnswer || '').toLowerCase() === optKey;
+
+                                                    return (
+                                                      <div key={optKey} className="flex items-start gap-1.5">
+                                                        <span className="shrink-0 mt-[1px]">
+                                                          {optionShape === 'circle' ? (
+                                                            <span className={`inline-flex items-center justify-center w-[18px] h-[18px] rounded-full border border-gray-600 text-[11px] leading-none pb-[1px] ${isCorrect ? 'bg-gray-800 text-white border-transparent' : ''}`}>{marker}</span>
+                                                          ) : optionShape === 'parens' ? (
+                                                            <span className={isCorrect ? 'font-bold bg-gray-200 px-1 rounded' : ''}>({marker})</span>
+                                                          ) : optionShape === 'paren' ? (
+                                                            <span className={isCorrect ? 'font-bold bg-gray-200 px-1 rounded' : ''}>{marker})</span>
+                                                          ) : (
+                                                            <span className={isCorrect ? 'font-bold bg-gray-200 px-1 rounded' : ''}>{marker}.</span>
+                                                          )}
+                                                        </span>
+                                                        <span {...getEditableProps(isCorrect ? 'font-bold' : '')} style={{ fontSize: `${fontSize - 1}px` }}>
+                                                          {enableLatex && !editingMode ? (
+                                                            <span className="react-markdown-math-wrapper inline-math">
+                                                              <ReactMarkdown
+                                                                remarkPlugins={[remarkMath]}
+                                                                rehypePlugins={[rehypeKatex]}
+                                                                components={{ p: ({ node, ...props }) => <span {...props} /> }}
+                                                              >
+                                                                {formatLatex(optValue)}
+                                                              </ReactMarkdown>
+                                                            </span>
+                                                          ) : (
+                                                            optValue
+                                                          )}
+                                                        </span>
+                                                      </div>
+                                                    )
+                                                  })}
+                                                </div>
+                                              )}
+
+                                              {/* TRUE / FALSE */}
+                                              {q.questionType === 'T/F' && (
+                                                <div className="flex gap-8 pl-6 mt-2">
+                                                  <div className="flex items-center gap-2">
+                                                    <span className={`inline-flex items-center justify-center w-[18px] h-[18px] rounded-full border border-gray-600 text-[11px] leading-none pb-[1px] ${format === 'qa' && q.correctAnswer?.toLowerCase() === 'true' ? 'bg-gray-800 text-white border-transparent' : ''}`}>
+                                                      {format === 'qa' && q.correctAnswer?.toLowerCase() === 'true' ? '✓' : ''}
+                                                    </span>
+                                                    <span className={format === 'qa' && q.correctAnswer?.toLowerCase() === 'true' ? 'font-bold' : ''}>True</span>
+                                                  </div>
+                                                  <div className="flex items-center gap-2">
+                                                    <span className={`inline-flex items-center justify-center w-[18px] h-[18px] rounded-full border border-gray-600 text-[11px] leading-none pb-[1px] ${format === 'qa' && q.correctAnswer?.toLowerCase() === 'false' ? 'bg-gray-800 text-white border-transparent' : ''}`}>
+                                                      {format === 'qa' && q.correctAnswer?.toLowerCase() === 'false' ? '✓' : ''}
+                                                    </span>
+                                                    <span className={format === 'qa' && q.correctAnswer?.toLowerCase() === 'false' ? 'font-bold' : ''}>False</span>
+                                                  </div>
+                                                </div>
+                                              )}
+
+                                              {/* FILL IN THE BLANK (FIB) */}
+                                              {q.questionType === 'FIB' && (
+                                                <div className="mt-2 pl-6">
+                                                  {/* Show distractors (Word Bank) if any */}
+                                                  {(q.options?.a || q.options?.b || q.options?.c || q.options?.d) && (
+                                                    <div className="flex gap-4 flex-wrap text-sm mb-2 p-2 border border-dashed border-gray-300 bg-gray-50 rounded">
+                                                      <span className="font-bold text-gray-700">Word Bank:</span>
+                                                      {['a', 'b', 'c', 'd'].map(opt => q.options?.[opt as keyof typeof q.options] && (
+                                                        <span key={opt} className="px-2">{q.options[opt as keyof typeof q.options]}</span>
+                                                      ))}
+                                                    </div>
+                                                  )}
+
+                                                  {/* If qa format, show answers */}
+                                                  {format === 'qa' && q.correctAnswer && (
+                                                    <div
+                                                      {...getEditableProps(`mt-2 font-bold inline-block border rounded ${ansBgStyle === 'colored' ? 'text-green-700 bg-green-50 px-2 py-1 border-green-200' : 'text-gray-800 bg-transparent px-0 py-0 border-transparent'}`)}
+                                                      style={{ fontSize: `${explanationFontSize}px` }}
+                                                    >
+                                                      {appLanguage === 'bn' ? 'উত্তর :' : 'Ans :'} {q.correctAnswer}
+                                                    </div>
+                                                  )}
+                                                </div>
+                                              )}
+
+                                              {/* MATCHING PAIRS (If Matching) */}
+                                              {q.questionType === 'Match' && q.matchingPairs && q.matchingPairs.length > 0 && (
+                                                <div className="mt-3 pl-6">
+                                                  <div className="grid grid-cols-2 gap-x-4 mb-2 font-bold text-gray-800 border-b border-gray-200 pb-2">
+                                                    <div>Column A</div>
+                                                    <div>Column B</div>
+                                                  </div>
+                                                  <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-gray-700">
+                                                    {q.matchingPairs.map((pair: any, idx: number) => (
+                                                      <React.Fragment key={idx}>
+                                                        <div className="font-medium flex items-start gap-2">
+                                                          <span className="text-gray-500">{idx + 1}.</span> {pair.left}
+                                                        </div>
+                                                        <div className="flex items-start gap-2">
+                                                          <span className="text-gray-500">{String.fromCharCode(65 + idx)}.</span> {pair.right}
+                                                        </div>
+                                                      </React.Fragment>
+                                                    ))}
+                                                  </div>
+                                                </div>
+                                              )}
+
+                                              {/* Fallback for Answers of Desc, CQ, etc. */}
+                                              {format === 'qa' && q.correctAnswer && !['MCQ', 'T/F', 'FIB', 'Match'].includes(q.questionType || 'MCQ') && (
+                                                <div
+                                                  {...getEditableProps(`mt-2 ml-6 max-w-[95%] text-justify break-words border rounded ${ansBgStyle === 'colored' ? 'text-green-800 bg-green-50 px-3 py-2 border-green-200' : 'text-gray-800 bg-transparent px-0 py-0 border-transparent'}`)}
+                                                  style={{ fontSize: `${explanationFontSize}px` }}
+                                                >
+                                                  <span className="font-bold">{appLanguage === 'bn' ? 'উত্তর :' : 'Ans :'}</span> <span dangerouslySetInnerHTML={{ __html: q.correctAnswer.replace(/\n/g, '<br/>') }} />
+                                                </div>
+                                              )}
+
+                                              {/* Explanation */}
+                                              {showExplanations && q.explanation && (
+                                                <div
+                                                  {...getEditableProps(`mt-2 ml-6 font-normal pl-2 border rounded ${ansBgStyle === 'colored' ? 'text-gray-600 bg-blue-50/40 border-l-2 border-blue-300 border-t-transparent border-r-transparent border-b-transparent' : 'text-gray-600 bg-transparent border-gray-300 border-l-2 border-t-transparent border-r-transparent border-b-transparent'}`)}
+                                                  style={{ fontSize: `${explanationFontSize}px` }}
+                                                >
+                                                  <span className="font-bold text-gray-700">{appLanguage === 'bn' ? 'ব্যাখ্যা :' : 'Explanation :'}</span> <span dangerouslySetInnerHTML={{ __html: q.explanation }} />
+                                                </div>
+                                              )}
+                                            </>
+                                          )}
                                         </div>
-                                      </div>
-                                    )}
-
-                                    {/* Fallback for Answers of Desc, CQ, etc. */}
-                                    {format === 'qa' && q.correctAnswer && !['MCQ', 'T/F', 'FIB', 'Match'].includes(q.questionType || 'MCQ') && (
-                                      <div 
-                                        {...getEditableProps(`mt-2 ml-6 max-w-[95%] text-justify break-words border rounded ${ansBgStyle === 'colored' ? 'text-green-800 bg-green-50 px-3 py-2 border-green-200' : 'text-gray-800 bg-transparent px-0 py-0 border-transparent'}`)}
-                                        style={{ fontSize: `${explanationFontSize}px` }}
-                                      >
-                                        <span className="font-bold">{appLanguage === 'bn' ? 'উত্তর :' : 'Ans :'}</span> <span dangerouslySetInnerHTML={{ __html: q.correctAnswer.replace(/\n/g, '<br/>') }} />
-                                      </div>
-                                    )}
-
-                                    {/* Explanation */}
-                                    {showExplanations && q.explanation && (
-                                      <div 
-                                        {...getEditableProps(`mt-2 ml-6 font-normal pl-2 border rounded ${ansBgStyle === 'colored' ? 'text-gray-600 bg-blue-50/40 border-l-2 border-blue-300 border-t-transparent border-r-transparent border-b-transparent' : 'text-gray-600 bg-transparent border-gray-300 border-l-2 border-t-transparent border-r-transparent border-b-transparent'}`)}
-                                        style={{ fontSize: `${explanationFontSize}px` }}
-                                      >
-                                        <span className="font-bold text-gray-700">{appLanguage === 'bn' ? 'ব্যাখ্যা :' : 'Explanation :'}</span> <span dangerouslySetInnerHTML={{ __html: q.explanation }} />
-                                      </div>
-                                    )}
-                                  </>
+                                      );
+                                    })}
+                                  </div>
                                 )}
                               </div>
-                                    );
-                                  })}
-                                </div>
-                              )}
-                            </div>
-                          ));
-                        })()}
-                      </div>
+                            ));
+                          })()}
+                        </div>
                       )}
 
                       {editingMode && (
@@ -2117,7 +2117,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                   {brandingEnabled && (
                     <div
                       className="absolute print:fixed print:inset-0 inset-0 pointer-events-none overflow-hidden z-0"
-                      style={{ 
+                      style={{
                         opacity: watermarkOpacity / 100,
                         ...(watermarkRepeat ? {
                           backgroundImage: watermarkImage ? `url("${watermarkImage}")` : `url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' transform='rotate(-45 200 200)' fill='rgba(150,150,150,1)' font-size='${watermarkSize}' font-family='${getWatermarkFontFamily().replace(/"/g, "%27")}'%3E${encodeURIComponent(watermarkText || 'দেশ এক্সাম একাডেমী')}%3C/text%3E%3C/svg%3E")`,
@@ -2549,9 +2549,9 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
           </div>
           <DialogFooter className="flex-col gap-2 sm:flex-col sm:space-x-0">
             {!user ? (
-               <Button className="w-full bg-indigo-600 hover:bg-indigo-700 h-11" onClick={() => { setIsPaywallOpen(false); openAuthDialog("sign-in"); }}>Log In / Sign Up</Button>
+              <Button className="w-full bg-indigo-600 hover:bg-indigo-700 h-11" onClick={() => { setIsPaywallOpen(false); openAuthDialog("sign-in"); }}>Log In / Sign Up</Button>
             ) : (
-               <Button className="w-full bg-indigo-600 hover:bg-indigo-700 h-11" onClick={() => { setIsPaywallOpen(false); router.push('/pricing'); }}>Upgrade to Premium</Button>
+              <Button className="w-full bg-indigo-600 hover:bg-indigo-700 h-11" onClick={() => { setIsPaywallOpen(false); router.push('/pricing'); }}>Upgrade to Premium</Button>
             )}
             <Button variant="outline" className="w-full h-11 text-gray-600" onClick={handleRemovePremiumFeaturesAndExport}>Remove Premium Features & Download Free</Button>
           </DialogFooter>
@@ -2559,14 +2559,14 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
       </Dialog>
 
       <Dialog open={isAddQuestionOpen} onOpenChange={setIsAddQuestionOpen}>
-        <DialogContent className="w-[95vw] sm:max-w-xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 rounded-xl sm:rounded-lg" style={{ 
+        <DialogContent className="w-[95vw] sm:max-w-xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 rounded-xl sm:rounded-lg" style={{
           fontFamily: fontFamily === 'solaimanlipi' ? '"SolaimanLipi", sans-serif' :
             fontFamily === 'kalpurush' ? '"Kalpurush", sans-serif' :
-            fontFamily === 'nikosh' ? '"Nikosh", sans-serif' :
-            fontFamily === 'siyamrupali' ? '"Siyam Rupali", sans-serif' :
-            fontFamily === 'sutonnymj' ? '"SutonnyMJ", sans-serif' :
-            fontFamily === 'timesnewroman' ? '"Times New Roman", serif' :
-            fontFamily === 'arial' ? 'Arial, sans-serif' : 'inherit'
+              fontFamily === 'nikosh' ? '"Nikosh", sans-serif' :
+                fontFamily === 'siyamrupali' ? '"Siyam Rupali", sans-serif' :
+                  fontFamily === 'sutonnymj' ? '"SutonnyMJ", sans-serif' :
+                    fontFamily === 'timesnewroman' ? '"Times New Roman", serif' :
+                      fontFamily === 'arial' ? 'Arial, sans-serif' : 'inherit'
         }}>
           <DialogHeader>
             <DialogTitle>{t('addCustomQuestion', appLanguage)}</DialogTitle>
@@ -2640,7 +2640,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                 <div className="text-[13px] text-gray-600 mb-3 bg-blue-50/50 p-3 rounded border border-blue-100 max-h-40 overflow-y-auto">
                   <div className="flex justify-between items-center mb-2">
                     <span className="font-semibold text-blue-700">Supported Formats:</span>
-                    <button 
+                    <button
                       onClick={() => {
                         navigator.clipboard.writeText(`1. What is the capital of India?\nType: MCQ\nA. Dhaka\nB. New Delhi\nC. Kolkata\nD. Mumbai\nAnswer: B\n\n2. The sky is green.\nType: T/F\nAnswer: False\n\n3. Write a short note on History.\nType: Short Question\nAnswer: History is the study of the past.\n\n4. Match the following items:\nType: Match\n1. Apple - Red\n2. Banana = Yellow\n3. Sky -> Blue`);
                         toast({ title: "Copied!", description: "Text format copied to clipboard." });
@@ -2651,7 +2651,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                     </button>
                   </div>
                   <pre className="mt-2 bg-white p-2 rounded text-[11px] sm:text-xs font-mono text-gray-700 border border-gray-200 leading-tight overflow-x-auto whitespace-pre-wrap">
-{`1. What is the capital of India?
+                    {`1. What is the capital of India?
 Type: MCQ
 A. Dhaka
 B. New Delhi
@@ -2675,7 +2675,7 @@ Type: Match
                   </pre>
                   <div className="flex justify-between items-center mt-4 mb-2">
                     <span className="font-semibold text-blue-700">{t('jsonFormat', appLanguage)}</span>
-                    <button 
+                    <button
                       onClick={() => {
                         navigator.clipboard.writeText(`[\n  { "questionText": "What is the capital of India?", "options": { "a": "Dhaka", "b": "New Delhi", "c": "Kolkata", "d": "Mumbai" }, "correctAnswer": "b", "questionType": "MCQ" },\n  { "questionText": "The sky is green.", "correctAnswer": "False", "questionType": "T/F" },\n  { "questionText": "Write a short note on History.", "correctAnswer": "History is the study of the past.", "questionType": "Short Question" },\n  { "questionText": "Match the following items:", "matchingPairs": [{ "left": "Apple", "right": "Red" }, { "left": "Banana", "right": "Yellow" }], "questionType": "Match" }\n]`);
                         toast({ title: "Copied!", description: "JSON format copied to clipboard." });
@@ -2775,7 +2775,7 @@ Type: Match
         appLanguage={appLanguage}
         initialFilters={{ boardId, classId, textbookId, subjectId, chapterId }}
       />
-      
+
       <AiQuestionGeneratorModal
         isOpen={isAiGeneratorOpen}
         onClose={() => setIsAiGeneratorOpen(false)}
