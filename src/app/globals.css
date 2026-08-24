@@ -813,3 +813,11 @@ html {
 .rounded-2xl {
     border-radius: 0.2rem;
 }
+@media print {
+  .border-red-500 {
+    border-color: #ef4444 !important;
+  }
+  .bg-red-50 {
+    background-color: #fef2f2 !important;
+  }
+}

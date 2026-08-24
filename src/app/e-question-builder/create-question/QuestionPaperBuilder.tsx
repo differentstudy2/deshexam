@@ -918,18 +918,18 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
 
         <div className="mb-4">
           <label className="text-xs text-gray-500 mb-2 block">{t('fileFormatting', appLanguage)}</label>
-          <RadioGroup value={format} onValueChange={setFormat} className="grid grid-cols-2 gap-2">
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="qa" id="fmt-qa" />
-              <label htmlFor="fmt-qa" className="text-sm text-gray-600 cursor-pointer">{t('qAndA', appLanguage)}</label>
+          <RadioGroup value={format} onValueChange={setFormat} className="flex flex-row items-center justify-between w-full">
+            <div className="flex items-center gap-1.5">
+              <RadioGroupItem value="qa" id="fmt-qa" className="w-3.5 h-3.5" />
+              <label htmlFor="fmt-qa" className="text-[13px] text-gray-600 cursor-pointer whitespace-nowrap">{t('qAndA', appLanguage)}</label>
             </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="question" id="fmt-q" />
-              <label htmlFor="fmt-q" className="text-sm text-gray-600 cursor-pointer">{t('questionOnly', appLanguage)}</label>
+            <div className="flex items-center gap-1.5">
+              <RadioGroupItem value="question" id="fmt-q" className="w-3.5 h-3.5" />
+              <label htmlFor="fmt-q" className="text-[13px] text-gray-600 cursor-pointer whitespace-nowrap">{t('questionOnly', appLanguage)}</label>
             </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="answer" id="fmt-ans" />
-              <label htmlFor="fmt-ans" className="text-sm text-gray-600 cursor-pointer">{t('answerKeyOnly', appLanguage)}</label>
+            <div className="flex items-center gap-1.5">
+              <RadioGroupItem value="answer" id="fmt-ans" className="w-3.5 h-3.5" />
+              <label htmlFor="fmt-ans" className="text-[13px] text-gray-600 cursor-pointer whitespace-nowrap">{t('answerKeyOnly', appLanguage)}</label>
             </div>
           </RadioGroup>
         </div>
@@ -1966,7 +1966,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
 
                                                     return (
                                                       <div key={optKey} className="flex items-center gap-1.5">
-                                                        <span className="shrink-0 mt-[1px]">
+                                                        <span className="shrink-0 mt-[0px]">
                                                           {optionShape === 'circle' ? (
                                                             <span className={`inline-flex items-center justify-center w-[18px] h-[18px] rounded-full border border-gray-600 text-[11px] leading-none pb-[1px] ${isCorrect ? 'bg-gray-800 text-white border-transparent' : ''}`}>{marker}</span>
                                                           ) : optionShape === 'parens' ? (
@@ -2238,9 +2238,9 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                             className="flex-1 flex flex-col"
                           >
                             {/* Table Header */}
-                            <div className="flex w-full border border-red-500 mb-1">
-                              <div className="w-[30%] shrink-0 border-r border-red-500 flex items-center justify-center font-bold text-[13px] py-1 text-gray-900 bg-white">{t('tableQuestion', appLanguage)}</div>
-                              <div className="flex-1 flex items-center justify-center font-bold text-[13px] py-1 text-gray-900 bg-white">{t('tableAnswer', appLanguage)}</div>
+                            <div className="flex w-full border border-red-500 mb-1 bg-white overflow-hidden" style={{ borderColor: '#ef4444' }}>
+                              <div className="w-[30%] shrink-0 border-r border-red-500 flex items-center justify-center font-bold text-[13px] py-1 text-gray-900" style={{ borderColor: '#ef4444' }}>{t('tableQuestion', appLanguage)}</div>
+                              <div className="flex-1 flex items-center justify-center font-bold text-[13px] py-1 text-gray-900">{t('tableAnswer', appLanguage)}</div>
                             </div>
 
                             {/* Rows */}
@@ -2249,16 +2249,16 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                                 const correctOptIndex = ['a', 'b', 'c', 'd'].indexOf((q.correctAnswer || '').toLowerCase());
 
                                 return (
-                                  <div key={q.id} className="flex items-stretch break-inside-avoid border border-red-500">
-                                    <div className="w-[30%] shrink-0 border-r border-red-500 flex justify-center items-center py-1.5 text-[14px] font-bold text-gray-800 bg-white">
+                                  <div key={q.id} className="flex items-stretch break-inside-avoid border border-red-500 bg-white overflow-hidden" style={{ borderColor: '#ef4444' }}>
+                                    <div className="w-[30%] shrink-0 border-r border-red-500 flex justify-center items-center py-1.5 text-[14px] font-bold text-gray-800" style={{ borderColor: '#ef4444' }}>
                                       {localizeNumber(originalIndex + 1, appLanguage)}
                                     </div>
-                                    <div className="flex-1 flex bg-white min-w-0">
+                                    <div className="flex-1 flex min-w-0">
                                       {[0, 1, 2, 3].map((optIdx) => {
                                         const isCorrect = optIdx === correctOptIndex;
                                         return (
-                                          <div key={optIdx} className={`flex-1 flex justify-center items-center py-1 border-red-500 ${optIdx !== 3 ? 'border-r' : ''} ${optIdx % 2 === 0 ? 'bg-red-50' : 'bg-white'}`}>
-                                            <div className={`relative flex items-center justify-center w-[18px] h-[18px] min-w-[18px] min-h-[18px] shrink-0 rounded-full border ${isCorrect ? 'border-[#1e293b] bg-[#1e293b]' : 'border-red-500 bg-white'}`}>
+                                          <div key={optIdx} className={`flex-1 flex justify-center items-center py-1 border-red-500 ${optIdx !== 3 ? 'border-r' : ''} ${optIdx % 2 === 0 ? 'bg-red-50' : ''}`} style={{ borderColor: '#ef4444' }}>
+                                            <div className={`relative flex items-center justify-center w-[18px] h-[18px] min-w-[18px] min-h-[18px] shrink-0 rounded-full border ${isCorrect ? 'border-[#1e293b] bg-[#1e293b]' : 'border-red-500 bg-white'}`} style={{ borderColor: isCorrect ? '#1e293b' : '#ef4444' }}>
                                               <span className={`text-[10px] font-bold absolute select-none leading-none pt-px ${isCorrect ? 'text-white' : 'text-gray-800'}`}>
                                                 {localizeOptionLabel(optIdx, optionLabelType, appLanguage)}
                                               </span>
@@ -2382,26 +2382,26 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                           return (
                             <div
                               key={colIndex}
-                              className="flex-1 flex flex-col"
+                              className="flex-1 flex flex-col bg-white"
                             >
                               {/* Table Header */}
-                              <div className="flex w-full border border-red-500 mb-1">
-                                <div className="w-[30%] shrink-0 border-r border-red-500 flex items-center justify-center font-bold text-[13px] py-1 text-gray-900 bg-white">{t('tableQuestion', appLanguage)}</div>
-                                <div className="flex-1 flex items-center justify-center font-bold text-[13px] py-1 text-gray-900 bg-white">{t('tableAnswer', appLanguage)}</div>
+                              <div className="flex w-full border border-red-500 mb-1 overflow-hidden" style={{ borderColor: '#ef4444' }}>
+                                <div className="w-[30%] shrink-0 border-r border-red-500 flex items-center justify-center font-bold text-[13px] py-1 text-gray-900" style={{ borderColor: '#ef4444' }}>{t('tableQuestion', appLanguage)}</div>
+                                <div className="flex-1 flex items-center justify-center font-bold text-[13px] py-1 text-gray-900">{t('tableAnswer', appLanguage)}</div>
                               </div>
 
                               {/* Rows */}
                               <div className="flex flex-col gap-1">
                                 {colItems.map(({ q, originalIndex }, idx) => {
                                   return (
-                                    <div key={q.id} className="flex items-stretch break-inside-avoid border border-red-500">
-                                      <div className="w-[30%] shrink-0 border-r border-red-500 flex justify-center items-center py-1.5 text-[14px] font-bold text-gray-800 bg-white">
+                                    <div key={q.id} className="flex items-stretch break-inside-avoid border border-red-500 bg-white overflow-hidden" style={{ borderColor: '#ef4444' }}>
+                                      <div className="w-[30%] shrink-0 border-r border-red-500 flex justify-center items-center py-1.5 text-[14px] font-bold text-gray-800" style={{ borderColor: '#ef4444' }}>
                                         {localizeNumber(originalIndex + 1, appLanguage)}
                                       </div>
-                                      <div className="flex-1 flex bg-white min-w-0">
+                                      <div className="flex-1 flex min-w-0">
                                         {[0, 1, 2, 3].map((optIdx) => (
-                                          <div key={optIdx} className={`flex-1 flex justify-center items-center py-1 border-red-500 ${optIdx !== 3 ? 'border-r' : ''} ${optIdx % 2 === 0 ? 'bg-red-50' : 'bg-white'}`}>
-                                            <div className="relative flex items-center justify-center w-[18px] h-[18px] min-w-[18px] min-h-[18px] shrink-0 rounded-full border border-red-500 bg-white">
+                                          <div key={optIdx} className={`flex-1 flex justify-center items-center py-1 border-red-500 ${optIdx !== 3 ? 'border-r' : ''} ${optIdx % 2 === 0 ? 'bg-red-50' : ''}`} style={{ borderColor: '#ef4444' }}>
+                                            <div className="relative flex items-center justify-center w-[18px] h-[18px] min-w-[18px] min-h-[18px] shrink-0 rounded-full border border-red-500 bg-white" style={{ borderColor: '#ef4444' }}>
                                               <span className="text-[10px] font-bold text-gray-800 absolute select-none leading-none pt-px">{localizeOptionLabel(optIdx, optionLabelType, appLanguage)}</span>
                                             </div>
                                           </div>

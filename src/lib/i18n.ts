@@ -9,6 +9,7 @@ type Translations = {
 export const translations: Translations = {
   bn: {
     // Builder UI
+    create_question_paper: 'প্রশ্নপত্র তৈরি',
     filterSettings: 'ফিল্টার সেটিংস',
     saveTemplate: 'টেমপ্লেট সেভ',
     pageSetup: 'পেইজ সেটআপ',
@@ -226,6 +227,7 @@ export const translations: Translations = {
   },
   en: {
     // Builder UI
+    create_question_paper: 'Create Question Paper',
     filterSettings: 'Filter Settings',
     quickActions: 'Quick Actions',
     saveTemplate: 'Save Template',
@@ -444,6 +446,7 @@ export const translations: Translations = {
   },
   hi: {
     // Builder UI
+    create_question_paper: 'प्रश्न पत्र बनाएं',
     filterSettings: 'फ़िल्टर सेटिंग्स',
     quickActions: 'त्वरित कार्रवाइयां',
     saveTemplate: 'टेम्पलेट सेव',
