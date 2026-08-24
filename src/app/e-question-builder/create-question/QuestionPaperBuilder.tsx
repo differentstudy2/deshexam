@@ -1965,10 +1965,10 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                                                     const isCorrect = format === 'qa' && (q.correctAnswer || '').toLowerCase() === optKey;
 
                                                     return (
-                                                      <div key={optKey} className="flex items-center gap-1.5">
-                                                        <span className="shrink-0 mt-[0px]">
+                                                      <div key={optKey} className="flex items-start gap-1.5">
+                                                        <span className="shrink-0 mt-0">
                                                           {optionShape === 'circle' ? (
-                                                            <span className={`inline-flex items-center justify-center w-[18px] h-[18px] rounded-full border border-gray-600 text-[11px] leading-none pb-[1px] ${isCorrect ? 'bg-gray-800 text-white border-transparent' : ''}`}>{marker}</span>
+                                                            <span className={`inline-flex items-center justify-center w-[18px] h-[18px] rounded-full border border-gray-600 text-[11px] leading-none ${isCorrect ? 'bg-gray-800 text-white border-transparent' : ''}`}>{marker}</span>
                                                           ) : optionShape === 'parens' ? (
                                                             <span className={isCorrect ? 'font-bold bg-gray-200 px-1 rounded' : ''}>({marker})</span>
                                                           ) : optionShape === 'paren' ? (
