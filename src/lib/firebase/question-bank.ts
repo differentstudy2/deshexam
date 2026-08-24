@@ -128,6 +128,26 @@ export async function getQuestionsPaginated(filters?: Record<string, any>, limit
     return true;
   });
 
+  const isLocalOffset = typeof startAfterDoc === 'number';
+  const isFirebaseStart = startAfterDoc === 'firebase-start';
+  const offset = isLocalOffset ? startAfterDoc : 0;
+
+  // 1. Serve Local Questions First
+  if (localQuestions.length > 0 && (!startAfterDoc || isLocalOffset)) {
+      const paginatedLocal = localQuestions.slice(offset, offset + limitCount);
+      
+      if (paginatedLocal.length > 0) {
+          const nextOffset = offset + paginatedLocal.length;
+          const hasMoreLocal = nextOffset < localQuestions.length;
+          
+          return {
+              questions: paginatedLocal,
+              lastDoc: hasMoreLocal ? nextOffset : 'firebase-start'
+          };
+      }
+  }
+
+  // 2. Serve Firebase Questions
   const colRef = collection(db, QUESTIONS_COLLECTION);
   let conditions = [];
   if (filters) {
@@ -143,15 +163,17 @@ export async function getQuestionsPaginated(filters?: Record<string, any>, limit
   }
 
   let q;
+  const actualStartAfter = (isFirebaseStart || isLocalOffset || !startAfterDoc) ? null : startAfterDoc;
+
   if (conditions.length > 0) {
-      if (startAfterDoc) {
-          q = query(colRef, ...conditions, startAfter(startAfterDoc), limit(limitCount));
+      if (actualStartAfter) {
+          q = query(colRef, ...conditions, startAfter(actualStartAfter), limit(limitCount));
       } else {
           q = query(colRef, ...conditions, limit(limitCount));
       }
   } else {
-      if (startAfterDoc) {
-          q = query(colRef, orderBy('createdAt', 'desc'), startAfter(startAfterDoc), limit(limitCount));
+      if (actualStartAfter) {
+          q = query(colRef, orderBy('createdAt', 'desc'), startAfter(actualStartAfter), limit(limitCount));
       } else {
           q = query(colRef, orderBy('createdAt', 'desc'), limit(limitCount));
       }
@@ -160,12 +182,8 @@ export async function getQuestionsPaginated(filters?: Record<string, any>, limit
   const snapshot = await getDocs(q);
   let results = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as QuestionBankEntry);
 
-  if (!startAfterDoc) {
-      results = [...localQuestions, ...results];
-  }
-
   return {
-      questions: results.slice(0, limitCount),
+      questions: results,
       lastDoc: snapshot.docs.length > 0 ? snapshot.docs[snapshot.docs.length - 1] : null
   };
 }
