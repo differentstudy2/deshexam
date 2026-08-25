@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   description: 'Learn about DeshExam, the modern educational platform offering mock tests, courses, question banks, documents, and AI-powered learning tools.',
   keywords: ['about deshexam', 'deshexam', 'deshexam platform', 'online learning platform india', 'mock test platform', 'education technology platform'],
   alternates: {
-    canonical: 'https://deshexam.com/about',
+    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/about`,
   },
   openGraph: {
     title: 'About DeshExam',
@@ -29,8 +29,8 @@ const jsonLdOrg = {
   "@context": "https://schema.org",
   "@type": "Organization",
   "name": "DeshExam",
-  "url": "https://deshexam.com",
-  "logo": "https://deshexam.com/logo.png",
+  "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}`,
+  "logo": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/logo.png`,
   "sameAs": [
     "https://facebook.com/deshexam",
     "https://youtube.com/deshexam"
@@ -41,14 +41,14 @@ const jsonLdAboutPage = {
   "@context": "https://schema.org",
   "@type": "AboutPage",
   "name": "About DeshExam",
-  "url": "https://deshexam.com/about"
+  "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/about`
 };
 
 const jsonLdWebSite = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   "name": "DeshExam",
-  "url": "https://deshexam.com"
+  "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}`
 };
 
 export default function AboutUsPage() {

@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Privacy Policy | DeshExam',
     description: 'Learn how DeshExam collects, uses, and protects your personal information and academic data.',
-    url: 'https://deshexam.com/privacy',
+    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/privacy`,
     siteName: 'DeshExam',
     locale: 'en_US',
     type: 'website',
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     description: 'Learn how DeshExam collects, uses, and protects your personal information and academic data.',
   },
   alternates: {
-    canonical: 'https://deshexam.com/privacy',
+    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/privacy`,
   }
 };
 

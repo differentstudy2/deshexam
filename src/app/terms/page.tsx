@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Terms of Service | DeshExam',
     description: 'Read the terms and conditions for using DeshExam, including user conduct, subscription terms, and intellectual property rights.',
-    url: 'https://deshexam.com/terms',
+    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/terms`,
     siteName: 'DeshExam',
     locale: 'en_US',
     type: 'website',
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     description: 'Read the terms and conditions for using DeshExam, including user conduct, subscription terms, and intellectual property rights.',
   },
   alternates: {
-    canonical: 'https://deshexam.com/terms',
+    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/terms`,
   }
 };
 

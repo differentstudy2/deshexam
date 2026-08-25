@@ -4,7 +4,7 @@ export const dynamic = 'force-static';
 export const revalidate = 86400;
 
 export async function GET() {
-  const baseUrl = 'https://deshexam.com';
+  const baseUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}`;
 
   const sitemaps = [
     { url: `${baseUrl}/sitemap.xml`, lastmod: new Date().toISOString() },

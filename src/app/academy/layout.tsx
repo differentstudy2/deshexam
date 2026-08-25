@@ -9,11 +9,11 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Academy – Textbooks, Guides, Chapters & Practice Questions | DeshExam',
     description: 'Explore all academic resources on DeshExam including textbooks, chapter-wise guides, MCQ practice, board exam questions, notes, and solutions for every class and subject.',
-    url: 'https://deshexam.com/academy',
+    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/academy`,
     siteName: 'DeshExam',
     images: [
       {
-        url: 'https://deshexam.com/og-academy.png', 
+        url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/og-academy.png`, 
         width: 1200,
         height: 630,
         alt: 'DeshExam Academy Dashboard',
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Academy – Textbooks, Guides, Chapters & Practice Questions | DeshExam',
     description: 'Explore all academic resources on DeshExam including textbooks, chapter-wise guides, MCQ practice, board exam questions, notes, and solutions for every class and subject.',
-    images: ['https://deshexam.com/og-academy.png'],
+    images: [`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/og-academy.png`],
   },
   robots: {
     index: true,
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: 'https://deshexam.com/academy',
+    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/academy`,
   },
 };
 
@@ -54,7 +54,7 @@ export default function AcademyLayout({
     "@type": "CollectionPage",
     "name": "Academy",
     "description": "Explore all academic resources on DeshExam including textbooks, chapter-wise guides, MCQ practice, board exam questions, notes, and solutions.",
-    "url": "https://deshexam.com/academy"
+    "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/academy`
   };
 
   const breadcrumbSchema = {
@@ -65,13 +65,13 @@ export default function AcademyLayout({
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": "https://deshexam.com/"
+        "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/`
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": "Academy",
-        "item": "https://deshexam.com/academy"
+        "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/academy`
       }
     ]
   };
@@ -83,7 +83,7 @@ export default function AcademyLayout({
     "provider": {
       "@type": "Organization",
       "name": "DeshExam",
-      "sameAs": "https://deshexam.com"
+      "sameAs": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}`
     }
   };
 

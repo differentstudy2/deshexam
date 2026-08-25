@@ -20,14 +20,14 @@ export const metadata: Metadata = {
     'deshexam boards'
   ],
   alternates: {
-    canonical: 'https://deshexam.com/boards'
+    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/boards`
   },
   openGraph: {
     title: 'All Education Boards in India | DeshExam',
     description: 'Explore CBSE, ICSE and state boards. Access comprehensive study materials and mock tests.',
     type: 'website',
-    url: 'https://deshexam.com/boards',
-    images: [{ url: 'https://deshexam.com/og-boards.jpg' }],
+    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/boards`,
+    images: [{ url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/og-boards.jpg` }],
   },
   twitter: {
     card: 'summary_large_image',
@@ -46,7 +46,7 @@ export default function BoardsDirectoryPage() {
     "itemListElement": indianBoards.map((board, index) => ({
       "@type": "ListItem",
       "position": index + 1,
-      "url": `https://deshexam.com/guide/${board.slug}`,
+      "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/guide/${board.slug}`,
       "name": board.acronym
     }))
   };
@@ -56,7 +56,7 @@ export default function BoardsDirectoryPage() {
     "@type": "WebPage",
     "name": "Explore Boards & Institutions",
     "description": "Directory of education boards in India including central and state boards.",
-    "url": "https://deshexam.com/boards"
+    "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/boards`
   };
 
   const breadcrumbSchema = {
@@ -67,13 +67,13 @@ export default function BoardsDirectoryPage() {
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": "https://deshexam.com"
+        "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}`
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": "Boards",
-        "item": "https://deshexam.com/boards"
+        "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/boards`
       }
     ]
   };
@@ -82,8 +82,8 @@ export default function BoardsDirectoryPage() {
     "@context": "https://schema.org",
     "@type": "Organization",
     "name": "DeshExam",
-    "url": "https://deshexam.com",
-    "logo": "https://deshexam.com/logo.png"
+    "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}`,
+    "logo": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/logo.png`
   };
 
   const faqSchema = {

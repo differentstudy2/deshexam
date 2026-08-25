@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       title,
       description,
       type: 'article',
-      url: `https://deshexam.com/documents/${decodedSlug}`,
+      url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/documents/${decodedSlug}`,
       images: item.thumbnail ? [{ url: item.thumbnail }] : [],
     },
     twitter: {
@@ -39,7 +39,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       images: item.thumbnail ? [item.thumbnail] : [],
     },
     alternates: {
-      canonical: `https://deshexam.com/documents/${decodedSlug}`,
+      canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/documents/${decodedSlug}`,
     }
   };
 }
@@ -60,14 +60,14 @@ export default async function DocumentReaderPage({ params }: { params: Promise<{
 
   // Generate Breadcrumb Schema
   const breadcrumbItems = [
-    { name: 'Home', item: 'https://deshexam.com' },
-    { name: 'Documents', item: 'https://deshexam.com/documents' },
-    ...(hierarchy?.board ? [{ name: hierarchy.board.title, item: `https://deshexam.com/board/${hierarchy.board.id}` }] : []),
-    ...(hierarchy?.class ? [{ name: hierarchy.class.title, item: `https://deshexam.com/class/${hierarchy.class.id}` }] : []),
-    ...(hierarchy?.subject ? [{ name: hierarchy.subject.title, item: `https://deshexam.com/subject/${hierarchy.subject.id}` }] : []),
-    ...(hierarchy?.textbook ? [{ name: hierarchy.textbook.title, item: `https://deshexam.com/textbook/${hierarchy.textbook.id}` }] : []),
-    ...(hierarchy?.chapter ? [{ name: hierarchy.chapter.title, item: `https://deshexam.com/chapter/${hierarchy.chapter.id}` }] : []),
-    { name: item.title, item: `https://deshexam.com/documents/${decodedSlug}` }
+    { name: 'Home', item: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}` },
+    { name: 'Documents', item: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/documents` },
+    ...(hierarchy?.board ? [{ name: hierarchy.board.title, item: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/board/${hierarchy.board.id}` }] : []),
+    ...(hierarchy?.class ? [{ name: hierarchy.class.title, item: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/class/${hierarchy.class.id}` }] : []),
+    ...(hierarchy?.subject ? [{ name: hierarchy.subject.title, item: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/subject/${hierarchy.subject.id}` }] : []),
+    ...(hierarchy?.textbook ? [{ name: hierarchy.textbook.title, item: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/textbook/${hierarchy.textbook.id}` }] : []),
+    ...(hierarchy?.chapter ? [{ name: hierarchy.chapter.title, item: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/chapter/${hierarchy.chapter.id}` }] : []),
+    { name: item.title, item: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/documents/${decodedSlug}` }
   ];
 
   const breadcrumbSchema = {
@@ -96,7 +96,7 @@ export default async function DocumentReaderPage({ params }: { params: Promise<{
       "name": "DeshExam",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://deshexam.com/image/logo.png"
+        "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/image/logo.png`
       }
     },
     "datePublished": item.createdAt ? new Date(item.createdAt.toMillis?.() || Date.now()).toISOString() : new Date().toISOString(),

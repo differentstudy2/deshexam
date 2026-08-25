@@ -73,7 +73,7 @@ const sendPushNotificationFlow = ai.defineFlow(
         },
         webpush: {
           fcm_options: {
-            link: link || 'https://deshexam.com',
+            link: link || `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}`,
           },
           notification: {
             icon: '/icon.png',

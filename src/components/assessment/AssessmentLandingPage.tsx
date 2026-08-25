@@ -69,19 +69,19 @@ export default async function AssessmentLandingPage({
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": "https://deshexam.com"
+        "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}`
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": titlePrefix + "s",
-        "item": `https://deshexam.com${basePath}`
+        "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}${basePath}`
       },
       {
         "@type": "ListItem",
         "position": 3,
         "name": test.title,
-        "item": `https://deshexam.com${basePath}/${test.slug}`
+        "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}${basePath}/${test.slug}`
       }
     ]
   };
@@ -94,7 +94,7 @@ export default async function AssessmentLandingPage({
     "provider": {
       "@type": "Organization",
       "name": "DeshExam",
-      "sameAs": "https://deshexam.com"
+      "sameAs": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}`
     }
   };
 
@@ -103,7 +103,7 @@ export default async function AssessmentLandingPage({
     "@type": "Product",
     "name": test.title,
     "description": test.description || `Take the ${test.title} ${titlePrefix} on DeshExam.`,
-    "image": (Array.isArray(test.thumbnail) ? test.thumbnail[0] : test.thumbnail) || `https://deshexam.com/og/${basePath.replace("/", "")}.jpg`,
+    "image": (Array.isArray(test.thumbnail) ? test.thumbnail[0] : test.thumbnail) || `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/og/${basePath.replace("/", "")}.jpg`,
     "brand": {
       "@type": "Brand",
       "name": "DeshExam"
@@ -120,7 +120,7 @@ export default async function AssessmentLandingPage({
       "price": test.price ? test.price.toString() : "0",
       "priceCurrency": "INR",
       "availability": "https://schema.org/InStock",
-      "url": `https://deshexam.com${basePath}/${test.slug}`,
+      "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}${basePath}/${test.slug}`,
       "shippingDetails": {
         "@type": "OfferShippingDetails",
         "shippingRate": {

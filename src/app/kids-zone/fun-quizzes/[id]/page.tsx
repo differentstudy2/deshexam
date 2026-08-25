@@ -76,25 +76,25 @@ export default async function FunQuizPage(props: Props) {
           '@type': 'ListItem',
           'position': 1,
           'name': 'Home',
-          'item': 'https://deshexam.com/'
+          'item': `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/`
         },
         {
           '@type': 'ListItem',
           'position': 2,
           'name': 'Kids Zone',
-          'item': 'https://deshexam.com/kids-zone'
+          'item': `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/kids-zone`
         },
         {
           '@type': 'ListItem',
           'position': 3,
           'name': 'Fun Quizzes',
-          'item': 'https://deshexam.com/kids-zone/fun-quizzes'
+          'item': `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/kids-zone/fun-quizzes`
         },
         {
           '@type': 'ListItem',
           'position': 4,
           'name': cleanTitle,
-          'item': `https://deshexam.com/kids-zone/fun-quizzes/${quiz.id}`
+          'item': `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/kids-zone/fun-quizzes/${quiz.id}`
         }
       ]
     }

@@ -11,16 +11,16 @@ export const metadata: Metadata = {
   description: 'Boost your exam preparation with interactive online quizzes, daily challenges, and mock tests for WBCS, PSC, SSC, TET, and WBP. Test your speed, earn points, and check your rank on the leaderboard.',
   keywords: 'online quiz, mcq test, mock test, wbcs preparation quiz, psc mcq, ssc quiz, west bengal govt job exam, free online test, daily quiz, deshexam quizzes, bengali quiz',
   alternates: {
-    canonical: 'https://deshexam.com/quiz',
+    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/quiz`,
   },
   openGraph: {
     title: 'Free Online Quizzes & MCQs for Govt Job Exams | DeshExam',
     description: 'Boost your exam preparation with interactive online quizzes, daily challenges, and mock tests. Test your speed, earn points, and check your rank.',
-    url: 'https://deshexam.com/quiz',
+    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/quiz`,
     siteName: 'DeshExam',
     images: [
       {
-        url: 'https://deshexam.com/og-image.jpg',
+        url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/og-image.jpg`,
         width: 1200,
         height: 630,
         alt: 'DeshExam Quizzes and Leaderboard',
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Free Online Quizzes & MCQs for Govt Job Exams | DeshExam',
     description: 'Boost your exam preparation with interactive online quizzes, daily challenges, and mock tests. Test your speed, earn points, and check your rank.',
-    images: ['https://deshexam.com/og-image.jpg'],
+    images: [`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/og-image.jpg`],
   },
   robots: {
     index: true,
@@ -77,13 +77,13 @@ export default async function QuizListingPage() {
       '@type': 'WebPage',
       name: 'Free Online Quizzes & MCQs for Govt Job Exams | DeshExam',
       description: 'Boost your exam preparation with interactive online quizzes, daily challenges, and mock tests for WBCS, PSC, SSC, TET, and WBP.',
-      url: 'https://deshexam.com/quiz',
+      url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/quiz`,
       publisher: {
         '@type': 'Organization',
         name: 'DeshExam',
         logo: {
           '@type': 'ImageObject',
-          url: 'https://deshexam.com/favicon-bg.png'
+          url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/favicon-bg.png`
         }
       }
     },
@@ -95,13 +95,13 @@ export default async function QuizListingPage() {
           '@type': 'ListItem',
           position: 1,
           name: 'Home',
-          item: 'https://deshexam.com'
+          item: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}`
         },
         {
           '@type': 'ListItem',
           position: 2,
           name: 'Quizzes',
-          item: 'https://deshexam.com/quiz'
+          item: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/quiz`
         }
       ]
     },
@@ -111,7 +111,7 @@ export default async function QuizListingPage() {
       itemListElement: publishedQuizzes.slice(0, 10).map((quiz, index) => ({
         '@type': 'ListItem',
         position: index + 1,
-        url: `https://deshexam.com/quiz/${quiz.slug}`
+        url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/quiz/${quiz.slug}`
       }))
     }
   ];

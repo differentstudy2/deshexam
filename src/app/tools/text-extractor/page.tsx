@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description: 'Extract text from images and PDF documents easily using high-quality OCR on DeshExam.',
   keywords: ['text extractor', 'ocr', 'image to text', 'pdf to text', 'deshexam tools'],
   alternates: {
-    canonical: 'https://deshexam.com/tools/text-extractor',
+    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/tools/text-extractor`,
   }
 };
 

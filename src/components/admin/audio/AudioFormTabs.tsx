@@ -332,7 +332,7 @@ export function SeoTab({ formData, setFormData }: TabProps) {
         </div>
         <div className="space-y-2">
           <Label>Canonical URL</Label>
-          <Input value={formData.canonicalUrl} onChange={e => setFormData({...formData, canonicalUrl: e.target.value})} placeholder={`https://deshexam.com/audio/${formData.slug}`} />
+          <Input value={formData.canonicalUrl} onChange={e => setFormData({...formData, canonicalUrl: e.target.value})} placeholder={`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/audio/${formData.slug}`} />
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">

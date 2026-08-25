@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: Props, parent: ResolvingMetad
   const test = (await getAssessmentBySlug('mockTests', slug) as MockTest | null)
     ?? getHardcodedMockTest(slug);
   if (!test) return { title: 'Mock Test Not Found' };
-  const imageUrl = (Array.isArray(test.thumbnail) ? test.thumbnail[0] : test.thumbnail) || "https://deshexam.com/og/mock-tests.jpg";
+  const imageUrl = (Array.isArray(test.thumbnail) ? test.thumbnail[0] : test.thumbnail) || `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/og/mock-tests.jpg`;
   const title = `${formatTitleForBrowser(test.title)} | Mock Test | DeshExam`;
   const description = test.description || `Take the mock test: ${test.title}.`;
 

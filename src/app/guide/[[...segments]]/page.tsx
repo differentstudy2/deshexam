@@ -70,11 +70,11 @@ export async function generateMetadata({ params }: { params: Promise<{ segments?
     ...metadata,
     alternates: {
       ...metadata.alternates,
-      canonical: metadata.alternates?.canonical || `https://deshexam.com/guide/${requestedPath}`,
+      canonical: metadata.alternates?.canonical || `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/guide/${requestedPath}`,
       languages: {
-        'en': `https://deshexam.com/en/guide/${requestedPath}`,
-        'bn': `https://deshexam.com/bn/guide/${requestedPath}`,
-        'x-default': `https://deshexam.com/en/guide/${requestedPath}`
+        'en': `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/en/guide/${requestedPath}`,
+        'bn': `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/bn/guide/${requestedPath}`,
+        'x-default': `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/en/guide/${requestedPath}`
       }
     }
   };
@@ -156,7 +156,7 @@ export default async function GuidePage({ params }: { params: Promise<{ segments
   const courseSchema = getCourseSchema(
     node.title || 'Academy Guide',
     node.seo?.customDescription || `Study materials and guide for ${node.title}`,
-    `https://deshexam.com/guide/${requestedPath}`
+    `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/guide/${requestedPath}`
   );
 
   // Fetch subjects for sidebar

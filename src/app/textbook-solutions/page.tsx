@@ -14,7 +14,7 @@ export default function TextbookSolutionsPage() {
         "@type": "WebPage",
         "name": "Textbook Solutions | DeshExam",
         "description": "Find free and comprehensive solutions for your school and competitive exam textbooks.",
-        "url": "https://deshexam.com/textbook-solutions"
+        "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/textbook-solutions`
     };
 
     return (

@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   title: 'DeshExam Jobs – Latest Government & Private Job Updates',
   description: 'Stay updated with the latest government job notifications, admit cards, exam dates, and private sector opportunities.',
   alternates: {
-    canonical: 'https://deshexam.com/job',
+    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/job`,
   },
   robots: {
     index: true,

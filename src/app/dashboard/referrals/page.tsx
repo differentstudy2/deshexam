@@ -25,7 +25,7 @@ export default function ReferralsPage() {
     if (typeof window !== 'undefined') {
       // Use a public domain if on localhost, because Facebook blocks localhost sharing
       if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        setBaseUrl('https://deshexam.com');
+        setBaseUrl(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}`);
       } else {
         setBaseUrl(window.location.origin);
       }

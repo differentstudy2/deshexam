@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: Props, parent: ResolvingMetad
 
   if (!test) return { title: 'Quiz Not Found' };
 
-  const imageUrl = (Array.isArray(test.thumbnail) ? test.thumbnail[0] : test.thumbnail) || 'https://deshexam.com/og/quiz.jpg';
+  const imageUrl = (Array.isArray(test.thumbnail) ? test.thumbnail[0] : test.thumbnail) || `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/og/quiz.jpg`;
   const title = `${formatTitleForBrowser(test.title)} | Quiz | DeshExam`;
   const description = test.description || `Take the ${test.title} quiz on DeshExam.`;
   const keywords = ['online quiz', 'mcq test', test.boardId, test.classId, test.subjectId, test.chapterId]
@@ -28,10 +28,10 @@ export async function generateMetadata({ params }: Props, parent: ResolvingMetad
     title,
     description,
     keywords,
-    alternates: { canonical: `https://deshexam.com/quiz/${slug}` },
+    alternates: { canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/quiz/${slug}` },
     openGraph: {
       title, description,
-      url: `https://deshexam.com/quiz/${slug}`,
+      url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/quiz/${slug}`,
       siteName: 'DeshExam',
       images: [{ url: imageUrl, width: 1200, height: 630, alt: title }],
       type: 'website',

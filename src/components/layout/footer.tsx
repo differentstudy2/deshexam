@@ -88,11 +88,11 @@ export function Footer() {
           <div className="space-y-4">
             <h4 className="font-semibold text-slate-400 tracking-wider text-xs uppercase mb-4">Legal</h4>
             <ul className="space-y-3">
-              <li><a href="https://deshexam.com/privacy" className="hover:text-white transition-colors">Privacy Policy</a></li>
-              <li><a href="https://deshexam.com/terms" className="hover:text-white transition-colors">Terms of Service</a></li>
-              <li><a href="https://deshexam.com/refund-policy" className="hover:text-white transition-colors">Refund Policy</a></li>
-              <li><a href="https://deshexam.com/cookie-policy" className="hover:text-white transition-colors">Cookie Policy</a></li>
-              <li><a href="https://deshexam.com/disclaimer" className="hover:text-white transition-colors">Disclaimer</a></li>
+              <li><a href={`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/privacy`} className="hover:text-white transition-colors">Privacy Policy</a></li>
+              <li><a href={`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/terms`} className="hover:text-white transition-colors">Terms of Service</a></li>
+              <li><a href={`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/refund-policy`} className="hover:text-white transition-colors">Refund Policy</a></li>
+              <li><a href={`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/cookie-policy`} className="hover:text-white transition-colors">Cookie Policy</a></li>
+              <li><a href={`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/disclaimer`} className="hover:text-white transition-colors">Disclaimer</a></li>
             </ul>
           </div>
         </div>

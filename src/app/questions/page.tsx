@@ -33,12 +33,12 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
         description: 'Practice 100,000+ exam-ready questions with answers, explanations, and instant answer checking. Prepare for board exams, competitive exams, MCQ tests, and previous year questions on DeshExam.',
         keywords: ['practice questions', 'question bank', 'mcq practice', 'online exam practice', 'previous year questions', 'general knowledge questions', 'competitive exam preparation'],
         alternates: {
-            canonical: 'https://deshexam.com/questions'
+            canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/questions`
         },
         openGraph: {
             title: 'Practice Questions & Question Bank for All Exams | DeshExam',
             description: 'Practice 100,000+ exam-ready questions with answers and explanations.',
-            url: 'https://deshexam.com/questions',
+            url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/questions`,
             type: 'website',
         },
         twitter: {
@@ -80,11 +80,11 @@ export default async function AllQuestionsPage(props: { searchParams: Promise<{ 
     const paginatedQuestions = questions.slice((page - 1) * itemsPerPage, page * itemsPerPage);
 
     const schemas = [
-        getCollectionPageSchema('https://deshexam.com/questions'),
+        getCollectionPageSchema(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/questions`),
         getItemListSchema(paginatedQuestions),
         getBreadcrumbSchema([
-            { name: 'Home', url: 'https://deshexam.com' },
-            { name: 'Questions', url: 'https://deshexam.com/questions' }
+            { name: 'Home', url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}` },
+            { name: 'Questions', url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/questions` }
         ]),
         getSearchActionSchema(),
         getOrganizationSchema(),

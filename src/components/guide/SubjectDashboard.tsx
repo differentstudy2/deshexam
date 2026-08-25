@@ -164,16 +164,16 @@ export function SubjectDashboard({
 
   if (node) {
     const breadcrumbItems = [
-      { name: 'Home', item: 'https://deshexam.com' },
-      { name: 'Academy', item: 'https://deshexam.com/guide/board' }
+      { name: 'Home', item: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}` },
+      { name: 'Academy', item: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/guide/board` }
     ];
-    let currentUrl = 'https://deshexam.com/guide';
+    let currentUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/guide`;
 
     node.ancestors?.forEach((anc: any) => {
       currentUrl += `/${anc.slug || anc.id}`;
       breadcrumbItems.push({ name: anc.title, item: currentUrl });
     });
-    breadcrumbItems.push({ name: node.title, item: `https://deshexam.com/guide/${node.fullSlug || node.id}` });
+    breadcrumbItems.push({ name: node.title, item: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/guide/${node.fullSlug || node.id}` });
 
     schemas.push(generateBreadcrumbSchema(breadcrumbItems));
 
@@ -194,12 +194,12 @@ export function SubjectDashboard({
     if (pageType === 'textbook') {
       itemListElements = ((curriculum.find((c: any) => c.dbId === id || c.id === id) || curriculum[0])?.topics || []).map((t: any) => ({
         name: t.title,
-        url: `https://deshexam.com/guide/${(t as any).fullSlug || t.id}`
+        url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/guide/${(t as any).fullSlug || t.id}`
       }));
     } else {
       itemListElements = treeData.map((item: any) => ({
         name: item.title,
-        url: `https://deshexam.com/guide/${item.fullSlug || item.id}`
+        url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/guide/${item.fullSlug || item.id}`
       }));
     }
 

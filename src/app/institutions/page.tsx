@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   title: 'Top Schools, Colleges & Universities in India 2026 | DeshExam',
   description: 'Explore verified schools, colleges and universities across India. Compare courses, fees, admissions, facilities and reviews on DeshExam.',
   alternates: {
-    canonical: 'https://deshexam.com/institutions',
+    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/institutions`,
   },
 };
 
@@ -33,34 +33,34 @@ export default async function InstitutionsDirectoryPage() {
     "@graph": [
       {
         "@type": "CollectionPage",
-        "@id": "https://deshexam.com/institutions/#webpage",
-        "url": "https://deshexam.com/institutions",
+        "@id": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/institutions/#webpage`,
+        "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/institutions`,
         "name": "Institutions Directory in India",
         "description": "Explore verified schools, colleges and universities across India. Compare courses, fees, admissions, facilities and reviews on DeshExam.",
         "inLanguage": "en-US"
       },
       {
         "@type": "BreadcrumbList",
-        "@id": "https://deshexam.com/institutions/#breadcrumb",
+        "@id": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/institutions/#breadcrumb`,
         "itemListElement": [
           {
             "@type": "ListItem",
             "position": 1,
             "name": "Home",
-            "item": "https://deshexam.com"
+            "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}`
           },
           {
             "@type": "ListItem",
             "position": 2,
             "name": "Institutions",
-            "item": "https://deshexam.com/institutions"
+            "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/institutions`
           }
         ]
       },
       // Only include ItemList if we have real institutions
       ...(featuredInstitutions.length > 0 ? [{
         "@type": "ItemList",
-        "url": "https://deshexam.com/institutions",
+        "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/institutions`,
         "name": "Featured Institutions in India",
         "description": "Top Schools, Colleges & Universities in India",
         "numberOfItems": featuredInstitutions.length,
@@ -68,7 +68,7 @@ export default async function InstitutionsDirectoryPage() {
           "@type": "ListItem",
           "position": i + 1,
           "name": inst.title,
-          "url": `https://deshexam.com/institutions/${inst.slug || inst.id}`
+          "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/institutions/${inst.slug || inst.id}`
         }))
       }] : []),
       {

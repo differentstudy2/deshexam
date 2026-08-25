@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Cookie Policy | How We Use Cookies – DeshExam',
     description: 'Learn how DeshExam uses cookies to improve performance, personalize experience, and ensure secure access to learning features and mock tests.',
-    url: 'https://deshexam.com/cookie-policy',
+    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/cookie-policy`,
     siteName: 'DeshExam',
     locale: 'en_US',
     type: 'website',
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     description: 'Learn how DeshExam uses cookies to improve performance, personalize experience, and ensure secure access to learning features and mock tests.',
   },
   alternates: {
-    canonical: 'https://deshexam.com/cookie-policy',
+    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/cookie-policy`,
   }
 };
 

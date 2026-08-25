@@ -33,11 +33,11 @@ export const metadata: Metadata = {
   openGraph: {
     title: "DeshExam - Best Online Learning Platform & Mock Test App",
     description: "Prepare for SSC, HSC, Admission & Job exams with DeshExam. Get access to 2M+ questions, live classes, model tests, and trending courses.",
-    url: "https://deshexam.com",
+    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}`,
     siteName: "DeshExam",
     images: [
       {
-        url: "https://deshexam.com/image/logo.png",
+        url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/image/logo.png`,
         width: 1200,
         height: 630,
         alt: "DeshExam - One Stop Learning Platform",
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "DeshExam - Best Online Learning Platform & Mock Test App",
     description: "Prepare for SSC, HSC, Admission & Job exams with DeshExam. Get access to 2M+ questions, live classes, model tests, and trending courses.",
-    images: ["https://deshexam.com/image/logo.png"],
+    images: [`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/image/logo.png`],
   },
 };
 
@@ -607,9 +607,9 @@ export default function Home() {
 
       {/* Explicit Legal Links for Google Cloud Verification */}
       <div className="container mx-auto px-4 max-w-6xl py-6 text-center text-xs text-gray-500 dark:text-gray-400 border-t border-gray-100 dark:border-slate-800">
-        <a href="https://deshexam.com/privacy" className="hover:underline mx-2">Privacy Policy</a>
+        <a href={`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/privacy`} className="hover:underline mx-2">Privacy Policy</a>
         <span>|</span>
-        <a href="https://deshexam.com/terms" className="hover:underline mx-2">Terms of Service</a>
+        <a href={`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/terms`} className="hover:underline mx-2">Terms of Service</a>
       </div>
     </div>
   );

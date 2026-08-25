@@ -35,7 +35,7 @@ export default function DocumentsPage() {
     '@type': 'CollectionPage',
     name: 'Educational Documents & Study Materials | DeshExam',
     description: 'Access our comprehensive library of educational documents, chapter notes, model papers, question banks, and study suggestions to boost your exam preparation.',
-    url: 'https://deshexam.com/documents',
+    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/documents`,
     publisher: {
       '@type': 'Organization',
       name: 'DeshExam'

@@ -98,7 +98,7 @@ export async function generateMetadata(props: PageProps, parent: ResolvingMetada
       openGraph: {
           title,
           description,
-          url: `https://deshexam.com/textbook-solutions/mock-test/${params.mockTestId}/textbook/${params.bookId}/chapter/${params.chapterId}/topic/${params.topicId}`,
+          url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/textbook-solutions/mock-test/${params.mockTestId}/textbook/${params.bookId}/chapter/${params.chapterId}/topic/${params.topicId}`,
           images: [{ url: imageUrl, width: 1200, height: 630, alt: title }],
           type: 'website',
       },
@@ -152,37 +152,37 @@ export default async function MockTestPage(props: PageProps) {
             "@type": "ListItem",
             "position": 1,
             "name": "Home",
-            "item": "https://deshexam.com/"
+            "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/`
           },
           {
             "@type": "ListItem",
             "position": 2,
             "name": "Textbook Solutions",
-            "item": "https://deshexam.com/textbook-solutions"
+            "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/textbook-solutions`
           },
           {
             "@type": "ListItem",
             "position": 3,
             "name": textbook.title,
-            "item": `https://deshexam.com/textbook-solutions/${textbook.id}`
+            "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/textbook-solutions/${textbook.id}`
           },
           {
             "@type": "ListItem",
             "position": 4,
             "name": chapter.title,
-            "item": `https://deshexam.com/textbook-solutions/${textbook.id}/chapter/${chapter.id}`
+            "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/textbook-solutions/${textbook.id}/chapter/${chapter.id}`
           },
           ...(topic ? [{
             "@type": "ListItem",
             "position": 5,
             "name": topic.title,
-            "item": `https://deshexam.com/textbook-solutions/${textbook.id}/chapter/${chapter.id}/topic/${topic.id}`
+            "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/textbook-solutions/${textbook.id}/chapter/${chapter.id}/topic/${topic.id}`
           }] : []),
           {
             "@type": "ListItem",
             "position": topic ? 6 : 5,
             "name": cleanTitle,
-            "item": `https://deshexam.com/textbook-solutions/mock-test/${params.mockTestId}/textbook/${params.bookId}/chapter/${params.chapterId}/topic/${params.topicId}`
+            "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/textbook-solutions/mock-test/${params.mockTestId}/textbook/${params.bookId}/chapter/${params.chapterId}/topic/${params.topicId}`
           }
         ]
       }

@@ -55,12 +55,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
                 description,
                 keywords: [cleanQuestion.substring(0, 50), 'question answer', 'solution', 'explanation', question.subjectId || '', question.topicId || ''],
                 alternates: {
-                    canonical: `https://deshexam.com/question/${lastSlug}`
+                    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/question/${lastSlug}`
                 },
                 openGraph: {
                     title,
                     description,
-                    url: `https://deshexam.com/question/${lastSlug}`,
+                    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/question/${lastSlug}`,
                     type: 'article',
                 }
             }
@@ -215,20 +215,20 @@ export default async function DynamicQuestionPage({ params }: Props) {
     const safeRelated = JSON.parse(JSON.stringify(relatedQuestions));
 
     const breadcrumbItems = [
-        { name: 'Home', url: 'https://deshexam.com' },
-        { name: 'Questions', url: 'https://deshexam.com/questions' }
+        { name: 'Home', url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}` },
+        { name: 'Questions', url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/questions` }
     ];
     if (breadcrumbTags.length > 0) {
-        breadcrumbTags.forEach((t: {title: string, slug: string}) => breadcrumbItems.push({ name: t.title, url: `https://deshexam.com/question/${t.slug}` }));
+        breadcrumbTags.forEach((t: {title: string, slug: string}) => breadcrumbItems.push({ name: t.title, url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/question/${t.slug}` }));
     }
-    breadcrumbItems.push({ name: question.title || lastSlug, url: `https://deshexam.com/question/${lastSlug}` });
+    breadcrumbItems.push({ name: question.title || lastSlug, url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/question/${lastSlug}` });
 
     const schemas = [
         getBreadcrumbSchema(breadcrumbItems),
         getQuestionSchema(
             question.questionText, 
             question.explanation || (question.options && question.correctAnswer && question.options[question.correctAnswer.toLowerCase() as keyof typeof question.options]) || question.correctAnswer || "Answer not provided",
-            `https://deshexam.com/question/${lastSlug}`,
+            `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/question/${lastSlug}`,
             (function() {
                 try {
                     const cDate = question.createdAt as any;

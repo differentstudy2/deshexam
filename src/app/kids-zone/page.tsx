@@ -13,8 +13,8 @@ export default function KidsZonePage() {
     "@context": "https://schema.org",
     "@type": "Organization",
     "name": "DeshExam",
-    "url": "https://deshexam.com",
-    "logo": "https://deshexam.com/logo.png",
+    "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}`,
+    "logo": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/logo.png`,
     "contactPoint": {
       "@type": "ContactPoint",
       "telephone": "+91-123-456-7890",
@@ -26,12 +26,12 @@ export default function KidsZonePage() {
     "@context": "https://schema.org",
     "@type": "WebSite",
     "name": "DeshExam",
-    "url": "https://deshexam.com/",
+    "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/`,
     "potentialAction": {
       "@type": "SearchAction",
       "target": {
         "@type": "EntryPoint",
-        "urlTemplate": "https://deshexam.com/search?q={search_term_string}"
+        "urlTemplate": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/search?q={search_term_string}`
       },
       "query-input": "required name=search_term_string"
     }

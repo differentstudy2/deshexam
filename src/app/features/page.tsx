@@ -15,15 +15,15 @@ export const metadata: Metadata = {
   title: 'DeshExam Features — Mock Tests, AI Learning, Question Bank & Institution Directory',
   description: 'Explore DeshExam features including mock tests, quizzes, AI learning assistant, question bank, institution directory, analytics and study materials.',
   alternates: {
-    canonical: 'https://deshexam.com/features'
+    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/features`
   },
   openGraph: {
     title: 'Explore DeshExam Features',
     description: 'Mock tests, AI learning, quizzes, question bank and institution directory all in one platform.',
-    url: 'https://deshexam.com/features',
+    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/features`,
     images: [
       {
-        url: 'https://deshexam.com/og/features.jpg',
+        url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/og/features.jpg`,
         width: 1200,
         height: 630,
         alt: 'DeshExam Features',
@@ -61,8 +61,8 @@ export default function FeaturesPage() {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     "itemListElement": [
-      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://deshexam.com" },
-      { "@type": "ListItem", "position": 2, "name": "Features", "item": "https://deshexam.com/features" }
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}` },
+      { "@type": "ListItem", "position": 2, "name": "Features", "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/features` }
     ]
   };
 

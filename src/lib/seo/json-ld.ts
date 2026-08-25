@@ -16,7 +16,7 @@ export function getItemListSchema(questions: any[]) {
     itemListElement: questions.map((q, i) => ({
       "@type": "ListItem",
       position: i + 1,
-      url: `https://deshexam.com/question/${q.slug || q.id}`
+      url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/question/${q.slug || q.id}`
     }))
   };
 }
@@ -53,10 +53,10 @@ export function getSearchActionSchema() {
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    url: "https://deshexam.com",
+    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}`,
     potentialAction: {
       "@type": "SearchAction",
-      target: "https://deshexam.com/questions?q={search_term_string}",
+      target: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/questions?q={search_term_string}`,
       "query-input": "required name=search_term_string"
     }
   };
@@ -67,8 +67,8 @@ export function getOrganizationSchema() {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "DeshExam",
-    url: "https://deshexam.com",
-    logo: "https://deshexam.com/logo.png"
+    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}`,
+    logo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/logo.png`
   };
 }
 
@@ -76,10 +76,10 @@ export function getQuestionSchema(questionText: string, answerText: string, url?
   const author = {
     "@type": "Organization",
     name: "DeshExam",
-    url: "https://deshexam.com"
+    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}`
   };
   const publishedDate = datePublished || "2024-01-01T00:00:00Z";
-  const questionUrl = url || "https://deshexam.com";
+  const questionUrl = url || `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}`;
 
   return {
     "@context": "https://schema.org",
@@ -113,7 +113,7 @@ export function getCourseSchema(courseName: string, description: string, url: st
     provider: {
       "@type": "Organization",
       name: providerName,
-      sameAs: "https://deshexam.com"
+      sameAs: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}`
     }
   };
 }

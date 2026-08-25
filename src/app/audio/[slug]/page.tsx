@@ -88,7 +88,7 @@ export default async function AudioSinglePage({ params }: { params: Promise<{ sl
       name: 'DeshExam',
       logo: {
         '@type': 'ImageObject',
-        url: 'https://deshexam.com/logo.png' // Replace with actual logo URL
+        url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/logo.png` // Replace with actual logo URL
       }
     }
   };

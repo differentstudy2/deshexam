@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Join me on DeshExam!",
     description: "Sign up for DeshExam and let's ace our competitive exams together. Start learning with AI-powered mock tests and get bonus XP!",
-    url: "https://deshexam.com/sign-up",
+    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/sign-up`,
     siteName: "DeshExam",
     type: "website",
   },

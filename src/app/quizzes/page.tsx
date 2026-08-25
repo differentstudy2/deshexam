@@ -17,7 +17,7 @@ export async function generateMetadata(
       description: 'Test your knowledge with fun and challenging quizzes on a wide range of subjects.',
       images: ['https://picsum.photos/seed/quizzes-og/1200/630', ...previousImages],
       type: 'website',
-      url: 'https://deshexam.com/quizzes',
+      url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/quizzes`,
     },
     twitter: {
       card: 'summary_large_image',

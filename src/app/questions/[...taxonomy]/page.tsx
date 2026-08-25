@@ -45,7 +45,7 @@ export async function generateMetadata({ params }: { params: Promise<{ taxonomy:
         title: `Top ${titleBase} Questions | DeshExam`,
         description: `Practice ${titleBase} questions with answers and explanations on DeshExam.`,
         alternates: {
-            canonical: `https://deshexam.com/questions/${taxonomy.join('/')}`
+            canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/questions/${taxonomy.join('/')}`
         }
     };
 }
@@ -66,11 +66,11 @@ export default async function TaxonomyFilterPage(props: { params: Promise<{ taxo
     const titleBase = taxonomy.map(t => t.toUpperCase().replace('-', ' ')).join(' ');
     
     const breadcrumbItems = [
-        { name: 'Home', url: 'https://deshexam.com' },
-        { name: 'Questions', url: 'https://deshexam.com/questions' }
+        { name: 'Home', url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}` },
+        { name: 'Questions', url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/questions` }
     ];
     
-    let currentUrl = 'https://deshexam.com/questions';
+    let currentUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/questions`;
     taxonomy.forEach(t => {
         currentUrl += `/${t}`;
         breadcrumbItems.push({ name: t.toUpperCase().replace('-', ' '), url: currentUrl });

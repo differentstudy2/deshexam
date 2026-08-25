@@ -99,7 +99,7 @@ export async function generateMetadata(props: PageProps, parent: ResolvingMetada
       openGraph: {
           title,
           description,
-          url: `https://deshexam.com/textbook-solutions/practice-set/${params.practiceSetId}/textbook/${params.bookId}/chapter/${params.chapterId}/topic/${params.topicId}`,
+          url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/textbook-solutions/practice-set/${params.practiceSetId}/textbook/${params.bookId}/chapter/${params.chapterId}/topic/${params.topicId}`,
           images: [{ url: imageUrl, width: 1200, height: 630, alt: title }],
           type: 'website',
       },
@@ -136,7 +136,7 @@ export default async function PracticeSetPage(props: PageProps) {
       "@type": "WebPage",
       "name": `${(practiceSet as any).title} | ${topic?.title || chapter.title}`,
       "description": `Take the interactive practice set "${(practiceSet as any).title}" for the topic "${topic?.title || chapter.title}" from the ${textbook.title} textbook.`,
-      "url": `https://deshexam.com/textbook-solutions/practice-set/${params.practiceSetId}/textbook/${params.bookId}/chapter/${params.chapterId}/topic/${params.topicId}`
+      "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/textbook-solutions/practice-set/${params.practiceSetId}/textbook/${params.bookId}/chapter/${params.chapterId}/topic/${params.topicId}`
     };
 
 

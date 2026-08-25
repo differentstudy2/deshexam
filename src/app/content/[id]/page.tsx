@@ -85,19 +85,19 @@ export default async function TestPage(props: Props) {
           '@type': 'ListItem',
           'position': 1,
           'name': 'Home',
-          'item': 'https://deshexam.com/'
+          'item': `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/`
         },
         {
           '@type': 'ListItem',
           'position': 2,
           'name': primaryType || 'Content',
-          'item': `https://deshexam.com/${typeSlug}s`
+          'item': `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/${typeSlug}s`
         },
         {
           '@type': 'ListItem',
           'position': 3,
           'name': cleanTitle,
-          'item': `https://deshexam.com/content/${test.id}`
+          'item': `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/content/${test.id}`
         }
       ]
     }

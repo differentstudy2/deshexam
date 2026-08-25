@@ -21,14 +21,14 @@ export const metadata: Metadata = {
     'concept building questions'
   ],
   alternates: {
-    canonical: 'https://deshexam.com/practice'
+    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/practice`
   },
   openGraph: {
     title: 'Free Practice Sets & Chapter-wise Questions | DeshExam',
     description: 'Practice topic-wise questions at your own pace. Build your foundation with instant explanations and daily challenges.',
     type: 'website',
-    url: 'https://deshexam.com/practice',
-    images: [{ url: 'https://deshexam.com/og-practice.jpg' }],
+    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/practice`,
+    images: [{ url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/og-practice.jpg` }],
   },
   twitter: {
     card: 'summary_large_image',

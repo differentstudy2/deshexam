@@ -73,7 +73,7 @@ export default async function LearnArticlePage(props: Props) {
         '@type': 'Article',
         'mainEntityOfPage': {
             '@type': 'WebPage',
-            '@id': `https://deshexam.com/learn/${article.id}`,
+            '@id': `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/learn/${article.id}`,
         },
         'headline': article.title,
         'description': article.description,
@@ -87,7 +87,7 @@ export default async function LearnArticlePage(props: Props) {
             'name': 'DeshExam',
             'logo': {
                 '@type': 'ImageObject',
-                'url': 'https://deshexam.com/logo.png',
+                'url': `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/logo.png`,
             },
         },
         'datePublished': article.createdAt,

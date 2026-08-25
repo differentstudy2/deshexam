@@ -85,12 +85,12 @@ export default function PushNotificationPage() {
             case 'mock':
                 form.setValue('title', 'New Mock Test Available! 📝');
                 form.setValue('body', 'Test your knowledge with our newly added mock test. Try it now!');
-                form.setValue('link', 'https://deshexam.com/mock-tests');
+                form.setValue('link', `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/mock-tests`);
                 break;
             case 'blog':
                 form.setValue('title', 'New Blog Post 📰');
                 form.setValue('body', 'Read our latest article to boost your exam preparation strategy.');
-                form.setValue('link', 'https://deshexam.com/blog');
+                form.setValue('link', `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/blog`);
                 break;
             case 'reminder':
                 form.setValue('title', 'Time to Practice! ⏰');
@@ -296,7 +296,7 @@ export default function PushNotificationPage() {
                               <div className="relative">
                                 <LinkIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
                                 <FormControl>
-                                  <Input placeholder="https://deshexam.com/mock-test/123" className="pl-8 bg-slate-50/50 focus-visible:ring-emerald-500" {...field} />
+                                  <Input placeholder={`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/mock-test/123`} className="pl-8 bg-slate-50/50 focus-visible:ring-emerald-500" {...field} />
                                 </FormControl>
                               </div>
                               <FormMessage className="text-[10px]" />

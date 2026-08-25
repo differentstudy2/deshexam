@@ -14,7 +14,7 @@ export default function FunQuizzesPage() {
         "@type": "WebPage",
         "name": "Fun Quizzes for Kids | DeshExam",
         "description": "Boost your child's knowledge with fun and educational quizzes on a variety of topics.",
-        "url": "https://deshexam.com/kids-zone/fun-quizzes"
+        "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/kids-zone/fun-quizzes`
     };
 
     return (

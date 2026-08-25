@@ -58,8 +58,8 @@ export async function generateMetadata({
   const title = `Top Schools, Colleges & Universities in ${location} 2026 | DeshExam`;
   const description = `Explore verified schools, colleges, universities and coaching institutes in ${location}. Compare courses, fees, admissions, facilities and reviews on DeshExam.`;
   const canonical = cityName
-    ? `https://deshexam.com/institutions/${slug[0]}/${slug[1]}`
-    : `https://deshexam.com/institutions/${slug[0]}`;
+    ? `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/institutions/${slug[0]}/${slug[1]}`
+    : `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/institutions/${slug[0]}`;
 
   return {
     title,
@@ -99,18 +99,18 @@ export default async function InstitutionsFilterPage({
   // ── Structured JSON-LD ──────────────────────────────────────────────────────
   const location = cityName ? `${cityName}, ${stateName}` : stateName;
   const canonicalUrl = cityName
-    ? `https://deshexam.com/institutions/${stateSlug}/${citySlug}`
-    : `https://deshexam.com/institutions/${stateSlug}`;
+    ? `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/institutions/${stateSlug}/${citySlug}`
+    : `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/institutions/${stateSlug}`;
 
   const breadcrumbItems: { name: string; item: string }[] = [
-    { name: 'Home', item: 'https://deshexam.com' },
-    { name: 'Institutions', item: 'https://deshexam.com/institutions' },
-    { name: stateName, item: `https://deshexam.com/institutions/${stateSlug}` },
+    { name: 'Home', item: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}` },
+    { name: 'Institutions', item: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/institutions` },
+    { name: stateName, item: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/institutions/${stateSlug}` },
   ];
   if (cityName && citySlug) {
     breadcrumbItems.push({
       name: cityName,
-      item: `https://deshexam.com/institutions/${stateSlug}/${citySlug}`,
+      item: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/institutions/${stateSlug}/${citySlug}`,
     });
   }
 

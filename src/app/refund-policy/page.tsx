@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Refund & Cancellation Policy | DeshExam',
     description: 'Read the DeshExam refund and cancellation policy. Understand our terms for subscription cancellations, refunds on premium purchases, and dispute resolution.',
-    url: 'https://deshexam.com/refund-policy',
+    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/refund-policy`,
     siteName: 'DeshExam',
     locale: 'en_US',
     type: 'website',
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     description: 'Read the DeshExam refund and cancellation policy. Understand our terms for subscription cancellations, refunds on premium purchases, and dispute resolution.',
   },
   alternates: {
-    canonical: 'https://deshexam.com/refund-policy',
+    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/refund-policy`,
   }
 };
 

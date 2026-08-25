@@ -490,7 +490,7 @@ export default async function AnswerSheetPage(
                                             {/* Left: QR and Marks */}
                                             <div className="flex flex-col gap-2">
                                                 <div className="border border-gray-300 p-1 w-fit bg-white">
-                                                    <QRCodeSVG value={`https://deshexam.com/${params.type}/${params.slug}`} size={64} />
+                                                    <QRCodeSVG value={`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/${params.type}/${params.slug}`} size={64} />
                                                 </div>
                                                 <div className="flex border border-black w-fit h-6">
                                                     <div className="bg-black text-white text-xs px-2 py-1 font-bold flex items-center">Marks</div>
