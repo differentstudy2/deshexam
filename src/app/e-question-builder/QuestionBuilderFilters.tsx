@@ -103,41 +103,41 @@ export default function QuestionBuilderFilters() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-6 text-slate-400">
-        <Loader2 className="w-6 h-6 animate-spin mr-2" />
-        <span>ফিল্টার লোড হচ্ছে...</span>
+      <div className="flex items-center justify-center py-4 text-slate-400">
+        <Loader2 className="w-5 h-5 animate-spin mr-2" />
+        <span className="text-sm">Loading filters...</span>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-3">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-2">
       <Select value={filters.boardId} onValueChange={handleBoardChange}>
-        <SelectTrigger className="bg-white dark:bg-slate-900"><SelectValue placeholder="বোর্ড" /></SelectTrigger>
-        <SelectContent><SelectItem value="all">সকল বোর্ড</SelectItem>{taxonomies.boards.map(b => <SelectItem key={b.id} value={b.id}>{b.acronym || b.shortName || b.name || b.title}</SelectItem>)}</SelectContent>
+        <SelectTrigger className="bg-white dark:bg-slate-900 rounded-sm h-9 text-sm"><SelectValue placeholder="Board" /></SelectTrigger>
+        <SelectContent><SelectItem value="all">All Boards</SelectItem>{taxonomies.boards.map(b => <SelectItem key={b.id} value={b.id}>{b.acronym || b.shortName || b.name || b.title}</SelectItem>)}</SelectContent>
       </Select>
       <Select value={filters.classId} onValueChange={handleClassChange}>
-        <SelectTrigger className="bg-white dark:bg-slate-900"><SelectValue placeholder="শ্রেণি" /></SelectTrigger>
-        <SelectContent><SelectItem value="all">সকল শ্রেণি</SelectItem>{filteredClasses.map(b => <SelectItem key={b.id} value={b.id}>{b.name || b.title}</SelectItem>)}</SelectContent>
+        <SelectTrigger className="bg-white dark:bg-slate-900 rounded-sm h-9 text-sm"><SelectValue placeholder="Class" /></SelectTrigger>
+        <SelectContent><SelectItem value="all">All Classes</SelectItem>{filteredClasses.map(b => <SelectItem key={b.id} value={b.id}>{b.name || b.title}</SelectItem>)}</SelectContent>
       </Select>
       <Select value={filters.subjectId} onValueChange={handleSubjectChange}>
-        <SelectTrigger className="bg-white dark:bg-slate-900"><SelectValue placeholder="বিষয়" /></SelectTrigger>
-        <SelectContent><SelectItem value="all">সকল বিষয়</SelectItem>{filteredSubjects.map(b => <SelectItem key={b.id} value={b.id}>{b.name || b.title}</SelectItem>)}</SelectContent>
+        <SelectTrigger className="bg-white dark:bg-slate-900 rounded-sm h-9 text-sm"><SelectValue placeholder="Subject" /></SelectTrigger>
+        <SelectContent><SelectItem value="all">All Subjects</SelectItem>{filteredSubjects.map(b => <SelectItem key={b.id} value={b.id}>{b.name || b.title}</SelectItem>)}</SelectContent>
       </Select>
       <Select value={filters.textbookId} onValueChange={handleTextbookChange}>
-        <SelectTrigger className="bg-white dark:bg-slate-900"><SelectValue placeholder="বই" /></SelectTrigger>
-        <SelectContent><SelectItem value="all">সকল বই</SelectItem>{filteredTextbooks.map(b => <SelectItem key={b.id} value={b.id}>{b.name || b.title}</SelectItem>)}</SelectContent>
+        <SelectTrigger className="bg-white dark:bg-slate-900 rounded-sm h-9 text-sm"><SelectValue placeholder="Textbook" /></SelectTrigger>
+        <SelectContent><SelectItem value="all">All Textbooks</SelectItem>{filteredTextbooks.map(b => <SelectItem key={b.id} value={b.id}>{b.name || b.title}</SelectItem>)}</SelectContent>
       </Select>
       <Select value={filters.chapterId} onValueChange={handleChapterChange}>
-        <SelectTrigger className="bg-white dark:bg-slate-900"><SelectValue placeholder="অধ্যায়" /></SelectTrigger>
-        <SelectContent><SelectItem value="all">সকল অধ্যায়</SelectItem>{filteredChapters.map(b => <SelectItem key={b.id} value={b.id}>{b.name || b.title}</SelectItem>)}</SelectContent>
+        <SelectTrigger className="bg-white dark:bg-slate-900 rounded-sm h-9 text-sm"><SelectValue placeholder="Chapter" /></SelectTrigger>
+        <SelectContent><SelectItem value="all">All Chapters</SelectItem>{filteredChapters.map(b => <SelectItem key={b.id} value={b.id}>{b.name || b.title}</SelectItem>)}</SelectContent>
       </Select>
       <Select value={filters.topicId} onValueChange={handleTopicChange}>
-        <SelectTrigger className="bg-white dark:bg-slate-900"><SelectValue placeholder="টপিক" /></SelectTrigger>
-        <SelectContent><SelectItem value="all">সকল টপিক</SelectItem>{filteredTopics.map(b => <SelectItem key={b.id} value={b.id}>{b.name || b.title}</SelectItem>)}</SelectContent>
+        <SelectTrigger className="bg-white dark:bg-slate-900 rounded-sm h-9 text-sm"><SelectValue placeholder="Topic" /></SelectTrigger>
+        <SelectContent><SelectItem value="all">All Topics</SelectItem>{filteredTopics.map(b => <SelectItem key={b.id} value={b.id}>{b.name || b.title}</SelectItem>)}</SelectContent>
       </Select>
-      <Button onClick={handleCreate} className="bg-[#6b21a8] hover:bg-[#581c87] text-white font-semibold w-full">
-        তৈরি করুন
+      <Button onClick={handleCreate} className="bg-[#6b21a8] hover:bg-[#581c87] text-white font-semibold w-full rounded-sm h-9 text-sm">
+        Create
       </Button>
     </div>
   );

@@ -28,28 +28,28 @@ export default function EQuestionBuilderPage() {
       <section className="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 pt-16 pb-12 shadow-sm">
         <div className="container mx-auto px-4 max-w-5xl">
           <div className="text-center mb-8">
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3">প্রশ্ন তৈরি করুন</h1>
-            <p className="text-gray-500 dark:text-gray-400">এখান থেকে আপনি আপনার প্রয়োজনীয় বোর্ড, শ্রেণি এবং বিষয় নির্বাচন করে প্রশ্ন তৈরি করতে পারবেন।</p>
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3">Create Question Papers</h1>
+            <p className="text-gray-500 dark:text-gray-400">Select your desired board, class, and subject to start building custom question papers instantly.</p>
           </div>
 
-          <div className="bg-gray-50 dark:bg-slate-800 p-4 md:p-6 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm mb-6">
+          <div className="bg-gray-50 dark:bg-slate-800 p-3 md:p-4 rounded-md border border-gray-200 dark:border-slate-700 shadow-sm mb-6">
             <QuestionBuilderFilters />
           </div>
           
           <div className="flex flex-col items-center gap-4">
             <div className="flex items-center gap-2 bg-[#e0f2fe] text-[#0284c7] px-4 py-2 rounded-full font-medium text-sm">
               <Sparkles className="w-4 h-4" />
-              <span>স্মার্ট কোয়েশ্চেন জেনারেটর ব্যবহার করুন</span>
+              <span>Try our Smart Question Generator</span>
             </div>
             <p className="text-sm text-gray-500 text-center max-w-2xl">
-              অটোমেটিক প্রশ্ন তৈরি করতে আমাদের অ্যাডভান্সড AI জেনারেটর ব্যবহার করুন। এটি আপনার সিলেবাস অনুযায়ী প্রশ্ন বাছাই করবে।
+              Use our advanced AI generator to automatically create balanced question papers based on your syllabus.
             </p>
             <div className="flex gap-4">
               <Button variant="outline" className="text-[#10b981] border-[#10b981] hover:bg-[#10b981]/10">
-                টিউটোরিয়াল দেখুন
+                Watch Tutorial
               </Button>
               <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                ম্যানুয়াল ভাবে তৈরি করুন
+                Create Manually
               </Button>
             </div>
           </div>
@@ -81,24 +81,24 @@ export default function EQuestionBuilderPage() {
             <div className="text-white">
               <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
                 <PlayCircle className="w-6 h-6 text-green-400" /> 
-                কিভাবে ব্যবহার করবেন?
+                How to use?
               </h2>
               <ul className="space-y-4">
                 <li className="flex gap-3">
                   <CheckCircle2 className="w-6 h-6 text-green-400 shrink-0" />
-                  <span>প্রথমে আপনার কাঙ্ক্ষিত বিষয় নির্বাচন করুন</span>
+                  <span>First, select your desired subject</span>
                 </li>
                 <li className="flex gap-3">
                   <CheckCircle2 className="w-6 h-6 text-green-400 shrink-0" />
-                  <span>এরপর অধ্যায় এবং প্রশ্নের ধরন বাছাই করুন</span>
+                  <span>Next, choose the chapter and question type</span>
                 </li>
                 <li className="flex gap-3">
                   <CheckCircle2 className="w-6 h-6 text-green-400 shrink-0" />
-                  <span>জেনারেট বাটনে ক্লিক করুন</span>
+                  <span>Click the generate button</span>
                 </li>
               </ul>
               <Button className="mt-8 bg-orange-500 hover:bg-orange-600 text-white rounded-full px-6 font-semibold shadow-lg">
-                <Youtube className="w-4 h-4 mr-2" /> ভিডিও টিউটোরিয়াল
+                <Youtube className="w-4 h-4 mr-2" /> Video Tutorial
               </Button>
             </div>
           </div>
@@ -108,8 +108,8 @@ export default function EQuestionBuilderPage() {
       {/* 3. FEATURES GRID */}
       <section className="py-8 container mx-auto px-4 max-w-5xl">
         <div className="text-center mb-10">
-          <h2 className="text-2xl font-bold text-gray-800 dark:text-white inline-block border-b-2 border-indigo-600 pb-2">আমাদের বিশেষ সুবিধা সমূহ</h2>
-          <p className="text-gray-500 dark:text-gray-400 mt-3 text-sm">এক নজরে দেখে নিন আমাদের ই-কোয়েশ্চেন বিল্ডারের সুবিধাগুলো</p>
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-white inline-block border-b-2 border-indigo-600 pb-2">Our Key Features</h2>
+          <p className="text-gray-500 dark:text-gray-400 mt-3 text-sm">Take a quick look at the benefits of our E-Question Builder</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -117,32 +117,32 @@ export default function EQuestionBuilderPage() {
             <div className="mx-auto w-14 h-14 bg-blue-50 dark:bg-blue-900/30 rounded-full flex items-center justify-center mb-4 text-blue-600">
               <FileQuestion className="w-7 h-7" />
             </div>
-            <h3 className="font-bold text-gray-800 dark:text-gray-100 mb-2">১০০,০০০+ প্রশ্ন</h3>
-            <p className="text-xs text-gray-500">আমাদের ভাণ্ডারে আছে লক্ষাধিক প্রশ্ন যা প্রতিদিন আপডেট হচ্ছে।</p>
+            <h3 className="font-bold text-gray-800 dark:text-gray-100 mb-2">100,000+ Questions</h3>
+            <p className="text-xs text-gray-500">Our repository contains thousands of questions updated daily.</p>
           </Card>
           
           <Card className="border-none shadow-sm hover:shadow-md transition-shadow dark:bg-slate-800 text-center p-6">
             <div className="mx-auto w-14 h-14 bg-green-50 dark:bg-green-900/30 rounded-full flex items-center justify-center mb-4 text-green-600">
               <Sparkles className="w-7 h-7" />
             </div>
-            <h3 className="font-bold text-gray-800 dark:text-gray-100 mb-2">AI Based জেনারেটর</h3>
-            <p className="text-xs text-gray-500">স্মার্ট অ্যালগরিদম ব্যবহার করে ১ ক্লিকেই ব্যালেন্সড প্রশ্নপত্র তৈরি।</p>
+            <h3 className="font-bold text-gray-800 dark:text-gray-100 mb-2">AI Based Generator</h3>
+            <p className="text-xs text-gray-500">Create balanced question papers in 1 click using smart algorithms.</p>
           </Card>
 
           <Card className="border-none shadow-sm hover:shadow-md transition-shadow dark:bg-slate-800 text-center p-6">
             <div className="mx-auto w-14 h-14 bg-red-50 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-4 text-red-600">
               <FileDown className="w-7 h-7" />
             </div>
-            <h3 className="font-bold text-gray-800 dark:text-gray-100 mb-2">PDF এক্সপোর্ট</h3>
-            <p className="text-xs text-gray-500">তৈরিকৃত প্রশ্নপত্র সাথে সাথেই হাই কোয়ালিটি PDF এ সেভ করুন।</p>
+            <h3 className="font-bold text-gray-800 dark:text-gray-100 mb-2">PDF Export</h3>
+            <p className="text-xs text-gray-500">Instantly save the generated question paper in high-quality PDF.</p>
           </Card>
 
           <Card className="border-none shadow-sm hover:shadow-md transition-shadow dark:bg-slate-800 text-center p-6">
             <div className="mx-auto w-14 h-14 bg-purple-50 dark:bg-purple-900/30 rounded-full flex items-center justify-center mb-4 text-purple-600">
               <LayoutTemplate className="w-7 h-7" />
             </div>
-            <h3 className="font-bold text-gray-800 dark:text-gray-100 mb-2">কাস্টম হেডার ও ওয়াটারমার্ক</h3>
-            <p className="text-xs text-gray-500">প্রতিষ্ঠানের নাম, লোগো এবং ওয়াটারমার্ক যুক্ত করার সুবিধা।</p>
+            <h3 className="font-bold text-gray-800 dark:text-gray-100 mb-2">Custom Header & Watermark</h3>
+            <p className="text-xs text-gray-500">Ability to add institution name, logo, and watermark.</p>
           </Card>
         </div>
       </section>
@@ -154,15 +154,15 @@ export default function EQuestionBuilderPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 divide-y md:divide-y-0 md:divide-x divide-gray-200 dark:divide-slate-700">
             <div className="px-4 py-2">
               <div className="text-4xl font-extrabold text-blue-600 mb-2">5000+</div>
-              <p className="text-gray-500 font-medium">শিক্ষক ব্যবহার করছেন</p>
+              <p className="text-gray-500 font-medium">Teachers Using</p>
             </div>
             <div className="px-4 py-2">
               <div className="text-4xl font-extrabold text-[#10b981] mb-2">100+</div>
-              <p className="text-gray-500 font-medium">স্কুল ও প্রতিষ্ঠান যুক্ত</p>
+              <p className="text-gray-500 font-medium">Schools & Institutions</p>
             </div>
             <div className="px-4 py-2">
               <div className="text-4xl font-extrabold text-purple-600 mb-2">150,000+</div>
-              <p className="text-gray-500 font-medium">মোট প্রশ্নপত্র তৈরি হয়েছে</p>
+              <p className="text-gray-500 font-medium">Papers Generated</p>
             </div>
           </div>
         </div>
@@ -171,8 +171,8 @@ export default function EQuestionBuilderPage() {
       {/* 5. DEMO/PREVIEW SECTION */}
       <section className="py-16 container mx-auto px-4 max-w-5xl">
         <div className="text-center mb-12">
-          <h2 className="text-2xl font-bold text-gray-800 dark:text-white">এক নজরে প্রশ্নপত্রের ডেমো</h2>
-          <p className="text-gray-500 dark:text-gray-400 mt-2">আমাদের সিস্টেম থেকে জেনারেট করা প্রশ্নপত্রের নমুনা দেখুন</p>
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Question Paper Demo at a Glance</h2>
+          <p className="text-gray-500 dark:text-gray-400 mt-2">Check out sample question papers generated from our system</p>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-12 items-center">
@@ -188,30 +188,30 @@ export default function EQuestionBuilderPage() {
             <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm flex gap-4">
               <div className="bg-green-100 text-green-600 p-3 rounded-full h-fit"><Printer className="w-6 h-6" /></div>
               <div>
-                <h4 className="font-bold text-gray-800 dark:text-gray-100 mb-1">প্রিন্ট রেডি ফরম্যাট</h4>
-                <p className="text-sm text-gray-500">একদম ঝকঝকে এবং সুন্দর ফন্টে প্রশ্নপত্র প্রিন্ট করার সুবিধা।</p>
+                <h4 className="font-bold text-gray-800 dark:text-gray-100 mb-1">Print Ready Format</h4>
+                <p className="text-sm text-gray-500">Crisp and beautiful fonts ready for printing.</p>
               </div>
             </div>
 
             <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm flex gap-4">
               <div className="bg-blue-100 text-blue-600 p-3 rounded-full h-fit"><FileText className="w-6 h-6" /></div>
               <div>
-                <h4 className="font-bold text-gray-800 dark:text-gray-100 mb-1">MS Word সাপোর্ট</h4>
-                <p className="text-sm text-gray-500">প্রয়োজনে Word ডকুমেন্টে সেভ করে নিজের মতো এডিট করে নিতে পারবেন।</p>
+                <h4 className="font-bold text-gray-800 dark:text-gray-100 mb-1">MS Word Support</h4>
+                <p className="text-sm text-gray-500">Save in Word documents to edit however you like.</p>
               </div>
             </div>
 
             <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm flex gap-4">
               <div className="bg-purple-100 text-purple-600 p-3 rounded-full h-fit"><ShieldCheck className="w-6 h-6" /></div>
               <div>
-                <h4 className="font-bold text-gray-800 dark:text-gray-100 mb-1">১০০% নির্ভুল প্রশ্ন</h4>
-                <p className="text-sm text-gray-500">অভিজ্ঞ শিক্ষকদের প্যানেল দ্বারা যাচাইকৃত প্রশ্নব্যাংক।</p>
+                <h4 className="font-bold text-gray-800 dark:text-gray-100 mb-1">100% Accurate Questions</h4>
+                <p className="text-sm text-gray-500">Question bank verified by a panel of experienced teachers.</p>
               </div>
             </div>
             
             <div className="pt-4">
               <Button className="w-full md:w-auto bg-[#10b981] hover:bg-emerald-600 text-white shadow-md">
-                ডেমো PDF ডাউনলোড করুন
+                Download Demo PDF
               </Button>
             </div>
           </div>
@@ -222,8 +222,8 @@ export default function EQuestionBuilderPage() {
       <section className="py-16 bg-gray-50 dark:bg-[#0f172a] border-t border-gray-200 dark:border-slate-800">
         <div className="container mx-auto px-4 max-w-5xl">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">সাবস্ক্রিপশন প্যাকেজ</h2>
-            <p className="text-gray-500">আপনার পছন্দমত প্যাকেজটি বেছে নিন এবং প্রশ্ন তৈরি শুরু করুন</p>
+            <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">Subscription Packages</h2>
+            <p className="text-gray-500">Choose your preferred package and start generating questions</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -232,12 +232,12 @@ export default function EQuestionBuilderPage() {
               <div className="bg-[#fef3c7] text-yellow-800 text-center py-3 font-bold uppercase rounded-t-xl border-b border-[#fde68a]">E-BASIC</div>
               <CardContent className="p-6 flex-1 flex flex-col">
                 <div className="text-center mb-6">
-                  <div className="text-3xl font-extrabold text-gray-800 dark:text-white mb-1">৳ ৫০০ <span className="text-base text-gray-500 font-normal">/ মাস</span></div>
+                  <div className="text-3xl font-extrabold text-gray-800 dark:text-white mb-1">₹ 500 <span className="text-base text-gray-500 font-normal">/ month</span></div>
                 </div>
                 <div className="space-y-3 flex-1 mb-6">
-                  <div className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-1 shrink-0" /><span className="text-sm text-gray-600 dark:text-gray-300">প্রতিমাসে ১০টি প্রশ্নপত্র</span></div>
-                  <div className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-1 shrink-0" /><span className="text-sm text-gray-600 dark:text-gray-300">সাধারণ হেডার ও লোগো</span></div>
-                  <div className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-1 shrink-0" /><span className="text-sm text-gray-600 dark:text-gray-300">শুধু PDF ডাউনলোড</span></div>
+                  <div className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-1 shrink-0" /><span className="text-sm text-gray-600 dark:text-gray-300">10 Question Papers / month</span></div>
+                  <div className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-1 shrink-0" /><span className="text-sm text-gray-600 dark:text-gray-300">Basic Header & Logo</span></div>
+                  <div className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-1 shrink-0" /><span className="text-sm text-gray-600 dark:text-gray-300">PDF Download Only</span></div>
                 </div>
                 <Button className="w-full bg-[#10b981] hover:bg-emerald-600 text-white rounded-md">Purchase</Button>
               </CardContent>
@@ -249,13 +249,13 @@ export default function EQuestionBuilderPage() {
               <div className="bg-[#d1fae5] text-emerald-800 text-center py-3 font-bold uppercase rounded-t-xl border-b border-[#a7f3d0]">E-PLUS</div>
               <CardContent className="p-6 flex-1 flex flex-col">
                 <div className="text-center mb-6">
-                  <div className="text-3xl font-extrabold text-gray-800 dark:text-white mb-1">৳ ১,০০০ <span className="text-base text-gray-500 font-normal">/ মাস</span></div>
+                  <div className="text-3xl font-extrabold text-gray-800 dark:text-white mb-1">₹ 1,000 <span className="text-base text-gray-500 font-normal">/ month</span></div>
                 </div>
                 <div className="space-y-3 flex-1 mb-6">
-                  <div className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-1 shrink-0" /><span className="text-sm text-gray-600 dark:text-gray-300">প্রতিমাসে ১০০টি প্রশ্নপত্র</span></div>
-                  <div className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-1 shrink-0" /><span className="text-sm text-gray-600 dark:text-gray-300">কাস্টম হেডার ও ওয়াটারমার্ক</span></div>
-                  <div className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-1 shrink-0" /><span className="text-sm text-gray-600 dark:text-gray-300">PDF এবং Word (DOCX) সাপোর্ট</span></div>
-                  <div className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-1 shrink-0" /><span className="text-sm text-gray-600 dark:text-gray-300">AI স্মার্ট জেনারেটর ব্যবহার</span></div>
+                  <div className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-1 shrink-0" /><span className="text-sm text-gray-600 dark:text-gray-300">100 Question Papers / month</span></div>
+                  <div className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-1 shrink-0" /><span className="text-sm text-gray-600 dark:text-gray-300">Custom Header & Watermark</span></div>
+                  <div className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-1 shrink-0" /><span className="text-sm text-gray-600 dark:text-gray-300">PDF and Word (DOCX) Support</span></div>
+                  <div className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-1 shrink-0" /><span className="text-sm text-gray-600 dark:text-gray-300">AI Smart Generator Access</span></div>
                 </div>
                 <Button className="w-full bg-[#10b981] hover:bg-emerald-600 text-white rounded-md shadow-md">Purchase</Button>
               </CardContent>
@@ -266,13 +266,13 @@ export default function EQuestionBuilderPage() {
               <div className="bg-[#fee2e2] text-red-800 text-center py-3 font-bold uppercase rounded-t-xl border-b border-[#fecaca]">E-PRO</div>
               <CardContent className="p-6 flex-1 flex flex-col">
                 <div className="text-center mb-6">
-                  <div className="text-3xl font-extrabold text-gray-800 dark:text-white mb-1">৳ ২,৫০০ <span className="text-base text-gray-500 font-normal">/ মাস</span></div>
+                  <div className="text-3xl font-extrabold text-gray-800 dark:text-white mb-1">₹ 2,500 <span className="text-base text-gray-500 font-normal">/ month</span></div>
                 </div>
                 <div className="space-y-3 flex-1 mb-6">
-                  <div className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-1 shrink-0" /><span className="text-sm text-gray-600 dark:text-gray-300">আনলিমিটেড প্রশ্নপত্র</span></div>
-                  <div className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-1 shrink-0" /><span className="text-sm text-gray-600 dark:text-gray-300">নিজস্ব প্রশ্ন এড করার সুবিধা</span></div>
-                  <div className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-1 shrink-0" /><span className="text-sm text-gray-600 dark:text-gray-300">সকল E-PLUS এর সুবিধাসমূহ</span></div>
-                  <div className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-1 shrink-0" /><span className="text-sm text-gray-600 dark:text-gray-300">ডেডিকেটেড সাপোর্ট টিম</span></div>
+                  <div className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-1 shrink-0" /><span className="text-sm text-gray-600 dark:text-gray-300">Unlimited Question Papers</span></div>
+                  <div className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-1 shrink-0" /><span className="text-sm text-gray-600 dark:text-gray-300">Ability to Add Own Questions</span></div>
+                  <div className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-1 shrink-0" /><span className="text-sm text-gray-600 dark:text-gray-300">All E-PLUS Features</span></div>
+                  <div className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-1 shrink-0" /><span className="text-sm text-gray-600 dark:text-gray-300">Dedicated Support Team</span></div>
                 </div>
                 <Button className="w-full bg-[#10b981] hover:bg-emerald-600 text-white rounded-md">Purchase</Button>
               </CardContent>
@@ -284,15 +284,15 @@ export default function EQuestionBuilderPage() {
       {/* 7. BOTTOM CTA */}
       <section className="py-16 container mx-auto px-4 max-w-5xl">
         <div className="bg-[#e8f5e9] dark:bg-[#00a651]/10 rounded-3xl p-8 md:p-12 text-center border border-green-100 dark:border-green-900/30 flex flex-col items-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-[#00a651] mb-4">আমাদের সাথেই যুক্ত হোন আজই!</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-[#00a651] mb-4">Join Us Today!</h2>
           <p className="text-gray-600 dark:text-gray-300 mb-8 max-w-2xl">
-            স্কুল, কলেজ, কোচিং সেন্টার বা প্রাইভেট টিউটর - সবার জন্যই আমাদের ই-কোয়েশ্চেন বিল্ডার একটি যুগান্তকারী সমাধান। আপনার মূল্যবান সময় বাঁচাতে আজই রেজিস্ট্রেশন করুন।
+            A revolutionary solution for schools, colleges, coaching centers, or private tutors. Register today to save your valuable time.
           </p>
           <div className="w-64 h-40 relative mb-8">
              <Image src="https://picsum.photos/seed/cta/400/250" alt="CTA Handshake" fill className="object-cover rounded-lg shadow-sm" />
           </div>
           <Button className="bg-[#2563eb] hover:bg-blue-700 text-white font-bold px-8 py-6 rounded-full text-lg shadow-lg">
-            রেজিস্ট্রেশন করুন
+            Register Now
           </Button>
         </div>
       </section>
@@ -301,21 +301,21 @@ export default function EQuestionBuilderPage() {
       <section className="py-16 bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-slate-800">
         <div className="container mx-auto px-4 max-w-3xl">
           <div className="text-center mb-10">
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-white">সাধারণ জিজ্ঞাসা (FAQ)</h2>
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Frequently Asked Questions (FAQ)</h2>
           </div>
           
           <div className="space-y-4">
             <div className="border border-gray-200 dark:border-slate-700 rounded-lg p-4">
               <h3 className="font-bold text-gray-800 dark:text-gray-200 flex justify-between items-center cursor-pointer">
-                প্রশ্নপত্র কি Word ফাইলে সেভ করা যায়? <span className="text-gray-400">+</span>
+                Can the question paper be saved as a Word file? <span className="text-gray-400">+</span>
               </h3>
-              <p className="text-sm text-gray-500 mt-2">হ্যাঁ, প্লাস এবং প্রো প্যাকেজে আপনি খুব সহজেই MS Word (.docx) ফরম্যাটে প্রশ্ন সেভ করে এডিট করতে পারবেন।</p>
+              <p className="text-sm text-gray-500 mt-2">Yes, with Plus and Pro packages, you can easily save and edit in MS Word (.docx) format.</p>
             </div>
             <div className="border border-gray-200 dark:border-slate-700 rounded-lg p-4">
               <h3 className="font-bold text-gray-800 dark:text-gray-200 flex justify-between items-center cursor-pointer">
-                আমি কি আমার প্রতিষ্ঠানের লোগো ব্যবহার করতে পারবো? <span className="text-gray-400">+</span>
+                Can I use my institution's logo? <span className="text-gray-400">+</span>
               </h3>
-              <p className="text-sm text-gray-500 mt-2">অবশ্যই। আমাদের বিল্ট-ইন হেডার এডিটর ব্যবহার করে আপনি সহজেই আপনার নিজস্ব লোগো ও স্কুলের নাম বসাতে পারবেন।</p>
+              <p className="text-sm text-gray-500 mt-2">Absolutely. Our built-in header editor allows you to seamlessly add your own logo and school name.</p>
             </div>
           </div>
         </div>

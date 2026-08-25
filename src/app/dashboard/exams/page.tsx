@@ -301,7 +301,7 @@ export default function ExamsPage() {
                   <div className="flex-1 min-w-0 flex flex-col justify-center">
                     <h4 className="text-[11px] font-bold text-slate-800 dark:text-slate-200 line-clamp-1 group-hover:text-blue-600 transition-colors mb-1">{pkg.title}</h4>
                     <div className="flex items-center gap-2 text-[10px] font-semibold text-slate-500">
-                      <span className="text-green-600">৳{pkg.price}</span>
+                      <span className="text-green-600">₹{pkg.price}</span>
                       <span className="flex items-center text-yellow-500"><Star className="w-2.5 h-2.5 fill-current mr-0.5" /> {pkg.rating}</span>
                       <span className="flex items-center text-slate-400"><Users className="w-2.5 h-2.5 mr-0.5" /> {pkg.students}</span>
                     </div>

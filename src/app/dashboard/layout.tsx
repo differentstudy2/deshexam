@@ -111,7 +111,7 @@ export default function DashboardLayout({
                                     </p>
                                     
                                     <div className="mt-3 mb-1 px-3 py-1.5 border border-dashed border-slate-200 dark:border-slate-700 rounded-full flex justify-center items-center bg-transparent">
-                                        <p className="text-xs font-medium text-slate-700 dark:text-slate-300">Balance: ৳1.75</p>
+                                        <p className="text-xs font-medium text-slate-700 dark:text-slate-300">Balance: ₹1.75</p>
                                     </div>
                                 </div>
                                 <DropdownMenuSeparator className="my-1 bg-slate-100 dark:bg-slate-800" />
