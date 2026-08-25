@@ -867,5 +867,1368 @@
       "বর্ম"
     ],
     "detailedExplanation": "শরীরে চামড়া না থাকলে ভিতরের মাংসপেশি, শিরা, ধমনী সবকিছু বাইরের পরিবেশে উন্মুক্ত থাকত। ফলে সামান্য আঘাতেই আমাদের অনেক ক্ষতি হতো। ধুলোবালি ও রোগজীবাণু সহজেই শরীরে প্রবেশ করে মারাত্মক ইনফেকশন তৈরি করত। এছাড়া রোদ ও তাপে শরীরের ভেতরের অঙ্গগুলোর ক্ষতি হতো।"
+  },
+  {
+    "id": "q-bormo-kake-bole-01",
+    "slug": "bormo-kake-bole-01",
+    "createdAt": "2026-08-25T15:41:48.000Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "mcq",
+    "questionText": "আমাদের শরীরের বর্ম বলা হয় কাকে?",
+    "marks": 1,
+    "difficulty": "easy",
+    "status": "published",
+    "tags": [
+      "মানবদেহ",
+      "ত্বক"
+    ],
+    "options": {
+      "a": "হাড়",
+      "b": "ত্বক বা চামড়া",
+      "c": "পেশি",
+      "d": "শিরা"
+    },
+    "optionExplanations": {
+      "a": "হাড় বর্ম নয়।",
+      "b": "সঠিক। ত্বক বর্মের মতো শরীরকে বাঁচায়।",
+      "c": "পেশি ত্বকের নিচে থাকে।",
+      "d": "শিরা রক্ত বহন করে।"
+    },
+    "correctAnswer": "b",
+    "explanation": "ত্বক শরীরের ভেতরের অঙ্গগুলোকে বাইরের আঘাত থেকে বাঁচায়, তাই একে বর্ম বলে[cite: 1]।"
+  },
+  {
+    "id": "q-prachin-kale-lekhar-jonno-02",
+    "slug": "prachin-kale-lekhar-jonno-02",
+    "createdAt": "2026-08-25T15:41:48.000Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "mcq",
+    "questionText": "একসময়ে মানুষ লেখার জন্য কী ব্যবহার করত?",
+    "marks": 1,
+    "difficulty": "medium",
+    "status": "published",
+    "tags": [
+      "মানবদেহ",
+      "ইতিহাস"
+    ],
+    "options": {
+      "a": "কাগজ",
+      "b": "পশুর চামড়া",
+      "c": "পাথর",
+      "d": "গাছের পাতা"
+    },
+    "optionExplanations": {
+      "a": "কাগজ পরে এসেছে।",
+      "b": "সঠিক। পশুর চামড়া শুকিয়ে তাতে লেখা হতো।",
+      "c": "পাথরেও লেখা হতো, কিন্তু বইয়ে চামড়ার কথা আছে।",
+      "d": "পাতার কথাও বইয়ে এই অংশে নেই।"
+    },
+    "correctAnswer": "b",
+    "explanation": "একসময়ে মানুষ পশুর চামড়া শুকিয়ে তাতে লিখত[cite: 1]।"
+  },
+  {
+    "id": "q-gondarer-chamra-03",
+    "slug": "gondarer-chamra-03",
+    "createdAt": "2026-08-25T15:41:48.000Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "mcq",
+    "questionText": "আগেকার দিনে যুদ্ধে ঢাল বানাতে কোন প্রাণীর চামড়া ব্যবহার হতো?",
+    "marks": 1,
+    "difficulty": "medium",
+    "status": "published",
+    "tags": [
+      "মানবদেহ",
+      "গন্ডার"
+    ],
+    "options": {
+      "a": "হাতি",
+      "b": "বাঘ",
+      "c": "গন্ডার",
+      "d": "কুমির"
+    },
+    "optionExplanations": {
+      "a": "হাতির কথা বলা নেই।",
+      "b": "বাঘের চামড়া ঢালে ব্যবহৃত হতো না।",
+      "c": "সঠিক। গন্ডারের চামড়া খুব পুরু হয়।",
+      "d": "কুমিরের কথা বলা নেই।"
+    },
+    "correctAnswer": "c",
+    "explanation": "গন্ডারের চামড়া খুব পুরু হওয়ায় তা দিয়ে যুদ্ধের ঢাল বানানো হতো[cite: 1]।"
+  },
+  {
+    "id": "q-chamrar-karkhana-dushon-04",
+    "slug": "chamrar-karkhana-dushon-04",
+    "createdAt": "2026-08-25T15:41:48.000Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "mcq",
+    "questionText": "চামড়া কারখানার নোংরা পড়ে প্রধানত কী নষ্ট হয়?",
+    "marks": 1,
+    "difficulty": "easy",
+    "status": "published",
+    "tags": [
+      "মানবদেহ",
+      "পরিবেশ দূষণ"
+    ],
+    "options": {
+      "a": "মাটি",
+      "b": "জল",
+      "c": "শব্দ",
+      "d": "আলো"
+    },
+    "optionExplanations": {
+      "a": "মাটির চেয়ে জলের কথা বেশি বলা হয়েছে।",
+      "b": "সঠিক। কারখানার নোংরায় জল নষ্ট হয়।",
+      "c": "শব্দ দূষণ এর সাথে সম্পর্কিত নয়।",
+      "d": "আলোর সম্পর্ক নেই।"
+    },
+    "correctAnswer": "b",
+    "explanation": "চামড়া কারখানার নোংরা পড়ে জল নষ্ট হয় এবং হাওয়ায় দুর্গন্ধ ছড়ায়[cite: 1]।"
+  },
+  {
+    "id": "q-shira-dhomoni-kothay-thake-05",
+    "slug": "shira-dhomoni-kothay-thake-05",
+    "createdAt": "2026-08-25T15:41:48.000Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "mcq",
+    "questionText": "শিরা ও ধমনি শরীরের কোথায় থাকে?",
+    "marks": 1,
+    "difficulty": "easy",
+    "status": "published",
+    "tags": [
+      "মানবদেহ",
+      "শিরা"
+    ],
+    "options": {
+      "a": "চামড়ার উপরে",
+      "b": "চামড়ার নীচে",
+      "c": "হাড়ের ভেতরে",
+      "d": "চুলের গোড়ায়"
+    },
+    "optionExplanations": {
+      "a": "উপরে থাকে না।",
+      "b": "সঠিক। চামড়ার নীচেই শিরা-ধমনি থাকে।",
+      "c": "হাড়ের ভেতরে মজ্জা থাকে।",
+      "d": "চুলের গোড়ায় নয়।"
+    },
+    "correctAnswer": "b",
+    "explanation": "চামড়ার নীচে শরীরের সবকিছু—মাংসপেশি, নার্ভ, শিরা-ধমনি থাকে[cite: 1]।"
+  },
+  {
+    "id": "q-otibeguni-roshmi-theke-rakkha-06",
+    "slug": "otibeguni-roshmi-theke-rakkha-06",
+    "createdAt": "2026-08-25T15:41:48.000Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "mcq",
+    "questionText": "সূর্যের অদৃশ্য অতিবেগুনি রশ্মি থেকে আমাদের কে বাঁচায়?",
+    "marks": 1,
+    "difficulty": "easy",
+    "status": "published",
+    "tags": [
+      "মানবদেহ",
+      "ত্বক"
+    ],
+    "options": {
+      "a": "হাড়",
+      "b": "রক্ত",
+      "c": "ত্বক বা চামড়া",
+      "d": "চুল"
+    },
+    "optionExplanations": {
+      "a": "হাড়ের এই ভূমিকা নেই।",
+      "b": "রক্ত পুষ্টি সরবরাহ করে।",
+      "c": "সঠিক। ত্বক অতিবেগুনি রশ্মি আটকায়।",
+      "d": "চুল শুধু মাথাকে রক্ষা করে।"
+    },
+    "correctAnswer": "c",
+    "explanation": "বর্মের মতো ত্বক বাইরের আঘাত ও সূর্যের আলোর অদৃশ্য অতিবেগুনি রশ্মি থেকে বাঁচায়[cite: 1]।"
+  },
+  {
+    "id": "q-noler-moto-shira-07",
+    "slug": "noler-moto-shira-07",
+    "createdAt": "2026-08-25T15:41:48.000Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "mcq",
+    "questionText": "চামড়ার নীচে নলের মতো ফুলে থাকা অংশগুলোকে কী বলে?",
+    "marks": 1,
+    "difficulty": "medium",
+    "status": "published",
+    "tags": [
+      "মানবদেহ",
+      "শিরা"
+    ],
+    "options": {
+      "a": "পেশি",
+      "b": "হাড়",
+      "c": "শিরা",
+      "d": "ত্বক"
+    },
+    "optionExplanations": {
+      "a": "পেশি নলের মতো ফুলে থাকে না।",
+      "b": "হাড় শক্ত কাঠামো।",
+      "c": "সঠিক। শিরাগুলো নলের মতো চামড়ার নীচে ফুলে থাকে।",
+      "d": "ত্বক হলো বাইরের আবরণ।"
+    },
+    "correctAnswer": "c",
+    "explanation": "চামড়ার নীচে নলের মতো ফুলে থাকা শাখা-প্রশাখাযুক্ত অংশগুলি হলো শিরা[cite: 1]।"
+  },
+  {
+    "id": "q-dhomoni-kothay-thake-08",
+    "slug": "dhomoni-kothay-thake-08",
+    "createdAt": "2026-08-25T15:41:48.000Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "mcq",
+    "questionText": "ধমনি চামড়ার কোথায় থাকে?",
+    "marks": 1,
+    "difficulty": "hard",
+    "status": "published",
+    "tags": [
+      "মানবদেহ",
+      "ধমনি"
+    ],
+    "options": {
+      "a": "একদম উপরে",
+      "b": "শিরার উপরে",
+      "c": "শিরার চেয়ে একটু ভিতর দিকে",
+      "d": "হাড়ের ভেতরে"
+    },
+    "optionExplanations": {
+      "a": "উপরে ত্বক থাকে।",
+      "b": "শিরার চেয়ে ভেতরে থাকে।",
+      "c": "সঠিক। ধমনি একটু ভিতর দিকে থাকে।",
+      "d": "হাড়ের ভেতরে নয়।"
+    },
+    "correctAnswer": "c",
+    "explanation": "শিরাগুলো চামড়ার ঠিক নীচে দেখা যায়, কিন্তু ধমনি একটু ভিতর দিকে থাকে[cite: 1]।"
+  },
+  {
+    "id": "q-kothakar-chamra-patla-09",
+    "slug": "kothakar-chamra-patla-09",
+    "createdAt": "2026-08-25T15:41:48.000Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "mcq",
+    "questionText": "ত্বক পাতলা হলে কী দেখা যায়?",
+    "marks": 1,
+    "difficulty": "easy",
+    "status": "published",
+    "tags": [
+      "মানবদেহ",
+      "শিরা"
+    ],
+    "options": {
+      "a": "হাড়",
+      "b": "শিরাগুলো দেখা যায়",
+      "c": "ফুসফুস",
+      "d": "পেশি"
+    },
+    "optionExplanations": {
+      "a": "হাড় অনেক গভীরে থাকে।",
+      "b": "সঠিক। ত্বক পাতলা হলে নীল রঙের শিরা বোঝা যায়।",
+      "c": "ফুসফুস বুকের ভেতরে।",
+      "d": "পেশি সরাসরি দেখা যায় না।"
+    },
+    "correctAnswer": "b",
+    "explanation": "চামড়া যেখানে পাতলা, সেখানেই শিরাগুলো দেখা যায়[cite: 1]।"
+  },
+  {
+    "id": "q-puro-chamra-hater-cheto-10",
+    "slug": "puro-chamra-hater-cheto-10",
+    "createdAt": "2026-08-25T15:41:48.000Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "mcq",
+    "questionText": "হাতের চেটোর চামড়া পুরু হয় কেন?",
+    "marks": 1,
+    "difficulty": "medium",
+    "status": "published",
+    "tags": [
+      "মানবদেহ",
+      "ত্বক"
+    ],
+    "options": {
+      "a": "কারণ সেখানে শিরা থাকে না",
+      "b": "কারণ সেখানে বেশি ঘষাঘষি হয়",
+      "c": "কারণ সেখানে আলো পৌঁছায় না",
+      "d": "কারণ সেখানে হাড় থাকে না"
+    },
+    "optionExplanations": {
+      "a": "শিরা থাকে, কিন্তু দেখা যায় না।",
+      "b": "সঠিক। কাজের জন্য হাতের চেটোতে বেশি ঘষাঘষি হয়।",
+      "c": "আলোর সাথে পুরুত্বের সম্পর্ক নেই।",
+      "d": "হাড় থাকে।"
+    },
+    "correctAnswer": "b",
+    "explanation": "হাতের চেটোর দিকটায় বেশি ঘষাঘষি হয় বলে সেখানকার ত্বক মোটা বা পুরু হয়ে যায়[cite: 1]।"
+  },
+  {
+    "id": "q-payer-goralir-chamra-11",
+    "slug": "payer-goralir-chamra-11",
+    "createdAt": "2026-08-25T15:41:48.000Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "mcq",
+    "questionText": "শরীরের কোন অংশের চামড়া সবচেয়ে বেশি পুরু?",
+    "marks": 1,
+    "difficulty": "easy",
+    "status": "published",
+    "tags": [
+      "মানবদেহ",
+      "গোড়ালি"
+    ],
+    "options": {
+      "a": "গালের",
+      "b": "পায়ের গোড়ালির",
+      "c": "গলার",
+      "d": "হাতের পিঠের"
+    },
+    "optionExplanations": {
+      "a": "গালের চামড়া পাতলা।",
+      "b": "সঠিক। গোড়ালিতে শরীরের সব ভার পড়ে।",
+      "c": "গলার চামড়াও পাতলা।",
+      "d": "হাতের পিঠের চামড়া পাতলা।"
+    },
+    "correctAnswer": "b",
+    "explanation": "হাঁটার সময় গোড়ালির উপর শরীরের সব ভার পড়ে, তাই পায়ের তলার চামড়া, বিশেষ করে গোড়ালির কাছটা সবচেয়ে পুরু হয়[cite: 1]।"
+  },
+  {
+    "id": "q-twoker-koyti-stor-12",
+    "slug": "twoker-koyti-stor-12",
+    "createdAt": "2026-08-25T15:41:48.000Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "mcq",
+    "questionText": "ত্বকের প্রধানত কয়টি স্তর থাকে বলে বইয়ে উল্লেখ আছে?",
+    "marks": 1,
+    "difficulty": "medium",
+    "status": "published",
+    "tags": [
+      "মানবদেহ",
+      "ত্বকের স্তর"
+    ],
+    "options": {
+      "a": "একটি",
+      "b": "দুটি",
+      "c": "তিনটি",
+      "d": "চারটি"
+    },
+    "optionExplanations": {
+      "a": "একটি নয়।",
+      "b": "সঠিক। উপরের স্তর এবং ভিতরের স্তর।",
+      "c": "তিনটির কথা বলা নেই।",
+      "d": "চারটি নয়।"
+    },
+    "correctAnswer": "b",
+    "explanation": "ত্বকের প্রধানত দুটি স্তর থাকে, একটি ওপরের স্তর এবং একটি ভিতরের স্তর[cite: 1]।"
+  },
+  {
+    "id": "q-rokto-thakena-twoke-13",
+    "slug": "rokto-thakena-twoke-13",
+    "createdAt": "2026-08-25T15:41:48.000Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "mcq",
+    "questionText": "ত্বকের কোন স্তরে রক্ত থাকে না?",
+    "marks": 1,
+    "difficulty": "hard",
+    "status": "published",
+    "tags": [
+      "মানবদেহ",
+      "ত্বকের স্তর"
+    ],
+    "options": {
+      "a": "ভিতরের স্তরে",
+      "b": "সব স্তরেই রক্ত থাকে",
+      "c": "উপরের স্তরে",
+      "d": "কোনো স্তরেই রক্ত থাকে না"
+    },
+    "optionExplanations": {
+      "a": "ভিতরের স্তরে রক্ত থাকে।",
+      "b": "ভুল।",
+      "c": "সঠিক। উপরের স্তরে রক্ত থাকে না।",
+      "d": "ভুল।"
+    },
+    "correctAnswer": "c",
+    "explanation": "ত্বকের উপরের স্তরে রক্ত থাকে না। এই স্তরটা মরা, তাই সামান্য কেটে গেলে কিছু হয় না[cite: 1]।"
+  },
+  {
+    "id": "q-twok-pure-gele-14",
+    "slug": "twok-pure-gele-14",
+    "createdAt": "2026-08-25T15:41:48.000Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "mcq",
+    "questionText": "কোথাও পুড়ে গেলে সাথে সাথে কী দেওয়া উচিত?",
+    "marks": 1,
+    "difficulty": "easy",
+    "status": "published",
+    "tags": [
+      "মানবদেহ",
+      "প্রাথমিক চিকিৎসা"
+    ],
+    "options": {
+      "a": "গরম জল",
+      "b": "ঠান্ডা জল",
+      "c": "তেল",
+      "d": "বরফ"
+    },
+    "optionExplanations": {
+      "a": "গরম জল দিলে ক্ষতি বাড়বে।",
+      "b": "সঠিক। ঠান্ডা জল দিলে ভিতরের স্তর বেঁচে যায়।",
+      "c": "তেল দেওয়া উচিত নয়।",
+      "d": "বরফ সরাসরি দেওয়া ঠিক নয়।"
+    },
+    "correctAnswer": "b",
+    "explanation": "পুড়ে গেলে সাথে সাথে ঠান্ডা জল দিলে চামড়ার ভিতরের স্তরে ক্ষতি হয় না এবং ফোসকা পড়া আটকানো যেতে পারে[cite: 1]।"
+  },
+  {
+    "id": "q-foska-ki-diye-toiri-15",
+    "slug": "foska-ki-diye-toiri-15",
+    "createdAt": "2026-08-25T15:41:48.000Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "mcq",
+    "questionText": "পুড়ে গেলে চামড়ার দুটি স্তরের মাঝে কী জমা হয়ে ফোসকা তৈরি হয়?",
+    "marks": 1,
+    "difficulty": "medium",
+    "status": "published",
+    "tags": [
+      "মানবদেহ",
+      "ফোসকা"
+    ],
+    "options": {
+      "a": "রক্ত",
+      "b": "পুঁজ",
+      "c": "জলীয় তরল",
+      "d": "বাতাস"
+    },
+    "optionExplanations": {
+      "a": "রক্ত জমে না।",
+      "b": "পুঁজ পরে হয় ইনফেকশন হলে।",
+      "c": "সঠিক। ভিতরের স্তর থেকে জল বেরিয়ে আসে।",
+      "d": "বাতাস থাকে না।"
+    },
+    "correctAnswer": "c",
+    "explanation": "চামড়ার ওপরের স্তরটা গরমে মরে যায় এবং নীচের স্তর থেকে জল বেরিয়ে দুটি স্তরের মাঝে সেই জলীয় তরল জমা হয়ে ফোসকা পড়ে[cite: 1]।"
+  },
+  {
+    "id": "q-boyos-barle-chamra-kuchke-jay-16",
+    "slug": "boyos-barle-chamra-kuchke-jay-16",
+    "createdAt": "2026-08-25T15:41:48.000Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "mcq",
+    "questionText": "বৃদ্ধ বয়সে মানুষের চামড়া কুঁচকে যায় কেন?",
+    "marks": 1,
+    "difficulty": "medium",
+    "status": "published",
+    "tags": [
+      "মানবদেহ",
+      "বয়স"
+    ],
+    "options": {
+      "a": "শরীর ছোটো হতে শুরু করে কিন্তু চামড়া কমে না",
+      "b": "শরীরে রক্তের পরিমাণ কমে যায়",
+      "c": "চামড়ার স্তর পাতলা হয়ে যায়",
+      "d": "মেলানিন তৈরি বন্ধ হয়ে যায়"
+    },
+    "optionExplanations": {
+      "a": "সঠিক। চামড়া একই থাকে তাই ভাঁজ পড়ে।",
+      "b": "এর কারণে কুঁচকায় না।",
+      "c": "পাতলা হলেও কুঁচকানোর আসল কারণ শরীরের আকার কমা।",
+      "d": "মেলানিনের কারণে চুল পাকে বা রং সাদা হয়।"
+    },
+    "correctAnswer": "a",
+    "explanation": "বৃদ্ধ হলে শরীরটা ছোটো হতে শুরু করে, কিন্তু চামড়া কমে না। তখন চামড়া কুঁচকে যায়[cite: 1]।"
+  },
+  {
+    "id": "q-chamrar-rong-kalo-17",
+    "slug": "chamrar-rong-kalo-17",
+    "createdAt": "2026-08-25T15:41:48.000Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "mcq",
+    "questionText": "চামড়ার রং কালো হয় কীসের জন্য?",
+    "marks": 1,
+    "difficulty": "easy",
+    "status": "published",
+    "tags": [
+      "মানবদেহ",
+      "মেলানিন"
+    ],
+    "options": {
+      "a": "ক্যালশিয়াম",
+      "b": "ভিটামিন-ডি",
+      "c": "মেলানিন",
+      "d": "হিমোগ্লোবিন"
+    },
+    "optionExplanations": {
+      "a": "ক্যালশিয়াম হাড়ে থাকে।",
+      "b": "ভিটামিন-ডি রোদে তৈরি হয়।",
+      "c": "সঠিক। মেলানিন চামড়াকে কালো করে।",
+      "d": "হিমোগ্লোবিন রক্তে থাকে।"
+    },
+    "correctAnswer": "c",
+    "explanation": "মেলানিন নামের একটা জিনিসের জন্য চামড়ার রং কালো হয়[cite: 1]।"
+  },
+  {
+    "id": "q-melanin-kon-roshomi-atkay-18",
+    "slug": "melanin-kon-roshomi-atkay-18",
+    "createdAt": "2026-08-25T15:41:48.000Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "mcq",
+    "questionText": "ত্বকের মেলানিন সূর্যের কোন ক্ষতিকর রশ্মি শুষে নেয়?",
+    "marks": 1,
+    "difficulty": "medium",
+    "status": "published",
+    "tags": [
+      "মানবদেহ",
+      "অতিবেগুনি রশ্মি"
+    ],
+    "options": {
+      "a": "রঞ্জন রশ্মি",
+      "b": "অতিবেগুনি রশ্মি",
+      "c": "অবলোহিত রশ্মি",
+      "d": "গামা রশ্মি"
+    },
+    "optionExplanations": {
+      "a": "রঞ্জন রশ্মি (X-ray) সূর্য থেকে আসে না।",
+      "b": "সঠিক। অতিবেগুনি রশ্মি ত্বকের ক্ষতি করে।",
+      "c": "অবলোহিত রশ্মি তাপ দেয়।",
+      "d": "গামা রশ্মি নয়।"
+    },
+    "correctAnswer": "b",
+    "explanation": "অতিবেগুনি রশ্মি ত্বকের ক্যানসার ঘটায়, মেলানিন তা শুষে নিয়ে ক্যানসার আটকায়[cite: 1]।"
+  },
+  {
+    "id": "q-kalo-chamra-roger-biruddhe-19",
+    "slug": "kalo-chamra-roger-biruddhe-19",
+    "createdAt": "2026-08-25T15:41:48.000Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "mcq",
+    "questionText": "কালো চামড়া সম্পর্কে কোনটি সঠিক?",
+    "marks": 1,
+    "difficulty": "medium",
+    "status": "published",
+    "tags": [
+      "মানবদেহ",
+      "মেলানিন"
+    ],
+    "options": {
+      "a": "কালো চামড়া রোগের বিরুদ্ধে কম লড়াই করতে পারে",
+      "b": "কালো চামড়া রোগের বিরুদ্ধে বেশি লড়াই করতে পারে",
+      "c": "কালো চামড়ায় সহজে ক্যানসার হয়",
+      "d": "কালো চামড়ায় ভিটামিন তৈরি হয় না"
+    },
+    "optionExplanations": {
+      "a": "ভুল।",
+      "b": "সঠিক। মেলানিন থাকায় এটি বেশি লড়াই করে।",
+      "c": "মেলানিন ক্যানসার আটকায়।",
+      "d": "ভিটামিন তৈরি হয়।"
+    },
+    "correctAnswer": "b",
+    "explanation": "কালো চামড়ায় মেলানিন বেশি থাকায় এটি অতিবেগুনি রশ্মি শুষে ক্যানসার আটকায় এবং রোগের বিরুদ্ধে বেশি লড়াই করতে পারে[cite: 1]।"
+  },
+  {
+    "id": "q-forsa-loker-melanin-20",
+    "slug": "forsa-loker-melanin-20",
+    "createdAt": "2026-08-25T15:41:48.000Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "mcq",
+    "questionText": "ফর্সা মানুষদের (যেমন সাহেবদের) চামড়ায় কি মেলানিন থাকে?",
+    "marks": 1,
+    "difficulty": "easy",
+    "status": "published",
+    "tags": [
+      "মানবদেহ",
+      "মেলানিন"
+    ],
+    "options": {
+      "a": "না, একদমই থাকে না",
+      "b": "হ্যাঁ, তবে কম থাকে",
+      "c": "কালো মানুষদের চেয়ে বেশি থাকে",
+      "d": "শুধু মুখে থাকে"
+    },
+    "optionExplanations": {
+      "a": "ভুল, কিছুটা থাকে।",
+      "b": "সঠিক। কম থাকে বলেই রং ফর্সা হয়।",
+      "c": "ভুল।",
+      "d": "ভুল।"
+    },
+    "correctAnswer": "b",
+    "explanation": "সাহেবদের বা ফর্সা মানুষদের চামড়াও মেলানিন থাকে, তবে তা পরিমাণে কম[cite: 1]।"
+  },
+  {
+    "id": "q-chamra-sada-hoye-jaoa-21",
+    "slug": "chamra-sada-hoye-jaoa-21",
+    "createdAt": "2026-08-25T15:41:48.000Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "mcq",
+    "questionText": "অপুষ্টি বা অসুখ হলে অনেক সময় চামড়ার কোনো কোনো জায়গা সাদা হয়ে যায় কেন?",
+    "marks": 1,
+    "difficulty": "medium",
+    "status": "published",
+    "tags": [
+      "মানবদেহ",
+      "অসুখ"
+    ],
+    "options": {
+      "a": "ওই জায়গায় মেলানিন তৈরি হয় না বলে",
+      "b": "রক্ত সাদা হয়ে যায় বলে",
+      "c": "ভিটামিন বেশি হয়ে যায় বলে",
+      "d": "হাড় দেখা যায় বলে"
+    },
+    "optionExplanations": {
+      "a": "সঠিক। মেলানিন তৈরি না হলে রং সাদা হয়।",
+      "b": "রক্ত সাদা হয় না।",
+      "c": "ভিটামিনের সাথে সম্পর্ক নেই।",
+      "d": "হাড় দেখা যায় না।"
+    },
+    "correctAnswer": "a",
+    "explanation": "অপুষ্টি বা অসুখে ত্বকের ওই জায়গাগুলোতে মেলানিন তৈরি না হলে চামড়া একদম সাদা হয়ে যায়[cite: 1]।"
+  },
+  {
+    "id": "q-rode-kon-vitamin-22",
+    "slug": "rode-kon-vitamin-22",
+    "createdAt": "2026-08-25T15:41:48.000Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "mcq",
+    "questionText": "গায়ে রোদ লাগালে ত্বকে কোন ভিটামিন তৈরি হয়?",
+    "marks": 1,
+    "difficulty": "easy",
+    "status": "published",
+    "tags": [
+      "মানবদেহ",
+      "ভিটামিন"
+    ],
+    "options": {
+      "a": "ভিটামিন-এ",
+      "b": "ভিটামিন-সি",
+      "c": "ভিটামিন-ডি",
+      "d": "ভিটামিন-ই"
+    },
+    "optionExplanations": {
+      "a": "ভিটামিন-এ খাবারে পাওয়া যায়।",
+      "b": "ভিটামিন-সি লেবুতে থাকে।",
+      "c": "সঠিক। রোদে ত্বকে ভিটামিন-ডি তৈরি হয়।",
+      "d": "ভিটামিন-ই নয়।"
+    },
+    "correctAnswer": "c",
+    "explanation": "ত্বকে রোদ লাগালে ভিটামিন-ডি তৈরি হয়[cite: 1]।"
+  },
+  {
+    "id": "q-rod-melanin-23",
+    "slug": "rod-melanin-23",
+    "createdAt": "2026-08-25T15:41:48.000Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "mcq",
+    "questionText": "রোদ শরীরে আর কী তৈরি করতে সাহায্য করে?",
+    "marks": 1,
+    "difficulty": "medium",
+    "status": "published",
+    "tags": [
+      "মানবদেহ",
+      "মেলানিন"
+    ],
+    "options": {
+      "a": "মেলানিন",
+      "b": "ক্যালশিয়াম",
+      "c": "রক্ত",
+      "d": "পেশি"
+    },
+    "optionExplanations": {
+      "a": "সঠিক। রোদ মেলানিন তৈরি করতে সাহায্য করে।",
+      "b": "ক্যালশিয়াম খাবারে থাকে।",
+      "c": "রোদ রক্ত তৈরি করে না।",
+      "d": "পেশি তৈরিতে ব্যায়াম লাগে।"
+    },
+    "correctAnswer": "a",
+    "explanation": "রোদ শরীরে মেলানিন তৈরি করতেও সাহায্য করে[cite: 1]।"
+  },
+  {
+    "id": "q-ghamer-modhye-ki-thake-24",
+    "slug": "ghamer-modhye-ki-thake-24",
+    "createdAt": "2026-08-25T15:41:48.000Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "mcq",
+    "questionText": "চামড়া থেকে বেরোনো ঘামে কী কী থাকে?",
+    "marks": 1,
+    "difficulty": "easy",
+    "status": "published",
+    "tags": [
+      "মানবদেহ",
+      "ঘাম"
+    ],
+    "options": {
+      "a": "শুধুমাত্র জল",
+      "b": "নুন আর শরীরের কিছু বর্জ্য",
+      "c": "রক্ত আর জল",
+      "d": "ভিটামিন আর ক্যালশিয়াম"
+    },
+    "optionExplanations": {
+      "a": "শুধু জল থাকে না।",
+      "b": "সঠিক। ঘামে নুন ও বর্জ্য থাকে।",
+      "c": "ঘামে রক্ত থাকে না।",
+      "d": "ভিটামিন ঘামে বেরোয় না।"
+    },
+    "correctAnswer": "b",
+    "explanation": "ঘামে নুন আর শরীরের কিছু বর্জ্য থাকে[cite: 1]।"
+  },
+  {
+    "id": "q-beshi-nun-beriye-gele-25",
+    "slug": "beshi-nun-beriye-gele-25",
+    "createdAt": "2026-08-25T15:41:48.000Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "mcq",
+    "questionText": "ঘামের সাথে শরীর থেকে বেশি নুন বেরিয়ে গেলে কী সমস্যা হতে পারে?",
+    "marks": 1,
+    "difficulty": "medium",
+    "status": "published",
+    "tags": [
+      "মানবদেহ",
+      "ঘাম"
+    ],
+    "options": {
+      "a": "মাথা ঘোরা বা অজ্ঞান হওয়া",
+      "b": "ক্যানসার হওয়া",
+      "c": "চামড়া সাদা হয়ে যাওয়া",
+      "d": "হাড় ভেঙে যাওয়া"
+    },
+    "optionExplanations": {
+      "a": "সঠিক। বেশি নুন কমলে মাথা ঘোরে।",
+      "b": "এর সাথে ক্যানসারের সম্পর্ক নেই।",
+      "c": "চামড়া সাদা হয় মেলানিন না থাকলে।",
+      "d": "হাড় ভাঙে না।"
+    },
+    "correctAnswer": "a",
+    "explanation": "ঘামের মাধ্যমে শরীর থেকে বেশি নুন বেরিয়ে গেলে মাথা ঘোরা বা অজ্ঞান হওয়ার ঘটনাও ঘটতে পারে[cite: 1]।"
+  },
+  {
+    "id": "q-ghame-nun-kome-gele-protikar-26",
+    "slug": "ghame-nun-kome-gele-protikar-26",
+    "createdAt": "2026-08-25T15:41:48.000Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "mcq",
+    "questionText": "খুব ঘাম হলে শরীর সুস্থ রাখতে ডাক্তারবাবুরা কী খেতে বলেন?",
+    "marks": 1,
+    "difficulty": "easy",
+    "status": "published",
+    "tags": [
+      "মানবদেহ",
+      "স্বাস্থ্য"
+    ],
+    "options": {
+      "a": "গরম জল",
+      "b": "একটু নুন জল",
+      "c": "ফলের রস",
+      "d": "দুধ"
+    },
+    "optionExplanations": {
+      "a": "গরম জল নুনের ঘাটতি মেটায় না।",
+      "b": "সঠিক। নুন জল শরীরের নুনের ঘাটতি মেটায়।",
+      "c": "ফলের রস ভালো, তবে নুন জল জরুরি।",
+      "d": "দুধ নয়।"
+    },
+    "correctAnswer": "b",
+    "explanation": "খুব ঘাম হলে শরীর থেকে নুন বেরিয়ে যায়, তাই ডাক্তারবাবু নুন জল খেতে বলেন[cite: 1]।"
+  },
+  {
+    "id": "q-chamrar-rong-bhedabhed-27",
+    "slug": "chamrar-rong-bhedabhed-27",
+    "createdAt": "2026-08-25T15:41:48.000Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "mcq",
+    "questionText": "একসময়ে কী দেখে মানুষে মানুষে ভেদাভেদ করা হতো?",
+    "marks": 1,
+    "difficulty": "easy",
+    "status": "published",
+    "tags": [
+      "মানবদেহ",
+      "সমাজ"
+    ],
+    "options": {
+      "a": "চুলের ধরন দেখে",
+      "b": "উচ্চতা দেখে",
+      "c": "চামড়ার রং দেখে",
+      "d": "ওজন দেখে"
+    },
+    "optionExplanations": {
+      "a": "চুল দেখে ভেদাভেদ হতো না।",
+      "b": "উচ্চতা দেখে নয়।",
+      "c": "সঠিক। সাদা ও কালো চামড়ার ভিত্তিতে ভেদাভেদ হতো।",
+      "d": "ওজন দেখে নয়।"
+    },
+    "correctAnswer": "c",
+    "explanation": "একসময়ে চামড়ার রং দেখে মানুষের ভেদাভেদ করা হতো, বলা হতো সাদা চামড়ার মানুষরা সভ্য আর কালোরা অসভ্য[cite: 1]।"
+  },
+  {
+    "id": "q-kalo-manushder-sommaner-lorai-28",
+    "slug": "kalo-manushder-sommaner-lorai-28",
+    "createdAt": "2026-08-25T15:41:48.000Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "mcq",
+    "questionText": "কালো মানুষদের সম্মানের জন্য কারা লড়াই করেছেন?",
+    "marks": 1,
+    "difficulty": "hard",
+    "status": "published",
+    "tags": [
+      "মানবদেহ",
+      "মহামানব"
+    ],
+    "options": {
+      "a": "নেলসন্ ম্যান্ডেলা, মহাত্মা গান্ধি, মার্টিন লুথার কিং",
+      "b": "শুধুমাত্র নেলসন্ ম্যান্ডেলা",
+      "c": "রেনে লিনেক",
+      "d": "উপরের কেউই নন"
+    },
+    "optionExplanations": {
+      "a": "সঠিক। এঁরা সবাই বর্ণবৈষম্যের বিরুদ্ধে লড়েছেন।",
+      "b": "গান্ধিজি ও লুথার কিং-ও লড়েছেন।",
+      "c": "লিনেক স্টেথোস্কোপ আবিষ্কার করেন।",
+      "d": "ভুল।"
+    },
+    "correctAnswer": "a",
+    "explanation": "নেলসন্ ম্যান্ডেলা, মহাত্মা গান্ধি, মার্টিন লুথার কিং এঁরা সবাই কালো মানুষদের সম্মানের জন্য লড়েছেন[cite: 1]।"
+  },
+  {
+    "id": "q-chamrar-rong-dekhe-bhedabhed-oporadh-29",
+    "slug": "chamrar-rong-dekhe-bhedabhed-oporadh-29",
+    "createdAt": "2026-08-25T15:41:48.000Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "mcq",
+    "questionText": "আজকের দিনে চামড়ার রং দেখে মানুষে-মানুষে ভেদাভেদ করাকে কী বলা হয়?",
+    "marks": 1,
+    "difficulty": "medium",
+    "status": "published",
+    "tags": [
+      "মানবদেহ",
+      "সমাজ"
+    ],
+    "options": {
+      "a": "অপরাধ",
+      "b": "স্বাভাবিক ব্যাপার",
+      "c": "সম্মানজনক",
+      "d": "বিজ্ঞানসম্মত"
+    },
+    "optionExplanations": {
+      "a": "সঠিক। এটি আজকের দিনে অপরাধের শামিল।",
+      "b": "এটি স্বাভাবিক নয়।",
+      "c": "একদমই নয়।",
+      "d": "বিজ্ঞান একে সমর্থন করে না।"
+    },
+    "correctAnswer": "a",
+    "explanation": "চামড়ার রং দেখে মানুষে-মানুষে ভেদাভেদ করা আজকের দিনে অপরাধের শামিল[cite: 1]।"
+  },
+  {
+    "id": "q-chamrar-niche-fule-thaka-ongsho-30",
+    "slug": "chamrar-niche-fule-thaka-ongsho-30",
+    "createdAt": "2026-08-25T15:41:48.000Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-shorirer-bormo-manabdeha",
+    "questionType": "mcq",
+    "questionText": "চামড়ার নীচে থাকা যে নলগুলোর শাখা প্রশাখা দেখা যায়, সেগুলো আসলে কী?",
+    "marks": 1,
+    "difficulty": "medium",
+    "status": "published",
+    "tags": [
+      "মানবদেহ",
+      "শিরা"
+    ],
+    "options": {
+      "a": "ধমনি",
+      "b": "শিরা",
+      "c": "হাড়",
+      "d": "পেশি"
+    },
+    "optionExplanations": {
+      "a": "ধমনি আরো গভীরে থাকে।",
+      "b": "সঠিক। চামড়ার নীচে শাখা প্রশাখা যুক্ত নলগুলো হলো শিরা।",
+      "c": "হাড় শাখা প্রশাখাযুক্ত নল নয়।",
+      "d": "পেশি নল নয়।"
+    },
+    "correctAnswer": "b",
+    "explanation": "রফিক যখন হাত উপুড় করে দেখায় তখন চামড়ার নীচে ফুলে থাকা শাখা-প্রশাখা যুক্ত নলগুলো শিরা হিসেবেই চিহ্নিত হয়[cite: 1]।"
+  },
+  {
+    "id": "q-twok-patla-shira-01",
+    "slug": "twok-patla-shira-01",
+    "createdAt": "2026-08-25T16:00:00.000Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-twok-kothay-patla-kothay-puru-manabdeha",
+    "questionType": "mcq",
+    "questionText": "চামড়া যেখানে পাতলা, সেখানে চামড়ার নিচ দিয়ে কী দেখা যায়?",
+    "marks": 1,
+    "difficulty": "easy",
+    "status": "published",
+    "tags": [
+      "মানবদেহ",
+      "ত্বক",
+      "শিরা"
+    ],
+    "options": {
+      "a": "হাড়",
+      "b": "শিরা",
+      "c": "পেশি",
+      "d": "রক্ত"
+    },
+    "optionExplanations": {
+      "a": "হাড় অনেক গভীরে থাকে, পাতলা চামড়ার নিচে সরাসরি দেখা যায় না।",
+      "b": "সঠিক। আমিনার মতে, চামড়া যেখানে পাতলা সেখানেই শিরাগুলো দেখা যায়।",
+      "c": "পেশি সরাসরি দেখা যায় না।",
+      "d": "রক্ত শিরার ভেতরে থাকে।"
+    },
+    "correctAnswer": "b",
+    "explanation": "চামড়া যেখানে পাতলা, সেখানেই শিরাগুলো খুব সহজেই দেখা যায়।"
+  },
+  {
+    "id": "q-hater-cheto-shira-02",
+    "slug": "hater-cheto-shira-02",
+    "createdAt": "2026-08-25T16:00:00.000Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-twok-kothay-patla-kothay-puru-manabdeha",
+    "questionType": "mcq",
+    "questionText": "হাতের চেটোর দিকে শিরা দেখা যায় না কেন?",
+    "marks": 1,
+    "difficulty": "medium",
+    "status": "published",
+    "tags": [
+      "মানবদেহ",
+      "ত্বক"
+    ],
+    "options": {
+      "a": "সেখানে কোনো শিরা থাকে না বলে",
+      "b": "সেখানকার চামড়া পাতলা বলে",
+      "c": "সেখানকার চামড়া মোটা বলে",
+      "d": "সেখানে হাড় থাকে না বলে"
+    },
+    "optionExplanations": {
+      "a": "শিরা থাকে, কিন্তু চামড়া পুরু হওয়ায় তা দেখা যায় না।",
+      "b": "চামড়া পাতলা হলে শিরা দেখা যেত।",
+      "c": "সঠিক। চামড়া মোটা হওয়ায় হাতের চেটোতে শিরা দেখা যায় না।",
+      "d": "হাড়ের সাথে শিরা দেখার সরাসরি সম্পর্ক নেই।"
+    },
+    "correctAnswer": "c",
+    "explanation": "চামড়া যেখানে মোটা সেখানে শিরা দেখা যায় না, আর তাই হাতের চেটোর দিকে শিরা দেখা যায় না।"
+  },
+  {
+    "id": "q-hater-cheto-puru-karon-03",
+    "slug": "hater-cheto-puru-karon-03",
+    "createdAt": "2026-08-25T16:00:00.000Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-twok-kothay-patla-kothay-puru-manabdeha",
+    "questionType": "mcq",
+    "questionText": "হাতের চেটোর দিকের ত্বক মোটা বা পুরু হয়ে যাওয়ার প্রধান কারণ কী?",
+    "marks": 1,
+    "difficulty": "medium",
+    "status": "published",
+    "tags": [
+      "মানবদেহ",
+      "ত্বকের পুরুত্ব"
+    ],
+    "options": {
+      "a": "ওই দিকে বেশি ঘষাঘষি হয়",
+      "b": "ওই দিকে কম ঘষাঘষি হয়",
+      "c": "ওই দিকে বেশি আলো পড়ে",
+      "d": "ওই দিকে বেশি শিরা থাকে"
+    },
+    "optionExplanations": {
+      "a": "সঠিক। হাতের চেটো দিয়ে সব কাজ করা হয় বলে সেখানে ঘষাঘষি বেশি হয়।",
+      "b": "কম ঘষাঘষি হলে চামড়া পাতলা হত।",
+      "c": "আলো পড়ার সাথে চামড়া মোটা হওয়ার সম্পর্ক নেই।",
+      "d": "শিরার পরিমাণের সাথে চামড়া মোটা হওয়ার সম্পর্ক নেই।"
+    },
+    "correctAnswer": "a",
+    "explanation": "হাতের চেটোর দিকটায় বেশি ঘষাঘষি হয় বলেই সেখানকার ত্বক মোটা হয়ে গিয়েছে।"
+  },
+  {
+    "id": "q-payer-tola-puru-04",
+    "slug": "payer-tola-puru-04",
+    "createdAt": "2026-08-25T16:00:00.000Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-twok-kothay-patla-kothay-puru-manabdeha",
+    "questionType": "mcq",
+    "questionText": "হাতের চেটোর চামড়ার চেয়েও শরীরের কোন অংশের চামড়া আরো বেশি পুরু হয়?",
+    "marks": 1,
+    "difficulty": "easy",
+    "status": "published",
+    "tags": [
+      "মানবদেহ",
+      "পায়ের তলা"
+    ],
+    "options": {
+      "a": "গালের চামড়া",
+      "b": "পায়ের তলার চামড়া",
+      "c": "গলার চামড়া",
+      "d": "হাতের পিঠের চামড়া"
+    },
+    "optionExplanations": {
+      "a": "গালের চামড়া পাতলা হয়।",
+      "b": "সঠিক। হাঁটাচলার জন্য পায়ের তলার চামড়া অনেক পুরু হয়।",
+      "c": "গলার চামড়া পাতলা।",
+      "d": "হাতের পিঠ হাতের চেটোর চেয়েও পাতলা।"
+    },
+    "correctAnswer": "b",
+    "explanation": "ইতুর কথা অনুযায়ী, হাতের চেটোর চেয়ে পায়ের তলার চামড়া আরো পুরু হয়।"
+  },
+  {
+    "id": "q-sobcheye-puru-gorali-05",
+    "slug": "sobcheye-puru-gorali-05",
+    "createdAt": "2026-08-25T16:00:00.000Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-twok-kothay-patla-kothay-puru-manabdeha",
+    "questionType": "mcq",
+    "questionText": "পায়ের তলার কোন অংশের চামড়া সবচেয়ে বেশি পুরু হয়?",
+    "marks": 1,
+    "difficulty": "easy",
+    "status": "published",
+    "tags": [
+      "মানবদেহ",
+      "গোড়ালি"
+    ],
+    "options": {
+      "a": "পায়ের আঙুলের",
+      "b": "পায়ের পাতার ওপরের অংশের",
+      "c": "গোড়ালির কাছটার",
+      "d": "পায়ের নখের পাশের"
+    },
+    "optionExplanations": {
+      "a": "পায়ের আঙুলের চামড়া গোড়ালির মতো এত পুরু নয়।",
+      "b": "পায়ের ওপরের অংশের চামড়া বেশ পাতলা।",
+      "c": "সঠিক। গোড়ালির চামড়া সবচেয়ে পুরু হয়।",
+      "d": "নখের পাশের চামড়া সবচেয়ে পুরু নয়।"
+    },
+    "correctAnswer": "c",
+    "explanation": "পায়ের তলার চামড়া আরো পুরু, আর তার মধ্যে গোড়ালির কাছটা সবচেয়ে পুরু হয়।"
+  },
+  {
+    "id": "q-goralir-chamra-puru-karon-06",
+    "slug": "goralir-chamra-puru-karon-06",
+    "createdAt": "2026-08-25T16:00:00.000Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-twok-kothay-patla-kothay-puru-manabdeha",
+    "questionType": "mcq",
+    "questionText": "গোড়ালির চামড়া সবচেয়ে পুরু হওয়ার বৈজ্ঞানিক কারণ কী?",
+    "marks": 1,
+    "difficulty": "medium",
+    "status": "published",
+    "tags": [
+      "মানবদেহ",
+      "গোড়ালি",
+      "ভার"
+    ],
+    "options": {
+      "a": "কারণ সেখানে বেশি ঘাম হয়",
+      "b": "হাঁটার সময় গোড়ালির ওপর শরীরের সব ভার পড়ে বলে",
+      "c": "কারণ গোড়ালি দিয়ে আমরা কাজ করি",
+      "d": "কারণ সেখানে শিরা থাকে না"
+    },
+    "optionExplanations": {
+      "a": "ঘামের কারণে চামড়া পুরু হয় না।",
+      "b": "সঠিক। শরীরের সমস্ত ভার বহনের জন্য সেখানকার চামড়াকে মোটা হতে হয়।",
+      "c": "আমরা হাত দিয়ে কাজ করি, গোড়ালি দিয়ে হাঁটি।",
+      "d": "গোড়ালিতেও শিরা থাকে, তবে গভীরে।"
+    },
+    "correctAnswer": "b",
+    "explanation": "হাঁটার কথা ভেবে দেখলে বোঝা যায়, গোড়ালির উপর শরীরের সব ভার পড়ে বলেই সেখানকার চামড়া বা বর্মটা মোটা হয়।"
+  },
+  {
+    "id": "q-chamrar-purutto-bojhhar-upay-07",
+    "slug": "chamrar-purutto-bojhhar-upay-07",
+    "createdAt": "2026-08-25T16:00:00.000Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-twok-kothay-patla-kothay-puru-manabdeha",
+    "questionType": "mcq",
+    "questionText": "শরীরের কোথাকার চামড়া কতটা পুরু, তা সহজে বোঝার উপায় কী?",
+    "marks": 1,
+    "difficulty": "medium",
+    "status": "published",
+    "tags": [
+      "মানবদেহ",
+      "পরীক্ষা"
+    ],
+    "options": {
+      "a": "চামড়ার রং দেখে",
+      "b": "চামড়া দু-আঙুল দিয়ে ধরে দেখলে",
+      "c": "চামড়ায় জল ঢেলে",
+      "d": "চামড়ায় রোদ লাগিয়ে"
+    },
+    "optionExplanations": {
+      "a": "রং দেখে পুরুত্ব বোঝা যায় না।",
+      "b": "সঠিক। সুজন দু-আঙুল দিয়ে চামড়া ধরে এর পুরুত্ব বুঝিয়েছে।",
+      "c": "জল ঢেলে চামড়ার পুরুত্ব বোঝা সম্ভব নয়।",
+      "d": "রোদ লাগালে ভিটামিন তৈরি হয়, পুরুত্ব বোঝা যায় না।"
+    },
+    "correctAnswer": "b",
+    "explanation": "সুজন রফিকের হাতের চামড়াটা দু-আঙুল দিয়ে ধরে বুঝিয়েছিল যে এভাবে ধরলে কোথাকার চামড়া কতটা পুরু তা বোঝা যায়।"
+  },
+  {
+    "id": "q-galer-chamra-kemon-08",
+    "slug": "galer-chamra-kemon-08",
+    "createdAt": "2026-08-25T16:00:00.000Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-twok-kothay-patla-kothay-puru-manabdeha",
+    "questionType": "mcq",
+    "questionText": "আমাদের গালের চামড়া বা ত্বক কেমন হয়?",
+    "marks": 1,
+    "difficulty": "easy",
+    "status": "published",
+    "tags": [
+      "মানবদেহ",
+      "গাল"
+    ],
+    "options": {
+      "a": "অনেক পুরু",
+      "b": "খুব শক্ত",
+      "c": "পাতলা",
+      "d": "গোড়ালির মতো মোটা"
+    },
+    "optionExplanations": {
+      "a": "গালের চামড়া পুরু নয়।",
+      "b": "গালের চামড়া শক্ত নয়, নরম।",
+      "c": "সঠিক। গালের ত্বক পাতলা হয়।",
+      "d": "গোড়ালির চামড়া সবচেয়ে মোটা, গাল পাতলা।"
+    },
+    "correctAnswer": "c",
+    "explanation": "বইয়ের তালিকা অনুযায়ী গালের ত্বক পাতলা হয়।"
+  },
+  {
+    "id": "q-bormo-mota-howa-09",
+    "slug": "bormo-mota-howa-09",
+    "createdAt": "2026-08-25T16:00:00.000Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-twok-kothay-patla-kothay-puru-manabdeha",
+    "questionType": "mcq",
+    "questionText": "হাঁটার সময় শরীরের ভার সামলানোর জন্য গোড়ালিতে কোন জিনিসটি মোটা না হলে চলে না?",
+    "marks": 1,
+    "difficulty": "medium",
+    "status": "published",
+    "tags": [
+      "মানবদেহ",
+      "বর্ম"
+    ],
+    "options": {
+      "a": "হাড়",
+      "b": "শিরা",
+      "c": "বর্ম বা চামড়া",
+      "d": "রক্ত"
+    },
+    "optionExplanations": {
+      "a": "হাড় শক্ত হয়, কিন্তু বাইরের আঘাত থেকে চামড়াই বাঁচায়।",
+      "b": "শিরা মোটা হওয়ার দরকার নেই।",
+      "c": "সঠিক। শরীরের বর্ম অর্থাৎ চামড়া মোটা না হলে শরীরের ভার সামলানো মুশকিল।",
+      "d": "রক্তের সাথে এর সম্পর্ক নেই।"
+    },
+    "correctAnswer": "c",
+    "explanation": "মীনা বলেছিল, গোড়ালির উপর শরীরের সব ভার পড়ে বলে সেখানে বর্মটা বা চামড়াটা মোটা না হলে চলে না।"
+  },
+  {
+    "id": "q-ghoshaghoshi-twok-10",
+    "slug": "ghoshaghoshi-twok-10",
+    "createdAt": "2026-08-25T16:00:00.000Z",
+    "boardId": "board-wb",
+    "classId": "class-5-wb",
+    "subjectId": "subject-evs-class-5-wb",
+    "textbookId": "textbook-amader-paribesh",
+    "chapterId": "chapter-manabdeha-amader-paribesh",
+    "topicId": "topic-twok-kothay-patla-kothay-puru-manabdeha",
+    "questionType": "mcq",
+    "questionText": "শরীরের চামড়ার পুরুত্ব প্রধানত কিসের উপর নির্ভর করে?",
+    "marks": 1,
+    "difficulty": "hard",
+    "status": "published",
+    "tags": [
+      "মানবদেহ",
+      "ত্বক",
+      "বিশ্লেষণ"
+    ],
+    "options": {
+      "a": "চামড়ার রঙের ওপর",
+      "b": "সেখানে কতটা ঘষাঘষি হয় এবং শরীরের কতটা ভার পড়ে তার ওপর",
+      "c": "মানুষের বয়সের ওপর",
+      "d": "মানুষ কতটা জল খায় তার ওপর"
+    },
+    "optionExplanations": {
+      "a": "রঙের সাথে পুরুত্বের কোনো সম্পর্ক নেই।",
+      "b": "সঠিক। হাতের চেটোতে ঘষাঘষি বেশি হয় এবং গোড়ালিতে ভার বেশি পড়ে বলেই সেখানকার চামড়া পুরু।",
+      "c": "বয়স বাড়লে চামড়া কুঁচকে যায়, কিন্তু কোথায় পুরু হবে তা বয়স ঠিক করে না।",
+      "d": "জল খাওয়ার ওপর চামড়ার পুরুত্ব নির্ভর করে না।"
+    },
+    "correctAnswer": "b",
+    "explanation": "হাতের চেটোতে বেশি ঘষাঘষি হয় এবং পায়ের গোড়ালিতে শরীরের সব ভার পড়ে বলেই সেখানকার চামড়া মোটা বা পুরু হয়।"
   }
 ]
