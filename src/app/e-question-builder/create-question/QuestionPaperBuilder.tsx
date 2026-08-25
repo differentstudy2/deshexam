@@ -28,6 +28,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuthDialog } from '@/hooks/use-auth-dialog';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
+import { generateQuestionPaperDocx } from '@/lib/export-docx';
 
 interface Props {
   boardId?: string;
@@ -443,22 +444,30 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
     });
   };
 
-  const handleExportWord = () => {
-    handleInterceptedExport(() => {
-      const element = document.getElementById('printable-paper');
-      if (!element) return;
-      const htmlContent = element.innerHTML;
-      const header = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-      <head><meta charset='utf-8'><title>Export Document</title></head><body>`;
-      const footer = `</body></html>`;
-      const sourceHTML = header + htmlContent + footer;
-      const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
-      const fileDownload = document.createElement("a");
-      document.body.appendChild(fileDownload);
-      fileDownload.href = source;
-      fileDownload.download = (paperName || 'Question_Paper') + '.doc';
-      fileDownload.click();
-      document.body.removeChild(fileDownload);
+  const handleExportWord = async () => {
+    handleInterceptedExport(async () => {
+      try {
+        await generateQuestionPaperDocx(
+          questions,
+          {
+            headerTitle: headerSettingsEnabled ? headerTitle : '',
+            headerAddress: headerSettingsEnabled && showAddress ? headerAddress : '',
+            headerClassName: headerSettingsEnabled && showClassName ? headerClassName : '',
+            headerSubjectName: headerSettingsEnabled && showSubjectName ? headerSubjectName : '',
+            headerTime: headerSettingsEnabled ? headerTime : '',
+            headerMarks: headerSettingsEnabled ? headerMarks : '',
+            activeSetCode: showSetCode ? activeSetCode : '',
+            paperColumns: paperColumns,
+            optionColumns: optionColumns,
+            optionLabelType: optionLabelType,
+            showInstructions: showInstructions
+          },
+          paperName || 'Question_Paper'
+        );
+      } catch (err) {
+        console.error("Docx generation failed", err);
+        toast({ title: 'Export failed', description: 'Failed to generate Word document.', variant: 'destructive' });
+      }
     });
   };
 
