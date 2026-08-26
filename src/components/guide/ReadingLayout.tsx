@@ -166,7 +166,7 @@ export function ReadingLayout({
         </div>
 
         {/* Right Sections Sidebar */}
-        <div className="w-[300px] shrink-0 hidden lg:flex flex-col gap-6 sticky top-6 self-start h-[calc(100vh-3rem)] overflow-y-auto custom-scrollbar pr-1 print:hidden">
+        <div className="w-[300px] shrink-0 hidden lg:flex flex-col gap-6 pr-1 print:hidden">
           <TopicSectionsSidebar sections={data.sections} node={node} currentContentType={contentType} />
           <GuideSidebar subjects={subjects} activeId={node?.fullSlug || id} classTitle={classTitle} />
         </div>

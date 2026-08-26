@@ -155,7 +155,7 @@ export function NodeQuestionsPage({ node, contentType, breadcrumbs, previewMode 
               index={index}
               isListView={true}
               testMode={isTestMode}
-              isDetailView={!isTestMode}
+              isDetailView={false}
             />
           ))}
 

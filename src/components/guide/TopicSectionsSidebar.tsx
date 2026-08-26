@@ -47,8 +47,14 @@ export function TopicSectionsSidebar({ sections = [], node, currentContentType }
   const baseUrl = node ? `/guide/${node.fullSlug || node.id}` : pathname.replace(/\/[^\/]+$/, '');
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col h-fit p-3">
-      <div className="space-y-1">
+    <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col h-fit overflow-hidden">
+      <div className="bg-gradient-to-r from-emerald-600 to-green-500 dark:from-emerald-700 dark:to-green-600 p-3 flex items-center gap-2 shrink-0">
+        <div className="p-1.5 bg-white/20 rounded-lg">
+          <BookOpen className="w-5 h-5 text-white" />
+        </div>
+        <h3 className="font-bold text-white text-[15px] leading-tight">বিষয়বস্তু</h3>
+      </div>
+      <div className="space-y-1 p-3">
         {sections.map((sec) => {
           const secId = sec.id || '';
           const isActive = activeId === secId;

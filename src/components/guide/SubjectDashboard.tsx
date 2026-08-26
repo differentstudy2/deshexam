@@ -522,19 +522,7 @@ At DeshExam, we provide high-quality MCQ, short answer questions (SAQ), long ans
                 ))}
               </Accordion>
 
-              {subjects && subjects.length > 0 && (
-                <>
-                  <h2 className="text-xl font-bold text-slate-900 dark:text-white mt-8 mb-4">Related Content</h2>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {subjects.slice(0, 4).map(sub => (
-                      <Link key={sub.id} href={`/guide/${sub.id}`} className="p-4 border border-slate-200 dark:border-slate-800 rounded-xl hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all">
-                        <h3 className="font-bold text-slate-800 dark:text-slate-200">{sub.title}</h3>
-                        <p className="text-xs text-slate-500 mt-1">{classTitle ? `Class ${classTitle}` : 'View More'}</p>
-                      </Link>
-                    ))}
-                  </div>
-                </>
-              )}
+
             </div>
           )}
         </div>

@@ -61,7 +61,6 @@ export const subjectTranslationMap: Record<string, string> = {
   'Ganit Prabha': 'গণিত প্রভা',
   'Poribesh O Bigyan': 'পরিবেশ ও বিজ্ঞান',
   'Bhasha Path': 'ভাষা পাঠ',
-  'Butterfly': 'বাটারফ্লাই',
   'Amader Prithibi': 'আমাদের পৃথিবী',
   'Atit O Aityaja': 'অতীত ও ঐতিহ্য',
 };

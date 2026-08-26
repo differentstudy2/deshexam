@@ -47,7 +47,7 @@ export function ContentNavigationSidebar({ curriculum, activeId, subjectTitle }:
             </h2>
           </div>
 
-          <div className="flex flex-col flex-1 overflow-y-auto custom-scrollbar pb-4 min-h-0">
+          <div className="flex flex-col flex-1 overflow-y-auto show-scrollbar pb-4 min-h-0">
             {(curriculum[0]?.topics || []).map((chapter: any, chapterIndex: number) => {
               const isChapterActive = chapter.id === activeId;
               const isChapterGroupActive = isChapterActive || chapter.subtopics?.some((t: any) => t.id === activeId);

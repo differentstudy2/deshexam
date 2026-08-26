@@ -64,7 +64,7 @@ const formatDate = (dateValue: any) => {
 
 export default function QuestionCard({ question, index, testMode = false, isListView = false, isDetailView = false }: QuestionCardProps) {
     const isDescriptive = ['desc', 'descriptive', 'creative question', 'creative-question', 'cq'].includes(question.questionType?.toLowerCase() || '');
-    const [showAnswer, setShowAnswer] = useState(isDetailView || isDescriptive);
+    const [showAnswer, setShowAnswer] = useState(isDetailView);
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
     const [fillBlankAnswer, setFillBlankAnswer] = useState<string>('');
     const { user } = useAuth();
