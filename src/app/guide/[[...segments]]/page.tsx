@@ -2,7 +2,7 @@ import React from 'react';
 import { redirect, notFound } from 'next/navigation';
 import { getTaxonomyNodeBySlug, getTaxonomyNodeById, VALID_CONTENT_TYPES, ContentType } from '@/lib/firebase/taxonomy';
 import { getReadingContent, getCurriculumBySubject, getCurriculumByClass, getCurriculumByBoard, getGuideSubjects, findGuideNodeAnyLevel, buildCurriculumFromTextbooks } from '@/lib/firebase/guide';
-import { getTaxonomyNodesByParent, getTaxonomyNodesByTrack } from '@/lib/firebase/taxonomy';
+import { getTaxonomyNodesByParent, getTaxonomyNodesByTrack, getTaxonomyNodesByType } from '@/lib/firebase/taxonomy';
 import { generateHybridSeo } from '@/lib/seo';
 import { ReadingLayout } from '@/components/guide/ReadingLayout';
 import { SubjectDashboard } from '@/components/guide/SubjectDashboard';
@@ -165,12 +165,21 @@ export default async function GuidePage({ params }: { params: Promise<{ segments
   if (classNode) {
     const classNodes = await getTaxonomyNodesByParent(classNode.id);
     const relevantNodes = classNodes.filter(n => n.type === 'subject' || n.type === 'textbook');
-    subjects = relevantNodes.map(n => ({
-      id: n.fullSlug || n.id, // Used for routing in sidebar
-      dbId: n.id,             // Used for database queries
-      title: n.title || (n as any).name,
-      countStr: ''
-    }));
+    const allTextbooks = await getTaxonomyNodesByType('academic', 'textbook');
+    
+    subjects = relevantNodes.map(n => {
+      const textbooks = allTextbooks.filter((t: any) => t.parentId === n.id).map((t: any) => ({
+        id: t.fullSlug || t.id,
+        title: t.title || t.name
+      }));
+      return {
+        id: n.fullSlug || n.id, // Used for routing in sidebar
+        dbId: n.id,             // Used for database queries
+        title: n.title || (n as any).name,
+        textbooks,
+        countStr: ''
+      };
+    });
   } else if (node.type?.toLowerCase() === 'board') {
     const boardNodes = await getTaxonomyNodesByParent(node.id);
     const classes = boardNodes.filter(n => n.type === 'class');

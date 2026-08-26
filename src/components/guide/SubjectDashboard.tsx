@@ -542,7 +542,7 @@ At DeshExam, we provide high-quality MCQ, short answer questions (SAQ), long ans
         {/* Right Column (Sidebar) */}
         {pageType !== 'board' && (
           <div className="w-full lg:w-[340px] shrink-0">
-            <GuideSidebar subjects={subjects} activeId={id} classTitle={classTitle} />
+            <GuideSidebar subjects={subjects} activeId={node?.fullSlug || id} classTitle={classTitle} />
           </div>
         )}
       </div>

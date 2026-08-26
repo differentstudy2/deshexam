@@ -21,6 +21,7 @@ export type SidebarSubject = {
   id: string;
   title: string;
   countStr: string;
+  textbooks?: { id: string, title: string }[];
 };
 
 // --- Dashboard Mock Data ---
