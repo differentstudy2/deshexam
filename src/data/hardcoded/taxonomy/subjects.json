@@ -1588,5 +1588,35 @@
         "type": "class"
       }
     ]
+  },
+  {
+    "id": "subject-english-class-6-wb",
+    "title": "English",
+    "slug": "english",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-6-wb",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/english",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "english",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      }
+    ]
   }
 ]

@@ -1774,5 +1774,42 @@
         "type": "subject"
       }
     ]
+  },
+  {
+    "id": "textbook-blossoms",
+    "title": "Blossoms",
+    "slug": "blossoms",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-english-class-6-wb",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/english/blossoms",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "english",
+    "textbookSlug": "blossoms",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-6-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      }
+    ]
   }
 ]

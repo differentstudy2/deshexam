@@ -3029,6 +3029,12 @@
         "type": "subject"
       },
       {
+        "id": "textbook-butterfly",
+        "slug": "butterfly",
+        "title": "Butterfly",
+        "type": "textbook"
+      },
+      {
         "id": "chapter-revision-lesson-butterfly",
         "slug": "revision-lesson",
         "title": "Revision Lesson",
@@ -3071,6 +3077,12 @@
         "slug": "english",
         "title": "English",
         "type": "subject"
+      },
+      {
+        "id": "textbook-butterfly",
+        "slug": "butterfly",
+        "title": "Butterfly",
+        "type": "textbook"
       },
       {
         "id": "chapter-lesson-1-india-superpower-in-cricket-butterfly",
@@ -3117,6 +3129,12 @@
         "type": "subject"
       },
       {
+        "id": "textbook-butterfly",
+        "slug": "butterfly",
+        "title": "Butterfly",
+        "type": "textbook"
+      },
+      {
         "id": "chapter-lesson-2-a-feat-on-feet-butterfly",
         "slug": "lesson-2-a-feat-on-feet",
         "title": "Lesson 2: A Feat on Feet",
@@ -3159,6 +3177,12 @@
         "slug": "english",
         "title": "English",
         "type": "subject"
+      },
+      {
+        "id": "textbook-butterfly",
+        "slug": "butterfly",
+        "title": "Butterfly",
+        "type": "textbook"
       },
       {
         "id": "chapter-lesson-3-phulmanis-india-butterfly",
@@ -3205,6 +3229,12 @@
         "type": "subject"
       },
       {
+        "id": "textbook-butterfly",
+        "slug": "butterfly",
+        "title": "Butterfly",
+        "type": "textbook"
+      },
+      {
         "id": "chapter-lesson-4-memory-in-marble-butterfly",
         "slug": "lesson-4-memory-in-marble",
         "title": "Lesson 4: Memory in Marble",
@@ -3247,6 +3277,12 @@
         "slug": "english",
         "title": "English",
         "type": "subject"
+      },
+      {
+        "id": "textbook-butterfly",
+        "slug": "butterfly",
+        "title": "Butterfly",
+        "type": "textbook"
       },
       {
         "id": "chapter-lesson-5-my-school-days-butterfly",
@@ -3293,6 +3329,12 @@
         "type": "subject"
       },
       {
+        "id": "textbook-butterfly",
+        "slug": "butterfly",
+        "title": "Butterfly",
+        "type": "textbook"
+      },
+      {
         "id": "chapter-lesson-6-the-clever-monkey-butterfly",
         "slug": "lesson-6-the-clever-monkey",
         "title": "Lesson 6: The Clever Monkey",
@@ -3335,6 +3377,12 @@
         "slug": "english",
         "title": "English",
         "type": "subject"
+      },
+      {
+        "id": "textbook-butterfly",
+        "slug": "butterfly",
+        "title": "Butterfly",
+        "type": "textbook"
       },
       {
         "id": "chapter-lesson-7-the-rebel-poet-butterfly",
@@ -3381,6 +3429,12 @@
         "type": "subject"
       },
       {
+        "id": "textbook-butterfly",
+        "slug": "butterfly",
+        "title": "Butterfly",
+        "type": "textbook"
+      },
+      {
         "id": "chapter-lesson-8-buildings-to-remember-butterfly",
         "slug": "lesson-8-buildings-to-remember",
         "title": "Lesson 8: Buildings to Remember",
@@ -3423,6 +3477,12 @@
         "slug": "english",
         "title": "English",
         "type": "subject"
+      },
+      {
+        "id": "textbook-butterfly",
+        "slug": "butterfly",
+        "title": "Butterfly",
+        "type": "textbook"
       },
       {
         "id": "chapter-lesson-9-birds-eye-butterfly",
@@ -3469,6 +3529,12 @@
         "type": "subject"
       },
       {
+        "id": "textbook-butterfly",
+        "slug": "butterfly",
+        "title": "Butterfly",
+        "type": "textbook"
+      },
+      {
         "id": "chapter-lesson-10-a-great-social-reformer-butterfly",
         "slug": "lesson-10-a-great-social-reformer",
         "title": "Lesson 10: A Great Social Reformer",
@@ -3511,6 +3577,12 @@
         "slug": "english",
         "title": "English",
         "type": "subject"
+      },
+      {
+        "id": "textbook-butterfly",
+        "slug": "butterfly",
+        "title": "Butterfly",
+        "type": "textbook"
       },
       {
         "id": "chapter-lesson-11-the-finishing-point-butterfly",
@@ -3557,9 +3629,5043 @@
         "type": "subject"
       },
       {
+        "id": "textbook-butterfly",
+        "slug": "butterfly",
+        "title": "Butterfly",
+        "type": "textbook"
+      },
+      {
         "id": "chapter-lesson-12-beyond-barriers-butterfly",
         "slug": "lesson-12-beyond-barriers",
         "title": "Lesson 12: Beyond Barriers",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-vordupure-sahityamela-class-6",
+    "title": "পাঠ ১: ভরদুপুরে",
+    "author": "নীরেন্দ্রনাথ চক্রবর্তী",
+    "slug": "vordupure",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahityamela-class-6-wb",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/bengali-literature/sahityamela/vordupure",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "vordupure",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-6-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-6-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-vordupure-sahityamela-class-6",
+        "slug": "vordupure",
+        "title": "পাঠ ১: ভরদুপুরে",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-senapati-shankar-sahityamela-class-6",
+    "title": "পাঠ ২: সেনাপতি শংকর",
+    "author": "শ্যামল গঙ্গোপাধ্যায়",
+    "slug": "senapati-shankar",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahityamela-class-6-wb",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/bengali-literature/sahityamela/senapati-shankar",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "senapati-shankar",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-6-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-6-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-senapati-shankar-sahityamela-class-6",
+        "slug": "senapati-shankar",
+        "title": "পাঠ ২: সেনাপতি শংকর",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-pine-dariye-akashe-nayan-tuli-sahityamela-class-6",
+    "title": "পাঠ ৩: পাইন দাঁড়িয়ে আকাশে নয়ন তুলি",
+    "author": "হাইনরিখ হাইনে",
+    "slug": "pine-dariye-akashe-nayan-tuli",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahityamela-class-6-wb",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/bengali-literature/sahityamela/pine-dariye-akashe-nayan-tuli",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "pine-dariye-akashe-nayan-tuli",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-6-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-6-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-pine-dariye-akashe-nayan-tuli-sahityamela-class-6",
+        "slug": "pine-dariye-akashe-nayan-tuli",
+        "title": "পাঠ ৩: পাইন দাঁড়িয়ে আকাশে নয়ন তুলি",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-akashbhara-surjo-tara-sahityamela-class-6",
+    "title": "পাঠ ৩.১: আকাশভরা সূর্য-তারা (গান)",
+    "author": "রবীন্দ্রনাথ ঠাকুর",
+    "slug": "akashbhara-surjo-tara",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahityamela-class-6-wb",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/bengali-literature/sahityamela/akashbhara-surjo-tara",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "akashbhara-surjo-tara",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-6-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-6-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-akashbhara-surjo-tara-sahityamela-class-6",
+        "slug": "akashbhara-surjo-tara",
+        "title": "পাঠ ৩.১: আকাশভরা সূর্য-তারা (গান)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-mon-valo-kora-sahityamela-class-6",
+    "title": "পাঠ ৪: মন-ভালো-করা",
+    "author": "শক্তি চট্টোপাধ্যায়",
+    "slug": "mon-valo-kora",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahityamela-class-6-wb",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/bengali-literature/sahityamela/mon-valo-kora",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "mon-valo-kora",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-6-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-6-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-mon-valo-kora-sahityamela-class-6",
+        "slug": "mon-valo-kora",
+        "title": "পাঠ ৪: মন-ভালো-করা",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-poshu-pakhir-bhasha-sahityamela-class-6",
+    "title": "পাঠ ৫: পশু-পাখির ভাষা",
+    "author": "সুবিনয় রায়চৌধুরী",
+    "slug": "poshu-pakhir-bhasha",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahityamela-class-6-wb",
+    "orderIndex": 6,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/bengali-literature/sahityamela/poshu-pakhir-bhasha",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "poshu-pakhir-bhasha",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-6-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-6-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-poshu-pakhir-bhasha-sahityamela-class-6",
+        "slug": "poshu-pakhir-bhasha",
+        "title": "পাঠ ৫: পশু-পাখির ভাষা",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-ghash-foring-sahityamela-class-6",
+    "title": "পাঠ ৬: ঘাস ফড়িং",
+    "author": "অরুণ মিত্র",
+    "slug": "ghash-foring",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahityamela-class-6-wb",
+    "orderIndex": 7,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/bengali-literature/sahityamela/ghash-foring",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "ghash-foring",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-6-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-6-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-ghash-foring-sahityamela-class-6",
+        "slug": "ghash-foring",
+        "title": "পাঠ ৬: ঘাস ফড়িং",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-kumore-pokar-bashabari-sahityamela-class-6",
+    "title": "পাঠ ৭: কুমোরে-পোকার বাসাবাড়ি",
+    "author": "গোপালচন্দ্র ভট্টাচার্য",
+    "slug": "kumore-pokar-bashabari",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahityamela-class-6-wb",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/bengali-literature/sahityamela/kumore-pokar-bashabari",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "kumore-pokar-bashabari",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-6-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-6-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-kumore-pokar-bashabari-sahityamela-class-6",
+        "slug": "kumore-pokar-bashabari",
+        "title": "পাঠ ৭: কুমোরে-পোকার বাসাবাড়ি",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chithi-sahityamela-class-6",
+    "title": "পাঠ ৮: চিঠি",
+    "author": "জসীমউদ্দীন",
+    "slug": "chithi",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahityamela-class-6-wb",
+    "orderIndex": 9,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/bengali-literature/sahityamela/chithi",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "chithi",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-6-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-6-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chithi-sahityamela-class-6",
+        "slug": "chithi",
+        "title": "পাঠ ৮: চিঠি",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-morshumer-dine-sahityamela-class-6",
+    "title": "পাঠ ৯: মরশুমের দিনে",
+    "author": "সুভাষ মুখোপাধ্যায়",
+    "slug": "morshumer-dine",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahityamela-class-6-wb",
+    "orderIndex": 10,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/bengali-literature/sahityamela/morshumer-dine",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "morshumer-dine",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-6-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-6-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-morshumer-dine-sahityamela-class-6",
+        "slug": "morshumer-dine",
+        "title": "পাঠ ৯: মরশুমের দিনে",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-hat-sahityamela-class-6",
+    "title": "পাঠ ১০: হাট",
+    "author": "যতীন্দ্রনাথ সেনগুপ্ত",
+    "slug": "hat",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahityamela-class-6-wb",
+    "orderIndex": 11,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/bengali-literature/sahityamela/hat",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "hat",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-6-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-6-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-hat-sahityamela-class-6",
+        "slug": "hat",
+        "title": "পাঠ ১০: হাট",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-matir-ghore-deyalchitro-sahityamela-class-6",
+    "title": "পাঠ ১১: মাটির ঘরে দেয়ালচিত্র",
+    "author": "তপন কর",
+    "slug": "matir-ghore-deyalchitro",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahityamela-class-6-wb",
+    "orderIndex": 12,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/bengali-literature/sahityamela/matir-ghore-deyalchitro",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "matir-ghore-deyalchitro",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-6-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-6-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-matir-ghore-deyalchitro-sahityamela-class-6",
+        "slug": "matir-ghore-deyalchitro",
+        "title": "পাঠ ১১: মাটির ঘরে দেয়ালচিত্র",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-jhumur-sahityamela-class-6",
+    "title": "পাঠ ১১.১: ঝুমুর (গান)",
+    "author": "দুর্যোধন দাস",
+    "slug": "jhumur",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahityamela-class-6-wb",
+    "orderIndex": 13,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/bengali-literature/sahityamela/jhumur",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "jhumur",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-6-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-6-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-jhumur-sahityamela-class-6",
+        "slug": "jhumur",
+        "title": "পাঠ ১১.১: ঝুমুর (গান)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-pipre-sahityamela-class-6",
+    "title": "পাঠ ১২: পিঁপড়ে",
+    "author": "অমিয় চক্রবর্তী",
+    "slug": "pipre",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahityamela-class-6-wb",
+    "orderIndex": 14,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/bengali-literature/sahityamela/pipre",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "pipre",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-6-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-6-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-pipre-sahityamela-class-6",
+        "slug": "pipre",
+        "title": "পাঠ ১২: পিঁপড়ে",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-faki-sahityamela-class-6",
+    "title": "পাঠ ১৩: ফাঁকি",
+    "author": "রাজকিশোর পট্টনায়ক",
+    "slug": "faki",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahityamela-class-6-wb",
+    "orderIndex": 15,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/bengali-literature/sahityamela/faki",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "faki",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-6-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-6-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-faki-sahityamela-class-6",
+        "slug": "faki",
+        "title": "পাঠ ১৩: ফাঁকি",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-ujjwal-ek-jhak-payra-sahityamela-class-6",
+    "title": "পাঠ ১৩.১: উজ্জ্বল এক ঝাঁক পায়রা (গান)",
+    "author": "বিমলচন্দ্র ঘোষ",
+    "slug": "ujjwal-ek-jhak-payra",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahityamela-class-6-wb",
+    "orderIndex": 16,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/bengali-literature/sahityamela/ujjwal-ek-jhak-payra",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "ujjwal-ek-jhak-payra",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-6-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-6-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-ujjwal-ek-jhak-payra-sahityamela-class-6",
+        "slug": "ujjwal-ek-jhak-payra",
+        "title": "পাঠ ১৩.১: উজ্জ্বল এক ঝাঁক পায়রা (গান)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chitrogrib-sahityamela-class-6",
+    "title": "পাঠ ১৪: চিত্রগ্রীব",
+    "author": "ধনগোপাল মুখোপাধ্যায়",
+    "slug": "chitrogrib",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahityamela-class-6-wb",
+    "orderIndex": 17,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/bengali-literature/sahityamela/chitrogrib",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "chitrogrib",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-6-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-6-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chitrogrib-sahityamela-class-6",
+        "slug": "chitrogrib",
+        "title": "পাঠ ১৪: চিত্রগ্রীব",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-ashirbad-sahityamela-class-6",
+    "title": "পাঠ ১৫: আশীর্বাদ",
+    "author": "দক্ষিণারঞ্জন মিত্র মজুমদার",
+    "slug": "ashirbad",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahityamela-class-6-wb",
+    "orderIndex": 18,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/bengali-literature/sahityamela/ashirbad",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "ashirbad",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-6-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-6-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-ashirbad-sahityamela-class-6",
+        "slug": "ashirbad",
+        "title": "পাঠ ১৫: আশীর্বাদ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-ek-bhuture-kando-sahityamela-class-6",
+    "title": "পাঠ ১৬: এক ভূতুড়ে কাণ্ড",
+    "author": "শিবরাম চক্রবর্তী",
+    "slug": "ek-bhuture-kando",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahityamela-class-6-wb",
+    "orderIndex": 19,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/bengali-literature/sahityamela/ek-bhuture-kando",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "ek-bhuture-kando",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-6-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-6-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-ek-bhuture-kando-sahityamela-class-6",
+        "slug": "ek-bhuture-kando",
+        "title": "পাঠ ১৬: এক ভূতুড়ে কাণ্ড",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-bagh-sahityamela-class-6",
+    "title": "পাঠ ১৭: বাঘ",
+    "author": "নবনীতা দেবসেন",
+    "slug": "bagh",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahityamela-class-6-wb",
+    "orderIndex": 20,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/bengali-literature/sahityamela/bagh",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "bagh",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-6-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-6-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-bagh-sahityamela-class-6",
+        "slug": "bagh",
+        "title": "পাঠ ১৭: বাঘ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-bongo-amar-jononi-amar-sahityamela-class-6",
+    "title": "পাঠ ১৮: বঙ্গ আমার জননী আমার",
+    "author": "দ্বিজেন্দ্রলাল রায়",
+    "slug": "bongo-amar-jononi-amar",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahityamela-class-6-wb",
+    "orderIndex": 21,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/bengali-literature/sahityamela/bongo-amar-jononi-amar",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "bongo-amar-jononi-amar",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-6-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-6-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-bongo-amar-jononi-amar-sahityamela-class-6",
+        "slug": "bongo-amar-jononi-amar",
+        "title": "পাঠ ১৮: বঙ্গ আমার জননী আমার",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-shahid-jatindranath-sahityamela-class-6",
+    "title": "পাঠ ১৯: শহিদ যতীন্দ্রনাথ",
+    "author": "আশিসকুমার মুখোপাধ্যায়",
+    "slug": "shahid-jatindranath",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahityamela-class-6-wb",
+    "orderIndex": 22,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/bengali-literature/sahityamela/shahid-jatindranath",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "shahid-jatindranath",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-6-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-6-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-shahid-jatindranath-sahityamela-class-6",
+        "slug": "shahid-jatindranath",
+        "title": "পাঠ ১৯: শহিদ যতীন্দ্রনাথ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chol-re-chol-sobe-sahityamela-class-6",
+    "title": "পাঠ ১৯.১: চল রে চল সবে (গান)",
+    "author": "জ্যোতিরিন্দ্রনাথ ঠাকুর",
+    "slug": "chol-re-chol-sobe",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahityamela-class-6-wb",
+    "orderIndex": 23,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/bengali-literature/sahityamela/chol-re-chol-sobe",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "chol-re-chol-sobe",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-6-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-6-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chol-re-chol-sobe-sahityamela-class-6",
+        "slug": "chol-re-chol-sobe",
+        "title": "পাঠ ১৯.১: চল রে চল সবে (গান)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-mora-dui-sohodor-bhai-sahityamela-class-6",
+    "title": "পাঠ ২০: মোরা দুই সহোদর ভাই",
+    "author": "কাজী নজরুল ইসলাম",
+    "slug": "mora-dui-sohodor-bhai",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahityamela-class-6-wb",
+    "orderIndex": 24,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/bengali-literature/sahityamela/mora-dui-sohodor-bhai",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "mora-dui-sohodor-bhai",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-6-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-6-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-mora-dui-sohodor-bhai-sahityamela-class-6",
+        "slug": "mora-dui-sohodor-bhai",
+        "title": "পাঠ ২০: মোরা দুই সহোদর ভাই",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-dhoratol-sahityamela-class-6",
+    "title": "পাঠ ২১: ধরাতল",
+    "author": "রবীন্দ্রনাথ ঠাকুর",
+    "slug": "dhoratol",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahityamela-class-6-wb",
+    "orderIndex": 25,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/bengali-literature/sahityamela/dhoratol",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "dhoratol",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-6-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-6-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-dhoratol-sahityamela-class-6",
+        "slug": "dhoratol",
+        "title": "পাঠ ২১: ধরাতল",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-habur-bipod-sahityamela-class-6",
+    "title": "পাঠ ২২: হাবুর বিপদ",
+    "author": "অজয় রায়",
+    "slug": "habur-bipod",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahityamela-class-6-wb",
+    "orderIndex": 26,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/bengali-literature/sahityamela/habur-bipod",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "habur-bipod",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-6-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-6-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-habur-bipod-sahityamela-class-6",
+        "slug": "habur-bipod",
+        "title": "পাঠ ২২: হাবুর বিপদ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-kishor-biggani-sahityamela-class-6",
+    "title": "পাঠ ২৩: কিশোর বিজ্ঞানী",
+    "author": "অন্নদাশঙ্কর রায়",
+    "slug": "kishor-biggani",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahityamela-class-6-wb",
+    "orderIndex": 27,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/bengali-literature/sahityamela/kishor-biggani",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "kishor-biggani",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-6-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-6-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-kishor-biggani-sahityamela-class-6",
+        "slug": "kishor-biggani",
+        "title": "পাঠ ২৩: কিশোর বিজ্ঞানী",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-nonida-not-out-sahityamela-class-6",
+    "title": "পাঠ ২৪: ননীদা নট আউট",
+    "author": "মতি নন্দী",
+    "slug": "nonida-not-out",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahityamela-class-6-wb",
+    "orderIndex": 28,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/bengali-literature/sahityamela/nonida-not-out",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "nonida-not-out",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-6-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-6-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-nonida-not-out-sahityamela-class-6",
+        "slug": "nonida-not-out",
+        "title": "পাঠ ২৪: ননীদা নট আউট",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-revision-lesson-blossoms-class-6",
+    "title": "Revision Lesson",
+    "slug": "revision-lesson",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-blossoms",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/english/blossoms/revision-lesson",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "english",
+    "textbookSlug": "blossoms",
+    "chapterSlug": "revision-lesson",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-6-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-blossoms",
+        "slug": "blossoms",
+        "title": "Blossoms",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-revision-lesson-blossoms-class-6",
+        "slug": "revision-lesson",
+        "title": "Revision Lesson",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-1-it-all-began-with-drip-drip-blossoms-class-6",
+    "title": "Lesson 1: It All Began With Drip-Drip",
+    "slug": "lesson-1-it-all-began-with-drip-drip",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-blossoms",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/english/blossoms/lesson-1-it-all-began-with-drip-drip",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "english",
+    "textbookSlug": "blossoms",
+    "chapterSlug": "lesson-1-it-all-began-with-drip-drip",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-6-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-blossoms",
+        "slug": "blossoms",
+        "title": "Blossoms",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-1-it-all-began-with-drip-drip-blossoms-class-6",
+        "slug": "lesson-1-it-all-began-with-drip-drip",
+        "title": "Lesson 1: It All Began With Drip-Drip",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-2-the-adventurous-clown-blossoms-class-6",
+    "title": "Lesson 2: The Adventurous Clown",
+    "slug": "lesson-2-the-adventurous-clown",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-blossoms",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/english/blossoms/lesson-2-the-adventurous-clown",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "english",
+    "textbookSlug": "blossoms",
+    "chapterSlug": "lesson-2-the-adventurous-clown",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-6-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-blossoms",
+        "slug": "blossoms",
+        "title": "Blossoms",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-2-the-adventurous-clown-blossoms-class-6",
+        "slug": "lesson-2-the-adventurous-clown",
+        "title": "Lesson 2: The Adventurous Clown",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-3-the-rainbow-blossoms-class-6",
+    "title": "Lesson 3: The Rainbow",
+    "slug": "lesson-3-the-rainbow",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-blossoms",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/english/blossoms/lesson-3-the-rainbow",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "english",
+    "textbookSlug": "blossoms",
+    "chapterSlug": "lesson-3-the-rainbow",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-6-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-blossoms",
+        "slug": "blossoms",
+        "title": "Blossoms",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-3-the-rainbow-blossoms-class-6",
+        "slug": "lesson-3-the-rainbow",
+        "title": "Lesson 3: The Rainbow",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-4-the-shop-that-never-was-blossoms-class-6",
+    "title": "Lesson 4: The Shop That Never Was",
+    "slug": "lesson-4-the-shop-that-never-was",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-blossoms",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/english/blossoms/lesson-4-the-shop-that-never-was",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "english",
+    "textbookSlug": "blossoms",
+    "chapterSlug": "lesson-4-the-shop-that-never-was",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-6-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-blossoms",
+        "slug": "blossoms",
+        "title": "Blossoms",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-4-the-shop-that-never-was-blossoms-class-6",
+        "slug": "lesson-4-the-shop-that-never-was",
+        "title": "Lesson 4: The Shop That Never Was",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-5-land-of-the-pharaohs-blossoms-class-6",
+    "title": "Lesson 5: Land of the Pharaohs",
+    "slug": "lesson-5-land-of-the-pharaohs",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-blossoms",
+    "orderIndex": 6,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/english/blossoms/lesson-5-land-of-the-pharaohs",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "english",
+    "textbookSlug": "blossoms",
+    "chapterSlug": "lesson-5-land-of-the-pharaohs",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-6-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-blossoms",
+        "slug": "blossoms",
+        "title": "Blossoms",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-5-land-of-the-pharaohs-blossoms-class-6",
+        "slug": "lesson-5-land-of-the-pharaohs",
+        "title": "Lesson 5: Land of the Pharaohs",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-6-how-the-little-kite-learned-to-fly-blossoms-class-6",
+    "title": "Lesson 6: How The Little Kite Learned to Fly",
+    "slug": "lesson-6-how-the-little-kite-learned-to-fly",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-blossoms",
+    "orderIndex": 7,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/english/blossoms/lesson-6-how-the-little-kite-learned-to-fly",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "english",
+    "textbookSlug": "blossoms",
+    "chapterSlug": "lesson-6-how-the-little-kite-learned-to-fly",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-6-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-blossoms",
+        "slug": "blossoms",
+        "title": "Blossoms",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-6-how-the-little-kite-learned-to-fly-blossoms-class-6",
+        "slug": "lesson-6-how-the-little-kite-learned-to-fly",
+        "title": "Lesson 6: How The Little Kite Learned to Fly",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-7-the-magic-fish-bone-blossoms-class-6",
+    "title": "Lesson 7: The Magic Fish Bone",
+    "slug": "lesson-7-the-magic-fish-bone",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-blossoms",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/english/blossoms/lesson-7-the-magic-fish-bone",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "english",
+    "textbookSlug": "blossoms",
+    "chapterSlug": "lesson-7-the-magic-fish-bone",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-6-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-blossoms",
+        "slug": "blossoms",
+        "title": "Blossoms",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-7-the-magic-fish-bone-blossoms-class-6",
+        "slug": "lesson-7-the-magic-fish-bone",
+        "title": "Lesson 7: The Magic Fish Bone",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-8-goodbye-to-the-moon-blossoms-class-6",
+    "title": "Lesson 8: Goodbye to the Moon",
+    "slug": "lesson-8-goodbye-to-the-moon",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-blossoms",
+    "orderIndex": 9,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/english/blossoms/lesson-8-goodbye-to-the-moon",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "english",
+    "textbookSlug": "blossoms",
+    "chapterSlug": "lesson-8-goodbye-to-the-moon",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-6-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-blossoms",
+        "slug": "blossoms",
+        "title": "Blossoms",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-8-goodbye-to-the-moon-blossoms-class-6",
+        "slug": "lesson-8-goodbye-to-the-moon",
+        "title": "Lesson 8: Goodbye to the Moon",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-9-i-will-go-with-my-father-a-ploughing-blossoms-class-6",
+    "title": "Lesson 9: I Will Go With My Father A-ploughing",
+    "slug": "lesson-9-i-will-go-with-my-father-a-ploughing",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-blossoms",
+    "orderIndex": 10,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/english/blossoms/lesson-9-i-will-go-with-my-father-a-ploughing",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "english",
+    "textbookSlug": "blossoms",
+    "chapterSlug": "lesson-9-i-will-go-with-my-father-a-ploughing",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-6-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-blossoms",
+        "slug": "blossoms",
+        "title": "Blossoms",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-9-i-will-go-with-my-father-a-ploughing-blossoms-class-6",
+        "slug": "lesson-9-i-will-go-with-my-father-a-ploughing",
+        "title": "Lesson 9: I Will Go With My Father A-ploughing",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-10-smart-ice-cream-blossoms-class-6",
+    "title": "Lesson 10: Smart Ice Cream",
+    "slug": "lesson-10-smart-ice-cream",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-blossoms",
+    "orderIndex": 11,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/english/blossoms/lesson-10-smart-ice-cream",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "english",
+    "textbookSlug": "blossoms",
+    "chapterSlug": "lesson-10-smart-ice-cream",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-6-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-blossoms",
+        "slug": "blossoms",
+        "title": "Blossoms",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-10-smart-ice-cream-blossoms-class-6",
+        "slug": "lesson-10-smart-ice-cream",
+        "title": "Lesson 10: Smart Ice Cream",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-11-the-blind-boy-blossoms-class-6",
+    "title": "Lesson 11: The Blind Boy",
+    "slug": "lesson-11-the-blind-boy",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-blossoms",
+    "orderIndex": 12,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/english/blossoms/lesson-11-the-blind-boy",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "english",
+    "textbookSlug": "blossoms",
+    "chapterSlug": "lesson-11-the-blind-boy",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-6-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-blossoms",
+        "slug": "blossoms",
+        "title": "Blossoms",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-11-the-blind-boy-blossoms-class-6",
+        "slug": "lesson-11-the-blind-boy",
+        "title": "Lesson 11: The Blind Boy",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-12-rip-van-winkle-blossoms-class-6",
+    "title": "Lesson 12: Rip Van Winkle",
+    "slug": "lesson-12-rip-van-winkle",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-blossoms",
+    "orderIndex": 13,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/english/blossoms/lesson-12-rip-van-winkle",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "english",
+    "textbookSlug": "blossoms",
+    "chapterSlug": "lesson-12-rip-van-winkle",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-6-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-blossoms",
+        "slug": "blossoms",
+        "title": "Blossoms",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-12-rip-van-winkle-blossoms-class-6",
+        "slug": "lesson-12-rip-van-winkle",
+        "title": "Lesson 12: Rip Van Winkle",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-poribesh-o-jibjogoter-parosporik-nirvorota-poribesh-o-bigyan-class-6",
+    "title": "অধ্যায় ১: পরিবেশ ও জীবজগতের পারস্পরিক নির্ভরতা",
+    "slug": "poribesh-o-jibjogoter-parosporik-nirvorota",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-poribesh-o-bigyan-class-6-wb",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/science/poribesh-o-bigyan/poribesh-o-jibjogoter-parosporik-nirvorota",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "science",
+    "textbookSlug": "poribesh-o-bigyan",
+    "chapterSlug": "poribesh-o-jibjogoter-parosporik-nirvorota",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-6-wb",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-poribesh-o-bigyan-class-6-wb",
+        "slug": "poribesh-o-bigyan",
+        "title": "Poribesh O Bigyan",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-poribesh-o-jibjogoter-parosporik-nirvorota-poribesh-o-bigyan-class-6",
+        "slug": "poribesh-o-jibjogoter-parosporik-nirvorota",
+        "title": "অধ্যায় ১: পরিবেশ ও জীবজগতের পারস্পরিক নির্ভরতা",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-amader-charpasher-ghotonasomuho-poribesh-o-bigyan-class-6",
+    "title": "অধ্যায় ২: আমাদের চারপাশের ঘটনাসমূহ",
+    "slug": "amader-charpasher-ghotonasomuho",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-poribesh-o-bigyan-class-6-wb",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/science/poribesh-o-bigyan/amader-charpasher-ghotonasomuho",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "science",
+    "textbookSlug": "poribesh-o-bigyan",
+    "chapterSlug": "amader-charpasher-ghotonasomuho",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-6-wb",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-poribesh-o-bigyan-class-6-wb",
+        "slug": "poribesh-o-bigyan",
+        "title": "Poribesh O Bigyan",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-amader-charpasher-ghotonasomuho-poribesh-o-bigyan-class-6",
+        "slug": "amader-charpasher-ghotonasomuho",
+        "title": "অধ্যায় ২: আমাদের চারপাশের ঘটনাসমূহ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-moulik-jougik-o-mishro-podartho-poribesh-o-bigyan-class-6",
+    "title": "অধ্যায় ৩: মৌলিক, যৌগিক ও মিশ্র পদার্থ",
+    "slug": "moulik-jougik-o-mishro-podartho",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-poribesh-o-bigyan-class-6-wb",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/science/poribesh-o-bigyan/moulik-jougik-o-mishro-podartho",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "science",
+    "textbookSlug": "poribesh-o-bigyan",
+    "chapterSlug": "moulik-jougik-o-mishro-podartho",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-6-wb",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-poribesh-o-bigyan-class-6-wb",
+        "slug": "poribesh-o-bigyan",
+        "title": "Poribesh O Bigyan",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-moulik-jougik-o-mishro-podartho-poribesh-o-bigyan-class-6",
+        "slug": "moulik-jougik-o-mishro-podartho",
+        "title": "অধ্যায় ৩: মৌলিক, যৌগিক ও মিশ্র পদার্থ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-shila-o-khonij-podartho-poribesh-o-bigyan-class-6",
+    "title": "অধ্যায় ৪: শিলা ও খনিজ পদার্থ",
+    "slug": "shila-o-khonij-podartho",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-poribesh-o-bigyan-class-6-wb",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/science/poribesh-o-bigyan/shila-o-khonij-podartho",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "science",
+    "textbookSlug": "poribesh-o-bigyan",
+    "chapterSlug": "shila-o-khonij-podartho",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-6-wb",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-poribesh-o-bigyan-class-6-wb",
+        "slug": "poribesh-o-bigyan",
+        "title": "Poribesh O Bigyan",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-shila-o-khonij-podartho-poribesh-o-bigyan-class-6",
+        "slug": "shila-o-khonij-podartho",
+        "title": "অধ্যায় ৪: শিলা ও খনিজ পদার্থ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-mapjok-ba-porimap-poribesh-o-bigyan-class-6",
+    "title": "অধ্যায় ৫: মাপজোক বা পরিমাপ",
+    "slug": "mapjok-ba-porimap",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-poribesh-o-bigyan-class-6-wb",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/science/poribesh-o-bigyan/mapjok-ba-porimap",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "science",
+    "textbookSlug": "poribesh-o-bigyan",
+    "chapterSlug": "mapjok-ba-porimap",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-6-wb",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-poribesh-o-bigyan-class-6-wb",
+        "slug": "poribesh-o-bigyan",
+        "title": "Poribesh O Bigyan",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-mapjok-ba-porimap-poribesh-o-bigyan-class-6",
+        "slug": "mapjok-ba-porimap",
+        "title": "অধ্যায় ৫: মাপজোক বা পরিমাপ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-bol-o-shokti-prathomik-dharona-poribesh-o-bigyan-class-6",
+    "title": "অধ্যায় ৬: বল ও শক্তি : প্রাথমিক ধারণা",
+    "slug": "bol-o-shokti-prathomik-dharona",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-poribesh-o-bigyan-class-6-wb",
+    "orderIndex": 6,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/science/poribesh-o-bigyan/bol-o-shokti-prathomik-dharona",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "science",
+    "textbookSlug": "poribesh-o-bigyan",
+    "chapterSlug": "bol-o-shokti-prathomik-dharona",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-6-wb",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-poribesh-o-bigyan-class-6-wb",
+        "slug": "poribesh-o-bigyan",
+        "title": "Poribesh O Bigyan",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-bol-o-shokti-prathomik-dharona-poribesh-o-bigyan-class-6",
+        "slug": "bol-o-shokti-prathomik-dharona",
+        "title": "অধ্যায় ৬: বল ও শক্তি : প্রাথমিক ধারণা",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-torol-o-gyasiyo-podarther-sthiti-o-goti-poribesh-o-bigyan-class-6",
+    "title": "অধ্যায় ৭: তরল ও গ্যাসীয় পদার্থের স্থিতি ও গতি",
+    "slug": "torol-o-gyasiyo-podarther-sthiti-o-goti",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-poribesh-o-bigyan-class-6-wb",
+    "orderIndex": 7,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/science/poribesh-o-bigyan/torol-o-gyasiyo-podarther-sthiti-o-goti",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "science",
+    "textbookSlug": "poribesh-o-bigyan",
+    "chapterSlug": "torol-o-gyasiyo-podarther-sthiti-o-goti",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-6-wb",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-poribesh-o-bigyan-class-6-wb",
+        "slug": "poribesh-o-bigyan",
+        "title": "Poribesh O Bigyan",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-torol-o-gyasiyo-podarther-sthiti-o-goti-poribesh-o-bigyan-class-6",
+        "slug": "torol-o-gyasiyo-podarther-sthiti-o-goti",
+        "title": "অধ্যায় ৭: তরল ও গ্যাসীয় পদার্থের স্থিতি ও গতি",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-manusher-shorir-poribesh-o-bigyan-class-6",
+    "title": "অধ্যায় ৮: মানুষের শরীর",
+    "slug": "manusher-shorir",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-poribesh-o-bigyan-class-6-wb",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/science/poribesh-o-bigyan/manusher-shorir",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "science",
+    "textbookSlug": "poribesh-o-bigyan",
+    "chapterSlug": "manusher-shorir",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-6-wb",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-poribesh-o-bigyan-class-6-wb",
+        "slug": "poribesh-o-bigyan",
+        "title": "Poribesh O Bigyan",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-manusher-shorir-poribesh-o-bigyan-class-6",
+        "slug": "manusher-shorir",
+        "title": "অধ্যায় ৮: মানুষের শরীর",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-sadharon-jontrosomuho-poribesh-o-bigyan-class-6",
+    "title": "অধ্যায় ৯: সাধারণ যন্ত্রসমূহ",
+    "slug": "sadharon-jontrosomuho",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-poribesh-o-bigyan-class-6-wb",
+    "orderIndex": 9,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/science/poribesh-o-bigyan/sadharon-jontrosomuho",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "science",
+    "textbookSlug": "poribesh-o-bigyan",
+    "chapterSlug": "sadharon-jontrosomuho",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-6-wb",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-poribesh-o-bigyan-class-6-wb",
+        "slug": "poribesh-o-bigyan",
+        "title": "Poribesh O Bigyan",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-sadharon-jontrosomuho-poribesh-o-bigyan-class-6",
+        "slug": "sadharon-jontrosomuho",
+        "title": "অধ্যায় ৯: সাধারণ যন্ত্রসমূহ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-jiboboichitro-o-tar-srenibinyas-poribesh-o-bigyan-class-6",
+    "title": "অধ্যায় ১০: জীববৈচিত্র্য ও তার শ্রেণীবিন্যাস",
+    "slug": "jiboboichitro-o-tar-srenibinyas",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-poribesh-o-bigyan-class-6-wb",
+    "orderIndex": 10,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/science/poribesh-o-bigyan/jiboboichitro-o-tar-srenibinyas",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "science",
+    "textbookSlug": "poribesh-o-bigyan",
+    "chapterSlug": "jiboboichitro-o-tar-srenibinyas",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-6-wb",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-poribesh-o-bigyan-class-6-wb",
+        "slug": "poribesh-o-bigyan",
+        "title": "Poribesh O Bigyan",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-jiboboichitro-o-tar-srenibinyas-poribesh-o-bigyan-class-6",
+        "slug": "jiboboichitro-o-tar-srenibinyas",
+        "title": "অধ্যায় ১০: জীববৈচিত্র্য ও তার শ্রেণীবিন্যাস",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-kotoguli-bisesh-pranir-bashosthan-o-achar-achoron-poribesh-o-bigyan-class-6",
+    "title": "অধ্যায় ১১: কতগুলি বিশেষ প্রাণীর বাসস্থান ও আচার-আচরণ",
+    "slug": "kotoguli-bisesh-pranir-bashosthan-o-achar-achoron",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-poribesh-o-bigyan-class-6-wb",
+    "orderIndex": 11,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/science/poribesh-o-bigyan/kotoguli-bisesh-pranir-bashosthan-o-achar-achoron",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "science",
+    "textbookSlug": "poribesh-o-bigyan",
+    "chapterSlug": "kotoguli-bisesh-pranir-bashosthan-o-achar-achoron",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-6-wb",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-poribesh-o-bigyan-class-6-wb",
+        "slug": "poribesh-o-bigyan",
+        "title": "Poribesh O Bigyan",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-kotoguli-bisesh-pranir-bashosthan-o-achar-achoron-poribesh-o-bigyan-class-6",
+        "slug": "kotoguli-bisesh-pranir-bashosthan-o-achar-achoron",
+        "title": "অধ্যায় ১১: কতগুলি বিশেষ প্রাণীর বাসস্থান ও আচার-আচরণ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-borjo-podartho-poribesh-o-bigyan-class-6",
+    "title": "অধ্যায় ১২: বর্জ্য পদার্থ",
+    "slug": "borjo-podartho",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-poribesh-o-bigyan-class-6-wb",
+    "orderIndex": 12,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/science/poribesh-o-bigyan/borjo-podartho",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "science",
+    "textbookSlug": "poribesh-o-bigyan",
+    "chapterSlug": "borjo-podartho",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-6-wb",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-poribesh-o-bigyan-class-6-wb",
+        "slug": "poribesh-o-bigyan",
+        "title": "Poribesh O Bigyan",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-borjo-podartho-poribesh-o-bigyan-class-6",
+        "slug": "borjo-podartho",
+        "title": "অধ্যায় ১২: বর্জ্য পদার্থ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-itihaser-dharona-atit-o-aityaja-class-6",
+    "title": "অধ্যায় ১: ইতিহাসের ধারণা",
+    "slug": "itihaser-dharona",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-atit-o-aityaja-class-6-wb",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/history/atit-o-aityaja/itihaser-dharona",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "history",
+    "textbookSlug": "atit-o-aityaja",
+    "chapterSlug": "itihaser-dharona",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-history-class-6-wb",
+        "slug": "history",
+        "title": "History",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-atit-o-aityaja-class-6-wb",
+        "slug": "atit-o-aityaja",
+        "title": "Atit O Aityaja",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-itihaser-dharona-atit-o-aityaja-class-6",
+        "slug": "itihaser-dharona",
+        "title": "অধ্যায় ১: ইতিহাসের ধারণা",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-bharotiyo-upomohodeshe-adim-manush-atit-o-aityaja-class-6",
+    "title": "অধ্যায় ২: ভারতীয় উপমহাদেশে আদিম মানুষ : যাযাবর জীবন থেকে স্থায়ী বসতি স্থাপন",
+    "slug": "bharotiyo-upomohodeshe-adim-manush",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-atit-o-aityaja-class-6-wb",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/history/atit-o-aityaja/bharotiyo-upomohodeshe-adim-manush",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "history",
+    "textbookSlug": "atit-o-aityaja",
+    "chapterSlug": "bharotiyo-upomohodeshe-adim-manush",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-history-class-6-wb",
+        "slug": "history",
+        "title": "History",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-atit-o-aityaja-class-6-wb",
+        "slug": "atit-o-aityaja",
+        "title": "Atit O Aityaja",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-bharotiyo-upomohodeshe-adim-manush-atit-o-aityaja-class-6",
+        "slug": "bharotiyo-upomohodeshe-adim-manush",
+        "title": "অধ্যায় ২: ভারতীয় উপমহাদেশে আদিম মানুষ : যাযাবর জীবন থেকে স্থায়ী বসতি স্থাপন",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-bharotiyo-upomohodesher-prachin-itihaser-dhara-1-atit-o-aityaja-class-6",
+    "title": "অধ্যায় ৩: ভারতীয় উপমহাদেশের প্রাচীন ইতিহাসের ধারা : প্রথম পর্যায় : আনুমানিক খ্রিস্টপূর্ব ৭০০০-১৫০০ অব্দ",
+    "slug": "bharotiyo-upomohodesher-prachin-itihaser-dhara-1",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-atit-o-aityaja-class-6-wb",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/history/atit-o-aityaja/bharotiyo-upomohodesher-prachin-itihaser-dhara-1",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "history",
+    "textbookSlug": "atit-o-aityaja",
+    "chapterSlug": "bharotiyo-upomohodesher-prachin-itihaser-dhara-1",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-history-class-6-wb",
+        "slug": "history",
+        "title": "History",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-atit-o-aityaja-class-6-wb",
+        "slug": "atit-o-aityaja",
+        "title": "Atit O Aityaja",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-bharotiyo-upomohodesher-prachin-itihaser-dhara-1-atit-o-aityaja-class-6",
+        "slug": "bharotiyo-upomohodesher-prachin-itihaser-dhara-1",
+        "title": "অধ্যায় ৩: ভারতীয় উপমহাদেশের প্রাচীন ইতিহাসের ধারা : প্রথম পর্যায় : আনুমানিক খ্রিস্টপূর্ব ৭০০০-১৫০০ অব্দ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-bharotiyo-upomohodesher-prachin-itihaser-dhara-2-atit-o-aityaja-class-6",
+    "title": "অধ্যায় ৪: ভারতীয় উপমহাদেশের প্রাচীন ইতিহাসের ধারা : দ্বিতীয় পর্যায় : আনুমানিক খ্রিস্টপূর্ব ১৫০০-৬০০ অব্দ",
+    "slug": "bharotiyo-upomohodesher-prachin-itihaser-dhara-2",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-atit-o-aityaja-class-6-wb",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/history/atit-o-aityaja/bharotiyo-upomohodesher-prachin-itihaser-dhara-2",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "history",
+    "textbookSlug": "atit-o-aityaja",
+    "chapterSlug": "bharotiyo-upomohodesher-prachin-itihaser-dhara-2",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-history-class-6-wb",
+        "slug": "history",
+        "title": "History",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-atit-o-aityaja-class-6-wb",
+        "slug": "atit-o-aityaja",
+        "title": "Atit O Aityaja",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-bharotiyo-upomohodesher-prachin-itihaser-dhara-2-atit-o-aityaja-class-6",
+        "slug": "bharotiyo-upomohodesher-prachin-itihaser-dhara-2",
+        "title": "অধ্যায় ৪: ভারতীয় উপমহাদেশের প্রাচীন ইতিহাসের ধারা : দ্বিতীয় পর্যায় : আনুমানিক খ্রিস্টপূর্ব ১৫০০-৬০০ অব্দ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-khristopurbo-shoshtho-shotoker-bharotiyo-upomohodesh-atit-o-aityaja-class-6",
+    "title": "অধ্যায় ৫: খ্রিস্টপূর্ব ষষ্ঠ শতকের ভারতীয় উপমহাদেশ : রাষ্ট্রব্যবস্থা এবং ধর্মের বিবর্তন - উত্তর ভারত",
+    "slug": "khristopurbo-shoshtho-shotoker-bharotiyo-upomohodesh",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-atit-o-aityaja-class-6-wb",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/history/atit-o-aityaja/khristopurbo-shoshtho-shotoker-bharotiyo-upomohodesh",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "history",
+    "textbookSlug": "atit-o-aityaja",
+    "chapterSlug": "khristopurbo-shoshtho-shotoker-bharotiyo-upomohodesh",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-history-class-6-wb",
+        "slug": "history",
+        "title": "History",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-atit-o-aityaja-class-6-wb",
+        "slug": "atit-o-aityaja",
+        "title": "Atit O Aityaja",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-khristopurbo-shoshtho-shotoker-bharotiyo-upomohodesh-atit-o-aityaja-class-6",
+        "slug": "khristopurbo-shoshtho-shotoker-bharotiyo-upomohodesh",
+        "title": "অধ্যায় ৫: খ্রিস্টপূর্ব ষষ্ঠ শতকের ভারতীয় উপমহাদেশ : রাষ্ট্রব্যবস্থা এবং ধর্মের বিবর্তন - উত্তর ভারত",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-samrajyo-bistar-o-shashon-atit-o-aityaja-class-6",
+    "title": "অধ্যায় ৬: সাম্রাজ্য বিস্তার ও শাসন : আনুমানিক খ্রিস্টপূর্ব ষষ্ঠ শতক থেকে খ্রিস্টীয় সপ্তম শতকের প্রথম ভাগ",
+    "slug": "samrajyo-bistar-o-shashon",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-atit-o-aityaja-class-6-wb",
+    "orderIndex": 6,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/history/atit-o-aityaja/samrajyo-bistar-o-shashon",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "history",
+    "textbookSlug": "atit-o-aityaja",
+    "chapterSlug": "samrajyo-bistar-o-shashon",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-history-class-6-wb",
+        "slug": "history",
+        "title": "History",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-atit-o-aityaja-class-6-wb",
+        "slug": "atit-o-aityaja",
+        "title": "Atit O Aityaja",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-samrajyo-bistar-o-shashon-atit-o-aityaja-class-6",
+        "slug": "samrajyo-bistar-o-shashon",
+        "title": "অধ্যায় ৬: সাম্রাজ্য বিস্তার ও শাসন : আনুমানিক খ্রিস্টপূর্ব ষষ্ঠ শতক থেকে খ্রিস্টীয় সপ্তম শতকের প্রথম ভাগ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-orthoniti-o-jibonjatra-atit-o-aityaja-class-6",
+    "title": "অধ্যায় ৭: অর্থনীতি ও জীবনযাত্রা : আনুমানিক খ্রিস্টপূর্ব ষষ্ঠ শতক থেকে খ্রিস্টীয় সপ্তম শতকের প্রথম ভাগ",
+    "slug": "orthoniti-o-jibonjatra",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-atit-o-aityaja-class-6-wb",
+    "orderIndex": 7,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/history/atit-o-aityaja/orthoniti-o-jibonjatra",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "history",
+    "textbookSlug": "atit-o-aityaja",
+    "chapterSlug": "orthoniti-o-jibonjatra",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-history-class-6-wb",
+        "slug": "history",
+        "title": "History",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-atit-o-aityaja-class-6-wb",
+        "slug": "atit-o-aityaja",
+        "title": "Atit O Aityaja",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-orthoniti-o-jibonjatra-atit-o-aityaja-class-6",
+        "slug": "orthoniti-o-jibonjatra",
+        "title": "অধ্যায় ৭: অর্থনীতি ও জীবনযাত্রা : আনুমানিক খ্রিস্টপূর্ব ষষ্ঠ শতক থেকে খ্রিস্টীয় সপ্তম শতকের প্রথম ভাগ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-prachin-bharotiyo-upomohodesher-songskritichorchar-nanadik-atit-o-aityaja-class-6",
+    "title": "অধ্যায় ৮: প্রাচীন ভারতীয় উপমহাদেশের সংস্কৃতিচর্চার নানাদিক : শিক্ষা, সাহিত্য, বিজ্ঞান ও শিল্প",
+    "slug": "prachin-bharotiyo-upomohodesher-songskritichorchar-nanadik",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-atit-o-aityaja-class-6-wb",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/history/atit-o-aityaja/prachin-bharotiyo-upomohodesher-songskritichorchar-nanadik",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "history",
+    "textbookSlug": "atit-o-aityaja",
+    "chapterSlug": "prachin-bharotiyo-upomohodesher-songskritichorchar-nanadik",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-history-class-6-wb",
+        "slug": "history",
+        "title": "History",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-atit-o-aityaja-class-6-wb",
+        "slug": "atit-o-aityaja",
+        "title": "Atit O Aityaja",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-prachin-bharotiyo-upomohodesher-songskritichorchar-nanadik-atit-o-aityaja-class-6",
+        "slug": "prachin-bharotiyo-upomohodesher-songskritichorchar-nanadik",
+        "title": "অধ্যায় ৮: প্রাচীন ভারতীয় উপমহাদেশের সংস্কৃতিচর্চার নানাদিক : শিক্ষা, সাহিত্য, বিজ্ঞান ও শিল্প",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-bharot-o-somokalin-bohirbishwo-atit-o-aityaja-class-6",
+    "title": "অধ্যায় ৯: ভারত ও সমকালীন বহির্বিশ্ব : খ্রিস্টীয় সপ্তম শতকের প্রথম ভাগ পর্যন্ত",
+    "slug": "bharot-o-somokalin-bohirbishwo",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-atit-o-aityaja-class-6-wb",
+    "orderIndex": 9,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/history/atit-o-aityaja/bharot-o-somokalin-bohirbishwo",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "history",
+    "textbookSlug": "atit-o-aityaja",
+    "chapterSlug": "bharot-o-somokalin-bohirbishwo",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-history-class-6-wb",
+        "slug": "history",
+        "title": "History",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-atit-o-aityaja-class-6-wb",
+        "slug": "atit-o-aityaja",
+        "title": "Atit O Aityaja",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-bharot-o-somokalin-bohirbishwo-atit-o-aityaja-class-6",
+        "slug": "bharot-o-somokalin-bohirbishwo",
+        "title": "অধ্যায় ৯: ভারত ও সমকালীন বহির্বিশ্ব : খ্রিস্টীয় সপ্তম শতকের প্রথম ভাগ পর্যন্ত",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-akash-vhora-surjo-tara-amader-prithibi-class-6",
+    "title": "অধ্যায় ১: আকাশ ভরা সূর্য তারা",
+    "slug": "akash-vhora-surjo-tara",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amader-prithibi-class-6-wb",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/geography/amader-prithibi/akash-vhora-surjo-tara",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "geography",
+    "textbookSlug": "amader-prithibi",
+    "chapterSlug": "akash-vhora-surjo-tara",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-geography-class-6-wb",
+        "slug": "geography",
+        "title": "Geography",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amader-prithibi-class-6-wb",
+        "slug": "amader-prithibi",
+        "title": "Amader Prithibi",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-akash-vhora-surjo-tara-amader-prithibi-class-6",
+        "slug": "akash-vhora-surjo-tara",
+        "title": "অধ্যায় ১: আকাশ ভরা সূর্য তারা",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-prithibi-ki-gol-amader-prithibi-class-6",
+    "title": "অধ্যায় ২: পৃথিবী কী গোল",
+    "slug": "prithibi-ki-gol",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amader-prithibi-class-6-wb",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/geography/amader-prithibi/prithibi-ki-gol",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "geography",
+    "textbookSlug": "amader-prithibi",
+    "chapterSlug": "prithibi-ki-gol",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-geography-class-6-wb",
+        "slug": "geography",
+        "title": "Geography",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amader-prithibi-class-6-wb",
+        "slug": "amader-prithibi",
+        "title": "Amader Prithibi",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-prithibi-ki-gol-amader-prithibi-class-6",
+        "slug": "prithibi-ki-gol",
+        "title": "অধ্যায় ২: পৃথিবী কী গোল",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-tumi-kothay-acho-amader-prithibi-class-6",
+    "title": "অধ্যায় ৩: তুমি কোথায় আছো",
+    "slug": "tumi-kothay-acho",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amader-prithibi-class-6-wb",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/geography/amader-prithibi/tumi-kothay-acho",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "geography",
+    "textbookSlug": "amader-prithibi",
+    "chapterSlug": "tumi-kothay-acho",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-geography-class-6-wb",
+        "slug": "geography",
+        "title": "Geography",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amader-prithibi-class-6-wb",
+        "slug": "amader-prithibi",
+        "title": "Amader Prithibi",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-tumi-kothay-acho-amader-prithibi-class-6",
+        "slug": "tumi-kothay-acho",
+        "title": "অধ্যায় ৩: তুমি কোথায় আছো",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-prithibir-aborton-amader-prithibi-class-6",
+    "title": "অধ্যায় ৪: পৃথিবীর আবর্তন",
+    "slug": "prithibir-aborton",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amader-prithibi-class-6-wb",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/geography/amader-prithibi/prithibir-aborton",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "geography",
+    "textbookSlug": "amader-prithibi",
+    "chapterSlug": "prithibir-aborton",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-geography-class-6-wb",
+        "slug": "geography",
+        "title": "Geography",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amader-prithibi-class-6-wb",
+        "slug": "amader-prithibi",
+        "title": "Amader Prithibi",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-prithibir-aborton-amader-prithibi-class-6",
+        "slug": "prithibir-aborton",
+        "title": "অধ্যায় ৪: পৃথিবীর আবর্তন",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-jol-sthol-batash-amader-prithibi-class-6",
+    "title": "অধ্যায় ৫: জল-স্থল-বাতাস",
+    "slug": "jol-sthol-batash",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amader-prithibi-class-6-wb",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/geography/amader-prithibi/jol-sthol-batash",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "geography",
+    "textbookSlug": "amader-prithibi",
+    "chapterSlug": "jol-sthol-batash",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-geography-class-6-wb",
+        "slug": "geography",
+        "title": "Geography",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amader-prithibi-class-6-wb",
+        "slug": "amader-prithibi",
+        "title": "Amader Prithibi",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-jol-sthol-batash-amader-prithibi-class-6",
+        "slug": "jol-sthol-batash",
+        "title": "অধ্যায় ৫: জল-স্থল-বাতাস",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-borofe-dhaka-mohadesh-amader-prithibi-class-6",
+    "title": "অধ্যায় ৬: বরফে ঢাকা মহাদেশ",
+    "slug": "borofe-dhaka-mohadesh",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amader-prithibi-class-6-wb",
+    "orderIndex": 6,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/geography/amader-prithibi/borofe-dhaka-mohadesh",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "geography",
+    "textbookSlug": "amader-prithibi",
+    "chapterSlug": "borofe-dhaka-mohadesh",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-geography-class-6-wb",
+        "slug": "geography",
+        "title": "Geography",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amader-prithibi-class-6-wb",
+        "slug": "amader-prithibi",
+        "title": "Amader Prithibi",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-borofe-dhaka-mohadesh-amader-prithibi-class-6",
+        "slug": "borofe-dhaka-mohadesh",
+        "title": "অধ্যায় ৬: বরফে ঢাকা মহাদেশ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-abohawa-o-jolobayu-amader-prithibi-class-6",
+    "title": "অধ্যায় ৭: আবহাওয়া ও জলবায়ু",
+    "slug": "abohawa-o-jolobayu",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amader-prithibi-class-6-wb",
+    "orderIndex": 7,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/geography/amader-prithibi/abohawa-o-jolobayu",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "geography",
+    "textbookSlug": "amader-prithibi",
+    "chapterSlug": "abohawa-o-jolobayu",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-geography-class-6-wb",
+        "slug": "geography",
+        "title": "Geography",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amader-prithibi-class-6-wb",
+        "slug": "amader-prithibi",
+        "title": "Amader Prithibi",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-abohawa-o-jolobayu-amader-prithibi-class-6",
+        "slug": "abohawa-o-jolobayu",
+        "title": "অধ্যায় ৭: আবহাওয়া ও জলবায়ু",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-bayudushon-amader-prithibi-class-6",
+    "title": "অধ্যায় ৮: বায়ুদূষণ",
+    "slug": "bayudushon",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amader-prithibi-class-6-wb",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/geography/amader-prithibi/bayudushon",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "geography",
+    "textbookSlug": "amader-prithibi",
+    "chapterSlug": "bayudushon",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-geography-class-6-wb",
+        "slug": "geography",
+        "title": "Geography",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amader-prithibi-class-6-wb",
+        "slug": "amader-prithibi",
+        "title": "Amader Prithibi",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-bayudushon-amader-prithibi-class-6",
+        "slug": "bayudushon",
+        "title": "অধ্যায় ৮: বায়ুদূষণ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-shobdodushon-amader-prithibi-class-6",
+    "title": "অধ্যায় ৯: শব্দদূষণ",
+    "slug": "shobdodushon",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amader-prithibi-class-6-wb",
+    "orderIndex": 9,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/geography/amader-prithibi/shobdodushon",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "geography",
+    "textbookSlug": "amader-prithibi",
+    "chapterSlug": "shobdodushon",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-geography-class-6-wb",
+        "slug": "geography",
+        "title": "Geography",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amader-prithibi-class-6-wb",
+        "slug": "amader-prithibi",
+        "title": "Amader Prithibi",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-shobdodushon-amader-prithibi-class-6",
+        "slug": "shobdodushon",
+        "title": "অধ্যায় ৯: শব্দদূষণ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-amader-desh-bharot-amader-prithibi-class-6",
+    "title": "অধ্যায় ১০: আমাদের দেশ ভারত",
+    "slug": "amader-desh-bharot",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amader-prithibi-class-6-wb",
+    "orderIndex": 10,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/geography/amader-prithibi/amader-desh-bharot",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "geography",
+    "textbookSlug": "amader-prithibi",
+    "chapterSlug": "amader-desh-bharot",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-geography-class-6-wb",
+        "slug": "geography",
+        "title": "Geography",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amader-prithibi-class-6-wb",
+        "slug": "amader-prithibi",
+        "title": "Amader Prithibi",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-amader-desh-bharot-amader-prithibi-class-6",
+        "slug": "amader-desh-bharot",
+        "title": "অধ্যায় ১০: আমাদের দেশ ভারত",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-manchitro-amader-prithibi-class-6",
+    "title": "অধ্যায় ১১: মানচিত্র",
+    "slug": "manchitro",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amader-prithibi-class-6-wb",
+    "orderIndex": 11,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/geography/amader-prithibi/manchitro",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "geography",
+    "textbookSlug": "amader-prithibi",
+    "chapterSlug": "manchitro",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-geography-class-6-wb",
+        "slug": "geography",
+        "title": "Geography",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amader-prithibi-class-6-wb",
+        "slug": "amader-prithibi",
+        "title": "Amader Prithibi",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-manchitro-amader-prithibi-class-6",
+        "slug": "manchitro",
+        "title": "অধ্যায় ১১: মানচিত্র",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-purbopather-punoralochona-ganit-prabha-class-6",
+    "title": "অধ্যায় ১: পূর্বপাঠের পুনরালোচনা (Revision of Previous Lessons)",
+    "slug": "purbopather-punoralochona",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-6-wb",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/mathematics/ganit-prabha/purbopather-punoralochona",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "purbopather-punoralochona",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-6-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-6-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-purbopather-punoralochona-ganit-prabha-class-6",
+        "slug": "purbopather-punoralochona",
+        "title": "অধ্যায় ১: পূর্বপাঠের পুনরালোচনা (Revision of Previous Lessons)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-sat-o-at-ongker-songkhar-dharona-ganit-prabha-class-6",
+    "title": "অধ্যায় ২: সাত ও আট অঙ্কের সংখ্যার ধারণা (Concept of 7 and 8 Digit Numbers)",
+    "slug": "sat-o-at-ongker-songkhar-dharona",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-6-wb",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/mathematics/ganit-prabha/sat-o-at-ongker-songkhar-dharona",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "sat-o-at-ongker-songkhar-dharona",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-6-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-6-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-sat-o-at-ongker-songkhar-dharona-ganit-prabha-class-6",
+        "slug": "sat-o-at-ongker-songkhar-dharona",
+        "title": "অধ্যায় ২: সাত ও আট অঙ্কের সংখ্যার ধারণা (Concept of 7 and 8 Digit Numbers)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-songkha-bishoye-juktisommoto-onuman-ganit-prabha-class-6",
+    "title": "অধ্যায় ৩: সংখ্যা বিষয়ে যুক্তিসম্মত অনুমান (Reasonable Estimation of Numbers)",
+    "slug": "songkha-bishoye-juktisommoto-onuman",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-6-wb",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/mathematics/ganit-prabha/songkha-bishoye-juktisommoto-onuman",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "songkha-bishoye-juktisommoto-onuman",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-6-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-6-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-songkha-bishoye-juktisommoto-onuman-ganit-prabha-class-6",
+        "slug": "songkha-bishoye-juktisommoto-onuman",
+        "title": "অধ্যায় ৩: সংখ্যা বিষয়ে যুক্তিসম্মত অনুমান (Reasonable Estimation of Numbers)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-ekshoto-porjonto-roman-songkha-ganit-prabha-class-6",
+    "title": "অধ্যায় ৪: একশত পর্যন্ত রোমান সংখ্যা (Roman Numerals up to 100)",
+    "slug": "ekshoto-porjonto-roman-songkha",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-6-wb",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/mathematics/ganit-prabha/ekshoto-porjonto-roman-songkha",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "ekshoto-porjonto-roman-songkha",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-6-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-6-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-ekshoto-porjonto-roman-songkha-ganit-prabha-class-6",
+        "slug": "ekshoto-porjonto-roman-songkha",
+        "title": "অধ্যায় ৪: একশত পর্যন্ত রোমান সংখ্যা (Roman Numerals up to 100)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-bijgonit-cholorashir-dharona-ganit-prabha-class-6",
+    "title": "অধ্যায় ৫: বীজগণিত চলরাশির ধারণা (Algebra: Concept of Variables)",
+    "slug": "bijgonit-cholorashir-dharona",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-6-wb",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/mathematics/ganit-prabha/bijgonit-cholorashir-dharona",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "bijgonit-cholorashir-dharona",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-6-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-6-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-bijgonit-cholorashir-dharona-ganit-prabha-class-6",
+        "slug": "bijgonit-cholorashir-dharona",
+        "title": "অধ্যায় ৫: বীজগণিত চলরাশির ধারণা (Algebra: Concept of Variables)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-bhognangshoke-purnosongkha-o-bhognangsho-diye-gun-o-bhag-ganit-prabha-class-6",
+    "title": "অধ্যায় ৬: ভগ্নাংশকে পূর্ণসংখ্যা ও ভগ্নাংশ দিয়ে গুণ ও ভাগ (Multiplication and Division of Fractions)",
+    "slug": "bhognangshoke-purnosongkha-o-bhognangsho-diye-gun-o-bhag",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-6-wb",
+    "orderIndex": 6,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/mathematics/ganit-prabha/bhognangshoke-purnosongkha-o-bhognangsho-diye-gun-o-bhag",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "bhognangshoke-purnosongkha-o-bhognangsho-diye-gun-o-bhag",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-6-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-6-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-bhognangshoke-purnosongkha-o-bhognangsho-diye-gun-o-bhag-ganit-prabha-class-6",
+        "slug": "bhognangshoke-purnosongkha-o-bhognangsho-diye-gun-o-bhag",
+        "title": "অধ্যায় ৬: ভগ্নাংশকে পূর্ণসংখ্যা ও ভগ্নাংশ দিয়ে গুণ ও ভাগ (Multiplication and Division of Fractions)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-doshomik-bhognangshoke-gun-o-bhag-ganit-prabha-class-6",
+    "title": "অধ্যায় ৭: দশমিক ভগ্নাংশকে গুণ ও ভাগ (Multiplication and Division of Decimal Fractions)",
+    "slug": "doshomik-bhognangshoke-gun-o-bhag",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-6-wb",
+    "orderIndex": 7,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/mathematics/ganit-prabha/doshomik-bhognangshoke-gun-o-bhag",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "doshomik-bhognangshoke-gun-o-bhag",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-6-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-6-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-doshomik-bhognangshoke-gun-o-bhag-ganit-prabha-class-6",
+        "slug": "doshomik-bhognangshoke-gun-o-bhag",
+        "title": "অধ্যায় ৭: দশমিক ভগ্নাংশকে গুণ ও ভাগ (Multiplication and Division of Decimal Fractions)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-metric-poddhoti-ganit-prabha-class-6",
+    "title": "অধ্যায় ৮: মেট্রিক পদ্ধতি (Metric System)",
+    "slug": "metric-poddhoti",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-6-wb",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/mathematics/ganit-prabha/metric-poddhoti",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "metric-poddhoti",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-6-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-6-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-metric-poddhoti-ganit-prabha-class-6",
+        "slug": "metric-poddhoti",
+        "title": "অধ্যায় ৮: মেট্রিক পদ্ধতি (Metric System)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-shotkora-ganit-prabha-class-6",
+    "title": "অধ্যায় ৯: শতকরা (Percentage)",
+    "slug": "shotkora",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-6-wb",
+    "orderIndex": 9,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/mathematics/ganit-prabha/shotkora",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "shotkora",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-6-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-6-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-shotkora-ganit-prabha-class-6",
+        "slug": "shotkora",
+        "title": "অধ্যায় ৯: শতকরা (Percentage)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-abritto-doshomik-songkha-ganit-prabha-class-6",
+    "title": "অধ্যায় ১০: আবৃত্ত দশমিক সংখ্যা (Recurring Decimal Numbers)",
+    "slug": "abritto-doshomik-songkha",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-6-wb",
+    "orderIndex": 10,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/mathematics/ganit-prabha/abritto-doshomik-songkha",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "abritto-doshomik-songkha",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-6-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-6-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-abritto-doshomik-songkha-ganit-prabha-class-6",
+        "slug": "abritto-doshomik-songkha",
+        "title": "অধ্যায় ১০: আবৃত্ত দশমিক সংখ্যা (Recurring Decimal Numbers)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-sushomo-ghonobostu-gothon-bishoyok-dharona-ganit-prabha-class-6",
+    "title": "অধ্যায় ১১: সুষম ঘনবস্তু গঠন বিষয়ক ধারণা (Geometric Concepts of Regular Solids)",
+    "slug": "sushomo-ghonobostu-gothon-bishoyok-dharona",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-6-wb",
+    "orderIndex": 11,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/mathematics/ganit-prabha/sushomo-ghonobostu-gothon-bishoyok-dharona",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "sushomo-ghonobostu-gothon-bishoyok-dharona",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-6-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-6-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-sushomo-ghonobostu-gothon-bishoyok-dharona-ganit-prabha-class-6",
+        "slug": "sushomo-ghonobostu-gothon-bishoyok-dharona",
+        "title": "অধ্যায় ১১: সুষম ঘনবস্তু গঠন বিষয়ক ধারণা (Geometric Concepts of Regular Solids)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-tinti-songkhar-gosagu-o-loshagu-ganit-prabha-class-6",
+    "title": "অধ্যায় ১২: তিনটি সংখ্যার গসাগু ও লসাগু (HCF and LCM of Three Numbers)",
+    "slug": "tinti-songkhar-gosagu-o-loshagu",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-6-wb",
+    "orderIndex": 12,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/mathematics/ganit-prabha/tinti-songkhar-gosagu-o-loshagu",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "tinti-songkhar-gosagu-o-loshagu",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-6-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-6-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-tinti-songkhar-gosagu-o-loshagu-ganit-prabha-class-6",
+        "slug": "tinti-songkhar-gosagu-o-loshagu",
+        "title": "অধ্যায় ১২: তিনটি সংখ্যার গসাগু ও লসাগু (HCF and LCM of Three Numbers)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-tothyo-sajano-o-bichar-ganit-prabha-class-6",
+    "title": "অধ্যায় ১৩: তথ্য সাজানো ও বিচার (Arranging and Analyzing Data)",
+    "slug": "tothyo-sajano-o-bichar",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-6-wb",
+    "orderIndex": 13,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/mathematics/ganit-prabha/tothyo-sajano-o-bichar",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "tothyo-sajano-o-bichar",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-6-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-6-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-tothyo-sajano-o-bichar-ganit-prabha-class-6",
+        "slug": "tothyo-sajano-o-bichar",
+        "title": "অধ্যায় ১৩: তথ্য সাজানো ও বিচার (Arranging and Analyzing Data)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-rekha-rekhangsho-roshmi-o-bindu-ganit-prabha-class-6",
+    "title": "অধ্যায় ১৪: রেখা, রেখাংশ, রশ্মি ও বিন্দু (Line, Line Segment, Ray, and Point)",
+    "slug": "rekha-rekhangsho-roshmi-o-bindu",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-6-wb",
+    "orderIndex": 14,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/mathematics/ganit-prabha/rekha-rekhangsho-roshmi-o-bindu",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "rekha-rekhangsho-roshmi-o-bindu",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-6-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-6-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-rekha-rekhangsho-roshmi-o-bindu-ganit-prabha-class-6",
+        "slug": "rekha-rekhangsho-roshmi-o-bindu",
+        "title": "অধ্যায় ১৪: রেখা, রেখাংশ, রশ্মি ও বিন্দু (Line, Line Segment, Ray, and Point)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-khetrofol-o-porisima-nirnoy-ganit-prabha-class-6",
+    "title": "অধ্যায় ১৫: ক্ষেত্রফল ও পরিসীমা নির্ণয় (Finding Area and Perimeter)",
+    "slug": "khetrofol-o-porisima-nirnoy",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-6-wb",
+    "orderIndex": 15,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/mathematics/ganit-prabha/khetrofol-o-porisima-nirnoy",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "khetrofol-o-porisima-nirnoy",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-6-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-6-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-khetrofol-o-porisima-nirnoy-ganit-prabha-class-6",
+        "slug": "khetrofol-o-porisima-nirnoy",
+        "title": "অধ্যায় ১৫: ক্ষেত্রফল ও পরিসীমা নির্ণয় (Finding Area and Perimeter)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-niyontrito-songkha-o-songkha-rekha-ganit-prabha-class-6",
+    "title": "অধ্যায় ১৬: নিয়ন্ত্রিত সংখ্যা ও সংখ্যা রেখা (Directed Numbers and Number Line)",
+    "slug": "niyontrito-songkha-o-songkha-rekha",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-6-wb",
+    "orderIndex": 16,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/mathematics/ganit-prabha/niyontrito-songkha-o-songkha-rekha",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "niyontrito-songkha-o-songkha-rekha",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-6-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-6-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-niyontrito-songkha-o-songkha-rekha-ganit-prabha-class-6",
+        "slug": "niyontrito-songkha-o-songkha-rekha",
+        "title": "অধ্যায় ১৬: নিয়ন্ত্রিত সংখ্যা ও সংখ্যা রেখা (Directed Numbers and Number Line)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-jyamitik-dharona-jyamiti-baksho-ganit-prabha-class-6",
+    "title": "অধ্যায় ১৭: জ্যামিতিক ধারণা (জ্যামিতি বাক্স) (Geometrical Concepts - Geometry Box)",
+    "slug": "jyamitik-dharona-jyamiti-baksho",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-6-wb",
+    "orderIndex": 17,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/mathematics/ganit-prabha/jyamitik-dharona-jyamiti-baksho",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "jyamitik-dharona-jyamiti-baksho",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-6-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-6-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-jyamitik-dharona-jyamiti-baksho-ganit-prabha-class-6",
+        "slug": "jyamitik-dharona-jyamiti-baksho",
+        "title": "অধ্যায় ১৭: জ্যামিতিক ধারণা (জ্যামিতি বাক্স) (Geometrical Concepts - Geometry Box)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-borgomul-ganit-prabha-class-6",
+    "title": "অধ্যায় ১৮: বর্গমূল (Square Root)",
+    "slug": "borgomul",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-6-wb",
+    "orderIndex": 18,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/mathematics/ganit-prabha/borgomul",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "borgomul",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-6-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-6-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-borgomul-ganit-prabha-class-6",
+        "slug": "borgomul",
+        "title": "অধ্যায় ১৮: বর্গমূল (Square Root)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-shomoyer-porimap-ganit-prabha-class-6",
+    "title": "অধ্যায় ১৯: সময়ের পরিমাপ (Measurement of Time)",
+    "slug": "shomoyer-porimap",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-6-wb",
+    "orderIndex": 19,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/mathematics/ganit-prabha/shomoyer-porimap",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "shomoyer-porimap",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-6-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-6-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-shomoyer-porimap-ganit-prabha-class-6",
+        "slug": "shomoyer-porimap",
+        "title": "অধ্যায় ১৯: সময়ের পরিমাপ (Measurement of Time)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-britto-bishoyok-jyamitik-dharona-ganit-prabha-class-6",
+    "title": "অধ্যায় ২০: বৃত্ত বিষয়ক জ্যামিতিক ধারণা (Geometric Concepts of Circle)",
+    "slug": "britto-bishoyok-jyamitik-dharona",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-6-wb",
+    "orderIndex": 20,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/mathematics/ganit-prabha/britto-bishoyok-jyamitik-dharona",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "britto-bishoyok-jyamitik-dharona",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-6-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-6-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-britto-bishoyok-jyamitik-dharona-ganit-prabha-class-6",
+        "slug": "britto-bishoyok-jyamitik-dharona",
+        "title": "অধ্যায় ২০: বৃত্ত বিষয়ক জ্যামিতিক ধারণা (Geometric Concepts of Circle)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-onupat-o-somanupater-dharona-ganit-prabha-class-6",
+    "title": "অধ্যায় ২১: অনুপাত ও সমানুপাতের ধারণা (Concepts of Ratio and Proportion)",
+    "slug": "onupat-o-somanupater-dharona",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-6-wb",
+    "orderIndex": 21,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/mathematics/ganit-prabha/onupat-o-somanupater-dharona",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "onupat-o-somanupater-dharona",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-6-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-6-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-onupat-o-somanupater-dharona-ganit-prabha-class-6",
+        "slug": "onupat-o-somanupater-dharona",
+        "title": "অধ্যায় ২১: অনুপাত ও সমানুপাতের ধারণা (Concepts of Ratio and Proportion)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-bibhinno-jyamitik-chitro-ongkon-ganit-prabha-class-6",
+    "title": "অধ্যায় ২২: বিভিন্ন জ্যামিতিক চিত্র অঙ্কন (Drawing Various Geometric Figures)",
+    "slug": "bibhinno-jyamitik-chitro-ongkon",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-6-wb",
+    "orderIndex": 22,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/mathematics/ganit-prabha/bibhinno-jyamitik-chitro-ongkon",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "bibhinno-jyamitik-chitro-ongkon",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-6-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-6-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-bibhinno-jyamitik-chitro-ongkon-ganit-prabha-class-6",
+        "slug": "bibhinno-jyamitik-chitro-ongkon",
+        "title": "অধ্যায় ২২: বিভিন্ন জ্যামিতিক চিত্র অঙ্কন (Drawing Various Geometric Figures)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-protisamyo-ganit-prabha-class-6",
+    "title": "অধ্যায় ২৩: প্রতিসাম্য (Symmetry)",
+    "slug": "protisamyo",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-6-wb",
+    "orderIndex": 23,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/mathematics/ganit-prabha/protisamyo",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "protisamyo",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-6-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-6-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-protisamyo-ganit-prabha-class-6",
+        "slug": "protisamyo",
+        "title": "অধ্যায় ২৩: প্রতিসাম্য (Symmetry)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-nana-dik-theke-ghonobostu-ganit-prabha-class-6",
+    "title": "অধ্যায় ২৪: নানা দিক থেকে ঘনবস্তু (Solid Objects from Different Views)",
+    "slug": "nana-dik-theke-ghonobostu",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-6-wb",
+    "orderIndex": 24,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/mathematics/ganit-prabha/nana-dik-theke-ghonobostu",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "nana-dik-theke-ghonobostu",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-6-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-6-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-nana-dik-theke-ghonobostu-ganit-prabha-class-6",
+        "slug": "nana-dik-theke-ghonobostu",
+        "title": "অধ্যায় ২৪: নানা দিক থেকে ঘনবস্তু (Solid Objects from Different Views)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-mojar-ongko-ganit-prabha-class-6",
+    "title": "অধ্যায় ২৫: মজার অংক (Fun Math)",
+    "slug": "mojar-ongko",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-6-wb",
+    "orderIndex": 25,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/mathematics/ganit-prabha/mojar-ongko",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "mojar-ongko",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-6-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-6-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-mojar-ongko-ganit-prabha-class-6",
+        "slug": "mojar-ongko",
+        "title": "অধ্যায় ২৫: মজার অংক (Fun Math)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-sushomo-ghonobostur-khola-akar-ganit-prabha-class-6",
+    "title": "অধ্যায় ২৬: সুষম ঘনবস্তুর খোলা আকার (Open Shape / Nets of Regular Solids)",
+    "slug": "sushomo-ghonobostur-khola-akar",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-6-wb",
+    "orderIndex": 26,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/mathematics/ganit-prabha/sushomo-ghonobostur-khola-akar",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "sushomo-ghonobostur-khola-akar",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-6-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-6-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-sushomo-ghonobostur-khola-akar-ganit-prabha-class-6",
+        "slug": "sushomo-ghonobostur-khola-akar",
+        "title": "অধ্যায় ২৬: সুষম ঘনবস্তুর খোলা আকার (Open Shape / Nets of Regular Solids)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-bhognangsho-doshomik-shotkora-o-onupat-ganit-prabha-class-6",
+    "title": "অধ্যায় ২৭: ভগ্নাংশ, দশমিক, শতকরা ও অনুপাত (Equivalence of Fractions, Decimals, Percentages & Ratios)",
+    "slug": "bhognangsho-doshomik-shotkora-o-onupat",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-6-wb",
+    "orderIndex": 27,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/mathematics/ganit-prabha/bhognangsho-doshomik-shotkora-o-onupat",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "bhognangsho-doshomik-shotkora-o-onupat",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-6-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-6-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-bhognangsho-doshomik-shotkora-o-onupat-ganit-prabha-class-6",
+        "slug": "bhognangsho-doshomik-shotkora-o-onupat",
+        "title": "অধ্যায় ২৭: ভগ্নাংশ, দশমিক, শতকরা ও অনুপাত (Equivalence of Fractions, Decimals, Percentages & Ratios)",
         "type": "chapter"
       }
     ]
