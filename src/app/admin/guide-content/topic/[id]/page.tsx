@@ -471,7 +471,7 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
           </button>
         </div>
       ) : ['questions','mcq','creative_question','descriptive'].includes(activeTab) ? (
-        <TopicQuestionManager topicId={nodeDbId || topicId} tabType={activeTab} nodeLevel={nodeLevel} />
+        <TopicQuestionManager topicId={nodeDbId || topicId} topicSlug={nodeSlug} tabType={activeTab} nodeLevel={nodeLevel} />
       ) : ['model_test','practice_sets','quizzes','mock_tests','exams_papers'].includes(activeTab) ? (
         <TopicAssessmentManager topicId={nodeDbId || topicId} tabType={activeTab} nodeLevel={nodeLevel} />
       ) : (

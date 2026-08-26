@@ -36,11 +36,12 @@ const renderMathInHtml = (htmlString: string) => {
 
 interface TopicQuestionManagerProps {
   topicId: string;
+  topicSlug?: string;
   tabType: string;
   nodeLevel?: 'chapter' | 'topic';
 }
 
-export function TopicQuestionManager({ topicId, tabType, nodeLevel = 'topic' }: TopicQuestionManagerProps) {
+export function TopicQuestionManager({ topicId, topicSlug, tabType, nodeLevel = 'topic' }: TopicQuestionManagerProps) {
   const { toast } = useToast();
   const [questions, setQuestions] = useState<QuestionBankEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -115,7 +116,8 @@ export function TopicQuestionManager({ topicId, tabType, nodeLevel = 'topic' }: 
     setLoading(true);
     try {
       const field = nodeLevel === 'chapter' ? 'chapterId' : 'topicId';
-      const data = await getQuestions({ [field]: topicId, questionType: qType }, 500);
+      const searchIds = topicSlug && topicSlug !== topicId ? [topicId, topicSlug] : topicId;
+      const data = await getQuestions({ [field]: searchIds, questionType: qType }, 500);
       setQuestions(data);
       setSelectedIds(new Set());
       setCurrentPage(1);

@@ -66,7 +66,11 @@ export async function getQuestions(filters?: Record<string, any>, limitCount = 5
     if (!filters) return true;
     for (const [key, value] of Object.entries(filters)) {
       if (value !== undefined && value !== null && value !== '' && value !== 'all') {
-        if (q[key as keyof QuestionBankEntry] !== value) return false;
+        if (Array.isArray(value)) {
+          if (!value.includes(q[key as keyof QuestionBankEntry] as any)) return false;
+        } else {
+          if (q[key as keyof QuestionBankEntry] !== value) return false;
+        }
       }
     }
     return true;
@@ -78,8 +82,12 @@ export async function getQuestions(filters?: Record<string, any>, limitCount = 5
   if (filters) {
     const conditions = [];
     for (const [key, value] of Object.entries(filters)) {
-      if (value !== undefined && value !== null && value !== '') {
-        conditions.push(where(key, '==', value));
+      if (value !== undefined && value !== null && value !== '' && value !== 'all') {
+        if (Array.isArray(value)) {
+          conditions.push(where(key, 'in', value));
+        } else {
+          conditions.push(where(key, '==', value));
+        }
       }
     }
     if (conditions.length > 0) {

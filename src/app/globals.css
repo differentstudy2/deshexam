@@ -100,6 +100,8 @@
 
   .prose img {
     @apply rounded-lg border bg-secondary shadow-sm;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
   }
 
   .prose .float-left-responsive,
