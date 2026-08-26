@@ -191,7 +191,7 @@ export function ReadingArticle({ data, node, hierarchy, navigation, contentType 
   );
 
   const renderSection = (sec: ContentSection, idx: number) => {
-    const isLesson = sec.id === 'lesson';
+    const isLesson = sec.id === 'lesson' || sec.id === 'guide_content';
 
     return (
       <div key={idx} id={sec.id} className="bg-white dark:bg-slate-900 scroll-mt-20 border-b border-slate-100 dark:border-slate-800">
