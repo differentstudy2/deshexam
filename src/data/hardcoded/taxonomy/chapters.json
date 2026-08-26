@@ -615,5 +615,2953 @@
         "type": "textbook"
       }
     ]
+  },
+  {
+    "id": "chapter-revision-of-previous-lessons-amar-ganit",
+    "title": "আগের পড়া মনে করি",
+    "slug": "revision-of-previous-lessons",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amar-ganit",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/mathematics/amar-ganit/revision-of-previous-lessons",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "amar-ganit",
+    "chapterSlug": "revision-of-previous-lessons",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-math-class-5-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amar-ganit",
+        "slug": "amar-ganit",
+        "title": "Amar Ganit",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-revision-of-previous-lessons-amar-ganit",
+        "slug": "revision-of-previous-lessons",
+        "title": "আগের পড়া মনে করি",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-easily-count-village-population-amar-ganit",
+    "title": "সহজে গ্রামের জনসংখ্যা গুনি",
+    "slug": "easily-count-village-population",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amar-ganit",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/mathematics/amar-ganit/easily-count-village-population",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "amar-ganit",
+    "chapterSlug": "easily-count-village-population",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-math-class-5-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amar-ganit",
+        "slug": "amar-ganit",
+        "title": "Amar Ganit",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-easily-count-village-population-amar-ganit",
+        "slug": "easily-count-village-population",
+        "title": "সহজে গ্রামের জনসংখ্যা গুনি",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-easy-calculations-with-cards-amar-ganit",
+    "title": "কার্ড দিয়ে সহজে হিসাব করি",
+    "slug": "easy-calculations-with-cards",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amar-ganit",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/mathematics/amar-ganit/easy-calculations-with-cards",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "amar-ganit",
+    "chapterSlug": "easy-calculations-with-cards",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-math-class-5-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amar-ganit",
+        "slug": "amar-ganit",
+        "title": "Amar Ganit",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-easy-calculations-with-cards-amar-ganit",
+        "slug": "easy-calculations-with-cards",
+        "title": "কার্ড দিয়ে সহজে হিসাব করি",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-distributing-equally-among-maximum-people-amar-ganit",
+    "title": "সবথেকে বেশি কতজনের মধ্যে সমান ভাগ করতে পারি",
+    "slug": "distributing-equally-among-maximum-people",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amar-ganit",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/mathematics/amar-ganit/distributing-equally-among-maximum-people",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "amar-ganit",
+    "chapterSlug": "distributing-equally-among-maximum-people",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-math-class-5-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amar-ganit",
+        "slug": "amar-ganit",
+        "title": "Amar Ganit",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-distributing-equally-among-maximum-people-amar-ganit",
+        "slug": "distributing-equally-among-maximum-people",
+        "title": "সবথেকে বেশি কতজনের মধ্যে সমান ভাগ করতে পারি",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lets-have-sweets-amar-ganit",
+    "title": "মিষ্টিমুখ হোক",
+    "slug": "lets-have-sweets",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amar-ganit",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/mathematics/amar-ganit/lets-have-sweets",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "amar-ganit",
+    "chapterSlug": "lets-have-sweets",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-math-class-5-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amar-ganit",
+        "slug": "amar-ganit",
+        "title": "Amar Ganit",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lets-have-sweets-amar-ganit",
+        "slug": "lets-have-sweets",
+        "title": "মিষ্টিমুখ হোক",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-easy-calculation-of-large-numbers-amar-ganit",
+    "title": "সহজে বড়ো সংখ্যার হিসাব করি",
+    "slug": "easy-calculation-of-large-numbers",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amar-ganit",
+    "orderIndex": 6,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/mathematics/amar-ganit/easy-calculation-of-large-numbers",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "amar-ganit",
+    "chapterSlug": "easy-calculation-of-large-numbers",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-math-class-5-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amar-ganit",
+        "slug": "amar-ganit",
+        "title": "Amar Ganit",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-easy-calculation-of-large-numbers-amar-ganit",
+        "slug": "easy-calculation-of-large-numbers",
+        "title": "সহজে বড়ো সংখ্যার হিসাব করি",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter--dividing-a-whole-thing-into-equal-parts-amar-ganit",
+    "title": "একটা গোটা",
+    "slug": "-dividing-a-whole-thing-into-equal-parts",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amar-ganit",
+    "orderIndex": 7,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/mathematics/amar-ganit/-dividing-a-whole-thing-into-equal-parts",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "amar-ganit",
+    "chapterSlug": "-dividing-a-whole-thing-into-equal-parts",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-math-class-5-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amar-ganit",
+        "slug": "amar-ganit",
+        "title": "Amar Ganit",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter--dividing-a-whole-thing-into-equal-parts-amar-ganit",
+        "slug": "-dividing-a-whole-thing-into-equal-parts",
+        "title": "একটা গোটা",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lets-see-how-much-water-is-in-the-tank-amar-ganit",
+    "title": "চৌবাচ্চায় কত জল আছে দেখি",
+    "slug": "lets-see-how-much-water-is-in-the-tank",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amar-ganit",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/mathematics/amar-ganit/lets-see-how-much-water-is-in-the-tank",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "amar-ganit",
+    "chapterSlug": "lets-see-how-much-water-is-in-the-tank",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-math-class-5-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amar-ganit",
+        "slug": "amar-ganit",
+        "title": "Amar Ganit",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lets-see-how-much-water-is-in-the-tank-amar-ganit",
+        "slug": "lets-see-how-much-water-is-in-the-tank",
+        "title": "চৌবাচ্চায় কত জল আছে দেখি",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lets-paint-the-school-windows-green-amar-ganit",
+    "title": "আজ স্কুলবাড়ির জানালায় সবুজ রং দিই",
+    "slug": "lets-paint-the-school-windows-green",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amar-ganit",
+    "orderIndex": 9,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/mathematics/amar-ganit/lets-paint-the-school-windows-green",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "amar-ganit",
+    "chapterSlug": "lets-paint-the-school-windows-green",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-math-class-5-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amar-ganit",
+        "slug": "amar-ganit",
+        "title": "Amar Ganit",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lets-paint-the-school-windows-green-amar-ganit",
+        "slug": "lets-paint-the-school-windows-green",
+        "title": "আজ স্কুলবাড়ির জানালায় সবুজ রং দিই",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-playing-with-matchsticks-amar-ganit",
+    "title": "দেশলাই কাঠির খেলা খেলি",
+    "slug": "playing-with-matchsticks",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amar-ganit",
+    "orderIndex": 10,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/mathematics/amar-ganit/playing-with-matchsticks",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "amar-ganit",
+    "chapterSlug": "playing-with-matchsticks",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-math-class-5-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amar-ganit",
+        "slug": "amar-ganit",
+        "title": "Amar Ganit",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-playing-with-matchsticks-amar-ganit",
+        "slug": "playing-with-matchsticks",
+        "title": "দেশলাই কাঠির খেলা খেলি",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-step-by-step-calculation-amar-ganit",
+    "title": "ধাপে ধাপে হিসাব করি",
+    "slug": "step-by-step-calculation",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amar-ganit",
+    "orderIndex": 11,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/mathematics/amar-ganit/step-by-step-calculation",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "amar-ganit",
+    "chapterSlug": "step-by-step-calculation",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-math-class-5-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amar-ganit",
+        "slug": "amar-ganit",
+        "title": "Amar Ganit",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-step-by-step-calculation-amar-ganit",
+        "slug": "step-by-step-calculation",
+        "title": "ধাপে ধাপে হিসাব করি",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-coloring-different-parts-as-we-wish-amar-ganit",
+    "title": "ইচ্ছামতো বিভিন্ন অংশে রং দিই",
+    "slug": "coloring-different-parts-as-we-wish",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amar-ganit",
+    "orderIndex": 12,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/mathematics/amar-ganit/coloring-different-parts-as-we-wish",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "amar-ganit",
+    "chapterSlug": "coloring-different-parts-as-we-wish",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-math-class-5-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amar-ganit",
+        "slug": "amar-ganit",
+        "title": "Amar Ganit",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-coloring-different-parts-as-we-wish-amar-ganit",
+        "slug": "coloring-different-parts-as-we-wish",
+        "title": "ইচ্ছামতো বিভিন্ন অংশে রং দিই",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-calculating-with-uncle-amar-ganit",
+    "title": "কাকার সাথে হিসাব করি",
+    "slug": "calculating-with-uncle",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amar-ganit",
+    "orderIndex": 13,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/mathematics/amar-ganit/calculating-with-uncle",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "amar-ganit",
+    "chapterSlug": "calculating-with-uncle",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-math-class-5-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amar-ganit",
+        "slug": "amar-ganit",
+        "title": "Amar Ganit",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-calculating-with-uncle-amar-ganit",
+        "slug": "calculating-with-uncle",
+        "title": "কাকার সাথে হিসাব করি",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-drawing-something-that-takes-very-little-space-amar-ganit",
+    "title": "এমন কিছু আঁকি যা খুব কম জায়গা নেবে",
+    "slug": "drawing-something-that-takes-very-little-space",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amar-ganit",
+    "orderIndex": 14,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/mathematics/amar-ganit/drawing-something-that-takes-very-little-space",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "amar-ganit",
+    "chapterSlug": "drawing-something-that-takes-very-little-space",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-math-class-5-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amar-ganit",
+        "slug": "amar-ganit",
+        "title": "Amar Ganit",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-drawing-something-that-takes-very-little-space-amar-ganit",
+        "slug": "drawing-something-that-takes-very-little-space",
+        "title": "এমন কিছু আঁকি যা খুব কম জায়গা নেবে",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-observing-the-position-of-clock-hands-with-time-amar-ganit",
+    "title": "সময়ের সঙ্গে ঘড়ির কাঁটার অবস্থান দেখি",
+    "slug": "observing-the-position-of-clock-hands-with-time",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amar-ganit",
+    "orderIndex": 15,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/mathematics/amar-ganit/observing-the-position-of-clock-hands-with-time",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "amar-ganit",
+    "chapterSlug": "observing-the-position-of-clock-hands-with-time",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-math-class-5-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amar-ganit",
+        "slug": "amar-ganit",
+        "title": "Amar Ganit",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-observing-the-position-of-clock-hands-with-time-amar-ganit",
+        "slug": "observing-the-position-of-clock-hands-with-time",
+        "title": "সময়ের সঙ্গে ঘড়ির কাঁটার অবস্থান দেখি",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-analyzing-data-using-pictures-amar-ganit",
+    "title": "ছবি দিয়ে তথ্য বিচার করি",
+    "slug": "analyzing-data-using-pictures",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amar-ganit",
+    "orderIndex": 16,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/mathematics/amar-ganit/analyzing-data-using-pictures",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "amar-ganit",
+    "chapterSlug": "analyzing-data-using-pictures",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-math-class-5-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amar-ganit",
+        "slug": "amar-ganit",
+        "title": "Amar Ganit",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-analyzing-data-using-pictures-amar-ganit",
+        "slug": "analyzing-data-using-pictures",
+        "title": "ছবি দিয়ে তথ্য বিচার করি",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-looking-at-solid-objects-amar-ganit",
+    "title": "ঘনবস্তু দেখি",
+    "slug": "looking-at-solid-objects",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amar-ganit",
+    "orderIndex": 17,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/mathematics/amar-ganit/looking-at-solid-objects",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "amar-ganit",
+    "chapterSlug": "looking-at-solid-objects",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-math-class-5-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amar-ganit",
+        "slug": "amar-ganit",
+        "title": "Amar Ganit",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-looking-at-solid-objects-amar-ganit",
+        "slug": "looking-at-solid-objects",
+        "title": "ঘনবস্তু দেখি",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-finding-the-meaning-of-unitary-method-amar-ganit",
+    "title": "ঐকিক শব্দের অর্থ খুঁজি",
+    "slug": "finding-the-meaning-of-unitary-method",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amar-ganit",
+    "orderIndex": 18,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/mathematics/amar-ganit/finding-the-meaning-of-unitary-method",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "amar-ganit",
+    "chapterSlug": "finding-the-meaning-of-unitary-method",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-math-class-5-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amar-ganit",
+        "slug": "amar-ganit",
+        "title": "Amar Ganit",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-finding-the-meaning-of-unitary-method-amar-ganit",
+        "slug": "finding-the-meaning-of-unitary-method",
+        "title": "ঐকিক শব্দের অর্থ খুঁজি",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-playing-with-three-sticks-amar-ganit",
+    "title": "তিনটি কাঠি নিয়ে খেলি",
+    "slug": "playing-with-three-sticks",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amar-ganit",
+    "orderIndex": 19,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/mathematics/amar-ganit/playing-with-three-sticks",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "amar-ganit",
+    "chapterSlug": "playing-with-three-sticks",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-math-class-5-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amar-ganit",
+        "slug": "amar-ganit",
+        "title": "Amar Ganit",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-playing-with-three-sticks-amar-ganit",
+        "slug": "playing-with-three-sticks",
+        "title": "তিনটি কাঠি নিয়ে খেলি",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-finding-something-in-a-circular-path-amar-ganit",
+    "title": "গোলাকার পথে কিছু খুঁজি",
+    "slug": "finding-something-in-a-circular-path",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amar-ganit",
+    "orderIndex": 20,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/mathematics/amar-ganit/finding-something-in-a-circular-path",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "amar-ganit",
+    "chapterSlug": "finding-something-in-a-circular-path",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-math-class-5-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amar-ganit",
+        "slug": "amar-ganit",
+        "title": "Amar Ganit",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-finding-something-in-a-circular-path-amar-ganit",
+        "slug": "finding-something-in-a-circular-path",
+        "title": "গোলাকার পথে কিছু খুঁজি",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-fun-with-numbers-amar-ganit",
+    "title": "অঙ্কের মজা",
+    "slug": "fun-with-numbers",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amar-ganit",
+    "orderIndex": 21,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/mathematics/amar-ganit/fun-with-numbers",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "amar-ganit",
+    "chapterSlug": "fun-with-numbers",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-math-class-5-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amar-ganit",
+        "slug": "amar-ganit",
+        "title": "Amar Ganit",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-fun-with-numbers-amar-ganit",
+        "slug": "fun-with-numbers",
+        "title": "অঙ্কের মজা",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-golpoburo-patabahar",
+    "title": "গল্পবুড়ো",
+    "author": "সুনির্মল বসু",
+    "slug": "golpoburo",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-patabahar",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/bengali-literature/patabahar/golpoburo",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "patabahar",
+    "chapterSlug": "golpoburo",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-lit-class-5-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-patabahar",
+        "slug": "patabahar",
+        "title": "Patabahar",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-golpoburo-patabahar",
+        "slug": "golpoburo",
+        "title": "গল্পবুড়ো",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-buno-hans-patabahar",
+    "title": "বুনো হাঁস",
+    "author": "লীলা মজুমদার",
+    "slug": "buno-hans",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-patabahar",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/bengali-literature/patabahar/buno-hans",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "patabahar",
+    "chapterSlug": "buno-hans",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-lit-class-5-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-patabahar",
+        "slug": "patabahar",
+        "title": "Patabahar",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-buno-hans-patabahar",
+        "slug": "buno-hans",
+        "title": "বুনো হাঁস",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-darogababu-ebong-habu-patabahar",
+    "title": "দারোগাবাবু এবং হাবু",
+    "author": "ভবানীপ্রসাদ মজুমদার",
+    "slug": "darogababu-ebong-habu",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-patabahar",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/bengali-literature/patabahar/darogababu-ebong-habu",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "patabahar",
+    "chapterSlug": "darogababu-ebong-habu",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-lit-class-5-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-patabahar",
+        "slug": "patabahar",
+        "title": "Patabahar",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-darogababu-ebong-habu-patabahar",
+        "slug": "darogababu-ebong-habu",
+        "title": "দারোগাবাবু এবং হাবু",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-etoa-mundar-kahini-patabahar",
+    "title": "এতোয়া মুন্ডার কাহিনী",
+    "author": "মহাশ্বেতা দেবী",
+    "slug": "etoa-mundar-kahini",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-patabahar",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/bengali-literature/patabahar/etoa-mundar-kahini",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "patabahar",
+    "chapterSlug": "etoa-mundar-kahini",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-lit-class-5-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-patabahar",
+        "slug": "patabahar",
+        "title": "Patabahar",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-etoa-mundar-kahini-patabahar",
+        "slug": "etoa-mundar-kahini",
+        "title": "এতোয়া মুন্ডার কাহিনী",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-pakhir-kache-fuler-kache-patabahar",
+    "title": "পাখির কাছে, ফুলের কাছে",
+    "author": "আল মাহমুদ",
+    "slug": "pakhir-kache-fuler-kache",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-patabahar",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/bengali-literature/patabahar/pakhir-kache-fuler-kache",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "patabahar",
+    "chapterSlug": "pakhir-kache-fuler-kache",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-lit-class-5-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-patabahar",
+        "slug": "patabahar",
+        "title": "Patabahar",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-pakhir-kache-fuler-kache-patabahar",
+        "slug": "pakhir-kache-fuler-kache",
+        "title": "পাখির কাছে, ফুলের কাছে",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-ore-grihobasi-patabahar",
+    "title": "ওরে গৃহবাসী (গান)",
+    "author": "রবীন্দ্রনাথ ঠাকুর",
+    "slug": "ore-grihobasi",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-patabahar",
+    "orderIndex": 6,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/bengali-literature/patabahar/ore-grihobasi",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "patabahar",
+    "chapterSlug": "ore-grihobasi",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-lit-class-5-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-patabahar",
+        "slug": "patabahar",
+        "title": "Patabahar",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-ore-grihobasi-patabahar",
+        "slug": "ore-grihobasi",
+        "title": "ওরে গৃহবাসী (গান)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-bimolar-obhiman-patabahar",
+    "title": "বিমলার অভিমান",
+    "author": "নবকৃষ্ণ ভট্টাচার্য",
+    "slug": "bimolar-obhiman",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-patabahar",
+    "orderIndex": 7,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/bengali-literature/patabahar/bimolar-obhiman",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "patabahar",
+    "chapterSlug": "bimolar-obhiman",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-lit-class-5-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-patabahar",
+        "slug": "patabahar",
+        "title": "Patabahar",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-bimolar-obhiman-patabahar",
+        "slug": "bimolar-obhiman",
+        "title": "বিমলার অভিমান",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chelebela-patabahar",
+    "title": "ছেলেবেলা",
+    "author": "রবীন্দ্রনাথ ঠাকুর",
+    "slug": "chelebela",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-patabahar",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/bengali-literature/patabahar/chelebela",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "patabahar",
+    "chapterSlug": "chelebela",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-lit-class-5-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-patabahar",
+        "slug": "patabahar",
+        "title": "Patabahar",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chelebela-patabahar",
+        "slug": "chelebela",
+        "title": "ছেলেবেলা",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-math-mane-chut-patabahar",
+    "title": "মাঠ মানে ছুট",
+    "author": "কার্তিক ঘোষ",
+    "slug": "math-mane-chut",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-patabahar",
+    "orderIndex": 9,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/bengali-literature/patabahar/math-mane-chut",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "patabahar",
+    "chapterSlug": "math-mane-chut",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-lit-class-5-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-patabahar",
+        "slug": "patabahar",
+        "title": "Patabahar",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-math-mane-chut-patabahar",
+        "slug": "math-mane-chut",
+        "title": "মাঠ মানে ছুট",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-paharia-borshar-sure-patabahar",
+    "title": "পাহাড়িয়া বর্ষার সুরে",
+    "author": "প্রচলিত / লোককথা",
+    "slug": "paharia-borshar-sure",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-patabahar",
+    "orderIndex": 10,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/bengali-literature/patabahar/paharia-borshar-sure",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "patabahar",
+    "chapterSlug": "paharia-borshar-sure",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-lit-class-5-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-patabahar",
+        "slug": "patabahar",
+        "title": "Patabahar",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-paharia-borshar-sure-patabahar",
+        "slug": "paharia-borshar-sure",
+        "title": "পাহাড়িয়া বর্ষার সুরে",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-limerick-patabahar",
+    "title": "লিমেরিক",
+    "author": "এডওয়ার্ড লিয়ার (তরজমা: সত্যজিৎ রায়)",
+    "slug": "limerick",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-patabahar",
+    "orderIndex": 11,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/bengali-literature/patabahar/limerick",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "patabahar",
+    "chapterSlug": "limerick",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-lit-class-5-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-patabahar",
+        "slug": "patabahar",
+        "title": "Patabahar",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-limerick-patabahar",
+        "slug": "limerick",
+        "title": "লিমেরিক",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-jhor-patabahar",
+    "title": "ঝড়",
+    "author": "মৈত্রেয়ী দেবী",
+    "slug": "jhor",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-patabahar",
+    "orderIndex": 12,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/bengali-literature/patabahar/jhor",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "patabahar",
+    "chapterSlug": "jhor",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-lit-class-5-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-patabahar",
+        "slug": "patabahar",
+        "title": "Patabahar",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-jhor-patabahar",
+        "slug": "jhor",
+        "title": "ঝড়",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-modhu-ante-bagher-mukhe-patabahar",
+    "title": "মধু আনতে বাঘের মুখে",
+    "author": "শিবশঙ্কর মিত্র",
+    "slug": "modhu-ante-bagher-mukhe",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-patabahar",
+    "orderIndex": 13,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/bengali-literature/patabahar/modhu-ante-bagher-mukhe",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "patabahar",
+    "chapterSlug": "modhu-ante-bagher-mukhe",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-lit-class-5-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-patabahar",
+        "slug": "patabahar",
+        "title": "Patabahar",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-modhu-ante-bagher-mukhe-patabahar",
+        "slug": "modhu-ante-bagher-mukhe",
+        "title": "মধু আনতে বাঘের মুখে",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-mayataru-patabahar",
+    "title": "মায়াতরু",
+    "author": "অশোকবিজয় রাহা",
+    "slug": "mayataru",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-patabahar",
+    "orderIndex": 14,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/bengali-literature/patabahar/mayataru",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "patabahar",
+    "chapterSlug": "mayataru",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-lit-class-5-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-patabahar",
+        "slug": "patabahar",
+        "title": "Patabahar",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-mayataru-patabahar",
+        "slug": "mayataru",
+        "title": "মায়াতরু",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-phonimonsha-o-boner-pori-patabahar",
+    "title": "ফণীমনসা ও বনের পরি",
+    "author": "বীরু চট্টোপাধ্যায়",
+    "slug": "phonimonsha-o-boner-pori",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-patabahar",
+    "orderIndex": 15,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/bengali-literature/patabahar/phonimonsha-o-boner-pori",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "patabahar",
+    "chapterSlug": "phonimonsha-o-boner-pori",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-lit-class-5-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-patabahar",
+        "slug": "patabahar",
+        "title": "Patabahar",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-phonimonsha-o-boner-pori-patabahar",
+        "slug": "phonimonsha-o-boner-pori",
+        "title": "ফণীমনসা ও বনের পরি",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-brishti-pore-tapur-tapur-patabahar",
+    "title": "বৃষ্টি পড়ে টাপুর টুপুর",
+    "author": "রবীন্দ্রনাথ ঠাকুর",
+    "slug": "brishti-pore-tapur-tapur",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-patabahar",
+    "orderIndex": 16,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/bengali-literature/patabahar/brishti-pore-tapur-tapur",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "patabahar",
+    "chapterSlug": "brishti-pore-tapur-tapur",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-lit-class-5-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-patabahar",
+        "slug": "patabahar",
+        "title": "Patabahar",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-brishti-pore-tapur-tapur-patabahar",
+        "slug": "brishti-pore-tapur-tapur",
+        "title": "বৃষ্টি পড়ে টাপুর টুপুর",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-boka-kumirer-kotha-patabahar",
+    "title": "বোকা কুমিরের কথা",
+    "author": "উপেন্দ্রকিশোর রায়চৌধুরী",
+    "slug": "boka-kumirer-kotha",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-patabahar",
+    "orderIndex": 17,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/bengali-literature/patabahar/boka-kumirer-kotha",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "patabahar",
+    "chapterSlug": "boka-kumirer-kotha",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-lit-class-5-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-patabahar",
+        "slug": "patabahar",
+        "title": "Patabahar",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-boka-kumirer-kotha-patabahar",
+        "slug": "boka-kumirer-kotha",
+        "title": "বোকা কুমিরের কথা",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chol-chol-chol-patabahar",
+    "title": "চল চল চল (গান)",
+    "author": "কাজী নজরুল ইসলাম",
+    "slug": "chol-chol-chol",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-patabahar",
+    "orderIndex": 18,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/bengali-literature/patabahar/chol-chol-chol",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "patabahar",
+    "chapterSlug": "chol-chol-chol",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-lit-class-5-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-patabahar",
+        "slug": "patabahar",
+        "title": "Patabahar",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chol-chol-chol-patabahar",
+        "slug": "chol-chol-chol",
+        "title": "চল চল চল (গান)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-masterda-patabahar",
+    "title": "মাস্টারদা",
+    "author": "অশোককুমার মুখোপাধ্যায়",
+    "slug": "masterda",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-patabahar",
+    "orderIndex": 19,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/bengali-literature/patabahar/masterda",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "patabahar",
+    "chapterSlug": "masterda",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-lit-class-5-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-patabahar",
+        "slug": "patabahar",
+        "title": "Patabahar",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-masterda-patabahar",
+        "slug": "masterda",
+        "title": "মাস্টারদা",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-muktir-mondir-sopanotole-patabahar",
+    "title": "মুক্তির মন্দির সোপানতলে (গান)",
+    "author": "মোহিনী চৌধুরী",
+    "slug": "muktir-mondir-sopanotole",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-patabahar",
+    "orderIndex": 20,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/bengali-literature/patabahar/muktir-mondir-sopanotole",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "patabahar",
+    "chapterSlug": "muktir-mondir-sopanotole",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-lit-class-5-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-patabahar",
+        "slug": "patabahar",
+        "title": "Patabahar",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-muktir-mondir-sopanotole-patabahar",
+        "slug": "muktir-mondir-sopanotole",
+        "title": "মুক্তির মন্দির সোপানতলে (গান)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-mishti-patabahar",
+    "title": "মিষ্টি",
+    "author": "প্রেমেন্দ্র মিত্র",
+    "slug": "mishti",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-patabahar",
+    "orderIndex": 21,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/bengali-literature/patabahar/mishti",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "patabahar",
+    "chapterSlug": "mishti",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-lit-class-5-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-patabahar",
+        "slug": "patabahar",
+        "title": "Patabahar",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-mishti-patabahar",
+        "slug": "mishti",
+        "title": "মিষ্টি",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-talonobomi-patabahar",
+    "title": "তালনবমী",
+    "author": "বিভূতিভূষণ বন্দ্যোপাধ্যায়",
+    "slug": "talonobomi",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-patabahar",
+    "orderIndex": 22,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/bengali-literature/patabahar/talonobomi",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "patabahar",
+    "chapterSlug": "talonobomi",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-lit-class-5-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-patabahar",
+        "slug": "patabahar",
+        "title": "Patabahar",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-talonobomi-patabahar",
+        "slug": "talonobomi",
+        "title": "তালনবমী",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-shorot-tomar-patabahar",
+    "title": "শরৎ তোমার (গান)",
+    "author": "রবীন্দ্রনাথ ঠাকুর",
+    "slug": "shorot-tomar",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-patabahar",
+    "orderIndex": 23,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/bengali-literature/patabahar/shorot-tomar",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "patabahar",
+    "chapterSlug": "shorot-tomar",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-lit-class-5-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-patabahar",
+        "slug": "patabahar",
+        "title": "Patabahar",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-shorot-tomar-patabahar",
+        "slug": "shorot-tomar",
+        "title": "শরৎ তোমার (গান)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-ekla-patabahar",
+    "title": "একলা",
+    "author": "শঙ্খ ঘোষ",
+    "slug": "ekla",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-patabahar",
+    "orderIndex": 24,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/bengali-literature/patabahar/ekla",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "patabahar",
+    "chapterSlug": "ekla",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-lit-class-5-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-patabahar",
+        "slug": "patabahar",
+        "title": "Patabahar",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-ekla-patabahar",
+        "slug": "ekla",
+        "title": "একলা",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-akasher-dui-bondhu-patabahar",
+    "title": "আকাশের দুই বন্ধু",
+    "author": "শৈলেন ঘোষ",
+    "slug": "akasher-dui-bondhu",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-patabahar",
+    "orderIndex": 25,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/bengali-literature/patabahar/akasher-dui-bondhu",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "patabahar",
+    "chapterSlug": "akasher-dui-bondhu",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-lit-class-5-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-patabahar",
+        "slug": "patabahar",
+        "title": "Patabahar",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-akasher-dui-bondhu-patabahar",
+        "slug": "akasher-dui-bondhu",
+        "title": "আকাশের দুই বন্ধু",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-bombagorer-raja-patabahar",
+    "title": "বোম্বাগড়ের রাজা",
+    "author": "সুকুমার রায়",
+    "slug": "bombagorer-raja",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-patabahar",
+    "orderIndex": 26,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/bengali-literature/patabahar/bombagorer-raja",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "patabahar",
+    "chapterSlug": "bombagorer-raja",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-lit-class-5-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-patabahar",
+        "slug": "patabahar",
+        "title": "Patabahar",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-bombagorer-raja-patabahar",
+        "slug": "bombagorer-raja",
+        "title": "বোম্বাগড়ের রাজা",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-revision-lesson-butterfly",
+    "title": "Revision Lesson",
+    "slug": "revision-lesson",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-butterfly",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/english/butterfly/revision-lesson",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "english",
+    "textbookSlug": "butterfly",
+    "chapterSlug": "revision-lesson",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-5-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "chapter-revision-lesson-butterfly",
+        "slug": "revision-lesson",
+        "title": "Revision Lesson",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-1-india-superpower-in-cricket-butterfly",
+    "title": "Lesson 1: India : Superpower in Cricket",
+    "slug": "lesson-1-india-superpower-in-cricket",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-butterfly",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/english/butterfly/lesson-1-india-superpower-in-cricket",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "english",
+    "textbookSlug": "butterfly",
+    "chapterSlug": "lesson-1-india-superpower-in-cricket",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-5-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "chapter-lesson-1-india-superpower-in-cricket-butterfly",
+        "slug": "lesson-1-india-superpower-in-cricket",
+        "title": "Lesson 1: India : Superpower in Cricket",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-2-a-feat-on-feet-butterfly",
+    "title": "Lesson 2: A Feat on Feet",
+    "slug": "lesson-2-a-feat-on-feet",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-butterfly",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/english/butterfly/lesson-2-a-feat-on-feet",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "english",
+    "textbookSlug": "butterfly",
+    "chapterSlug": "lesson-2-a-feat-on-feet",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-5-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "chapter-lesson-2-a-feat-on-feet-butterfly",
+        "slug": "lesson-2-a-feat-on-feet",
+        "title": "Lesson 2: A Feat on Feet",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-3-phulmanis-india-butterfly",
+    "title": "Lesson 3: Phulmani's India",
+    "slug": "lesson-3-phulmanis-india",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-butterfly",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/english/butterfly/lesson-3-phulmanis-india",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "english",
+    "textbookSlug": "butterfly",
+    "chapterSlug": "lesson-3-phulmanis-india",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-5-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "chapter-lesson-3-phulmanis-india-butterfly",
+        "slug": "lesson-3-phulmanis-india",
+        "title": "Lesson 3: Phulmani's India",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-4-memory-in-marble-butterfly",
+    "title": "Lesson 4: Memory in Marble",
+    "slug": "lesson-4-memory-in-marble",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-butterfly",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/english/butterfly/lesson-4-memory-in-marble",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "english",
+    "textbookSlug": "butterfly",
+    "chapterSlug": "lesson-4-memory-in-marble",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-5-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "chapter-lesson-4-memory-in-marble-butterfly",
+        "slug": "lesson-4-memory-in-marble",
+        "title": "Lesson 4: Memory in Marble",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-5-my-school-days-butterfly",
+    "title": "Lesson 5: My School Days",
+    "slug": "lesson-5-my-school-days",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-butterfly",
+    "orderIndex": 6,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/english/butterfly/lesson-5-my-school-days",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "english",
+    "textbookSlug": "butterfly",
+    "chapterSlug": "lesson-5-my-school-days",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-5-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "chapter-lesson-5-my-school-days-butterfly",
+        "slug": "lesson-5-my-school-days",
+        "title": "Lesson 5: My School Days",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-6-the-clever-monkey-butterfly",
+    "title": "Lesson 6: The Clever Monkey",
+    "slug": "lesson-6-the-clever-monkey",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-butterfly",
+    "orderIndex": 7,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/english/butterfly/lesson-6-the-clever-monkey",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "english",
+    "textbookSlug": "butterfly",
+    "chapterSlug": "lesson-6-the-clever-monkey",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-5-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "chapter-lesson-6-the-clever-monkey-butterfly",
+        "slug": "lesson-6-the-clever-monkey",
+        "title": "Lesson 6: The Clever Monkey",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-7-the-rebel-poet-butterfly",
+    "title": "Lesson 7: The Rebel Poet",
+    "slug": "lesson-7-the-rebel-poet",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-butterfly",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/english/butterfly/lesson-7-the-rebel-poet",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "english",
+    "textbookSlug": "butterfly",
+    "chapterSlug": "lesson-7-the-rebel-poet",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-5-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "chapter-lesson-7-the-rebel-poet-butterfly",
+        "slug": "lesson-7-the-rebel-poet",
+        "title": "Lesson 7: The Rebel Poet",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-8-buildings-to-remember-butterfly",
+    "title": "Lesson 8: Buildings to Remember",
+    "slug": "lesson-8-buildings-to-remember",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-butterfly",
+    "orderIndex": 9,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/english/butterfly/lesson-8-buildings-to-remember",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "english",
+    "textbookSlug": "butterfly",
+    "chapterSlug": "lesson-8-buildings-to-remember",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-5-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "chapter-lesson-8-buildings-to-remember-butterfly",
+        "slug": "lesson-8-buildings-to-remember",
+        "title": "Lesson 8: Buildings to Remember",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-9-birds-eye-butterfly",
+    "title": "Lesson 9: Bird's Eye",
+    "slug": "lesson-9-birds-eye",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-butterfly",
+    "orderIndex": 10,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/english/butterfly/lesson-9-birds-eye",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "english",
+    "textbookSlug": "butterfly",
+    "chapterSlug": "lesson-9-birds-eye",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-5-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "chapter-lesson-9-birds-eye-butterfly",
+        "slug": "lesson-9-birds-eye",
+        "title": "Lesson 9: Bird's Eye",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-10-a-great-social-reformer-butterfly",
+    "title": "Lesson 10: A Great Social Reformer",
+    "slug": "lesson-10-a-great-social-reformer",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-butterfly",
+    "orderIndex": 11,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/english/butterfly/lesson-10-a-great-social-reformer",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "english",
+    "textbookSlug": "butterfly",
+    "chapterSlug": "lesson-10-a-great-social-reformer",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-5-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "chapter-lesson-10-a-great-social-reformer-butterfly",
+        "slug": "lesson-10-a-great-social-reformer",
+        "title": "Lesson 10: A Great Social Reformer",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-11-the-finishing-point-butterfly",
+    "title": "Lesson 11: The Finishing Point",
+    "slug": "lesson-11-the-finishing-point",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-butterfly",
+    "orderIndex": 12,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/english/butterfly/lesson-11-the-finishing-point",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "english",
+    "textbookSlug": "butterfly",
+    "chapterSlug": "lesson-11-the-finishing-point",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-5-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "chapter-lesson-11-the-finishing-point-butterfly",
+        "slug": "lesson-11-the-finishing-point",
+        "title": "Lesson 11: The Finishing Point",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-12-beyond-barriers-butterfly",
+    "title": "Lesson 12: Beyond Barriers",
+    "slug": "lesson-12-beyond-barriers",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-butterfly",
+    "orderIndex": 13,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/english/butterfly/lesson-12-beyond-barriers",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "english",
+    "textbookSlug": "butterfly",
+    "chapterSlug": "lesson-12-beyond-barriers",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-5-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "chapter-lesson-12-beyond-barriers-butterfly",
+        "slug": "lesson-12-beyond-barriers",
+        "title": "Lesson 12: Beyond Barriers",
+        "type": "chapter"
+      }
+    ]
   }
 ]

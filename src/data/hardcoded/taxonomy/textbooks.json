@@ -1737,5 +1737,42 @@
         "type": "subject"
       }
     ]
+  },
+  {
+    "id": "textbook-butterfly",
+    "title": "Butterfly",
+    "slug": "butterfly",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-english-class-5-wb",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/english/butterfly",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "english",
+    "textbookSlug": "butterfly",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-5-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      }
+    ]
   }
 ]
