@@ -8669,5 +8669,805 @@
         "type": "chapter"
       }
     ]
+  },
+  {
+    "id": "chapter-revision-lesson-blossoms-class-7",
+    "title": "Revision Lesson",
+    "slug": "revision-lesson",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-blossoms-class-7-wb",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-7/english/blossoms/revision-lesson",
+    "boardSlug": "wb-board",
+    "classSlug": "class-7",
+    "subjectSlug": "english",
+    "textbookSlug": "blossoms",
+    "chapterSlug": "revision-lesson",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-7-wb",
+        "slug": "class-7",
+        "title": "Class 7",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-7-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-blossoms-class-7-wb",
+        "slug": "blossoms",
+        "title": "Blossoms",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-revision-lesson-blossoms-class-7",
+        "slug": "revision-lesson",
+        "title": "Revision Lesson",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-1-the-book-of-nature-blossoms-class-7",
+    "title": "Lesson 1: The Book of Nature",
+    "slug": "lesson-1-the-book-of-nature",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-blossoms-class-7-wb",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "wb-board/class-7/english/blossoms/lesson-1-the-book-of-nature",
+    "boardSlug": "wb-board",
+    "classSlug": "class-7",
+    "subjectSlug": "english",
+    "textbookSlug": "blossoms",
+    "chapterSlug": "lesson-1-the-book-of-nature",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-7-wb",
+        "slug": "class-7",
+        "title": "Class 7",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-7-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-blossoms-class-7-wb",
+        "slug": "blossoms",
+        "title": "Blossoms",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-1-the-book-of-nature-blossoms-class-7",
+        "slug": "lesson-1-the-book-of-nature",
+        "title": "Lesson 1: The Book of Nature",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-2-the-riddle-blossoms-class-7",
+    "title": "Lesson 2: The Riddle",
+    "slug": "lesson-2-the-riddle",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-blossoms-class-7-wb",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "wb-board/class-7/english/blossoms/lesson-2-the-riddle",
+    "boardSlug": "wb-board",
+    "classSlug": "class-7",
+    "subjectSlug": "english",
+    "textbookSlug": "blossoms",
+    "chapterSlug": "lesson-2-the-riddle",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-7-wb",
+        "slug": "class-7",
+        "title": "Class 7",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-7-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-blossoms-class-7-wb",
+        "slug": "blossoms",
+        "title": "Blossoms",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-2-the-riddle-blossoms-class-7",
+        "slug": "lesson-2-the-riddle",
+        "title": "Lesson 2: The Riddle",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-3-we-are-seven-blossoms-class-7",
+    "title": "Lesson 3: We are Seven",
+    "slug": "lesson-3-we-are-seven",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-blossoms-class-7-wb",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "wb-board/class-7/english/blossoms/lesson-3-we-are-seven",
+    "boardSlug": "wb-board",
+    "classSlug": "class-7",
+    "subjectSlug": "english",
+    "textbookSlug": "blossoms",
+    "chapterSlug": "lesson-3-we-are-seven",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-7-wb",
+        "slug": "class-7",
+        "title": "Class 7",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-7-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-blossoms-class-7-wb",
+        "slug": "blossoms",
+        "title": "Blossoms",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-3-we-are-seven-blossoms-class-7",
+        "slug": "lesson-3-we-are-seven",
+        "title": "Lesson 3: We are Seven",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-4-the-beauty-and-the-beast-blossoms-class-7",
+    "title": "Lesson 4: The Beauty and the Beast",
+    "slug": "lesson-4-the-beauty-and-the-beast",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-blossoms-class-7-wb",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "wb-board/class-7/english/blossoms/lesson-4-the-beauty-and-the-beast",
+    "boardSlug": "wb-board",
+    "classSlug": "class-7",
+    "subjectSlug": "english",
+    "textbookSlug": "blossoms",
+    "chapterSlug": "lesson-4-the-beauty-and-the-beast",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-7-wb",
+        "slug": "class-7",
+        "title": "Class 7",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-7-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-blossoms-class-7-wb",
+        "slug": "blossoms",
+        "title": "Blossoms",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-4-the-beauty-and-the-beast-blossoms-class-7",
+        "slug": "lesson-4-the-beauty-and-the-beast",
+        "title": "Lesson 4: The Beauty and the Beast",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-5-uncle-podger-hangs-a-picture-blossoms-class-7",
+    "title": "Lesson 5: Uncle Podger Hangs a Picture",
+    "slug": "lesson-5-uncle-podger-hangs-a-picture",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-blossoms-class-7-wb",
+    "orderIndex": 6,
+    "status": "published",
+    "fullSlug": "wb-board/class-7/english/blossoms/lesson-5-uncle-podger-hangs-a-picture",
+    "boardSlug": "wb-board",
+    "classSlug": "class-7",
+    "subjectSlug": "english",
+    "textbookSlug": "blossoms",
+    "chapterSlug": "lesson-5-uncle-podger-hangs-a-picture",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-7-wb",
+        "slug": "class-7",
+        "title": "Class 7",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-7-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-blossoms-class-7-wb",
+        "slug": "blossoms",
+        "title": "Blossoms",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-5-uncle-podger-hangs-a-picture-blossoms-class-7",
+        "slug": "lesson-5-uncle-podger-hangs-a-picture",
+        "title": "Lesson 5: Uncle Podger Hangs a Picture",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-6-the-vagabond-blossoms-class-7",
+    "title": "Lesson 6: The Vagabond",
+    "slug": "lesson-6-the-vagabond",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-blossoms-class-7-wb",
+    "orderIndex": 7,
+    "status": "published",
+    "fullSlug": "wb-board/class-7/english/blossoms/lesson-6-the-vagabond",
+    "boardSlug": "wb-board",
+    "classSlug": "class-7",
+    "subjectSlug": "english",
+    "textbookSlug": "blossoms",
+    "chapterSlug": "lesson-6-the-vagabond",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-7-wb",
+        "slug": "class-7",
+        "title": "Class 7",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-7-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-blossoms-class-7-wb",
+        "slug": "blossoms",
+        "title": "Blossoms",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-6-the-vagabond-blossoms-class-7",
+        "slug": "lesson-6-the-vagabond",
+        "title": "Lesson 6: The Vagabond",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-7-mowglis-brothers-blossoms-class-7",
+    "title": "Lesson 7: Mowgli's Brothers",
+    "slug": "lesson-7-mowglis-brothers",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-blossoms-class-7-wb",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "wb-board/class-7/english/blossoms/lesson-7-mowglis-brothers",
+    "boardSlug": "wb-board",
+    "classSlug": "class-7",
+    "subjectSlug": "english",
+    "textbookSlug": "blossoms",
+    "chapterSlug": "lesson-7-mowglis-brothers",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-7-wb",
+        "slug": "class-7",
+        "title": "Class 7",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-7-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-blossoms-class-7-wb",
+        "slug": "blossoms",
+        "title": "Blossoms",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-7-mowglis-brothers-blossoms-class-7",
+        "slug": "lesson-7-mowglis-brothers",
+        "title": "Lesson 7: Mowgli's Brothers",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-8-the-story-of-proserpine-blossoms-class-7",
+    "title": "Lesson 8: The Story of Proserpine",
+    "slug": "lesson-8-the-story-of-proserpine",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-blossoms-class-7-wb",
+    "orderIndex": 9,
+    "status": "published",
+    "fullSlug": "wb-board/class-7/english/blossoms/lesson-8-the-story-of-proserpine",
+    "boardSlug": "wb-board",
+    "classSlug": "class-7",
+    "subjectSlug": "english",
+    "textbookSlug": "blossoms",
+    "chapterSlug": "lesson-8-the-story-of-proserpine",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-7-wb",
+        "slug": "class-7",
+        "title": "Class 7",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-7-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-blossoms-class-7-wb",
+        "slug": "blossoms",
+        "title": "Blossoms",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-8-the-story-of-proserpine-blossoms-class-7",
+        "slug": "lesson-8-the-story-of-proserpine",
+        "title": "Lesson 8: The Story of Proserpine",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-9-jc-bose-blossoms-class-7",
+    "title": "Lesson 9: J.C. Bose",
+    "slug": "lesson-9-jc-bose",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-blossoms-class-7-wb",
+    "orderIndex": 10,
+    "status": "published",
+    "fullSlug": "wb-board/class-7/english/blossoms/lesson-9-jc-bose",
+    "boardSlug": "wb-board",
+    "classSlug": "class-7",
+    "subjectSlug": "english",
+    "textbookSlug": "blossoms",
+    "chapterSlug": "lesson-9-jc-bose",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-7-wb",
+        "slug": "class-7",
+        "title": "Class 7",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-7-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-blossoms-class-7-wb",
+        "slug": "blossoms",
+        "title": "Blossoms",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-9-jc-bose-blossoms-class-7",
+        "slug": "lesson-9-jc-bose",
+        "title": "Lesson 9: J.C. Bose",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-10-the-echoing-green-blossoms-class-7",
+    "title": "Lesson 10: The Echoing Green",
+    "slug": "lesson-10-the-echoing-green",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-blossoms-class-7-wb",
+    "orderIndex": 11,
+    "status": "published",
+    "fullSlug": "wb-board/class-7/english/blossoms/lesson-10-the-echoing-green",
+    "boardSlug": "wb-board",
+    "classSlug": "class-7",
+    "subjectSlug": "english",
+    "textbookSlug": "blossoms",
+    "chapterSlug": "lesson-10-the-echoing-green",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-7-wb",
+        "slug": "class-7",
+        "title": "Class 7",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-7-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-blossoms-class-7-wb",
+        "slug": "blossoms",
+        "title": "Blossoms",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-10-the-echoing-green-blossoms-class-7",
+        "slug": "lesson-10-the-echoing-green",
+        "title": "Lesson 10: The Echoing Green",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-11-the-axe-blossoms-class-7",
+    "title": "Lesson 11: The Axe",
+    "slug": "lesson-11-the-axe",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-blossoms-class-7-wb",
+    "orderIndex": 12,
+    "status": "published",
+    "fullSlug": "wb-board/class-7/english/blossoms/lesson-11-the-axe",
+    "boardSlug": "wb-board",
+    "classSlug": "class-7",
+    "subjectSlug": "english",
+    "textbookSlug": "blossoms",
+    "chapterSlug": "lesson-11-the-axe",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-7-wb",
+        "slug": "class-7",
+        "title": "Class 7",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-7-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-blossoms-class-7-wb",
+        "slug": "blossoms",
+        "title": "Blossoms",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-11-the-axe-blossoms-class-7",
+        "slug": "lesson-11-the-axe",
+        "title": "Lesson 11: The Axe",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-12-my-diary-blossoms-class-7",
+    "title": "Lesson 12: My Diary",
+    "slug": "lesson-12-my-diary",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-blossoms-class-7-wb",
+    "orderIndex": 13,
+    "status": "published",
+    "fullSlug": "wb-board/class-7/english/blossoms/lesson-12-my-diary",
+    "boardSlug": "wb-board",
+    "classSlug": "class-7",
+    "subjectSlug": "english",
+    "textbookSlug": "blossoms",
+    "chapterSlug": "lesson-12-my-diary",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-7-wb",
+        "slug": "class-7",
+        "title": "Class 7",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-7-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-blossoms-class-7-wb",
+        "slug": "blossoms",
+        "title": "Blossoms",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-12-my-diary-blossoms-class-7",
+        "slug": "lesson-12-my-diary",
+        "title": "Lesson 12: My Diary",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-13-ghosts-on-the-verandah-blossoms-class-7",
+    "title": "Lesson 13: Ghosts on the Verandah",
+    "slug": "lesson-13-ghosts-on-the-verandah",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-blossoms-class-7-wb",
+    "orderIndex": 14,
+    "status": "published",
+    "fullSlug": "wb-board/class-7/english/blossoms/lesson-13-ghosts-on-the-verandah",
+    "boardSlug": "wb-board",
+    "classSlug": "class-7",
+    "subjectSlug": "english",
+    "textbookSlug": "blossoms",
+    "chapterSlug": "lesson-13-ghosts-on-the-verandah",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-7-wb",
+        "slug": "class-7",
+        "title": "Class 7",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-7-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-blossoms-class-7-wb",
+        "slug": "blossoms",
+        "title": "Blossoms",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-13-ghosts-on-the-verandah-blossoms-class-7",
+        "slug": "lesson-13-ghosts-on-the-verandah",
+        "title": "Lesson 13: Ghosts on the Verandah",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-teachers-guidelines-blossoms-class-7",
+    "title": "Teachers' Guidelines",
+    "slug": "teachers-guidelines",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-blossoms-class-7-wb",
+    "orderIndex": 15,
+    "status": "published",
+    "fullSlug": "wb-board/class-7/english/blossoms/teachers-guidelines",
+    "boardSlug": "wb-board",
+    "classSlug": "class-7",
+    "subjectSlug": "english",
+    "textbookSlug": "blossoms",
+    "chapterSlug": "teachers-guidelines",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-7-wb",
+        "slug": "class-7",
+        "title": "Class 7",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-7-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-blossoms-class-7-wb",
+        "slug": "blossoms",
+        "title": "Blossoms",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-teachers-guidelines-blossoms-class-7",
+        "slug": "teachers-guidelines",
+        "title": "Teachers' Guidelines",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-my-page-blossoms-class-7",
+    "title": "My Page",
+    "slug": "my-page",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-blossoms-class-7-wb",
+    "orderIndex": 16,
+    "status": "published",
+    "fullSlug": "wb-board/class-7/english/blossoms/my-page",
+    "boardSlug": "wb-board",
+    "classSlug": "class-7",
+    "subjectSlug": "english",
+    "textbookSlug": "blossoms",
+    "chapterSlug": "my-page",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-7-wb",
+        "slug": "class-7",
+        "title": "Class 7",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-7-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-blossoms-class-7-wb",
+        "slug": "blossoms",
+        "title": "Blossoms",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-my-page-blossoms-class-7",
+        "slug": "my-page",
+        "title": "My Page",
+        "type": "chapter"
+      }
+    ]
   }
 ]
