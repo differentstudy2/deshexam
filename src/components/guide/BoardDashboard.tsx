@@ -12,6 +12,7 @@ import { Progress } from '@/components/ui/progress';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import ReactMarkdown from 'react-markdown';
 import { useAuth } from '@/hooks/use-auth';
+import { translateToBengali } from '@/components/guide/GuideSidebar';
 
 interface BoardDashboardProps {
   id: string;
@@ -185,7 +186,7 @@ export function BoardDashboard({
                   <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-500/20 flex items-center justify-center mb-4 transition-colors">
                     <BookOpen className="w-5 h-5 text-slate-400 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors" />
                   </div>
-                  <h4 className="font-bold text-slate-900 dark:text-white text-sm mb-1 group-hover:text-emerald-600 dark:group-hover:text-emerald-300 transition-colors">{subj}</h4>
+                  <h4 className="font-bold text-slate-900 dark:text-white text-sm mb-1 group-hover:text-emerald-600 dark:group-hover:text-emerald-300 transition-colors">{translateToBengali(subj)}</h4>
                   <p className="text-[11px] text-slate-500">Chapters: {(idx % 10) + 10}<br/>Questions: {(idx * 3 % 10) + 15}</p>
                 </div>
               ))}

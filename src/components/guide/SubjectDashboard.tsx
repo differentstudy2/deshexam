@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { CurriculumTree } from '@/components/guide/CurriculumTree';
-import { GuideSidebar } from '@/components/guide/GuideSidebar';
+import { GuideSidebar, translateToBengali } from '@/components/guide/GuideSidebar';
 import { Chapter } from '@/app/guide/guide-data';
 import { generateBreadcrumbSchema, generateBookSchema, generateLearningResourceSchema, generateItemListSchema, generateFAQPageSchema } from '@/lib/seo-schemas';
 import ReactMarkdown from 'react-markdown';
@@ -250,7 +250,7 @@ At DeshExam, we provide high-quality MCQ, short answer questions (SAQ), long ans
               <ChevronLeft className="w-6 h-6" />
             </button>
             <h1 className="font-bold text-[16px] text-slate-900 dark:text-white absolute left-1/2 -translate-x-1/2 max-w-[200px] truncate">
-              {displayTitle}
+              {translateToBengali(displayTitle)}
             </h1>
             <button className="p-2 -mr-2 ml-auto text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
               <MoreVertical className="w-5 h-5" />
@@ -266,10 +266,10 @@ At DeshExam, we provide high-quality MCQ, short answer questions (SAQ), long ans
                   <React.Fragment key={idx}>
                     {idx > 0 && <ChevronRight className="w-3.5 h-3.5 mx-2" />}
                     {idx === uiBreadcrumbs!.length - 1 ? (
-                      <span className="text-slate-800 dark:text-slate-200">{crumb.name}</span>
+                      <span className="text-slate-800 dark:text-slate-200">{translateToBengali(crumb.name)}</span>
                     ) : (
                       <Link href={crumb.url} className="hover:text-emerald-600 transition-colors">
-                        {crumb.name}
+                        {translateToBengali(crumb.name)}
                       </Link>
                     )}
                   </React.Fragment>
@@ -294,13 +294,13 @@ At DeshExam, we provide high-quality MCQ, short answer questions (SAQ), long ans
                   {subjectTitle && (
                     <>
                       <ChevronRight className="w-3.5 h-3.5 mx-2" />
-                      <span className="text-slate-800 dark:text-slate-200">{subjectTitle}</span>
+                      <span className="text-slate-800 dark:text-slate-200">{translateToBengali(subjectTitle)}</span>
                     </>
                   )}
                   {textbookTitle && (pageType === 'textbook' || pageType === 'chapter') && (
                     <>
                       <ChevronRight className="w-3.5 h-3.5 mx-2" />
-                      <span className="text-slate-800 dark:text-slate-200">{textbookTitle}</span>
+                      <span className="text-slate-800 dark:text-slate-200">{translateToBengali(textbookTitle)}</span>
                     </>
                   )}
                   {pageType === 'chapter' && chapterTitle && (
@@ -347,8 +347,8 @@ At DeshExam, we provide high-quality MCQ, short answer questions (SAQ), long ans
                 </button>
               </div>
 
-              <h1 className="text-[22px] sm:text-[26px] font-bold text-[#1e293b] dark:text-slate-100 mb-1 leading-tight sm:pr-24">
-                {displayTitle}
+              <h1 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white mb-4 tracking-tight leading-tight">
+                {translateToBengali(displayTitle)}
               </h1>
 
               {/* Description */}
@@ -505,7 +505,7 @@ At DeshExam, we provide high-quality MCQ, short answer questions (SAQ), long ans
                 </div>
               )}
 
-              <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">About {displayTitle}</h2>
+              <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">About {translateToBengali(displayTitle)}</h2>
               <div className="prose dark:prose-invert max-w-none text-slate-700 dark:text-slate-300 text-sm leading-relaxed">
                 <ReactMarkdown>{seoContent}</ReactMarkdown>
               </div>

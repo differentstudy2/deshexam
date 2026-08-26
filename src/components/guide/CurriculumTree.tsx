@@ -5,6 +5,7 @@ import { ChevronsRight, CircleDot, MoreHorizontal, ArrowUp, ArrowDown } from 'lu
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { Chapter } from '@/app/guide/guide-data';
+import { translateToBengali } from './GuideSidebar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -59,7 +60,7 @@ export function CurriculumTree({ curriculum }: CurriculumTreeProps) {
                 </div>
                 <Link href={`/guide/${chapter.id}`} className="hover:opacity-80 transition-opacity">
                   <h3 className="font-semibold text-[17px] text-emerald-600 dark:text-emerald-400 hover:underline">
-                    {chapter.title}
+                    {translateToBengali(chapter.title)}
                   </h3>
                 </Link>
               </div>
