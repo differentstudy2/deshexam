@@ -22,7 +22,10 @@
   "tags": [
     "GK",
     "General Knowledge",
-    "Quiz"
+    "Quiz",
+    "WBBSE",
+    "Bengali",
+    "Class 2"
   ],
   "createdAt": "2025-01-01T00:00:00Z",
   "questions": [
@@ -986,5 +989,8 @@
       "difficulty": "Easy",
       "status": "Published"
     }
-  ]
+  ],
+  "boardId": "WBBSE",
+  "classId": "Class 2",
+  "subjectId": "Bengali"
 }

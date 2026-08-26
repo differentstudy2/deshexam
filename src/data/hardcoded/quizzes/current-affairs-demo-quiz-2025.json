@@ -19,7 +19,15 @@
   "averageScore": 55,
   "instructions": "* মোট ১৫টি প্রশ্ন, সময় ১০ মিনিট।\n* কোনো নেগেটিভ মার্কিং নেই।",
   "examRules": "",
-  "tags": ["Current Affairs", "2025", "Quiz"],
+  "tags": [
+    "Current Affairs",
+    "2025",
+    "Quiz",
+    "All"
+  ],
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2025-01-01T00:00:00Z"
+  "updatedAt": "2025-01-01T00:00:00Z",
+  "boardId": "All",
+  "classId": "All",
+  "subjectId": "Current Affairs"
 }

@@ -19,7 +19,16 @@
   "averageScore": 68,
   "instructions": "* মোট ৩০টি প্রশ্ন থাকবে।\n* যেকোনো সময় pause করতে পারবেন।\n* শেষে বিস্তারিত ব্যাখ্যা দেখতে পাবেন।",
   "examRules": "",
-  "tags": ["Bengali", "Grammar", "Madhyamik"],
+  "tags": [
+    "Bengali",
+    "Grammar",
+    "Madhyamik",
+    "WBBSE",
+    "Class 10"
+  ],
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2025-01-01T00:00:00Z"
+  "updatedAt": "2025-01-01T00:00:00Z",
+  "boardId": "WBBSE",
+  "classId": "Class 10",
+  "subjectId": "Bengali"
 }

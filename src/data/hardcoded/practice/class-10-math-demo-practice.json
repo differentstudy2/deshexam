@@ -19,7 +19,14 @@
   "averageScore": 48,
   "instructions": "* মোট ৫০টি প্রশ্ন, সময় ৪৫ মিনিট।\n* Calculator ব্যবহার করা যাবে না।\n* সব প্রশ্ন MCQ ফরম্যাটে।",
   "examRules": "",
-  "tags": ["Mathematics", "Class 10", "WBBSE"],
+  "tags": [
+    "Mathematics",
+    "Class 10",
+    "WBBSE"
+  ],
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2025-01-01T00:00:00Z"
+  "updatedAt": "2025-01-01T00:00:00Z",
+  "boardId": "WBBSE",
+  "classId": "Class 10",
+  "subjectId": "Mathematics"
 }

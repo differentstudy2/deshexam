@@ -26,7 +26,9 @@
   "tags": [
     "Madhyamik",
     "Science",
-    "WBBSE"
+    "WBBSE",
+    "WBBSE",
+    "Science"
   ],
   "createdAt": "2025-01-01T00:00:00Z",
   "questions": [
@@ -190,5 +192,8 @@
       "difficulty": "Easy",
       "status": "Published"
     }
-  ]
+  ],
+  "boardId": "WBBSE",
+  "classId": "Class 10",
+  "subjectId": "Science"
 }

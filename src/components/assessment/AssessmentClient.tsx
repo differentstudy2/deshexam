@@ -61,7 +61,7 @@ export function AssessmentClient({
 
 
 
-  const categories = ['All', 'WBBSE', 'WBCHSE', 'ICSE', 'WBCS', 'NEET', 'JEE', 'GK', 'Math', 'Science'];
+  const categories = ['All', 'WBBSE', 'WBCHSE', 'ICSE', 'CBSE', 'WBCS', 'NEET', 'JEE', 'GK', 'Math', 'Science'];
 
   const handleReset = () => {
     setSearch('');
@@ -75,12 +75,25 @@ export function AssessmentClient({
   };
 
   const filtered = assessments.filter(a => {
-    const matchesSearch = a.title.toLowerCase().includes(search.toLowerCase()) || 
-                          (a.description || '').toLowerCase().includes(search.toLowerCase());
-    const matchesCategory = category === 'All' || (a.tags || []).includes(category);
+    const searchLower = search.toLowerCase();
+    const matchesSearch = 
+      a.title.toLowerCase().includes(searchLower) || 
+      (a.description || '').toLowerCase().includes(searchLower);
+
+    // Pill category acts as a unified filter
+    const matchesCategory = category === 'All' || 
+      (a.tags || []).includes(category) || 
+      a.boardId === category || 
+      a.subjectId === category;
+
+    // Dropdown filters
     const matchesDiff = difficulty === 'All' || a.difficulty === difficulty;
-    // Add other filters as needed when taxonomies exist
-    return matchesSearch && matchesCategory && matchesDiff;
+    const matchesBoard = board === 'All' || a.boardId === board;
+    const matchesClass = classFilter === 'All' || a.classId === classFilter;
+    const matchesSubject = subject === 'All' || a.subjectId === subject;
+    const matchesLanguage = language === 'All' || a.language === language;
+
+    return matchesSearch && matchesCategory && matchesDiff && matchesBoard && matchesClass && matchesSubject && matchesLanguage;
   });
 
   // Sort
@@ -185,22 +198,55 @@ export function AssessmentClient({
             <div className="flex flex-col gap-1">
               <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-1">Board</label>
               <Select value={board} onValueChange={setBoard}>
-                <SelectTrigger className="h-10 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg font-semibold"><SelectValue placeholder="Select" /></SelectTrigger>
-                <SelectContent><SelectItem value="All">Select</SelectItem></SelectContent>
+                <SelectTrigger className="h-10 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg font-semibold"><SelectValue placeholder="All" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="All">All</SelectItem>
+                  <SelectItem value="WBBSE">WBBSE</SelectItem>
+                  <SelectItem value="WBCHSE">WBCHSE</SelectItem>
+                  <SelectItem value="ICSE">ICSE</SelectItem>
+                  <SelectItem value="CBSE">CBSE</SelectItem>
+                  <SelectItem value="WBCS">WBCS</SelectItem>
+                  <SelectItem value="SSC">SSC</SelectItem>
+                  <SelectItem value="PSC">PSC</SelectItem>
+                  <SelectItem value="TET">TET</SelectItem>
+                  <SelectItem value="Railway">Railway</SelectItem>
+                  <SelectItem value="Banking">Banking</SelectItem>
+                  <SelectItem value="Police">Police</SelectItem>
+                </SelectContent>
               </Select>
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-1">Class</label>
               <Select value={classFilter} onValueChange={setClassFilter}>
-                <SelectTrigger className="h-10 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg font-semibold"><SelectValue placeholder="Select" /></SelectTrigger>
-                <SelectContent><SelectItem value="All">Select</SelectItem></SelectContent>
+                <SelectTrigger className="h-10 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg font-semibold"><SelectValue placeholder="All" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="All">All</SelectItem>
+                  <SelectItem value="Class 6">Class 6</SelectItem>
+                  <SelectItem value="Class 7">Class 7</SelectItem>
+                  <SelectItem value="Class 8">Class 8</SelectItem>
+                  <SelectItem value="Class 9">Class 9</SelectItem>
+                  <SelectItem value="Class 10">Class 10</SelectItem>
+                  <SelectItem value="Class 11">Class 11</SelectItem>
+                  <SelectItem value="Class 12">Class 12</SelectItem>
+                </SelectContent>
               </Select>
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-1">Subject</label>
               <Select value={subject} onValueChange={setSubject}>
-                <SelectTrigger className="h-10 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg font-semibold"><SelectValue placeholder="Select" /></SelectTrigger>
-                <SelectContent><SelectItem value="All">Select</SelectItem></SelectContent>
+                <SelectTrigger className="h-10 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg font-semibold"><SelectValue placeholder="All" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="All">All</SelectItem>
+                  <SelectItem value="Mathematics">Mathematics</SelectItem>
+                  <SelectItem value="Science">Science</SelectItem>
+                  <SelectItem value="History">History</SelectItem>
+                  <SelectItem value="Geography">Geography</SelectItem>
+                  <SelectItem value="Bengali">Bengali</SelectItem>
+                  <SelectItem value="English">English</SelectItem>
+                  <SelectItem value="General Knowledge">General Knowledge</SelectItem>
+                  <SelectItem value="Reasoning">Reasoning</SelectItem>
+                  <SelectItem value="Current Affairs">Current Affairs</SelectItem>
+                </SelectContent>
               </Select>
             </div>
             <div className="flex flex-col gap-1">
@@ -220,7 +266,12 @@ export function AssessmentClient({
               <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-1">Language</label>
               <Select value={language} onValueChange={setLanguage}>
                 <SelectTrigger className="h-10 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg font-semibold"><SelectValue placeholder="All" /></SelectTrigger>
-                <SelectContent><SelectItem value="All">All</SelectItem></SelectContent>
+                <SelectContent>
+                  <SelectItem value="All">All</SelectItem>
+                  <SelectItem value="Bengali">Bengali</SelectItem>
+                  <SelectItem value="English">English</SelectItem>
+                  <SelectItem value="Hindi">Hindi</SelectItem>
+                </SelectContent>
               </Select>
             </div>
             <div className="flex flex-col gap-1">

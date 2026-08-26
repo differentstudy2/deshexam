@@ -27,7 +27,10 @@
     "তৃতীয় পাঠ",
     "রবীন্দ্রনাথ",
     "Bengali Literature",
-    "Primary"
+    "Primary",
+    "WBBSE",
+    "Bengali",
+    "Class 2"
   ],
   "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2025-01-01T00:00:00Z",
@@ -512,5 +515,8 @@
       "difficulty": "Medium",
       "status": "Published"
     }
-  ]
+  ],
+  "boardId": "WBBSE",
+  "classId": "Class 2",
+  "subjectId": "Bengali"
 }

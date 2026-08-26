@@ -22,7 +22,8 @@
   "tags": [
     "GK",
     "General Knowledge",
-    "Quiz"
+    "Quiz",
+    "All"
   ],
   "createdAt": "2025-01-01T00:00:00Z",
   "questions": [
@@ -58,5 +59,8 @@
       "difficulty": "Easy",
       "status": "Published"
     }
-  ]
+  ],
+  "boardId": "All",
+  "classId": "All",
+  "subjectId": "General Knowledge"
 }
