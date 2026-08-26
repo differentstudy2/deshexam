@@ -19541,5 +19541,3005 @@
         "type": "chapter"
       }
     ]
+  },
+  {
+    "id": "chapter-chapter-0-itihas-o-poribesh-class-9",
+    "title": "অধ্যায় ০: প্রাক্কথন: ইউরোপ ও আধুনিক যুগ",
+    "slug": "chapter-0",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-itihas-o-poribesh-class-9-wb",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/history/itihas-o-poribesh/chapter-0",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "history",
+    "textbookSlug": "itihas-o-poribesh",
+    "chapterSlug": "chapter-0",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-history-class-9-wb",
+        "slug": "history",
+        "title": "History",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-itihas-o-poribesh-class-9-wb",
+        "slug": "itihas-o-poribesh",
+        "title": "Itihas O Poribesh",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-0-itihas-o-poribesh-class-9",
+        "slug": "chapter-0",
+        "title": "অধ্যায় ০: প্রাক্কথন: ইউরোপ ও আধুনিক যুগ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-1-itihas-o-poribesh-class-9",
+    "title": "অধ্যায় ১: ফরাসি বিপ্লবের কয়েকটি দিক",
+    "slug": "chapter-1",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-itihas-o-poribesh-class-9-wb",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/history/itihas-o-poribesh/chapter-1",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "history",
+    "textbookSlug": "itihas-o-poribesh",
+    "chapterSlug": "chapter-1",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-history-class-9-wb",
+        "slug": "history",
+        "title": "History",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-itihas-o-poribesh-class-9-wb",
+        "slug": "itihas-o-poribesh",
+        "title": "Itihas O Poribesh",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-1-itihas-o-poribesh-class-9",
+        "slug": "chapter-1",
+        "title": "অধ্যায় ১: ফরাসি বিপ্লবের কয়েকটি দিক",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-2-itihas-o-poribesh-class-9",
+    "title": "অধ্যায় ২: বিপ্লবী আদর্শ, নেপোলিয়নীয় সাম্রাজ্য ও জাতীয়তাবাদ",
+    "slug": "chapter-2",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-itihas-o-poribesh-class-9-wb",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/history/itihas-o-poribesh/chapter-2",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "history",
+    "textbookSlug": "itihas-o-poribesh",
+    "chapterSlug": "chapter-2",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-history-class-9-wb",
+        "slug": "history",
+        "title": "History",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-itihas-o-poribesh-class-9-wb",
+        "slug": "itihas-o-poribesh",
+        "title": "Itihas O Poribesh",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-2-itihas-o-poribesh-class-9",
+        "slug": "chapter-2",
+        "title": "অধ্যায় ২: বিপ্লবী আদর্শ, নেপোলিয়নীয় সাম্রাজ্য ও জাতীয়তাবাদ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-3-itihas-o-poribesh-class-9",
+    "title": "অধ্যায় ৩: ঊনবিংশ শতকের ইউরোপ: রাজতান্ত্রিক ও জাতীয়তাবাদী ভাবধারার সংঘাত",
+    "slug": "chapter-3",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-itihas-o-poribesh-class-9-wb",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/history/itihas-o-poribesh/chapter-3",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "history",
+    "textbookSlug": "itihas-o-poribesh",
+    "chapterSlug": "chapter-3",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-history-class-9-wb",
+        "slug": "history",
+        "title": "History",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-itihas-o-poribesh-class-9-wb",
+        "slug": "itihas-o-poribesh",
+        "title": "Itihas O Poribesh",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-3-itihas-o-poribesh-class-9",
+        "slug": "chapter-3",
+        "title": "অধ্যায় ৩: ঊনবিংশ শতকের ইউরোপ: রাজতান্ত্রিক ও জাতীয়তাবাদী ভাবধারার সংঘাত",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-4-itihas-o-poribesh-class-9",
+    "title": "অধ্যায় ৪: শিল্পবিপ্লব, উপনিবেশবাদ ও সাম্রাজ্যবাদ",
+    "slug": "chapter-4",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-itihas-o-poribesh-class-9-wb",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/history/itihas-o-poribesh/chapter-4",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "history",
+    "textbookSlug": "itihas-o-poribesh",
+    "chapterSlug": "chapter-4",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-history-class-9-wb",
+        "slug": "history",
+        "title": "History",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-itihas-o-poribesh-class-9-wb",
+        "slug": "itihas-o-poribesh",
+        "title": "Itihas O Poribesh",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-4-itihas-o-poribesh-class-9",
+        "slug": "chapter-4",
+        "title": "অধ্যায় ৪: শিল্পবিপ্লব, উপনিবেশবাদ ও সাম্রাজ্যবাদ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-5-itihas-o-poribesh-class-9",
+    "title": "অধ্যায় ৫: বিশ শতকে ইউরোপ",
+    "slug": "chapter-5",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-itihas-o-poribesh-class-9-wb",
+    "orderIndex": 6,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/history/itihas-o-poribesh/chapter-5",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "history",
+    "textbookSlug": "itihas-o-poribesh",
+    "chapterSlug": "chapter-5",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-history-class-9-wb",
+        "slug": "history",
+        "title": "History",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-itihas-o-poribesh-class-9-wb",
+        "slug": "itihas-o-poribesh",
+        "title": "Itihas O Poribesh",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-5-itihas-o-poribesh-class-9",
+        "slug": "chapter-5",
+        "title": "অধ্যায় ৫: বিশ শতকে ইউরোপ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-6-itihas-o-poribesh-class-9",
+    "title": "অধ্যায় ৬: দ্বিতীয় বিশ্বযুদ্ধ ও তারপর",
+    "slug": "chapter-6",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-itihas-o-poribesh-class-9-wb",
+    "orderIndex": 7,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/history/itihas-o-poribesh/chapter-6",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "history",
+    "textbookSlug": "itihas-o-poribesh",
+    "chapterSlug": "chapter-6",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-history-class-9-wb",
+        "slug": "history",
+        "title": "History",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-itihas-o-poribesh-class-9-wb",
+        "slug": "itihas-o-poribesh",
+        "title": "Itihas O Poribesh",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-6-itihas-o-poribesh-class-9",
+        "slug": "chapter-6",
+        "title": "অধ্যায় ৬: দ্বিতীয় বিশ্বযুদ্ধ ও তারপর",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-7-itihas-o-poribesh-class-9",
+    "title": "অধ্যায় ৭: জাতিসংঘ এবং সম্মিলিত জাতিপুঞ্জ",
+    "slug": "chapter-7",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-itihas-o-poribesh-class-9-wb",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/history/itihas-o-poribesh/chapter-7",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "history",
+    "textbookSlug": "itihas-o-poribesh",
+    "chapterSlug": "chapter-7",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-history-class-9-wb",
+        "slug": "history",
+        "title": "History",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-itihas-o-poribesh-class-9-wb",
+        "slug": "itihas-o-poribesh",
+        "title": "Itihas O Poribesh",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-7-itihas-o-poribesh-class-9",
+        "slug": "chapter-7",
+        "title": "অধ্যায় ৭: জাতিসংঘ এবং সম্মিলিত জাতিপুঞ্জ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-part-1-sahitya-sanchayan-class-10",
+    "title": "গল্প (Stories)",
+    "slug": "part-1",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahitya-sanchayan-class-10-wb",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/bengali-literature/sahitya-sanchayan/part-1",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahitya-sanchayan",
+    "chapterSlug": "part-1",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-10-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahitya-sanchayan-class-10-wb",
+        "slug": "sahitya-sanchayan",
+        "title": "Sahitya Sanchayan",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-part-1-sahitya-sanchayan-class-10",
+        "slug": "part-1",
+        "title": "গল্প (Stories)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-part-2-sahitya-sanchayan-class-10",
+    "title": "কবিতা (Poems)",
+    "slug": "part-2",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahitya-sanchayan-class-10-wb",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/bengali-literature/sahitya-sanchayan/part-2",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahitya-sanchayan",
+    "chapterSlug": "part-2",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-10-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahitya-sanchayan-class-10-wb",
+        "slug": "sahitya-sanchayan",
+        "title": "Sahitya Sanchayan",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-part-2-sahitya-sanchayan-class-10",
+        "slug": "part-2",
+        "title": "কবিতা (Poems)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-part-3-sahitya-sanchayan-class-10",
+    "title": "প্রবন্ধ ও নাটক (Essays & Drama)",
+    "slug": "part-3",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahitya-sanchayan-class-10-wb",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/bengali-literature/sahitya-sanchayan/part-3",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahitya-sanchayan",
+    "chapterSlug": "part-3",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-10-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahitya-sanchayan-class-10-wb",
+        "slug": "sahitya-sanchayan",
+        "title": "Sahitya Sanchayan",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-part-3-sahitya-sanchayan-class-10",
+        "slug": "part-3",
+        "title": "প্রবন্ধ ও নাটক (Essays & Drama)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-1-bliss-class-10",
+    "title": "Lesson 1: Father's Help",
+    "slug": "lesson-1",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bliss-class-10-wb",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/english/bliss/lesson-1",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "english",
+    "textbookSlug": "bliss",
+    "chapterSlug": "lesson-1",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-10-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bliss-class-10-wb",
+        "slug": "bliss",
+        "title": "Bliss",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-1-bliss-class-10",
+        "slug": "lesson-1",
+        "title": "Lesson 1: Father's Help",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-2-bliss-class-10",
+    "title": "Lesson 2: Fable",
+    "slug": "lesson-2",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bliss-class-10-wb",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/english/bliss/lesson-2",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "english",
+    "textbookSlug": "bliss",
+    "chapterSlug": "lesson-2",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-10-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bliss-class-10-wb",
+        "slug": "bliss",
+        "title": "Bliss",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-2-bliss-class-10",
+        "slug": "lesson-2",
+        "title": "Lesson 2: Fable",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-3-bliss-class-10",
+    "title": "Lesson 3: The Passing Away of Bapu",
+    "slug": "lesson-3",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bliss-class-10-wb",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/english/bliss/lesson-3",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "english",
+    "textbookSlug": "bliss",
+    "chapterSlug": "lesson-3",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-10-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bliss-class-10-wb",
+        "slug": "bliss",
+        "title": "Bliss",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-3-bliss-class-10",
+        "slug": "lesson-3",
+        "title": "Lesson 3: The Passing Away of Bapu",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-4-bliss-class-10",
+    "title": "Lesson 4: My Own True Family",
+    "slug": "lesson-4",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bliss-class-10-wb",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/english/bliss/lesson-4",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "english",
+    "textbookSlug": "bliss",
+    "chapterSlug": "lesson-4",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-10-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bliss-class-10-wb",
+        "slug": "bliss",
+        "title": "Bliss",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-4-bliss-class-10",
+        "slug": "lesson-4",
+        "title": "Lesson 4: My Own True Family",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-5-bliss-class-10",
+    "title": "Lesson 5: Our Runaway Kite",
+    "slug": "lesson-5",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bliss-class-10-wb",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/english/bliss/lesson-5",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "english",
+    "textbookSlug": "bliss",
+    "chapterSlug": "lesson-5",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-10-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bliss-class-10-wb",
+        "slug": "bliss",
+        "title": "Bliss",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-5-bliss-class-10",
+        "slug": "lesson-5",
+        "title": "Lesson 5: Our Runaway Kite",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-6-bliss-class-10",
+    "title": "Lesson 6: Sea Fever",
+    "slug": "lesson-6",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bliss-class-10-wb",
+    "orderIndex": 6,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/english/bliss/lesson-6",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "english",
+    "textbookSlug": "bliss",
+    "chapterSlug": "lesson-6",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-10-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bliss-class-10-wb",
+        "slug": "bliss",
+        "title": "Bliss",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-6-bliss-class-10",
+        "slug": "lesson-6",
+        "title": "Lesson 6: Sea Fever",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-7-bliss-class-10",
+    "title": "Lesson 7: The Cat",
+    "slug": "lesson-7",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bliss-class-10-wb",
+    "orderIndex": 7,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/english/bliss/lesson-7",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "english",
+    "textbookSlug": "bliss",
+    "chapterSlug": "lesson-7",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-10-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bliss-class-10-wb",
+        "slug": "bliss",
+        "title": "Bliss",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-7-bliss-class-10",
+        "slug": "lesson-7",
+        "title": "Lesson 7: The Cat",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-8-bliss-class-10",
+    "title": "Lesson 8: The Snail",
+    "slug": "lesson-8",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bliss-class-10-wb",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/english/bliss/lesson-8",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "english",
+    "textbookSlug": "bliss",
+    "chapterSlug": "lesson-8",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-10-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bliss-class-10-wb",
+        "slug": "bliss",
+        "title": "Bliss",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-8-bliss-class-10",
+        "slug": "lesson-8",
+        "title": "Lesson 8: The Snail",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-other-1-bliss-class-10",
+    "title": "Reading Comprehension (Unseen)",
+    "slug": "other-1",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bliss-class-10-wb",
+    "orderIndex": 9,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/english/bliss/other-1",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "english",
+    "textbookSlug": "bliss",
+    "chapterSlug": "other-1",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-10-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bliss-class-10-wb",
+        "slug": "bliss",
+        "title": "Bliss",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-other-1-bliss-class-10",
+        "slug": "other-1",
+        "title": "Reading Comprehension (Unseen)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-other-2-bliss-class-10",
+    "title": "Teachers' Guidelines",
+    "slug": "other-2",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bliss-class-10-wb",
+    "orderIndex": 10,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/english/bliss/other-2",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "english",
+    "textbookSlug": "bliss",
+    "chapterSlug": "other-2",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-10-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bliss-class-10-wb",
+        "slug": "bliss",
+        "title": "Bliss",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-other-2-bliss-class-10",
+        "slug": "other-2",
+        "title": "Teachers' Guidelines",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-1-ganit-prakash-class-10",
+    "title": "অধ্যায় ১: একচলবিশিষ্ট দ্বিঘাত সমীকরণ",
+    "slug": "chapter-1",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-10-wb",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/mathematics/ganit-prakash/chapter-1",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-1",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-10-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-10-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-1-ganit-prakash-class-10",
+        "slug": "chapter-1",
+        "title": "অধ্যায় ১: একচলবিশিষ্ট দ্বিঘাত সমীকরণ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-2-ganit-prakash-class-10",
+    "title": "অধ্যায় ২: সরল সুদকষা",
+    "slug": "chapter-2",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-10-wb",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/mathematics/ganit-prakash/chapter-2",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-2",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-10-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-10-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-2-ganit-prakash-class-10",
+        "slug": "chapter-2",
+        "title": "অধ্যায় ২: সরল সুদকষা",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-3-ganit-prakash-class-10",
+    "title": "অধ্যায় ৩: বৃত্ত সম্পর্কিত উপপাদ্য",
+    "slug": "chapter-3",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-10-wb",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/mathematics/ganit-prakash/chapter-3",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-3",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-10-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-10-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-3-ganit-prakash-class-10",
+        "slug": "chapter-3",
+        "title": "অধ্যায় ৩: বৃত্ত সম্পর্কিত উপপাদ্য",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-4-ganit-prakash-class-10",
+    "title": "অধ্যায় ৪: আয়তঘন",
+    "slug": "chapter-4",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-10-wb",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/mathematics/ganit-prakash/chapter-4",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-4",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-10-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-10-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-4-ganit-prakash-class-10",
+        "slug": "chapter-4",
+        "title": "অধ্যায় ৪: আয়তঘন",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-5-ganit-prakash-class-10",
+    "title": "অধ্যায় ৫: অনুপাত ও সমানুপাত",
+    "slug": "chapter-5",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-10-wb",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/mathematics/ganit-prakash/chapter-5",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-5",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-10-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-10-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-5-ganit-prakash-class-10",
+        "slug": "chapter-5",
+        "title": "অধ্যায় ৫: অনুপাত ও সমানুপাত",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-6-ganit-prakash-class-10",
+    "title": "অধ্যায় ৬: চক্রবৃদ্ধি সুদ ও সমহার বৃদ্ধি বা হ্রাস",
+    "slug": "chapter-6",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-10-wb",
+    "orderIndex": 6,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/mathematics/ganit-prakash/chapter-6",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-6",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-10-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-10-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-6-ganit-prakash-class-10",
+        "slug": "chapter-6",
+        "title": "অধ্যায় ৬: চক্রবৃদ্ধি সুদ ও সমহার বৃদ্ধি বা হ্রাস",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-7-ganit-prakash-class-10",
+    "title": "অধ্যায় ৭: বৃত্তস্থ কোণ সম্পর্কিত উপপাদ্য",
+    "slug": "chapter-7",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-10-wb",
+    "orderIndex": 7,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/mathematics/ganit-prakash/chapter-7",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-7",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-10-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-10-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-7-ganit-prakash-class-10",
+        "slug": "chapter-7",
+        "title": "অধ্যায় ৭: বৃত্তস্থ কোণ সম্পর্কিত উপপাদ্য",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-8-ganit-prakash-class-10",
+    "title": "অধ্যায় ৮: লম্ব বৃত্তাকার চোঙ",
+    "slug": "chapter-8",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-10-wb",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/mathematics/ganit-prakash/chapter-8",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-8",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-10-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-10-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-8-ganit-prakash-class-10",
+        "slug": "chapter-8",
+        "title": "অধ্যায় ৮: লম্ব বৃত্তাকার চোঙ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-9-ganit-prakash-class-10",
+    "title": "অধ্যায় ৯: দ্বিঘাত করণী",
+    "slug": "chapter-9",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-10-wb",
+    "orderIndex": 9,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/mathematics/ganit-prakash/chapter-9",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-9",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-10-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-10-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-9-ganit-prakash-class-10",
+        "slug": "chapter-9",
+        "title": "অধ্যায় ৯: দ্বিঘাত করণী",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-10-ganit-prakash-class-10",
+    "title": "অধ্যায় ১০: বৃত্তস্থ চতুর্ভুজ সংক্রান্ত উপপাদ্য",
+    "slug": "chapter-10",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-10-wb",
+    "orderIndex": 10,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/mathematics/ganit-prakash/chapter-10",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-10",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-10-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-10-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-10-ganit-prakash-class-10",
+        "slug": "chapter-10",
+        "title": "অধ্যায় ১০: বৃত্তস্থ চতুর্ভুজ সংক্রান্ত উপপাদ্য",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-11-ganit-prakash-class-10",
+    "title": "অধ্যায় ১১: সম্পাদ্য: ত্রিভুজের পরিবৃত্ত ও অন্তর্বৃত্ত অঙ্কন",
+    "slug": "chapter-11",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-10-wb",
+    "orderIndex": 11,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/mathematics/ganit-prakash/chapter-11",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-11",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-10-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-10-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-11-ganit-prakash-class-10",
+        "slug": "chapter-11",
+        "title": "অধ্যায় ১১: সম্পাদ্য: ত্রিভুজের পরিবৃত্ত ও অন্তর্বৃত্ত অঙ্কন",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-12-ganit-prakash-class-10",
+    "title": "অধ্যায় ১২: গোলক",
+    "slug": "chapter-12",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-10-wb",
+    "orderIndex": 12,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/mathematics/ganit-prakash/chapter-12",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-12",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-10-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-10-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-12-ganit-prakash-class-10",
+        "slug": "chapter-12",
+        "title": "অধ্যায় ১২: গোলক",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-13-ganit-prakash-class-10",
+    "title": "অধ্যায় ১৩: ভেদ",
+    "slug": "chapter-13",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-10-wb",
+    "orderIndex": 13,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/mathematics/ganit-prakash/chapter-13",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-13",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-10-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-10-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-13-ganit-prakash-class-10",
+        "slug": "chapter-13",
+        "title": "অধ্যায় ১৩: ভেদ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-14-ganit-prakash-class-10",
+    "title": "অধ্যায় ১৪: অংশীদারি কারবার",
+    "slug": "chapter-14",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-10-wb",
+    "orderIndex": 14,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/mathematics/ganit-prakash/chapter-14",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-14",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-10-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-10-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-14-ganit-prakash-class-10",
+        "slug": "chapter-14",
+        "title": "অধ্যায় ১৪: অংশীদারি কারবার",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-15-ganit-prakash-class-10",
+    "title": "অধ্যায় ১৫: বৃত্তের স্পর্শক সংক্রান্ত উপপাদ্য",
+    "slug": "chapter-15",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-10-wb",
+    "orderIndex": 15,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/mathematics/ganit-prakash/chapter-15",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-15",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-10-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-10-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-15-ganit-prakash-class-10",
+        "slug": "chapter-15",
+        "title": "অধ্যায় ১৫: বৃত্তের স্পর্শক সংক্রান্ত উপপাদ্য",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-16-ganit-prakash-class-10",
+    "title": "অধ্যায় ১৬: লম্ব বৃত্তাকার শঙ্কু",
+    "slug": "chapter-16",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-10-wb",
+    "orderIndex": 16,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/mathematics/ganit-prakash/chapter-16",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-16",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-10-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-10-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-16-ganit-prakash-class-10",
+        "slug": "chapter-16",
+        "title": "অধ্যায় ১৬: লম্ব বৃত্তাকার শঙ্কু",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-17-ganit-prakash-class-10",
+    "title": "অধ্যায় ১৭: সম্পাদ্য: বৃত্তের স্পর্শক অঙ্কন",
+    "slug": "chapter-17",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-10-wb",
+    "orderIndex": 17,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/mathematics/ganit-prakash/chapter-17",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-17",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-10-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-10-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-17-ganit-prakash-class-10",
+        "slug": "chapter-17",
+        "title": "অধ্যায় ১৭: সম্পাদ্য: বৃত্তের স্পর্শক অঙ্কন",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-18-ganit-prakash-class-10",
+    "title": "অধ্যায় ১৮: সদৃশতা",
+    "slug": "chapter-18",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-10-wb",
+    "orderIndex": 18,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/mathematics/ganit-prakash/chapter-18",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-18",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-10-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-10-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-18-ganit-prakash-class-10",
+        "slug": "chapter-18",
+        "title": "অধ্যায় ১৮: সদৃশতা",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-19-ganit-prakash-class-10",
+    "title": "অধ্যায় ১৯: বিভিন্ন ঘনবস্তু সংক্রান্ত বাস্তব সমস্যা",
+    "slug": "chapter-19",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-10-wb",
+    "orderIndex": 19,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/mathematics/ganit-prakash/chapter-19",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-19",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-10-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-10-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-19-ganit-prakash-class-10",
+        "slug": "chapter-19",
+        "title": "অধ্যায় ১৯: বিভিন্ন ঘনবস্তু সংক্রান্ত বাস্তব সমস্যা",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-20-ganit-prakash-class-10",
+    "title": "অধ্যায় ২০: ত্রিকোণমিতি: কোণ পরিমাপের ধারণা",
+    "slug": "chapter-20",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-10-wb",
+    "orderIndex": 20,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/mathematics/ganit-prakash/chapter-20",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-20",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-10-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-10-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-20-ganit-prakash-class-10",
+        "slug": "chapter-20",
+        "title": "অধ্যায় ২০: ত্রিকোণমিতি: কোণ পরিমাপের ধারণা",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-21-ganit-prakash-class-10",
+    "title": "অধ্যায় ২১: সম্পাদ্য: মধ্যসমানুপাতী নির্ণয়",
+    "slug": "chapter-21",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-10-wb",
+    "orderIndex": 21,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/mathematics/ganit-prakash/chapter-21",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-21",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-10-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-10-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-21-ganit-prakash-class-10",
+        "slug": "chapter-21",
+        "title": "অধ্যায় ২১: সম্পাদ্য: মধ্যসমানুপাতী নির্ণয়",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-22-ganit-prakash-class-10",
+    "title": "অধ্যায় ২২: পিথাগোরাসের উপপাদ্য",
+    "slug": "chapter-22",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-10-wb",
+    "orderIndex": 22,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/mathematics/ganit-prakash/chapter-22",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-22",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-10-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-10-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-22-ganit-prakash-class-10",
+        "slug": "chapter-22",
+        "title": "অধ্যায় ২২: পিথাগোরাসের উপপাদ্য",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-23-ganit-prakash-class-10",
+    "title": "অধ্যায় ২৩: ত্রিকোণমিতিক অনুপাত এবং ত্রিকোণমিতিক অভেদাবলি",
+    "slug": "chapter-23",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-10-wb",
+    "orderIndex": 23,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/mathematics/ganit-prakash/chapter-23",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-23",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-10-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-10-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-23-ganit-prakash-class-10",
+        "slug": "chapter-23",
+        "title": "অধ্যায় ২৩: ত্রিকোণমিতিক অনুপাত এবং ত্রিকোণমিতিক অভেদাবলি",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-24-ganit-prakash-class-10",
+    "title": "অধ্যায় ২৪: পূরক কোণের ত্রিকোণমিতিক অনুপাত",
+    "slug": "chapter-24",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-10-wb",
+    "orderIndex": 24,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/mathematics/ganit-prakash/chapter-24",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-24",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-10-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-10-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-24-ganit-prakash-class-10",
+        "slug": "chapter-24",
+        "title": "অধ্যায় ২৪: পূরক কোণের ত্রিকোণমিতিক অনুপাত",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-25-ganit-prakash-class-10",
+    "title": "অধ্যায় ২৫: ত্রিকোণমিতিক অনুপাতের প্রয়োগ: উচ্চতা ও দূরত্ব",
+    "slug": "chapter-25",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-10-wb",
+    "orderIndex": 25,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/mathematics/ganit-prakash/chapter-25",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-25",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-10-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-10-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-25-ganit-prakash-class-10",
+        "slug": "chapter-25",
+        "title": "অধ্যায় ২৫: ত্রিকোণমিতিক অনুপাতের প্রয়োগ: উচ্চতা ও দূরত্ব",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-26-ganit-prakash-class-10",
+    "title": "অধ্যায় ২৬: রাশিবিজ্ঞান: গড়, মধ্যমা, ওজাইভ, সংখ্যাগুরুমান",
+    "slug": "chapter-26",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-10-wb",
+    "orderIndex": 26,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/mathematics/ganit-prakash/chapter-26",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-26",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-10-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-10-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-26-ganit-prakash-class-10",
+        "slug": "chapter-26",
+        "title": "অধ্যায় ২৬: রাশিবিজ্ঞান: গড়, মধ্যমা, ওজাইভ, সংখ্যাগুরুমান",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-1-jibon-bigyan-o-paribesh-class-10",
+    "title": "অধ্যায় ১: জীবজগতে নিয়ন্ত্রণ ও সমন্বয়",
+    "slug": "chapter-1",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-jibon-bigyan-o-paribesh-class-10-wb",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/life-science/jibon-bigyan-o-paribesh/chapter-1",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "life-science",
+    "textbookSlug": "jibon-bigyan-o-paribesh",
+    "chapterSlug": "chapter-1",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-life-science-class-10-wb",
+        "slug": "life-science",
+        "title": "Life Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-jibon-bigyan-o-paribesh-class-10-wb",
+        "slug": "jibon-bigyan-o-paribesh",
+        "title": "Jibon Bigyan O Paribesh",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-1-jibon-bigyan-o-paribesh-class-10",
+        "slug": "chapter-1",
+        "title": "অধ্যায় ১: জীবজগতে নিয়ন্ত্রণ ও সমন্বয়",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-2-jibon-bigyan-o-paribesh-class-10",
+    "title": "অধ্যায় ২: জীবনের প্রবাহমানতা",
+    "slug": "chapter-2",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-jibon-bigyan-o-paribesh-class-10-wb",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/life-science/jibon-bigyan-o-paribesh/chapter-2",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "life-science",
+    "textbookSlug": "jibon-bigyan-o-paribesh",
+    "chapterSlug": "chapter-2",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-life-science-class-10-wb",
+        "slug": "life-science",
+        "title": "Life Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-jibon-bigyan-o-paribesh-class-10-wb",
+        "slug": "jibon-bigyan-o-paribesh",
+        "title": "Jibon Bigyan O Paribesh",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-2-jibon-bigyan-o-paribesh-class-10",
+        "slug": "chapter-2",
+        "title": "অধ্যায় ২: জীবনের প্রবাহমানতা",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-3-jibon-bigyan-o-paribesh-class-10",
+    "title": "অধ্যায় ৩: বংশগতি এবং কয়েকটি সাধারণ জিনগত রোগ",
+    "slug": "chapter-3",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-jibon-bigyan-o-paribesh-class-10-wb",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/life-science/jibon-bigyan-o-paribesh/chapter-3",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "life-science",
+    "textbookSlug": "jibon-bigyan-o-paribesh",
+    "chapterSlug": "chapter-3",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-life-science-class-10-wb",
+        "slug": "life-science",
+        "title": "Life Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-jibon-bigyan-o-paribesh-class-10-wb",
+        "slug": "jibon-bigyan-o-paribesh",
+        "title": "Jibon Bigyan O Paribesh",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-3-jibon-bigyan-o-paribesh-class-10",
+        "slug": "chapter-3",
+        "title": "অধ্যায় ৩: বংশগতি এবং কয়েকটি সাধারণ জিনগত রোগ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-4-jibon-bigyan-o-paribesh-class-10",
+    "title": "অধ্যায় ৪: অভিব্যক্তি ও অভিযোজন",
+    "slug": "chapter-4",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-jibon-bigyan-o-paribesh-class-10-wb",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/life-science/jibon-bigyan-o-paribesh/chapter-4",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "life-science",
+    "textbookSlug": "jibon-bigyan-o-paribesh",
+    "chapterSlug": "chapter-4",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-life-science-class-10-wb",
+        "slug": "life-science",
+        "title": "Life Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-jibon-bigyan-o-paribesh-class-10-wb",
+        "slug": "jibon-bigyan-o-paribesh",
+        "title": "Jibon Bigyan O Paribesh",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-4-jibon-bigyan-o-paribesh-class-10",
+        "slug": "chapter-4",
+        "title": "অধ্যায় ৪: অভিব্যক্তি ও অভিযোজন",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-5-jibon-bigyan-o-paribesh-class-10",
+    "title": "অধ্যায় ৫: পরিবেশ, তার সম্পদ এবং তাদের সংরক্ষণ",
+    "slug": "chapter-5",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-jibon-bigyan-o-paribesh-class-10-wb",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/life-science/jibon-bigyan-o-paribesh/chapter-5",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "life-science",
+    "textbookSlug": "jibon-bigyan-o-paribesh",
+    "chapterSlug": "chapter-5",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-life-science-class-10-wb",
+        "slug": "life-science",
+        "title": "Life Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-jibon-bigyan-o-paribesh-class-10-wb",
+        "slug": "jibon-bigyan-o-paribesh",
+        "title": "Jibon Bigyan O Paribesh",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-5-jibon-bigyan-o-paribesh-class-10",
+        "slug": "chapter-5",
+        "title": "অধ্যায় ৫: পরিবেশ, তার সম্পদ এবং তাদের সংরক্ষণ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-1-itihas-o-paribesh-class-10",
+    "title": "অধ্যায় ১: ইতিহাসের ধারণা",
+    "slug": "chapter-1",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-itihas-o-paribesh-class-10-wb",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/history/itihas-o-paribesh/chapter-1",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "history",
+    "textbookSlug": "itihas-o-paribesh",
+    "chapterSlug": "chapter-1",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-history-class-10-wb",
+        "slug": "history",
+        "title": "History",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-itihas-o-paribesh-class-10-wb",
+        "slug": "itihas-o-paribesh",
+        "title": "Itihas o Paribesh",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-1-itihas-o-paribesh-class-10",
+        "slug": "chapter-1",
+        "title": "অধ্যায় ১: ইতিহাসের ধারণা",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-2-itihas-o-paribesh-class-10",
+    "title": "অধ্যায় ২: সংস্কার : বৈশিষ্ট্য ও মূল্যায়ন",
+    "slug": "chapter-2",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-itihas-o-paribesh-class-10-wb",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/history/itihas-o-paribesh/chapter-2",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "history",
+    "textbookSlug": "itihas-o-paribesh",
+    "chapterSlug": "chapter-2",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-history-class-10-wb",
+        "slug": "history",
+        "title": "History",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-itihas-o-paribesh-class-10-wb",
+        "slug": "itihas-o-paribesh",
+        "title": "Itihas o Paribesh",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-2-itihas-o-paribesh-class-10",
+        "slug": "chapter-2",
+        "title": "অধ্যায় ২: সংস্কার : বৈশিষ্ট্য ও মূল্যায়ন",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-3-itihas-o-paribesh-class-10",
+    "title": "অধ্যায় ৩: প্রতিরোধ ও বিদ্রোহ : বৈশিষ্ট্য ও বিশ্লেষণ",
+    "slug": "chapter-3",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-itihas-o-paribesh-class-10-wb",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/history/itihas-o-paribesh/chapter-3",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "history",
+    "textbookSlug": "itihas-o-paribesh",
+    "chapterSlug": "chapter-3",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-history-class-10-wb",
+        "slug": "history",
+        "title": "History",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-itihas-o-paribesh-class-10-wb",
+        "slug": "itihas-o-paribesh",
+        "title": "Itihas o Paribesh",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-3-itihas-o-paribesh-class-10",
+        "slug": "chapter-3",
+        "title": "অধ্যায় ৩: প্রতিরোধ ও বিদ্রোহ : বৈশিষ্ট্য ও বিশ্লেষণ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-4-itihas-o-paribesh-class-10",
+    "title": "অধ্যায় ৪: সংঘবদ্ধতার গোড়ার কথা : বৈশিষ্ট্য ও বিশ্লেষণ",
+    "slug": "chapter-4",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-itihas-o-paribesh-class-10-wb",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/history/itihas-o-paribesh/chapter-4",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "history",
+    "textbookSlug": "itihas-o-paribesh",
+    "chapterSlug": "chapter-4",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-history-class-10-wb",
+        "slug": "history",
+        "title": "History",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-itihas-o-paribesh-class-10-wb",
+        "slug": "itihas-o-paribesh",
+        "title": "Itihas o Paribesh",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-4-itihas-o-paribesh-class-10",
+        "slug": "chapter-4",
+        "title": "অধ্যায় ৪: সংঘবদ্ধতার গোড়ার কথা : বৈশিষ্ট্য ও বিশ্লেষণ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-5-itihas-o-paribesh-class-10",
+    "title": "অধ্যায় ৫: বিকল্প চিন্তা ও উদ্যোগ (১৯ শতকের মধ্যভাগ থেকে ২০ শতকের প্রথম ভাগ)",
+    "slug": "chapter-5",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-itihas-o-paribesh-class-10-wb",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/history/itihas-o-paribesh/chapter-5",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "history",
+    "textbookSlug": "itihas-o-paribesh",
+    "chapterSlug": "chapter-5",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-history-class-10-wb",
+        "slug": "history",
+        "title": "History",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-itihas-o-paribesh-class-10-wb",
+        "slug": "itihas-o-paribesh",
+        "title": "Itihas o Paribesh",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-5-itihas-o-paribesh-class-10",
+        "slug": "chapter-5",
+        "title": "অধ্যায় ৫: বিকল্প চিন্তা ও উদ্যোগ (১৯ শতকের মধ্যভাগ থেকে ২০ শতকের প্রথম ভাগ)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-6-itihas-o-paribesh-class-10",
+    "title": "অধ্যায় ৬: বিশ শতকের ভারতে কৃষক, শ্রমিক ও বামপন্থী আন্দোলন",
+    "slug": "chapter-6",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-itihas-o-paribesh-class-10-wb",
+    "orderIndex": 6,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/history/itihas-o-paribesh/chapter-6",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "history",
+    "textbookSlug": "itihas-o-paribesh",
+    "chapterSlug": "chapter-6",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-history-class-10-wb",
+        "slug": "history",
+        "title": "History",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-itihas-o-paribesh-class-10-wb",
+        "slug": "itihas-o-paribesh",
+        "title": "Itihas o Paribesh",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-6-itihas-o-paribesh-class-10",
+        "slug": "chapter-6",
+        "title": "অধ্যায় ৬: বিশ শতকের ভারতে কৃষক, শ্রমিক ও বামপন্থী আন্দোলন",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-7-itihas-o-paribesh-class-10",
+    "title": "অধ্যায় ৭: বিশ শতকের ভারতে নারী, ছাত্র ও প্রান্তিক জনগোষ্ঠীর আন্দোলন",
+    "slug": "chapter-7",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-itihas-o-paribesh-class-10-wb",
+    "orderIndex": 7,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/history/itihas-o-paribesh/chapter-7",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "history",
+    "textbookSlug": "itihas-o-paribesh",
+    "chapterSlug": "chapter-7",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-history-class-10-wb",
+        "slug": "history",
+        "title": "History",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-itihas-o-paribesh-class-10-wb",
+        "slug": "itihas-o-paribesh",
+        "title": "Itihas o Paribesh",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-7-itihas-o-paribesh-class-10",
+        "slug": "chapter-7",
+        "title": "অধ্যায় ৭: বিশ শতকের ভারতে নারী, ছাত্র ও প্রান্তিক জনগোষ্ঠীর আন্দোলন",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-8-itihas-o-paribesh-class-10",
+    "title": "অধ্যায় ৮: উত্তর-ঔপনিবেশিক ভারত : বিশ শতকের দ্বিতীয় পর্ব",
+    "slug": "chapter-8",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-itihas-o-paribesh-class-10-wb",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/history/itihas-o-paribesh/chapter-8",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "history",
+    "textbookSlug": "itihas-o-paribesh",
+    "chapterSlug": "chapter-8",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-history-class-10-wb",
+        "slug": "history",
+        "title": "History",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-itihas-o-paribesh-class-10-wb",
+        "slug": "itihas-o-paribesh",
+        "title": "Itihas o Paribesh",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-8-itihas-o-paribesh-class-10",
+        "slug": "chapter-8",
+        "title": "অধ্যায় ৮: উত্তর-ঔপনিবেশিক ভারত : বিশ শতকের দ্বিতীয় পর্ব",
+        "type": "chapter"
+      }
+    ]
   }
 ]

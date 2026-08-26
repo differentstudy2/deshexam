@@ -1738,5 +1738,125 @@
         "type": "class"
       }
     ]
+  },
+  {
+    "id": "subject-history-class-9-wb",
+    "title": "History",
+    "slug": "history",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-9-wb",
+    "orderIndex": 14,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/history",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "history",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-english-class-10-wb",
+    "title": "English",
+    "slug": "english",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-10-wb",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/english",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "english",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-life-science-class-10-wb",
+    "title": "Life Science",
+    "slug": "life-science",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-10-wb",
+    "orderIndex": 13,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/life-science",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "life-science",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-history-class-10-wb",
+    "title": "History",
+    "slug": "history",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-10-wb",
+    "orderIndex": 14,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/history",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "history",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      }
+    ]
   }
 ]

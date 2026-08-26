@@ -1959,5 +1959,153 @@
         "type": "subject"
       }
     ]
+  },
+  {
+    "id": "textbook-itihas-o-poribesh-class-9-wb",
+    "title": "Itihas O Poribesh",
+    "slug": "itihas-o-poribesh",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-history-class-9-wb",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/history/itihas-o-poribesh",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "history",
+    "textbookSlug": "itihas-o-poribesh",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-history-class-9-wb",
+        "slug": "history",
+        "title": "History",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-bliss-class-10-wb",
+    "title": "Bliss",
+    "slug": "bliss",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-english-class-10-wb",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/english/bliss",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "english",
+    "textbookSlug": "bliss",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-10-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-jibon-bigyan-o-paribesh-class-10-wb",
+    "title": "Jibon Bigyan O Paribesh",
+    "slug": "jibon-bigyan-o-paribesh",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-life-science-class-10-wb",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/life-science/jibon-bigyan-o-paribesh",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "life-science",
+    "textbookSlug": "jibon-bigyan-o-paribesh",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-life-science-class-10-wb",
+        "slug": "life-science",
+        "title": "Life Science",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-itihas-o-paribesh-class-10-wb",
+    "title": "Itihas o Paribesh",
+    "slug": "itihas-o-paribesh",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-history-class-10-wb",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/history/itihas-o-paribesh",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "history",
+    "textbookSlug": "itihas-o-paribesh",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-history-class-10-wb",
+        "slug": "history",
+        "title": "History",
+        "type": "subject"
+      }
+    ]
   }
 ]
