@@ -17091,5 +17091,2455 @@
         "type": "chapter"
       }
     ]
+  },
+  {
+    "id": "chapter-path-1-sahitya-sanchayan-class-9",
+    "title": "প্রথম পাঠ",
+    "slug": "path-1",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahitya-sanchayan-class-9-wb",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/bengali-literature/sahitya-sanchayan/path-1",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahitya-sanchayan",
+    "chapterSlug": "path-1",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-9-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahitya-sanchayan-class-9-wb",
+        "slug": "sahitya-sanchayan",
+        "title": "Sahitya Sanchayan",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-1-sahitya-sanchayan-class-9",
+        "slug": "path-1",
+        "title": "প্রথম পাঠ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-path-2-sahitya-sanchayan-class-9",
+    "title": "দ্বিতীয় পাঠ",
+    "slug": "path-2",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahitya-sanchayan-class-9-wb",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/bengali-literature/sahitya-sanchayan/path-2",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahitya-sanchayan",
+    "chapterSlug": "path-2",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-9-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahitya-sanchayan-class-9-wb",
+        "slug": "sahitya-sanchayan",
+        "title": "Sahitya Sanchayan",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-2-sahitya-sanchayan-class-9",
+        "slug": "path-2",
+        "title": "দ্বিতীয় পাঠ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-path-3-sahitya-sanchayan-class-9",
+    "title": "তৃতীয় পাঠ",
+    "slug": "path-3",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahitya-sanchayan-class-9-wb",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/bengali-literature/sahitya-sanchayan/path-3",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahitya-sanchayan",
+    "chapterSlug": "path-3",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-9-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahitya-sanchayan-class-9-wb",
+        "slug": "sahitya-sanchayan",
+        "title": "Sahitya Sanchayan",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-3-sahitya-sanchayan-class-9",
+        "slug": "path-3",
+        "title": "তৃতীয় পাঠ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-path-4-sahitya-sanchayan-class-9",
+    "title": "চতুর্থ পাঠ",
+    "slug": "path-4",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahitya-sanchayan-class-9-wb",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/bengali-literature/sahitya-sanchayan/path-4",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahitya-sanchayan",
+    "chapterSlug": "path-4",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-9-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahitya-sanchayan-class-9-wb",
+        "slug": "sahitya-sanchayan",
+        "title": "Sahitya Sanchayan",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-4-sahitya-sanchayan-class-9",
+        "slug": "path-4",
+        "title": "চতুর্থ পাঠ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-path-5-sahitya-sanchayan-class-9",
+    "title": "পঞ্চম পাঠ",
+    "slug": "path-5",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahitya-sanchayan-class-9-wb",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/bengali-literature/sahitya-sanchayan/path-5",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahitya-sanchayan",
+    "chapterSlug": "path-5",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-9-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahitya-sanchayan-class-9-wb",
+        "slug": "sahitya-sanchayan",
+        "title": "Sahitya Sanchayan",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-5-sahitya-sanchayan-class-9",
+        "slug": "path-5",
+        "title": "পঞ্চম পাঠ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-path-6-sahitya-sanchayan-class-9",
+    "title": "ষষ্ঠ পাঠ",
+    "slug": "path-6",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahitya-sanchayan-class-9-wb",
+    "orderIndex": 6,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/bengali-literature/sahitya-sanchayan/path-6",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahitya-sanchayan",
+    "chapterSlug": "path-6",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-9-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahitya-sanchayan-class-9-wb",
+        "slug": "sahitya-sanchayan",
+        "title": "Sahitya Sanchayan",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-6-sahitya-sanchayan-class-9",
+        "slug": "path-6",
+        "title": "ষষ্ঠ পাঠ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-path-7-sahitya-sanchayan-class-9",
+    "title": "অন্যান্য অংশ",
+    "slug": "path-7",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahitya-sanchayan-class-9-wb",
+    "orderIndex": 7,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/bengali-literature/sahitya-sanchayan/path-7",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahitya-sanchayan",
+    "chapterSlug": "path-7",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-9-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahitya-sanchayan-class-9-wb",
+        "slug": "sahitya-sanchayan",
+        "title": "Sahitya Sanchayan",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-7-sahitya-sanchayan-class-9",
+        "slug": "path-7",
+        "title": "অন্যান্য অংশ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-1-bliss-class-9",
+    "title": "Lesson 1: Tales of Bhola Grandpa",
+    "slug": "lesson-1",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bliss-class-9-wb",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/english/bliss/lesson-1",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "english",
+    "textbookSlug": "bliss",
+    "chapterSlug": "lesson-1",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-9-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bliss-class-9-wb",
+        "slug": "bliss",
+        "title": "Bliss",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-1-bliss-class-9",
+        "slug": "lesson-1",
+        "title": "Lesson 1: Tales of Bhola Grandpa",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-2-bliss-class-9",
+    "title": "Lesson 2: All about a Dog",
+    "slug": "lesson-2",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bliss-class-9-wb",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/english/bliss/lesson-2",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "english",
+    "textbookSlug": "bliss",
+    "chapterSlug": "lesson-2",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-9-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bliss-class-9-wb",
+        "slug": "bliss",
+        "title": "Bliss",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-2-bliss-class-9",
+        "slug": "lesson-2",
+        "title": "Lesson 2: All about a Dog",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-3-bliss-class-9",
+    "title": "Lesson 3: Autumn",
+    "slug": "lesson-3",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bliss-class-9-wb",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/english/bliss/lesson-3",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "english",
+    "textbookSlug": "bliss",
+    "chapterSlug": "lesson-3",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-9-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bliss-class-9-wb",
+        "slug": "bliss",
+        "title": "Bliss",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-3-bliss-class-9",
+        "slug": "lesson-3",
+        "title": "Lesson 3: Autumn",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-4-bliss-class-9",
+    "title": "Lesson 4: A Day in the Zoo",
+    "slug": "lesson-4",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bliss-class-9-wb",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/english/bliss/lesson-4",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "english",
+    "textbookSlug": "bliss",
+    "chapterSlug": "lesson-4",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-9-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bliss-class-9-wb",
+        "slug": "bliss",
+        "title": "Bliss",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-4-bliss-class-9",
+        "slug": "lesson-4",
+        "title": "Lesson 4: A Day in the Zoo",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-5-bliss-class-9",
+    "title": "Lesson 5: All Summer in a Day",
+    "slug": "lesson-5",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bliss-class-9-wb",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/english/bliss/lesson-5",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "english",
+    "textbookSlug": "bliss",
+    "chapterSlug": "lesson-5",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-9-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bliss-class-9-wb",
+        "slug": "bliss",
+        "title": "Bliss",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-5-bliss-class-9",
+        "slug": "lesson-5",
+        "title": "Lesson 5: All Summer in a Day",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-6-bliss-class-9",
+    "title": "Lesson 6: Mild the Mist Upon the Hill",
+    "slug": "lesson-6",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bliss-class-9-wb",
+    "orderIndex": 6,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/english/bliss/lesson-6",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "english",
+    "textbookSlug": "bliss",
+    "chapterSlug": "lesson-6",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-9-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bliss-class-9-wb",
+        "slug": "bliss",
+        "title": "Bliss",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-6-bliss-class-9",
+        "slug": "lesson-6",
+        "title": "Lesson 6: Mild the Mist Upon the Hill",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-7-bliss-class-9",
+    "title": "Lesson 7: Tom Loses a Tooth",
+    "slug": "lesson-7",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bliss-class-9-wb",
+    "orderIndex": 7,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/english/bliss/lesson-7",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "english",
+    "textbookSlug": "bliss",
+    "chapterSlug": "lesson-7",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-9-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bliss-class-9-wb",
+        "slug": "bliss",
+        "title": "Bliss",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-7-bliss-class-9",
+        "slug": "lesson-7",
+        "title": "Lesson 7: Tom Loses a Tooth",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-8-bliss-class-9",
+    "title": "Lesson 8: His First Flight",
+    "slug": "lesson-8",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bliss-class-9-wb",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/english/bliss/lesson-8",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "english",
+    "textbookSlug": "bliss",
+    "chapterSlug": "lesson-8",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-9-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bliss-class-9-wb",
+        "slug": "bliss",
+        "title": "Bliss",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-8-bliss-class-9",
+        "slug": "lesson-8",
+        "title": "Lesson 8: His First Flight",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-9-bliss-class-9",
+    "title": "Lesson 9: The North Ship",
+    "slug": "lesson-9",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bliss-class-9-wb",
+    "orderIndex": 9,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/english/bliss/lesson-9",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "english",
+    "textbookSlug": "bliss",
+    "chapterSlug": "lesson-9",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-9-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bliss-class-9-wb",
+        "slug": "bliss",
+        "title": "Bliss",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-9-bliss-class-9",
+        "slug": "lesson-9",
+        "title": "Lesson 9: The North Ship",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-10-bliss-class-9",
+    "title": "Lesson 10: The Price of Bananas",
+    "slug": "lesson-10",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bliss-class-9-wb",
+    "orderIndex": 10,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/english/bliss/lesson-10",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "english",
+    "textbookSlug": "bliss",
+    "chapterSlug": "lesson-10",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-9-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bliss-class-9-wb",
+        "slug": "bliss",
+        "title": "Bliss",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-10-bliss-class-9",
+        "slug": "lesson-10",
+        "title": "Lesson 10: The Price of Bananas",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-11-bliss-class-9",
+    "title": "Lesson 11: A Shipwrecked Sailor",
+    "slug": "lesson-11",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bliss-class-9-wb",
+    "orderIndex": 11,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/english/bliss/lesson-11",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "english",
+    "textbookSlug": "bliss",
+    "chapterSlug": "lesson-11",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-9-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bliss-class-9-wb",
+        "slug": "bliss",
+        "title": "Bliss",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-11-bliss-class-9",
+        "slug": "lesson-11",
+        "title": "Lesson 11: A Shipwrecked Sailor",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lesson-12-bliss-class-9",
+    "title": "Lesson 12: Hunting Snake",
+    "slug": "lesson-12",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bliss-class-9-wb",
+    "orderIndex": 12,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/english/bliss/lesson-12",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "english",
+    "textbookSlug": "bliss",
+    "chapterSlug": "lesson-12",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-9-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bliss-class-9-wb",
+        "slug": "bliss",
+        "title": "Bliss",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lesson-12-bliss-class-9",
+        "slug": "lesson-12",
+        "title": "Lesson 12: Hunting Snake",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-other-13-bliss-class-9",
+    "title": "Reading Comprehension (Unseen)",
+    "slug": "other-13",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bliss-class-9-wb",
+    "orderIndex": 13,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/english/bliss/other-13",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "english",
+    "textbookSlug": "bliss",
+    "chapterSlug": "other-13",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-9-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bliss-class-9-wb",
+        "slug": "bliss",
+        "title": "Bliss",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-other-13-bliss-class-9",
+        "slug": "other-13",
+        "title": "Reading Comprehension (Unseen)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-other-14-bliss-class-9",
+    "title": "Teachers' Guidelines",
+    "slug": "other-14",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bliss-class-9-wb",
+    "orderIndex": 14,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/english/bliss/other-14",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "english",
+    "textbookSlug": "bliss",
+    "chapterSlug": "other-14",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-9-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bliss-class-9-wb",
+        "slug": "bliss",
+        "title": "Bliss",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-other-14-bliss-class-9",
+        "slug": "other-14",
+        "title": "Teachers' Guidelines",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-1-ganit-prakash-class-9",
+    "title": "অধ্যায় 1: বাস্তব সংখ্যা",
+    "slug": "chapter-1",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-9-wb",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/mathematics/ganit-prakash/chapter-1",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-1",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-9-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-9-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-1-ganit-prakash-class-9",
+        "slug": "chapter-1",
+        "title": "অধ্যায় 1: বাস্তব সংখ্যা",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-2-ganit-prakash-class-9",
+    "title": "অধ্যায় 2: সূচকের নিয়মাবলি",
+    "slug": "chapter-2",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-9-wb",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/mathematics/ganit-prakash/chapter-2",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-2",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-9-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-9-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-2-ganit-prakash-class-9",
+        "slug": "chapter-2",
+        "title": "অধ্যায় 2: সূচকের নিয়মাবলি",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-3-ganit-prakash-class-9",
+    "title": "অধ্যায় 3: লেখচিত্র",
+    "slug": "chapter-3",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-9-wb",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/mathematics/ganit-prakash/chapter-3",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-3",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-9-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-9-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-3-ganit-prakash-class-9",
+        "slug": "chapter-3",
+        "title": "অধ্যায় 3: লেখচিত্র",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-4-ganit-prakash-class-9",
+    "title": "অধ্যায় 4: স্থানাঙ্ক জ্যামিতি : দূরত্ব নির্ণয়",
+    "slug": "chapter-4",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-9-wb",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/mathematics/ganit-prakash/chapter-4",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-4",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-9-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-9-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-4-ganit-prakash-class-9",
+        "slug": "chapter-4",
+        "title": "অধ্যায় 4: স্থানাঙ্ক জ্যামিতি : দূরত্ব নির্ণয়",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-5-ganit-prakash-class-9",
+    "title": "অধ্যায় 5: রৈখিক সহ সমীকরণ (দুই চল বিশিষ্ট)",
+    "slug": "chapter-5",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-9-wb",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/mathematics/ganit-prakash/chapter-5",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-5",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-9-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-9-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-5-ganit-prakash-class-9",
+        "slug": "chapter-5",
+        "title": "অধ্যায় 5: রৈখিক সহ সমীকরণ (দুই চল বিশিষ্ট)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-6-ganit-prakash-class-9",
+    "title": "অধ্যায় 6: সামান্তরিকের ধর্ম",
+    "slug": "chapter-6",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-9-wb",
+    "orderIndex": 6,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/mathematics/ganit-prakash/chapter-6",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-6",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-9-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-9-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-6-ganit-prakash-class-9",
+        "slug": "chapter-6",
+        "title": "অধ্যায় 6: সামান্তরিকের ধর্ম",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-7-ganit-prakash-class-9",
+    "title": "অধ্যায় 7: বহুপদী সংখ্যামালা",
+    "slug": "chapter-7",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-9-wb",
+    "orderIndex": 7,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/mathematics/ganit-prakash/chapter-7",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-7",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-9-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-9-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-7-ganit-prakash-class-9",
+        "slug": "chapter-7",
+        "title": "অধ্যায় 7: বহুপদী সংখ্যামালা",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-8-ganit-prakash-class-9",
+    "title": "অধ্যায় 8: উৎপাদকে বিশ্লেষণ",
+    "slug": "chapter-8",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-9-wb",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/mathematics/ganit-prakash/chapter-8",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-8",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-9-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-9-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-8-ganit-prakash-class-9",
+        "slug": "chapter-8",
+        "title": "অধ্যায় 8: উৎপাদকে বিশ্লেষণ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-9-ganit-prakash-class-9",
+    "title": "অধ্যায় 9: ভেদক ও মধ্যবিন্দু সংক্রান্ত উপপাদ্য",
+    "slug": "chapter-9",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-9-wb",
+    "orderIndex": 9,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/mathematics/ganit-prakash/chapter-9",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-9",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-9-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-9-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-9-ganit-prakash-class-9",
+        "slug": "chapter-9",
+        "title": "অধ্যায় 9: ভেদক ও মধ্যবিন্দু সংক্রান্ত উপপাদ্য",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-10-ganit-prakash-class-9",
+    "title": "অধ্যায় 10: লাভ ও ক্ষতি",
+    "slug": "chapter-10",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-9-wb",
+    "orderIndex": 10,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/mathematics/ganit-prakash/chapter-10",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-10",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-9-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-9-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-10-ganit-prakash-class-9",
+        "slug": "chapter-10",
+        "title": "অধ্যায় 10: লাভ ও ক্ষতি",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-11-ganit-prakash-class-9",
+    "title": "অধ্যায় 11: রাশিবিজ্ঞান",
+    "slug": "chapter-11",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-9-wb",
+    "orderIndex": 11,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/mathematics/ganit-prakash/chapter-11",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-11",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-9-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-9-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-11-ganit-prakash-class-9",
+        "slug": "chapter-11",
+        "title": "অধ্যায় 11: রাশিবিজ্ঞান",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-12-ganit-prakash-class-9",
+    "title": "অধ্যায় 12: ক্ষেত্রফল সংক্রান্ত উপপাদ্য",
+    "slug": "chapter-12",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-9-wb",
+    "orderIndex": 12,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/mathematics/ganit-prakash/chapter-12",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-12",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-9-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-9-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-12-ganit-prakash-class-9",
+        "slug": "chapter-12",
+        "title": "অধ্যায় 12: ক্ষেত্রফল সংক্রান্ত উপপাদ্য",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-13-ganit-prakash-class-9",
+    "title": "অধ্যায় 13: সম্পাদ্য : ত্রিভুজের সমান ক্ষেত্রফল বিশিষ্ট সামান্তরিক অঙ্কন",
+    "slug": "chapter-13",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-9-wb",
+    "orderIndex": 13,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/mathematics/ganit-prakash/chapter-13",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-13",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-9-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-9-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-13-ganit-prakash-class-9",
+        "slug": "chapter-13",
+        "title": "অধ্যায় 13: সম্পাদ্য : ত্রিভুজের সমান ক্ষেত্রফল বিশিষ্ট সামান্তরিক অঙ্কন",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-14-ganit-prakash-class-9",
+    "title": "অধ্যায় 14: সম্পাদ্য : চতুর্ভুজের সমান ক্ষেত্রফল বিশিষ্ট ত্রিভুজ অঙ্কন",
+    "slug": "chapter-14",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-9-wb",
+    "orderIndex": 14,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/mathematics/ganit-prakash/chapter-14",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-14",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-9-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-9-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-14-ganit-prakash-class-9",
+        "slug": "chapter-14",
+        "title": "অধ্যায় 14: সম্পাদ্য : চতুর্ভুজের সমান ক্ষেত্রফল বিশিষ্ট ত্রিভুজ অঙ্কন",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-15-ganit-prakash-class-9",
+    "title": "অধ্যায় 15: ত্রিভুজ ও চতুর্ভুজের পরিসীমা ও ক্ষেত্রফল",
+    "slug": "chapter-15",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-9-wb",
+    "orderIndex": 15,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/mathematics/ganit-prakash/chapter-15",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-15",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-9-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-9-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-15-ganit-prakash-class-9",
+        "slug": "chapter-15",
+        "title": "অধ্যায় 15: ত্রিভুজ ও চতুর্ভুজের পরিসীমা ও ক্ষেত্রফল",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-16-ganit-prakash-class-9",
+    "title": "অধ্যায় 16: বৃত্তের পরিধি",
+    "slug": "chapter-16",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-9-wb",
+    "orderIndex": 16,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/mathematics/ganit-prakash/chapter-16",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-16",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-9-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-9-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-16-ganit-prakash-class-9",
+        "slug": "chapter-16",
+        "title": "অধ্যায় 16: বৃত্তের পরিধি",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-17-ganit-prakash-class-9",
+    "title": "অধ্যায় 17: সমবিন্দু সংক্রান্ত উপপাদ্য",
+    "slug": "chapter-17",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-9-wb",
+    "orderIndex": 17,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/mathematics/ganit-prakash/chapter-17",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-17",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-9-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-9-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-17-ganit-prakash-class-9",
+        "slug": "chapter-17",
+        "title": "অধ্যায় 17: সমবিন্দু সংক্রান্ত উপপাদ্য",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-18-ganit-prakash-class-9",
+    "title": "অধ্যায় 18: বৃত্তের ক্ষেত্রফল",
+    "slug": "chapter-18",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-9-wb",
+    "orderIndex": 18,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/mathematics/ganit-prakash/chapter-18",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-18",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-9-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-9-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-18-ganit-prakash-class-9",
+        "slug": "chapter-18",
+        "title": "অধ্যায় 18: বৃত্তের ক্ষেত্রফল",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-19-ganit-prakash-class-9",
+    "title": "অধ্যায় 19: স্থানাঙ্ক জ্যামিতি: সরলরেখাংশের অন্তর্বিভক্ত ও বহিঃর্বিভক্ত",
+    "slug": "chapter-19",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-9-wb",
+    "orderIndex": 19,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/mathematics/ganit-prakash/chapter-19",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-19",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-9-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-9-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-19-ganit-prakash-class-9",
+        "slug": "chapter-19",
+        "title": "অধ্যায় 19: স্থানাঙ্ক জ্যামিতি: সরলরেখাংশের অন্তর্বিভক্ত ও বহিঃর্বিভক্ত",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-20-ganit-prakash-class-9",
+    "title": "অধ্যায় 20: স্থানাঙ্ক জ্যামিতি: ত্রিভুজাকৃতি ক্ষেত্রের ক্ষেত্রফল",
+    "slug": "chapter-20",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-9-wb",
+    "orderIndex": 20,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/mathematics/ganit-prakash/chapter-20",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-20",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-9-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-9-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-20-ganit-prakash-class-9",
+        "slug": "chapter-20",
+        "title": "অধ্যায় 20: স্থানাঙ্ক জ্যামিতি: ত্রিভুজাকৃতি ক্ষেত্রের ক্ষেত্রফল",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-21-ganit-prakash-class-9",
+    "title": "অধ্যায় 21: লগারিদম",
+    "slug": "chapter-21",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prakash-class-9-wb",
+    "orderIndex": 21,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/mathematics/ganit-prakash/chapter-21",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prakash",
+    "chapterSlug": "chapter-21",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-9-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prakash-class-9-wb",
+        "slug": "ganit-prakash",
+        "title": "Ganit Prakash",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-21-ganit-prakash-class-9",
+        "slug": "chapter-21",
+        "title": "অধ্যায় 21: লগারিদম",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-1-physical-science-class-9",
+    "title": "অধ্যায় 1: পরিমাপ (Measurement)",
+    "slug": "chapter-1",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-physical-science-class-9-wb",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/physical-science/physical-science/chapter-1",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "physical-science",
+    "textbookSlug": "physical-science",
+    "chapterSlug": "chapter-1",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-physical-science-class-9-wb",
+        "slug": "physical-science",
+        "title": "Physical Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-physical-science-class-9-wb",
+        "slug": "physical-science",
+        "title": "Physical Science",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-1-physical-science-class-9",
+        "slug": "chapter-1",
+        "title": "অধ্যায় 1: পরিমাপ (Measurement)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-2-physical-science-class-9",
+    "title": "অধ্যায় 2: বল ও গতি (Force and Motion)",
+    "slug": "chapter-2",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-physical-science-class-9-wb",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/physical-science/physical-science/chapter-2",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "physical-science",
+    "textbookSlug": "physical-science",
+    "chapterSlug": "chapter-2",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-physical-science-class-9-wb",
+        "slug": "physical-science",
+        "title": "Physical Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-physical-science-class-9-wb",
+        "slug": "physical-science",
+        "title": "Physical Science",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-2-physical-science-class-9",
+        "slug": "chapter-2",
+        "title": "অধ্যায় 2: বল ও গতি (Force and Motion)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-3-physical-science-class-9",
+    "title": "অধ্যায় 3: পদার্থ : গঠন ও ধর্ম (Matter: Structure and Properties)",
+    "slug": "chapter-3",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-physical-science-class-9-wb",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/physical-science/physical-science/chapter-3",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "physical-science",
+    "textbookSlug": "physical-science",
+    "chapterSlug": "chapter-3",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-physical-science-class-9-wb",
+        "slug": "physical-science",
+        "title": "Physical Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-physical-science-class-9-wb",
+        "slug": "physical-science",
+        "title": "Physical Science",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-3-physical-science-class-9",
+        "slug": "chapter-3",
+        "title": "অধ্যায় 3: পদার্থ : গঠন ও ধর্ম (Matter: Structure and Properties)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-4-physical-science-class-9",
+    "title": "অধ্যায় 4: পদার্থ: পরমাণুর গঠন ও ভৌত-রাসায়নিক ধর্ম (Atomic Structure & Chemical Properties)",
+    "slug": "chapter-4",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-physical-science-class-9-wb",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/physical-science/physical-science/chapter-4",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "physical-science",
+    "textbookSlug": "physical-science",
+    "chapterSlug": "chapter-4",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-physical-science-class-9-wb",
+        "slug": "physical-science",
+        "title": "Physical Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-physical-science-class-9-wb",
+        "slug": "physical-science",
+        "title": "Physical Science",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-4-physical-science-class-9",
+        "slug": "chapter-4",
+        "title": "অধ্যায় 4: পদার্থ: পরমাণুর গঠন ও ভৌত-রাসায়নিক ধর্ম (Atomic Structure & Chemical Properties)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-5-physical-science-class-9",
+    "title": "অধ্যায় 5: শক্তির ক্রিয়া: কার্য, ক্ষমতা ও শক্তি (Work, Power and Energy)",
+    "slug": "chapter-5",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-physical-science-class-9-wb",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/physical-science/physical-science/chapter-5",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "physical-science",
+    "textbookSlug": "physical-science",
+    "chapterSlug": "chapter-5",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-physical-science-class-9-wb",
+        "slug": "physical-science",
+        "title": "Physical Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-physical-science-class-9-wb",
+        "slug": "physical-science",
+        "title": "Physical Science",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-5-physical-science-class-9",
+        "slug": "chapter-5",
+        "title": "অধ্যায় 5: শক্তির ক্রিয়া: কার্য, ক্ষমতা ও শক্তি (Work, Power and Energy)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-6-physical-science-class-9",
+    "title": "অধ্যায় 6: তাপ (Heat)",
+    "slug": "chapter-6",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-physical-science-class-9-wb",
+    "orderIndex": 6,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/physical-science/physical-science/chapter-6",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "physical-science",
+    "textbookSlug": "physical-science",
+    "chapterSlug": "chapter-6",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-physical-science-class-9-wb",
+        "slug": "physical-science",
+        "title": "Physical Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-physical-science-class-9-wb",
+        "slug": "physical-science",
+        "title": "Physical Science",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-6-physical-science-class-9",
+        "slug": "chapter-6",
+        "title": "অধ্যায় 6: তাপ (Heat)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-7-physical-science-class-9",
+    "title": "অধ্যায় 7: শব্দ (Sound)",
+    "slug": "chapter-7",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-physical-science-class-9-wb",
+    "orderIndex": 7,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/physical-science/physical-science/chapter-7",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "physical-science",
+    "textbookSlug": "physical-science",
+    "chapterSlug": "chapter-7",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-physical-science-class-9-wb",
+        "slug": "physical-science",
+        "title": "Physical Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-physical-science-class-9-wb",
+        "slug": "physical-science",
+        "title": "Physical Science",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-7-physical-science-class-9",
+        "slug": "chapter-7",
+        "title": "অধ্যায় 7: শব্দ (Sound)",
+        "type": "chapter"
+      }
+    ]
   }
 ]

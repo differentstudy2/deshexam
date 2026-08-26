@@ -1885,5 +1885,79 @@
         "type": "subject"
       }
     ]
+  },
+  {
+    "id": "textbook-bliss-class-9-wb",
+    "title": "Bliss",
+    "slug": "bliss",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-english-class-9-wb",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/english/bliss",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "english",
+    "textbookSlug": "bliss",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-9-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-physical-science-class-9-wb",
+    "title": "Physical Science",
+    "slug": "physical-science",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-physical-science-class-9-wb",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/physical-science/physical-science",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "physical-science",
+    "textbookSlug": "physical-science",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      },
+      {
+        "id": "subject-physical-science-class-9-wb",
+        "slug": "physical-science",
+        "title": "Physical Science",
+        "type": "subject"
+      }
+    ]
   }
 ]
