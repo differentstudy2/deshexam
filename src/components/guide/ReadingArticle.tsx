@@ -499,7 +499,8 @@ export function ReadingArticle({ data, node, hierarchy, navigation, contentType 
             {node && (
               <div className="bg-slate-50 dark:bg-slate-900/40 px-3 sm:px-4 py-2.5 border-b border-slate-200/60 dark:border-slate-800 print:hidden overflow-hidden">
                 <div className="flex items-center gap-2 w-full overflow-x-auto hide-scrollbar pb-0.5">
-                  <div className="flex items-center gap-2 min-w-max">
+                  <div className="flex-1 min-w-0"></div>
+                  <div className="flex items-center justify-center gap-2 min-w-max shrink-0">
                     <Link href={`/guide/${node.fullSlug || node.id}/questions`} className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white dark:bg-slate-800 border border-emerald-100 dark:border-slate-700 rounded text-[10px] font-bold text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-slate-700 transition-colors shadow-sm whitespace-nowrap">
                       <FileQuestion className="w-3 h-3" />
                       Questions
@@ -521,10 +522,11 @@ export function ReadingArticle({ data, node, hierarchy, navigation, contentType 
                       Q/A
                     </Link>
                   </div>
-                  <div className="flex-1"></div>
-                  <Link href={`/admin/guide-content/topic/${node.id}`} title="Edit Content" className="flex-shrink-0 text-slate-400 hover:text-emerald-600 transition-colors p-1.5 rounded-md hover:bg-emerald-100 dark:hover:bg-slate-800 ml-auto bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700">
-                    <Edit className="w-3.5 h-3.5" />
-                  </Link>
+                  <div className="flex-1 min-w-0 flex justify-end shrink-0">
+                    <Link href={`/admin/guide-content/topic/${node.id}`} title="Edit Content" className="flex-shrink-0 text-slate-400 hover:text-emerald-600 transition-colors p-1.5 rounded-md hover:bg-emerald-100 dark:hover:bg-slate-800 bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700">
+                      <Edit className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
                 </div>
               </div>
             )}
