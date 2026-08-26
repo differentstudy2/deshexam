@@ -69,14 +69,31 @@ export function TopicSectionsSidebar({ sections = [], node, currentContentType }
               href={href}
               scroll={true}
               className={cn(
-                "w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-[14px] font-medium transition-colors",
+                "flex items-start justify-between py-2.5 px-3 transition-all duration-300 rounded-[0.120rem] border group relative overflow-hidden w-full",
                 isActive 
-                  ? "bg-[#107c41]/10 text-[#107c41] dark:bg-emerald-900/30 dark:text-emerald-400" 
-                  : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+                  ? "bg-green-50/80 border-green-200 shadow-sm dark:bg-green-900/20 dark:border-green-800/50" 
+                  : "bg-white border-black/5 hover:shadow-sm hover:border-slate-200 hover:bg-slate-50 dark:bg-slate-900/50 dark:border-white/5 dark:hover:border-slate-700"
               )}
             >
-              <Icon className={cn("w-4 h-4 shrink-0", isActive ? "text-[#107c41] dark:text-emerald-400" : "text-slate-400")} />
-              <span className="truncate">{sec.title}</span>
+              {isActive && (
+                <div className="absolute left-0 top-3 bottom-3 w-1 rounded-r-full bg-green-500"></div>
+              )}
+              <div className="flex items-center gap-2.5 w-full relative z-10">
+                <div className={cn(
+                  "flex items-center justify-center w-8 h-8 rounded-lg shrink-0 transition-transform duration-300 group-hover:scale-105 shadow-sm border",
+                  isActive
+                    ? "bg-white border-green-200 text-green-600 dark:bg-slate-800 dark:border-green-800 dark:text-green-400"
+                    : "bg-white/70 border-black/5 text-slate-500 dark:bg-slate-900/50 dark:border-white/5 dark:text-slate-400"
+                )}>
+                  <Icon className="w-4 h-4" />
+                </div>
+                <span className={cn(
+                  "font-bold text-[13.5px] transition-colors tracking-tight leading-tight truncate",
+                  isActive ? "text-green-700 dark:text-green-400" : "text-slate-800 dark:text-slate-200 group-hover:text-green-600"
+                )}>
+                  {sec.title}
+                </span>
+              </div>
             </Link>
           );
         })}
