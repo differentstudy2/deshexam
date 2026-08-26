@@ -1858,5 +1858,35 @@
         "type": "class"
       }
     ]
+  },
+  {
+    "id": "subject-geography-class-10-wb",
+    "title": "Geography",
+    "slug": "geography",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-10-wb",
+    "orderIndex": 15,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/geography",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "geography",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      }
+    ]
   }
 ]

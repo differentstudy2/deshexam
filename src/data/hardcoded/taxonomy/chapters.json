@@ -22541,5 +22541,355 @@
         "type": "chapter"
       }
     ]
+  },
+  {
+    "id": "chapter-chapter-1-bhugol-o-paribesh-class-10",
+    "title": "অধ্যায় ১: বহির্জাত প্রক্রিয়া ও তাদের দ্বারা সৃষ্ট ভূমিরূপ",
+    "slug": "chapter-1",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bhugol-o-paribesh-class-10-wb",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/geography/bhugol-o-paribesh/chapter-1",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "geography",
+    "textbookSlug": "bhugol-o-paribesh",
+    "chapterSlug": "chapter-1",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-geography-class-10-wb",
+        "slug": "geography",
+        "title": "Geography",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bhugol-o-paribesh-class-10-wb",
+        "slug": "bhugol-o-paribesh",
+        "title": "Bhugol o Paribesh",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-1-bhugol-o-paribesh-class-10",
+        "slug": "chapter-1",
+        "title": "অধ্যায় ১: বহির্জাত প্রক্রিয়া ও তাদের দ্বারা সৃষ্ট ভূমিরূপ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-2-bhugol-o-paribesh-class-10",
+    "title": "অধ্যায় ২: বায়ুমণ্ডল",
+    "slug": "chapter-2",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bhugol-o-paribesh-class-10-wb",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/geography/bhugol-o-paribesh/chapter-2",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "geography",
+    "textbookSlug": "bhugol-o-paribesh",
+    "chapterSlug": "chapter-2",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-geography-class-10-wb",
+        "slug": "geography",
+        "title": "Geography",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bhugol-o-paribesh-class-10-wb",
+        "slug": "bhugol-o-paribesh",
+        "title": "Bhugol o Paribesh",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-2-bhugol-o-paribesh-class-10",
+        "slug": "chapter-2",
+        "title": "অধ্যায় ২: বায়ুমণ্ডল",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-3-bhugol-o-paribesh-class-10",
+    "title": "অধ্যায় ৩: বারিমন্ডল",
+    "slug": "chapter-3",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bhugol-o-paribesh-class-10-wb",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/geography/bhugol-o-paribesh/chapter-3",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "geography",
+    "textbookSlug": "bhugol-o-paribesh",
+    "chapterSlug": "chapter-3",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-geography-class-10-wb",
+        "slug": "geography",
+        "title": "Geography",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bhugol-o-paribesh-class-10-wb",
+        "slug": "bhugol-o-paribesh",
+        "title": "Bhugol o Paribesh",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-3-bhugol-o-paribesh-class-10",
+        "slug": "chapter-3",
+        "title": "অধ্যায় ৩: বারিমন্ডল",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-4-bhugol-o-paribesh-class-10",
+    "title": "অধ্যায় ৪: বর্জ্য ব্যবস্থাপনা",
+    "slug": "chapter-4",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bhugol-o-paribesh-class-10-wb",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/geography/bhugol-o-paribesh/chapter-4",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "geography",
+    "textbookSlug": "bhugol-o-paribesh",
+    "chapterSlug": "chapter-4",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-geography-class-10-wb",
+        "slug": "geography",
+        "title": "Geography",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bhugol-o-paribesh-class-10-wb",
+        "slug": "bhugol-o-paribesh",
+        "title": "Bhugol o Paribesh",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-4-bhugol-o-paribesh-class-10",
+        "slug": "chapter-4",
+        "title": "অধ্যায় ৪: বর্জ্য ব্যবস্থাপনা",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-5-bhugol-o-paribesh-class-10",
+    "title": "অধ্যায় ৫: ভারত (প্রাকৃতিক পরিবেশ)",
+    "slug": "chapter-5",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bhugol-o-paribesh-class-10-wb",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/geography/bhugol-o-paribesh/chapter-5",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "geography",
+    "textbookSlug": "bhugol-o-paribesh",
+    "chapterSlug": "chapter-5",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-geography-class-10-wb",
+        "slug": "geography",
+        "title": "Geography",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bhugol-o-paribesh-class-10-wb",
+        "slug": "bhugol-o-paribesh",
+        "title": "Bhugol o Paribesh",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-5-bhugol-o-paribesh-class-10",
+        "slug": "chapter-5",
+        "title": "অধ্যায় ৫: ভারত (প্রাকৃতিক পরিবেশ)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-6-bhugol-o-paribesh-class-10",
+    "title": "অধ্যায় ৬: ভারত (অর্থনৈতিক পরিবেশ)",
+    "slug": "chapter-6",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bhugol-o-paribesh-class-10-wb",
+    "orderIndex": 6,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/geography/bhugol-o-paribesh/chapter-6",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "geography",
+    "textbookSlug": "bhugol-o-paribesh",
+    "chapterSlug": "chapter-6",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-geography-class-10-wb",
+        "slug": "geography",
+        "title": "Geography",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bhugol-o-paribesh-class-10-wb",
+        "slug": "bhugol-o-paribesh",
+        "title": "Bhugol o Paribesh",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-6-bhugol-o-paribesh-class-10",
+        "slug": "chapter-6",
+        "title": "অধ্যায় ৬: ভারত (অর্থনৈতিক পরিবেশ)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-7-bhugol-o-paribesh-class-10",
+    "title": "অধ্যায় ৭: উপগ্রহ চিত্র ও ভূ-বৈচিত্র্যসূচক মানচিত্র",
+    "slug": "chapter-7",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bhugol-o-paribesh-class-10-wb",
+    "orderIndex": 7,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/geography/bhugol-o-paribesh/chapter-7",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "geography",
+    "textbookSlug": "bhugol-o-paribesh",
+    "chapterSlug": "chapter-7",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-geography-class-10-wb",
+        "slug": "geography",
+        "title": "Geography",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bhugol-o-paribesh-class-10-wb",
+        "slug": "bhugol-o-paribesh",
+        "title": "Bhugol o Paribesh",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-7-bhugol-o-paribesh-class-10",
+        "slug": "chapter-7",
+        "title": "অধ্যায় ৭: উপগ্রহ চিত্র ও ভূ-বৈচিত্র্যসূচক মানচিত্র",
+        "type": "chapter"
+      }
+    ]
   }
 ]

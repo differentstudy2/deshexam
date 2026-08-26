@@ -2107,5 +2107,42 @@
         "type": "subject"
       }
     ]
+  },
+  {
+    "id": "textbook-bhugol-o-paribesh-class-10-wb",
+    "title": "Bhugol o Paribesh",
+    "slug": "bhugol-o-paribesh",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-geography-class-10-wb",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/geography/bhugol-o-paribesh",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "geography",
+    "textbookSlug": "bhugol-o-paribesh",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      },
+      {
+        "id": "subject-geography-class-10-wb",
+        "slug": "geography",
+        "title": "Geography",
+        "type": "subject"
+      }
+    ]
   }
 ]
