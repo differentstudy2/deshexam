@@ -28,6 +28,9 @@ export interface AssessmentClientProps {
     rating: string;
     successRate: string;
   };
+  boards?: any[];
+  classes?: any[];
+  subjects?: any[];
 }
 
 export function AssessmentClient({
@@ -42,6 +45,9 @@ export function AssessmentClient({
   initialAssessments = [],
   initialLeaderboard = [],
   initialChallenges = [],
+  boards = [],
+  classes = [],
+  subjects = [],
 }: AssessmentClientProps) {
   const [assessments, setAssessments] = useState<MockTest[]>(initialAssessments);
   const [leaderboard, setLeaderboard] = useState<any[]>(initialLeaderboard);
@@ -201,17 +207,19 @@ export function AssessmentClient({
                 <SelectTrigger className="h-10 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg font-semibold"><SelectValue placeholder="All" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="All">All</SelectItem>
-                  <SelectItem value="WBBSE">WBBSE</SelectItem>
-                  <SelectItem value="WBCHSE">WBCHSE</SelectItem>
-                  <SelectItem value="ICSE">ICSE</SelectItem>
-                  <SelectItem value="CBSE">CBSE</SelectItem>
-                  <SelectItem value="WBCS">WBCS</SelectItem>
-                  <SelectItem value="SSC">SSC</SelectItem>
-                  <SelectItem value="PSC">PSC</SelectItem>
-                  <SelectItem value="TET">TET</SelectItem>
-                  <SelectItem value="Railway">Railway</SelectItem>
-                  <SelectItem value="Banking">Banking</SelectItem>
-                  <SelectItem value="Police">Police</SelectItem>
+                  {boards.map(b => (
+                    <SelectItem key={b.id} value={b.id}>{b.title}</SelectItem>
+                  ))}
+                  {/* Keep fallback options in case DB is empty */}
+                  {boards.length === 0 && (
+                    <>
+                      <SelectItem value="WBBSE">WBBSE</SelectItem>
+                      <SelectItem value="WBCHSE">WBCHSE</SelectItem>
+                      <SelectItem value="ICSE">ICSE</SelectItem>
+                      <SelectItem value="CBSE">CBSE</SelectItem>
+                      <SelectItem value="WBCS">WBCS</SelectItem>
+                    </>
+                  )}
                 </SelectContent>
               </Select>
             </div>
@@ -221,13 +229,15 @@ export function AssessmentClient({
                 <SelectTrigger className="h-10 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg font-semibold"><SelectValue placeholder="All" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="All">All</SelectItem>
-                  <SelectItem value="Class 6">Class 6</SelectItem>
-                  <SelectItem value="Class 7">Class 7</SelectItem>
-                  <SelectItem value="Class 8">Class 8</SelectItem>
-                  <SelectItem value="Class 9">Class 9</SelectItem>
-                  <SelectItem value="Class 10">Class 10</SelectItem>
-                  <SelectItem value="Class 11">Class 11</SelectItem>
-                  <SelectItem value="Class 12">Class 12</SelectItem>
+                  {classes.map(c => (
+                    <SelectItem key={c.id} value={c.id}>{c.title}</SelectItem>
+                  ))}
+                  {classes.length === 0 && (
+                    <>
+                      <SelectItem value="Class 10">Class 10</SelectItem>
+                      <SelectItem value="Class 12">Class 12</SelectItem>
+                    </>
+                  )}
                 </SelectContent>
               </Select>
             </div>
@@ -237,15 +247,16 @@ export function AssessmentClient({
                 <SelectTrigger className="h-10 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg font-semibold"><SelectValue placeholder="All" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="All">All</SelectItem>
-                  <SelectItem value="Mathematics">Mathematics</SelectItem>
-                  <SelectItem value="Science">Science</SelectItem>
-                  <SelectItem value="History">History</SelectItem>
-                  <SelectItem value="Geography">Geography</SelectItem>
-                  <SelectItem value="Bengali">Bengali</SelectItem>
-                  <SelectItem value="English">English</SelectItem>
-                  <SelectItem value="General Knowledge">General Knowledge</SelectItem>
-                  <SelectItem value="Reasoning">Reasoning</SelectItem>
-                  <SelectItem value="Current Affairs">Current Affairs</SelectItem>
+                  {subjects.map(s => (
+                    <SelectItem key={s.id} value={s.id}>{s.title}</SelectItem>
+                  ))}
+                  {subjects.length === 0 && (
+                    <>
+                      <SelectItem value="Mathematics">Mathematics</SelectItem>
+                      <SelectItem value="Science">Science</SelectItem>
+                      <SelectItem value="English">English</SelectItem>
+                    </>
+                  )}
                 </SelectContent>
               </Select>
             </div>

@@ -3,6 +3,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { getAssessments } from '@/lib/firebase/assessment';
 import { getTopLeaderboard, getDailyChallenges } from '@/lib/firebase/student-analytics';
+import { getTaxonomyNodesByType } from '@/lib/firebase/taxonomy';
 import { serializeTimestamps } from '@/lib/utils';
 import { MockTest } from '@/lib/assessment-types';
 import { getAllHardcodedMockTests } from '@/lib/hardcoded-loader';
@@ -151,10 +152,13 @@ const jsonLdSoftwareApp = {
 export const dynamic = 'force-dynamic';
 
 export default async function MockTestsListingPage() {
-  const [data, lbData, chData] = await Promise.all([
+  const [data, lbData, chData, boards, classes, subjects] = await Promise.all([
     getAssessments('mockTests'),
     getTopLeaderboard(4),
-    getDailyChallenges()
+    getDailyChallenges(),
+    getTaxonomyNodesByType('academic', 'board'),
+    getTaxonomyNodesByType('academic', 'class'),
+    getTaxonomyNodesByType('academic', 'subject')
   ]);
 
   const publishedMockTests = (data as MockTest[]).filter(a => a.status === 'Published');
@@ -184,6 +188,9 @@ export default async function MockTestsListingPage() {
         initialAssessments={initialAssessments}
         initialLeaderboard={initialLeaderboard}
         initialChallenges={initialChallenges}
+        boards={boards}
+        classes={classes}
+        subjects={subjects}
         collectionName="mockTests"
         type="Mock Test"
         heroBadgeText="70,000+ Mock Tests Available"

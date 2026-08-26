@@ -2,6 +2,7 @@ import { AssessmentClient } from '@/components/assessment/AssessmentClient';
 import { Metadata } from 'next';
 import { getAssessments } from '@/lib/firebase/assessment';
 import { getTopLeaderboard, getDailyChallenges } from '@/lib/firebase/student-analytics';
+import { getTaxonomyNodesByType } from '@/lib/firebase/taxonomy';
 import { serializeTimestamps } from '@/lib/utils';
 import { MockTest } from '@/lib/assessment-types';
 import { getAllHardcodedQuizzes } from '@/lib/hardcoded-loader';
@@ -51,10 +52,13 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function QuizListingPage() {
-  const [data, lbData, chData] = await Promise.all([
+  const [data, lbData, chData, boards, classes, subjects] = await Promise.all([
     getAssessments('quizzes'),
     getTopLeaderboard(4),
-    getDailyChallenges()
+    getDailyChallenges(),
+    getTaxonomyNodesByType('academic', 'board'),
+    getTaxonomyNodesByType('academic', 'class'),
+    getTaxonomyNodesByType('academic', 'subject')
   ]);
 
   const publishedQuizzes = (data as MockTest[]).filter(a => a.status === 'Published');
@@ -126,6 +130,9 @@ export default async function QuizListingPage() {
         initialAssessments={initialAssessments}
         initialLeaderboard={initialLeaderboard}
         initialChallenges={initialChallenges} 
+        boards={boards}
+        classes={classes}
+        subjects={subjects}
         collectionName="quizzes"
         type="Quiz"
         heroBadgeText="Daily Interactive Quizzes"
