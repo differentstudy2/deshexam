@@ -13941,5 +13941,3155 @@
         "type": "chapter"
       }
     ]
+  },
+  {
+    "id": "chapter-path-1-sahityamela-class-8",
+    "title": "১. প্রথম পাঠ",
+    "slug": "path-1",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahityamela-class-8-wb",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-1",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-1",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-1-sahityamela-class-8",
+        "slug": "path-1",
+        "title": "১. প্রথম পাঠ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-path-2-sahityamela-class-8",
+    "title": "২. দ্বিতীয় পাঠ",
+    "slug": "path-2",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahityamela-class-8-wb",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-2",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-2",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-2-sahityamela-class-8",
+        "slug": "path-2",
+        "title": "২. দ্বিতীয় পাঠ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-path-3-sahityamela-class-8",
+    "title": "৩. তৃতীয় পাঠ",
+    "slug": "path-3",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahityamela-class-8-wb",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-3",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-3",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-3-sahityamela-class-8",
+        "slug": "path-3",
+        "title": "৩. তৃতীয় পাঠ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-path-4-sahityamela-class-8",
+    "title": "৪. চতুর্থ পাঠ",
+    "slug": "path-4",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahityamela-class-8-wb",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-4",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-4",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-4-sahityamela-class-8",
+        "slug": "path-4",
+        "title": "৪. চতুর্থ পাঠ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-path-5-sahityamela-class-8",
+    "title": "৫. পঞ্চম পাঠ",
+    "slug": "path-5",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahityamela-class-8-wb",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-5",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-5",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-5-sahityamela-class-8",
+        "slug": "path-5",
+        "title": "৫. পঞ্চম পাঠ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-path-6-sahityamela-class-8",
+    "title": "৬. ষষ্ঠ পাঠ",
+    "slug": "path-6",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahityamela-class-8-wb",
+    "orderIndex": 6,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-6",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-6",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-6-sahityamela-class-8",
+        "slug": "path-6",
+        "title": "৬. ষষ্ঠ পাঠ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-path-7-sahityamela-class-8",
+    "title": "৭. সপ্তম পাঠ",
+    "slug": "path-7",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahityamela-class-8-wb",
+    "orderIndex": 7,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-7",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-7",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-7-sahityamela-class-8",
+        "slug": "path-7",
+        "title": "৭. সপ্তম পাঠ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-path-8-sahityamela-class-8",
+    "title": "৮. অষ্টম পাঠ",
+    "slug": "path-8",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahityamela-class-8-wb",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-8",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-8",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-8-sahityamela-class-8",
+        "slug": "path-8",
+        "title": "৮. অষ্টম পাঠ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-path-9-sahityamela-class-8",
+    "title": "৯. নবম পাঠ",
+    "slug": "path-9",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-sahityamela-class-8-wb",
+    "orderIndex": 9,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-9",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-9",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-9-sahityamela-class-8",
+        "slug": "path-9",
+        "title": "৯. নবম পাঠ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-purbopather-punoralochona-ganit-prabha-class-8",
+    "title": "অধ্যায় ১: পূর্বপাঠের পুনরালোচনা",
+    "slug": "purbopather-punoralochona",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-8-wb",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/mathematics/ganit-prabha/purbopather-punoralochona",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "purbopather-punoralochona",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-8-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-8-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-purbopather-punoralochona-ganit-prabha-class-8",
+        "slug": "purbopather-punoralochona",
+        "title": "অধ্যায় ১: পূর্বপাঠের পুনরালোচনা",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-pai-chitro-ganit-prabha-class-8",
+    "title": "অধ্যায় ২: পাই চিত্র",
+    "slug": "pai-chitro",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-8-wb",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/mathematics/ganit-prabha/pai-chitro",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "pai-chitro",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-8-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-8-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-pai-chitro-ganit-prabha-class-8",
+        "slug": "pai-chitro",
+        "title": "অধ্যায় ২: পাই চিত্র",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-mulodo-sonkhyar-dharona-ganit-prabha-class-8",
+    "title": "অধ্যায় ৩: মূলদ সংখ্যার ধারণা",
+    "slug": "mulodo-sonkhyar-dharona",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-8-wb",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/mathematics/ganit-prabha/mulodo-sonkhyar-dharona",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "mulodo-sonkhyar-dharona",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-8-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-8-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-mulodo-sonkhyar-dharona-ganit-prabha-class-8",
+        "slug": "mulodo-sonkhyar-dharona",
+        "title": "অধ্যায় ৩: মূলদ সংখ্যার ধারণা",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-bohupodi-sonkhamalar-gun-o-bhag-ganit-prabha-class-8",
+    "title": "অধ্যায় ৪: বহুপদী সংখ্যামালার গুণ ও ভাগ",
+    "slug": "bohupodi-sonkhamalar-gun-o-bhag",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-8-wb",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/mathematics/ganit-prabha/bohupodi-sonkhamalar-gun-o-bhag",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "bohupodi-sonkhamalar-gun-o-bhag",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-8-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-8-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-bohupodi-sonkhamalar-gun-o-bhag-ganit-prabha-class-8",
+        "slug": "bohupodi-sonkhamalar-gun-o-bhag",
+        "title": "অধ্যায় ৪: বহুপদী সংখ্যামালার গুণ ও ভাগ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-ghonophol-nirnoy-ganit-prabha-class-8",
+    "title": "অধ্যায় ৫: ঘনফল নির্ণয়",
+    "slug": "ghonophol-nirnoy",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-8-wb",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/mathematics/ganit-prabha/ghonophol-nirnoy",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "ghonophol-nirnoy",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-8-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-8-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-ghonophol-nirnoy-ganit-prabha-class-8",
+        "slug": "ghonophol-nirnoy",
+        "title": "অধ্যায় ৫: ঘনফল নির্ণয়",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-purok-kon-sompurok-kon-o-sonnihito-kon-ganit-prabha-class-8",
+    "title": "অধ্যায় ৬: পূরক কোণ, সম্পূরক কোণ ও সন্নিহিত কোণ",
+    "slug": "purok-kon-sompurok-kon-o-sonnihito-kon",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-8-wb",
+    "orderIndex": 6,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/mathematics/ganit-prabha/purok-kon-sompurok-kon-o-sonnihito-kon",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "purok-kon-sompurok-kon-o-sonnihito-kon",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-8-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-8-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-purok-kon-sompurok-kon-o-sonnihito-kon-ganit-prabha-class-8",
+        "slug": "purok-kon-sompurok-kon-o-sonnihito-kon",
+        "title": "অধ্যায় ৬: পূরক কোণ, সম্পূরক কোণ ও সন্নিহিত কোণ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-biprotip-koner-dharona-ganit-prabha-class-8",
+    "title": "অধ্যায় ৭: বিপ্রতীপ কোণের ধারণা",
+    "slug": "biprotip-koner-dharona",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-8-wb",
+    "orderIndex": 7,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/mathematics/ganit-prabha/biprotip-koner-dharona",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "biprotip-koner-dharona",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-8-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-8-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-biprotip-koner-dharona-ganit-prabha-class-8",
+        "slug": "biprotip-koner-dharona",
+        "title": "অধ্যায় ৭: বিপ্রতীপ কোণের ধারণা",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-somantoral-sorolrekha-o-chedoker-dhormo-ganit-prabha-class-8",
+    "title": "অধ্যায় ৮: সমান্তরাল সরলরেখা ও ছেদকের ধর্ম",
+    "slug": "somantoral-sorolrekha-o-chedoker-dhormo",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-8-wb",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/mathematics/ganit-prabha/somantoral-sorolrekha-o-chedoker-dhormo",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "somantoral-sorolrekha-o-chedoker-dhormo",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-8-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-8-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-somantoral-sorolrekha-o-chedoker-dhormo-ganit-prabha-class-8",
+        "slug": "somantoral-sorolrekha-o-chedoker-dhormo",
+        "title": "অধ্যায় ৮: সমান্তরাল সরলরেখা ও ছেদকের ধর্ম",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-tribhujer-duti-bahu-o-tader-biporit-koner-somporko-ganit-prabha-class-8",
+    "title": "অধ্যায় ৯: ত্রিভুজের দুটি বাহু ও তাদের বিপরীত কোণের সম্পর্ক",
+    "slug": "tribhujer-duti-bahu-o-tader-biporit-koner-somporko",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-8-wb",
+    "orderIndex": 9,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/mathematics/ganit-prabha/tribhujer-duti-bahu-o-tader-biporit-koner-somporko",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "tribhujer-duti-bahu-o-tader-biporit-koner-somporko",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-8-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-8-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-tribhujer-duti-bahu-o-tader-biporit-koner-somporko-ganit-prabha-class-8",
+        "slug": "tribhujer-duti-bahu-o-tader-biporit-koner-somporko",
+        "title": "অধ্যায় ৯: ত্রিভুজের দুটি বাহু ও তাদের বিপরীত কোণের সম্পর্ক",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-troirashik-ganit-prabha-class-8",
+    "title": "অধ্যায় ১০: ত্রৈরাশিক",
+    "slug": "troirashik",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-8-wb",
+    "orderIndex": 10,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/mathematics/ganit-prabha/troirashik",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "troirashik",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-8-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-8-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-troirashik-ganit-prabha-class-8",
+        "slug": "troirashik",
+        "title": "অধ্যায় ১০: ত্রৈরাশিক",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-shotkora-ganit-prabha-class-8",
+    "title": "অধ্যায় ১১: শতকরা",
+    "slug": "shotkora",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-8-wb",
+    "orderIndex": 11,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/mathematics/ganit-prabha/shotkora",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "shotkora",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-8-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-8-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-shotkora-ganit-prabha-class-8",
+        "slug": "shotkora",
+        "title": "অধ্যায় ১১: শতকরা",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-misron-ganit-prabha-class-8",
+    "title": "অধ্যায় ১২: মিশ্রণ",
+    "slug": "misron",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-8-wb",
+    "orderIndex": 12,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/mathematics/ganit-prabha/misron",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "misron",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-8-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-8-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-misron-ganit-prabha-class-8",
+        "slug": "misron",
+        "title": "অধ্যায় ১২: মিশ্রণ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-bijganitik-sonkhamalar-utpadoke-bishleshon-ganit-prabha-class-8",
+    "title": "অধ্যায় ১৩: বীজগাণিতিক সংখ্যামালার উৎপাদকে বিশ্লেষণ",
+    "slug": "bijganitik-sonkhamalar-utpadoke-bishleshon",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-8-wb",
+    "orderIndex": 13,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/mathematics/ganit-prabha/bijganitik-sonkhamalar-utpadoke-bishleshon",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "bijganitik-sonkhamalar-utpadoke-bishleshon",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-8-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-8-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-bijganitik-sonkhamalar-utpadoke-bishleshon-ganit-prabha-class-8",
+        "slug": "bijganitik-sonkhamalar-utpadoke-bishleshon",
+        "title": "অধ্যায় ১৩: বীজগাণিতিক সংখ্যামালার উৎপাদকে বিশ্লেষণ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-bijganitik-sonkhamalar-gosagu-o-losagu-ganit-prabha-class-8",
+    "title": "অধ্যায় ১৪: বীজগাণিতিক সংখ্যামালার গ.সা.গু ও ল.সা.গু. (গরিষ্ঠ সাধারণ গুণনীয়ক ও লঘিষ্ঠ সাধারণ গুণিতক)",
+    "slug": "bijganitik-sonkhamalar-gosagu-o-losagu",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-8-wb",
+    "orderIndex": 14,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/mathematics/ganit-prabha/bijganitik-sonkhamalar-gosagu-o-losagu",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "bijganitik-sonkhamalar-gosagu-o-losagu",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-8-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-8-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-bijganitik-sonkhamalar-gosagu-o-losagu-ganit-prabha-class-8",
+        "slug": "bijganitik-sonkhamalar-gosagu-o-losagu",
+        "title": "অধ্যায় ১৪: বীজগাণিতিক সংখ্যামালার গ.সা.গু ও ল.সা.গু. (গরিষ্ঠ সাধারণ গুণনীয়ক ও লঘিষ্ঠ সাধারণ গুণিতক)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-bijganitik-sonkhamalar-sorolikoron-ganit-prabha-class-8",
+    "title": "অধ্যায় ১৫: বীজগাণিতিক সংখ্যামালার সরলীকরণ",
+    "slug": "bijganitik-sonkhamalar-sorolikoron",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-8-wb",
+    "orderIndex": 15,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/mathematics/ganit-prabha/bijganitik-sonkhamalar-sorolikoron",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "bijganitik-sonkhamalar-sorolikoron",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-8-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-8-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-bijganitik-sonkhamalar-sorolikoron-ganit-prabha-class-8",
+        "slug": "bijganitik-sonkhamalar-sorolikoron",
+        "title": "অধ্যায় ১৫: বীজগাণিতিক সংখ্যামালার সরলীকরণ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-tribhujer-kon-o-bahur-modhye-somporker-jachai-ganit-prabha-class-8",
+    "title": "অধ্যায় ১৬: ত্রিভুজের কোণ ও বাহুর মধ্যে সম্পর্কের যাচাই",
+    "slug": "tribhujer-kon-o-bahur-modhye-somporker-jachai",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-8-wb",
+    "orderIndex": 16,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/mathematics/ganit-prabha/tribhujer-kon-o-bahur-modhye-somporker-jachai",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "tribhujer-kon-o-bahur-modhye-somporker-jachai",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-8-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-8-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-tribhujer-kon-o-bahur-modhye-somporker-jachai-ganit-prabha-class-8",
+        "slug": "tribhujer-kon-o-bahur-modhye-somporker-jachai",
+        "title": "অধ্যায় ১৬: ত্রিভুজের কোণ ও বাহুর মধ্যে সম্পর্কের যাচাই",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-somoy-o-karjo-ganit-prabha-class-8",
+    "title": "অধ্যায় ১৭: সময় ও কার্য",
+    "slug": "somoy-o-karjo",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-8-wb",
+    "orderIndex": 17,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/mathematics/ganit-prabha/somoy-o-karjo",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "somoy-o-karjo",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-8-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-8-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-somoy-o-karjo-ganit-prabha-class-8",
+        "slug": "somoy-o-karjo",
+        "title": "অধ্যায় ১৭: সময় ও কার্য",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-lekh-chitro-ganit-prabha-class-8",
+    "title": "অধ্যায় ১৮: লেখচিত্র",
+    "slug": "lekh-chitro",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-8-wb",
+    "orderIndex": 18,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/mathematics/ganit-prabha/lekh-chitro",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "lekh-chitro",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-8-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-8-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-lekh-chitro-ganit-prabha-class-8",
+        "slug": "lekh-chitro",
+        "title": "অধ্যায় ১৮: লেখচিত্র",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-somikoron-gothon-o-somadhan-ganit-prabha-class-8",
+    "title": "অধ্যায় ১৯: সমীকরণ গঠন ও সমাধান",
+    "slug": "somikoron-gothon-o-somadhan",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-8-wb",
+    "orderIndex": 19,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/mathematics/ganit-prabha/somikoron-gothon-o-somadhan",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "somikoron-gothon-o-somadhan",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-8-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-8-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-somikoron-gothon-o-somadhan-ganit-prabha-class-8",
+        "slug": "somikoron-gothon-o-somadhan",
+        "title": "অধ্যায় ১৯: সমীকরণ গঠন ও সমাধান",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-jyamitik-proman-ganit-prabha-class-8",
+    "title": "অধ্যায় ২০: জ্যামিতিক প্রমাণ",
+    "slug": "jyamitik-proman",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-8-wb",
+    "orderIndex": 20,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/mathematics/ganit-prabha/jyamitik-proman",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "jyamitik-proman",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-8-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-8-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-jyamitik-proman-ganit-prabha-class-8",
+        "slug": "jyamitik-proman",
+        "title": "অধ্যায় ২০: জ্যামিতিক প্রমাণ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-tribhuj-ongkon-ganit-prabha-class-8",
+    "title": "অধ্যায় ২১: ত্রিভুজ অঙ্কন",
+    "slug": "tribhuj-ongkon",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-8-wb",
+    "orderIndex": 21,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/mathematics/ganit-prabha/tribhuj-ongkon",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "tribhuj-ongkon",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-8-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-8-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-tribhuj-ongkon-ganit-prabha-class-8",
+        "slug": "tribhuj-ongkon",
+        "title": "অধ্যায় ২১: ত্রিভুজ অঙ্কন",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-somantoral-sorolrekha-ongkon-ganit-prabha-class-8",
+    "title": "অধ্যায় ২২: সমান্তরাল সরলরেখা অঙ্কন",
+    "slug": "somantoral-sorolrekha-ongkon",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-8-wb",
+    "orderIndex": 22,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/mathematics/ganit-prabha/somantoral-sorolrekha-ongkon",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "somantoral-sorolrekha-ongkon",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-8-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-8-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-somantoral-sorolrekha-ongkon-ganit-prabha-class-8",
+        "slug": "somantoral-sorolrekha-ongkon",
+        "title": "অধ্যায় ২২: সমান্তরাল সরলরেখা অঙ্কন",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-prodott-sorolrekhangshoke-soman-tin-pach-bhage-bibhokto-kora-ganit-prabha-class-8",
+    "title": "অধ্যায় ২৩: প্রদত্ত সরলরেখাংশকে সমান তিনটি, পাঁচটি ভাগে বিভক্ত করা",
+    "slug": "prodott-sorolrekhangshoke-soman-tin-pach-bhage-bibhokto-kora",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-ganit-prabha-class-8-wb",
+    "orderIndex": 23,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/mathematics/ganit-prabha/prodott-sorolrekhangshoke-soman-tin-pach-bhage-bibhokto-kora",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "ganit-prabha",
+    "chapterSlug": "prodott-sorolrekhangshoke-soman-tin-pach-bhage-bibhokto-kora",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-8-wb",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-ganit-prabha-class-8-wb",
+        "slug": "ganit-prabha",
+        "title": "Ganit Prabha",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-prodott-sorolrekhangshoke-soman-tin-pach-bhage-bibhokto-kora-ganit-prabha-class-8",
+        "slug": "prodott-sorolrekhangshoke-soman-tin-pach-bhage-bibhokto-kora",
+        "title": "অধ্যায় ২৩: প্রদত্ত সরলরেখাংশকে সমান তিনটি, পাঁচটি ভাগে বিভক্ত করা",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-1-poribesh-o-bigyan-class-8",
+    "title": "অধ্যায় 1: ভৌত পরিবেশ",
+    "slug": "chapter-1",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-poribesh-o-bigyan-class-8-wb",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/science/poribesh-o-bigyan/chapter-1",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "science",
+    "textbookSlug": "poribesh-o-bigyan",
+    "chapterSlug": "chapter-1",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-8-wb",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-poribesh-o-bigyan-class-8-wb",
+        "slug": "poribesh-o-bigyan",
+        "title": "Poribesh O Bigyan",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-1-poribesh-o-bigyan-class-8",
+        "slug": "chapter-1",
+        "title": "অধ্যায় 1: ভৌত পরিবেশ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-2-poribesh-o-bigyan-class-8",
+    "title": "অধ্যায় 2: মৌল, যৌগ ও রাসায়নিক বিক্রিয়া",
+    "slug": "chapter-2",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-poribesh-o-bigyan-class-8-wb",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/science/poribesh-o-bigyan/chapter-2",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "science",
+    "textbookSlug": "poribesh-o-bigyan",
+    "chapterSlug": "chapter-2",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-8-wb",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-poribesh-o-bigyan-class-8-wb",
+        "slug": "poribesh-o-bigyan",
+        "title": "Poribesh O Bigyan",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-2-poribesh-o-bigyan-class-8",
+        "slug": "chapter-2",
+        "title": "অধ্যায় 2: মৌল, যৌগ ও রাসায়নিক বিক্রিয়া",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-3-poribesh-o-bigyan-class-8",
+    "title": "অধ্যায় 3: কয়েকটি গ্যাসের পরিচিতি",
+    "slug": "chapter-3",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-poribesh-o-bigyan-class-8-wb",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/science/poribesh-o-bigyan/chapter-3",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "science",
+    "textbookSlug": "poribesh-o-bigyan",
+    "chapterSlug": "chapter-3",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-8-wb",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-poribesh-o-bigyan-class-8-wb",
+        "slug": "poribesh-o-bigyan",
+        "title": "Poribesh O Bigyan",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-3-poribesh-o-bigyan-class-8",
+        "slug": "chapter-3",
+        "title": "অধ্যায় 3: কয়েকটি গ্যাসের পরিচিতি",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-4-poribesh-o-bigyan-class-8",
+    "title": "অধ্যায় 4: কার্বন ও কার্বনঘটিত যৌগ",
+    "slug": "chapter-4",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-poribesh-o-bigyan-class-8-wb",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/science/poribesh-o-bigyan/chapter-4",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "science",
+    "textbookSlug": "poribesh-o-bigyan",
+    "chapterSlug": "chapter-4",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-8-wb",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-poribesh-o-bigyan-class-8-wb",
+        "slug": "poribesh-o-bigyan",
+        "title": "Poribesh O Bigyan",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-4-poribesh-o-bigyan-class-8",
+        "slug": "chapter-4",
+        "title": "অধ্যায় 4: কার্বন ও কার্বনঘটিত যৌগ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-5-poribesh-o-bigyan-class-8",
+    "title": "অধ্যায় 5: প্রাকৃতিক ঘটনা ও তার বিশ্লেষণ",
+    "slug": "chapter-5",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-poribesh-o-bigyan-class-8-wb",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/science/poribesh-o-bigyan/chapter-5",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "science",
+    "textbookSlug": "poribesh-o-bigyan",
+    "chapterSlug": "chapter-5",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-8-wb",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-poribesh-o-bigyan-class-8-wb",
+        "slug": "poribesh-o-bigyan",
+        "title": "Poribesh O Bigyan",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-5-poribesh-o-bigyan-class-8",
+        "slug": "chapter-5",
+        "title": "অধ্যায় 5: প্রাকৃতিক ঘটনা ও তার বিশ্লেষণ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-6-poribesh-o-bigyan-class-8",
+    "title": "অধ্যায় 6: দেহের গঠন",
+    "slug": "chapter-6",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-poribesh-o-bigyan-class-8-wb",
+    "orderIndex": 6,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/science/poribesh-o-bigyan/chapter-6",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "science",
+    "textbookSlug": "poribesh-o-bigyan",
+    "chapterSlug": "chapter-6",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-8-wb",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-poribesh-o-bigyan-class-8-wb",
+        "slug": "poribesh-o-bigyan",
+        "title": "Poribesh O Bigyan",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-6-poribesh-o-bigyan-class-8",
+        "slug": "chapter-6",
+        "title": "অধ্যায় 6: দেহের গঠন",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-7-poribesh-o-bigyan-class-8",
+    "title": "অধ্যায় 7: অণুজীবের জগৎ",
+    "slug": "chapter-7",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-poribesh-o-bigyan-class-8-wb",
+    "orderIndex": 7,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/science/poribesh-o-bigyan/chapter-7",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "science",
+    "textbookSlug": "poribesh-o-bigyan",
+    "chapterSlug": "chapter-7",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-8-wb",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-poribesh-o-bigyan-class-8-wb",
+        "slug": "poribesh-o-bigyan",
+        "title": "Poribesh O Bigyan",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-7-poribesh-o-bigyan-class-8",
+        "slug": "chapter-7",
+        "title": "অধ্যায় 7: অণুজীবের জগৎ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-8-poribesh-o-bigyan-class-8",
+    "title": "অধ্যায় 8: মানুষের খাদ্য ও খাদ্য উৎপাদন",
+    "slug": "chapter-8",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-poribesh-o-bigyan-class-8-wb",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/science/poribesh-o-bigyan/chapter-8",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "science",
+    "textbookSlug": "poribesh-o-bigyan",
+    "chapterSlug": "chapter-8",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-8-wb",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-poribesh-o-bigyan-class-8-wb",
+        "slug": "poribesh-o-bigyan",
+        "title": "Poribesh O Bigyan",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-8-poribesh-o-bigyan-class-8",
+        "slug": "chapter-8",
+        "title": "অধ্যায় 8: মানুষের খাদ্য ও খাদ্য উৎপাদন",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-9-poribesh-o-bigyan-class-8",
+    "title": "অধ্যায় 9: অন্তঃক্ষরা তন্ত্র ও বয়ঃসন্ধি",
+    "slug": "chapter-9",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-poribesh-o-bigyan-class-8-wb",
+    "orderIndex": 9,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/science/poribesh-o-bigyan/chapter-9",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "science",
+    "textbookSlug": "poribesh-o-bigyan",
+    "chapterSlug": "chapter-9",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-8-wb",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-poribesh-o-bigyan-class-8-wb",
+        "slug": "poribesh-o-bigyan",
+        "title": "Poribesh O Bigyan",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-9-poribesh-o-bigyan-class-8",
+        "slug": "chapter-9",
+        "title": "অধ্যায় 9: অন্তঃক্ষরা তন্ত্র ও বয়ঃসন্ধি",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-10-poribesh-o-bigyan-class-8",
+    "title": "অধ্যায় 10: পরিবেশের সংকট ও সংরক্ষণ",
+    "slug": "chapter-10",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-poribesh-o-bigyan-class-8-wb",
+    "orderIndex": 10,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/science/poribesh-o-bigyan/chapter-10",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "science",
+    "textbookSlug": "poribesh-o-bigyan",
+    "chapterSlug": "chapter-10",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-8-wb",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-poribesh-o-bigyan-class-8-wb",
+        "slug": "poribesh-o-bigyan",
+        "title": "Poribesh O Bigyan",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-10-poribesh-o-bigyan-class-8",
+        "slug": "chapter-10",
+        "title": "অধ্যায় 10: পরিবেশের সংকট ও সংরক্ষণ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-11-poribesh-o-bigyan-class-8",
+    "title": "অধ্যায় 11: আমাদের চারপাশের পরিবেশ ও উদ্ভিদজগৎ",
+    "slug": "chapter-11",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-poribesh-o-bigyan-class-8-wb",
+    "orderIndex": 11,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/science/poribesh-o-bigyan/chapter-11",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "science",
+    "textbookSlug": "poribesh-o-bigyan",
+    "chapterSlug": "chapter-11",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-8-wb",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-poribesh-o-bigyan-class-8-wb",
+        "slug": "poribesh-o-bigyan",
+        "title": "Poribesh O Bigyan",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-11-poribesh-o-bigyan-class-8",
+        "slug": "chapter-11",
+        "title": "অধ্যায় 11: আমাদের চারপাশের পরিবেশ ও উদ্ভিদজগৎ",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-1-atit-o-aityaja-class-8",
+    "title": "অধ্যায় 1: ইতিহাসের ধারণা (Concept of History)",
+    "slug": "chapter-1",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-atit-o-aityaja-class-8-wb",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/history/atit-o-aityaja/chapter-1",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "history",
+    "textbookSlug": "atit-o-aityaja",
+    "chapterSlug": "chapter-1",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-history-class-8-wb",
+        "slug": "history",
+        "title": "History",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-atit-o-aityaja-class-8-wb",
+        "slug": "atit-o-aityaja",
+        "title": "Atit O Aityaja",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-1-atit-o-aityaja-class-8",
+        "slug": "chapter-1",
+        "title": "অধ্যায় 1: ইতিহাসের ধারণা (Concept of History)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-2-atit-o-aityaja-class-8",
+    "title": "অধ্যায় 2: আঞ্চলিক শক্তির উত্থান (Rise of Regional Powers)",
+    "slug": "chapter-2",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-atit-o-aityaja-class-8-wb",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/history/atit-o-aityaja/chapter-2",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "history",
+    "textbookSlug": "atit-o-aityaja",
+    "chapterSlug": "chapter-2",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-history-class-8-wb",
+        "slug": "history",
+        "title": "History",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-atit-o-aityaja-class-8-wb",
+        "slug": "atit-o-aityaja",
+        "title": "Atit O Aityaja",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-2-atit-o-aityaja-class-8",
+        "slug": "chapter-2",
+        "title": "অধ্যায় 2: আঞ্চলিক শক্তির উত্থান (Rise of Regional Powers)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-3-atit-o-aityaja-class-8",
+    "title": "অধ্যায় 3: ঔপনিবেশিক কর্তৃত্ব প্রতিষ্ঠা (Establishment of Colonial Authority)",
+    "slug": "chapter-3",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-atit-o-aityaja-class-8-wb",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/history/atit-o-aityaja/chapter-3",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "history",
+    "textbookSlug": "atit-o-aityaja",
+    "chapterSlug": "chapter-3",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-history-class-8-wb",
+        "slug": "history",
+        "title": "History",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-atit-o-aityaja-class-8-wb",
+        "slug": "atit-o-aityaja",
+        "title": "Atit O Aityaja",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-3-atit-o-aityaja-class-8",
+        "slug": "chapter-3",
+        "title": "অধ্যায় 3: ঔপনিবেশিক কর্তৃত্ব প্রতিষ্ঠা (Establishment of Colonial Authority)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-4-atit-o-aityaja-class-8",
+    "title": "অধ্যায় 4: ঔপনিবেশিক অর্থনীতি ও দরিদ্রতা (Colonial Economy & Poverty)",
+    "slug": "chapter-4",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-atit-o-aityaja-class-8-wb",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/history/atit-o-aityaja/chapter-4",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "history",
+    "textbookSlug": "atit-o-aityaja",
+    "chapterSlug": "chapter-4",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-history-class-8-wb",
+        "slug": "history",
+        "title": "History",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-atit-o-aityaja-class-8-wb",
+        "slug": "atit-o-aityaja",
+        "title": "Atit O Aityaja",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-4-atit-o-aityaja-class-8",
+        "slug": "chapter-4",
+        "title": "অধ্যায় 4: ঔপনিবেশিক অর্থনীতি ও দরিদ্রতা (Colonial Economy & Poverty)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-5-atit-o-aityaja-class-8",
+    "title": "অধ্যায় 5: ঔপনিবেশিক শাসনের প্রতিক্রিয়া : সহযোগিতা ও বিদ্রোহ (Reaction to Colonial Rule : Cooperation & Revolt)",
+    "slug": "chapter-5",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-atit-o-aityaja-class-8-wb",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/history/atit-o-aityaja/chapter-5",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "history",
+    "textbookSlug": "atit-o-aityaja",
+    "chapterSlug": "chapter-5",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-history-class-8-wb",
+        "slug": "history",
+        "title": "History",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-atit-o-aityaja-class-8-wb",
+        "slug": "atit-o-aityaja",
+        "title": "Atit O Aityaja",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-5-atit-o-aityaja-class-8",
+        "slug": "chapter-5",
+        "title": "অধ্যায় 5: ঔপনিবেশিক শাসনের প্রতিক্রিয়া : সহযোগিতা ও বিদ্রোহ (Reaction to Colonial Rule : Cooperation & Revolt)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-6-atit-o-aityaja-class-8",
+    "title": "অধ্যায় 6: জাতীয়তাবাদের প্রাথমিক বিকাশ (Early Development of Nationalism)",
+    "slug": "chapter-6",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-atit-o-aityaja-class-8-wb",
+    "orderIndex": 6,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/history/atit-o-aityaja/chapter-6",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "history",
+    "textbookSlug": "atit-o-aityaja",
+    "chapterSlug": "chapter-6",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-history-class-8-wb",
+        "slug": "history",
+        "title": "History",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-atit-o-aityaja-class-8-wb",
+        "slug": "atit-o-aityaja",
+        "title": "Atit O Aityaja",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-6-atit-o-aityaja-class-8",
+        "slug": "chapter-6",
+        "title": "অধ্যায় 6: জাতীয়তাবাদের প্রাথমিক বিকাশ (Early Development of Nationalism)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-7-atit-o-aityaja-class-8",
+    "title": "অধ্যায় 7: ভারতের জাতীয় আন্দোলনের আদর্শ ও বিবর্তন (Ideals & Evolution of Indian National Movement)",
+    "slug": "chapter-7",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-atit-o-aityaja-class-8-wb",
+    "orderIndex": 7,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/history/atit-o-aityaja/chapter-7",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "history",
+    "textbookSlug": "atit-o-aityaja",
+    "chapterSlug": "chapter-7",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-history-class-8-wb",
+        "slug": "history",
+        "title": "History",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-atit-o-aityaja-class-8-wb",
+        "slug": "atit-o-aityaja",
+        "title": "Atit O Aityaja",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-7-atit-o-aityaja-class-8",
+        "slug": "chapter-7",
+        "title": "অধ্যায় 7: ভারতের জাতীয় আন্দোলনের আদর্শ ও বিবর্তন (Ideals & Evolution of Indian National Movement)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-8-atit-o-aityaja-class-8",
+    "title": "অধ্যায় 8: সাম্প্রদায়িকতা থেকে দেশভাগ (Communalism to Partition)",
+    "slug": "chapter-8",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-atit-o-aityaja-class-8-wb",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/history/atit-o-aityaja/chapter-8",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "history",
+    "textbookSlug": "atit-o-aityaja",
+    "chapterSlug": "chapter-8",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-history-class-8-wb",
+        "slug": "history",
+        "title": "History",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-atit-o-aityaja-class-8-wb",
+        "slug": "atit-o-aityaja",
+        "title": "Atit O Aityaja",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-8-atit-o-aityaja-class-8",
+        "slug": "chapter-8",
+        "title": "অধ্যায় 8: সাম্প্রদায়িকতা থেকে দেশভাগ (Communalism to Partition)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-9-atit-o-aityaja-class-8",
+    "title": "অধ্যায় 9: ভারতীয় সংবিধান : গণতন্ত্রের কাঠামো ও জনগণের অধিকার (Indian Constitution : Structure of Democracy & Rights of People)",
+    "slug": "chapter-9",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-atit-o-aityaja-class-8-wb",
+    "orderIndex": 9,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/history/atit-o-aityaja/chapter-9",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "history",
+    "textbookSlug": "atit-o-aityaja",
+    "chapterSlug": "chapter-9",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-history-class-8-wb",
+        "slug": "history",
+        "title": "History",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-atit-o-aityaja-class-8-wb",
+        "slug": "atit-o-aityaja",
+        "title": "Atit O Aityaja",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-9-atit-o-aityaja-class-8",
+        "slug": "chapter-9",
+        "title": "অধ্যায় 9: ভারতীয় সংবিধান : গণতন্ত্রের কাঠামো ও জনগণের অধিকার (Indian Constitution : Structure of Democracy & Rights of People)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-1-amader-prithibi-class-8",
+    "title": "অধ্যায় 1: পৃথিবীর অন্দরমহল (Interior of the Earth)",
+    "slug": "chapter-1",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amader-prithibi-class-8-wb",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/geography/amader-prithibi/chapter-1",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "geography",
+    "textbookSlug": "amader-prithibi",
+    "chapterSlug": "chapter-1",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-geography-class-8-wb",
+        "slug": "geography",
+        "title": "Geography",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amader-prithibi-class-8-wb",
+        "slug": "amader-prithibi",
+        "title": "Amader Prithibi",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-1-amader-prithibi-class-8",
+        "slug": "chapter-1",
+        "title": "অধ্যায় 1: পৃথিবীর অন্দরমহল (Interior of the Earth)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-2-amader-prithibi-class-8",
+    "title": "অধ্যায় 2: অস্থিত পৃথিবী (Restless Earth)",
+    "slug": "chapter-2",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amader-prithibi-class-8-wb",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/geography/amader-prithibi/chapter-2",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "geography",
+    "textbookSlug": "amader-prithibi",
+    "chapterSlug": "chapter-2",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-geography-class-8-wb",
+        "slug": "geography",
+        "title": "Geography",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amader-prithibi-class-8-wb",
+        "slug": "amader-prithibi",
+        "title": "Amader Prithibi",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-2-amader-prithibi-class-8",
+        "slug": "chapter-2",
+        "title": "অধ্যায় 2: অস্থিত পৃথিবী (Restless Earth)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-3-amader-prithibi-class-8",
+    "title": "অধ্যায় 3: শিলা (Rocks)",
+    "slug": "chapter-3",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amader-prithibi-class-8-wb",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/geography/amader-prithibi/chapter-3",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "geography",
+    "textbookSlug": "amader-prithibi",
+    "chapterSlug": "chapter-3",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-geography-class-8-wb",
+        "slug": "geography",
+        "title": "Geography",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amader-prithibi-class-8-wb",
+        "slug": "amader-prithibi",
+        "title": "Amader Prithibi",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-3-amader-prithibi-class-8",
+        "slug": "chapter-3",
+        "title": "অধ্যায় 3: শিলা (Rocks)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-4-amader-prithibi-class-8",
+    "title": "অধ্যায় 4: চাপবলয় ও বায়ুপ্রবাহ (Pressure Belts & Wind Flow)",
+    "slug": "chapter-4",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amader-prithibi-class-8-wb",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/geography/amader-prithibi/chapter-4",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "geography",
+    "textbookSlug": "amader-prithibi",
+    "chapterSlug": "chapter-4",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-geography-class-8-wb",
+        "slug": "geography",
+        "title": "Geography",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amader-prithibi-class-8-wb",
+        "slug": "amader-prithibi",
+        "title": "Amader Prithibi",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-4-amader-prithibi-class-8",
+        "slug": "chapter-4",
+        "title": "অধ্যায় 4: চাপবলয় ও বায়ুপ্রবাহ (Pressure Belts & Wind Flow)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-5-amader-prithibi-class-8",
+    "title": "অধ্যায় 5: মেঘ-বৃষ্টি (Clouds & Rain)",
+    "slug": "chapter-5",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amader-prithibi-class-8-wb",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/geography/amader-prithibi/chapter-5",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "geography",
+    "textbookSlug": "amader-prithibi",
+    "chapterSlug": "chapter-5",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-geography-class-8-wb",
+        "slug": "geography",
+        "title": "Geography",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amader-prithibi-class-8-wb",
+        "slug": "amader-prithibi",
+        "title": "Amader Prithibi",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-5-amader-prithibi-class-8",
+        "slug": "chapter-5",
+        "title": "অধ্যায় 5: মেঘ-বৃষ্টি (Clouds & Rain)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-6-amader-prithibi-class-8",
+    "title": "অধ্যায় 6: জলবায়ু অঞ্চল (Climate Zones)",
+    "slug": "chapter-6",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amader-prithibi-class-8-wb",
+    "orderIndex": 6,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/geography/amader-prithibi/chapter-6",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "geography",
+    "textbookSlug": "amader-prithibi",
+    "chapterSlug": "chapter-6",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-geography-class-8-wb",
+        "slug": "geography",
+        "title": "Geography",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amader-prithibi-class-8-wb",
+        "slug": "amader-prithibi",
+        "title": "Amader Prithibi",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-6-amader-prithibi-class-8",
+        "slug": "chapter-6",
+        "title": "অধ্যায় 6: জলবায়ু অঞ্চল (Climate Zones)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-7-amader-prithibi-class-8",
+    "title": "অধ্যায় 7: মানুষের কার্যাবলি ও পরিবেশের অবনমন (Human Activities & Environmental Degradation)",
+    "slug": "chapter-7",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amader-prithibi-class-8-wb",
+    "orderIndex": 7,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/geography/amader-prithibi/chapter-7",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "geography",
+    "textbookSlug": "amader-prithibi",
+    "chapterSlug": "chapter-7",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-geography-class-8-wb",
+        "slug": "geography",
+        "title": "Geography",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amader-prithibi-class-8-wb",
+        "slug": "amader-prithibi",
+        "title": "Amader Prithibi",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-7-amader-prithibi-class-8",
+        "slug": "chapter-7",
+        "title": "অধ্যায় 7: মানুষের কার্যাবলি ও পরিবেশের অবনমন (Human Activities & Environmental Degradation)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-8-amader-prithibi-class-8",
+    "title": "অধ্যায় 8: ভারতের প্রতিবেশী দেশসমূহ ও তাদের সঙ্গে সম্পর্ক (India's Neighbouring Countries & Relations)",
+    "slug": "chapter-8",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amader-prithibi-class-8-wb",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/geography/amader-prithibi/chapter-8",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "geography",
+    "textbookSlug": "amader-prithibi",
+    "chapterSlug": "chapter-8",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-geography-class-8-wb",
+        "slug": "geography",
+        "title": "Geography",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amader-prithibi-class-8-wb",
+        "slug": "amader-prithibi",
+        "title": "Amader Prithibi",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-8-amader-prithibi-class-8",
+        "slug": "chapter-8",
+        "title": "অধ্যায় 8: ভারতের প্রতিবেশী দেশসমূহ ও তাদের সঙ্গে সম্পর্ক (India's Neighbouring Countries & Relations)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-9-amader-prithibi-class-8",
+    "title": "অধ্যায় 9: উত্তর আমেরিকা (North America)",
+    "slug": "chapter-9",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amader-prithibi-class-8-wb",
+    "orderIndex": 9,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/geography/amader-prithibi/chapter-9",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "geography",
+    "textbookSlug": "amader-prithibi",
+    "chapterSlug": "chapter-9",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-geography-class-8-wb",
+        "slug": "geography",
+        "title": "Geography",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amader-prithibi-class-8-wb",
+        "slug": "amader-prithibi",
+        "title": "Amader Prithibi",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-9-amader-prithibi-class-8",
+        "slug": "chapter-9",
+        "title": "অধ্যায় 9: উত্তর আমেরিকা (North America)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-10-amader-prithibi-class-8",
+    "title": "অধ্যায় 10: দক্ষিণ আমেরিকা (South America)",
+    "slug": "chapter-10",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amader-prithibi-class-8-wb",
+    "orderIndex": 10,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/geography/amader-prithibi/chapter-10",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "geography",
+    "textbookSlug": "amader-prithibi",
+    "chapterSlug": "chapter-10",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-geography-class-8-wb",
+        "slug": "geography",
+        "title": "Geography",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amader-prithibi-class-8-wb",
+        "slug": "amader-prithibi",
+        "title": "Amader Prithibi",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-10-amader-prithibi-class-8",
+        "slug": "chapter-10",
+        "title": "অধ্যায় 10: দক্ষিণ আমেরিকা (South America)",
+        "type": "chapter"
+      }
+    ]
+  },
+  {
+    "id": "chapter-chapter-11-amader-prithibi-class-8",
+    "title": "অধ্যায় 11: ওশিয়ানিয়া (Oceania)",
+    "slug": "chapter-11",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-amader-prithibi-class-8-wb",
+    "orderIndex": 11,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/geography/amader-prithibi/chapter-11",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "geography",
+    "textbookSlug": "amader-prithibi",
+    "chapterSlug": "chapter-11",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-geography-class-8-wb",
+        "slug": "geography",
+        "title": "Geography",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-amader-prithibi-class-8-wb",
+        "slug": "amader-prithibi",
+        "title": "Amader Prithibi",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-11-amader-prithibi-class-8",
+        "slug": "chapter-11",
+        "title": "অধ্যায় 11: ওশিয়ানিয়া (Oceania)",
+        "type": "chapter"
+      }
+    ]
   }
 ]

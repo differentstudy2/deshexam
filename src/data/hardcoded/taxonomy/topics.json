@@ -1063,5 +1063,2607 @@
         "type": "topic"
       }
     ]
+  },
+  {
+    "id": "topic-path-1-topic-1-sahityamela-class-8",
+    "title": "বোঝাপড়া",
+    "slug": "topic-1",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-path-1-sahityamela-class-8",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-1/topic-1",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-1",
+    "topicSlug": "topic-1",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "author": "রবীন্দ্রনাথ ঠাকুর",
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-1-sahityamela-class-8",
+        "slug": "path-1",
+        "title": "১. প্রথম পাঠ",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-path-1-topic-1-sahityamela-class-8",
+        "slug": "topic-1",
+        "title": "বোঝাপড়া",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-path-1-topic-2-sahityamela-class-8",
+    "title": "অদ্ভুত আতিথেয়তা",
+    "slug": "topic-2",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-path-1-sahityamela-class-8",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-1/topic-2",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-1",
+    "topicSlug": "topic-2",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "author": "ঈশ্বরচন্দ্র বিদ্যাসাগর",
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-1-sahityamela-class-8",
+        "slug": "path-1",
+        "title": "১. প্রথম পাঠ",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-path-1-topic-2-sahityamela-class-8",
+        "slug": "topic-2",
+        "title": "অদ্ভুত আতিথেয়তা",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-path-1-topic-3-sahityamela-class-8",
+    "title": "প্রাণ ভরিয়ে",
+    "slug": "topic-3",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-path-1-sahityamela-class-8",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-1/topic-3",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-1",
+    "topicSlug": "topic-3",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "author": "রবীন্দ্রনাথ ঠাকুর",
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-1-sahityamela-class-8",
+        "slug": "path-1",
+        "title": "১. প্রথম পাঠ",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-path-1-topic-3-sahityamela-class-8",
+        "slug": "topic-3",
+        "title": "প্রাণ ভরিয়ে",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-path-1-topic-4-sahityamela-class-8",
+    "title": "চন্দ্রগুপ্ত",
+    "slug": "topic-4",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-path-1-sahityamela-class-8",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-1/topic-4",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-1",
+    "topicSlug": "topic-4",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "author": "দ্বিজেন্দ্রলাল রায়",
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-1-sahityamela-class-8",
+        "slug": "path-1",
+        "title": "১. প্রথম পাঠ",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-path-1-topic-4-sahityamela-class-8",
+        "slug": "topic-4",
+        "title": "চন্দ্রগুপ্ত",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-path-2-topic-1-sahityamela-class-8",
+    "title": "বনভোজনের ব্যাপার",
+    "slug": "topic-1",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-path-2-sahityamela-class-8",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-2/topic-1",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-2",
+    "topicSlug": "topic-1",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "author": "নারায়ণ গঙ্গোপাধ্যায়",
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-2-sahityamela-class-8",
+        "slug": "path-2",
+        "title": "২. দ্বিতীয় পাঠ",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-path-2-topic-1-sahityamela-class-8",
+        "slug": "topic-1",
+        "title": "বনভোজনের ব্যাপার",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-path-2-topic-2-sahityamela-class-8",
+    "title": "সবুজ জামা",
+    "slug": "topic-2",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-path-2-sahityamela-class-8",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-2/topic-2",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-2",
+    "topicSlug": "topic-2",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "author": "বীরেন্দ্র চট্টোপাধ্যায়",
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-2-sahityamela-class-8",
+        "slug": "path-2",
+        "title": "২. দ্বিতীয় পাঠ",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-path-2-topic-2-sahityamela-class-8",
+        "slug": "topic-2",
+        "title": "সবুজ জামা",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-path-2-topic-3-sahityamela-class-8",
+    "title": "চিঠি",
+    "slug": "topic-3",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-path-2-sahityamela-class-8",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-2/topic-3",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-2",
+    "topicSlug": "topic-3",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "author": "মাইকেল মধুসূদন দত্ত",
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-2-sahityamela-class-8",
+        "slug": "path-2",
+        "title": "২. দ্বিতীয় পাঠ",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-path-2-topic-3-sahityamela-class-8",
+        "slug": "topic-3",
+        "title": "চিঠি",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-path-2-topic-4-sahityamela-class-8",
+    "title": "মিলিয়ে পড়ো : নিখিল বঙ্গ কবিতা সংঘ",
+    "slug": "topic-4",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-path-2-sahityamela-class-8",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-2/topic-4",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-2",
+    "topicSlug": "topic-4",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "author": "নলিনী দাশ",
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-2-sahityamela-class-8",
+        "slug": "path-2",
+        "title": "২. দ্বিতীয় পাঠ",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-path-2-topic-4-sahityamela-class-8",
+        "slug": "topic-4",
+        "title": "মিলিয়ে পড়ো : নিখিল বঙ্গ কবিতা সংঘ",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-path-2-topic-5-sahityamela-class-8",
+    "title": "মিলিয়ে পড়ো : আলাপ",
+    "slug": "topic-5",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-path-2-sahityamela-class-8",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-2/topic-5",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-2",
+    "topicSlug": "topic-5",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "author": "পূর্ণেন্দু পত্রী",
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-2-sahityamela-class-8",
+        "slug": "path-2",
+        "title": "২. দ্বিতীয় পাঠ",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-path-2-topic-5-sahityamela-class-8",
+        "slug": "topic-5",
+        "title": "মিলিয়ে পড়ো : আলাপ",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-path-3-topic-1-sahityamela-class-8",
+    "title": "পরবাসী",
+    "slug": "topic-1",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-path-3-sahityamela-class-8",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-3/topic-1",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-3",
+    "topicSlug": "topic-1",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "author": "বিষ্ণু দে",
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-3-sahityamela-class-8",
+        "slug": "path-3",
+        "title": "৩. তৃতীয় পাঠ",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-path-3-topic-1-sahityamela-class-8",
+        "slug": "topic-1",
+        "title": "পরবাসী",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-path-3-topic-2-sahityamela-class-8",
+    "title": "পথচলতি",
+    "slug": "topic-2",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-path-3-sahityamela-class-8",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-3/topic-2",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-3",
+    "topicSlug": "topic-2",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "author": "সুনীতিকুমার চট্টোপাধ্যায়",
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-3-sahityamela-class-8",
+        "slug": "path-3",
+        "title": "৩. তৃতীয় পাঠ",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-path-3-topic-2-sahityamela-class-8",
+        "slug": "topic-2",
+        "title": "পথচলতি",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-path-3-topic-3-sahityamela-class-8",
+    "title": "একটি চড়ুই পাখি",
+    "slug": "topic-3",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-path-3-sahityamela-class-8",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-3/topic-3",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-3",
+    "topicSlug": "topic-3",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "author": "তারাপদ রায়",
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-3-sahityamela-class-8",
+        "slug": "path-3",
+        "title": "৩. তৃতীয় পাঠ",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-path-3-topic-3-sahityamela-class-8",
+        "slug": "topic-3",
+        "title": "একটি চড়ুই পাখি",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-path-4-topic-1-sahityamela-class-8",
+    "title": "দাঁড়াও",
+    "slug": "topic-1",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-path-4-sahityamela-class-8",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-4/topic-1",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-4",
+    "topicSlug": "topic-1",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "author": "শক্তি চট্টোপাধ্যায়",
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-4-sahityamela-class-8",
+        "slug": "path-4",
+        "title": "৪. চতুর্থ পাঠ",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-path-4-topic-1-sahityamela-class-8",
+        "slug": "topic-1",
+        "title": "দাঁড়াও",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-path-4-topic-2-sahityamela-class-8",
+    "title": "পল্লীসমাজ",
+    "slug": "topic-2",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-path-4-sahityamela-class-8",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-4/topic-2",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-4",
+    "topicSlug": "topic-2",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "author": "শরৎচন্দ্র চট্টোপাধ্যায়",
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-4-sahityamela-class-8",
+        "slug": "path-4",
+        "title": "৪. চতুর্থ পাঠ",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-path-4-topic-2-sahityamela-class-8",
+        "slug": "topic-2",
+        "title": "পল্লীসমাজ",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-path-4-topic-3-sahityamela-class-8",
+    "title": "ছন্নছাড়া",
+    "slug": "topic-3",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-path-4-sahityamela-class-8",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-4/topic-3",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-4",
+    "topicSlug": "topic-3",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "author": "অচিন্ত্যকুমার সেনগুপ্ত",
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-4-sahityamela-class-8",
+        "slug": "path-4",
+        "title": "৪. চতুর্থ পাঠ",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-path-4-topic-3-sahityamela-class-8",
+        "slug": "topic-3",
+        "title": "ছন্নছাড়া",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-path-4-topic-4-sahityamela-class-8",
+    "title": "গাঁয়ের বধু",
+    "slug": "topic-4",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-path-4-sahityamela-class-8",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-4/topic-4",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-4",
+    "topicSlug": "topic-4",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "author": "সলিল চৌধুরী",
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-4-sahityamela-class-8",
+        "slug": "path-4",
+        "title": "৪. চতুর্থ পাঠ",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-path-4-topic-4-sahityamela-class-8",
+        "slug": "topic-4",
+        "title": "গাঁয়ের বধু",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-path-5-topic-1-sahityamela-class-8",
+    "title": "গাছের কথা",
+    "slug": "topic-1",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-path-5-sahityamela-class-8",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-5/topic-1",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-5",
+    "topicSlug": "topic-1",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "author": "জগদীশচন্দ্র বসু",
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-5-sahityamela-class-8",
+        "slug": "path-5",
+        "title": "৫. পঞ্চম পাঠ",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-path-5-topic-1-sahityamela-class-8",
+        "slug": "topic-1",
+        "title": "গাছের কথা",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-path-5-topic-2-sahityamela-class-8",
+    "title": "হাওয়ার গান",
+    "slug": "topic-2",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-path-5-sahityamela-class-8",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-5/topic-2",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-5",
+    "topicSlug": "topic-2",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "author": "বুদ্ধদেব বসু",
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-5-sahityamela-class-8",
+        "slug": "path-5",
+        "title": "৫. পঞ্চম পাঠ",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-path-5-topic-2-sahityamela-class-8",
+        "slug": "topic-2",
+        "title": "হাওয়ার গান",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-path-5-topic-3-sahityamela-class-8",
+    "title": "কী করে বুঝব",
+    "slug": "topic-3",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-path-5-sahityamela-class-8",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-5/topic-3",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-5",
+    "topicSlug": "topic-3",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "author": "আশাপূর্ণা দেবী",
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-5-sahityamela-class-8",
+        "slug": "path-5",
+        "title": "৫. পঞ্চম পাঠ",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-path-5-topic-3-sahityamela-class-8",
+        "slug": "topic-3",
+        "title": "কী করে বুঝব",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-path-6-topic-1-sahityamela-class-8",
+    "title": "পাড়াগাঁর দু-প্রহর ভালোবাসি",
+    "slug": "topic-1",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-path-6-sahityamela-class-8",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-6/topic-1",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-6",
+    "topicSlug": "topic-1",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "author": "জীবনানন্দ দাশ",
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-6-sahityamela-class-8",
+        "slug": "path-6",
+        "title": "৬. ষষ্ঠ পাঠ",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-path-6-topic-1-sahityamela-class-8",
+        "slug": "topic-1",
+        "title": "পাড়াগাঁর দু-প্রহর ভালোবাসি",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-path-6-topic-2-sahityamela-class-8",
+    "title": "নাটোরের কথা",
+    "slug": "topic-2",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-path-6-sahityamela-class-8",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-6/topic-2",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-6",
+    "topicSlug": "topic-2",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "author": "অবনীন্দ্রনাথ ঠাকুর",
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-6-sahityamela-class-8",
+        "slug": "path-6",
+        "title": "৬. ষষ্ঠ পাঠ",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-path-6-topic-2-sahityamela-class-8",
+        "slug": "topic-2",
+        "title": "নাটোরের কথা",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-path-6-topic-3-sahityamela-class-8",
+    "title": "গড়াই নদীর তীরে",
+    "slug": "topic-3",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-path-6-sahityamela-class-8",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-6/topic-3",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-6",
+    "topicSlug": "topic-3",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "author": "জসীমউদ্দীন",
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-6-sahityamela-class-8",
+        "slug": "path-6",
+        "title": "৬. ষষ্ঠ পাঠ",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-path-6-topic-3-sahityamela-class-8",
+        "slug": "topic-3",
+        "title": "গড়াই নদীর তীরে",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-path-6-topic-4-sahityamela-class-8",
+    "title": "আষাঢ়ের কোন ভেজা পথে",
+    "slug": "topic-4",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-path-6-sahityamela-class-8",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-6/topic-4",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-6",
+    "topicSlug": "topic-4",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "author": "বিজয় সরকার",
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-6-sahityamela-class-8",
+        "slug": "path-6",
+        "title": "৬. ষষ্ঠ পাঠ",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-path-6-topic-4-sahityamela-class-8",
+        "slug": "topic-4",
+        "title": "আষাঢ়ের কোন ভেজা পথে",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-path-6-topic-5-sahityamela-class-8",
+    "title": "মিলিয়ে পড়ো : স্বাদেশিকতা",
+    "slug": "topic-5",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-path-6-sahityamela-class-8",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-6/topic-5",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-6",
+    "topicSlug": "topic-5",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "author": "রবীন্দ্রনাথ ঠাকুর",
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-6-sahityamela-class-8",
+        "slug": "path-6",
+        "title": "৬. ষষ্ঠ পাঠ",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-path-6-topic-5-sahityamela-class-8",
+        "slug": "topic-5",
+        "title": "মিলিয়ে পড়ো : স্বাদেশিকতা",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-path-7-topic-1-sahityamela-class-8",
+    "title": "জেলখানার চিঠি",
+    "slug": "topic-1",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-path-7-sahityamela-class-8",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-7/topic-1",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-7",
+    "topicSlug": "topic-1",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "author": "সুভাষচন্দ্র বসু",
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-7-sahityamela-class-8",
+        "slug": "path-7",
+        "title": "৭. সপ্তম পাঠ",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-path-7-topic-1-sahityamela-class-8",
+        "slug": "topic-1",
+        "title": "জেলখানার চিঠি",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-path-7-topic-2-sahityamela-class-8",
+    "title": "স্বাধীনতা",
+    "slug": "topic-2",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-path-7-sahityamela-class-8",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-7/topic-2",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-7",
+    "topicSlug": "topic-2",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "author": "ল্যাংস্টন হিউজ",
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-7-sahityamela-class-8",
+        "slug": "path-7",
+        "title": "৭. সপ্তম পাঠ",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-path-7-topic-2-sahityamela-class-8",
+        "slug": "topic-2",
+        "title": "স্বাধীনতা",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-path-7-topic-3-sahityamela-class-8",
+    "title": "আদাব",
+    "slug": "topic-3",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-path-7-sahityamela-class-8",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-7/topic-3",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-7",
+    "topicSlug": "topic-3",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "author": "সমরেশ বসু",
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-7-sahityamela-class-8",
+        "slug": "path-7",
+        "title": "৭. সপ্তম পাঠ",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-path-7-topic-3-sahityamela-class-8",
+        "slug": "topic-3",
+        "title": "আদাব",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-path-7-topic-4-sahityamela-class-8",
+    "title": "ভয় কি মরণে",
+    "slug": "topic-4",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-path-7-sahityamela-class-8",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-7/topic-4",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-7",
+    "topicSlug": "topic-4",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "author": "মুকুন্দদাস",
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-7-sahityamela-class-8",
+        "slug": "path-7",
+        "title": "৭. সপ্তম পাঠ",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-path-7-topic-4-sahityamela-class-8",
+        "slug": "topic-4",
+        "title": "ভয় কি মরণে",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-path-7-topic-5-sahityamela-class-8",
+    "title": "শিকল-পরার গান",
+    "slug": "topic-5",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-path-7-sahityamela-class-8",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-7/topic-5",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-7",
+    "topicSlug": "topic-5",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "author": "কাজী নজরুল ইসলাম",
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-7-sahityamela-class-8",
+        "slug": "path-7",
+        "title": "৭. সপ্তম পাঠ",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-path-7-topic-5-sahityamela-class-8",
+        "slug": "topic-5",
+        "title": "শিকল-পরার গান",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-path-8-topic-1-sahityamela-class-8",
+    "title": "হরিচরণ বন্দ্যোপাধ্যায়",
+    "slug": "topic-1",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-path-8-sahityamela-class-8",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-8/topic-1",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-8",
+    "topicSlug": "topic-1",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "author": "হীরেন্দ্রনাথ দত্ত",
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-8-sahityamela-class-8",
+        "slug": "path-8",
+        "title": "৮. অষ্টম পাঠ",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-path-8-topic-1-sahityamela-class-8",
+        "slug": "topic-1",
+        "title": "হরিচরণ বন্দ্যোপাধ্যায়",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-path-8-topic-2-sahityamela-class-8",
+    "title": "ঘুরে দাঁড়াও",
+    "slug": "topic-2",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-path-8-sahityamela-class-8",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-8/topic-2",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-8",
+    "topicSlug": "topic-2",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "author": "প্রণবেন্দু দাশগুপ্ত",
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-8-sahityamela-class-8",
+        "slug": "path-8",
+        "title": "৮. অষ্টম পাঠ",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-path-8-topic-2-sahityamela-class-8",
+        "slug": "topic-2",
+        "title": "ঘুরে দাঁড়াও",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-path-8-topic-3-sahityamela-class-8",
+    "title": "সুভা",
+    "slug": "topic-3",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-path-8-sahityamela-class-8",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-8/topic-3",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-8",
+    "topicSlug": "topic-3",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "author": "রবীন্দ্রনাথ ঠাকুর",
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-8-sahityamela-class-8",
+        "slug": "path-8",
+        "title": "৮. অষ্টম পাঠ",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-path-8-topic-3-sahityamela-class-8",
+        "slug": "topic-3",
+        "title": "সুভা",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-path-8-topic-4-sahityamela-class-8",
+    "title": "মিলিয়ে পড়ো : ভালোবাসা কি বৃথা যায়?",
+    "slug": "topic-4",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-path-8-sahityamela-class-8",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-8/topic-4",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-8",
+    "topicSlug": "topic-4",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "author": "শিবনাথ শাস্ত্রী",
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-8-sahityamela-class-8",
+        "slug": "path-8",
+        "title": "৮. অষ্টম পাঠ",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-path-8-topic-4-sahityamela-class-8",
+        "slug": "topic-4",
+        "title": "মিলিয়ে পড়ো : ভালোবাসা কি বৃথা যায়?",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-path-9-topic-1-sahityamela-class-8",
+    "title": "পরাজয়",
+    "slug": "topic-1",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-path-9-sahityamela-class-8",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-9/topic-1",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-9",
+    "topicSlug": "topic-1",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "author": "শান্তিপ্রিয় বন্দ্যোপাধ্যায়",
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-9-sahityamela-class-8",
+        "slug": "path-9",
+        "title": "৯. নবম পাঠ",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-path-9-topic-1-sahityamela-class-8",
+        "slug": "topic-1",
+        "title": "পরাজয়",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-path-9-topic-2-sahityamela-class-8",
+    "title": "মাসিপিসি",
+    "slug": "topic-2",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-path-9-sahityamela-class-8",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-9/topic-2",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-9",
+    "topicSlug": "topic-2",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "author": "জয় গোস্বামী",
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-9-sahityamela-class-8",
+        "slug": "path-9",
+        "title": "৯. নবম পাঠ",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-path-9-topic-2-sahityamela-class-8",
+        "slug": "topic-2",
+        "title": "মাসিপিসি",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-path-9-topic-3-sahityamela-class-8",
+    "title": "টিকিটের অ্যালবাম",
+    "slug": "topic-3",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-path-9-sahityamela-class-8",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-9/topic-3",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-9",
+    "topicSlug": "topic-3",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "author": "সুন্দর রামস্বামী",
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-9-sahityamela-class-8",
+        "slug": "path-9",
+        "title": "৯. নবম পাঠ",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-path-9-topic-3-sahityamela-class-8",
+        "slug": "topic-3",
+        "title": "টিকিটের অ্যালবাম",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-path-9-topic-4-sahityamela-class-8",
+    "title": "লোকটা জানলই না",
+    "slug": "topic-4",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-path-9-sahityamela-class-8",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature/sahityamela/path-9/topic-4",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahityamela",
+    "chapterSlug": "path-9",
+    "topicSlug": "topic-4",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "author": "সুভাষ মুখোপাধ্যায়",
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-literature-class-8-wb",
+        "slug": "bengali-literature",
+        "title": "Bengali Literature",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-sahityamela-class-8-wb",
+        "slug": "sahityamela",
+        "title": "Sahityamela",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-path-9-sahityamela-class-8",
+        "slug": "path-9",
+        "title": "৯. নবম পাঠ",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-path-9-topic-4-sahityamela-class-8",
+        "slug": "topic-4",
+        "title": "লোকটা জানলই না",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-chapter-1-topic-1-poribesh-o-bigyan-class-8",
+    "title": "বল ও চাপ",
+    "slug": "topic-1",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-chapter-1-poribesh-o-bigyan-class-8",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/science/poribesh-o-bigyan/chapter-1/topic-1",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "science",
+    "textbookSlug": "poribesh-o-bigyan",
+    "chapterSlug": "chapter-1",
+    "topicSlug": "topic-1",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-8-wb",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-poribesh-o-bigyan-class-8-wb",
+        "slug": "poribesh-o-bigyan",
+        "title": "Poribesh O Bigyan",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-1-poribesh-o-bigyan-class-8",
+        "slug": "chapter-1",
+        "title": "অধ্যায় 1: ভৌত পরিবেশ",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-chapter-1-topic-1-poribesh-o-bigyan-class-8",
+        "slug": "topic-1",
+        "title": "বল ও চাপ",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-chapter-1-topic-2-poribesh-o-bigyan-class-8",
+    "title": "স্পর্শ ছাড়া ক্রিয়াশীল বল",
+    "slug": "topic-2",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-chapter-1-poribesh-o-bigyan-class-8",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/science/poribesh-o-bigyan/chapter-1/topic-2",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "science",
+    "textbookSlug": "poribesh-o-bigyan",
+    "chapterSlug": "chapter-1",
+    "topicSlug": "topic-2",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-8-wb",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-poribesh-o-bigyan-class-8-wb",
+        "slug": "poribesh-o-bigyan",
+        "title": "Poribesh O Bigyan",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-1-poribesh-o-bigyan-class-8",
+        "slug": "chapter-1",
+        "title": "অধ্যায় 1: ভৌত পরিবেশ",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-chapter-1-topic-2-poribesh-o-bigyan-class-8",
+        "slug": "topic-2",
+        "title": "স্পর্শ ছাড়া ক্রিয়াশীল বল",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-chapter-1-topic-3-poribesh-o-bigyan-class-8",
+    "title": "তাপ",
+    "slug": "topic-3",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-chapter-1-poribesh-o-bigyan-class-8",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/science/poribesh-o-bigyan/chapter-1/topic-3",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "science",
+    "textbookSlug": "poribesh-o-bigyan",
+    "chapterSlug": "chapter-1",
+    "topicSlug": "topic-3",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-8-wb",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-poribesh-o-bigyan-class-8-wb",
+        "slug": "poribesh-o-bigyan",
+        "title": "Poribesh O Bigyan",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-1-poribesh-o-bigyan-class-8",
+        "slug": "chapter-1",
+        "title": "অধ্যায় 1: ভৌত পরিবেশ",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-chapter-1-topic-3-poribesh-o-bigyan-class-8",
+        "slug": "topic-3",
+        "title": "তাপ",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-chapter-1-topic-4-poribesh-o-bigyan-class-8",
+    "title": "আলো",
+    "slug": "topic-4",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-chapter-1-poribesh-o-bigyan-class-8",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/science/poribesh-o-bigyan/chapter-1/topic-4",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "science",
+    "textbookSlug": "poribesh-o-bigyan",
+    "chapterSlug": "chapter-1",
+    "topicSlug": "topic-4",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-8-wb",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-poribesh-o-bigyan-class-8-wb",
+        "slug": "poribesh-o-bigyan",
+        "title": "Poribesh O Bigyan",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-1-poribesh-o-bigyan-class-8",
+        "slug": "chapter-1",
+        "title": "অধ্যায় 1: ভৌত পরিবেশ",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-chapter-1-topic-4-poribesh-o-bigyan-class-8",
+        "slug": "topic-4",
+        "title": "আলো",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-chapter-2-topic-1-poribesh-o-bigyan-class-8",
+    "title": "পদার্থের প্রকৃতি",
+    "slug": "topic-1",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-chapter-2-poribesh-o-bigyan-class-8",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/science/poribesh-o-bigyan/chapter-2/topic-1",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "science",
+    "textbookSlug": "poribesh-o-bigyan",
+    "chapterSlug": "chapter-2",
+    "topicSlug": "topic-1",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-8-wb",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-poribesh-o-bigyan-class-8-wb",
+        "slug": "poribesh-o-bigyan",
+        "title": "Poribesh O Bigyan",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-2-poribesh-o-bigyan-class-8",
+        "slug": "chapter-2",
+        "title": "অধ্যায় 2: মৌল, যৌগ ও রাসায়নিক বিক্রিয়া",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-chapter-2-topic-1-poribesh-o-bigyan-class-8",
+        "slug": "topic-1",
+        "title": "পদার্থের প্রকৃতি",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-chapter-2-topic-2-poribesh-o-bigyan-class-8",
+    "title": "পদার্থের গঠন",
+    "slug": "topic-2",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-chapter-2-poribesh-o-bigyan-class-8",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/science/poribesh-o-bigyan/chapter-2/topic-2",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "science",
+    "textbookSlug": "poribesh-o-bigyan",
+    "chapterSlug": "chapter-2",
+    "topicSlug": "topic-2",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-8-wb",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-poribesh-o-bigyan-class-8-wb",
+        "slug": "poribesh-o-bigyan",
+        "title": "Poribesh O Bigyan",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-2-poribesh-o-bigyan-class-8",
+        "slug": "chapter-2",
+        "title": "অধ্যায় 2: মৌল, যৌগ ও রাসায়নিক বিক্রিয়া",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-chapter-2-topic-2-poribesh-o-bigyan-class-8",
+        "slug": "topic-2",
+        "title": "পদার্থের গঠন",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-chapter-2-topic-3-poribesh-o-bigyan-class-8",
+    "title": "রাসায়নিক বিক্রিয়া",
+    "slug": "topic-3",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-chapter-2-poribesh-o-bigyan-class-8",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/science/poribesh-o-bigyan/chapter-2/topic-3",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "science",
+    "textbookSlug": "poribesh-o-bigyan",
+    "chapterSlug": "chapter-2",
+    "topicSlug": "topic-3",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-8-wb",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-poribesh-o-bigyan-class-8-wb",
+        "slug": "poribesh-o-bigyan",
+        "title": "Poribesh O Bigyan",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-2-poribesh-o-bigyan-class-8",
+        "slug": "chapter-2",
+        "title": "অধ্যায় 2: মৌল, যৌগ ও রাসায়নিক বিক্রিয়া",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-chapter-2-topic-3-poribesh-o-bigyan-class-8",
+        "slug": "topic-3",
+        "title": "রাসায়নিক বিক্রিয়া",
+        "type": "topic"
+      }
+    ]
+  },
+  {
+    "id": "topic-chapter-2-topic-4-poribesh-o-bigyan-class-8",
+    "title": "তড়িতের রাসায়নিক প্রভাব",
+    "slug": "topic-4",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-chapter-2-poribesh-o-bigyan-class-8",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/science/poribesh-o-bigyan/chapter-2/topic-4",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "science",
+    "textbookSlug": "poribesh-o-bigyan",
+    "chapterSlug": "chapter-2",
+    "topicSlug": "topic-4",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-8-wb",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-poribesh-o-bigyan-class-8-wb",
+        "slug": "poribesh-o-bigyan",
+        "title": "Poribesh O Bigyan",
+        "type": "textbook"
+      },
+      {
+        "id": "chapter-chapter-2-poribesh-o-bigyan-class-8",
+        "slug": "chapter-2",
+        "title": "অধ্যায় 2: মৌল, যৌগ ও রাসায়নিক বিক্রিয়া",
+        "type": "chapter"
+      },
+      {
+        "id": "topic-chapter-2-topic-4-poribesh-o-bigyan-class-8",
+        "slug": "topic-4",
+        "title": "তড়িতের রাসায়নিক প্রভাব",
+        "type": "topic"
+      }
+    ]
   }
 ]

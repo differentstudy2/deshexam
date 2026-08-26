@@ -190,7 +190,11 @@ export const getTaxonomyNodeBySlug = async (fullSlug: string): Promise<TaxonomyN
     // Check hardcoded nodes first
     const parts = fullSlug.split('/');
     const slug = parts[parts.length - 1]; // Naive check for hardcoded node by slug
-    const hardcodedNode = hardcodedRegistry.getHardcodedTaxonomyNodes().find(n => n.fullSlug === fullSlug || n.slug === slug);
+    const hardcodedNodes = hardcodedRegistry.getHardcodedTaxonomyNodes();
+    let hardcodedNode = hardcodedNodes.find(n => n.fullSlug === fullSlug);
+    if (!hardcodedNode) {
+      hardcodedNode = hardcodedNodes.find(n => n.slug === slug);
+    }
     if (hardcodedNode) return hardcodedNode;
 
     const q = query(collection(db, 'taxonomy_nodes'), where('fullSlug', '==', fullSlug));
