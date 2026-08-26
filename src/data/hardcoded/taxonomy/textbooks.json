@@ -1848,5 +1848,42 @@
         "type": "subject"
       }
     ]
+  },
+  {
+    "id": "textbook-blossoms-class-8-wb",
+    "title": "Blossoms",
+    "slug": "blossoms",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-english-class-8-wb",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/english/blossoms",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "english",
+    "textbookSlug": "blossoms",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-8-wb",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      }
+    ]
   }
 ]
