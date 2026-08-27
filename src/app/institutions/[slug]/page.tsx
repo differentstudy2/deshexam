@@ -8,7 +8,7 @@ import InstitutionsClient from '../institutions-client';
 import {
   MapPin, Globe, Star, Building, Navigation, ArrowLeft, Bookmark, CheckCircle2,
   Users, BookOpen, Clock, Phone, Mail, FileText, Monitor, Bed, Bus, TestTube,
-  Trophy, Wifi, Coffee, Tent, PlusSquare, ChevronDown, ChevronRight, Filter, Sparkles, Calendar, XCircle
+  Trophy, Wifi, Coffee, Tent, PlusSquare, ChevronDown, ChevronRight, Filter, Sparkles, Calendar, XCircle, Info
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -474,8 +474,12 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
       {/* 3. OVERVIEW */}
       <Card className="border-slate-100 dark:border-slate-800 shadow-sm rounded-sm bg-white dark:bg-slate-900">
         <CardContent className="p-4 sm:p-6">
-          <div className="w-12 h-1.5 bg-emerald-500 rounded-full mb-3"></div>
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">About Institution</h2>
+          <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100 dark:border-slate-800/60">
+            <div className="w-10 h-10 rounded-full bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center border border-emerald-100 dark:border-emerald-500/20 shadow-sm">
+              <FileText className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+            </div>
+            <h2 className="text-xl sm:text-2xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">About Institution</h2>
+          </div>
 
           <input type="checkbox" id="about-toggle" className="peer hidden" />
 
@@ -517,8 +521,13 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
       {/* 4. COURSES / PROGRAMS */}
       <Card className="border-slate-100 dark:border-slate-800 shadow-sm rounded-sm bg-white dark:bg-slate-900">
         <CardContent className="p-4 sm:p-6">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-            <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">Courses & Programs</h2>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-4 border-b border-slate-100 dark:border-slate-800/60">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center border border-blue-100 dark:border-blue-500/20 shadow-sm">
+                <BookOpen className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              </div>
+              <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">Courses & Programs</h2>
+            </div>
             <div className="flex gap-2 w-full sm:w-auto relative">
               <Input placeholder="Search courses..." className="pl-8 bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 placeholder:text-slate-400" />
               <div className="absolute left-2.5 top-2.5">
@@ -551,7 +560,12 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
       {/* FACILITIES */}
       <Card className="border-slate-100 dark:border-slate-800 shadow-sm rounded-sm bg-white dark:bg-slate-900">
         <CardContent className="p-4 sm:p-6">
-          <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-6">Facilities</h2>
+          <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100 dark:border-slate-800/60">
+            <div className="w-10 h-10 rounded-full bg-purple-50 dark:bg-purple-500/10 flex items-center justify-center border border-purple-100 dark:border-purple-500/20 shadow-sm">
+              <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+            </div>
+            <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">Facilities</h2>
+          </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
             {institution.facilities && institution.facilities.length > 0 ? (
               institution.facilities.map((facilityObj: any, idx) => {
@@ -593,7 +607,12 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
       {/* PLACEMENTS & SCHOLARSHIPS */}
       <Card className="border-slate-100 dark:border-slate-800 shadow-sm rounded-sm bg-white dark:bg-slate-900">
         <CardContent className="p-4 sm:p-6">
-          <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-6">Placements & Scholarships</h2>
+          <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100 dark:border-slate-800/60">
+            <div className="w-10 h-10 rounded-full bg-amber-50 dark:bg-amber-500/10 flex items-center justify-center border border-amber-100 dark:border-amber-500/20 shadow-sm">
+              <Trophy className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+            </div>
+            <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">Placements & Scholarships</h2>
+          </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
@@ -673,7 +692,12 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
       {/* 5. ADMISSION INFO */}
       <Card className="border-slate-100 dark:border-slate-800 shadow-sm rounded-sm bg-white dark:bg-slate-900">
         <CardContent className="p-4 sm:p-6">
-          <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-6">Admission</h2>
+          <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100 dark:border-slate-800/60">
+            <div className="w-10 h-10 rounded-full bg-rose-50 dark:bg-rose-500/10 flex items-center justify-center border border-rose-100 dark:border-rose-500/20 shadow-sm">
+              <Calendar className="w-5 h-5 text-rose-600 dark:text-rose-400" />
+            </div>
+            <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">Admission</h2>
+          </div>
 
           <div className="flex flex-wrap gap-4 mb-6">
             <Badge className={institution.admission?.admissionOpen ? "bg-emerald-500 hover:bg-emerald-600 text-white rounded text-sm py-1.5 px-4" : "bg-emerald-500 hover:bg-emerald-600 text-white rounded text-sm py-1.5 px-4 opacity-50"}>Admission Open</Badge>
@@ -736,7 +760,12 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
       {/* GALLERY */}
       <Card className="border-slate-100 dark:border-slate-800 shadow-sm rounded-sm bg-white dark:bg-slate-900 overflow-hidden">
         <CardContent className="p-4 sm:p-6">
-          <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-6">Gallery</h2>
+          <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100 dark:border-slate-800/60">
+            <div className="w-10 h-10 rounded-full bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center border border-indigo-100 dark:border-indigo-500/20 shadow-sm">
+              <Sparkles className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+            </div>
+            <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">Gallery</h2>
+          </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             {(institution.galleryImages && institution.galleryImages.length > 0 ? institution.galleryImages : [...MOCK_GALLERY, ...MOCK_GALLERY, MOCK_GALLERY[0]]).slice(0, 9).map((img, idx) => (
               <div key={idx} className={`relative rounded-sm overflow-hidden group aspect-square`}>
@@ -751,8 +780,13 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
       {/* REVIEWS */}
       <Card className="border-slate-100 dark:border-slate-800 shadow-sm rounded-sm bg-white dark:bg-slate-900">
         <CardContent className="p-4 sm:p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">Reviews</h2>
+          <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-100 dark:border-slate-800/60">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-teal-50 dark:bg-teal-500/10 flex items-center justify-center border border-teal-100 dark:border-teal-500/20 shadow-sm">
+                <Star className="w-5 h-5 text-teal-600 dark:text-teal-400" />
+              </div>
+              <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">Reviews</h2>
+            </div>
             <InstitutionReviewModal institutionId={institution.id} />
           </div>
           <div className="flex flex-col sm:flex-row gap-8 mb-8 border-b border-slate-100 dark:border-slate-800 pb-8">
@@ -853,7 +887,12 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
       {/* FAQs */}
       <Card className="border-slate-100 dark:border-slate-800 shadow-sm rounded-sm bg-white dark:bg-slate-900">
         <CardContent className="p-4 sm:p-6">
-          <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-6">FAQs</h2>
+          <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100 dark:border-slate-800/60">
+            <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 shadow-sm">
+              <Info className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+            </div>
+            <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">FAQs</h2>
+          </div>
           <div className="space-y-3">
             {MOCK_FAQS.map((faq, idx) => (
               <details key={idx} className="group border border-slate-100 dark:border-slate-800 rounded-sm bg-slate-50 dark:bg-slate-800/50 overflow-hidden [&_summary::-webkit-details-marker]:hidden">
@@ -936,7 +975,7 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
       </Card>
 
       {/* Quick Contact Card */}
-      <Card className="border-slate-100 dark:border-slate-800 shadow-sm rounded-sm bg-white dark:bg-slate-900 sticky top-24 z-10">
+      <Card className="border-slate-100 dark:border-slate-800 shadow-sm rounded-sm bg-white dark:bg-slate-900">
         <CardContent className="p-6">
           <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-4 text-lg">Interested?</h3>
           <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Get free counselling and admission assistance from our experts.</p>
