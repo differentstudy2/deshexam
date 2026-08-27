@@ -69,7 +69,23 @@ async function getRelatedInstitutions(boardType: string, currentId: string): Pro
 }
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const institution = await getInstitutionBySlug(slug);
+  let institution = await getInstitutionBySlug(slug);
+  
+  if (!institution) {
+    const hardcodedMatch = hardcodedInstitutions.find(inst => inst.slug === slug);
+    if (hardcodedMatch) {
+      institution = {
+        ...hardcodedMatch,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      } as TaxonomyNode;
+    } else if (slug === 'demo' || slug === 'hardcoded' || slug === 'test') {
+      institution = {
+        title: 'Premium Demo International Academy',
+      } as TaxonomyNode;
+    }
+  }
+
   if (!institution) return { title: 'Not Found' };
 
   const currentYear = new Date().getFullYear();
@@ -160,18 +176,51 @@ const MOCK_NEARBY = [
 ];
 // ----------------------------------------------------------------------
 
+import hardcodedInstitutions from '@/data/institutions.json';
+
 export default async function InstitutionDetailsPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const institution = await getInstitutionBySlug(slug);
+  let institution = await getInstitutionBySlug(slug);
 
-  // ── Fallback: treat slug as a location filter ──────────────────────────────
-  // e.g. /institutions/west-bengal — no institution found, show filtered list
+  // ── Fallback: treat slug as a location filter or check hardcoded JSON ────────
   if (!institution) {
-    const locationName = slug
-      .split('-')
-      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-      .join(' ');
-    return <InstitutionsClient initialLocationFilter={locationName} />;
+    const hardcodedMatch = hardcodedInstitutions.find(inst => inst.slug === slug);
+    if (hardcodedMatch) {
+      institution = {
+        ...hardcodedMatch,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      } as TaxonomyNode;
+    } else if (slug === 'demo' || slug === 'hardcoded' || slug === 'test') {
+      // Create a hardcoded dummy institution to test the UI
+      institution = {
+        id: 'demo-inst',
+        type: 'institution',
+        slug: 'demo',
+        title: 'Premium Demo International Academy',
+        description: 'A world-class premium educational institution designed to showcase the ultimate user interface and all available features in the system. Experience excellence in education and modern infrastructure.',
+        category: 'School',
+        boardType: 'Central Board',
+        stateRegion: 'West Bengal',
+        city: 'Kolkata',
+        address: '123 Premium Avenue, Salt Lake Sector V',
+        contactPhone: '+91 98765 43210',
+        contactEmail: 'admissions@demoacademy.edu.in',
+        website: 'https://demoacademy.edu.in',
+        status: 'published',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        track: 'academic',
+        parentId: null,
+        orderIndex: 0
+      } as TaxonomyNode;
+    } else {
+      const locationName = slug
+        .split('-')
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(' ');
+      return <InstitutionsClient initialLocationFilter={locationName} />;
+    }
   }
 
   const relatedInstitutions = await getRelatedInstitutions(institution.boardType || '', institution.id || '');
@@ -292,9 +341,9 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
             <div className="w-full lg:w-2/3 flex flex-col">
 
               <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-center sm:items-start w-full text-center sm:text-left">
-                <div className="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-sm bg-white dark:bg-slate-900 shadow-2xl flex items-center justify-center overflow-hidden shrink-0 z-10 relative mx-auto sm:mx-0 ring-1 ring-black/5 dark:ring-white/10">
+                <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full bg-white dark:bg-slate-900 shadow-2xl flex items-center justify-center overflow-hidden shrink-0 z-10 relative mx-auto sm:mx-0 ring-1 ring-black/5 dark:ring-white/10">
                   {institution.logoUrl || institution.featureImage ? (
-                    <Image src={institution.logoUrl || institution.featureImage || ''} alt={`${institution.title} official logo`} fill className="object-contain p-2 sm:p-3" unoptimized />
+                    <Image src={institution.logoUrl || institution.featureImage || ''} alt={`${institution.title} official logo`} fill className="object-contain p-1 sm:p-2" unoptimized />
                   ) : (
                     <Building className="w-12 h-12 sm:w-16 sm:h-16 text-slate-300 dark:text-slate-600" />
                   )}
@@ -334,13 +383,13 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
                   <Badge variant="outline" className="text-emerald-200 border-emerald-500/30 bg-emerald-500/10 backdrop-blur-md whitespace-nowrap">Type: College</Badge>
                 </div>
 
-                <div className="flex flex-col sm:flex-row flex-wrap gap-3 w-full">
-                  <Button className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-medium shadow-lg hover:shadow-emerald-500/25 px-6 h-12 sm:h-10 rounded-sm sm:rounded-sm transition-all border border-emerald-500/50 text-base sm:text-sm">Get Admission Info</Button>
-                  <div className="grid grid-cols-2 gap-3 w-full sm:w-auto sm:flex sm:flex-wrap">
-                    <Button className="w-full sm:w-auto bg-indigo-500/20 border border-indigo-400/30 text-indigo-50 hover:bg-indigo-500/30 hover:border-indigo-400/50 backdrop-blur-md font-medium px-2 sm:px-5 h-12 sm:h-10 rounded-sm sm:rounded-sm shadow-lg shadow-indigo-500/10 transition-all text-[13px] sm:text-sm">Brochure</Button>
+                <div className="flex flex-col sm:flex-row flex-wrap gap-2 w-full">
+                  <Button className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-medium shadow-md hover:shadow-emerald-500/25 px-4 h-9 rounded-sm transition-all border border-emerald-500/50 text-xs sm:text-[13px]">Get Admission Info</Button>
+                  <div className="grid grid-cols-2 gap-2 w-full sm:w-auto sm:flex sm:flex-wrap">
+                    <Button className="w-full sm:w-auto bg-indigo-500/20 border border-indigo-400/30 text-indigo-50 hover:bg-indigo-500/30 hover:border-indigo-400/50 backdrop-blur-md font-medium px-4 h-9 rounded-sm shadow-md shadow-indigo-500/10 transition-all text-xs sm:text-[13px]">Brochure</Button>
                     {institution.websiteUrl && (
-                      <Button asChild className="w-full sm:w-auto bg-amber-500/20 border border-amber-400/30 text-amber-50 hover:bg-amber-500/30 hover:border-amber-400/50 backdrop-blur-md font-medium px-2 sm:px-5 h-12 sm:h-10 rounded-sm sm:rounded-sm shadow-lg shadow-amber-500/10 transition-all text-[13px] sm:text-sm">
-                        <a href={institution.websiteUrl} target="_blank" rel="noopener noreferrer"><Globe className="w-4 h-4 sm:mr-2 shrink-0" /> <span className="hidden sm:inline">Visit Website</span><span className="sm:hidden ml-1">Website</span></a>
+                      <Button asChild className="w-full sm:w-auto bg-amber-500/20 border border-amber-400/30 text-amber-50 hover:bg-amber-500/30 hover:border-amber-400/50 backdrop-blur-md font-medium px-4 h-9 rounded-sm shadow-md shadow-amber-500/10 transition-all text-xs sm:text-[13px]">
+                        <a href={institution.websiteUrl} target="_blank" rel="noopener noreferrer"><Globe className="w-3.5 h-3.5 sm:mr-1.5 shrink-0" /> <span className="hidden sm:inline">Visit Website</span><span className="sm:hidden ml-1">Website</span></a>
                       </Button>
                     )}
                   </div>
@@ -349,22 +398,22 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
             </div>
 
             {/* Right side: Stats Cards */}
-            <div className="lg:w-1/3 w-full grid grid-cols-2 gap-3 sm:gap-4 pt-4 lg:pt-0">
-              <div className="bg-blue-900/20 backdrop-blur-md border border-blue-500/20 rounded-sm p-4 sm:p-5 text-blue-50 flex flex-col items-center justify-center shadow-inner hover:bg-blue-800/30 hover:border-blue-400/40 transition-all group">
-                <div className="text-2xl sm:text-3xl font-bold mb-1 group-hover:scale-105 transition-transform">{institution.totalEnrollment || '3,25K'}</div>
-                <div className="text-xs sm:text-sm text-blue-200/80 font-medium">Students</div>
+            <div className="lg:w-1/3 w-full grid grid-cols-2 gap-2 pt-4 lg:pt-0">
+              <div className="bg-blue-900/20 backdrop-blur-md border border-blue-500/20 rounded-sm p-3 text-blue-50 flex flex-col items-center justify-center shadow-inner hover:bg-blue-800/30 hover:border-blue-400/40 transition-all group">
+                <div className="text-xl sm:text-2xl font-bold mb-0.5 group-hover:scale-105 transition-transform">{institution.totalEnrollment || '3.25K'}</div>
+                <div className="text-[10px] sm:text-xs text-blue-200/80 font-medium uppercase tracking-wider">Students</div>
               </div>
-              <div className="bg-amber-900/20 backdrop-blur-md border border-amber-500/20 rounded-sm p-4 sm:p-5 text-amber-50 flex flex-col items-center justify-center shadow-inner hover:bg-amber-800/30 hover:border-amber-400/40 transition-all group">
-                <div className="flex items-center gap-1 sm:gap-2 text-2xl sm:text-3xl font-bold mb-1 group-hover:scale-105 transition-transform">{institution.rating || '4.7'}<Star className="w-5 h-5 sm:w-6 sm:h-6 fill-amber-400 text-amber-400" /></div>
-                <div className="text-xs sm:text-sm text-amber-200/80 font-medium">Rating</div>
+              <div className="bg-amber-900/20 backdrop-blur-md border border-amber-500/20 rounded-sm p-3 text-amber-50 flex flex-col items-center justify-center shadow-inner hover:bg-amber-800/30 hover:border-amber-400/40 transition-all group">
+                <div className="flex items-center gap-1 text-xl sm:text-2xl font-bold mb-0.5 group-hover:scale-105 transition-transform">{institution.rating || '4.7'}<Star className="w-4 h-4 fill-amber-400 text-amber-400" /></div>
+                <div className="text-[10px] sm:text-xs text-amber-200/80 font-medium uppercase tracking-wider">Rating</div>
               </div>
-              <div className="bg-emerald-900/20 backdrop-blur-md border border-emerald-500/20 rounded-sm p-4 sm:p-5 text-emerald-50 flex flex-col items-center justify-center shadow-inner hover:bg-emerald-800/30 hover:border-emerald-400/40 transition-all group">
-                <div className="text-2xl sm:text-3xl font-bold mb-1 group-hover:scale-105 transition-transform">{MOCK_COURSES.length}</div>
-                <div className="text-xs sm:text-sm text-emerald-200/80 font-medium">Courses</div>
+              <div className="bg-emerald-900/20 backdrop-blur-md border border-emerald-500/20 rounded-sm p-3 text-emerald-50 flex flex-col items-center justify-center shadow-inner hover:bg-emerald-800/30 hover:border-emerald-400/40 transition-all group">
+                <div className="text-xl sm:text-2xl font-bold mb-0.5 group-hover:scale-105 transition-transform">{MOCK_COURSES.length}</div>
+                <div className="text-[10px] sm:text-xs text-emerald-200/80 font-medium uppercase tracking-wider">Courses</div>
               </div>
-              <div className="bg-purple-900/20 backdrop-blur-md border border-purple-500/20 rounded-sm p-4 sm:p-5 text-purple-50 flex flex-col items-center justify-center shadow-inner hover:bg-purple-800/30 hover:border-purple-400/40 transition-all group">
-                <div className="text-2xl sm:text-3xl font-bold mb-1 group-hover:scale-105 transition-transform">{institution.userRatingsTotal || 232}</div>
-                <div className="text-xs sm:text-sm text-purple-200/80 font-medium">Reviews</div>
+              <div className="bg-purple-900/20 backdrop-blur-md border border-purple-500/20 rounded-sm p-3 text-purple-50 flex flex-col items-center justify-center shadow-inner hover:bg-purple-800/30 hover:border-purple-400/40 transition-all group">
+                <div className="text-xl sm:text-2xl font-bold mb-0.5 group-hover:scale-105 transition-transform">{institution.userRatingsTotal || 232}</div>
+                <div className="text-[10px] sm:text-xs text-purple-200/80 font-medium uppercase tracking-wider">Reviews</div>
               </div>
             </div>
 

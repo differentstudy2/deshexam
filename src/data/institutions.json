@@ -1,0 +1,108 @@
+[
+  {
+    "id": "inst-1",
+    "type": "institution",
+    "slug": "delhi-public-school-rk-puram",
+    "title": "Delhi Public School, R.K. Puram",
+    "description": "Delhi Public School R.K. Puram is one of the most prestigious schools in India, offering world-class education and state-of-the-art facilities.",
+    "category": "School",
+    "boardType": "Central Board",
+    "stateRegion": "Delhi",
+    "city": "New Delhi",
+    "address": "Sector 12, R.K. Puram, New Delhi, Delhi 110022",
+    "contactPhone": "+91 11 2617 1267",
+    "contactEmail": "principal@dpsrkp.net",
+    "website": "https://dpsrkp.net",
+    "websiteUrl": "https://dpsrkp.net",
+    "phoneNumber": "+911126171267",
+    "establishedYear": "1972",
+    "rating": 4.8,
+    "userRatingsTotal": 320,
+    "featureImage": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=1200",
+    "logoUrl": "https://dpsrkp.net/wp-content/uploads/2021/08/dps-logo-1.png",
+    "galleryImages": [
+      "https://images.unsplash.com/photo-1592280771190-3e2e4d571952?auto=format&fit=crop&q=80&w=800",
+      "https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&q=80&w=800",
+      "https://images.unsplash.com/photo-1576495199011-eb94736d05d6?auto=format&fit=crop&q=80&w=800",
+      "https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&q=80&w=800"
+    ],
+    "latitude": 28.5677,
+    "longitude": 77.1724,
+    "admission": {
+      "admissionOpen": true,
+      "applicationStartDate": "2026-11-01T00:00:00Z",
+      "applicationEndDate": "2026-12-15T00:00:00Z",
+      "admissionMode": "Online",
+      "applicationFee": "2500",
+      "admissionProcess": "The admission process involves an online application followed by an interaction session and document verification.",
+      "admissionUrl": "https://dpsrkp.net/admissions"
+    },
+    "placement": {
+      "placementDescription": "100% placement record in top national and international universities including Ivy League schools."
+    },
+    "socialProfiles": {
+      "facebook": "https://facebook.com",
+      "twitter": "https://twitter.com",
+      "instagram": "https://instagram.com",
+      "linkedin": "https://linkedin.com",
+      "youtube": "https://youtube.com"
+    },
+    "aiReviewSummary": "Students and parents highly recommend DPS R.K. Puram for its exceptional academic standards, experienced faculty, and outstanding extracurricular facilities. The rigorous curriculum is well-balanced with sports and arts.",
+    "status": "published",
+    "track": "academic",
+    "parentId": null,
+    "orderIndex": 1
+  },
+  {
+    "id": "inst-2",
+    "type": "institution",
+    "slug": "st-xaviers-college-kolkata",
+    "title": "St. Xavier's College, Kolkata",
+    "description": "St. Xavier's College is a prestigious college in Kolkata offering undergraduate and postgraduate courses in Arts, Science, and Commerce.",
+    "category": "College",
+    "boardType": "State Board",
+    "stateRegion": "West Bengal",
+    "city": "Kolkata",
+    "address": "30 Mother Teresa Sarani, Kolkata, West Bengal 700016",
+    "contactPhone": "+91 33 2255 1101",
+    "contactEmail": "principal@sxccal.edu",
+    "website": "https://www.sxccal.edu",
+    "websiteUrl": "https://www.sxccal.edu",
+    "phoneNumber": "+913322551101",
+    "establishedYear": "1860",
+    "rating": 4.9,
+    "userRatingsTotal": 850,
+    "featureImage": "https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&q=80&w=1200",
+    "logoUrl": "https://upload.wikimedia.org/wikipedia/en/0/0d/XavKolKata.png?utm_source=en.wikipedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+    "galleryImages": [
+      "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=800",
+      "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80&w=800",
+      "https://images.unsplash.com/photo-1564981797816-1043664bf78d?auto=format&fit=crop&q=80&w=800",
+      "https://images.unsplash.com/photo-1525926472898-7521c7d23d9b?auto=format&fit=crop&q=80&w=800"
+    ],
+    "latitude": 22.5499,
+    "longitude": 88.3554,
+    "admission": {
+      "admissionOpen": false,
+      "applicationStartDate": "2026-05-01T00:00:00Z",
+      "applicationEndDate": "2026-06-30T00:00:00Z",
+      "admissionMode": "Online / Offline",
+      "applicationFee": "1000",
+      "admissionProcess": "Admissions are purely merit-based on previous qualifying exam scores. Some courses may require a written entrance test.",
+      "admissionUrl": "https://www.sxccal.edu/admissions"
+    },
+    "placement": {
+      "placementDescription": "Top recruiters include Deloitte, PWC, EY, KPMG, and various multinational corporations with competitive packages."
+    },
+    "socialProfiles": {
+      "facebook": "https://facebook.com",
+      "linkedin": "https://linkedin.com",
+      "youtube": "https://youtube.com"
+    },
+    "aiReviewSummary": "A highly reputed institution known for its strict discipline, excellent faculty, and vibrant campus life. The alumni network is one of the strongest in the country.",
+    "status": "published",
+    "track": "higher-education",
+    "parentId": null,
+    "orderIndex": 2
+  }
+]
