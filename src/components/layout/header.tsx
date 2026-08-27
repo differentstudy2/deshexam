@@ -753,7 +753,7 @@ export function Header() {
       )}
     >
       <div className="container flex h-16 items-center">
-        <div className="mr-auto md:mr-6 flex items-center">
+        <div className="mr-auto md:mr-12 lg:mr-16 flex items-center">
           <Link href="/" className="flex items-center">
             <DeshExamLogo />
           </Link>
@@ -761,7 +761,7 @@ export function Header() {
 
         <MainNav isScrolled={isScrolled} />
 
-        <div className="flex flex-1 items-center justify-end space-x-2">
+        <div className="flex flex-1 items-center justify-end space-x-2 md:space-x-4">
           <Button asChild size="icon" variant="outline" className="hidden md:flex h-9 w-9 rounded-full bg-gradient-to-r from-amber-100 to-yellow-100 dark:from-amber-900/30 dark:to-yellow-900/30 text-amber-700 dark:text-amber-400 border-amber-300/50 dark:border-amber-700/50 hover:bg-amber-50 shadow-sm" title="Premium Upgrade">
             <Link href="/pricing">
               <Sparkles className="h-4 w-4 text-amber-600 dark:text-amber-400" />
