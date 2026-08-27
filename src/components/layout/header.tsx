@@ -37,7 +37,7 @@ type NavLinkType = {
 };
 
 const mainNavLinks: NavLinkType[] = [
-  { href: "/academy", label: "Academy", icon: <BookOpen className="h-5 w-5" /> },
+  { href: "/academy", label: "Learn", icon: <BookOpen className="h-5 w-5" /> },
   { 
     label: "Media", 
     icon: <Play className="h-5 w-5" />, 
@@ -47,8 +47,6 @@ const mainNavLinks: NavLinkType[] = [
       { href: "/documents", label: "Documents", icon: <FileText className="h-4 w-4" /> },
     ]
   },
-  { href: "/skill", label: "Skill", icon: <Zap className="h-5 w-5" /> },
-  { href: "/course", label: "Course", icon: <Book className="h-5 w-5" /> },
   { href: "/book", label: "Book", icon: <Library className="h-5 w-5" /> },
   { 
     label: "Test & Practice", 
@@ -406,7 +404,7 @@ const MainNav = ({ isMobile = false, onLinkClick, isScrolled = false }: { isMobi
       href={href}
       onClick={onLinkClick}
       className={cn(
-        "transition-colors flex items-center hover:text-[#00a651] text-sm font-medium",
+        "transition-colors flex items-center hover:text-[#00a651] text-base font-medium",
         pathname === href
           ? "text-[#00a651] font-bold"
           : "text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white",
@@ -445,7 +443,7 @@ const MainNav = ({ isMobile = false, onLinkClick, isScrolled = false }: { isMobi
           return (
             <DropdownMenu key={link.label}>
               <DropdownMenuTrigger className={cn(
-                "flex items-center gap-1 transition-colors hover:text-[#00a651] text-sm font-medium outline-none",
+                "flex items-center gap-1 transition-colors hover:text-[#00a651] text-base font-medium outline-none",
                 "text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
               )}>
                 <span>{link.label}</span>
