@@ -8,7 +8,7 @@ import InstitutionsClient from '../institutions-client';
 import {
   MapPin, Globe, Star, Building, Navigation, ArrowLeft, Bookmark, CheckCircle2,
   Users, BookOpen, Clock, Phone, Mail, FileText, Monitor, Bed, Bus, TestTube,
-  Trophy, Wifi, Coffee, Tent, PlusSquare, ChevronDown, ChevronRight, Filter, Sparkles, Calendar, XCircle, Info
+  Trophy, Wifi, Coffee, Tent, PlusSquare, ChevronDown, ChevronRight, Filter, Sparkles, Calendar, XCircle, Info, Camera, HelpCircle
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -917,8 +917,14 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
     <div className="lg:col-span-4 space-y-6">
 
       {/* Mini Gallery */}
-      <Card className="border-none shadow-sm rounded-sm bg-white overflow-hidden">
-        <CardContent className="p-4">
+      <div className="rounded-md overflow-hidden shadow-sm bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
+        <div className="bg-gradient-to-r from-indigo-500 to-purple-500 p-3 flex items-center gap-3">
+          <div className="bg-white p-1.5 rounded-md shadow-sm flex items-center justify-center">
+            <Camera className="w-5 h-5 text-indigo-500" />
+          </div>
+          <h3 className="text-white font-bold uppercase text-sm tracking-wide">Gallery</h3>
+        </div>
+        <div className="p-4">
           <div className="grid grid-cols-2 gap-2">
             {(institution.galleryImages && institution.galleryImages.length > 0 ? institution.galleryImages : MOCK_GALLERY).slice(0, 4).map((img, idx) => (
               <div key={idx} className="relative aspect-square rounded-sm overflow-hidden group">
@@ -926,14 +932,19 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
               </div>
             ))}
           </div>
-          <Button variant="outline" className="w-full mt-4 text-xs font-semibold">View All Photos</Button>
-        </CardContent>
-      </Card>
+          <Button variant="outline" className="w-full mt-4 text-xs font-semibold border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">View All Photos</Button>
+        </div>
+      </div>
 
       {/* Contact Card */}
-      <Card className="border-none shadow-sm rounded-sm bg-white">
-        <CardContent className="p-6">
-          <h3 className="font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">Contact Us</h3>
+      <div className="rounded-md overflow-hidden shadow-sm bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
+        <div className="bg-gradient-to-r from-emerald-500 to-teal-500 p-3 flex items-center gap-3">
+          <div className="bg-white p-1.5 rounded-md shadow-sm flex items-center justify-center">
+            <Phone className="w-5 h-5 text-emerald-600" />
+          </div>
+          <h3 className="text-white font-bold uppercase text-sm tracking-wide">Contact Details</h3>
+        </div>
+        <div className="p-5">
           <div className="space-y-4">
             <a href={`tel:${institution.internationalPhoneNumber || institution.phoneNumber || '+919876543210'}`} className="flex items-center gap-3 text-slate-600 hover:text-emerald-600 transition-colors group">
               <div className="bg-emerald-50 p-2.5 rounded-full text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-colors"><Phone className="w-4 h-4" /></div>
@@ -971,13 +982,18 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
               </a>
             )}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Quick Contact Card */}
-      <Card className="border-slate-100 dark:border-slate-800 shadow-sm rounded-sm bg-white dark:bg-slate-900">
-        <CardContent className="p-6">
-          <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-4 text-lg">Interested?</h3>
+      <div className="rounded-md overflow-hidden shadow-sm bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
+        <div className="bg-gradient-to-r from-orange-400 to-pink-500 p-3 flex items-center gap-3">
+          <div className="bg-white p-1.5 rounded-md shadow-sm flex items-center justify-center">
+            <HelpCircle className="w-5 h-5 text-orange-500" />
+          </div>
+          <h3 className="text-white font-bold uppercase text-sm tracking-wide">Interested?</h3>
+        </div>
+        <div className="p-5">
           <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Get free counselling and admission assistance from our experts.</p>
           <div className="space-y-3 mb-6">
             <Button className="w-full bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 text-white font-bold h-11 shadow-sm"><Phone className="w-4 h-4 mr-2" /> Request Callback</Button>
@@ -986,8 +1002,8 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
           <div className="text-xs text-center text-slate-400 dark:text-slate-500">
             100% Free & Secure. We don't spam.
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Map/Contact Details Card */}
       <Card className="border-slate-100 dark:border-slate-800 shadow-sm rounded-sm bg-white dark:bg-slate-900">
