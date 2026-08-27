@@ -1,12 +1,16 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
-import { ChevronLeft, BookOpen, BookMarked, GraduationCap, ChevronRight, Hash } from 'lucide-react';
+import {
+  ChevronLeft, BookMarked, GraduationCap,
+  ChevronDown, ChevronRight, List, BookOpen, FileText
+} from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import hardcodedTextbooksJson from '@/data/hardcoded/taxonomy/textbooks.json';
 import hardcodedChaptersJson from '@/data/hardcoded/taxonomy/chapters.json';
+import hardcodedTopicsJson from '@/data/hardcoded/taxonomy/topics.json';
 
 const bnBookTitles: Record<string, string> = {
   "Amader Paribesh": "আমাদের পরিবেশ",
@@ -45,7 +49,6 @@ const bnSubjects: Record<string, string> = {
   "mathematics": "গণিত",
   "bengali-language": "বাংলা",
   "english": "ইংরেজি",
-  "english-language": "ইংরেজি",
   "history": "ইতিহাস",
   "geography": "ভূগোল",
   "physical-science": "ভৌত বিজ্ঞান",
@@ -72,6 +75,22 @@ const BOARD_SLUG_MAP: Record<string, string[]> = {
   'wbchse': ['wbchse-board', 'wbchse'],
   'ncert': ['ncert', 'ncert-board'],
 };
+
+// Color palette — badge bg, border accent, topic bg, topic text
+const CHAPTER_PALETTE = [
+  { badge: 'bg-blue-500',    border: 'border-l-blue-400',    topicBg: 'bg-blue-50/60 dark:bg-blue-950/20',   topicText: 'text-blue-700 dark:text-blue-300',   topicNum: 'bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300' },
+  { badge: 'bg-emerald-500', border: 'border-l-emerald-400', topicBg: 'bg-emerald-50/60 dark:bg-emerald-950/20', topicText: 'text-emerald-700 dark:text-emerald-300', topicNum: 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-300' },
+  { badge: 'bg-orange-500',  border: 'border-l-orange-400',  topicBg: 'bg-orange-50/60 dark:bg-orange-950/20', topicText: 'text-orange-700 dark:text-orange-300',   topicNum: 'bg-orange-100 dark:bg-orange-900/40 text-orange-600 dark:text-orange-300' },
+  { badge: 'bg-violet-500',  border: 'border-l-violet-400',  topicBg: 'bg-violet-50/60 dark:bg-violet-950/20', topicText: 'text-violet-700 dark:text-violet-300',   topicNum: 'bg-violet-100 dark:bg-violet-900/40 text-violet-600 dark:text-violet-300' },
+  { badge: 'bg-rose-500',    border: 'border-l-rose-400',    topicBg: 'bg-rose-50/60 dark:bg-rose-950/20',   topicText: 'text-rose-700 dark:text-rose-300',       topicNum: 'bg-rose-100 dark:bg-rose-900/40 text-rose-600 dark:text-rose-300' },
+  { badge: 'bg-teal-500',    border: 'border-l-teal-400',    topicBg: 'bg-teal-50/60 dark:bg-teal-950/20',   topicText: 'text-teal-700 dark:text-teal-300',       topicNum: 'bg-teal-100 dark:bg-teal-900/40 text-teal-600 dark:text-teal-300' },
+  { badge: 'bg-amber-500',   border: 'border-l-amber-400',   topicBg: 'bg-amber-50/60 dark:bg-amber-950/20', topicText: 'text-amber-700 dark:text-amber-300',     topicNum: 'bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-300' },
+  { badge: 'bg-cyan-500',    border: 'border-l-cyan-400',    topicBg: 'bg-cyan-50/60 dark:bg-cyan-950/20',   topicText: 'text-cyan-700 dark:text-cyan-300',       topicNum: 'bg-cyan-100 dark:bg-cyan-900/40 text-cyan-600 dark:text-cyan-300' },
+  { badge: 'bg-fuchsia-500', border: 'border-l-fuchsia-400', topicBg: 'bg-fuchsia-50/60 dark:bg-fuchsia-950/20', topicText: 'text-fuchsia-700 dark:text-fuchsia-300', topicNum: 'bg-fuchsia-100 dark:bg-fuchsia-900/40 text-fuchsia-600 dark:text-fuchsia-300' },
+  { badge: 'bg-lime-600',    border: 'border-l-lime-500',    topicBg: 'bg-lime-50/60 dark:bg-lime-950/20',   topicText: 'text-lime-700 dark:text-lime-300',       topicNum: 'bg-lime-100 dark:bg-lime-900/40 text-lime-600 dark:text-lime-300' },
+  { badge: 'bg-indigo-500',  border: 'border-l-indigo-400',  topicBg: 'bg-indigo-50/60 dark:bg-indigo-950/20', topicText: 'text-indigo-700 dark:text-indigo-300',   topicNum: 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-300' },
+  { badge: 'bg-pink-500',    border: 'border-l-pink-400',    topicBg: 'bg-pink-50/60 dark:bg-pink-950/20',   topicText: 'text-pink-700 dark:text-pink-300',       topicNum: 'bg-pink-100 dark:bg-pink-900/40 text-pink-600 dark:text-pink-300' },
+];
 
 function isWBBoard(board: string) {
   return ['wbbse', 'wbbpe', 'wb-board', 'wbbpe-board'].includes(board.toLowerCase());
@@ -100,9 +119,39 @@ export default function TextbookSolutionsClient({ board, classSlug, textbookSlug
     if (!textbook) return [];
     const allChapters = hardcodedChaptersJson as any[];
     return allChapters
-      .filter(ch => ch.parentId === textbook.id || ch.textbookSlug === textbook.textbookSlug)
+      .filter(ch => ch.parentId === textbook.id)
       .sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
   }, [textbook]);
+
+  const topicsByChapter = useMemo(() => {
+    const allTopics = hardcodedTopicsJson as any[];
+    const map: Record<string, any[]> = {};
+    chapters.forEach(ch => {
+      map[ch.id] = allTopics
+        .filter(t => t.parentId === ch.id)
+        .sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
+    });
+    return map;
+  }, [chapters]);
+
+  // Default: all chapters with topics are expanded
+  const [expandedChapters, setExpandedChapters] = useState<Set<string>>(() =>
+    new Set(chapters.filter(ch => (topicsByChapter[ch.id] || []).length > 0).map(ch => ch.id))
+  );
+
+  const toggleChapter = (chapterId: string) => {
+    setExpandedChapters(prev => {
+      const next = new Set(prev);
+      if (next.has(chapterId)) next.delete(chapterId);
+      else next.add(chapterId);
+      return next;
+    });
+  };
+
+  const expandAll = () => setExpandedChapters(new Set(
+    chapters.filter(ch => (topicsByChapter[ch.id] || []).length > 0).map(ch => ch.id)
+  ));
+  const collapseAll = () => setExpandedChapters(new Set());
 
   const displayTitle = isWB && textbook ? (bnBookTitles[textbook.title] || textbook.title) : textbook?.title;
   const subjectDisplay = isWB && textbook
@@ -118,9 +167,9 @@ export default function TextbookSolutionsClient({ board, classSlug, textbookSlug
         <div className="text-center py-20">
           <BookOpen className="h-16 w-16 text-slate-300 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-slate-700 dark:text-slate-300 mb-2">Textbook Not Found</h2>
-          <p className="text-slate-500 mb-6">We couldn't find this textbook. Please check the URL.</p>
+          <p className="text-slate-500 mb-6">We couldn't find this textbook.</p>
           <Button asChild variant="outline">
-            <Link href={`/solutions/${board}/${classSlug}`}>← Back to {classSlug.replace(/-/g, ' ')}</Link>
+            <Link href={`/solutions/${board}/${classSlug}`}>← Back</Link>
           </Button>
         </div>
       </div>
@@ -128,110 +177,199 @@ export default function TextbookSolutionsClient({ board, classSlug, textbookSlug
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-16">
-      {/* Hero */}
-      <div className="bg-gradient-to-br from-emerald-700 via-teal-700 to-cyan-800 text-white py-14 px-4 relative overflow-hidden">
-        <div className="absolute inset-0 overflow-hidden z-0">
-          <div className="absolute top-[-20%] right-[-5%] w-80 h-80 bg-white/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-[-30%] left-[-10%] w-96 h-96 bg-black/10 rounded-full blur-3xl" />
-        </div>
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-20">
 
-        <div className="container mx-auto max-w-5xl relative z-10">
-          <Link
-            href={`/solutions/${board.toLowerCase()}/${classSlug}`}
-            className="inline-flex items-center text-emerald-100 hover:text-white mb-6 text-sm font-medium transition-colors bg-emerald-800/30 px-3 py-1.5 rounded-full backdrop-blur-sm border border-emerald-500/30"
-          >
-            <ChevronLeft className="h-4 w-4 mr-1" /> {classDisplay} Books
+      {/* ── Breadcrumb ── */}
+      <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
+        <div className="container mx-auto max-w-5xl px-4 py-3 flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+          <Link href={`/solutions/${board.toLowerCase()}/${classSlug}`} className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors font-medium">
+            {classDisplay}
           </Link>
+          <ChevronRight className="h-3.5 w-3.5 text-slate-300" />
+          <span className="text-slate-700 dark:text-slate-200 font-medium truncate">{displayTitle}</span>
+        </div>
+      </div>
 
-          <div className="flex flex-col md:flex-row gap-6 items-start">
-            {/* Book icon */}
-            <div className="flex-shrink-0 w-20 h-20 bg-white/10 rounded-2xl flex items-center justify-center backdrop-blur-sm border border-white/20 shadow-lg">
-              <BookMarked className="h-10 w-10 text-white" />
+      {/* ── Premium Hero Card ── */}
+      <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
+        <div className="container mx-auto max-w-5xl px-4 py-8">
+          <div className="flex flex-col sm:flex-row gap-6 items-start">
+            {/* Book cover */}
+            <div className="flex-shrink-0 w-24 h-32 bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/30 dark:to-teal-900/30 rounded-xl flex items-center justify-center border border-emerald-200 dark:border-emerald-800/50 shadow-md">
+              <BookMarked className="h-12 w-12 text-emerald-500 dark:text-emerald-400" />
             </div>
 
             <div className="flex-1 min-w-0">
-              <div className="flex flex-wrap gap-2 mb-3">
-                <Badge variant="outline" className="text-emerald-100 border-emerald-300/30 bg-emerald-800/30 text-xs">
+              <h1 className="text-2xl md:text-3xl font-bold font-headline text-slate-900 dark:text-white tracking-tight leading-tight mb-1">
+                {displayTitle}
+              </h1>
+              {isWB && bnBookTitles[textbook.title] && (
+                <p className="text-slate-400 dark:text-slate-500 text-sm italic mb-3">{textbook.title}</p>
+              )}
+
+              <div className="flex flex-wrap gap-1.5 mb-4">
+                <Badge variant="outline" className="text-xs font-semibold text-slate-600 dark:text-slate-300 border-slate-300 dark:border-slate-600">
                   {board.toUpperCase()}
                 </Badge>
-                <Badge variant="outline" className="text-emerald-100 border-emerald-300/30 bg-emerald-800/30 text-xs flex items-center gap-1">
+                <Badge variant="outline" className="text-xs font-semibold text-slate-600 dark:text-slate-300 border-slate-300 dark:border-slate-600 flex items-center gap-1">
                   <GraduationCap className="h-3 w-3" /> {classDisplay}
                 </Badge>
                 {subjectDisplay && (
-                  <Badge variant="outline" className="text-emerald-100 border-emerald-300/30 bg-emerald-800/30 text-xs">
+                  <Badge className="text-xs bg-emerald-500 hover:bg-emerald-600 text-white border-none">
                     {subjectDisplay}
                   </Badge>
                 )}
               </div>
 
-              <h1 className="text-3xl md:text-4xl font-bold font-headline tracking-tight mb-1">
-                {displayTitle}
-              </h1>
-              {isWB && bnBookTitles[textbook.title] && (
-                <p className="text-emerald-200/70 text-sm italic">{textbook.title}</p>
-              )}
-
-              <p className="text-emerald-100/80 mt-3 text-base">
-                {chapters.length} টি অধ্যায় — সম্পূর্ণ সমাধান সহ
-              </p>
+              <div className="flex items-center gap-5 text-sm text-slate-500 dark:text-slate-400">
+                <span className="flex items-center gap-1.5">
+                  <List className="h-4 w-4 text-emerald-500" />
+                  <strong className="text-slate-700 dark:text-slate-200">{chapters.length}</strong> অধ্যায়
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <FileText className="h-4 w-4 text-blue-500" />
+                  <strong className="text-slate-700 dark:text-slate-200">
+                    {Object.values(topicsByChapter).reduce((s, t) => s + t.length, 0)}
+                  </strong> বিষয়
+                </span>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Table of Contents */}
+      {/* ── Table of Contents ── */}
       <div className="container mx-auto max-w-5xl px-4 mt-10">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 font-headline">
-              সুচিপত্র
-            </h2>
-            <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
-              {chapters.length === 0 ? 'কোনো অধ্যায় পাওয়া যায়নি' : `মোট ${chapters.length}টি অধ্যায়`}
-            </p>
+
+        {/* Professional centered heading */}
+        <div className="text-center mb-10">
+          <p className="text-xs font-semibold tracking-[0.25em] uppercase text-slate-400 dark:text-slate-500 mb-3">
+            {textbook.title}
+          </p>
+          <h2 className="text-4xl md:text-5xl font-bold font-headline text-slate-900 dark:text-white tracking-tight mb-3">
+            সুচিপত্র
+          </h2>
+          <div className="flex items-center justify-center gap-3 mb-3">
+            <div className="h-px w-16 bg-gradient-to-r from-transparent to-emerald-400" />
+            <div className="w-2 h-2 rounded-full bg-emerald-500" />
+            <div className="h-px w-16 bg-gradient-to-l from-transparent to-emerald-400" />
           </div>
+          <p className="text-slate-400 dark:text-slate-500 text-sm">
+            মোট <strong className="text-slate-600 dark:text-slate-300">{chapters.length}</strong>টি অধ্যায়
+          </p>
+          {chapters.some(ch => (topicsByChapter[ch.id] || []).length > 0) && (
+            <div className="flex justify-center gap-2 mt-4">
+              <Button variant="outline" size="sm" onClick={expandAll}
+                className="text-xs h-8 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400">
+                সব খুলুন
+              </Button>
+              <Button variant="outline" size="sm" onClick={collapseAll}
+                className="text-xs h-8 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400">
+                সব বন্ধ করুন
+              </Button>
+            </div>
+          )}
         </div>
 
         {chapters.length === 0 ? (
-          <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800">
-            <BookOpen className="h-14 w-14 text-slate-300 mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-slate-700 dark:text-slate-300 mb-2">অধ্যায় পাওয়া যায়নি</h3>
-            <p className="text-slate-400 max-w-sm mx-auto">
-              এই বইয়ের জন্য এখনও অধ্যায় যোগ করা হয়নি। শীঘ্রই আসছে!
-            </p>
+          <div className="text-center py-24 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800">
+            <BookOpen className="h-14 w-14 text-slate-200 dark:text-slate-700 mx-auto mb-4" />
+            <h3 className="text-xl font-bold text-slate-600 dark:text-slate-400 mb-2">অধ্যায় পাওয়া যায়নি</h3>
+            <p className="text-slate-400 max-w-sm mx-auto text-sm">শীঘ্রই আসছে!</p>
           </div>
         ) : (
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
-            {chapters.map((chapter, index) => (
-              <Link
-                key={chapter.id}
-                href={`/solutions/${board.toLowerCase()}/${classSlug}/${textbookSlug}/${chapter.chapterSlug || chapter.slug}`}
-                className="group flex items-center gap-4 px-6 py-4 border-b border-slate-100 dark:border-slate-800 last:border-b-0 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/10 transition-colors duration-200"
-              >
-                {/* Chapter number */}
-                <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 group-hover:bg-emerald-100 dark:group-hover:bg-emerald-900/30 flex items-center justify-center transition-colors">
-                  <span className="text-sm font-bold text-slate-500 dark:text-slate-400 group-hover:text-emerald-600 dark:group-hover:text-emerald-400">
-                    {chapter.orderIndex || index + 1}
-                  </span>
-                </div>
+          <div className="space-y-3">
+            {chapters.map((chapter, index) => {
+              const topics = topicsByChapter[chapter.id] || [];
+              const hasTopics = topics.length > 0;
+              const isExpanded = expandedChapters.has(chapter.id);
+              const palette = CHAPTER_PALETTE[index % CHAPTER_PALETTE.length];
+              const numStr = String(chapter.orderIndex || index + 1).padStart(2, '0');
+              const chapterHref = `/solutions/${board.toLowerCase()}/${classSlug}/${textbookSlug}/${chapter.chapterSlug || chapter.slug}`;
 
-                {/* Chapter title */}
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-slate-800 dark:text-slate-100 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors leading-snug">
-                    {chapter.title}
-                  </p>
-                  {chapter.slug && (
-                    <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5 flex items-center gap-1">
-                      <Hash className="h-3 w-3" />{chapter.slug}
-                    </p>
+              return (
+                <div
+                  key={chapter.id}
+                  className={`bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 border-l-4 ${palette.border}`}
+                >
+                  {/* Chapter row */}
+                  <div className="flex items-center gap-4 px-5 py-4 group">
+                    {/* Numbered badge */}
+                    <div className={`flex-shrink-0 w-10 h-10 rounded-xl ${palette.badge} flex items-center justify-center shadow-sm`}>
+                      <span className="text-xs font-bold text-white">{numStr}</span>
+                    </div>
+
+                    {/* Title */}
+                    {hasTopics ? (
+                      <button onClick={() => toggleChapter(chapter.id)} className="flex-1 min-w-0 text-left">
+                        <p className="font-bold text-slate-800 dark:text-slate-100 text-sm leading-snug">
+                          {chapter.title}
+                        </p>
+                        <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{topics.length}টি বিষয়</p>
+                      </button>
+                    ) : (
+                      <Link href={chapterHref} className="flex-1 min-w-0">
+                        <p className="font-bold text-slate-800 dark:text-slate-100 text-sm leading-snug">
+                          {chapter.title}
+                        </p>
+                      </Link>
+                    )}
+
+                    {/* Page number */}
+                    {(chapter as any).pageNo && (
+                      <span className="hidden sm:block text-xs text-slate-400 dark:text-slate-500 flex-shrink-0 min-w-[64px] text-right">
+                        পৃষ্ঠা {String((chapter as any).pageNo).padStart(2, '0')}
+                      </span>
+                    )}
+
+                    {/* Actions */}
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <Link
+                        href={chapterHref}
+                        onClick={e => e.stopPropagation()}
+                        className={`hidden sm:flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-lg border transition-colors whitespace-nowrap ${palette.topicText} ${palette.topicBg} border-current/20`}
+                      >
+                        সমাধান দেখুন <ChevronRight className="h-3 w-3" />
+                      </Link>
+                      {hasTopics ? (
+                        <button
+                          onClick={() => toggleChapter(chapter.id)}
+                          className="w-8 h-8 rounded-lg border border-slate-200 dark:border-slate-700 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                        >
+                          <ChevronDown className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
+                        </button>
+                      ) : (
+                        <div className="w-8 h-8 rounded-lg border border-slate-200 dark:border-slate-700 flex items-center justify-center sm:hidden">
+                          <ChevronRight className="h-4 w-4 text-slate-400" />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Topics — colored */}
+                  {hasTopics && isExpanded && (
+                    <div className="border-t border-slate-100 dark:border-slate-800">
+                      {topics.map((topic, tIndex) => (
+                        <Link
+                          key={topic.id}
+                          href={`${chapterHref}/${topic.topicSlug || topic.slug}`}
+                          className={`flex items-center gap-3 px-5 py-3 border-b border-slate-100/80 dark:border-slate-800/50 last:border-b-0 ${palette.topicBg} hover:brightness-95 dark:hover:brightness-110 transition-all group/topic`}
+                        >
+                          {/* Topic number */}
+                          <div className={`flex-shrink-0 w-6 h-6 rounded-md ${palette.topicNum} flex items-center justify-center ml-12 font-bold text-[10px]`}>
+                            {tIndex + 1}
+                          </div>
+                          <p className={`flex-1 text-sm font-medium leading-snug ${palette.topicText}`}>
+                            {topic.title}
+                          </p>
+                          <ChevronRight className={`h-3.5 w-3.5 flex-shrink-0 opacity-50 group-hover/topic:opacity-100 transition-opacity ${palette.topicText}`} />
+                        </Link>
+                      ))}
+                    </div>
                   )}
                 </div>
-
-                {/* Arrow */}
-                <ChevronRight className="h-5 w-5 text-slate-300 dark:text-slate-600 group-hover:text-emerald-500 flex-shrink-0 transition-colors" />
-              </Link>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

@@ -125,7 +125,7 @@ export default function ClassSolutionsClient({ board, classSlug }: { board: stri
           id: book.id,
           title: book.title,
           description: book.description || `Comprehensive textbook solutions for ${book.title}`,
-          board: book.boardSlug, // We'll map this in the filter
+          board: book.boardSlug,
           class: book.classSlug,
           subject: book.subjectSlug || 'General',
           featureImage: book.coverImage || book.featureImage || null,
@@ -133,6 +133,7 @@ export default function ClassSolutionsClient({ board, classSlug }: { board: stri
           totalSolutions: book.totalSolutions || 0,
           boardSlug: book.boardSlug,
           classSlug: book.classSlug,
+          textbookSlug: book.textbookSlug || book.slug,
         })) as unknown as Textbook[];
 
         setTextbooks([...formattedHardcoded, ...firebaseBooks] as unknown as Textbook[]);
