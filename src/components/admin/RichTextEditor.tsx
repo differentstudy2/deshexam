@@ -158,7 +158,7 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
     content,
     editorProps: {
       attributes: {
-        className: 'prose prose-sm sm:prose lg:prose-lg xl:prose-xl focus:outline-none min-h-[400px] max-w-none p-4',
+        class: 'prose prose-slate dark:prose-invert max-w-none focus:outline-none min-h-[400px] w-full px-8 py-6',
       },
     },
     onUpdate: ({ editor }) => {
@@ -169,7 +169,7 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
   });
 
   return (
-    <div className="border rounded-md shadow-sm bg-white overflow-hidden flex flex-col w-full">
+    <div className="border rounded-lg shadow-sm bg-white dark:bg-slate-950 overflow-hidden flex flex-col w-full min-h-[400px]">
       <MenuBar editor={editor} />
       <EditorContent editor={editor} className="w-full flex-grow cursor-text" />
     </div>
