@@ -201,12 +201,6 @@ const adminNavGroups = [
     title: "Settings",
     items: [
       { href: '/admin/settings', label: 'General', icon: <Settings className="h-4 w-4" /> },
-      { href: '/admin/settings/branding', label: 'Branding', icon: <Sparkles className="h-4 w-4" /> },
-      { href: '/admin/settings/theme', label: 'Theme', icon: <LayoutDashboard className="h-4 w-4" /> },
-      { href: '/admin/settings/security', label: 'Security', icon: <ShieldCheck className="h-4 w-4" /> },
-      { href: '/admin/settings/backup', label: 'Backup', icon: <Upload className="h-4 w-4" /> },
-      { href: '/admin/migrate-seo', label: 'Migrate SEO', icon: <Upload className="h-4 w-4" /> },
-      { href: '/admin/migrate-taxonomy', label: 'Migrate Taxonomy', icon: <Upload className="h-4 w-4" /> },
     ]
   }
 ];
