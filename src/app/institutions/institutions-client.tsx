@@ -9,6 +9,7 @@ import { TaxonomyNode } from '@/lib/firebase/taxonomy';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
+import hardcodedInstitutions from '@/data/institutions.json';
 
 export default function InstitutionsClient({ 
   initialTypeFilter, 
@@ -33,9 +34,16 @@ export default function InstitutionsClient({
         );
         const snap = await getDocs(q);
         const fetchedNodes = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as TaxonomyNode));
+        
+        // Merge with hardcoded JSON
+        const allNodes = [...fetchedNodes, ...hardcodedInstitutions as any[]];
+        
+        // Deduplicate by slug
+        const uniqueNodes = Array.from(new globalThis.Map(allNodes.map(item => [item.slug, item])).values()) as TaxonomyNode[];
+
         // Sort alphabetically by title
-        fetchedNodes.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
-        setInstitutions(fetchedNodes);
+        uniqueNodes.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+        setInstitutions(uniqueNodes);
       } catch (error) {
         console.error('Failed to fetch institutions:', error);
       } finally {

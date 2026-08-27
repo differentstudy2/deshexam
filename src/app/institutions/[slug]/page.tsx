@@ -247,7 +247,7 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
   }
 
   // Cover Image (Mocked if not present)
-  const coverImage = (institution.galleryImages && institution.galleryImages.length > 0) ? institution.galleryImages[0] : 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=2000';
+  const coverImage = institution.featureImage || ((institution.galleryImages && institution.galleryImages.length > 0) ? institution.galleryImages[0] : 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=2000');
 
   // Generate JSON-LD Schemas
   const schemaInstitution = {
@@ -694,11 +694,20 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
 
       {/* 5. ADMISSION INFO */}
       <Card className="border-slate-100 dark:border-slate-800 shadow-sm rounded-md bg-white dark:bg-slate-900 overflow-hidden">
-        <div className="bg-gradient-to-r from-rose-500 to-pink-500 p-3 sm:p-4 flex items-center gap-3">
-          <div className="bg-white/20 p-1.5 rounded-md shadow-sm flex items-center justify-center backdrop-blur-sm">
-            <Calendar className="w-5 h-5 text-white" />
+        <div className="bg-gradient-to-r from-rose-500 to-pink-500 p-3 sm:p-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="bg-white/20 p-1.5 rounded-md shadow-sm flex items-center justify-center backdrop-blur-sm">
+              <Calendar className="w-5 h-5 text-white" />
+            </div>
+            <h2 className="text-white font-bold uppercase text-sm sm:text-base tracking-wide">Admission</h2>
           </div>
-          <h2 className="text-white font-bold uppercase text-sm sm:text-base tracking-wide">Admission</h2>
+          <Button asChild className="bg-white text-rose-600 hover:bg-slate-50 dark:bg-slate-900 dark:text-rose-400 dark:hover:bg-slate-800 shadow-sm h-8 px-4 text-xs font-bold rounded">
+            {institution.admission?.admissionUrl ? (
+              <a href={institution.admission.admissionUrl} target="_blank" rel="noopener noreferrer">Apply Now</a>
+            ) : (
+              <Link href="#">Apply Now</Link>
+            )}
+          </Button>
         </div>
         <CardContent className="p-4 sm:p-6 pt-6 sm:pt-6">
           <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-100 dark:border-slate-800/60">
@@ -730,20 +739,22 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
           </div>
 
           {/* Timeline */}
-          <div className="mb-8">
-            <h3 className="font-bold text-slate-800 dark:text-slate-200 text-sm mb-6">Process Timeline</h3>
-            <div className="relative flex justify-between items-start w-full px-4">
-              <div className="absolute top-2.5 left-8 right-8 h-0.5 bg-slate-100 dark:bg-slate-800 -z-10"></div>
-              
-              {((institution.admission as any)?.steps || MOCK_ADMISSION_STEPS).slice(0, 4).map((step: any, idx: number) => (
-                <div key={idx} className="flex flex-col items-center w-1/4 relative group">
-                  <div className={`w-5 h-5 rounded-full border-[3px] border-white dark:border-slate-900 mb-2.5 shadow-sm transition-colors ${idx <= 1 ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700'}`}></div>
-                  <span className="text-[9px] text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider">{step.step}</span>
-                  <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 text-center leading-tight mt-1 max-w-[80px]">{step.title}</span>
-                </div>
-              ))}
+          {(institution.admission as any)?.steps && (institution.admission as any).steps.length > 0 && (
+            <div className="mb-8">
+              <h3 className="font-bold text-slate-800 dark:text-slate-200 text-sm mb-6">Process Timeline</h3>
+              <div className="relative flex justify-between items-start w-full px-4">
+                <div className="absolute top-2.5 left-8 right-8 h-0.5 bg-slate-100 dark:bg-slate-800 -z-10"></div>
+                
+                {(institution.admission as any).steps.slice(0, 4).map((step: any, idx: number) => (
+                  <div key={idx} className="flex flex-col items-center w-1/4 relative group">
+                    <div className={`w-5 h-5 rounded-full border-[3px] border-white dark:border-slate-900 mb-2.5 shadow-sm transition-colors ${idx <= 1 ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700'}`}></div>
+                    <span className="text-[9px] text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider">{step.step}</span>
+                    <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 text-center leading-tight mt-1 max-w-[80px]">{step.title}</span>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {institution.admission?.admissionProcess && (
             <div className="mb-8 p-4 bg-slate-50 dark:bg-slate-800/20 rounded-sm border border-slate-100 dark:border-slate-800/60">
@@ -752,16 +763,6 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
             </div>
           )}
 
-          <div className="flex flex-col items-center">
-            {institution.admission?.admissionOpen && <div className="text-xs text-slate-500 dark:text-slate-400 mb-3">Admissions are currently active</div>}
-            <Button asChild className="w-full bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 text-white rounded shadow-sm h-10">
-              {institution.admission?.admissionUrl ? (
-                <a href={institution.admission.admissionUrl} target="_blank" rel="noopener noreferrer">Apply Now</a>
-              ) : (
-                <Link href="#">Apply Now</Link>
-              )}
-            </Button>
-          </div>
         </CardContent>
       </Card>
 
