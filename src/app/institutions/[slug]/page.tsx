@@ -535,20 +535,22 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
         </div>
         <CardContent className="p-4 sm:p-6 pt-6 sm:pt-6">
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {MOCK_COURSES.map(course => (
-              <div key={course.id} className="border border-slate-100 dark:border-slate-800/60 rounded-sm p-4 hover:border-emerald-200 dark:hover:border-emerald-500/30 hover:shadow-sm transition-all bg-white dark:bg-slate-800/30 relative">
-                <div className="absolute top-4 right-4 bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">New</div>
-                <h3 className="font-bold text-base text-slate-900 dark:text-slate-100 mb-4 pr-10">{course.title}</h3>
-                <div className="grid grid-cols-2 gap-y-3 gap-x-4 text-xs text-slate-600 dark:text-slate-300 mb-4">
-                  <div className="flex flex-col"><span className="text-slate-400 dark:text-slate-500 font-medium">Degree Type</span> <span className="font-bold text-slate-800 dark:text-slate-200">English</span></div>
-                  <div className="flex flex-col"><span className="text-slate-400 dark:text-slate-500 font-medium">Duration</span> <span className="font-bold text-slate-800 dark:text-slate-200">{course.duration}</span></div>
-                  <div className="flex flex-col"><span className="text-slate-400 dark:text-slate-500 font-medium">Annual Fees</span> <span className="font-bold text-slate-800 dark:text-slate-200">{course.fees}</span></div>
-                  <div className="flex flex-col"><span className="text-slate-400 dark:text-slate-500 font-medium">Seats</span> <span className="font-bold text-slate-800 dark:text-slate-200">{course.seats}</span></div>
-                  <div className="flex flex-col col-span-2"><span className="text-slate-400 dark:text-slate-500 font-medium">Eligibility</span> <span className="font-bold text-slate-800 dark:text-slate-200">{course.eligibility}</span></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {((institution as any).courses || MOCK_COURSES).map((course: any) => (
+              <div key={course.id} className="border border-slate-100 dark:border-slate-800/60 rounded-sm p-3 hover:border-emerald-200 dark:hover:border-emerald-500/30 hover:shadow-sm transition-all bg-white dark:bg-slate-800/30 relative flex flex-col justify-between">
+                <div>
+                  {course.isNew && <div className="absolute top-3 right-3 bg-emerald-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow-sm">New</div>}
+                  <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100 mb-3 pr-8">{course.title}</h3>
+                  <div className="grid grid-cols-2 gap-y-2 gap-x-2 text-[11px] text-slate-600 dark:text-slate-300 mb-3">
+                    <div className="flex flex-col"><span className="text-slate-400 dark:text-slate-500 font-medium text-[10px]">Degree Type</span> <span className="font-bold text-slate-800 dark:text-slate-200">{course.degreeType || 'English'}</span></div>
+                    <div className="flex flex-col"><span className="text-slate-400 dark:text-slate-500 font-medium text-[10px]">Duration</span> <span className="font-bold text-slate-800 dark:text-slate-200">{course.duration}</span></div>
+                    <div className="flex flex-col"><span className="text-slate-400 dark:text-slate-500 font-medium text-[10px]">Annual Fees</span> <span className="font-bold text-slate-800 dark:text-slate-200">{course.fees}</span></div>
+                    <div className="flex flex-col"><span className="text-slate-400 dark:text-slate-500 font-medium text-[10px]">Seats</span> <span className="font-bold text-slate-800 dark:text-slate-200">{course.seats}</span></div>
+                    <div className="flex flex-col col-span-2"><span className="text-slate-400 dark:text-slate-500 font-medium text-[10px]">Eligibility</span> <span className="font-bold text-slate-800 dark:text-slate-200">{course.eligibility}</span></div>
+                  </div>
                 </div>
-                <div className="flex justify-end mt-2">
-                  <Button className="bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 text-white rounded shadow-sm h-8 px-6 text-xs">Apply</Button>
+                <div className="flex justify-end mt-1">
+                  <Button className="bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 text-white rounded shadow-sm h-7 px-4 text-[11px]">Apply</Button>
                 </div>
               </div>
             ))}
