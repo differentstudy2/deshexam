@@ -17,6 +17,41 @@ import hardcodedTextbooksJson from '@/data/hardcoded/taxonomy/textbooks.json';
 
 const ITEMS_PER_PAGE = 12;
 
+const bnTranslations: Record<string, string> = {
+  // Subjects
+  "environmental-science": "পরিবেশ বিজ্ঞান",
+  "mathematics": "গণিত",
+  "bengali-language": "বাংলা",
+  "english": "ইংরেজি",
+  "english-language": "ইংরেজি",
+  "history": "ইতিহাস",
+  "geography": "ভূগোল",
+  "physical-science": "ভৌত বিজ্ঞান",
+  "life-science": "জীবন বিজ্ঞান",
+  // Classes
+  "class-1": "১ম শ্রেণী",
+  "class-2": "২য় শ্রেণী",
+  "class-3": "৩য় শ্রেণী",
+  "class-4": "৪র্থ শ্রেণী",
+  "class-5": "৫ম শ্রেণী",
+  "class-6": "৬ষ্ঠ শ্রেণী",
+  "class-7": "৭ম শ্রেণী",
+  "class-8": "৮ম শ্রেণী",
+  "class-9": "৯ম শ্রেণী",
+  "class-10": "১০ম শ্রেণী",
+  "class-11": "একাদশ শ্রেণী",
+  "class-12": "দ্বাদশ শ্রেণী",
+};
+
+const formatLabel = (slug: string, board: string) => {
+  if (!slug) return '';
+  const isWB = board.toLowerCase() === 'wbbse' || board.toLowerCase() === 'wb-board';
+  if (isWB && bnTranslations[slug.toLowerCase()]) {
+    return bnTranslations[slug.toLowerCase()];
+  }
+  return slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+};
+
 export default function ClassSolutionsClient({ board, classSlug }: { board: string; classSlug: string }) {
   const [textbooks, setTextbooks] = useState<Textbook[]>([]);
   const [loading, setLoading] = useState(true);
@@ -190,8 +225,8 @@ export default function ClassSolutionsClient({ board, classSlug }: { board: stri
                   </CardHeader>
                   <CardContent className="flex-grow p-4 space-y-3">
                       <div className="flex flex-wrap gap-1.5">
-                          {book.subject && <Badge variant="secondary" className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 font-medium">{book.subject}</Badge>}
-                          {book.class && <Badge variant="secondary" className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 font-medium">{book.class}</Badge>}
+                          {book.subject && <Badge variant="secondary" className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 font-medium">{formatLabel(book.subject, board)}</Badge>}
+                          {book.class && <Badge variant="secondary" className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 font-medium">{formatLabel(book.class, board)}</Badge>}
                           {((book as any).version || (book as any).medium || (book as any).language) && (
                             <Badge variant="secondary" className="bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border border-blue-200/50 dark:border-blue-800/50 font-medium">
                               {((book as any).version || (book as any).medium || (book as any).language)}
