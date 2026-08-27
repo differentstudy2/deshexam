@@ -114,9 +114,6 @@ const adminNavGroups = [
     title: "Dashboard",
     items: [
       { href: '/admin', label: 'Overview', icon: <LayoutGrid className="h-4 w-4" /> },
-      { href: '/admin/todo', label: 'Todo List', icon: <ClipboardList className="h-4 w-4" /> },
-      { href: '/admin/reports', label: 'Reports', icon: <BarChart2 className="h-4 w-4" /> },
-      { href: '/admin/notifications', label: 'Notifications', icon: <Bell className="h-4 w-4" /> },
     ]
   },
   {
@@ -160,16 +157,6 @@ const adminNavGroups = [
       { href: '/admin/question-bank/import', label: 'Bulk Import', icon: <Upload className="h-4 w-4" /> },
       { href: '/admin/questions', label: 'Questions Manager', icon: <ClipboardList className="h-4 w-4" /> },
       { href: '/admin/quizzes', label: 'Quizzes Manager', icon: <Sparkles className="h-4 w-4" /> },
-    ]
-  },
-  {
-    title: "Student Portal",
-    items: [
-      { href: '/dashboard/student', label: 'Students', icon: <Users className="h-4 w-4" /> },
-      { href: '/dashboard/student-dashboard', label: 'Student Dashboard', icon: <LayoutDashboard className="h-4 w-4" /> },
-      { href: '/admin/progress-reports', label: 'Progress Reports', icon: <BarChart2 className="h-4 w-4" /> },
-      { href: '/admin/analytics', label: 'Analytics', icon: <Activity className="h-4 w-4" /> },
-      { href: '/admin/leaderboard', label: 'Leaderboard', icon: <Trophy className="h-4 w-4" /> },
     ]
   },
   {

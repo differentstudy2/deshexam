@@ -23,12 +23,16 @@ interface PageProps {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const post = await getContentBySlug(params.slug);
+  const resolvedParams = await params;
+  let post = await getContentBySlug(resolvedParams.slug);
   
   if (!post) {
-    return {
-      title: 'Post Not Found',
-    };
+    // Hardcoded fallback
+    post = {
+      title: "The Ultimate Guide to Premium Blog Design (Hardcoded)",
+      description: "This is a hardcoded blog post so you can see the new UI.",
+      featureImage: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=2070&auto=format&fit=crop"
+    } as any;
   }
 
   const cleanDescription = post.description?.substring(0, 160).replace(/<[^>]*>?/gm, '') || 'Read this post on DeshExam.';
@@ -52,10 +56,31 @@ function getReadingTime(htmlContent: string) {
 }
 
 export default async function BlogPostPage({ params }: PageProps) {
-  const post = await getContentBySlug(params.slug);
+  const resolvedParams = await params;
+  let post = await getContentBySlug(resolvedParams.slug);
 
   if (!post) {
-    notFound();
+    // HARDCODED FALLBACK FOR UI TESTING
+    post = {
+      title: "The Ultimate Guide to Premium Blog Design",
+      description: `
+        <p>This is a completely hardcoded blog post for you to test the UI!</p>
+        <h2>Why this UI is amazing</h2>
+        <p>Because it uses prose-xl and has a very clean, minimalist layout.</p>
+        <blockquote><p>Design is not just what it looks like and feels like. Design is how it works. - Steve Jobs</p></blockquote>
+        <p>Enjoy the clean typography, the beautiful cinematic feature image layout, and the sticky social share buttons!</p>
+        <ul>
+          <li>World class typography</li>
+          <li>Cinematic header image</li>
+          <li>Optimized reading experience</li>
+        </ul>
+      `,
+      featureImage: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=2070&auto=format&fit=crop",
+      tags: "Design, Next.js, Test",
+      publishedAt: new Date().toISOString(),
+      authorName: "System Admin",
+      category: "Technology",
+    } as any;
   }
 
   let publishDate = post.publishedAt ? new Date(post.publishedAt) : new Date();

@@ -2817,20 +2817,29 @@ export const getContentBySlug = async (slugOrId: string) => {
         const q = query(
             collection(db, "content"),
             where("slug", "==", decodedSlug),
-            where("status", "==", "Published"),
             limit(1)
         );
         const querySnapshot = await getDocs(q);
         
         let docSnap;
         if (!querySnapshot.empty) {
-            docSnap = querySnapshot.docs[0];
-        } else {
+            const data = querySnapshot.docs[0].data();
+            if (!data.status || data.status === "Published") {
+                docSnap = querySnapshot.docs[0];
+            }
+        } 
+
+        if (!docSnap) {
             // Fallback: try by document ID
             const docRef = doc(db, "content", decodedSlug);
             const maybeDoc = await getDoc(docRef);
-            if (maybeDoc.exists() && maybeDoc.data().status === "Published") {
-                docSnap = maybeDoc;
+            if (maybeDoc.exists()) {
+                const docStatus = maybeDoc.data().status;
+                if (!docStatus || docStatus === "Published") {
+                    docSnap = maybeDoc;
+                } else {
+                    return null;
+                }
             } else {
                 return null;
             }
