@@ -1003,52 +1003,71 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
       </div>
 
       {/* Map/Contact Details Card */}
-      <Card className="border-slate-100 dark:border-slate-800 shadow-sm rounded-sm bg-white dark:bg-slate-900">
-        <CardContent className="p-0">
-          <div className="p-4 sm:p-6 border-b border-slate-100 dark:border-slate-800">
-            <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-4 pb-2 border-b border-slate-100 dark:border-slate-800">Contact Details</h3>
-            <div className="space-y-4">
-              <div className="flex gap-3 text-sm">
-                <MapPin className="w-5 h-5 text-indigo-500 dark:text-indigo-400 shrink-0 mt-0.5" />
-                <div>
-                  <div className="font-semibold text-slate-800 dark:text-slate-200">Address</div>
-                  <div className="text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">{institution.address || 'Address not available'}</div>
+      <div className="rounded-md overflow-hidden shadow-sm bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
+        <div className="bg-gradient-to-r from-teal-500 to-emerald-500 p-3 flex items-center gap-3">
+          <div className="bg-white p-1.5 rounded-md shadow-sm flex items-center justify-center">
+            <Phone className="w-5 h-5 text-teal-600" />
+          </div>
+          <h3 className="text-white font-bold uppercase text-sm tracking-wide">Contact Details</h3>
+        </div>
+        <div className="p-4 sm:p-6 border-b border-slate-100 dark:border-slate-800">
+          <div className="flex flex-col gap-1.5">
+            <div className="flex items-start gap-3 p-2 rounded-md hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+              <div className="w-10 h-10 rounded-[10px] bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center shrink-0">
+                <MapPin className="w-5 h-5 text-indigo-600 dark:text-indigo-500" />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-bold text-slate-800 dark:text-slate-100 text-sm">Address</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mt-0.5">{institution.address || 'Address not available'}</span>
+              </div>
+            </div>
+            {(institution as any).email && (
+              <div className="flex items-center gap-3 p-2 rounded-md hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                <div className="w-10 h-10 rounded-[10px] bg-amber-50 dark:bg-amber-500/10 flex items-center justify-center shrink-0">
+                  <Mail className="w-5 h-5 text-amber-600 dark:text-amber-500" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="font-bold text-slate-800 dark:text-slate-100 text-sm">Email</span>
+                  <a href={`mailto:${(institution as any).email}`} className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline mt-0.5">{(institution as any).email}</a>
                 </div>
               </div>
-              {(institution as any).email && (
-                <div className="flex gap-3 text-sm">
-                  <Mail className="w-5 h-5 text-amber-500 dark:text-amber-400 shrink-0 mt-0.5" />
-                  <div>
-                    <div className="font-semibold text-slate-800 dark:text-slate-200">Email</div>
-                    <a href={`mailto:${(institution as any).email}`} className="text-indigo-600 dark:text-indigo-400 hover:underline mt-1 block">{(institution as any).email}</a>
-                  </div>
+            )}
+            {institution.phoneNumber && (
+              <div className="flex items-center gap-3 p-2 rounded-md hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                <div className="w-10 h-10 rounded-[10px] bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center shrink-0">
+                  <Phone className="w-5 h-5 text-emerald-600 dark:text-emerald-500" />
                 </div>
-              )}
-              {institution.phoneNumber && (
-                <div className="flex gap-3 text-sm">
-                  <Phone className="w-5 h-5 text-emerald-500 dark:text-emerald-400 shrink-0 mt-0.5" />
-                  <div>
-                    <div className="font-semibold text-slate-800 dark:text-slate-200">Phone</div>
-                    <a href={`tel:${institution.phoneNumber}`} className="text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors mt-1 block">{institution.phoneNumber}</a>
-                  </div>
+                <div className="flex flex-col">
+                  <span className="font-bold text-slate-800 dark:text-slate-100 text-sm">Phone</span>
+                  <a href={`tel:${institution.phoneNumber}`} className="text-xs text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors mt-0.5">{institution.phoneNumber}</a>
                 </div>
-              )}
-              {institution.websiteUrl && (
-                <div className="flex gap-3 text-sm">
-                  <Globe className="w-5 h-5 text-cyan-500 dark:text-cyan-400 shrink-0 mt-0.5" />
-                  <div>
-                    <div className="font-semibold text-slate-800 dark:text-slate-200">Website</div>
-                    <a href={institution.websiteUrl} target="_blank" rel="noopener noreferrer" className="text-indigo-600 dark:text-indigo-400 hover:underline mt-1 block truncate max-w-[200px]">{institution.websiteUrl.replace(/^https?:\/\//, '')}</a>
-                  </div>
+              </div>
+            )}
+            {institution.websiteUrl && (
+              <div className="flex items-center gap-3 p-2 rounded-md hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                <div className="w-10 h-10 rounded-[10px] bg-cyan-50 dark:bg-cyan-500/10 flex items-center justify-center shrink-0">
+                  <Globe className="w-5 h-5 text-cyan-600 dark:text-cyan-500" />
                 </div>
-              )}
-            </div>
+                <div className="flex flex-col">
+                  <span className="font-bold text-slate-800 dark:text-slate-100 text-sm">Website</span>
+                  <a href={institution.websiteUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline mt-0.5 truncate max-w-[200px]">{institution.websiteUrl.replace(/^https?:\/\//, '')}</a>
+                </div>
+              </div>
+            )}
           </div>
+        </div>
+      </div>
 
-          {/* Operating Hours inside Contact Card */}
-          <div className="p-4 sm:p-6 bg-slate-50/50 dark:bg-slate-800/30">
-            <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2 text-sm"><Clock className="w-4 h-4 text-slate-400 dark:text-slate-500" /> Operating Hours</h3>
-            <table className="w-full text-xs">
+      {/* Operating Hours Card */}
+      <div className="rounded-md overflow-hidden shadow-sm bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
+        <div className="bg-gradient-to-r from-blue-500 to-indigo-500 p-3 flex items-center gap-3">
+          <div className="bg-white p-1.5 rounded-md shadow-sm flex items-center justify-center">
+            <Clock className="w-5 h-5 text-blue-600" />
+          </div>
+          <h3 className="text-white font-bold uppercase text-sm tracking-wide">Operating Hours</h3>
+        </div>
+        <div className="p-4 sm:p-6 bg-slate-50/50 dark:bg-slate-800/30">
+          <table className="w-full text-xs">
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
                 {(() => {
                   let rawHours = (institution as any).openingHours;
@@ -1106,38 +1125,68 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
               </tbody>
             </table>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Quick Stats Card */}
-      <Card className="border-slate-100 dark:border-slate-800 shadow-sm rounded-sm bg-white dark:bg-slate-900">
-        <CardContent className="p-4 sm:p-6">
-          <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-4 pb-2 border-b border-slate-100 dark:border-slate-800">Quick Stats</h3>
-          <div className="grid grid-cols-2 gap-y-4 gap-x-2 text-sm">
-            <div className="flex flex-col">
-              <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wider mb-1 flex items-center gap-1"><Building className="w-3 h-3" /> Ownership</span>
-              <span className="font-semibold text-slate-800 dark:text-slate-200">{(institution as any).ownershipType || 'Private'}</span>
+      <div className="rounded-md overflow-hidden shadow-sm bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
+        <div className="bg-gradient-to-r from-purple-500 to-fuchsia-500 p-3 flex items-center gap-3">
+          <div className="bg-white p-1.5 rounded-md shadow-sm flex items-center justify-center">
+            <Building className="w-5 h-5 text-purple-600" />
+          </div>
+          <h3 className="text-white font-bold uppercase text-sm tracking-wide">Quick Stats</h3>
+        </div>
+        <div className="p-4 sm:p-6">
+          <div className="flex flex-col gap-1.5">
+            <div className="flex items-center gap-3 p-2 rounded-md hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+              <div className="w-10 h-10 rounded-[10px] bg-orange-50 dark:bg-orange-500/10 flex items-center justify-center shrink-0">
+                <Building className="w-5 h-5 text-orange-600 dark:text-orange-500" />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-bold text-slate-800 dark:text-slate-100 text-sm">Ownership</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400">{(institution as any).ownershipType || 'Private'}</span>
+              </div>
             </div>
-            <div className="flex flex-col">
-              <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wider mb-1 flex items-center gap-1"><MapPin className="w-3 h-3" /> Area</span>
-              <span className="font-semibold text-slate-800 dark:text-slate-200">{(institution as any).campusArea || '50 Acres'}</span>
+            <div className="flex items-center gap-3 p-2 rounded-md hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+              <div className="w-10 h-10 rounded-[10px] bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center shrink-0">
+                <MapPin className="w-5 h-5 text-blue-600 dark:text-blue-500" />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-bold text-slate-800 dark:text-slate-100 text-sm">Area</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400">{(institution as any).campusArea || '50 Acres'}</span>
+              </div>
             </div>
-            <div className="flex flex-col">
-              <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wider mb-1 flex items-center gap-1"><Users className="w-3 h-3" /> Faculty</span>
-              <span className="font-semibold text-slate-800 dark:text-slate-200">{(institution as any).facultyCount || '200+'}</span>
+            <div className="flex items-center gap-3 p-2 rounded-md hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+              <div className="w-10 h-10 rounded-[10px] bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center shrink-0">
+                <Users className="w-5 h-5 text-emerald-600 dark:text-emerald-500" />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-bold text-slate-800 dark:text-slate-100 text-sm">Faculty</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400">{(institution as any).facultyCount || '200+'}</span>
+              </div>
             </div>
-            <div className="flex flex-col">
-              <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wider mb-1 flex items-center gap-1"><Calendar className="w-3 h-3" /> Est. Year</span>
-              <span className="font-semibold text-slate-800 dark:text-slate-200">{institution.establishedYear || '1995'}</span>
+            <div className="flex items-center gap-3 p-2 rounded-md hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+              <div className="w-10 h-10 rounded-[10px] bg-purple-50 dark:bg-purple-500/10 flex items-center justify-center shrink-0">
+                <Calendar className="w-5 h-5 text-purple-600 dark:text-purple-500" />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-bold text-slate-800 dark:text-slate-100 text-sm">Est. Year</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400">{institution.establishedYear || '1995'}</span>
+              </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Location Map View */}
-      <Card className="border-slate-100 dark:border-slate-800 shadow-sm rounded-sm bg-white dark:bg-slate-900">
-        <CardContent className="p-4 sm:p-6">
-          <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-4 pb-2 border-b border-slate-100 dark:border-slate-800">Location</h3>
+      <div className="rounded-md overflow-hidden shadow-sm bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
+        <div className="bg-gradient-to-r from-amber-500 to-orange-500 p-3 flex items-center gap-3">
+          <div className="bg-white p-1.5 rounded-md shadow-sm flex items-center justify-center">
+            <MapPin className="w-5 h-5 text-amber-600" />
+          </div>
+          <h3 className="text-white font-bold uppercase text-sm tracking-wide">Location</h3>
+        </div>
+        <div className="p-4 sm:p-6">
           <div className="text-sm text-slate-600 dark:text-slate-400 mb-4 flex items-start gap-2">
             <MapPin className="w-4 h-4 text-emerald-500 dark:text-emerald-400 mt-0.5 shrink-0" />
             <span>{institution.address || 'Institution Address, City, State, Country - ZIP'}</span>
@@ -1159,14 +1208,19 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
               Map View Not Available
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Social Links */}
       {institution.socialProfiles && Object.values(institution.socialProfiles).some(val => val) && (
-        <Card className="border-slate-100 dark:border-slate-800 shadow-sm rounded-sm bg-white dark:bg-slate-900">
-          <CardContent className="p-4 sm:p-6">
-            <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-4 pb-2 border-b border-slate-100 dark:border-slate-800">Follow Us</h3>
+        <div className="rounded-md overflow-hidden shadow-sm bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
+          <div className="bg-gradient-to-r from-cyan-500 to-blue-500 p-3 flex items-center gap-3">
+            <div className="bg-white p-1.5 rounded-md shadow-sm flex items-center justify-center">
+              <Globe className="w-5 h-5 text-cyan-600" />
+            </div>
+            <h3 className="text-white font-bold uppercase text-sm tracking-wide">Follow Us</h3>
+          </div>
+          <div className="p-4 sm:p-6">
             <div className="flex gap-3">
               {institution.socialProfiles.facebook && (
                 <a href={institution.socialProfiles.facebook} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-blue-600 hover:text-white flex items-center justify-center transition-colors">
@@ -1194,11 +1248,12 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
                 </a>
               )}
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
+      
       {/* Brochure Download Card */}
-      <Card className="border-none shadow-sm rounded-sm bg-gradient-to-br from-indigo-500 to-indigo-700 dark:from-indigo-900 dark:to-indigo-950 text-white">
+      <Card className="border-none shadow-sm rounded-md bg-gradient-to-br from-indigo-500 to-indigo-700 dark:from-indigo-900 dark:to-indigo-950 text-white overflow-hidden">
         <CardContent className="p-6 text-center">
           <BookOpen className="w-12 h-12 mx-auto mb-4 text-indigo-200 dark:text-indigo-400" />
           <h3 className="font-bold text-lg mb-2">Download Brochure</h3>
@@ -1208,12 +1263,17 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
       </Card>
 
       {/* Nearby Institutions */}
-      <Card className="border-slate-100 dark:border-slate-800 shadow-sm rounded-sm bg-white dark:bg-slate-900">
-        <CardContent className="p-4 sm:p-6">
-          <div className="flex justify-between items-center mb-4 border-b border-slate-100 dark:border-slate-800 pb-3">
-            <h3 className="font-bold text-lg text-slate-900 dark:text-slate-100">Nearby</h3>
-            <Link href="/institutions" className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold hover:underline">View All</Link>
+      <div className="rounded-md overflow-hidden shadow-sm bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
+        <div className="bg-gradient-to-r from-rose-500 to-orange-500 p-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="bg-white p-1.5 rounded-md shadow-sm flex items-center justify-center">
+              <Building className="w-5 h-5 text-rose-600" />
+            </div>
+            <h3 className="text-white font-bold uppercase text-sm tracking-wide">Nearby</h3>
           </div>
+          <Link href="/institutions" className="text-xs text-white/90 font-semibold hover:text-white hover:underline bg-white/20 px-2 py-1 rounded backdrop-blur-sm">View All</Link>
+        </div>
+        <div className="p-4 sm:p-6">
           <div className="space-y-4">
             {relatedInstitutions.length > 0 ? relatedInstitutions.map(related => (
               <Link href={`/institutions/${related.slug}`} key={related.id} className="flex items-center gap-3 group">
@@ -1241,8 +1301,8 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
               <div className="text-sm text-slate-500 dark:text-slate-400">No related institutions found.</div>
             )}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
     </div>
   </div>
