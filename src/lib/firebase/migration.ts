@@ -154,6 +154,15 @@ export async function rebuildSubtreeSeo(rootNodeId: string) {
         ancestors: ancestorsArray as any,
       };
 
+      ancestors.forEach(a => {
+        if (a.type === 'board') updates.boardSlug = a.slug || generateSlug(a.title);
+        if (a.type === 'class') updates.classSlug = a.slug || generateSlug(a.title);
+        if (a.type === 'subject') updates.subjectSlug = a.slug || generateSlug(a.title);
+        if (a.type === 'textbook') updates.bookSlug = a.slug || generateSlug(a.title);
+        if (a.type === 'chapter') updates.chapterSlug = a.slug || generateSlug(a.title);
+        if (a.type === 'topic') updates.topicSlug = a.slug || generateSlug(a.title);
+      });
+
       return updateDoc(doc(db, 'taxonomy_nodes', node.id), updates as any).then(() => {
         // Create redirect mapping
         return setDoc(doc(db, 'url_redirects', node.id), {

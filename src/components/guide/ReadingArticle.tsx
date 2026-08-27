@@ -167,7 +167,7 @@ export function ReadingArticle({ data, node, hierarchy, navigation, contentType 
           </div>
         </div>
       </div>
-      <div className="p-6 sm:p-10 flex flex-col gap-8">
+      <div className="p-6 sm:p-6 flex flex-col gap-8">
         {data.content && typeof data.content === 'string' && (
           <div className="prose dark:prose-invert max-w-none custom-reading-font">
             <ReactMarkdown
@@ -301,7 +301,7 @@ export function ReadingArticle({ data, node, hierarchy, navigation, contentType 
 
           {['mcq', 'cq', 'true-false', 'fill-in-blanks', 'matching'].includes(sec.type) && !(sec as any).questions && (
             <div className="mt-8 relative">
-               <NodeQuestionsPage node={node} contentType={sec.type} previewMode={true} />
+              <NodeQuestionsPage node={node} contentType={sec.type} previewMode={true} />
             </div>
           )}
 
@@ -445,16 +445,16 @@ export function ReadingArticle({ data, node, hierarchy, navigation, contentType 
                 </div>
 
                 <div className="flex items-center text-[#6b8c80] print:hidden shrink-0">
-                  <div className="flex items-center gap-1.5 text-[15px] font-medium mr-1">
+                  <div className="flex items-center gap-1.5 text-[15px] font-medium mr-1.5">
                     <Eye className="w-[18px] h-[18px]" />
                     {viewCount}
                   </div>
                   <button
                     onClick={() => window.print()}
-                    className="hover:text-[#1b3d36] transition-colors p-1.5"
+                    className="hover:text-[#1b3d36] transition-colors p-0"
                     title="Print"
                   >
-                    <Printer className="w-[20px] h-[20px] stroke-[1.5]" />
+                    <Printer className="w-[18px] h-[18px] stroke-[1.5]" />
                   </button>
                   <button
                     onClick={() => {
@@ -465,15 +465,15 @@ export function ReadingArticle({ data, node, hierarchy, navigation, contentType 
                         alert('Link copied to clipboard!');
                       }
                     }}
-                    className="hover:text-[#1b3d36] transition-colors p-1.5"
+                    className="hover:text-[#1b3d36] transition-colors p-0 mx-1.5"
                     title="Share"
                   >
-                    <Share2 className="w-[20px] h-[20px] stroke-[1.5]" />
+                    <Share2 className="w-[18px] h-[18px] stroke-[1.5]" />
                   </button>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <button className="bg-white dark:bg-slate-800 rounded-md p-1.5 hover:text-[#1b3d36] hover:bg-slate-50 shadow-sm border border-slate-200/80 dark:border-slate-700 transition-colors ml-2">
-                        <MoreVertical className="w-5 h-5 stroke-[1.5]" />
+                      <button className="bg-white dark:bg-slate-800 rounded-md p-0 hover:text-[#1b3d36] hover:bg-slate-50 shadow-sm border border-slate-200/80 dark:border-slate-700 transition-colors w-7 h-7 flex items-center justify-center">
+                        <MoreVertical className="w-[18px] h-[18px] stroke-[1.5]" />
                       </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-48 bg-white dark:bg-slate-900">

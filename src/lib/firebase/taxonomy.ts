@@ -320,9 +320,12 @@ export const updateTaxonomyNode = async (id: string, data: Partial<TaxonomyNode>
     if ((data.title && data.title !== existingData.title) || 
         (data.slug && data.slug !== existingData.slug) ||
         (data.parentId !== undefined && data.parentId !== existingData.parentId)) {
-      import('./migration').then(({ rebuildSubtreeSeo }) => {
-        rebuildSubtreeSeo(id).catch(e => console.error("Failed to rebuild subtree SEO in background:", e));
-      }).catch(e => console.error("Failed to import migration module:", e));
+      try {
+        const { rebuildSubtreeSeo } = await import('./migration');
+        await rebuildSubtreeSeo(id);
+      } catch (e) {
+        console.error("Failed to rebuild subtree SEO:", e);
+      }
     }
 
     // Automatically sync updates to the new guide_* collections to prevent split-brain issues
