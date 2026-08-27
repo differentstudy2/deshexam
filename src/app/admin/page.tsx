@@ -1,7 +1,7 @@
 'use client';
 
 import { Card, CardContent } from '@/components/ui/card';
-import { Users, FileText, BarChart2, PlusCircle, FilePlus, Book, ArrowUpRight, TrendingUp, Search } from 'lucide-react';
+import { Users, FileText, BarChart2, PlusCircle, FilePlus, Book, ArrowUpRight, TrendingUp, Search, Settings } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { getPaginatedSubmissions, getAllContent, getUserProfile, deleteSubmissions, getAllUsers } from '@/lib/firebase/firestore';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -278,6 +278,15 @@ export default function AdminDashboardPage() {
                 <div className="mt-6 relative z-10">
                   <h3 className="font-bold text-slate-900 text-lg">Users</h3>
                   <p className="text-xs text-slate-500 mt-1">Manage accounts</p>
+                </div>
+            </Link>
+
+            <Link href="/admin/settings" className="relative overflow-hidden group bg-white/80 backdrop-blur-md rounded-[24px] p-6 border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_rgb(100,116,139,0.15)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
+                <div className="absolute right-0 top-0 w-24 h-24 bg-slate-500/10 rounded-bl-[100px] transition-colors duration-300 group-hover:bg-slate-600" />
+                <Settings className="w-8 h-8 text-slate-700 group-hover:text-slate-50 relative z-10 transition-colors" />
+                <div className="mt-6 relative z-10">
+                  <h3 className="font-bold text-slate-900 text-lg">Settings</h3>
+                  <p className="text-xs text-slate-500 mt-1">System config</p>
                 </div>
             </Link>
 
