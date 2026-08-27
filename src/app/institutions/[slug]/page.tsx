@@ -618,12 +618,15 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
 
             {/* Left side: Scholarships */}
             <div className="space-y-4">
-              {[1, 2].map((i) => (
-                <div key={i} className="border border-slate-100 dark:border-slate-800 rounded-sm p-4 bg-white dark:bg-slate-800/30 relative">
-                  <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-3">Scholarship Name</h3>
+              {((institution as any).scholarships || [
+                { id: 1, name: 'Merit Excellence Scholarship', amount: '₹50,000', eligibility: 'Merit Based' },
+                { id: 2, name: 'Need-based Financial Aid', amount: '₹25,000', eligibility: 'Income < 5 LPA' }
+              ]).map((scholarship: any, idx: number) => (
+                <div key={scholarship.id || idx} className="border border-slate-100 dark:border-slate-800 rounded-sm p-4 bg-white dark:bg-slate-800/30 relative">
+                  <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-3">{scholarship.name}</h3>
                   <div className="flex flex-col gap-1 text-xs text-slate-600 dark:text-slate-300 mb-4">
-                    <div className="flex"><span className="text-slate-400 dark:text-slate-500 w-20">Amount</span> <span className="font-bold text-slate-800 dark:text-slate-200">₹50,000</span></div>
-                    <div className="flex"><span className="text-slate-400 dark:text-slate-500 w-20">Eligibility</span> <span className="font-bold text-slate-800 dark:text-slate-200">Merit Based</span></div>
+                    <div className="flex"><span className="text-slate-400 dark:text-slate-500 w-20">Amount</span> <span className="font-bold text-slate-800 dark:text-slate-200">{scholarship.amount}</span></div>
+                    <div className="flex"><span className="text-slate-400 dark:text-slate-500 w-20">Eligibility</span> <span className="font-bold text-slate-800 dark:text-slate-200">{scholarship.eligibility}</span></div>
                   </div>
                   <Button className="w-full bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 text-white rounded shadow-sm h-8 text-xs">Apply Scholarship</Button>
                 </div>
@@ -698,48 +701,54 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
           <h2 className="text-white font-bold uppercase text-sm sm:text-base tracking-wide">Admission</h2>
         </div>
         <CardContent className="p-4 sm:p-6 pt-6 sm:pt-6">
-          <div className="flex flex-wrap gap-4 mb-6">
-            <Badge className={institution.admission?.admissionOpen ? "bg-emerald-500 hover:bg-emerald-600 text-white rounded text-sm py-1.5 px-4" : "bg-emerald-500 hover:bg-emerald-600 text-white rounded text-sm py-1.5 px-4 opacity-50"}>Admission Open</Badge>
-            <Badge className={!institution.admission?.admissionOpen ? "bg-rose-500 hover:bg-rose-600 text-white rounded text-sm py-1.5 px-4" : "bg-rose-500 hover:bg-rose-600 text-white rounded text-sm py-1.5 px-4 opacity-50"}>Admission Closed</Badge>
+          <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-100 dark:border-slate-800/60">
+            <h3 className="font-bold text-slate-800 dark:text-slate-200 text-sm">Admission Status</h3>
+            {institution.admission?.admissionOpen ? (
+              <Badge className="bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400 hover:bg-emerald-500/20 border-emerald-200 dark:border-emerald-500/30 rounded-sm px-3 py-1 uppercase tracking-wider font-bold text-[10px]">Open Now</Badge>
+            ) : (
+              <Badge className="bg-rose-500/10 text-rose-600 dark:bg-rose-500/20 dark:text-rose-400 hover:bg-rose-500/20 border-rose-200 dark:border-rose-500/30 rounded-sm px-3 py-1 uppercase tracking-wider font-bold text-[10px]">Closed</Badge>
+            )}
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10 text-sm">
-            <div className="flex flex-col"><span className="text-slate-500 dark:text-slate-400 font-medium mb-1">Start Date</span> <span className="font-bold text-slate-800 dark:text-slate-200">{institution.admission?.applicationStartDate ? new Date(institution.admission.applicationStartDate).toLocaleDateString('en-GB') : 'TBA'}</span></div>
-            <div className="flex flex-col"><span className="text-slate-500 dark:text-slate-400 font-medium mb-1">End Date</span> <span className="font-bold text-slate-800 dark:text-slate-200">{institution.admission?.applicationEndDate ? new Date(institution.admission.applicationEndDate).toLocaleDateString('en-GB') : 'TBA'}</span></div>
-            <div className="flex flex-col"><span className="text-slate-500 dark:text-slate-400 font-medium mb-1">Mode</span> <span className="font-bold text-slate-800 dark:text-slate-200">{institution.admission?.admissionMode || '-'}</span></div>
-            <div className="flex flex-col"><span className="text-slate-500 dark:text-slate-400 font-medium mb-1">Application Fee</span> <span className="font-bold text-slate-800 dark:text-slate-200">{institution.admission?.applicationFee ? `₹${institution.admission.applicationFee}` : '-'}</span></div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+            <div className="bg-slate-50/50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/60 rounded-sm p-3 flex flex-col items-center justify-center text-center">
+              <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wider mb-1">Start Date</span>
+              <span className="font-bold text-slate-800 dark:text-slate-200 text-xs">{institution.admission?.applicationStartDate ? new Date(institution.admission.applicationStartDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'TBA'}</span>
+            </div>
+            <div className="bg-slate-50/50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/60 rounded-sm p-3 flex flex-col items-center justify-center text-center">
+              <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wider mb-1">End Date</span>
+              <span className="font-bold text-slate-800 dark:text-slate-200 text-xs">{institution.admission?.applicationEndDate ? new Date(institution.admission.applicationEndDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'TBA'}</span>
+            </div>
+            <div className="bg-slate-50/50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/60 rounded-sm p-3 flex flex-col items-center justify-center text-center">
+              <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wider mb-1">Mode</span>
+              <span className="font-bold text-slate-800 dark:text-slate-200 text-xs">{institution.admission?.admissionMode || '-'}</span>
+            </div>
+            <div className="bg-slate-50/50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/60 rounded-sm p-3 flex flex-col items-center justify-center text-center">
+              <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wider mb-1">App Fee</span>
+              <span className="font-bold text-slate-800 dark:text-slate-200 text-xs">{institution.admission?.applicationFee ? `₹${institution.admission.applicationFee}` : 'Free'}</span>
+            </div>
           </div>
 
           {/* Timeline */}
-          <div className="relative flex justify-between items-start w-full mb-10 px-2">
-            <div className="absolute top-2.5 left-0 w-full h-0.5 bg-slate-200 dark:bg-slate-700 -z-10"></div>
-
-            <div className="flex flex-col items-center w-1/4">
-              <div className="w-5 h-5 rounded-full bg-emerald-500 border-4 border-white dark:border-slate-900 mb-2 shadow-sm"></div>
-              <span className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium">Step 1</span>
-              <span className="text-[10px] sm:text-xs font-bold text-slate-800 dark:text-slate-200 text-center">Registration</span>
-            </div>
-            <div className="flex flex-col items-center w-1/4">
-              <div className="w-5 h-5 rounded-full bg-emerald-500 border-4 border-white dark:border-slate-900 mb-2 shadow-sm"></div>
-              <span className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium">Step 2</span>
-              <span className="text-[10px] sm:text-xs font-bold text-slate-800 dark:text-slate-200 text-center">Document<br />Upload</span>
-            </div>
-            <div className="flex flex-col items-center w-1/4">
-              <div className="w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-700 border-4 border-white dark:border-slate-900 mb-2 shadow-sm"></div>
-              <span className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium">Step 3</span>
-              <span className="text-[10px] sm:text-xs font-bold text-slate-800 dark:text-slate-200 text-center">Verification</span>
-            </div>
-            <div className="flex flex-col items-center w-1/4">
-              <div className="w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-700 border-4 border-white dark:border-slate-900 mb-2 shadow-sm"></div>
-              <span className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium">Step 4</span>
-              <span className="text-[10px] sm:text-xs font-bold text-slate-800 dark:text-slate-200 text-center">Confirmation</span>
+          <div className="mb-8">
+            <h3 className="font-bold text-slate-800 dark:text-slate-200 text-sm mb-6">Process Timeline</h3>
+            <div className="relative flex justify-between items-start w-full px-4">
+              <div className="absolute top-2.5 left-8 right-8 h-0.5 bg-slate-100 dark:bg-slate-800 -z-10"></div>
+              
+              {((institution.admission as any)?.steps || MOCK_ADMISSION_STEPS).slice(0, 4).map((step: any, idx: number) => (
+                <div key={idx} className="flex flex-col items-center w-1/4 relative group">
+                  <div className={`w-5 h-5 rounded-full border-[3px] border-white dark:border-slate-900 mb-2.5 shadow-sm transition-colors ${idx <= 1 ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700'}`}></div>
+                  <span className="text-[9px] text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider">{step.step}</span>
+                  <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 text-center leading-tight mt-1 max-w-[80px]">{step.title}</span>
+                </div>
+              ))}
             </div>
           </div>
 
           {institution.admission?.admissionProcess && (
-            <div className="mb-8">
-              <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-2">Admission Details</h3>
-              <div className="prose prose-sm dark:prose-invert prose-slate max-w-none text-slate-600 dark:text-slate-400 tiptap-content" dangerouslySetInnerHTML={{ __html: institution.admission.admissionProcess }} />
+            <div className="mb-8 p-4 bg-slate-50 dark:bg-slate-800/20 rounded-sm border border-slate-100 dark:border-slate-800/60">
+              <h3 className="font-bold text-slate-800 dark:text-slate-200 text-sm mb-3">Admission Details</h3>
+              <div className="prose prose-sm dark:prose-invert max-w-none text-slate-600 dark:text-slate-400 text-xs leading-relaxed" dangerouslySetInnerHTML={{ __html: institution.admission.admissionProcess }} />
             </div>
           )}
 

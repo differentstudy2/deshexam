@@ -92,7 +92,20 @@
       "admissionUrl": "https://www.sxccal.edu/admissions"
     },
     "placement": {
-      "placementDescription": "Top recruiters include Deloitte, PWC, EY, KPMG, and various multinational corporations with competitive packages."
+      "placementAvailable": true,
+      "placementRate": "98%",
+      "highestPackage": "24 LPA",
+      "averagePackage": "8.5 LPA",
+      "recruiters": [
+        "Google",
+        "Microsoft",
+        "TCS",
+        "Infosys",
+        "Deloitte",
+        "PwC",
+        "KPMG"
+      ],
+      "placementDescription": "<p>The Career Development Cell at St. Xavier College ensures top-notch placement opportunities. Over 98% of registered students secure placements in leading multinational companies and Big 4 accounting firms.</p>"
     },
     "socialProfiles": {
       "facebook": "https://facebook.com",
@@ -103,6 +116,52 @@
     "status": "published",
     "track": "higher-education",
     "parentId": null,
-    "orderIndex": 2
+    "orderIndex": 2,
+    "courses": [
+      {
+        "id": 101,
+        "title": "B.Sc Physics (Hons)",
+        "degreeType": "Bachelors",
+        "duration": "3 Years",
+        "fees": "₹45,000 / yr",
+        "seats": 60,
+        "eligibility": "10+2 with Science",
+        "isNew": true
+      },
+      {
+        "id": 102,
+        "title": "B.Com (Hons)",
+        "degreeType": "Bachelors",
+        "duration": "3 Years",
+        "fees": "₹55,000 / yr",
+        "seats": 120,
+        "eligibility": "10+2 Commerce",
+        "isNew": false
+      },
+      {
+        "id": 103,
+        "title": "M.Sc Computer Science",
+        "degreeType": "Masters",
+        "duration": "2 Years",
+        "fees": "₹80,000 / yr",
+        "seats": 40,
+        "eligibility": "B.Sc CS or IT",
+        "isNew": true
+      }
+    ],
+    "scholarships": [
+      {
+        "id": 1,
+        "name": "St. Xavier Excellence Scholarship",
+        "amount": "₹1,00,000",
+        "eligibility": "95% and above in 10+2"
+      },
+      {
+        "id": 2,
+        "name": "Need-based Financial Aid",
+        "amount": "₹40,000",
+        "eligibility": "Family Income < 3 LPA"
+      }
+    ]
   }
 ]
