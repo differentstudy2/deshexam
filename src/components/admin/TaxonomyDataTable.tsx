@@ -883,6 +883,9 @@ export function TaxonomyDataTable({ type, title }: Props) {
                       className="mt-0.5 z-10"
                     />
                     <div className="flex items-center gap-1.5 z-10">
+                      {(node as any).isHardcoded && (
+                        <span className="flex items-center justify-center min-w-[22px] h-[22px] text-[10px] font-bold bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 rounded border border-purple-200 dark:border-purple-500/30" title="Hardcoded">H</span>
+                      )}
                       <span className="text-xs text-slate-400 dark:text-slate-500 font-mono bg-slate-50 dark:bg-slate-900 px-1.5 py-0.5 rounded border border-slate-100 dark:border-slate-700">#{node.orderIndex || 0}</span>
                       <div className={`flex items-center justify-center w-6 h-6 rounded-full border shadow-sm transition-colors
                           ${node.status === 'published' ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800' : ''}
@@ -901,14 +904,9 @@ export function TaxonomyDataTable({ type, title }: Props) {
                       <h3 className="font-semibold text-slate-800 dark:text-slate-200 text-lg leading-tight line-clamp-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                         {node.title}
                       </h3>
-                      {((node as any).isHardcoded || nodeAcronym) && (
+                      {nodeAcronym && (
                         <div className="flex items-center gap-1.5 mt-0.5">
-                          {(node as any).isHardcoded && (
-                            <span className="text-[10px] font-bold px-1.5 py-0.5 bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 rounded-md border border-purple-200 dark:border-purple-500/30 uppercase tracking-wider shrink-0">Hardcoded</span>
-                          )}
-                          {nodeAcronym && (
-                            <span className="text-xs font-semibold px-2 py-0.5 bg-indigo-50 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-300 rounded-md border border-indigo-200 dark:border-indigo-500/30 shrink-0">{nodeAcronym}</span>
-                          )}
+                          <span className="text-xs font-semibold px-2 py-0.5 bg-indigo-50 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-300 rounded-md border border-indigo-200 dark:border-indigo-500/30 shrink-0">{nodeAcronym}</span>
                         </div>
                       )}
                     </div>
@@ -919,8 +917,32 @@ export function TaxonomyDataTable({ type, title }: Props) {
                     {type !== 'board' && (
                       <div className="mt-auto pt-2">
                         <div className="text-[11px] font-medium text-slate-500 uppercase tracking-wider mb-1">Context</div>
-                        <div className="text-sm text-slate-600 dark:text-slate-300 line-clamp-2 bg-slate-50 dark:bg-slate-900/50 p-2 rounded-lg border border-slate-100 dark:border-slate-800">
-                          {getParentContext(node) || '—'}
+                        <div className="flex flex-wrap items-center gap-1.5 mt-1">
+                          {(() => {
+                            if (!node.parentId) return <span className="text-sm text-slate-500">—</span>;
+                            let current = node;
+                            const path: TaxonomyNode[] = [];
+                            while (current.parentId) {
+                              const parent = allNodes.find(n => n.id === current.parentId);
+                              if (!parent) break;
+                              path.unshift(parent);
+                              current = parent;
+                            }
+                            if (path.length === 0) return <span className="text-sm text-slate-500">—</span>;
+
+                            return path.map((p, i) => {
+                              const titleToShow = (p as any).titleBn || (p as any).title_bn || p.title;
+                              const label = p.type === 'board' && p.acronym ? p.acronym : titleToShow;
+                              return (
+                                <React.Fragment key={i}>
+                                  <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-medium text-slate-600 dark:text-slate-300 shadow-sm">
+                                    {label}
+                                  </span>
+                                  {i < path.length - 1 && <ChevronRight className="w-3 h-3 text-slate-400" />}
+                                </React.Fragment>
+                              );
+                            });
+                          })()}
                         </div>
                       </div>
                     )}
