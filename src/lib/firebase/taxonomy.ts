@@ -13,6 +13,7 @@ export type ContentType = typeof VALID_CONTENT_TYPES[number] | string;
 export interface TaxonomyNode {
   id: string;
   title: string;
+  titleBn?: string;
   slug?: string;
   type: NodeType;
   track: TaxonomyTrack;

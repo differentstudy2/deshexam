@@ -75,12 +75,12 @@ export function TaxonomyDataTable({ type, title }: Props) {
 
   // Add Modal State
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [addForm, setAddForm] = useState({ title: '', slug: '', subjectCode: '' });
+  const [addForm, setAddForm] = useState({ title: '', titleBn: '', slug: '', subjectCode: '' });
 
   // Edit Modal State
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingNode, setEditingNode] = useState<TaxonomyNode | null>(null);
-  const [editForm, setEditForm] = useState({ title: '', slug: '', subjectCode: '' });
+  const [editForm, setEditForm] = useState({ title: '', titleBn: '', slug: '', subjectCode: '' });
   const [isSaving, setIsSaving] = useState(false);
 
   // Merge Duplicates State
@@ -273,6 +273,7 @@ export function TaxonomyDataTable({ type, title }: Props) {
     setEditingNode(node);
     setEditForm({ 
       title: node.title, 
+      titleBn: (node as any).titleBn || (node as any).title_bn || '',
       slug: node.slug || generateSlug(node.title),
       subjectCode: (node as any).subjectCode || ''
     });
@@ -285,6 +286,7 @@ export function TaxonomyDataTable({ type, title }: Props) {
     try {
       await updateTaxonomyNode(editingNode.id, { 
         title: editForm.title, 
+        ...(editForm.titleBn ? { titleBn: editForm.titleBn } : {}),
         slug: editForm.slug,
         ...(type === 'subject' && { subjectCode: editForm.subjectCode })
       });
@@ -421,6 +423,7 @@ export function TaxonomyDataTable({ type, title }: Props) {
 
       await createTaxonomyNode({
         title: addForm.title,
+        ...(addForm.titleBn ? { titleBn: addForm.titleBn } : {}),
         slug: addForm.slug || generateSlug(addForm.title),
         type: type,
         track: 'academic',
@@ -429,7 +432,7 @@ export function TaxonomyDataTable({ type, title }: Props) {
         ...(type === 'subject' && { subjectCode: addForm.subjectCode })
       });
       setIsAddModalOpen(false);
-      setAddForm({ title: '', slug: '', subjectCode: '' });
+      setAddForm({ title: '', titleBn: '', slug: '', subjectCode: '' });
       fetchData();
     } catch (error) {
       console.error("Failed to add node", error);
@@ -902,7 +905,7 @@ export function TaxonomyDataTable({ type, title }: Props) {
                   <div className="p-4 flex-1 flex flex-col cursor-pointer overflow-hidden" onClick={() => handleToggleSelect(node.id, !selectedIds.includes(node.id))}>
                     <div className="flex flex-wrap items-start gap-x-2 gap-y-1 mb-1.5">
                       <h3 className="font-semibold text-slate-800 dark:text-slate-200 text-lg leading-tight line-clamp-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                        {node.title}
+                        {(node as any).titleBn || (node as any).title_bn || node.title}
                       </h3>
                       {nodeAcronym && (
                         <div className="flex items-center gap-1.5 mt-0.5">
@@ -1005,7 +1008,7 @@ export function TaxonomyDataTable({ type, title }: Props) {
                 <TableBody>
                   {Object.values(
                     filteredNodes.reduce((acc, node) => {
-                      const title = node.title.trim();
+                      const title = ((node as any).titleBn || (node as any).title_bn || node.title).trim();
                       if (!acc[title]) acc[title] = { title, nodes: [] };
                       acc[title].nodes.push(node);
                       return acc;
@@ -1094,7 +1097,7 @@ export function TaxonomyDataTable({ type, title }: Props) {
                       </TableCell>
                       <TableCell className="py-2 pr-2">
                         <div className="font-medium text-sm text-gray-900 dark:text-slate-200 line-clamp-2 inline-flex items-center gap-2">
-                          {node.title}
+                          {(node as any).titleBn || (node as any).title_bn || node.title}
                           {(node as any).isHardcoded && (
                             <span className="text-[10px] font-bold px-1.5 py-0.5 bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 rounded border border-purple-200 dark:border-purple-500/30 whitespace-nowrap uppercase tracking-wider">Hardcoded</span>
                           )}
@@ -1233,6 +1236,15 @@ export function TaxonomyDataTable({ type, title }: Props) {
               />
             </div>
             <div className="grid gap-2">
+              <Label className="text-slate-700 dark:text-slate-300">Title (Bengali) - Optional</Label>
+              <Input
+                value={editForm.titleBn}
+                onChange={(e) => setEditForm({ ...editForm, titleBn: e.target.value })}
+                placeholder="Bengali Title"
+                className="bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-600 text-slate-900 dark:text-slate-100"
+              />
+            </div>
+            <div className="grid gap-2">
               <Label className="text-slate-700 dark:text-slate-300">Slug</Label>
               <Input
                 value={editForm.slug}
@@ -1283,6 +1295,15 @@ export function TaxonomyDataTable({ type, title }: Props) {
                   }));
                 }}
                 placeholder={`Enter ${type} title`}
+                className="bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-600 text-slate-900 dark:text-slate-100"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label className="text-slate-700 dark:text-slate-300">Title (Bengali) - Optional</Label>
+              <Input
+                value={addForm.titleBn}
+                onChange={(e) => setAddForm({ ...addForm, titleBn: e.target.value })}
+                placeholder="Bengali Title"
                 className="bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-600 text-slate-900 dark:text-slate-100"
               />
             </div>
