@@ -51,7 +51,7 @@ const mainNavLinks: NavLinkType[] = [
   { href: "/course", label: "Course", icon: <Book className="h-5 w-5" /> },
   { href: "/book", label: "Book", icon: <Library className="h-5 w-5" /> },
   { 
-    label: "Assessments", 
+    label: "Test & Practice", 
     icon: <Award className="h-5 w-5" />, 
     subItems: [
       { href: "/exams", label: "Exams", icon: <Award className="h-4 w-4" /> },
