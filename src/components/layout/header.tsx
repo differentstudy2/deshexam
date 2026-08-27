@@ -38,19 +38,30 @@ type NavLinkType = {
 
 const mainNavLinks: NavLinkType[] = [
   { href: "/academy", label: "Learn", icon: <BookOpen className="h-5 w-5" /> },
-  { 
-    label: "Media", 
-    icon: <Play className="h-5 w-5" />, 
+  { href: "/book", label: "Book", icon: <Library className="h-5 w-5" /> },
+  {
+    label: "Solutions",
+    icon: <ClipboardList className="h-5 w-5" />,
+    subItems: [
+      { href: "/solutions/ncert", label: "NCERT Solutions", icon: <Book className="h-4 w-4" /> },
+      { href: "/solutions/wbbse", label: "WBBSE Solutions", icon: <Book className="h-4 w-4" /> },
+      { href: "/solutions/wbchse", label: "WBCHSE Solutions", icon: <Book className="h-4 w-4" /> },
+      { href: "/solutions/cbse", label: "CBSE Solutions", icon: <Book className="h-4 w-4" /> },
+      { href: "/solutions/icse", label: "ICSE Solutions", icon: <Book className="h-4 w-4" /> },
+    ]
+  },
+  {
+    label: "Media",
+    icon: <Play className="h-5 w-5" />,
     subItems: [
       { href: "/videos", label: "Videos", icon: <Zap className="h-4 w-4" /> },
       { href: "/audios", label: "Audios", icon: <Headphones className="h-4 w-4" /> },
       { href: "/documents", label: "Documents", icon: <FileText className="h-4 w-4" /> },
     ]
   },
-  { href: "/book", label: "Book", icon: <Library className="h-5 w-5" /> },
-  { 
-    label: "Test & Practice", 
-    icon: <Award className="h-5 w-5" />, 
+  {
+    label: "Test & Practice",
+    icon: <Award className="h-5 w-5" />,
     subItems: [
       { href: "/exams", label: "Exams", icon: <Award className="h-4 w-4" /> },
       { href: "/mock-tests", label: "Mock Test", icon: <FileText className="h-4 w-4" /> },
