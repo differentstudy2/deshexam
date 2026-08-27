@@ -117,50 +117,46 @@ const adminNavGroups = [
     ]
   },
   {
-    title: "Academic Content",
+    title: "Content",
     items: [
       { href: '/admin/video', label: 'Videos', icon: <Play className="h-4 w-4" /> },
       { href: '/admin/audio', label: 'Audio', icon: <Headphones className="h-4 w-4" /> },
-      { href: '/admin/documents', label: 'Documents', icon: <FileText className="h-4 w-4" /> },
-      { href: '/admin/guide-content/explorer', label: 'Content Explorer', icon: <Compass className="h-4 w-4" /> },
+      { href: '/admin/documents', label: 'Docs', icon: <FileText className="h-4 w-4" /> },
+      { href: '/admin/guide-content/explorer', label: 'Explorer', icon: <Compass className="h-4 w-4" /> },
       { href: '/admin/institution', label: 'Institutions', icon: <School className="h-4 w-4" /> },
       { href: '/admin/boards', label: 'Boards', icon: <Library className="h-4 w-4" /> },
       { href: '/admin/classes', label: 'Classes', icon: <Users className="h-4 w-4" /> },
-      { href: '/admin/textbook', label: 'Textbook Data', icon: <BookOpen className="h-4 w-4" /> },
+      { href: '/admin/textbook', label: 'Textbooks', icon: <BookOpen className="h-4 w-4" /> },
       { href: '/admin/subjects', label: 'Subjects', icon: <Book className="h-4 w-4" /> },
       { href: '/admin/chapters', label: 'Chapters', icon: <FileText className="h-4 w-4" /> },
       { href: '/admin/topics', label: 'Topics', icon: <FileText className="h-4 w-4" /> },
-
-      { href: '/admin/guide-content', label: 'Guide Manager', icon: <Compass className="h-4 w-4" /> },
+      { href: '/admin/guide-content', label: 'Guides', icon: <Compass className="h-4 w-4" /> },
       { href: '/admin/kids-zone/manage', label: 'Kids Zone', icon: <ToyBrick className="h-4 w-4" /> },
     ]
   },
   {
-    title: "Blog & Updates",
+    title: "Updates",
     items: [
-      { href: '/admin/blog', label: 'Blog Posts', icon: <FileText className="h-4 w-4" /> },
-      { href: '/admin/job', label: 'Job Circulars', icon: <Briefcase className="h-4 w-4" /> },
-      { href: '/admin/news', label: 'News & Notices', icon: <Bell className="h-4 w-4" /> },
+      { href: '/admin/blog', label: 'Blog', icon: <FileText className="h-4 w-4" /> },
+      { href: '/admin/job', label: 'Jobs', icon: <Briefcase className="h-4 w-4" /> },
+      { href: '/admin/news', label: 'News', icon: <Bell className="h-4 w-4" /> },
     ]
   },
   {
-    title: "Assessment Center",
+    title: "Assessments",
     items: [
-      { href: '/admin/question-bank/questions', label: 'Question Bank', icon: <ClipboardList className="h-4 w-4" /> },
+      { href: '/admin/question-bank/questions', label: 'Questions', icon: <ClipboardList className="h-4 w-4" /> },
       { href: '/admin/question-bank/categories', label: 'Categories', icon: <BookOpen className="h-4 w-4" /> },
-      { href: '/admin/exam-taxonomy', label: 'Exam Taxonomy', icon: <Library className="h-4 w-4" /> },
-      { href: '/admin/assessment-center/practice-sets', label: 'Practice Sets', icon: <Activity className="h-4 w-4" /> },
+      { href: '/admin/exam-taxonomy', label: 'Taxonomy', icon: <Library className="h-4 w-4" /> },
+      { href: '/admin/assessment-center/practice-sets', label: 'Practice', icon: <Activity className="h-4 w-4" /> },
       { href: '/admin/assessment-center/quizzes', label: 'Quizzes', icon: <Sparkles className="h-4 w-4" /> },
-      { href: '/admin/assessment-center/mock-tests', label: 'Mock Tests', icon: <FileText className="h-4 w-4" /> },
-      { href: '/admin/assessment-center/exams', label: 'Exams & Papers', icon: <Award className="h-4 w-4" /> },
-      { href: '/admin/assessment-center/daily-challenges', label: 'Daily Challenges', icon: <Trophy className="h-4 w-4" /> },
-      { href: '/admin/question-bank/import', label: 'Bulk Import', icon: <Upload className="h-4 w-4" /> },
-      { href: '/admin/questions', label: 'Questions Manager', icon: <ClipboardList className="h-4 w-4" /> },
-      { href: '/admin/quizzes', label: 'Quizzes Manager', icon: <Sparkles className="h-4 w-4" /> },
+      { href: '/admin/assessment-center/mock-tests', label: 'Mocks', icon: <FileText className="h-4 w-4" /> },
+      { href: '/admin/assessment-center/exams', label: 'Exams', icon: <Award className="h-4 w-4" /> },
+      { href: '/admin/assessment-center/daily-challenges', label: 'Challenges', icon: <Trophy className="h-4 w-4" /> },
     ]
   },
   {
-    title: "User Management",
+    title: "Users",
     items: [
       { href: '/admin/users', label: 'Users', icon: <Users className="h-4 w-4" /> },
       { href: '/admin/roles', label: 'Roles', icon: <ShieldCheck className="h-4 w-4" /> },
@@ -169,32 +165,32 @@ const adminNavGroups = [
     ]
   },
   {
-    title: "Monetization",
+    title: "Sales",
     items: [
       { href: '/admin/earning', label: 'Earnings', icon: <DollarSign className="h-4 w-4" /> },
       { href: '/admin/coupons', label: 'Coupons', icon: <Ticket className="h-4 w-4" /> },
       { href: '/admin/plans', label: 'Plans', icon: <Package className="h-4 w-4" /> },
       { href: '/admin/orders', label: 'Orders', icon: <ShoppingCart className="h-4 w-4" /> },
       { href: '/admin/transactions', label: 'Transactions', icon: <Activity className="h-4 w-4" /> },
-      { href: '/admin/products', label: 'Products Store', icon: <Library className="h-4 w-4" /> },
+      { href: '/admin/products', label: 'Products', icon: <Library className="h-4 w-4" /> },
     ]
   },
   {
-    title: "Communication",
+    title: "Comms",
     items: [
-      { href: '/admin/faqs', label: 'Manage FAQs', icon: <HelpCircle className="h-4 w-4" /> },
-      { href: '/admin/push-notification', label: 'Push Notifications', icon: <Send className="h-4 w-4" /> },
-      { href: '/admin/broadcast-messages', label: 'Broadcast Messages', icon: <MessageSquare className="h-4 w-4" /> },
+      { href: '/admin/faqs', label: 'FAQs', icon: <HelpCircle className="h-4 w-4" /> },
+      { href: '/admin/push-notification', label: 'Push Notifs', icon: <Send className="h-4 w-4" /> },
+      { href: '/admin/broadcast-messages', label: 'Broadcasts', icon: <MessageSquare className="h-4 w-4" /> },
       { href: '/admin/templates', label: 'Templates', icon: <FileText className="h-4 w-4" /> },
     ]
   },
   {
-    title: "AI Tools",
+    title: "AI",
     items: [
-      { href: '/admin/ai-question-generator', label: 'Question Generator', icon: <Sparkles className="h-4 w-4" /> },
-      { href: '/admin/ai-quiz-generator', label: 'Quiz Generator', icon: <Sparkles className="h-4 w-4" /> },
-      { href: '/admin/ai-seo-assistant', label: 'SEO Assistant', icon: <Search className="h-4 w-4" /> },
-      { href: '/admin/ai-video-generator', label: 'Video Generator', icon: <Zap className="h-4 w-4" /> },
+      { href: '/admin/ai-question-generator', label: 'AI Qs', icon: <Sparkles className="h-4 w-4" /> },
+      { href: '/admin/ai-quiz-generator', label: 'AI Quizzes', icon: <Sparkles className="h-4 w-4" /> },
+      { href: '/admin/ai-seo-assistant', label: 'AI SEO', icon: <Search className="h-4 w-4" /> },
+      { href: '/admin/ai-video-generator', label: 'AI Videos', icon: <Zap className="h-4 w-4" /> },
     ]
   },
   {
