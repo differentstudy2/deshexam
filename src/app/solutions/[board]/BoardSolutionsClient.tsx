@@ -5,33 +5,99 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen } from "lucide-react";
-import { getAllTextbooks } from '@/lib/firebase/firestore';
+import { GraduationCap } from "lucide-react";
+import { getClasses } from '@/lib/firebase/firestore';
+import hardcodedClassesJson from '@/data/hardcoded/taxonomy/classes.json';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
-import type { Textbook } from '@/lib/types';
-import { TextbookStats } from '@/components/feature/textbook-stats';
 import { Badge } from '@/components/ui/badge';
-import { ContentBadge } from '@/components/content-badge';
 
 const ITEMS_PER_PAGE = 12;
 
+const CARD_GRADIENTS = [
+  "from-emerald-500 to-teal-700",
+  "from-blue-500 to-indigo-700",
+  "from-violet-500 to-purple-700",
+  "from-rose-500 to-pink-700",
+  "from-amber-500 to-orange-600",
+  "from-cyan-500 to-blue-600",
+  "from-fuchsia-500 to-purple-700",
+  "from-sky-500 to-indigo-600",
+];
+
 export default function BoardSolutionsClient({ board }: { board: string }) {
-  const [textbooks, setTextbooks] = useState<Textbook[]>([]);
+  const [classes, setClasses] = useState<{id: string, name: string, slug: string}[]>([]);
   const [loading, setLoading] = useState(true);
-  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
   const { toast } = useToast();
 
   const formattedBoard = board.toUpperCase();
 
   useEffect(() => {
-    const fetchBoardTextbooks = async () => {
+    const fetchBoardClasses = async () => {
       try {
         setLoading(true);
-        // Fetch all textbooks, then we filter by board client-side
-        // Alternatively, if there's an API index, we can filter it there.
-        const textbookData = await getAllTextbooks();
-        setTextbooks(textbookData as Textbook[]);
+        const firebaseClasses = await getClasses().catch(() => []);
+
+        const boardToSlugsMap: Record<string, string[]> = {
+          cbse: ['cbse-board', 'cbse'],
+          wbbse: ['wb-board', 'wbbme', 'wbbse'], // Excluded wbbpe to show only secondary classes
+          wbchse: ['wbchse'],
+          ncert: ['ncert'],
+          icse: ['icse-board', 'icse']
+        };
+
+        const boardSlugs = boardToSlugsMap[board.toLowerCase()] || [board.toLowerCase()];
+
+        // Safely extract array regardless of module system
+        let hardcodedClasses: any[] = [];
+        if (Array.isArray(hardcodedClassesJson)) {
+          hardcodedClasses = hardcodedClassesJson;
+        } else if (hardcodedClassesJson && typeof hardcodedClassesJson === 'object') {
+          if (Array.isArray((hardcodedClassesJson as any).default)) {
+            hardcodedClasses = (hardcodedClassesJson as any).default;
+          } else {
+            // fallback if it's an object with keys
+            hardcodedClasses = Object.values(hardcodedClassesJson);
+          }
+        }
+
+        const filteredHardcodedClasses = hardcodedClasses.filter(c => 
+          c && c.boardSlug && boardSlugs.includes(c.boardSlug)
+        ).map(c => ({ id: c.id, name: c.title || 'Unknown', slug: c.classSlug || c.slug || 'unknown' }));
+
+        const firebaseMapped = (firebaseClasses as any[]).filter(c => 
+          c.boardSlug && boardSlugs.includes(c.boardSlug)
+        ).map(c => ({ 
+          id: c.id, 
+          name: c.name || c.title, 
+          slug: c.classSlug || c.slug || (c.name || c.title)?.toLowerCase().replace(/\s+/g, '-') 
+        }));
+
+        // Ensure unique classes by name
+        const allBoardClassesMap = new Map();
+        [...filteredHardcodedClasses, ...firebaseMapped].forEach(c => {
+          if (!allBoardClassesMap.has(c.name)) {
+            allBoardClassesMap.set(c.name, c);
+          }
+        });
+
+        // Sort classes (e.g. Class 5, Class 6... instead of random order)
+        const sortedClasses = Array.from(allBoardClassesMap.values()).sort((a, b) => {
+          // Sort KG before Class
+          const isKgA = a.name.toLowerCase().includes('kg');
+          const isKgB = b.name.toLowerCase().includes('kg');
+          
+          if (isKgA && !isKgB) return -1;
+          if (!isKgA && isKgB) return 1;
+
+          // Extract numbers from class names for numeric sorting
+          const numA = parseInt(a.name.replace(/\D/g, '')) || 0;
+          const numB = parseInt(b.name.replace(/\D/g, '')) || 0;
+          if (numA !== numB) return numA - numB;
+          return a.name.localeCompare(b.name);
+        });
+
+        setClasses(sortedClasses);
       } catch (error) {
          toast({
           variant: "destructive",
@@ -43,25 +109,8 @@ export default function BoardSolutionsClient({ board }: { board: string }) {
       }
     };
 
-    fetchBoardTextbooks();
-  }, [toast]);
-
-  // Filter textbooks for this specific board
-  const filteredTextbooks = useMemo(() => {
-    return textbooks.filter(book => {
-      if (!book.board) return false;
-      return book.board.toLowerCase().replace(/\s+/g, '-') === board.toLowerCase() || 
-             book.board.toLowerCase() === board.toLowerCase();
-    });
-  }, [textbooks, board]);
-
-  const visibleTextbooks = useMemo(() => {
-    return filteredTextbooks.slice(0, visibleCount);
-  }, [filteredTextbooks, visibleCount]);
-
-  const handleLoadMore = () => {
-    setVisibleCount(prev => prev + ITEMS_PER_PAGE);
-  };
+    fetchBoardClasses();
+  }, [toast, board]);
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-12">
@@ -88,101 +137,66 @@ export default function BoardSolutionsClient({ board }: { board: string }) {
         </div>
       </div>
 
-      <div className="container mx-auto max-w-7xl px-4 mt-8 md:mt-12">
-        {/* Results Header */}
-        <div className="flex justify-between items-end mb-8">
-            <div>
-                <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 font-headline">Available Textbooks</h2>
-                {!loading && <p className="text-muted-foreground mt-1 text-sm">Showing {visibleTextbooks.length} of {filteredTextbooks.length} solutions for {formattedBoard}</p>}
+        <div className="container mx-auto max-w-7xl px-4 mt-8 md:mt-12">
+        {/* Classes Section */}
+        {!loading && classes.length > 0 ? (
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 font-headline mb-6">Select Your Class</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              {classes.map((c, index) => {
+                const gradient = CARD_GRADIENTS[index % CARD_GRADIENTS.length];
+                
+                return (
+                <Link
+                   key={c.id}
+                   href={`/solutions/${board.toLowerCase()}/${c.slug}`}
+                   className="group relative flex flex-col items-center justify-center p-8 rounded-2xl overflow-hidden transition-all duration-300 hover:scale-[1.03] hover:shadow-2xl border-none"
+                   style={{
+                      boxShadow: '0 10px 40px -10px rgba(0,0,0,0.1)'
+                   }}
+                >
+                  {/* Premium Gradient Background */}
+                  <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-95 group-hover:opacity-100 transition-opacity duration-300`}></div>
+                  
+                  {/* Subtle noise/pattern overlay */}
+                  <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors duration-300"></div>
+                  
+                  <div className="relative z-10 flex flex-col items-center w-full">
+                    <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center mb-5 backdrop-blur-md shadow-inner border border-white/30 group-hover:scale-110 transition-transform duration-500 ease-out">
+                      <GraduationCap className="h-8 w-8 text-white drop-shadow-md" />
+                    </div>
+                    
+                    <span className="font-bold text-2xl text-white tracking-wide drop-shadow-md font-headline mb-4">{c.name}</span>
+                    
+                    <div className="w-full flex justify-center mt-2 px-2">
+                       <span className="inline-flex items-center justify-center bg-white text-slate-800 font-semibold px-3 py-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform translate-y-2 opacity-90 group-hover:opacity-100 group-hover:translate-y-0 w-full whitespace-nowrap text-xs sm:text-sm">
+                         View Solutions
+                         <svg className="w-3.5 h-3.5 ml-1 sm:ml-1.5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                         </svg>
+                       </span>
+                    </div>
+                  </div>
+                </Link>
+              )})}
             </div>
-        </div>
-
-        {/* Textbooks Grid */}
-        {loading ? (
-           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {Array.from({ length: 8 }).map((_, i) => (
-                    <Card key={i}>
-                        <CardHeader className="p-0 relative h-48">
-                            <Skeleton className="w-full h-full rounded-t-lg" />
-                        </CardHeader>
-                        <CardContent className="p-4 space-y-2">
-                             <Skeleton className="h-4 w-1/3" />
-                             <Skeleton className="h-6 w-full" />
-                             <Skeleton className="h-16 w-full" />
-                        </CardContent>
-                        <CardFooter className="p-4">
-                             <Skeleton className="h-10 w-full" />
-                        </CardFooter>
-                    </Card>
-                ))}
-            </div>
-        ) : filteredTextbooks.length > 0 ? (
-          <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {visibleTextbooks.map((book) => (
-                <Card key={book.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow bg-textbook-card-gradient text-white border-none">
-                  <CardHeader className="p-0 relative bg-black/20 flex items-center justify-center h-48 group">
-                    <Link href={`/textbook-solutions/${book.id}`} className="block w-full h-full relative">
-                        <Image
-                          src={book.featureImage || `https://picsum.photos/seed/${book.id}/200/280`}
-                          alt={book.title}
-                          width={200}
-                          height={280}
-                          className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-300"
-                        />
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
-                    </Link>
-                     <div className="absolute top-3 right-3">
-                        <ContentBadge type={book.access} />
-                      </div>
-                  </CardHeader>
-                  <CardContent className="flex-grow p-4 space-y-3">
-                      <div className="flex flex-wrap gap-1.5">
-                          {book.subject && <Badge variant="secondary" className="bg-white/10 hover:bg-white/20 text-white border-none font-medium">{book.subject}</Badge>}
-                          {book.class && <Badge variant="secondary" className="bg-white/10 hover:bg-white/20 text-white border-none font-medium">{book.class}</Badge>}
-                      </div>
-                      <Link href={`/textbook-solutions/${book.id}`} className="block group">
-                          <CardTitle className="font-headline text-lg mt-1 leading-snug text-white group-hover:text-emerald-300 transition-colors line-clamp-2">
-                              {book.title}
-                          </CardTitle>
-                      </Link>
-                       <p className="text-sm text-emerald-100/70 font-medium">by {(book as any).authorName || 'DeshExam'}</p>
-                      
-                      <div className="pt-2 border-t border-white/10">
-                        <TextbookStats textbookId={book.id} />
-                      </div>
-                  </CardContent>
-                  <CardFooter className="p-4 pt-0">
-                      <Button asChild className="w-full bg-white text-emerald-800 hover:bg-emerald-50 hover:text-emerald-900 shadow-sm border-none">
-                          <Link href={`/textbook-solutions/${book.id}`}>
-                            <BookOpen className="mr-2 h-4 w-4"/> View Solutions
-                          </Link>
-                      </Button>
-                  </CardFooter>
-                </Card>
-              ))}
-            </div>
-             {visibleCount < filteredTextbooks.length && (
-              <div className="mt-12 text-center">
-                <Button onClick={handleLoadMore} size="lg" variant="outline" className="border-emerald-200 text-emerald-800 hover:bg-emerald-50">
-                  Load More Solutions
-                </Button>
-              </div>
-            )}
-          </>
-        ) : (
-          <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-            <div className="mx-auto w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-6">
-                <BookOpen className="h-10 w-10 text-slate-400" />
-            </div>
-            <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-2">No textbooks found</h3>
-            <p className="text-muted-foreground max-w-md mx-auto">
-                We couldn't find any textbook solutions for the {formattedBoard} board at this time. We are constantly adding new materials, so check back soon!
-            </p>
-            <Button asChild className="mt-8">
-                <Link href="/textbook-solutions">Browse All Solutions</Link>
-            </Button>
           </div>
+        ) : !loading && classes.length === 0 ? (
+           <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm mb-12">
+            <div className="mx-auto w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-6">
+                <GraduationCap className="h-10 w-10 text-slate-400" />
+            </div>
+            <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-2">No classes found</h3>
+            <p className="text-muted-foreground max-w-md mx-auto">
+                We couldn't find any classes for the {formattedBoard} board at this time. We are constantly adding new materials, so check back soon!
+            </p>
+          </div>
+        ) : (
+           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-12">
+              {Array.from({ length: 6 }).map((_, i) => (
+                  <Skeleton key={i} className="h-28 w-full rounded-xl" />
+              ))}
+           </div>
         )}
       </div>
     </div>

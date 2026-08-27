@@ -573,5 +573,143 @@
         "type": "board"
       }
     ]
+  },
+  {
+    "id": "class-kg1-ncert",
+    "title": "KG 1",
+    "slug": "kg-1",
+    "type": "class",
+    "track": "academic",
+    "parentId": "board-ncert",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "ncert/kg-1",
+    "boardSlug": "ncert",
+    "classSlug": "kg-1",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-ncert",
+        "slug": "ncert",
+        "title": "NCERT",
+        "type": "board"
+      }
+    ]
+  },
+  {
+    "id": "class-kg2-ncert",
+    "title": "KG 2",
+    "slug": "kg-2",
+    "type": "class",
+    "track": "academic",
+    "parentId": "board-ncert",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "ncert/kg-2",
+    "boardSlug": "ncert",
+    "classSlug": "kg-2",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-ncert",
+        "slug": "ncert",
+        "title": "NCERT",
+        "type": "board"
+      }
+    ]
+  },
+  {
+    "id": "class-1-ncert",
+    "title": "Class 1",
+    "slug": "class-1",
+    "type": "class",
+    "track": "academic",
+    "parentId": "board-ncert",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "ncert/class-1",
+    "boardSlug": "ncert",
+    "classSlug": "class-1",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-ncert",
+        "slug": "ncert",
+        "title": "NCERT",
+        "type": "board"
+      }
+    ]
+  },
+  {
+    "id": "class-2-ncert",
+    "title": "Class 2",
+    "slug": "class-2",
+    "type": "class",
+    "track": "academic",
+    "parentId": "board-ncert",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "ncert/class-2",
+    "boardSlug": "ncert",
+    "classSlug": "class-2",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-ncert",
+        "slug": "ncert",
+        "title": "NCERT",
+        "type": "board"
+      }
+    ]
+  },
+  {
+    "id": "class-3-ncert",
+    "title": "Class 3",
+    "slug": "class-3",
+    "type": "class",
+    "track": "academic",
+    "parentId": "board-ncert",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "ncert/class-3",
+    "boardSlug": "ncert",
+    "classSlug": "class-3",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-ncert",
+        "slug": "ncert",
+        "title": "NCERT",
+        "type": "board"
+      }
+    ]
+  },
+  {
+    "id": "class-4-ncert",
+    "title": "Class 4",
+    "slug": "class-4",
+    "type": "class",
+    "track": "academic",
+    "parentId": "board-ncert",
+    "orderIndex": 6,
+    "status": "published",
+    "fullSlug": "ncert/class-4",
+    "boardSlug": "ncert",
+    "classSlug": "class-4",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-ncert",
+        "slug": "ncert",
+        "title": "NCERT",
+        "type": "board"
+      }
+    ]
   }
 ]
