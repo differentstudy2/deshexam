@@ -2791,3 +2791,31 @@ export const recordMockTest = async (userId: string, scorePct: number, simulated
         return { success: false, xpAwarded: 0 };
     }
 };
+
+export const getContentBySlug = async (slug: string) => {
+    try {
+        const q = query(
+            collection(db, "content"),
+            where("slug", "==", slug),
+            where("status", "==", "Published"),
+            limit(1)
+        );
+        const querySnapshot = await getDocs(q);
+        if (querySnapshot.empty) {
+            return null;
+        }
+        
+        const doc = querySnapshot.docs[0];
+        const data = doc.data();
+        return {
+            id: doc.id,
+            ...data,
+            createdAt: data.createdAt?.toDate?.()?.toISOString() || null,
+            publishedAt: data.publishedAt?.toDate?.()?.toISOString() || null,
+            updatedAt: data.updatedAt?.toDate?.()?.toISOString() || null,
+        } as any;
+    } catch (e) {
+        console.error("Error fetching content by slug: ", e);
+        return null;
+    }
+};
