@@ -427,45 +427,45 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
     <div className="lg:col-span-8 space-y-4 sm:space-y-8">
 
       {/* 2. QUICK INFO BAR */}
-      <Card className="border-slate-100 dark:border-slate-800 shadow-sm rounded-sm overflow-hidden bg-white dark:bg-slate-900">
+      <Card className="border-slate-100 dark:border-slate-800 shadow-sm rounded-sm overflow-hidden bg-white dark:bg-slate-900 mb-2">
         <CardContent className="p-0">
-          <div className="grid grid-cols-3 md:grid-cols-7 divide-x divide-y md:divide-y-0 divide-slate-100 dark:divide-slate-800/60 text-sm">
-            <div className="flex flex-col items-center justify-center text-center p-4">
-              <MapPin className="w-5 h-5 text-indigo-500 dark:text-indigo-400 mb-2" />
-              <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">Address</span>
-              <span className="text-slate-500 dark:text-slate-400 text-[10px] sm:text-xs line-clamp-1 mt-1">{institution.address ? institution.address.split(',')[0] : 'Location Details'}</span>
+          <div className="grid grid-cols-3 md:grid-cols-7 divide-x divide-y md:divide-y-0 divide-slate-100 dark:divide-slate-800/60">
+            <div className="flex flex-col items-center justify-center text-center py-2.5 px-1 sm:py-3 sm:px-2 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+              <MapPin className="w-4 h-4 text-indigo-500 dark:text-indigo-400 mb-1" />
+              <span className="font-semibold text-slate-800 dark:text-slate-200 text-[11px] leading-tight">Address</span>
+              <span className="text-slate-500 dark:text-slate-400 text-[10px] line-clamp-1 mt-0.5">{institution.address ? institution.address.split(',')[0] : 'Location'}</span>
             </div>
-            <div className="flex flex-col items-center justify-center text-center p-4">
-              <Phone className="w-5 h-5 text-emerald-500 dark:text-emerald-400 mb-2" />
-              <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">Phone</span>
-              <span className="text-slate-500 dark:text-slate-400 text-[10px] sm:text-xs mt-1">{institution.phoneNumber || '+91 98765 43210'}</span>
+            <div className="flex flex-col items-center justify-center text-center py-2.5 px-1 sm:py-3 sm:px-2 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+              <Phone className="w-4 h-4 text-emerald-500 dark:text-emerald-400 mb-1" />
+              <span className="font-semibold text-slate-800 dark:text-slate-200 text-[11px] leading-tight">Phone</span>
+              <span className="text-slate-500 dark:text-slate-400 text-[10px] mt-0.5 line-clamp-1">{institution.phoneNumber || '+91 98765 43210'}</span>
             </div>
             {(institution as any).email && (
-              <div className="flex flex-col items-center justify-center text-center p-4">
-                <Mail className="w-5 h-5 text-amber-500 dark:text-amber-400 mb-2" />
-                <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">Email</span>
-                <span className="text-slate-500 dark:text-slate-400 text-[10px] sm:text-xs mt-1 line-clamp-1">{(institution as any).email}</span>
+              <div className="flex flex-col items-center justify-center text-center py-2.5 px-1 sm:py-3 sm:px-2 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                <Mail className="w-4 h-4 text-amber-500 dark:text-amber-400 mb-1" />
+                <span className="font-semibold text-slate-800 dark:text-slate-200 text-[11px] leading-tight">Email</span>
+                <span className="text-slate-500 dark:text-slate-400 text-[10px] mt-0.5 line-clamp-1">{(institution as any).email}</span>
               </div>
             )}
-            <div className="flex flex-col items-center justify-center text-center p-4">
-              <BookOpen className="w-5 h-5 text-purple-500 dark:text-purple-400 mb-2" />
-              <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">Courses</span>
-              <span className="text-slate-500 dark:text-slate-400 text-[10px] sm:text-xs mt-1 line-clamp-1">{MOCK_COURSES.length} Available</span>
+            <div className="flex flex-col items-center justify-center text-center py-2.5 px-1 sm:py-3 sm:px-2 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+              <BookOpen className="w-4 h-4 text-purple-500 dark:text-purple-400 mb-1" />
+              <span className="font-semibold text-slate-800 dark:text-slate-200 text-[11px] leading-tight">Courses</span>
+              <span className="text-slate-500 dark:text-slate-400 text-[10px] mt-0.5 line-clamp-1">{MOCK_COURSES.length} Available</span>
             </div>
-            <div className="flex flex-col items-center justify-center text-center p-4">
-              <Globe className="w-5 h-5 text-cyan-500 dark:text-cyan-400 mb-2" />
-              <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">Website</span>
-              <span className="text-slate-500 dark:text-slate-400 text-[10px] sm:text-xs mt-1 line-clamp-1">{institution.websiteUrl ? 'Available' : 'N/A'}</span>
+            <div className="flex flex-col items-center justify-center text-center py-2.5 px-1 sm:py-3 sm:px-2 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+              <Globe className="w-4 h-4 text-cyan-500 dark:text-cyan-400 mb-1" />
+              <span className="font-semibold text-slate-800 dark:text-slate-200 text-[11px] leading-tight">Website</span>
+              <span className="text-slate-500 dark:text-slate-400 text-[10px] mt-0.5 line-clamp-1">{institution.websiteUrl ? 'Available' : 'N/A'}</span>
             </div>
-            <div className="flex flex-col items-center justify-center text-center p-4 bg-emerald-50/30 dark:bg-emerald-900/10">
-              <CheckCircle2 className="w-5 h-5 text-emerald-500 dark:text-emerald-400 mb-2" />
-              <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">Admission</span>
-              <span className="text-emerald-600 dark:text-emerald-400 font-medium text-[10px] sm:text-xs mt-1 line-clamp-1">{institution.admission?.admissionOpen ? 'Open Now' : 'Closed'}</span>
+            <div className="flex flex-col items-center justify-center text-center py-2.5 px-1 sm:py-3 sm:px-2 bg-emerald-50/40 dark:bg-emerald-900/10">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500 dark:text-emerald-400 mb-1" />
+              <span className="font-semibold text-slate-800 dark:text-slate-200 text-[11px] leading-tight">Admission</span>
+              <span className="text-emerald-600 dark:text-emerald-400 font-medium text-[10px] mt-0.5 line-clamp-1">{institution.admission?.admissionOpen ? 'Open' : 'Closed'}</span>
             </div>
-            <div className="flex flex-col items-center justify-center text-center p-4 col-span-3 md:col-span-1">
-              <Building className="w-5 h-5 text-slate-500 dark:text-slate-400 mb-2" />
-              <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">Board</span>
-              <span className="text-slate-500 dark:text-slate-400 text-[10px] sm:text-xs mt-1 line-clamp-1">{institution.boardType || 'University'}</span>
+            <div className="flex flex-col items-center justify-center text-center py-2.5 px-1 sm:py-3 sm:px-2 col-span-3 md:col-span-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+              <Building className="w-4 h-4 text-slate-500 dark:text-slate-400 mb-1" />
+              <span className="font-semibold text-slate-800 dark:text-slate-200 text-[11px] leading-tight">Board</span>
+              <span className="text-slate-500 dark:text-slate-400 text-[10px] mt-0.5 line-clamp-1">{institution.boardType || 'University'}</span>
             </div>
           </div>
         </CardContent>
@@ -583,19 +583,19 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
                   'Smart Board': <Monitor className="w-6 h-6" />
                 };
                 return (
-                  <div key={idx} className={`flex flex-col items-center justify-center p-4 rounded-sm border transition-colors cursor-default ${available ? 'border-emerald-100 dark:border-emerald-500/20 bg-emerald-50/50 dark:bg-emerald-500/10 hover:bg-emerald-50 dark:hover:bg-emerald-500/20 text-slate-800 dark:text-slate-200' : 'border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/30 text-slate-400 dark:text-slate-500'}`}>
-                    <div className={`mb-2 ${available ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-500'}`}>{iconMap[facilityStr] || <Building className="w-6 h-6" />}</div>
-                    <span className="text-sm font-bold text-center mb-1">{facilityStr}</span>
-                    <span className={`text-[10px] font-semibold tracking-wide uppercase ${available ? 'text-emerald-600 dark:text-emerald-500' : 'text-slate-400 dark:text-slate-600'}`}>{available ? 'Available' : 'Not Available'}</span>
+                  <div key={idx} className={`flex flex-col items-center justify-center py-2.5 px-2 rounded-sm border transition-colors cursor-default ${available ? 'border-emerald-100 dark:border-emerald-500/20 bg-emerald-50/50 dark:bg-emerald-500/10 hover:bg-emerald-50 dark:hover:bg-emerald-500/20 text-slate-800 dark:text-slate-200' : 'border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/30 text-slate-400 dark:text-slate-500'}`}>
+                    <div className={`mb-1.5 [&>svg]:w-5 [&>svg]:h-5 ${available ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-500'}`}>{iconMap[facilityStr] || <Building className="w-5 h-5" />}</div>
+                    <span className="text-xs font-bold text-center mb-0.5">{facilityStr}</span>
+                    <span className={`text-[9px] font-semibold tracking-wide uppercase ${available ? 'text-emerald-600 dark:text-emerald-500' : 'text-slate-400 dark:text-slate-600'}`}>{available ? 'Available' : 'Not Available'}</span>
                   </div>
                 );
               })
             ) : (
               MOCK_FACILITIES.slice(0, 8).map((facility, idx) => (
-                <div key={idx} className="flex flex-col items-center justify-center p-4 rounded-sm border border-emerald-100 dark:border-emerald-500/20 bg-emerald-50/50 dark:bg-emerald-500/10 hover:bg-emerald-50 dark:hover:bg-emerald-500/20 transition-colors text-slate-800 dark:text-slate-200 cursor-default">
-                  <div className="mb-2 text-emerald-600 dark:text-emerald-400">{facility.icon}</div>
-                  <span className="text-sm font-bold text-center mb-1">{facility.label}</span>
-                  <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-500 tracking-wide uppercase">Available</span>
+                <div key={idx} className="flex flex-col items-center justify-center py-2.5 px-2 rounded-sm border border-emerald-100 dark:border-emerald-500/20 bg-emerald-50/50 dark:bg-emerald-500/10 hover:bg-emerald-50 dark:hover:bg-emerald-500/20 transition-colors text-slate-800 dark:text-slate-200 cursor-default">
+                  <div className="mb-1.5 text-emerald-600 dark:text-emerald-400 [&>svg]:w-5 [&>svg]:h-5">{facility.icon}</div>
+                  <span className="text-xs font-bold text-center mb-0.5">{facility.label}</span>
+                  <span className="text-[9px] font-semibold text-emerald-600 dark:text-emerald-500 tracking-wide uppercase">Available</span>
                 </div>
               ))
             )}
@@ -1126,7 +1126,6 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
             </table>
           </div>
         </div>
-      </div>
 
       {/* Quick Stats Card */}
       <div className="rounded-md overflow-hidden shadow-sm bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
