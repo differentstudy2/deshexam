@@ -28,6 +28,11 @@ const bnTranslations: Record<string, string> = {
   "geography": "ভূগোল",
   "physical-science": "ভৌত বিজ্ঞান",
   "life-science": "জীবন বিজ্ঞান",
+  "bengali-literature": "বাংলা সাহিত্য",
+  "bengali-grammar": "বাংলা ব্যাকরণ",
+  "science": "বিজ্ঞান",
+  "rapid-reader": "র‍্যাপিড রিডার",
+  "health-physical-education": "স্বাস্থ্য ও শারীরশিক্ষা",
   // Classes
   "class-1": "১ম শ্রেণী",
   "class-2": "২য় শ্রেণী",
@@ -43,6 +48,36 @@ const bnTranslations: Record<string, string> = {
   "class-12": "দ্বাদশ শ্রেণী",
 };
 
+const bnBookTitles: Record<string, string> = {
+  // WBBSE / WBBPE textbook titles in Bengali script
+  "Amader Paribesh": "আমাদের পরিবেশ",
+  "Amar Ganit": "আমার গণিত",
+  "Bhasha Path": "ভাষা পাঠ",
+  "Health & Physical Education": "স্বাস্থ্য ও শারীরশিক্ষা",
+  "Patabahar": "পাতাবাহার",
+  "Amader Prithibi": "আমাদের পৃথিবী",
+  "Atit O Aityaja": "অতীত ও ঐতিহ্য",
+  "Bhasa Charcha": "ভাষাচর্চা",
+  "Ganit Prabha": "গণিত প্রভা",
+  "Ha Ja Ba Ra La": "হ য ব র ল",
+  "Poribesh O Bigyan": "পরিবেশ ও বিজ্ঞান",
+  "Sahityamela": "সাহিত্যমেলা",
+  "Maku": "মাকু",
+  "Pather Panchali Rapid": "পথের পাঁচালী র‍্যাপিড",
+  "Ganit Prakash": "গণিত প্রকাশ",
+  "Professor Shankur Dairy": "প্রফেসর শঙ্কুর ডায়েরি",
+  "Sahitya Sanchayan": "সাহিত্য সঞ্চয়ন",
+  "Koni Rapid Reader": "কোনি র‍্যাপিড রিডার",
+  "Amar Boi": "আমার বই",
+  "Sahaj Path Pratham Bhag": "সহজ পাঠ প্রথম ভাগ",
+  "Sahaj Path Dwitiyo Bhag": "সহজ পাঠ দ্বিতীয় ভাগ",
+  "Itihas O Poribesh": "ইতিহাস ও পরিবেশ",
+  "Itihas o Paribesh": "ইতিহাস ও পরিবেশ",
+  "Jibon Bigyan O Paribesh": "জীবন বিজ্ঞান ও পরিবেশ",
+  "Bhugol o Paribesh": "ভূগোল ও পরিবেশ",
+  "Physical Science": "ভৌতবিজ্ঞান",
+};
+
 const formatLabel = (slug: string, board: string) => {
   if (!slug) return '';
   const isWB = board.toLowerCase() === 'wbbse' || board.toLowerCase() === 'wb-board';
@@ -50,6 +85,14 @@ const formatLabel = (slug: string, board: string) => {
     return bnTranslations[slug.toLowerCase()];
   }
   return slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+};
+
+const translateTitle = (title: string, board: string) => {
+  const isWB = board.toLowerCase() === 'wbbse' || board.toLowerCase() === 'wb-board' || board.toLowerCase() === 'wbbpe' || board.toLowerCase() === 'wbbpe-board';
+  if (isWB && bnBookTitles[title]) {
+    return { original: title, translated: bnBookTitles[title] };
+  }
+  return { original: title, translated: null };
 };
 
 export default function ClassSolutionsClient({ board, classSlug }: { board: string; classSlug: string }) {
@@ -234,9 +277,21 @@ export default function ClassSolutionsClient({ board, classSlug }: { board: stri
                           )}
                       </div>
                       <Link href={`/textbook-solutions/${book.id}`} className="block group">
-                          <CardTitle className="font-headline text-lg mt-1 leading-snug text-slate-800 dark:text-slate-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors line-clamp-2">
-                              {book.title}
-                          </CardTitle>
+                          {(() => {
+                            const { original, translated } = translateTitle(book.title, board);
+                            return translated ? (
+                              <div>
+                                <CardTitle className="font-headline text-lg mt-1 leading-snug text-slate-800 dark:text-slate-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors line-clamp-2">
+                                  {translated}
+                                </CardTitle>
+                                <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5 italic">{original}</p>
+                              </div>
+                            ) : (
+                              <CardTitle className="font-headline text-lg mt-1 leading-snug text-slate-800 dark:text-slate-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors line-clamp-2">
+                                {original}
+                              </CardTitle>
+                            );
+                          })()}
                       </Link>
                        <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">by {(book as any).authorName || 'DeshExam'}</p>
                       
