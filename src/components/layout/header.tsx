@@ -29,18 +29,37 @@ import { useFcm } from "@/hooks/use-fcm";
 import { useToast } from "@/hooks/use-toast";
 import { clearAllCache } from "@/lib/actions/cache";
 
-const mainNavLinks = [
+type NavLinkType = {
+  href?: string;
+  label: string;
+  icon?: React.ReactNode;
+  subItems?: { href: string; label: string; icon?: React.ReactNode }[];
+};
+
+const mainNavLinks: NavLinkType[] = [
   { href: "/academy", label: "Academy", icon: <BookOpen className="h-5 w-5" /> },
-  { href: "/videos", label: "Videos", icon: <Zap className="h-5 w-5" /> },
-  { href: "/audios", label: "Audios", icon: <Headphones className="h-5 w-5" /> },
-  { href: "/documents", label: "Documents", icon: <FileText className="h-5 w-5" /> },
+  { 
+    label: "Media", 
+    icon: <Play className="h-5 w-5" />, 
+    subItems: [
+      { href: "/videos", label: "Videos", icon: <Zap className="h-4 w-4" /> },
+      { href: "/audios", label: "Audios", icon: <Headphones className="h-4 w-4" /> },
+      { href: "/documents", label: "Documents", icon: <FileText className="h-4 w-4" /> },
+    ]
+  },
   { href: "/skill", label: "Skill", icon: <Zap className="h-5 w-5" /> },
   { href: "/course", label: "Course", icon: <Book className="h-5 w-5" /> },
   { href: "/book", label: "Book", icon: <Library className="h-5 w-5" /> },
-  { href: "/exams", label: "Exams", icon: <Award className="h-5 w-5" /> },
-  { href: "/mock-tests", label: "Mock Test", icon: <FileText className="h-5 w-5" /> },
-  { href: "/quiz", label: "Quiz", icon: <Sparkles className="h-5 w-5" /> },
-  { href: "/practice", label: "Practice", icon: <Activity className="h-5 w-5" /> },
+  { 
+    label: "Assessments", 
+    icon: <Award className="h-5 w-5" />, 
+    subItems: [
+      { href: "/exams", label: "Exams", icon: <Award className="h-4 w-4" /> },
+      { href: "/mock-tests", label: "Mock Test", icon: <FileText className="h-4 w-4" /> },
+      { href: "/quiz", label: "Quiz", icon: <Sparkles className="h-4 w-4" /> },
+      { href: "/practice", label: "Practice", icon: <Activity className="h-4 w-4" /> },
+    ]
+  },
   { href: "/pricing", label: "Pricing", icon: <ShoppingCart className="h-5 w-5" /> },
 ];
 
@@ -406,9 +425,47 @@ const MainNav = ({ isMobile = false, onLinkClick, isScrolled = false }: { isMobi
         isMobile ? "flex flex-col items-start space-x-0 space-y-4 pt-4 w-full" : "hidden md:flex"
       )}
     >
-      {mainNavLinks.map((link) => (
-        <NavLink key={link.href} {...link} />
-      ))}
+      {mainNavLinks.map((link) => {
+        if (link.subItems) {
+          if (isMobile) {
+            return (
+              <div key={link.label} className="flex flex-col w-full space-y-1">
+                <div className="flex items-center gap-4 text-slate-800 dark:text-slate-200 font-medium text-lg py-2">
+                  {link.icon}
+                  <span>{link.label}</span>
+                </div>
+                <div className="flex flex-col pl-9 space-y-2">
+                  {link.subItems.map(subItem => (
+                    <NavLink key={subItem.href} href={subItem.href} label={subItem.label} icon={subItem.icon} />
+                  ))}
+                </div>
+              </div>
+            );
+          }
+          return (
+            <DropdownMenu key={link.label}>
+              <DropdownMenuTrigger className={cn(
+                "flex items-center gap-1 transition-colors hover:text-[#00a651] text-sm font-medium outline-none",
+                "text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
+              )}>
+                <span>{link.label}</span>
+                <ChevronDown className="h-3 w-3 opacity-50" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-48">
+                {link.subItems.map(subItem => (
+                  <DropdownMenuItem key={subItem.href} asChild>
+                    <Link href={subItem.href} onClick={onLinkClick} className="w-full cursor-pointer flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white">
+                      {subItem.icon}
+                      {subItem.label}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          );
+        }
+        return <NavLink key={link.label} href={link.href!} label={link.label} icon={link.icon} />;
+      })}
     </nav>
   );
 };
