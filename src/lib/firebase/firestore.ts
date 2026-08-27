@@ -45,6 +45,12 @@ const generateUsername = async (displayName: string): Promise<string> => {
 };
 
 const cleanDataForFirebase = (data: any): any => {
+    if (data instanceof Date) {
+        return data;
+    }
+    if (data && typeof data === 'object' && typeof data.toDate === 'function') {
+        return data;
+    }
     if (Array.isArray(data)) {
         return data.map(item => cleanDataForFirebase(item));
     }
@@ -480,10 +486,20 @@ export const updateContent = async (contentId: string, data: any) => {
             }
         }
         
-        await updateDoc(contentRef, {
+        const updatePayload: any = {
             ...cleanedData,
             updatedAt: serverTimestamp(),
-        });
+        };
+
+        const existingData = contentSnap.data();
+        if (!existingData.publishedAt || (typeof existingData.publishedAt === 'object' && !existingData.publishedAt.seconds)) {
+            updatePayload.publishedAt = serverTimestamp();
+        }
+        if (!existingData.createdAt || (typeof existingData.createdAt === 'object' && !existingData.createdAt.seconds)) {
+            updatePayload.createdAt = serverTimestamp();
+        }
+
+        await updateDoc(contentRef, updatePayload);
     } catch (e) {
         console.error("Error updating content: ", e);
         throw new Error("Failed to update content.");
@@ -563,6 +579,8 @@ export const getAllContent = async (type?: string) => {
                     pubDate = format(dateField.toDate(), 'PPP');
                 } else if (dateField instanceof Date) {
                     pubDate = format(dateField, 'PPP');
+                } else if (typeof dateField === 'object' && 'seconds' in dateField) {
+                    pubDate = format(new Date(dateField.seconds * 1000), 'PPP');
                 } else {
                     const d = new Date(dateField);
                     if (!isNaN(d.getTime())) {
@@ -2792,23 +2810,35 @@ export const recordMockTest = async (userId: string, scorePct: number, simulated
     }
 };
 
-export const getContentBySlug = async (slug: string) => {
+export const getContentBySlug = async (slugOrId: string) => {
     try {
+        const decodedSlug = decodeURIComponent(slugOrId);
+        
         const q = query(
             collection(db, "content"),
-            where("slug", "==", slug),
+            where("slug", "==", decodedSlug),
             where("status", "==", "Published"),
             limit(1)
         );
         const querySnapshot = await getDocs(q);
-        if (querySnapshot.empty) {
-            return null;
+        
+        let docSnap;
+        if (!querySnapshot.empty) {
+            docSnap = querySnapshot.docs[0];
+        } else {
+            // Fallback: try by document ID
+            const docRef = doc(db, "content", decodedSlug);
+            const maybeDoc = await getDoc(docRef);
+            if (maybeDoc.exists() && maybeDoc.data().status === "Published") {
+                docSnap = maybeDoc;
+            } else {
+                return null;
+            }
         }
         
-        const doc = querySnapshot.docs[0];
-        const data = doc.data();
+        const data = docSnap.data();
         return {
-            id: doc.id,
+            id: docSnap.id,
             ...data,
             createdAt: data.createdAt?.toDate?.()?.toISOString() || null,
             publishedAt: data.publishedAt?.toDate?.()?.toISOString() || null,

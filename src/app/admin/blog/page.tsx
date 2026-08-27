@@ -45,7 +45,9 @@ import { ContentBadge } from '@/components/content-badge';
 type ContentItem = {
     id: string;
     title: string;
-    subject: string;
+    subject?: string;
+    category?: string;
+    slug?: string;
     testType: string | string[];
     access: 'free' | 'premium' | 'pro';
     publishedAt: string;
@@ -123,7 +125,7 @@ export default function ManageBlogsPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>Title</TableHead>
-                <TableHead className="hidden md:table-cell">Subject</TableHead>
+                <TableHead className="hidden md:table-cell">Category</TableHead>
                 <TableHead className="hidden md:table-cell">Access</TableHead>
                 <TableHead className="hidden lg:table-cell">Published At</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
@@ -144,7 +146,7 @@ export default function ManageBlogsPage() {
                 items.map((item) => (
                   <TableRow key={item.id}>
                     <TableCell className="font-medium">{item.title}</TableCell>
-                    <TableCell className="hidden md:table-cell">{item.subject}</TableCell>
+                    <TableCell className="hidden md:table-cell">{item.category || item.subject || '-'}</TableCell>
                     <TableCell className="hidden md:table-cell">
                         <ContentBadge type={item.access} />
                     </TableCell>
@@ -160,7 +162,7 @@ export default function ManageBlogsPage() {
                         <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuItem asChild>
-                                <Link href={`/blog/${item.id}`}><Eye className="mr-2 h-4 w-4"/>View</Link>
+                                <Link href={`/blog/${item.slug || item.id}`}><Eye className="mr-2 h-4 w-4"/>View</Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
                                <Link href={`/admin/blog/edit/${item.id}`}><Pencil className="mr-2 h-4 w-4"/>Edit</Link>
