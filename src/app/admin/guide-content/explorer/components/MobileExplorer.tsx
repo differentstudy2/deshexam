@@ -501,21 +501,22 @@ export function MobileExplorer({ className }: { className?: string }) {
   return (
     <div className={`flex flex-col relative h-full bg-[#f6faf8] dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden ${className || ''}`}>
       {/* Mobile App Header (Green Theme) */}
-      <div className="flex items-center justify-between p-4 bg-[#3b8c4c] text-white shrink-0 shadow-sm relative z-10">
-        <div className="flex items-center gap-3 overflow-hidden">
+      <div className="flex items-center justify-between p-4 bg-gradient-to-r from-[#107c41] to-emerald-700 text-white shrink-0 shadow-md relative z-10">
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+        <div className="flex items-center gap-3 overflow-hidden relative z-10">
           {navigationStack.length > 1 ? (
-            <Button variant="ghost" size="icon" className="shrink-0 h-8 w-8 text-white hover:bg-white/20" onClick={handlePop}>
-              <ChevronRight className="w-5 h-5 rotate-180" />
+            <Button variant="ghost" size="icon" className="shrink-0 h-9 w-9 text-white hover:bg-white/20 rounded-xl" onClick={handlePop}>
+              <ChevronRight className="w-6 h-6 rotate-180" />
             </Button>
           ) : (
-             <Button variant="ghost" size="icon" className="shrink-0 h-8 w-8 text-white hover:bg-white/20" onClick={() => {}}>
+             <Button variant="ghost" size="icon" className="shrink-0 h-9 w-9 text-white hover:bg-white/20 rounded-xl" onClick={() => {}}>
                 <MoreHorizontal className="w-5 h-5" />
              </Button>
           )}
-          <h1 className="text-xl font-bold truncate flex items-center gap-2">
-            {activeLevel.type === 'root' ? 'DeshExam Explorer' : 
-             activeLevel.type === 'board' ? `${activeLevel.name}${activeLevel.acronym ? ` (${activeLevel.acronym})` : ''} - Subjects` :
-             activeLevel.type === 'class' ? `${activeLevel.name}${activeLevel.acronym ? ` (${activeLevel.acronym})` : ''} - Chapters` :
+          <h1 className="text-xl font-extrabold tracking-tight truncate flex items-center gap-2">
+            {activeLevel.type === 'root' ? 'Universal Explorer' : 
+             activeLevel.type === 'board' ? `${activeLevel.name}${activeLevel.acronym ? ` (${activeLevel.acronym})` : ''}` :
+             activeLevel.type === 'class' ? `${activeLevel.name}${activeLevel.acronym ? ` (${activeLevel.acronym})` : ''}` :
              `${activeLevel.name}${activeLevel.acronym ? ` (${activeLevel.acronym})` : ''}`}
           </h1>
         </div>
@@ -533,11 +534,11 @@ export function MobileExplorer({ className }: { className?: string }) {
 
       <div className="bg-white dark:bg-slate-950 px-4 pt-4 pb-2 shrink-0 z-0 shadow-sm">
         {/* Breadcrumb Pill */}
-        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-full text-xs font-medium text-slate-700 dark:text-slate-300 mb-4 border border-slate-200 dark:border-slate-700">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-full text-[13px] font-semibold text-slate-700 dark:text-slate-300 mb-4 border border-slate-200 dark:border-slate-700 shadow-sm">
             <span className="shrink-0">Home</span>
             {navigationStack.slice(1).map((nav, idx) => (
               <React.Fragment key={nav.id}>
-                <ChevronRight className="w-3 h-3 text-slate-400 shrink-0" />
+                <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                 <span className="shrink-0 max-w-[80px] truncate">{nav.name}</span>
               </React.Fragment>
             ))}
@@ -580,23 +581,23 @@ export function MobileExplorer({ className }: { className?: string }) {
                  return (
                     <div 
                       key={node.id} 
-                      className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden active:scale-[0.98] transition-transform flex flex-col items-center justify-center p-3 min-h-[120px]"
+                      className="bg-gradient-to-br from-white to-slate-50 dark:from-slate-900 dark:to-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden active:scale-[0.96] transition-all flex flex-col items-center justify-center p-4 min-h-[130px]"
                       onClick={() => hasChildren ? handlePush(node) : null}
                     >
-                      <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center mb-2">
+                      <div className="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center mb-3 shadow-inner">
                          {getIcon(node.type)}
                       </div>
-                      <h3 className="text-sm font-bold text-slate-900 dark:text-white text-center mb-1 line-clamp-2">{node.title || node.name}{node.acronym ? ` (${node.acronym})` : ''}</h3>
-                      <p className="text-[11px] font-medium text-[#3b8c4c] dark:text-[#4ade80]">Explore Classes</p>
+                      <h3 className="text-[15px] font-extrabold text-slate-800 dark:text-white text-center mb-1 line-clamp-2 leading-snug">{node.title || node.name}{node.acronym ? ` (${node.acronym})` : ''}</h3>
+                      <p className="text-[12px] font-bold text-emerald-600 dark:text-emerald-400">Explore</p>
                     </div>
                  );
               }
 
               return (
-                <div key={node.id} className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
-                  <div className="flex flex-col min-h-[64px]">
-                    <div className="flex items-center gap-2 px-3 py-2 cursor-pointer active:bg-slate-50 dark:active:bg-slate-800/50 transition-colors flex-1" onClick={() => hasChildren ? handlePush(node) : null}>
-                      <div className={cn("shrink-0 p-2 rounded-lg", isChapterLevel ? "bg-green-50 dark:bg-green-900/20" : "bg-orange-50 dark:bg-orange-900/20")}>
+                <div key={node.id} className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden active:scale-[0.98] transition-transform">
+                  <div className="flex flex-col min-h-[68px]">
+                    <div className="flex items-center gap-3 px-4 py-3 cursor-pointer active:bg-slate-50 dark:active:bg-slate-800/50 transition-colors flex-1" onClick={() => hasChildren ? handlePush(node) : null}>
+                      <div className={cn("shrink-0 p-2.5 rounded-xl shadow-inner", isChapterLevel ? "bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/40 dark:to-green-800/40" : "bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-900/40 dark:to-indigo-800/40")}>
                         {getIcon(node.type)}
                       </div>
                       <div className="flex-1 min-w-0 py-0.5">

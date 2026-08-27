@@ -897,15 +897,21 @@ export function TaxonomyDataTable({ type, title }: Props) {
 
                   {/* Card Body */}
                   <div className="p-4 flex-1 flex flex-col cursor-pointer overflow-hidden" onClick={() => handleToggleSelect(node.id, !selectedIds.includes(node.id))}>
-                    <h3 className="font-semibold text-slate-800 dark:text-slate-200 text-lg leading-tight line-clamp-2 mb-1.5 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                      {node.title}
-                      {(node as any).isHardcoded && (
-                        <span className="ml-2 text-[10px] font-bold px-1.5 py-0.5 bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 rounded-md border border-purple-200 dark:border-purple-500/30 uppercase tracking-wider align-middle inline-block">Hardcoded</span>
+                    <div className="flex flex-wrap items-start gap-x-2 gap-y-1 mb-1.5">
+                      <h3 className="font-semibold text-slate-800 dark:text-slate-200 text-lg leading-tight line-clamp-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                        {node.title}
+                      </h3>
+                      {((node as any).isHardcoded || nodeAcronym) && (
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                          {(node as any).isHardcoded && (
+                            <span className="text-[10px] font-bold px-1.5 py-0.5 bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 rounded-md border border-purple-200 dark:border-purple-500/30 uppercase tracking-wider shrink-0">Hardcoded</span>
+                          )}
+                          {nodeAcronym && (
+                            <span className="text-xs font-semibold px-2 py-0.5 bg-indigo-50 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-300 rounded-md border border-indigo-200 dark:border-indigo-500/30 shrink-0">{nodeAcronym}</span>
+                          )}
+                        </div>
                       )}
-                      {nodeAcronym && (
-                        <span className="ml-2 text-xs font-semibold px-2 py-0.5 bg-indigo-50 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-300 rounded-md border border-indigo-200 dark:border-indigo-500/30 align-middle inline-block">{nodeAcronym}</span>
-                      )}
-                    </h3>
+                    </div>
                     <div className="mb-2">
                       <p className="text-xs text-slate-500 dark:text-slate-400 font-mono truncate bg-slate-50 dark:bg-slate-900 px-2 py-0.5 rounded inline-block max-w-full" title={node.slug}>{node.slug}</p>
                     </div>

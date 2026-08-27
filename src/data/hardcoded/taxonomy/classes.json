@@ -529,29 +529,6 @@
     ]
   },
   {
-    "id": "class-5-wbbpe",
-    "title": "Class 5",
-    "slug": "class-5",
-    "type": "class",
-    "track": "academic",
-    "parentId": "board-wbbpe",
-    "orderIndex": 7,
-    "status": "published",
-    "fullSlug": "wbbpe/class-5",
-    "boardSlug": "wbbpe",
-    "classSlug": "class-5",
-    "isIndexable": true,
-    "isHardcoded": true,
-    "ancestors": [
-      {
-        "id": "board-wbbpe",
-        "slug": "wbbpe",
-        "title": "WBBPE",
-        "type": "board"
-      }
-    ]
-  },
-  {
     "id": "class-11-wbchse",
     "title": "Class 11",
     "slug": "class-11",

@@ -41,13 +41,13 @@ import { getTopicSections } from '@/lib/firebase/guide'; // Keeps old content fe
 
 const getLevelConfig = (type: string) => {
   switch (type) {
-    case 'board': return { color: 'text-emerald-600', icon: FolderTree, bg: 'bg-white', border: 'border border-gray-100 hover:border-emerald-200' };
-    case 'class': return { color: 'text-indigo-600', icon: GraduationCap, bg: 'bg-indigo-50/50', border: 'border border-transparent border-l-4 border-l-indigo-400' };
-    case 'subject': return { color: 'text-amber-600', icon: Library, bg: 'bg-amber-50/50', border: 'border border-transparent border-l-4 border-l-amber-400' };
-    case 'textbook': return { color: 'text-rose-600', icon: BookOpen, bg: 'bg-rose-50/50', border: 'border border-transparent border-l-4 border-l-rose-400' };
-    case 'chapter': return { color: 'text-sky-600', icon: Layers, bg: 'bg-sky-50/50', border: 'border border-transparent border-l-4 border-l-sky-400' };
-    case 'topic': return { color: 'text-purple-600', icon: FileText, bg: 'bg-purple-50/50', border: 'border border-transparent border-l-4 border-l-purple-400' };
-    case 'section': return { color: 'text-slate-600', icon: Bookmark, bg: 'bg-slate-50', border: 'border border-transparent border-l-2 border-l-slate-300' };
+    case 'board': return { color: 'text-emerald-700 dark:text-emerald-400', icon: FolderTree, bg: 'bg-gradient-to-r from-emerald-50/80 to-white dark:from-emerald-900/20 dark:to-slate-900', border: 'border border-emerald-100/80 dark:border-emerald-800/50 hover:border-emerald-300 hover:shadow-md' };
+    case 'class': return { color: 'text-indigo-600 dark:text-indigo-400', icon: GraduationCap, bg: 'bg-gradient-to-r from-indigo-50/80 to-white dark:from-indigo-900/20 dark:to-slate-900', border: 'border border-indigo-100/80 dark:border-indigo-800/50 hover:border-indigo-300 hover:shadow-md' };
+    case 'subject': return { color: 'text-amber-600 dark:text-amber-400', icon: Library, bg: 'bg-gradient-to-r from-amber-50/80 to-white dark:from-amber-900/20 dark:to-slate-900', border: 'border border-amber-100/80 dark:border-amber-800/50 hover:border-amber-300 hover:shadow-md' };
+    case 'textbook': return { color: 'text-rose-600 dark:text-rose-400', icon: BookOpen, bg: 'bg-gradient-to-r from-rose-50/80 to-white dark:from-rose-900/20 dark:to-slate-900', border: 'border border-rose-100/80 dark:border-rose-800/50 hover:border-rose-300 hover:shadow-md' };
+    case 'chapter': return { color: 'text-sky-600 dark:text-sky-400', icon: Layers, bg: 'bg-gradient-to-r from-sky-50/80 to-white dark:from-sky-900/20 dark:to-slate-900', border: 'border border-sky-100/80 dark:border-sky-800/50 hover:border-sky-300 hover:shadow-md' };
+    case 'topic': return { color: 'text-purple-600 dark:text-purple-400', icon: FileText, bg: 'bg-gradient-to-r from-purple-50/80 to-white dark:from-purple-900/20 dark:to-slate-900', border: 'border border-purple-100/80 dark:border-purple-800/50 hover:border-purple-300 hover:shadow-md' };
+    case 'section': return { color: 'text-slate-600 dark:text-slate-400', icon: Bookmark, bg: 'bg-slate-50 dark:bg-slate-800', border: 'border border-slate-200 dark:border-slate-700 hover:shadow-sm' };
     default: return { color: 'text-slate-600', icon: FolderTree, bg: 'bg-white', border: 'border-gray-100' };
   }
 };
@@ -211,43 +211,43 @@ const TreeNode = ({ node, level = 0, onAddClick, onBulkAddClick, onEditClick, on
 
   return (
     <div className={`mt-2`}>
-      <div className={`group flex items-center justify-between p-3 rounded-xl transition-all ${conf.bg} ${conf.border} ${level === 0 ? 'shadow-sm hover:shadow-md mb-3 border-gray-200' : 'mb-1.5'}`}>
+      <div className={`group flex items-center justify-between p-3 rounded-xl transition-all duration-300 ${conf.bg} ${conf.border} ${level === 0 ? 'shadow-sm mb-4 border-slate-200 dark:border-slate-700 hover:scale-[1.01]' : 'mb-2 hover:scale-[1.01]'}`}>
         
         <div className="flex items-center gap-3 cursor-pointer flex-1" onClick={() => hasChildren && handleToggle()}>
           
           {dragListeners && (
-            <div {...dragListeners} {...dragAttributes} className="cursor-grab p-1 -ml-2 rounded text-slate-300 hover:text-slate-600 hover:bg-slate-200" onClick={(e) => e.stopPropagation()}>
+            <div {...dragListeners} {...dragAttributes} className="cursor-grab p-1.5 -ml-2 rounded-lg text-slate-300 hover:text-slate-600 hover:bg-white/60 dark:hover:bg-slate-800/60 transition-colors" onClick={(e) => e.stopPropagation()}>
               <GripVertical className="w-4 h-4" />
             </div>
           )}
           
-          <div className={`w-6 flex justify-center items-center ${conf.color} bg-white rounded-full h-6 shadow-sm border border-gray-100`}>
+          <div className={`w-7 flex justify-center items-center ${conf.color} bg-white dark:bg-slate-800 rounded-full h-7 shadow-sm border border-slate-100 dark:border-slate-700 transition-transform duration-300 ${expanded ? 'rotate-90' : ''}`}>
             {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : hasChildren ? (
-              expanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-4 h-4" />
             ) : <div className="w-3.5" />}
           </div>
-          <div className={`p-1.5 rounded-lg bg-white/60 shadow-sm`}>
+          <div className={`p-2 rounded-xl bg-white/80 dark:bg-slate-800/80 shadow-sm backdrop-blur-sm`}>
             <Icon className={`w-4 h-4 ${conf.color}`} />
           </div>
           
           <div className="flex flex-col flex-1">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className={`font-semibold text-gray-800 ${level === 0 ? 'text-lg tracking-tight' : ''}`}>
+              <span className={`font-bold text-slate-800 dark:text-slate-100 ${level === 0 ? 'text-lg tracking-tight' : 'text-sm'}`}>
                 {finalMainName}
               </span>
               {finalSubName && (
-                <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200 truncate max-w-[200px] md:max-w-[400px]" title={finalSubName}>
+                <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-slate-100/80 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 truncate max-w-[200px] md:max-w-[400px]" title={finalSubName}>
                   {finalSubName}
                 </span>
               )}
               {level > 0 && node.acronym && !finalSubName && (
-                <span className="text-[11px] font-medium px-1.5 py-0.5 rounded bg-slate-100 text-slate-500">
+                <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500">
                   {node.acronym}
                 </span>
               )}
             </div>
             {node.author && (
-              <span className="text-xs text-slate-400 italic mt-0.5">Author: {node.author}</span>
+              <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium mt-0.5">Author: {node.author}</span>
             )}
           </div>
         </div>
@@ -310,13 +310,13 @@ const TreeNode = ({ node, level = 0, onAddClick, onBulkAddClick, onEditClick, on
       </div>
 
       {expanded && children && (
-        <div className="relative mt-1">
+        <div className="relative mt-2 mb-4">
           {/* Tree Guide Line */}
-          <div className="absolute left-6 top-0 bottom-3 w-[1.5px] bg-slate-200" />
+          <div className="absolute left-6 top-0 bottom-4 w-[2px] bg-gradient-to-b from-slate-200 to-transparent dark:from-slate-700" />
           
-          <div className="pl-10">
+          <div className="pl-12">
             {children.length === 0 ? (
-              <div className="text-xs text-slate-400 italic py-3">No items found.</div>
+              <div className="text-xs font-medium text-slate-400 dark:text-slate-500 italic py-4">No items found.</div>
             ) : (
               <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                 <SortableContext items={children.filter(c => activeChildId ? c.id === activeChildId : true).map(c => c.id)} strategy={verticalListSortingStrategy}>
@@ -674,24 +674,31 @@ export function DesktopExplorer({ className }: { className?: string }) {
   });
 
   return (
-    <div className={`space-y-6 max-w-7xl mx-auto p-4 md:p-6 ${className || ''}`}>
+    <div className={`space-y-6 max-w-[1400px] mx-auto p-4 md:p-6 lg:p-8 ${className || ''}`}>
       
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <FolderTree className="w-7 h-7 text-[#107c41]" />
-            Guide Content (Universal API)
-          </h1>
-          <p className="text-sm text-slate-500 mt-1">Navigate and manage the entire 7-level academic tree.</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <Button variant="outline" className="border-gray-200" onClick={() => handleOpenDialog('', 'board', fetchRootAndStats)}>
-            <Plus className="w-4 h-4 mr-2" /> Add Board
-          </Button>
-          <Button variant="outline" className="border-gray-200" onClick={() => handleOpenBulkAdd('', 'board', fetchRootAndStats)}>
-            <AlignLeft className="w-4 h-4 mr-2" /> Bulk Add Boards
-          </Button>
+      {/* Header Banner */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-[#107c41] via-emerald-600 to-teal-700 p-6 md:p-8 rounded-3xl shadow-xl border border-emerald-500/30 mb-8">
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-extrabold text-white flex items-center gap-3 tracking-tight">
+              <div className="p-2.5 bg-white/20 rounded-xl backdrop-blur-md shadow-inner border border-white/10">
+                <FolderTree className="w-6 h-6 md:w-7 md:h-7 text-white" />
+              </div>
+              Universal Taxonomy Explorer
+            </h1>
+            <p className="text-emerald-100/90 mt-2 text-[14px] md:text-[15px] font-medium max-w-2xl leading-relaxed">
+              Navigate and manage the entire 7-level academic tree architecture (Boards, Classes, Subjects, Textbooks, Chapters, Topics, Sections).
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <Button variant="secondary" className="bg-white text-emerald-700 hover:bg-emerald-50 font-bold shadow-sm rounded-xl h-11 px-5 transition-transform active:scale-95" onClick={() => handleOpenDialog('', 'board', fetchRootAndStats)}>
+              <Plus className="w-4 h-4 mr-2" /> Add Board
+            </Button>
+            <Button variant="outline" className="text-white border-white/30 bg-black/10 hover:bg-black/20 hover:text-white font-bold backdrop-blur-sm rounded-xl h-11 px-5 transition-transform active:scale-95" onClick={() => handleOpenBulkAdd('', 'board', fetchRootAndStats)}>
+              <AlignLeft className="w-4 h-4 mr-2" /> Bulk Add
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -701,37 +708,37 @@ export function DesktopExplorer({ className }: { className?: string }) {
         <div className="lg:col-span-3 space-y-4">
           
           <div className="flex-1 max-w-5xl mx-auto w-full flex flex-col gap-4 mt-6 pb-20">
-            <div className="flex flex-col sm:flex-row items-center gap-3">
-              <div className="relative flex-1 w-full">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <div className="flex flex-col lg:flex-row items-center gap-4 bg-slate-50 dark:bg-slate-800/50 p-3 rounded-2xl border border-slate-200 dark:border-slate-700">
+              <div className="relative flex-1 w-full group">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors w-5 h-5" />
                 <Input 
-                  placeholder="Search Boards..." 
-                  className="pl-10 h-12 bg-white border-gray-200 rounded-xl shadow-sm text-lg w-full"
+                  placeholder="Search Boards or Nodes..." 
+                  className="pl-12 h-12 bg-white dark:bg-slate-900 border-0 rounded-xl shadow-sm text-[15px] font-medium w-full focus-visible:ring-2 focus-visible:ring-indigo-500 transition-all"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
-              <div className="flex items-center gap-2 w-full sm:w-auto">
-                <div className="flex items-center gap-2 bg-white px-3 h-12 rounded-xl shadow-sm border border-gray-200 cursor-pointer" onClick={() => setHideEmpty(!hideEmpty)}>
-                  <Checkbox checked={hideEmpty} onCheckedChange={(c) => setHideEmpty(!!c)} />
-                  <Label className="text-sm font-medium text-slate-600 cursor-pointer">Hide Empty</Label>
+              <div className="flex items-center gap-3 w-full lg:w-auto">
+                <div className="flex items-center gap-2.5 bg-white dark:bg-slate-900 px-4 h-12 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 cursor-pointer hover:border-indigo-300 transition-colors" onClick={() => setHideEmpty(!hideEmpty)}>
+                  <Checkbox checked={hideEmpty} onCheckedChange={(c) => setHideEmpty(!!c)} className="data-[state=checked]:bg-indigo-600 data-[state=checked]:border-indigo-600" />
+                  <Label className="text-[14px] font-bold text-slate-700 dark:text-slate-300 cursor-pointer">Hide Empty</Label>
                 </div>
-                <div className="flex bg-white rounded-xl shadow-sm border border-gray-200 p-1 h-12 items-center">
+                <div className="flex bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-1.5 h-12 items-center gap-1">
                   <Button 
                     variant={viewMode === 'grid' ? 'secondary' : 'ghost'} 
                     size="icon" 
                     onClick={() => setViewMode('grid')}
-                    className={viewMode === 'grid' ? 'bg-slate-100' : ''}
+                    className={`h-9 w-9 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/40 dark:text-indigo-400' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'}`}
                   >
-                    <LayoutGrid className="w-5 h-5 text-slate-600" />
+                    <LayoutGrid className="w-4 h-4" />
                   </Button>
                   <Button 
                     variant={viewMode === 'list' ? 'secondary' : 'ghost'} 
                     size="icon" 
                     onClick={() => setViewMode('list')}
-                    className={viewMode === 'list' ? 'bg-slate-100' : ''}
+                    className={`h-9 w-9 rounded-lg transition-all ${viewMode === 'list' ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/40 dark:text-indigo-400' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'}`}
                   >
-                    <List className="w-5 h-5 text-slate-600" />
+                    <List className="w-4 h-4" />
                   </Button>
                 </div>
               </div>
@@ -768,62 +775,66 @@ export function DesktopExplorer({ className }: { className?: string }) {
 
         {/* Right Sidebar Section */}
         <div className="space-y-6">
-          <Card className="border-gray-100 shadow-sm sticky top-6">
-            <CardHeader className="pb-3 border-b border-gray-50 bg-gray-50/50 rounded-t-xl">
-              <CardTitle className="text-sm font-semibold flex items-center gap-2 text-gray-700">
-                <FolderTree className="w-4 h-4 text-emerald-600" />
+          <Card className="border-slate-200 dark:border-slate-700 shadow-md rounded-2xl overflow-hidden bg-white dark:bg-slate-900 sticky top-6">
+            <CardHeader className="pb-4 border-b border-slate-100 dark:border-slate-800 bg-gradient-to-r from-slate-50 to-white dark:from-slate-800 dark:to-slate-900 p-5">
+              <CardTitle className="text-[15px] font-bold flex items-center gap-2.5 text-slate-800 dark:text-slate-100">
+                <div className="p-1.5 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 rounded-lg">
+                  <FolderTree className="w-4 h-4" />
+                </div>
                 7-Level Hierarchy
               </CardTitle>
             </CardHeader>
-            <CardContent className="pt-4">
-              <ul className="text-xs text-slate-600 space-y-3 font-medium">
-                <li className="flex flex-col gap-1 border-l-2 border-emerald-400 pl-3">
-                  <span className="flex items-center gap-2 text-emerald-700"><FolderTree className="w-3 h-3" /> Board</span>
-                  <span className="text-[10px] text-gray-400 font-normal">e.g. CBSE, ICSE, WBBSE</span>
+            <CardContent className="p-5">
+              <ul className="text-[13px] text-slate-600 dark:text-slate-300 space-y-4 font-semibold">
+                <li className="flex flex-col gap-1 border-l-2 border-emerald-400 pl-4">
+                  <span className="flex items-center gap-2.5 text-emerald-700 dark:text-emerald-400"><FolderTree className="w-3.5 h-3.5" /> Board</span>
+                  <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">e.g. CBSE, ICSE, WBBSE</span>
                 </li>
-                <li className="flex flex-col gap-1 border-l-2 border-indigo-400 pl-3 ml-2">
-                  <span className="flex items-center gap-2 text-indigo-700"><GraduationCap className="w-3 h-3" /> Class</span>
-                  <span className="text-[10px] text-gray-400 font-normal">e.g. Class 10, Class 12</span>
+                <li className="flex flex-col gap-1 border-l-2 border-indigo-400 pl-4 ml-3">
+                  <span className="flex items-center gap-2.5 text-indigo-700 dark:text-indigo-400"><GraduationCap className="w-3.5 h-3.5" /> Class</span>
+                  <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">e.g. Class 10, Class 12</span>
                 </li>
-                <li className="flex flex-col gap-1 border-l-2 border-amber-400 pl-3 ml-4">
-                  <span className="flex items-center gap-2 text-amber-700"><Library className="w-3 h-3" /> Subject</span>
-                  <span className="text-[10px] text-gray-400 font-normal">e.g. Mathematics, Science</span>
+                <li className="flex flex-col gap-1 border-l-2 border-amber-400 pl-4 ml-6">
+                  <span className="flex items-center gap-2.5 text-amber-700 dark:text-amber-400"><Library className="w-3.5 h-3.5" /> Subject</span>
+                  <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">e.g. Mathematics, Science</span>
                 </li>
-                <li className="flex flex-col gap-1 border-l-2 border-rose-400 pl-3 ml-6">
-                  <span className="flex items-center gap-2 text-rose-700"><BookOpen className="w-3 h-3" /> Textbook</span>
-                  <span className="text-[10px] text-gray-400 font-normal">e.g. NCERT Math Vol 1</span>
+                <li className="flex flex-col gap-1 border-l-2 border-rose-400 pl-4 ml-9">
+                  <span className="flex items-center gap-2.5 text-rose-700 dark:text-rose-400"><BookOpen className="w-3.5 h-3.5" /> Textbook</span>
+                  <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">e.g. NCERT Math Vol 1</span>
                 </li>
-                <li className="flex flex-col gap-1 border-l-2 border-sky-400 pl-3 ml-8">
-                  <span className="flex items-center gap-2 text-sky-700"><Layers className="w-3 h-3" /> Chapter</span>
-                  <span className="text-[10px] text-gray-400 font-normal">e.g. Algebra, Trigonometry</span>
+                <li className="flex flex-col gap-1 border-l-2 border-sky-400 pl-4 ml-12">
+                  <span className="flex items-center gap-2.5 text-sky-700 dark:text-sky-400"><Layers className="w-3.5 h-3.5" /> Chapter</span>
+                  <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">e.g. Algebra, Trigonometry</span>
                 </li>
-                <li className="flex flex-col gap-1 border-l-2 border-purple-400 pl-3 ml-10">
-                  <span className="flex items-center gap-2 text-purple-700"><FileText className="w-3 h-3" /> Topic</span>
-                  <span className="text-[10px] text-gray-400 font-normal">e.g. Quadratic Equations</span>
+                <li className="flex flex-col gap-1 border-l-2 border-purple-400 pl-4 ml-14">
+                  <span className="flex items-center gap-2.5 text-purple-700 dark:text-purple-400"><FileText className="w-3.5 h-3.5" /> Topic</span>
+                  <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">e.g. Quadratic Equations</span>
                 </li>
-                <li className="flex flex-col gap-1 border-l-2 border-slate-300 pl-3 ml-12">
-                  <span className="flex items-center gap-2 text-slate-700"><Bookmark className="w-3 h-3" /> Content Section</span>
-                  <span className="text-[10px] text-gray-400 font-normal">e.g. MCQ, Video, PDF Notes</span>
+                <li className="flex flex-col gap-1 border-l-2 border-slate-300 dark:border-slate-600 pl-4 ml-16">
+                  <span className="flex items-center gap-2.5 text-slate-700 dark:text-slate-300"><Bookmark className="w-3.5 h-3.5" /> Content Section</span>
+                  <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">e.g. MCQ, Video, PDF Notes</span>
                 </li>
               </ul>
             </CardContent>
           </Card>
 
-          <Card className="border-gray-100 shadow-sm">
-            <CardHeader className="pb-3 border-b border-gray-50 bg-gray-50/50 rounded-t-xl">
-              <CardTitle className="text-sm font-semibold flex items-center gap-2 text-gray-700">
-                <BarChart3 className="w-4 h-4 text-blue-500" />
+          <Card className="border-slate-200 dark:border-slate-700 shadow-md rounded-2xl overflow-hidden bg-white dark:bg-slate-900">
+            <CardHeader className="pb-4 border-b border-slate-100 dark:border-slate-800 bg-gradient-to-r from-slate-50 to-white dark:from-slate-800 dark:to-slate-900 p-5">
+              <CardTitle className="text-[15px] font-bold flex items-center gap-2.5 text-slate-800 dark:text-slate-100">
+                <div className="p-1.5 bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 rounded-lg">
+                  <BarChart3 className="w-4 h-4" />
+                </div>
                 Database Counts
               </CardTitle>
             </CardHeader>
-            <CardContent className="pt-4">
-              <ul className="text-xs text-slate-600 space-y-2">
-                <li className="flex items-center justify-between"><div className="flex items-center gap-2"><FolderTree className="w-3 h-3 text-emerald-500" /> Boards</div> <span className="font-mono bg-gray-100 px-1.5 rounded">{stats.boards}</span></li>
-                <li className="flex items-center justify-between"><div className="flex items-center gap-2"><GraduationCap className="w-3 h-3 text-indigo-500" /> Classes</div> <span className="font-mono bg-gray-100 px-1.5 rounded">{stats.classes}</span></li>
-                <li className="flex items-center justify-between"><div className="flex items-center gap-2"><Library className="w-3 h-3 text-amber-500" /> Subjects</div> <span className="font-mono bg-gray-100 px-1.5 rounded">{stats.subjects}</span></li>
-                <li className="flex items-center justify-between"><div className="flex items-center gap-2"><BookOpen className="w-3 h-3 text-rose-500" /> Textbooks</div> <span className="font-mono bg-gray-100 px-1.5 rounded">{stats.textbooks}</span></li>
-                <li className="flex items-center justify-between"><div className="flex items-center gap-2"><Layers className="w-3 h-3 text-sky-500" /> Chapters</div> <span className="font-mono bg-gray-100 px-1.5 rounded">{stats.chapters}</span></li>
-                <li className="flex items-center justify-between"><div className="flex items-center gap-2"><FileText className="w-3 h-3 text-purple-500" /> Topics</div> <span className="font-mono bg-gray-100 px-1.5 rounded">{stats.topics}</span></li>
+            <CardContent className="p-5">
+              <ul className="text-[13px] font-semibold text-slate-700 dark:text-slate-300 space-y-3">
+                <li className="flex items-center justify-between"><div className="flex items-center gap-2.5"><FolderTree className="w-4 h-4 text-emerald-500" /> Boards</div> <span className="font-mono font-bold bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700">{stats.boards}</span></li>
+                <li className="flex items-center justify-between"><div className="flex items-center gap-2.5"><GraduationCap className="w-4 h-4 text-indigo-500" /> Classes</div> <span className="font-mono font-bold bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700">{stats.classes}</span></li>
+                <li className="flex items-center justify-between"><div className="flex items-center gap-2.5"><Library className="w-4 h-4 text-amber-500" /> Subjects</div> <span className="font-mono font-bold bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700">{stats.subjects}</span></li>
+                <li className="flex items-center justify-between"><div className="flex items-center gap-2.5"><BookOpen className="w-4 h-4 text-rose-500" /> Textbooks</div> <span className="font-mono font-bold bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700">{stats.textbooks}</span></li>
+                <li className="flex items-center justify-between"><div className="flex items-center gap-2.5"><Layers className="w-4 h-4 text-sky-500" /> Chapters</div> <span className="font-mono font-bold bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700">{stats.chapters}</span></li>
+                <li className="flex items-center justify-between"><div className="flex items-center gap-2.5"><FileText className="w-4 h-4 text-purple-500" /> Topics</div> <span className="font-mono font-bold bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700">{stats.topics}</span></li>
               </ul>
             </CardContent>
           </Card>

@@ -1,4 +1,4 @@
-import { collection, query, orderBy, getDocs, doc, setDoc, deleteDoc, serverTimestamp, updateDoc, where, getDoc } from "firebase/firestore";
+import { collection, query, orderBy, getDocs, doc, setDoc, deleteDoc, serverTimestamp, updateDoc, where, getDoc, limit } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
 import * as hardcodedRegistry from "@/data/hardcoded/taxonomy";
 
@@ -173,6 +173,32 @@ export interface TaxonomyNode {
 // -------------------------------------------------------------
 // CORE CRUD OPERATIONS
 // -------------------------------------------------------------
+
+export const getRecentlyUpdatedNodes = async (limitCount: number = 5, track: TaxonomyTrack = 'academic'): Promise<TaxonomyNode[]> => {
+  try {
+    const q = query(
+      collection(db, 'taxonomy_nodes'), 
+      where('track', '==', track),
+      orderBy('updatedAt', 'desc'),
+      limit(limitCount)
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as TaxonomyNode));
+  } catch (error: any) {
+    console.error("Error fetching recent nodes:", error);
+    // Fallback if index on updatedAt is missing
+    if (error.message && error.message.includes("index")) {
+      const snap = await getDocs(query(collection(db, 'taxonomy_nodes'), where('track', '==', track)));
+      const nodes = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as TaxonomyNode));
+      return nodes.sort((a, b) => {
+        const timeA = a.updatedAt?.toMillis ? a.updatedAt.toMillis() : (a.updatedAt || 0);
+        const timeB = b.updatedAt?.toMillis ? b.updatedAt.toMillis() : (b.updatedAt || 0);
+        return timeB - timeA;
+      }).slice(0, limitCount);
+    }
+    return [];
+  }
+};
 
 export const getTaxonomyNodesByTrack = async (track: TaxonomyTrack): Promise<TaxonomyNode[]> => {
   const q = query(collection(db, 'taxonomy_nodes'), where('track', '==', track));
