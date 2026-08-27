@@ -252,7 +252,7 @@ export default function ClassSolutionsClient({ board, classSlug }: { board: stri
               {visibleTextbooks.map((book) => (
                 <Card key={book.id} className="flex flex-col overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100">
                   <CardHeader className="p-0 relative bg-slate-100 dark:bg-slate-800/50 flex items-center justify-center h-48 group">
-                    <Link href={`/textbook-solutions/${book.id}`} className="block w-full h-full relative">
+                    <Link href={`/solutions/${board.toLowerCase()}/${classSlug}/${(book as any).textbookSlug || book.id}`} className="block w-full h-full relative">
                         <Image
                           src={book.featureImage || `https://picsum.photos/seed/${book.id}/200/280`}
                           alt={book.title}
@@ -276,7 +276,7 @@ export default function ClassSolutionsClient({ board, classSlug }: { board: stri
                             </Badge>
                           )}
                       </div>
-                      <Link href={`/textbook-solutions/${book.id}`} className="block group">
+                      <Link href={`/solutions/${board.toLowerCase()}/${classSlug}/${(book as any).textbookSlug || book.id}`} className="block group">
                           {(() => {
                             const { original, translated } = translateTitle(book.title, board);
                             return translated ? (
@@ -293,7 +293,6 @@ export default function ClassSolutionsClient({ board, classSlug }: { board: stri
                             );
                           })()}
                       </Link>
-                       <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">by {(book as any).authorName || 'DeshExam'}</p>
                       
                       <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
                         <TextbookStats textbookId={book.id} />
@@ -301,7 +300,7 @@ export default function ClassSolutionsClient({ board, classSlug }: { board: stri
                   </CardContent>
                   <CardFooter className="p-4 pt-0">
                       <Button asChild className="w-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 shadow-none border border-emerald-100 dark:border-emerald-800/50">
-                          <Link href={`/textbook-solutions/${book.id}`}>
+                          <Link href={`/solutions/${board.toLowerCase()}/${classSlug}/${(book as any).textbookSlug || book.id}`}>
                             <BookOpen className="mr-2 h-4 w-4"/> View Solutions
                           </Link>
                       </Button>
