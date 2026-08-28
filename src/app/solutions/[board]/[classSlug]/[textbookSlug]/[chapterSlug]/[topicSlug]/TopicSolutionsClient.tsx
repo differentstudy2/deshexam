@@ -199,7 +199,7 @@ export default function TopicSolutionsClient({ board, classSlug, textbookSlug, c
         </div>
       </div>
 
-      <div className="w-full px-4 md:px-6 lg:px-8 py-6 space-y-8">
+      <div className="w-full px-0 md:px-0 lg:px-0 py-4 space-y-4">
         {customContents.length > 0 ? (
           customContents.map((content, ci) => (
             <div key={content.id} className="space-y-5">
