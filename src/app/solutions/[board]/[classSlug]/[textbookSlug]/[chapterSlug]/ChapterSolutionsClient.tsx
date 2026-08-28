@@ -201,7 +201,7 @@ export default function ChapterSolutionsClient({ board, classSlug, textbookSlug,
         </div>
       </div>
 
-      <div className="w-full px-4 md:px-6 lg:px-8 mt-8 space-y-8">
+      <div className="w-full px-4 md:px-6 lg:px-8 py-6 space-y-8">
 
         {/* Topics Section */}
         {topics.length > 0 && (
