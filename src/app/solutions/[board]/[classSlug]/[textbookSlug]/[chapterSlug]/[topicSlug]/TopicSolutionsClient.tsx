@@ -13,6 +13,12 @@ import hardcodedChaptersJson from '@/data/hardcoded/taxonomy/chapters.json';
 import hardcodedTopicsJson from '@/data/hardcoded/taxonomy/topics.json';
 import hardcodedTextbooksJson from '@/data/hardcoded/taxonomy/textbooks.json';
 import customSolutionsJson from '@/data/hardcoded/taxonomy/solutions.json';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import rehypeRaw from 'rehype-raw';
+import 'katex/dist/katex.min.css';
 
 const BOARD_SLUG_MAP: Record<string, string[]> = {
   'wbbse': ['wb-board', 'wbbse'],
@@ -40,7 +46,7 @@ interface Props {
 }
 
 function CustomQuestion({ q, idx }: { q: any; idx: number }) {
-  const [showAnswer, setShowAnswer] = useState(false);
+  const [showAnswer, setShowAnswer] = useState(true);
   const badge = TYPE_BADGE[q.questionType] || { label: q.questionType || 'প্রশ্ন', class: 'bg-slate-500' };
 
   return (
@@ -70,7 +76,15 @@ function CustomQuestion({ q, idx }: { q: any; idx: number }) {
           <div className="space-y-2">
             {q.answer && (
               <div className="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800/40 rounded-lg px-4 py-3">
-                <p className="text-xs font-bold text-emerald-700 dark:text-emerald-300 mb-1">উত্তর</p>
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-xs font-bold text-emerald-700 dark:text-emerald-300">উত্তর</p>
+                  <button
+                    onClick={() => setShowAnswer(false)}
+                    className="text-[11px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                  >
+                    লুকান
+                  </button>
+                </div>
                 <p className="text-sm text-emerald-800 dark:text-emerald-200 leading-relaxed whitespace-pre-line">{q.answer}</p>
               </div>
             )}
@@ -279,10 +293,11 @@ export default function TopicSolutionsClient({ board, classSlug, textbookSlug, c
                 )}
 
                 {content.content && (
-                  <div
-                    className="prose prose-sm dark:prose-invert max-w-none bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 px-5 py-4 shadow-sm"
-                    dangerouslySetInnerHTML={{ __html: content.content }}
-                  />
+                  <div className="prose prose-slate dark:prose-invert max-w-none bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 px-5 py-5 shadow-sm">
+                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
+                      {content.content}
+                    </ReactMarkdown>
+                  </div>
                 )}
 
                 {content.questions && content.questions.length > 0 && (
@@ -299,6 +314,14 @@ export default function TopicSolutionsClient({ board, classSlug, textbookSlug, c
                 )}
               </div>
             ))
+          ) : topic?.content ? (
+            <div className="space-y-5 px-4 md:px-5">
+              <div className="prose prose-slate dark:prose-invert max-w-none bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 px-5 py-5 shadow-sm">
+                <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
+                  {topic.content}
+                </ReactMarkdown>
+              </div>
+            </div>
           ) : (
             <div className="mx-4 text-center py-16 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
               <BookOpen className="h-12 w-12 text-slate-300 dark:text-slate-700 mx-auto mb-3" />

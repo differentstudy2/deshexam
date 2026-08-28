@@ -10,6 +10,12 @@ import hardcodedChaptersJson from '@/data/hardcoded/taxonomy/chapters.json';
 import hardcodedTopicsJson from '@/data/hardcoded/taxonomy/topics.json';
 import hardcodedTextbooksJson from '@/data/hardcoded/taxonomy/textbooks.json';
 import customSolutionsJson from '@/data/hardcoded/taxonomy/solutions.json';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import rehypeRaw from 'rehype-raw';
+import 'katex/dist/katex.min.css';
 
 const BOARD_SLUG_MAP: Record<string, string[]> = {
   'wbbse': ['wb-board', 'wbbse'],
@@ -45,7 +51,7 @@ interface Props {
 }
 
 function CustomQuestion({ q, idx }: { q: any; idx: number }) {
-  const [showAnswer, setShowAnswer] = useState(false);
+  const [showAnswer, setShowAnswer] = useState(true);
   const badge = TYPE_BADGE[q.questionType] || { label: q.questionType, class: 'bg-slate-500' };
 
   return (
@@ -75,7 +81,15 @@ function CustomQuestion({ q, idx }: { q: any; idx: number }) {
           <div className="space-y-2">
             {q.answer && (
               <div className="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800/40 rounded-lg px-4 py-3">
-                <p className="text-xs font-bold text-emerald-700 dark:text-emerald-300 mb-1">উত্তর</p>
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-xs font-bold text-emerald-700 dark:text-emerald-300">উত্তর</p>
+                  <button
+                    onClick={() => setShowAnswer(false)}
+                    className="text-[11px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                  >
+                    লুকান
+                  </button>
+                </div>
                 <p className="text-sm text-emerald-800 dark:text-emerald-200 leading-relaxed whitespace-pre-line">{q.answer}</p>
               </div>
             )}
@@ -121,6 +135,26 @@ export default function ChapterSolutionsClient({ board, classSlug, textbookSlug,
       .filter(t => t.parentId === chapter.id)
       .sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
   }, [chapter]);
+
+  const allChaptersInBook = useMemo(() => {
+    return (hardcodedChaptersJson as any[])
+      .filter(ch =>
+        boardSlugs.includes(ch.boardSlug?.toLowerCase()) &&
+        ch.classSlug?.toLowerCase() === classSlug.toLowerCase() &&
+        ch.textbookSlug?.toLowerCase() === textbookSlug.toLowerCase()
+      )
+      .sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
+  }, [boardSlugs, classSlug, textbookSlug]);
+
+  const chapterIndex = useMemo(() => {
+    return allChaptersInBook.findIndex(ch =>
+      ch.chapterSlug?.toLowerCase() === chapterSlug.toLowerCase() ||
+      ch.slug?.toLowerCase() === chapterSlug.toLowerCase()
+    );
+  }, [allChaptersInBook, chapterSlug]);
+
+  const prevChapter = chapterIndex > 0 ? allChaptersInBook[chapterIndex - 1] : null;
+  const nextChapter = chapterIndex !== -1 && chapterIndex < allChaptersInBook.length - 1 ? allChaptersInBook[chapterIndex + 1] : null;
 
   // Read CUSTOM content for this chapter (no topicSlug)
   const customContents = useMemo(() => {
@@ -191,10 +225,17 @@ export default function ChapterSolutionsClient({ board, classSlug, textbookSlug,
               <h1 className="text-xl md:text-2xl font-bold font-headline text-slate-900 dark:text-white leading-tight">{chapterTitle}</h1>
               <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{formattedTextbook}</p>
               <div className="flex items-center gap-4 mt-3 text-sm text-slate-500 dark:text-slate-400">
-                <span className="flex items-center gap-1.5">
-                  <FileText className="h-4 w-4 text-blue-500" />
-                  <strong className="text-slate-700 dark:text-slate-200">{topics.length}</strong> Topics
-                </span>
+                {topics.length > 0 ? (
+                  <span className="flex items-center gap-1.5">
+                    <FileText className="h-4 w-4 text-blue-500" />
+                    <strong className="text-slate-700 dark:text-slate-200">{topics.length}</strong> Topics
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-1.5">
+                    <BookOpen className="h-4 w-4 text-emerald-500" />
+                    <strong className="text-slate-700 dark:text-slate-200">{allChaptersInBook.length}</strong> Chapters in Book
+                  </span>
+                )}
               </div>
             </div>
           </div>
@@ -205,49 +246,94 @@ export default function ChapterSolutionsClient({ board, classSlug, textbookSlug,
       <div className="flex items-start gap-0">
 
         {/* Left TOC Sidebar */}
-        {topics.length > 0 && (
-          <aside className="hidden lg:block w-[220px] xl:w-[240px] shrink-0 sticky top-0 max-h-screen overflow-y-auto border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-            {/* TOC Header */}
-            <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 bg-gradient-to-r from-emerald-600 to-teal-600">
-              <div className="flex items-center gap-2">
-                <div className="w-5 h-5 rounded bg-white/20 flex items-center justify-center">
-                  <FileText className="h-3 w-3 text-white" />
+        <aside className="hidden lg:block w-[240px] xl:w-[260px] shrink-0 sticky top-0 max-h-screen overflow-y-auto border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+          {topics.length > 0 ? (
+            <>
+              {/* TOC Header for Topics */}
+              <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 bg-gradient-to-r from-emerald-600 to-teal-600">
+                <div className="flex items-center gap-2">
+                  <div className="w-5 h-5 rounded bg-white/20 flex items-center justify-center">
+                    <FileText className="h-3 w-3 text-white" />
+                  </div>
+                  <span className="text-xs font-bold text-white uppercase tracking-wider">টপিকসমূহ</span>
                 </div>
-                <span className="text-xs font-bold text-white uppercase tracking-wider">বিষয়সূচি</span>
+                <p className="text-[10px] text-emerald-200 mt-0.5 truncate">{chapterTitle}</p>
               </div>
-              <p className="text-[10px] text-emerald-200 mt-0.5 truncate">{chapterTitle}</p>
-            </div>
 
-            {/* Topic List */}
-            <nav className="p-2 flex flex-col gap-0.5">
-              {topics.map((topic, i) => {
-                const slug = topic.topicSlug || topic.slug;
-                return (
-                  <Link
-                    key={topic.id}
-                    href={`/solutions/${board}/${classSlug}/${textbookSlug}/${chapterSlug}/${slug}`}
-                    className="flex items-start gap-2 px-3 py-2 rounded-lg text-xs transition-all duration-150 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-800 dark:hover:text-slate-200"
-                  >
-                    <span className="flex-shrink-0 w-4 h-4 rounded text-[9px] font-bold flex items-center justify-center mt-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
-                      {i + 1}
-                    </span>
-                    <span className="leading-snug line-clamp-2">{topic.title}</span>
-                  </Link>
-                );
-              })}
-            </nav>
+              {/* Topic List */}
+              <nav className="p-2 flex flex-col gap-0.5">
+                {topics.map((topic, i) => {
+                  const slug = topic.topicSlug || topic.slug;
+                  return (
+                    <Link
+                      key={topic.id}
+                      href={`/solutions/${board}/${classSlug}/${textbookSlug}/${chapterSlug}/${slug}`}
+                      className="flex items-start gap-2 px-3 py-2 rounded-lg text-xs transition-all duration-150 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-800 dark:hover:text-slate-200"
+                    >
+                      <span className="flex-shrink-0 w-4 h-4 rounded text-[9px] font-bold flex items-center justify-center mt-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                        {i + 1}
+                      </span>
+                      <span className="leading-snug line-clamp-2">{topic.title}</span>
+                    </Link>
+                  );
+                })}
+              </nav>
+            </>
+          ) : (
+            <>
+              {/* TOC Header for Chapters */}
+              <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 bg-gradient-to-r from-emerald-600 to-teal-600">
+                <div className="flex items-center gap-2">
+                  <div className="w-5 h-5 rounded bg-white/20 flex items-center justify-center">
+                    <BookOpen className="h-3 w-3 text-white" />
+                  </div>
+                  <span className="text-xs font-bold text-white uppercase tracking-wider">অধ্যায়সূচি</span>
+                </div>
+                <p className="text-[10px] text-emerald-200 mt-0.5 truncate">{formattedTextbook}</p>
+              </div>
 
-            {/* More link at bottom */}
-            <div className="px-3 py-2 border-t border-slate-100 dark:border-slate-800">
-              <Link
-                href={`/solutions/${board}/${classSlug}/${textbookSlug}/${chapterSlug}/more`}
-                className="flex items-center gap-1.5 text-[10px] font-semibold text-violet-600 dark:text-violet-400 hover:underline"
-              >
-                <FileText className="h-3 w-3" /> অতিরিক্ত প্রশ্নোত্তর
-              </Link>
-            </div>
-          </aside>
-        )}
+              {/* Chapter List */}
+              <nav className="p-2 flex flex-col gap-0.5">
+                {allChaptersInBook.map((ch, i) => {
+                  const slug = ch.chapterSlug || ch.slug;
+                  const isActive = slug?.toLowerCase() === chapterSlug.toLowerCase();
+                  return (
+                    <Link
+                      key={ch.id}
+                      href={`/solutions/${board}/${classSlug}/${textbookSlug}/${slug}`}
+                      className={cn(
+                        'flex items-start gap-2 px-3 py-2 rounded-lg text-xs transition-all duration-150 group',
+                        isActive
+                          ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 font-semibold border border-emerald-200 dark:border-emerald-800/50'
+                          : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-800 dark:hover:text-slate-200'
+                      )}
+                    >
+                      <span className={cn(
+                        'flex-shrink-0 w-4 h-4 rounded text-[9px] font-bold flex items-center justify-center mt-0.5',
+                        isActive
+                          ? 'bg-emerald-600 text-white'
+                          : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+                      )}>
+                        {i + 1}
+                      </span>
+                      <span className="leading-snug line-clamp-2">{ch.title}</span>
+                    </Link>
+                  );
+                })}
+              </nav>
+            </>
+          )}
+
+          {/* More link at bottom */}
+          <div className="px-3 py-2 border-t border-slate-100 dark:border-slate-800">
+            <Link
+              href={`/solutions/${board}/${classSlug}/${textbookSlug}/${chapterSlug}/more`}
+              className="flex items-center gap-1.5 text-[10px] font-semibold text-violet-600 dark:text-violet-400 hover:underline"
+            >
+              <FileText className="h-3 w-3" /> অতিরিক্ত প্রশ্নোত্তর
+            </Link>
+          </div>
+        </aside>
 
         {/* Content Area */}
         <div className="flex-1 min-w-0 w-full py-4 space-y-4">
@@ -300,10 +386,11 @@ export default function ChapterSolutionsClient({ board, classSlug, textbookSlug,
                   )}
 
                   {content.content && (
-                    <div
-                      className="prose prose-sm dark:prose-invert max-w-none bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 px-5 py-4 shadow-sm"
-                      dangerouslySetInnerHTML={{ __html: content.content }}
-                    />
+                    <div className="prose prose-slate dark:prose-invert max-w-none bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 px-5 py-5 shadow-sm">
+                      <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
+                        {content.content}
+                      </ReactMarkdown>
+                    </div>
                   )}
 
                   {content.questions && content.questions.length > 0 && (
@@ -318,7 +405,18 @@ export default function ChapterSolutionsClient({ board, classSlug, textbookSlug,
             </div>
           )}
 
-          {topics.length === 0 && customContents.length === 0 && (
+          {/* Fallback to chapter.content (from chapters.json) if no custom solutions */}
+          {customContents.length === 0 && chapter?.content && (
+            <div className="px-4 md:px-5 space-y-6">
+              <div className="prose prose-slate dark:prose-invert max-w-none bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 px-5 py-5 shadow-sm">
+                <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
+                  {chapter.content}
+                </ReactMarkdown>
+              </div>
+            </div>
+          )}
+
+          {topics.length === 0 && customContents.length === 0 && !chapter?.content && (
             <div className="mx-4 text-center py-16 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
               <BookOpen className="h-12 w-12 text-slate-300 dark:text-slate-700 mx-auto mb-3" />
               <h3 className="text-lg font-bold text-slate-700 dark:text-slate-300 mb-1">Content coming soon</h3>
@@ -334,9 +432,32 @@ export default function ChapterSolutionsClient({ board, classSlug, textbookSlug,
               অতিরিক্ত প্রশ্ন ও উত্তর দেখুন <ChevronRight className="h-4 w-4" />
             </Link>
           </div>
+
+          {/* Prev / Next Chapter Navigation */}
+          {(prevChapter || nextChapter) && (
+            <div className="flex items-center justify-between gap-4 pt-4 mx-4 border-t border-slate-200 dark:border-slate-800">
+              {prevChapter ? (
+                <Link
+                  href={`/solutions/${board}/${classSlug}/${textbookSlug}/${prevChapter.chapterSlug || prevChapter.slug}`}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-emerald-300 dark:hover:border-emerald-700 hover:shadow-sm transition-all text-sm font-medium text-slate-700 dark:text-slate-300 max-w-[45%]"
+                >
+                  <ArrowLeft className="h-4 w-4 flex-shrink-0" />
+                  <span className="truncate">{prevChapter.title}</span>
+                </Link>
+              ) : <div />}
+              {nextChapter ? (
+                <Link
+                  href={`/solutions/${board}/${classSlug}/${textbookSlug}/${nextChapter.chapterSlug || nextChapter.slug}`}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-emerald-300 dark:hover:border-emerald-700 hover:shadow-sm transition-all text-sm font-medium text-slate-700 dark:text-slate-300 max-w-[45%] ml-auto"
+                >
+                  <span className="truncate">{nextChapter.title}</span>
+                  <ChevronRight className="h-4 w-4 flex-shrink-0" />
+                </Link>
+              ) : <div />}
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 }
-
