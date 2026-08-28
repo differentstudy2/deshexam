@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 import hardcodedChaptersJson from '@/data/hardcoded/taxonomy/chapters.json';
 import hardcodedTopicsJson from '@/data/hardcoded/taxonomy/topics.json';
 import hardcodedTextbooksJson from '@/data/hardcoded/taxonomy/textbooks.json';
-import customSolutionsJson from '@/data/hardcoded/taxonomy/custom-solutions.json';
+import customSolutionsJson from '@/data/hardcoded/taxonomy/solutions.json';
 
 const BOARD_SLUG_MAP: Record<string, string[]> = {
   'wbbse': ['wb-board', 'wbbse'],
