@@ -156,6 +156,7 @@ export default function TopicSolutionsClient({ board, classSlug, textbookSlug, c
 
   return (
     <div className="pb-16">
+      {/* Breadcrumb */}
       <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
         <div className="w-full px-4 md:px-6 lg:px-8 py-3 flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 flex-wrap">
           <Link href="/solutions" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Solutions</Link>
@@ -172,6 +173,7 @@ export default function TopicSolutionsClient({ board, classSlug, textbookSlug, c
         </div>
       </div>
 
+      {/* Hero */}
       <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
         <div className="w-full px-4 md:px-6 lg:px-8 py-6">
           <Link
@@ -199,84 +201,146 @@ export default function TopicSolutionsClient({ board, classSlug, textbookSlug, c
         </div>
       </div>
 
-      <div className="w-full px-0 md:px-0 lg:px-0 py-4 space-y-4">
-        {customContents.length > 0 ? (
-          customContents.map((content, ci) => (
-            <div key={content.id} className="space-y-5">
-              {content.title && (
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
-                    <PenLine className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                  </div>
-                  <h2 className="text-base font-bold text-slate-800 dark:text-slate-100">{content.title}</h2>
+      {/* Main layout: Left TOC + Content */}
+      <div className="flex items-start gap-0">
+
+        {/* Left TOC Sidebar */}
+        {allTopicsInChapter.length > 0 && (
+          <aside className="hidden lg:block w-[220px] xl:w-[240px] shrink-0 sticky top-0 max-h-screen overflow-y-auto border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+            {/* TOC Header */}
+            <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 bg-gradient-to-r from-blue-600 to-indigo-600">
+              <div className="flex items-center gap-2">
+                <div className="w-5 h-5 rounded bg-white/20 flex items-center justify-center">
+                  <ChevronDown className="h-3 w-3 text-white" />
                 </div>
-              )}
-
-              {content.description && (
-                <p className="text-sm text-slate-500 dark:text-slate-400">{content.description}</p>
-              )}
-
-              {content.content && (
-                <div
-                  className="prose prose-sm dark:prose-invert max-w-none bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 px-5 py-4 shadow-sm"
-                  dangerouslySetInnerHTML={{ __html: content.content }}
-                />
-              )}
-
-              {content.questions && content.questions.length > 0 && (
-                <div>
-                  <h3 className="text-sm font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-                    <FileText className="h-4 w-4" /> প্রশ্নোত্তর
-                  </h3>
-                  <div className="space-y-3">
-                    {content.questions.map((q: any, qi: number) => (
-                      <CustomQuestion key={q.id || qi} q={q} idx={qi} />
-                    ))}
-                  </div>
-                </div>
-              )}
+                <span className="text-xs font-bold text-white uppercase tracking-wider">বিষয়সূচি</span>
+              </div>
+              <p className="text-[10px] text-blue-200 mt-0.5 truncate">{chapterTitle}</p>
             </div>
-          ))
-        ) : (
-          <div className="text-center py-16 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
-            <BookOpen className="h-12 w-12 text-slate-300 dark:text-slate-700 mx-auto mb-3" />
-            <h3 className="text-lg font-bold text-slate-700 dark:text-slate-300 mb-1">Solutions coming soon</h3>
-            <p className="text-slate-500 text-sm">Custom content for this topic will be added shortly.</p>
-          </div>
+
+            {/* Topic List */}
+            <nav className="p-2 flex flex-col gap-0.5">
+              {allTopicsInChapter.map((t, i) => {
+                const slug = t.topicSlug || t.slug;
+                const isActive = slug?.toLowerCase() === topicSlug.toLowerCase();
+                return (
+                  <Link
+                    key={t.id}
+                    href={`/solutions/${board}/${classSlug}/${textbookSlug}/${chapterSlug}/${slug}`}
+                    className={cn(
+                      'flex items-start gap-2 px-3 py-2 rounded-lg text-xs transition-all duration-150 group',
+                      isActive
+                        ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 font-semibold border border-blue-200 dark:border-blue-800/50'
+                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-800 dark:hover:text-slate-200'
+                    )}
+                  >
+                    <span className={cn(
+                      'flex-shrink-0 w-4 h-4 rounded text-[9px] font-bold flex items-center justify-center mt-0.5',
+                      isActive
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+                    )}>
+                      {i + 1}
+                    </span>
+                    <span className="leading-snug line-clamp-2">{t.title}</span>
+                  </Link>
+                );
+              })}
+            </nav>
+
+            {/* More link at bottom */}
+            <div className="px-3 py-2 border-t border-slate-100 dark:border-slate-800">
+              <Link
+                href={`/solutions/${board}/${classSlug}/${textbookSlug}/${chapterSlug}/${topicSlug}/more`}
+                className="flex items-center gap-1.5 text-[10px] font-semibold text-violet-600 dark:text-violet-400 hover:underline"
+              >
+                <FileText className="h-3 w-3" /> অতিরিক্ত প্রশ্নোত্তর
+              </Link>
+            </div>
+          </aside>
         )}
 
-        <div className="flex justify-center pt-4 pb-4">
-          <Link
-            href={`/solutions/${board}/${classSlug}/${textbookSlug}/${chapterSlug}/${topicSlug}/more`}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400 font-semibold hover:bg-violet-100 dark:hover:bg-violet-900/40 transition-colors border border-violet-200 dark:border-violet-800/40 shadow-sm"
-          >
-            অতিরিক্ত প্রশ্নোত্তর দেখুন <ChevronRight className="h-4 w-4" />
-          </Link>
+        {/* Content Area */}
+        <div className="flex-1 min-w-0 w-full px-0 md:px-0 lg:px-0 py-4 space-y-4">
+          {customContents.length > 0 ? (
+            customContents.map((content, ci) => (
+              <div key={content.id} className="space-y-5 px-4 md:px-5">
+                {content.title && (
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                      <PenLine className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                    </div>
+                    <h2 className="text-base font-bold text-slate-800 dark:text-slate-100">{content.title}</h2>
+                  </div>
+                )}
+
+                {content.description && (
+                  <p className="text-sm text-slate-500 dark:text-slate-400">{content.description}</p>
+                )}
+
+                {content.content && (
+                  <div
+                    className="prose prose-sm dark:prose-invert max-w-none bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 px-5 py-4 shadow-sm"
+                    dangerouslySetInnerHTML={{ __html: content.content }}
+                  />
+                )}
+
+                {content.questions && content.questions.length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                      <FileText className="h-4 w-4" /> প্রশ্নোত্তর
+                    </h3>
+                    <div className="space-y-3">
+                      {content.questions.map((q: any, qi: number) => (
+                        <CustomQuestion key={q.id || qi} q={q} idx={qi} />
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))
+          ) : (
+            <div className="mx-4 text-center py-16 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
+              <BookOpen className="h-12 w-12 text-slate-300 dark:text-slate-700 mx-auto mb-3" />
+              <h3 className="text-lg font-bold text-slate-700 dark:text-slate-300 mb-1">Solutions coming soon</h3>
+              <p className="text-slate-500 text-sm">Custom content for this topic will be added shortly.</p>
+            </div>
+          )}
+
+          <div className="flex justify-center pt-4 pb-4 px-4">
+            <Link
+              href={`/solutions/${board}/${classSlug}/${textbookSlug}/${chapterSlug}/${topicSlug}/more`}
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400 font-semibold hover:bg-violet-100 dark:hover:bg-violet-900/40 transition-colors border border-violet-200 dark:border-violet-800/40 shadow-sm"
+            >
+              অতিরিক্ত প্রশ্নোত্তর দেখুন <ChevronRight className="h-4 w-4" />
+            </Link>
+          </div>
+
+          {(prevTopic || nextTopic) && (
+            <div className="flex items-center justify-between gap-4 pt-4 mx-4 border-t border-slate-200 dark:border-slate-800">
+              {prevTopic ? (
+                <Link
+                  href={`/solutions/${board}/${classSlug}/${textbookSlug}/${chapterSlug}/${prevTopic.topicSlug || prevTopic.slug}`}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-emerald-300 dark:hover:border-emerald-700 hover:shadow-sm transition-all text-sm font-medium text-slate-700 dark:text-slate-300 max-w-[45%]"
+                >
+                  <ArrowLeft className="h-4 w-4 flex-shrink-0" />
+                  <span className="truncate">{prevTopic.title}</span>
+                </Link>
+              ) : <div />}
+              {nextTopic ? (
+                <Link
+                  href={`/solutions/${board}/${classSlug}/${textbookSlug}/${chapterSlug}/${nextTopic.topicSlug || nextTopic.slug}`}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-emerald-300 dark:hover:border-emerald-700 hover:shadow-sm transition-all text-sm font-medium text-slate-700 dark:text-slate-300 max-w-[45%] ml-auto"
+                >
+                  <span className="truncate">{nextTopic.title}</span>
+                  <ChevronRight className="h-4 w-4 flex-shrink-0" />
+                </Link>
+              ) : <div />}
+            </div>
+          )}
         </div>
-
-        {(prevTopic || nextTopic) && (
-          <div className="flex items-center justify-between gap-4 pt-4 border-t border-slate-200 dark:border-slate-800">
-            {prevTopic ? (
-              <Link
-                href={`/solutions/${board}/${classSlug}/${textbookSlug}/${chapterSlug}/${prevTopic.topicSlug || prevTopic.slug}`}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-emerald-300 dark:hover:border-emerald-700 hover:shadow-sm transition-all text-sm font-medium text-slate-700 dark:text-slate-300 max-w-[45%]"
-              >
-                <ArrowLeft className="h-4 w-4 flex-shrink-0" />
-                <span className="truncate">{prevTopic.title}</span>
-              </Link>
-            ) : <div />}
-            {nextTopic ? (
-              <Link
-                href={`/solutions/${board}/${classSlug}/${textbookSlug}/${chapterSlug}/${nextTopic.topicSlug || nextTopic.slug}`}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-emerald-300 dark:hover:border-emerald-700 hover:shadow-sm transition-all text-sm font-medium text-slate-700 dark:text-slate-300 max-w-[45%] ml-auto"
-              >
-                <span className="truncate">{nextTopic.title}</span>
-                <ChevronRight className="h-4 w-4 flex-shrink-0" />
-              </Link>
-            ) : <div />}
-          </div>
-        )}
       </div>
     </div>
   );
 }
+

@@ -201,45 +201,93 @@ export default function ChapterSolutionsClient({ board, classSlug, textbookSlug,
         </div>
       </div>
 
-      <div className="w-full px-0 md:px-0 lg:px-0 py-4 space-y-4">
+      {/* Main layout: Left TOC + Content */}
+      <div className="flex items-start gap-0">
 
-        {/* Topics Section */}
+        {/* Left TOC Sidebar */}
         {topics.length > 0 && (
-          <div>
-            <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
-              <FileText className="h-5 w-5 text-blue-500" /> Topics in this Chapter
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {topics.map((topic, idx) => {
-                const pal = PALETTE[idx % PALETTE.length];
+          <aside className="hidden lg:block w-[220px] xl:w-[240px] shrink-0 sticky top-0 max-h-screen overflow-y-auto border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+            {/* TOC Header */}
+            <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 bg-gradient-to-r from-emerald-600 to-teal-600">
+              <div className="flex items-center gap-2">
+                <div className="w-5 h-5 rounded bg-white/20 flex items-center justify-center">
+                  <FileText className="h-3 w-3 text-white" />
+                </div>
+                <span className="text-xs font-bold text-white uppercase tracking-wider">বিষয়সূচি</span>
+              </div>
+              <p className="text-[10px] text-emerald-200 mt-0.5 truncate">{chapterTitle}</p>
+            </div>
+
+            {/* Topic List */}
+            <nav className="p-2 flex flex-col gap-0.5">
+              {topics.map((topic, i) => {
+                const slug = topic.topicSlug || topic.slug;
                 return (
                   <Link
                     key={topic.id}
-                    href={`/solutions/${board}/${classSlug}/${textbookSlug}/${chapterSlug}/${topic.topicSlug || topic.slug}`}
-                    className={cn(
-                      'flex items-center gap-3 p-4 rounded-xl border transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 group',
-                      pal.bg, pal.border
-                    )}
+                    href={`/solutions/${board}/${classSlug}/${textbookSlug}/${chapterSlug}/${slug}`}
+                    className="flex items-start gap-2 px-3 py-2 rounded-lg text-xs transition-all duration-150 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-800 dark:hover:text-slate-200"
                   >
-                    <div className={cn('w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold text-white flex-shrink-0', pal.badge)}>
-                      {String(idx + 1).padStart(2, '0')}
-                    </div>
-                    <span className={cn('font-semibold text-sm leading-snug flex-1', pal.text)}>{topic.title}</span>
-                    <ChevronRight className={cn('h-4 w-4 flex-shrink-0 opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all', pal.text)} />
+                    <span className="flex-shrink-0 w-4 h-4 rounded text-[9px] font-bold flex items-center justify-center mt-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                      {i + 1}
+                    </span>
+                    <span className="leading-snug line-clamp-2">{topic.title}</span>
                   </Link>
                 );
               })}
+            </nav>
+
+            {/* More link at bottom */}
+            <div className="px-3 py-2 border-t border-slate-100 dark:border-slate-800">
+              <Link
+                href={`/solutions/${board}/${classSlug}/${textbookSlug}/${chapterSlug}/more`}
+                className="flex items-center gap-1.5 text-[10px] font-semibold text-violet-600 dark:text-violet-400 hover:underline"
+              >
+                <FileText className="h-3 w-3" /> অতিরিক্ত প্রশ্নোত্তর
+              </Link>
             </div>
-          </div>
+          </aside>
         )}
 
-        {/* Custom Content Section */}
-        {customContents.length > 0 && (
-          <div>
-            <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-emerald-500" /> Chapter Solutions
-            </h2>
-            <div className="space-y-6">
+        {/* Content Area */}
+        <div className="flex-1 min-w-0 w-full py-4 space-y-4">
+
+          {/* Topics Grid */}
+          {topics.length > 0 && (
+            <div className="px-4 md:px-5">
+              <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
+                <FileText className="h-5 w-5 text-blue-500" /> Topics in this Chapter
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {topics.map((topic, idx) => {
+                  const pal = PALETTE[idx % PALETTE.length];
+                  return (
+                    <Link
+                      key={topic.id}
+                      href={`/solutions/${board}/${classSlug}/${textbookSlug}/${chapterSlug}/${topic.topicSlug || topic.slug}`}
+                      className={cn(
+                        'flex items-center gap-3 p-4 rounded-xl border transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 group',
+                        pal.bg, pal.border
+                      )}
+                    >
+                      <div className={cn('w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold text-white flex-shrink-0', pal.badge)}>
+                        {String(idx + 1).padStart(2, '0')}
+                      </div>
+                      <span className={cn('font-semibold text-sm leading-snug flex-1', pal.text)}>{topic.title}</span>
+                      <ChevronRight className={cn('h-4 w-4 flex-shrink-0 opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all', pal.text)} />
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Custom Content Section */}
+          {customContents.length > 0 && (
+            <div className="px-4 md:px-5 space-y-6">
+              <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-emerald-500" /> Chapter Solutions
+              </h2>
               {customContents.map((content, ci) => (
                 <div key={content.id} className="space-y-4">
                   {content.title && (
@@ -268,26 +316,27 @@ export default function ChapterSolutionsClient({ board, classSlug, textbookSlug,
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          )}
 
-        {topics.length === 0 && customContents.length === 0 && (
-          <div className="text-center py-16 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
-            <BookOpen className="h-12 w-12 text-slate-300 dark:text-slate-700 mx-auto mb-3" />
-            <h3 className="text-lg font-bold text-slate-700 dark:text-slate-300 mb-1">Content coming soon</h3>
-            <p className="text-slate-500 text-sm">Solutions for this chapter will be added shortly.</p>
-          </div>
-        )}
+          {topics.length === 0 && customContents.length === 0 && (
+            <div className="mx-4 text-center py-16 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
+              <BookOpen className="h-12 w-12 text-slate-300 dark:text-slate-700 mx-auto mb-3" />
+              <h3 className="text-lg font-bold text-slate-700 dark:text-slate-300 mb-1">Content coming soon</h3>
+              <p className="text-slate-500 text-sm">Solutions for this chapter will be added shortly.</p>
+            </div>
+          )}
 
-        <div className="flex justify-center pt-8">
-          <Link
-            href={`/solutions/${board}/${classSlug}/${textbookSlug}/${chapterSlug}/more`}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400 font-semibold hover:bg-violet-100 dark:hover:bg-violet-900/40 transition-colors border border-violet-200 dark:border-violet-800/40 shadow-sm"
-          >
-            অতিরিক্ত প্রশ্ন ও উত্তর দেখুন <ChevronRight className="h-4 w-4" />
-          </Link>
+          <div className="flex justify-center pt-6 pb-4 px-4">
+            <Link
+              href={`/solutions/${board}/${classSlug}/${textbookSlug}/${chapterSlug}/more`}
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400 font-semibold hover:bg-violet-100 dark:hover:bg-violet-900/40 transition-colors border border-violet-200 dark:border-violet-800/40 shadow-sm"
+            >
+              অতিরিক্ত প্রশ্ন ও উত্তর দেখুন <ChevronRight className="h-4 w-4" />
+            </Link>
+          </div>
         </div>
       </div>
     </div>
   );
 }
+
