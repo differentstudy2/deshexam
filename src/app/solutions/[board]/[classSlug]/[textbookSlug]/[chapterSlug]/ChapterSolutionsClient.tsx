@@ -59,7 +59,7 @@ function CustomQuestion({ q, idx }: { q: any; idx: number }) {
             <Badge className={cn('text-[10px] text-white border-none', badge.class)}>{badge.label}</Badge>
             {q.marks && <span className="text-[10px] text-slate-400">{q.marks} mark{q.marks > 1 ? 's' : ''}</span>}
           </div>
-          <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 leading-snug">{q.questionText}</p>
+          <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 leading-snug whitespace-pre-line">{q.questionText}</p>
         </div>
       </div>
 
@@ -76,7 +76,7 @@ function CustomQuestion({ q, idx }: { q: any; idx: number }) {
             {q.answer && (
               <div className="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800/40 rounded-lg px-4 py-3">
                 <p className="text-xs font-bold text-emerald-700 dark:text-emerald-300 mb-1">উত্তর</p>
-                <p className="text-sm text-emerald-800 dark:text-emerald-200 leading-relaxed">{q.answer}</p>
+                <p className="text-sm text-emerald-800 dark:text-emerald-200 leading-relaxed whitespace-pre-line">{q.answer}</p>
               </div>
             )}
             {q.explanation && (
@@ -84,7 +84,7 @@ function CustomQuestion({ q, idx }: { q: any; idx: number }) {
                 <p className="text-xs font-bold text-blue-700 dark:text-blue-300 mb-1 flex items-center gap-1">
                   <Lightbulb className="h-3 w-3" /> ব্যাখ্যা
                 </p>
-                <p className="text-sm text-blue-800 dark:text-blue-200 leading-relaxed">{q.explanation}</p>
+                <p className="text-sm text-blue-800 dark:text-blue-200 leading-relaxed whitespace-pre-line">{q.explanation}</p>
               </div>
             )}
           </div>
