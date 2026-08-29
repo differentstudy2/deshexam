@@ -6,7 +6,6 @@ import {
   ChevronRight, BookOpen, CheckCircle2, XCircle,
   ChevronDown, ArrowLeft, Lightbulb, HelpCircle, FileText, PenLine
 } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import hardcodedChaptersJson from '@/data/hardcoded/taxonomy/chapters.json';
@@ -187,29 +186,41 @@ export default function TopicSolutionsClient({ board, classSlug, textbookSlug, c
         </div>
       </div>
 
-      {/* Hero */}
-      <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
-        <div className="w-full px-4 md:px-6 lg:px-8 py-6">
+      {/* Hero — Premium gradient banner */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-indigo-600 via-blue-600 to-violet-700 dark:from-indigo-800 dark:via-blue-800 dark:to-violet-900">
+        {/* decorative blobs */}
+        <div className="absolute -top-8 -right-8 w-48 h-48 rounded-full bg-white/10 blur-2xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-32 h-32 rounded-full bg-black/10 blur-2xl pointer-events-none" />
+
+        <div className="relative w-full px-4 md:px-6 lg:px-8 py-6">
           <Link
             href={`/solutions/${board}/${classSlug}/${textbookSlug}/${chapterSlug}`}
-            className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 mb-4 transition-colors font-medium"
+            className="inline-flex items-center gap-1.5 text-xs text-indigo-100 hover:text-white mb-4 transition-colors font-medium"
           >
-            <ArrowLeft className="h-3.5 w-3.5" /> Back to Chapter
+            <ArrowLeft className="h-3.5 w-3.5" /> {chapterTitle}
           </Link>
 
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 flex items-center justify-center border border-blue-200 dark:border-blue-800/50 flex-shrink-0">
-              <BookOpen className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+            {/* Cover avatar */}
+            <div className="shrink-0 w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center shadow-lg">
+              <BookOpen className="h-7 w-7 text-white" />
             </div>
-            <div>
-              <div className="flex items-center gap-2 mb-1 flex-wrap">
-                <Badge variant="outline" className="text-xs">{formattedBoard}</Badge>
-                <Badge variant="outline" className="text-xs">{formattedClass}</Badge>
+
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/20 text-white border border-white/30 backdrop-blur-sm">{formattedBoard}</span>
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/20 text-white border border-white/30 backdrop-blur-sm">{formattedClass}</span>
               </div>
-              <h1 className="text-xl md:text-2xl font-bold font-headline text-slate-900 dark:text-white leading-tight">
-                {topicTitle}
-              </h1>
-              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{chapterTitle} · {formattedTextbook}</p>
+              <h1 className="text-xl md:text-2xl font-extrabold text-white leading-tight drop-shadow-sm">{topicTitle}</h1>
+              <p className="text-sm text-indigo-100 mt-1 font-medium">{chapterTitle} · {formattedTextbook}</p>
+              {allTopicsInChapter.length > 0 && (
+                <div className="flex items-center gap-3 mt-2.5">
+                  <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-white/80">
+                    <FileText className="h-3.5 w-3.5" />
+                    {allTopicsInChapter.length} Topics in Chapter
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </div>
