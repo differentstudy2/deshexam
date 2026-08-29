@@ -114,7 +114,9 @@
   .prose h2,
   .prose h3,
   .prose h4 {
-    @apply font-headline font-bold tracking-tight mb-4 mt-8 first:mt-0;
+    @apply font-headline font-bold tracking-tight first:mt-0;
+    margin-bottom: 0.2rem;
+    margin-top: 0.2rem;
   }
 
   .prose h1 {
@@ -134,7 +136,7 @@
   }
 
   .prose p {
-    @apply mb-4;
+    margin: 0;
   }
 
 
@@ -785,28 +787,38 @@ textarea,
   display: block;
   width: 6px;
 }
+
 .show-scrollbar::-webkit-scrollbar-track {
   background: transparent;
 }
+
 .show-scrollbar::-webkit-scrollbar-thumb {
   background-color: #cbd5e1;
   border-radius: 20px;
 }
+
 .dark .show-scrollbar::-webkit-scrollbar-thumb {
   background-color: #334155;
 }
+
 .show-scrollbar {
   -ms-overflow-style: auto;
   scrollbar-width: thin;
 }
 
-.rounded-2xl {
-    border-radius: 0.2rem;
+/* .rounded-2xl border-radius intentionally kept as Tailwind default (1rem) */
+
+/* Solution card question headers — margin 0.2rem top/bottom */
+.not-prose h3 {
+  margin-top: 0.2rem;
+  margin-bottom: 0.2rem;
 }
+
 @media print {
   .border-red-500 {
     border-color: #ef4444 !important;
   }
+
   .bg-red-50 {
     background-color: #fef2f2 !important;
   }
