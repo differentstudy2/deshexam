@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import {
-  ChevronRight, BookOpen, CheckCircle2, XCircle,
+  ChevronRight, BookOpen, BookMarked, CheckCircle2, XCircle,
   ChevronDown, ArrowLeft, Lightbulb, HelpCircle, FileText, PenLine
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -202,8 +202,18 @@ export default function TopicSolutionsClient({ board, classSlug, textbookSlug, c
 
           <div className="flex items-start gap-4">
             {/* Cover avatar */}
-            <div className="shrink-0 w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center shadow-lg">
-              <BookOpen className="h-7 w-7 text-white" />
+            <div className="shrink-0 w-14 h-20 rounded-xl bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/40 dark:to-teal-900/40 border border-emerald-200 dark:border-emerald-800/50 flex items-center justify-center shadow-lg overflow-hidden relative">
+              <img 
+                src={topic?.image || chapter?.image || textbook?.image || '/image/fallback-cover.png'} 
+                alt={topicTitle} 
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                  const nextEl = e.currentTarget.nextElementSibling;
+                  if (nextEl) nextEl.classList.remove('hidden');
+                }}
+              />
+              <BookMarked className="h-7 w-7 text-emerald-500 dark:text-emerald-400 hidden absolute z-10" />
             </div>
 
             <div className="flex-1 min-w-0">
