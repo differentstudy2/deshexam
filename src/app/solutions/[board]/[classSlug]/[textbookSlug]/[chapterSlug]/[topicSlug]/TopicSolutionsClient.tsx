@@ -7,6 +7,7 @@ import {
   ChevronDown, ArrowLeft, Lightbulb, HelpCircle, FileText, PenLine
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import hardcodedChaptersJson from '@/data/hardcoded/taxonomy/chapters.json';
 import hardcodedTopicsJson from '@/data/hardcoded/taxonomy/topics.json';
@@ -103,6 +104,7 @@ function CustomQuestion({ q, idx }: { q: any; idx: number }) {
 }
 
 export default function TopicSolutionsClient({ board, classSlug, textbookSlug, chapterSlug, topicSlug }: Props) {
+  const [imageError, setImageError] = useState(false);
   const boardSlugs = BOARD_SLUG_MAP[board.toLowerCase()] || [board.toLowerCase()];
 
   const textbook = useMemo(() =>
@@ -187,33 +189,25 @@ export default function TopicSolutionsClient({ board, classSlug, textbookSlug, c
       </div>
 
       {/* Hero — Premium gradient banner */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-indigo-600 via-blue-600 to-violet-700 dark:from-indigo-800 dark:via-blue-800 dark:to-violet-900">
+      <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 dark:from-slate-950 dark:via-indigo-950/80 dark:to-slate-950">
         {/* decorative blobs */}
-        <div className="absolute -top-8 -right-8 w-48 h-48 rounded-full bg-white/10 blur-2xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-32 h-32 rounded-full bg-black/10 blur-2xl pointer-events-none" />
+        <div className="absolute -top-12 -right-12 w-64 h-64 rounded-full bg-indigo-500/20 blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full bg-blue-500/10 blur-3xl pointer-events-none" />
 
-        <div className="relative w-full px-4 md:px-6 lg:px-8 py-6">
-          <Link
-            href={`/solutions/${board}/${classSlug}/${textbookSlug}/${chapterSlug}`}
-            className="inline-flex items-center gap-1.5 text-xs text-indigo-100 hover:text-white mb-4 transition-colors font-medium"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" /> {chapterTitle}
-          </Link>
-
-          <div className="flex items-start gap-4">
+        <div className="relative w-full px-4 md:px-6 lg:px-8 py-8 md:py-10">
+          <div className="flex items-center md:items-start gap-5 md:gap-6">
             {/* Cover avatar */}
-            <div className="shrink-0 w-14 h-20 rounded-xl bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/40 dark:to-teal-900/40 border border-emerald-200 dark:border-emerald-800/50 flex items-center justify-center shadow-lg overflow-hidden relative">
-              <img 
-                src={topic?.image || chapter?.image || textbook?.image || '/image/fallback-cover.png'} 
-                alt={topicTitle} 
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                  const nextEl = e.currentTarget.nextElementSibling;
-                  if (nextEl) nextEl.classList.remove('hidden');
-                }}
-              />
-              <BookMarked className="h-7 w-7 text-emerald-500 dark:text-emerald-400 hidden absolute z-10" />
+            <div className="shrink-0 w-20 h-28 md:w-28 md:h-40 rounded-xl bg-slate-800 border border-white/10 flex items-center justify-center shadow-2xl overflow-hidden relative group">
+              {(topic?.image || chapter?.image || textbook?.image) && !imageError ? (
+                <img 
+                  src={topic?.image || chapter?.image || textbook?.image} 
+                  alt={topicTitle} 
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  onError={() => setImageError(true)}
+                />
+              ) : (
+                <BookMarked className="h-10 w-10 md:h-12 md:w-12 text-slate-500/50" />
+              )}
             </div>
 
             <div className="flex-1 min-w-0">
@@ -222,7 +216,7 @@ export default function TopicSolutionsClient({ board, classSlug, textbookSlug, c
                 <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/20 text-white border border-white/30 backdrop-blur-sm">{formattedClass}</span>
               </div>
               <h1 className="text-xl md:text-2xl font-extrabold text-white leading-tight drop-shadow-sm">{topicTitle}</h1>
-              <p className="text-sm text-indigo-100 mt-1 font-medium">{chapterTitle} · {formattedTextbook}</p>
+              <p className="text-sm text-indigo-200/80 mt-1 font-medium">{chapterTitle} · {formattedTextbook}</p>
               {allTopicsInChapter.length > 0 && (
                 <div className="flex items-center gap-3 mt-2.5">
                   <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-white/80">
