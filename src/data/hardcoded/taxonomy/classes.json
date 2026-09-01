@@ -711,5 +711,235 @@
         "type": "board"
       }
     ]
+  },
+  {
+    "id": "class-1-icse",
+    "title": "Class 1",
+    "slug": "class-1",
+    "type": "class",
+    "track": "academic",
+    "parentId": "board-icse",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "icse-board/class-1",
+    "boardSlug": "icse-board",
+    "classSlug": "class-1",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      }
+    ]
+  },
+  {
+    "id": "class-2-icse",
+    "title": "Class 2",
+    "slug": "class-2",
+    "type": "class",
+    "track": "academic",
+    "parentId": "board-icse",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "icse-board/class-2",
+    "boardSlug": "icse-board",
+    "classSlug": "class-2",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      }
+    ]
+  },
+  {
+    "id": "class-3-icse",
+    "title": "Class 3",
+    "slug": "class-3",
+    "type": "class",
+    "track": "academic",
+    "parentId": "board-icse",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "icse-board/class-3",
+    "boardSlug": "icse-board",
+    "classSlug": "class-3",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      }
+    ]
+  },
+  {
+    "id": "class-4-icse",
+    "title": "Class 4",
+    "slug": "class-4",
+    "type": "class",
+    "track": "academic",
+    "parentId": "board-icse",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "icse-board/class-4",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      }
+    ]
+  },
+  {
+    "id": "class-5-icse",
+    "title": "Class 5",
+    "slug": "class-5",
+    "type": "class",
+    "track": "academic",
+    "parentId": "board-icse",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "icse-board/class-5",
+    "boardSlug": "icse-board",
+    "classSlug": "class-5",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      }
+    ]
+  },
+  {
+    "id": "class-6-icse",
+    "title": "Class 6",
+    "slug": "class-6",
+    "type": "class",
+    "track": "academic",
+    "parentId": "board-icse",
+    "orderIndex": 6,
+    "status": "published",
+    "fullSlug": "icse-board/class-6",
+    "boardSlug": "icse-board",
+    "classSlug": "class-6",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      }
+    ]
+  },
+  {
+    "id": "class-7-icse",
+    "title": "Class 7",
+    "slug": "class-7",
+    "type": "class",
+    "track": "academic",
+    "parentId": "board-icse",
+    "orderIndex": 7,
+    "status": "published",
+    "fullSlug": "icse-board/class-7",
+    "boardSlug": "icse-board",
+    "classSlug": "class-7",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      }
+    ]
+  },
+  {
+    "id": "class-8-icse",
+    "title": "Class 8",
+    "slug": "class-8",
+    "type": "class",
+    "track": "academic",
+    "parentId": "board-icse",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "icse-board/class-8",
+    "boardSlug": "icse-board",
+    "classSlug": "class-8",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      }
+    ]
+  },
+  {
+    "id": "class-9-icse",
+    "title": "Class 9",
+    "slug": "class-9",
+    "type": "class",
+    "track": "academic",
+    "parentId": "board-icse",
+    "orderIndex": 9,
+    "status": "published",
+    "fullSlug": "icse-board/class-9",
+    "boardSlug": "icse-board",
+    "classSlug": "class-9",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      }
+    ]
+  },
+  {
+    "id": "class-10-icse",
+    "title": "Class 10",
+    "slug": "class-10",
+    "type": "class",
+    "track": "academic",
+    "parentId": "board-icse",
+    "orderIndex": 10,
+    "status": "published",
+    "fullSlug": "icse-board/class-10",
+    "boardSlug": "icse-board",
+    "classSlug": "class-10",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      }
+    ]
   }
 ]

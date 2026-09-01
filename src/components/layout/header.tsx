@@ -37,7 +37,18 @@ type NavLinkType = {
 };
 
 const mainNavLinks: NavLinkType[] = [
-  { href: "/academy", label: "Learn", icon: <BookOpen className="h-5 w-5" /> },
+  {
+    label: "Learn",
+    icon: <BookOpen className="h-5 w-5" />,
+    subItems: [
+      { href: "/academy", label: "All Boards", icon: <Library className="h-4 w-4" /> },
+      { href: "/academy/ncert", label: "NCERT", icon: <BookOpen className="h-4 w-4" /> },
+      { href: "/academy/wbbse", label: "WBBSE", icon: <BookOpen className="h-4 w-4" /> },
+      { href: "/academy/wbchse", label: "WBCHSE", icon: <BookOpen className="h-4 w-4" /> },
+      { href: "/academy/cbse", label: "CBSE", icon: <BookOpen className="h-4 w-4" /> },
+      { href: "/academy/icse", label: "ICSE", icon: <BookOpen className="h-4 w-4" /> },
+    ]
+  },
   { href: "/book", label: "Book", icon: <Library className="h-5 w-5" /> },
   {
     label: "Solutions",

@@ -357,7 +357,12 @@ export default function AcademyClient({
           }
         } else {
           // Fetch only 'class' nodes, not the entire database
-          fetchedClasses = await getTaxonomyNodesByType('academic', 'class');
+          let allClasses = await getTaxonomyNodesByType('academic', 'class');
+          if (preSelectedBoardSlug) {
+            fetchedClasses = allClasses.filter(c => c.boardSlug === preSelectedBoardSlug || (c.fullSlug && c.fullSlug.includes(preSelectedBoardSlug)));
+          } else {
+            fetchedClasses = allClasses;
+          }
         }
         
         setClassesList(fetchedClasses);

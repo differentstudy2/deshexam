@@ -2144,5 +2144,190 @@
         "type": "subject"
       }
     ]
+  },
+  {
+    "id": "textbook-viva-social-studies-4",
+    "title": "Viva Social Studies 4",
+    "slug": "viva-social-studies-4",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-social-studies-class-4-icse",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/social-studies/viva-social-studies-4",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "social-studies",
+    "textbookSlug": "viva-social-studies-4",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-social-studies-class-4-icse",
+        "slug": "social-studies",
+        "title": "Social Studies",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-basic-english-grammar-4",
+    "title": "BASIC English Grammar & Composition 4",
+    "slug": "basic-english-grammar-4",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-english-grammar-class-4-icse",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english-grammar/basic-english-grammar-4",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english-grammar",
+    "textbookSlug": "basic-english-grammar-4",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-grammar-class-4-icse",
+        "slug": "english-grammar",
+        "title": "English Grammar",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-know-it-now-4",
+    "title": "KNOW IT NOW 4",
+    "slug": "know-it-now-4",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-general-knowledge-class-4-icse",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/general-knowledge/know-it-now-4",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "general-knowledge",
+    "textbookSlug": "know-it-now-4",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-general-knowledge-class-4-icse",
+        "slug": "general-knowledge",
+        "title": "General Knowledge",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-the-inner-circle-4",
+    "title": "The Inner Circle 4",
+    "slug": "the-inner-circle-4",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-value-education-class-4-icse",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/value-education/the-inner-circle-4",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "value-education",
+    "textbookSlug": "the-inner-circle-4",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-value-education-class-4-icse",
+        "slug": "value-education",
+        "title": "Value Education",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-conquer-english-4",
+    "title": "CONQUER ENGLISH Course Book 4",
+    "slug": "conquer-english-4",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-english-class-4-icse",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english/conquer-english-4",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english",
+    "textbookSlug": "conquer-english-4",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-4-icse",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      }
+    ]
   }
 ]

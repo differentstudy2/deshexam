@@ -22893,5 +22893,4361 @@
         "type": "chapter"
       }
     ]
+  },
+  {
+    "id": "chapter-ss-viva-4-our-country-india",
+    "title": "Our Country-India",
+    "slug": "our-country-india",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-viva-social-studies-4",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/social-studies/viva-social-studies-4/our-country-india",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "social-studies",
+    "bookSlug": "viva-social-studies-4",
+    "chapterSlug": "our-country-india",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-social-studies-class-4-icse",
+        "slug": "social-studies",
+        "title": "Social Studies",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-viva-social-studies-4",
+        "slug": "viva-social-studies-4",
+        "title": "Viva Social Studies 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-ss-viva-4-the-himalayas",
+    "title": "The Himalayas",
+    "slug": "the-himalayas",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-viva-social-studies-4",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/social-studies/viva-social-studies-4/the-himalayas",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "social-studies",
+    "bookSlug": "viva-social-studies-4",
+    "chapterSlug": "the-himalayas",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-social-studies-class-4-icse",
+        "slug": "social-studies",
+        "title": "Social Studies",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-viva-social-studies-4",
+        "slug": "viva-social-studies-4",
+        "title": "Viva Social Studies 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-ss-viva-4-the-northern-plains",
+    "title": "The Northern Plains",
+    "slug": "the-northern-plains",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-viva-social-studies-4",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/social-studies/viva-social-studies-4/the-northern-plains",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "social-studies",
+    "bookSlug": "viva-social-studies-4",
+    "chapterSlug": "the-northern-plains",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-social-studies-class-4-icse",
+        "slug": "social-studies",
+        "title": "Social Studies",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-viva-social-studies-4",
+        "slug": "viva-social-studies-4",
+        "title": "Viva Social Studies 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-ss-viva-4-the-southern-plateau",
+    "title": "The Southern Plateau",
+    "slug": "the-southern-plateau",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-viva-social-studies-4",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/social-studies/viva-social-studies-4/the-southern-plateau",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "social-studies",
+    "bookSlug": "viva-social-studies-4",
+    "chapterSlug": "the-southern-plateau",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-social-studies-class-4-icse",
+        "slug": "social-studies",
+        "title": "Social Studies",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-viva-social-studies-4",
+        "slug": "viva-social-studies-4",
+        "title": "Viva Social Studies 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-ss-viva-4-the-coastal-plains-and-islands",
+    "title": "The Coastal Plains and Islands",
+    "slug": "the-coastal-plains-and-islands",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-viva-social-studies-4",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/social-studies/viva-social-studies-4/the-coastal-plains-and-islands",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "social-studies",
+    "bookSlug": "viva-social-studies-4",
+    "chapterSlug": "the-coastal-plains-and-islands",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-social-studies-class-4-icse",
+        "slug": "social-studies",
+        "title": "Social Studies",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-viva-social-studies-4",
+        "slug": "viva-social-studies-4",
+        "title": "Viva Social Studies 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-ss-viva-4-the-desert-land-of-india",
+    "title": "The Desert Land of India",
+    "slug": "the-desert-land-of-india",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-viva-social-studies-4",
+    "orderIndex": 6,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/social-studies/viva-social-studies-4/the-desert-land-of-india",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "social-studies",
+    "bookSlug": "viva-social-studies-4",
+    "chapterSlug": "the-desert-land-of-india",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-social-studies-class-4-icse",
+        "slug": "social-studies",
+        "title": "Social Studies",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-viva-social-studies-4",
+        "slug": "viva-social-studies-4",
+        "title": "Viva Social Studies 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-ss-viva-4-the-natural-wealth-of-india",
+    "title": "The Natural Wealth of India",
+    "slug": "the-natural-wealth-of-india",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-viva-social-studies-4",
+    "orderIndex": 7,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/social-studies/viva-social-studies-4/the-natural-wealth-of-india",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "social-studies",
+    "bookSlug": "viva-social-studies-4",
+    "chapterSlug": "the-natural-wealth-of-india",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-social-studies-class-4-icse",
+        "slug": "social-studies",
+        "title": "Social Studies",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-viva-social-studies-4",
+        "slug": "viva-social-studies-4",
+        "title": "Viva Social Studies 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-ss-viva-4-our-resources",
+    "title": "Our Resources",
+    "slug": "our-resources",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-viva-social-studies-4",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/social-studies/viva-social-studies-4/our-resources",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "social-studies",
+    "bookSlug": "viva-social-studies-4",
+    "chapterSlug": "our-resources",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-social-studies-class-4-icse",
+        "slug": "social-studies",
+        "title": "Social Studies",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-viva-social-studies-4",
+        "slug": "viva-social-studies-4",
+        "title": "Viva Social Studies 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-ss-viva-4-assessment-i",
+    "title": "Assessment-I",
+    "slug": "assessment-i",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-viva-social-studies-4",
+    "orderIndex": 9,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/social-studies/viva-social-studies-4/assessment-i",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "social-studies",
+    "bookSlug": "viva-social-studies-4",
+    "chapterSlug": "assessment-i",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-social-studies-class-4-icse",
+        "slug": "social-studies",
+        "title": "Social Studies",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-viva-social-studies-4",
+        "slug": "viva-social-studies-4",
+        "title": "Viva Social Studies 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-ss-viva-4-agriculture-and-livestock",
+    "title": "Agriculture and Livestock",
+    "slug": "agriculture-and-livestock",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-viva-social-studies-4",
+    "orderIndex": 10,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/social-studies/viva-social-studies-4/agriculture-and-livestock",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "social-studies",
+    "bookSlug": "viva-social-studies-4",
+    "chapterSlug": "agriculture-and-livestock",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-social-studies-class-4-icse",
+        "slug": "social-studies",
+        "title": "Social Studies",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-viva-social-studies-4",
+        "slug": "viva-social-studies-4",
+        "title": "Viva Social Studies 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-ss-viva-4-industries-in-india",
+    "title": "Industries in India",
+    "slug": "industries-in-india",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-viva-social-studies-4",
+    "orderIndex": 11,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/social-studies/viva-social-studies-4/industries-in-india",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "social-studies",
+    "bookSlug": "viva-social-studies-4",
+    "chapterSlug": "industries-in-india",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-social-studies-class-4-icse",
+        "slug": "social-studies",
+        "title": "Social Studies",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-viva-social-studies-4",
+        "slug": "viva-social-studies-4",
+        "title": "Viva Social Studies 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-ss-viva-4-transport-and-communication",
+    "title": "Transport and Communication",
+    "slug": "transport-and-communication",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-viva-social-studies-4",
+    "orderIndex": 12,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/social-studies/viva-social-studies-4/transport-and-communication",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "social-studies",
+    "bookSlug": "viva-social-studies-4",
+    "chapterSlug": "transport-and-communication",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-social-studies-class-4-icse",
+        "slug": "social-studies",
+        "title": "Social Studies",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-viva-social-studies-4",
+        "slug": "viva-social-studies-4",
+        "title": "Viva Social Studies 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-ss-viva-4-our-heritage",
+    "title": "Our Heritage",
+    "slug": "our-heritage",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-viva-social-studies-4",
+    "orderIndex": 13,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/social-studies/viva-social-studies-4/our-heritage",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "social-studies",
+    "bookSlug": "viva-social-studies-4",
+    "chapterSlug": "our-heritage",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-social-studies-class-4-icse",
+        "slug": "social-studies",
+        "title": "Social Studies",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-viva-social-studies-4",
+        "slug": "viva-social-studies-4",
+        "title": "Viva Social Studies 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-ss-viva-4-our-national-symbols",
+    "title": "Our National Symbols",
+    "slug": "our-national-symbols",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-viva-social-studies-4",
+    "orderIndex": 14,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/social-studies/viva-social-studies-4/our-national-symbols",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "social-studies",
+    "bookSlug": "viva-social-studies-4",
+    "chapterSlug": "our-national-symbols",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-social-studies-class-4-icse",
+        "slug": "social-studies",
+        "title": "Social Studies",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-viva-social-studies-4",
+        "slug": "viva-social-studies-4",
+        "title": "Viva Social Studies 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-ss-viva-4-our-rights-and-duties",
+    "title": "Our Rights and Duties",
+    "slug": "our-rights-and-duties",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-viva-social-studies-4",
+    "orderIndex": 15,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/social-studies/viva-social-studies-4/our-rights-and-duties",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "social-studies",
+    "bookSlug": "viva-social-studies-4",
+    "chapterSlug": "our-rights-and-duties",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-social-studies-class-4-icse",
+        "slug": "social-studies",
+        "title": "Social Studies",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-viva-social-studies-4",
+        "slug": "viva-social-studies-4",
+        "title": "Viva Social Studies 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-ss-viva-4-public-services",
+    "title": "Public Services",
+    "slug": "public-services",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-viva-social-studies-4",
+    "orderIndex": 16,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/social-studies/viva-social-studies-4/public-services",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "social-studies",
+    "bookSlug": "viva-social-studies-4",
+    "chapterSlug": "public-services",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-social-studies-class-4-icse",
+        "slug": "social-studies",
+        "title": "Social Studies",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-viva-social-studies-4",
+        "slug": "viva-social-studies-4",
+        "title": "Viva Social Studies 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-ss-viva-4-great-achievers",
+    "title": "Great Achievers",
+    "slug": "great-achievers",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-viva-social-studies-4",
+    "orderIndex": 17,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/social-studies/viva-social-studies-4/great-achievers",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "social-studies",
+    "bookSlug": "viva-social-studies-4",
+    "chapterSlug": "great-achievers",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-social-studies-class-4-icse",
+        "slug": "social-studies",
+        "title": "Social Studies",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-viva-social-studies-4",
+        "slug": "viva-social-studies-4",
+        "title": "Viva Social Studies 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-ss-viva-4-assessment-ii",
+    "title": "Assessment-II",
+    "slug": "assessment-ii",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-viva-social-studies-4",
+    "orderIndex": 18,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/social-studies/viva-social-studies-4/assessment-ii",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "social-studies",
+    "bookSlug": "viva-social-studies-4",
+    "chapterSlug": "assessment-ii",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-social-studies-class-4-icse",
+        "slug": "social-studies",
+        "title": "Social Studies",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-viva-social-studies-4",
+        "slug": "viva-social-studies-4",
+        "title": "Viva Social Studies 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-ss-viva-4-india-at-a-glance",
+    "title": "India at a Glance",
+    "slug": "india-at-a-glance",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-viva-social-studies-4",
+    "orderIndex": 19,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/social-studies/viva-social-studies-4/india-at-a-glance",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "social-studies",
+    "bookSlug": "viva-social-studies-4",
+    "chapterSlug": "india-at-a-glance",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-social-studies-class-4-icse",
+        "slug": "social-studies",
+        "title": "Social Studies",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-viva-social-studies-4",
+        "slug": "viva-social-studies-4",
+        "title": "Viva Social Studies 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-ss-viva-4-outline-maps-of-india",
+    "title": "Outline Maps of India",
+    "slug": "outline-maps-of-india",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-viva-social-studies-4",
+    "orderIndex": 20,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/social-studies/viva-social-studies-4/outline-maps-of-india",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "social-studies",
+    "bookSlug": "viva-social-studies-4",
+    "chapterSlug": "outline-maps-of-india",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-social-studies-class-4-icse",
+        "slug": "social-studies",
+        "title": "Social Studies",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-viva-social-studies-4",
+        "slug": "viva-social-studies-4",
+        "title": "Viva Social Studies 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-ss-viva-4-from-theory-to-practice",
+    "title": "From Theory to Practice",
+    "slug": "from-theory-to-practice",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-viva-social-studies-4",
+    "orderIndex": 21,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/social-studies/viva-social-studies-4/from-theory-to-practice",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "social-studies",
+    "bookSlug": "viva-social-studies-4",
+    "chapterSlug": "from-theory-to-practice",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-social-studies-class-4-icse",
+        "slug": "social-studies",
+        "title": "Social Studies",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-viva-social-studies-4",
+        "slug": "viva-social-studies-4",
+        "title": "Viva Social Studies 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-ss-viva-4-exploring-the-national-parks-in-india",
+    "title": "Exploring the National Parks in India",
+    "slug": "exploring-the-national-parks-in-india",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-viva-social-studies-4",
+    "orderIndex": 22,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/social-studies/viva-social-studies-4/exploring-the-national-parks-in-india",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "social-studies",
+    "bookSlug": "viva-social-studies-4",
+    "chapterSlug": "exploring-the-national-parks-in-india",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-social-studies-class-4-icse",
+        "slug": "social-studies",
+        "title": "Social Studies",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-viva-social-studies-4",
+        "slug": "viva-social-studies-4",
+        "title": "Viva Social Studies 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-ss-viva-4-electric-vehicles",
+    "title": "Electric Vehicles",
+    "slug": "electric-vehicles",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-viva-social-studies-4",
+    "orderIndex": 23,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/social-studies/viva-social-studies-4/electric-vehicles",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "social-studies",
+    "bookSlug": "viva-social-studies-4",
+    "chapterSlug": "electric-vehicles",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-social-studies-class-4-icse",
+        "slug": "social-studies",
+        "title": "Social Studies",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-viva-social-studies-4",
+        "slug": "viva-social-studies-4",
+        "title": "Viva Social Studies 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-ss-viva-4-artificial-intelligence",
+    "title": "Artificial Intelligence",
+    "slug": "artificial-intelligence",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-viva-social-studies-4",
+    "orderIndex": 24,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/social-studies/viva-social-studies-4/artificial-intelligence",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "social-studies",
+    "bookSlug": "viva-social-studies-4",
+    "chapterSlug": "artificial-intelligence",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-social-studies-class-4-icse",
+        "slug": "social-studies",
+        "title": "Social Studies",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-viva-social-studies-4",
+        "slug": "viva-social-studies-4",
+        "title": "Viva Social Studies 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-eng-basic-4-sentences-and-phrases",
+    "title": "Sentences and Phrases",
+    "slug": "sentences-and-phrases",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-basic-english-grammar-4",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english-grammar/basic-english-grammar-4/sentences-and-phrases",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english-grammar",
+    "bookSlug": "basic-english-grammar-4",
+    "chapterSlug": "sentences-and-phrases",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-grammar-class-4-icse",
+        "slug": "english-grammar",
+        "title": "English Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-basic-english-grammar-4",
+        "slug": "basic-english-grammar-4",
+        "title": "BASIC English Grammar & Composition 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-eng-basic-4-subject-and-predicate",
+    "title": "Subject and Predicate",
+    "slug": "subject-and-predicate",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-basic-english-grammar-4",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english-grammar/basic-english-grammar-4/subject-and-predicate",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english-grammar",
+    "bookSlug": "basic-english-grammar-4",
+    "chapterSlug": "subject-and-predicate",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-grammar-class-4-icse",
+        "slug": "english-grammar",
+        "title": "English Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-basic-english-grammar-4",
+        "slug": "basic-english-grammar-4",
+        "title": "BASIC English Grammar & Composition 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-eng-basic-4-statements-and-questions",
+    "title": "Statements and Questions",
+    "slug": "statements-and-questions",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-basic-english-grammar-4",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english-grammar/basic-english-grammar-4/statements-and-questions",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english-grammar",
+    "bookSlug": "basic-english-grammar-4",
+    "chapterSlug": "statements-and-questions",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-grammar-class-4-icse",
+        "slug": "english-grammar",
+        "title": "English Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-basic-english-grammar-4",
+        "slug": "basic-english-grammar-4",
+        "title": "BASIC English Grammar & Composition 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-eng-basic-4-questions-and-answers",
+    "title": "Questions and Answers",
+    "slug": "questions-and-answers",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-basic-english-grammar-4",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english-grammar/basic-english-grammar-4/questions-and-answers",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english-grammar",
+    "bookSlug": "basic-english-grammar-4",
+    "chapterSlug": "questions-and-answers",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-grammar-class-4-icse",
+        "slug": "english-grammar",
+        "title": "English Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-basic-english-grammar-4",
+        "slug": "basic-english-grammar-4",
+        "title": "BASIC English Grammar & Composition 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-eng-basic-4-the-wh-family",
+    "title": "The Wh- Family",
+    "slug": "the-wh-family",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-basic-english-grammar-4",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english-grammar/basic-english-grammar-4/the-wh-family",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english-grammar",
+    "bookSlug": "basic-english-grammar-4",
+    "chapterSlug": "the-wh-family",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-grammar-class-4-icse",
+        "slug": "english-grammar",
+        "title": "English Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-basic-english-grammar-4",
+        "slug": "basic-english-grammar-4",
+        "title": "BASIC English Grammar & Composition 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-eng-basic-4-negative-and-positive-sentences",
+    "title": "Negative and Positive Sentences",
+    "slug": "negative-and-positive-sentences",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-basic-english-grammar-4",
+    "orderIndex": 6,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english-grammar/basic-english-grammar-4/negative-and-positive-sentences",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english-grammar",
+    "bookSlug": "basic-english-grammar-4",
+    "chapterSlug": "negative-and-positive-sentences",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-grammar-class-4-icse",
+        "slug": "english-grammar",
+        "title": "English Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-basic-english-grammar-4",
+        "slug": "basic-english-grammar-4",
+        "title": "BASIC English Grammar & Composition 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-eng-basic-4-revision-1",
+    "title": "Revision 1",
+    "slug": "revision-1",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-basic-english-grammar-4",
+    "orderIndex": 7,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english-grammar/basic-english-grammar-4/revision-1",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english-grammar",
+    "bookSlug": "basic-english-grammar-4",
+    "chapterSlug": "revision-1",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-grammar-class-4-icse",
+        "slug": "english-grammar",
+        "title": "English Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-basic-english-grammar-4",
+        "slug": "basic-english-grammar-4",
+        "title": "BASIC English Grammar & Composition 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-eng-basic-4-parts-of-speech",
+    "title": "Parts of Speech",
+    "slug": "parts-of-speech",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-basic-english-grammar-4",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english-grammar/basic-english-grammar-4/parts-of-speech",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english-grammar",
+    "bookSlug": "basic-english-grammar-4",
+    "chapterSlug": "parts-of-speech",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-grammar-class-4-icse",
+        "slug": "english-grammar",
+        "title": "English Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-basic-english-grammar-4",
+        "slug": "basic-english-grammar-4",
+        "title": "BASIC English Grammar & Composition 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-eng-basic-4-nouns-and-kinds-of-nouns",
+    "title": "Nouns and Kinds of Nouns",
+    "slug": "nouns-and-kinds-of-nouns",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-basic-english-grammar-4",
+    "orderIndex": 9,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english-grammar/basic-english-grammar-4/nouns-and-kinds-of-nouns",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english-grammar",
+    "bookSlug": "basic-english-grammar-4",
+    "chapterSlug": "nouns-and-kinds-of-nouns",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-grammar-class-4-icse",
+        "slug": "english-grammar",
+        "title": "English Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-basic-english-grammar-4",
+        "slug": "basic-english-grammar-4",
+        "title": "BASIC English Grammar & Composition 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-eng-basic-4-nouns-singular-and-plural",
+    "title": "Nouns: Singular and Plural",
+    "slug": "nouns-singular-and-plural",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-basic-english-grammar-4",
+    "orderIndex": 10,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english-grammar/basic-english-grammar-4/nouns-singular-and-plural",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english-grammar",
+    "bookSlug": "basic-english-grammar-4",
+    "chapterSlug": "nouns-singular-and-plural",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-grammar-class-4-icse",
+        "slug": "english-grammar",
+        "title": "English Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-basic-english-grammar-4",
+        "slug": "basic-english-grammar-4",
+        "title": "BASIC English Grammar & Composition 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-eng-basic-4-nouns-gender",
+    "title": "Nouns: Gender",
+    "slug": "nouns-gender",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-basic-english-grammar-4",
+    "orderIndex": 11,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english-grammar/basic-english-grammar-4/nouns-gender",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english-grammar",
+    "bookSlug": "basic-english-grammar-4",
+    "chapterSlug": "nouns-gender",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-grammar-class-4-icse",
+        "slug": "english-grammar",
+        "title": "English Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-basic-english-grammar-4",
+        "slug": "basic-english-grammar-4",
+        "title": "BASIC English Grammar & Composition 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-eng-basic-4-nouns-possession",
+    "title": "Nouns: Possession",
+    "slug": "nouns-possession",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-basic-english-grammar-4",
+    "orderIndex": 12,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english-grammar/basic-english-grammar-4/nouns-possession",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english-grammar",
+    "bookSlug": "basic-english-grammar-4",
+    "chapterSlug": "nouns-possession",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-grammar-class-4-icse",
+        "slug": "english-grammar",
+        "title": "English Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-basic-english-grammar-4",
+        "slug": "basic-english-grammar-4",
+        "title": "BASIC English Grammar & Composition 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-eng-basic-4-pronouns-and-kinds-of-pronouns",
+    "title": "Pronouns and Kinds of Pronouns",
+    "slug": "pronouns-and-kinds-of-pronouns",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-basic-english-grammar-4",
+    "orderIndex": 13,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english-grammar/basic-english-grammar-4/pronouns-and-kinds-of-pronouns",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english-grammar",
+    "bookSlug": "basic-english-grammar-4",
+    "chapterSlug": "pronouns-and-kinds-of-pronouns",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-grammar-class-4-icse",
+        "slug": "english-grammar",
+        "title": "English Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-basic-english-grammar-4",
+        "slug": "basic-english-grammar-4",
+        "title": "BASIC English Grammar & Composition 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-eng-basic-4-revision-2",
+    "title": "Revision 2",
+    "slug": "revision-2",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-basic-english-grammar-4",
+    "orderIndex": 14,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english-grammar/basic-english-grammar-4/revision-2",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english-grammar",
+    "bookSlug": "basic-english-grammar-4",
+    "chapterSlug": "revision-2",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-grammar-class-4-icse",
+        "slug": "english-grammar",
+        "title": "English Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-basic-english-grammar-4",
+        "slug": "basic-english-grammar-4",
+        "title": "BASIC English Grammar & Composition 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-eng-basic-4-adjectives-and-kinds-of-adjectives",
+    "title": "Adjectives and Kinds of Adjectives",
+    "slug": "adjectives-and-kinds-of-adjectives",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-basic-english-grammar-4",
+    "orderIndex": 15,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english-grammar/basic-english-grammar-4/adjectives-and-kinds-of-adjectives",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english-grammar",
+    "bookSlug": "basic-english-grammar-4",
+    "chapterSlug": "adjectives-and-kinds-of-adjectives",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-grammar-class-4-icse",
+        "slug": "english-grammar",
+        "title": "English Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-basic-english-grammar-4",
+        "slug": "basic-english-grammar-4",
+        "title": "BASIC English Grammar & Composition 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-eng-basic-4-adjectives-comparison",
+    "title": "Adjectives: Comparison",
+    "slug": "adjectives-comparison",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-basic-english-grammar-4",
+    "orderIndex": 16,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english-grammar/basic-english-grammar-4/adjectives-comparison",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english-grammar",
+    "bookSlug": "basic-english-grammar-4",
+    "chapterSlug": "adjectives-comparison",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-grammar-class-4-icse",
+        "slug": "english-grammar",
+        "title": "English Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-basic-english-grammar-4",
+        "slug": "basic-english-grammar-4",
+        "title": "BASIC English Grammar & Composition 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-eng-basic-4-verbs",
+    "title": "Verbs",
+    "slug": "verbs",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-basic-english-grammar-4",
+    "orderIndex": 17,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english-grammar/basic-english-grammar-4/verbs",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english-grammar",
+    "bookSlug": "basic-english-grammar-4",
+    "chapterSlug": "verbs",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-grammar-class-4-icse",
+        "slug": "english-grammar",
+        "title": "English Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-basic-english-grammar-4",
+        "slug": "basic-english-grammar-4",
+        "title": "BASIC English Grammar & Composition 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-eng-basic-4-verbs-helping-verbs-and-modals",
+    "title": "Verbs: Helping Verbs and Modals",
+    "slug": "verbs-helping-verbs-and-modals",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-basic-english-grammar-4",
+    "orderIndex": 18,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english-grammar/basic-english-grammar-4/verbs-helping-verbs-and-modals",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english-grammar",
+    "bookSlug": "basic-english-grammar-4",
+    "chapterSlug": "verbs-helping-verbs-and-modals",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-grammar-class-4-icse",
+        "slug": "english-grammar",
+        "title": "English Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-basic-english-grammar-4",
+        "slug": "basic-english-grammar-4",
+        "title": "BASIC English Grammar & Composition 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-eng-basic-4-subject-verb-agreement",
+    "title": "Subject-Verb Agreement",
+    "slug": "subject-verb-agreement",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-basic-english-grammar-4",
+    "orderIndex": 19,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english-grammar/basic-english-grammar-4/subject-verb-agreement",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english-grammar",
+    "bookSlug": "basic-english-grammar-4",
+    "chapterSlug": "subject-verb-agreement",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-grammar-class-4-icse",
+        "slug": "english-grammar",
+        "title": "English Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-basic-english-grammar-4",
+        "slug": "basic-english-grammar-4",
+        "title": "BASIC English Grammar & Composition 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-eng-basic-4-tenses",
+    "title": "Tenses",
+    "slug": "tenses",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-basic-english-grammar-4",
+    "orderIndex": 20,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english-grammar/basic-english-grammar-4/tenses",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english-grammar",
+    "bookSlug": "basic-english-grammar-4",
+    "chapterSlug": "tenses",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-grammar-class-4-icse",
+        "slug": "english-grammar",
+        "title": "English Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-basic-english-grammar-4",
+        "slug": "basic-english-grammar-4",
+        "title": "BASIC English Grammar & Composition 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-eng-basic-4-forms-of-verbs",
+    "title": "Forms of Verbs",
+    "slug": "forms-of-verbs",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-basic-english-grammar-4",
+    "orderIndex": 21,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english-grammar/basic-english-grammar-4/forms-of-verbs",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english-grammar",
+    "bookSlug": "basic-english-grammar-4",
+    "chapterSlug": "forms-of-verbs",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-grammar-class-4-icse",
+        "slug": "english-grammar",
+        "title": "English Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-basic-english-grammar-4",
+        "slug": "basic-english-grammar-4",
+        "title": "BASIC English Grammar & Composition 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-eng-basic-4-adverbs",
+    "title": "Adverbs",
+    "slug": "adverbs",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-basic-english-grammar-4",
+    "orderIndex": 22,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english-grammar/basic-english-grammar-4/adverbs",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english-grammar",
+    "bookSlug": "basic-english-grammar-4",
+    "chapterSlug": "adverbs",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-grammar-class-4-icse",
+        "slug": "english-grammar",
+        "title": "English Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-basic-english-grammar-4",
+        "slug": "basic-english-grammar-4",
+        "title": "BASIC English Grammar & Composition 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-eng-basic-4-prepositions",
+    "title": "Prepositions",
+    "slug": "prepositions",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-basic-english-grammar-4",
+    "orderIndex": 23,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english-grammar/basic-english-grammar-4/prepositions",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english-grammar",
+    "bookSlug": "basic-english-grammar-4",
+    "chapterSlug": "prepositions",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-grammar-class-4-icse",
+        "slug": "english-grammar",
+        "title": "English Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-basic-english-grammar-4",
+        "slug": "basic-english-grammar-4",
+        "title": "BASIC English Grammar & Composition 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-eng-basic-4-conjunctions",
+    "title": "Conjunctions",
+    "slug": "conjunctions",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-basic-english-grammar-4",
+    "orderIndex": 24,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english-grammar/basic-english-grammar-4/conjunctions",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english-grammar",
+    "bookSlug": "basic-english-grammar-4",
+    "chapterSlug": "conjunctions",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-grammar-class-4-icse",
+        "slug": "english-grammar",
+        "title": "English Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-basic-english-grammar-4",
+        "slug": "basic-english-grammar-4",
+        "title": "BASIC English Grammar & Composition 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-eng-basic-4-interjections",
+    "title": "Interjections",
+    "slug": "interjections",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-basic-english-grammar-4",
+    "orderIndex": 25,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english-grammar/basic-english-grammar-4/interjections",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english-grammar",
+    "bookSlug": "basic-english-grammar-4",
+    "chapterSlug": "interjections",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-grammar-class-4-icse",
+        "slug": "english-grammar",
+        "title": "English Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-basic-english-grammar-4",
+        "slug": "basic-english-grammar-4",
+        "title": "BASIC English Grammar & Composition 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-eng-basic-4-articles",
+    "title": "Articles",
+    "slug": "articles",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-basic-english-grammar-4",
+    "orderIndex": 26,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english-grammar/basic-english-grammar-4/articles",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english-grammar",
+    "bookSlug": "basic-english-grammar-4",
+    "chapterSlug": "articles",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-grammar-class-4-icse",
+        "slug": "english-grammar",
+        "title": "English Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-basic-english-grammar-4",
+        "slug": "basic-english-grammar-4",
+        "title": "BASIC English Grammar & Composition 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-eng-basic-4-revision-3",
+    "title": "Revision 3",
+    "slug": "revision-3",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-basic-english-grammar-4",
+    "orderIndex": 27,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english-grammar/basic-english-grammar-4/revision-3",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english-grammar",
+    "bookSlug": "basic-english-grammar-4",
+    "chapterSlug": "revision-3",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-grammar-class-4-icse",
+        "slug": "english-grammar",
+        "title": "English Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-basic-english-grammar-4",
+        "slug": "basic-english-grammar-4",
+        "title": "BASIC English Grammar & Composition 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-eng-basic-4-mixed-bag",
+    "title": "MIXED BAG",
+    "slug": "mixed-bag",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-basic-english-grammar-4",
+    "orderIndex": 28,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english-grammar/basic-english-grammar-4/mixed-bag",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english-grammar",
+    "bookSlug": "basic-english-grammar-4",
+    "chapterSlug": "mixed-bag",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-grammar-class-4-icse",
+        "slug": "english-grammar",
+        "title": "English Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-basic-english-grammar-4",
+        "slug": "basic-english-grammar-4",
+        "title": "BASIC English Grammar & Composition 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-eng-basic-4-punctuation",
+    "title": "Punctuation",
+    "slug": "punctuation",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-basic-english-grammar-4",
+    "orderIndex": 29,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english-grammar/basic-english-grammar-4/punctuation",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english-grammar",
+    "bookSlug": "basic-english-grammar-4",
+    "chapterSlug": "punctuation",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-grammar-class-4-icse",
+        "slug": "english-grammar",
+        "title": "English Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-basic-english-grammar-4",
+        "slug": "basic-english-grammar-4",
+        "title": "BASIC English Grammar & Composition 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-eng-basic-4-vocabulary",
+    "title": "Vocabulary",
+    "slug": "vocabulary",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-basic-english-grammar-4",
+    "orderIndex": 30,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english-grammar/basic-english-grammar-4/vocabulary",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english-grammar",
+    "bookSlug": "basic-english-grammar-4",
+    "chapterSlug": "vocabulary",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-grammar-class-4-icse",
+        "slug": "english-grammar",
+        "title": "English Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-basic-english-grammar-4",
+        "slug": "basic-english-grammar-4",
+        "title": "BASIC English Grammar & Composition 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-eng-basic-4-comprehension",
+    "title": "Comprehension",
+    "slug": "comprehension",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-basic-english-grammar-4",
+    "orderIndex": 31,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english-grammar/basic-english-grammar-4/comprehension",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english-grammar",
+    "bookSlug": "basic-english-grammar-4",
+    "chapterSlug": "comprehension",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-grammar-class-4-icse",
+        "slug": "english-grammar",
+        "title": "English Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-basic-english-grammar-4",
+        "slug": "basic-english-grammar-4",
+        "title": "BASIC English Grammar & Composition 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-eng-basic-4-composition",
+    "title": "Composition",
+    "slug": "composition",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-basic-english-grammar-4",
+    "orderIndex": 32,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english-grammar/basic-english-grammar-4/composition",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english-grammar",
+    "bookSlug": "basic-english-grammar-4",
+    "chapterSlug": "composition",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-grammar-class-4-icse",
+        "slug": "english-grammar",
+        "title": "English Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-basic-english-grammar-4",
+        "slug": "basic-english-grammar-4",
+        "title": "BASIC English Grammar & Composition 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-know-it-now-4-space",
+    "title": "Space",
+    "slug": "space",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-know-it-now-4",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/general-knowledge/know-it-now-4/space",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "general-knowledge",
+    "bookSlug": "know-it-now-4",
+    "chapterSlug": "space",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-general-knowledge-class-4-icse",
+        "slug": "general-knowledge",
+        "title": "General Knowledge",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-know-it-now-4",
+        "slug": "know-it-now-4",
+        "title": "KNOW IT NOW 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-know-it-now-4-animal-world",
+    "title": "Animal World",
+    "slug": "animal-world",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-know-it-now-4",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/general-knowledge/know-it-now-4/animal-world",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "general-knowledge",
+    "bookSlug": "know-it-now-4",
+    "chapterSlug": "animal-world",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-general-knowledge-class-4-icse",
+        "slug": "general-knowledge",
+        "title": "General Knowledge",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-know-it-now-4",
+        "slug": "know-it-now-4",
+        "title": "KNOW IT NOW 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-know-it-now-4-language-and-literature",
+    "title": "Language and Literature",
+    "slug": "language-and-literature",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-know-it-now-4",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/general-knowledge/know-it-now-4/language-and-literature",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "general-knowledge",
+    "bookSlug": "know-it-now-4",
+    "chapterSlug": "language-and-literature",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-general-knowledge-class-4-icse",
+        "slug": "general-knowledge",
+        "title": "General Knowledge",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-know-it-now-4",
+        "slug": "know-it-now-4",
+        "title": "KNOW IT NOW 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-know-it-now-4-miscellaneous",
+    "title": "Miscellaneous",
+    "slug": "miscellaneous",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-know-it-now-4",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/general-knowledge/know-it-now-4/miscellaneous",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "general-knowledge",
+    "bookSlug": "know-it-now-4",
+    "chapterSlug": "miscellaneous",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-general-knowledge-class-4-icse",
+        "slug": "general-knowledge",
+        "title": "General Knowledge",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-know-it-now-4",
+        "slug": "know-it-now-4",
+        "title": "KNOW IT NOW 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-know-it-now-4-fun-time",
+    "title": "Fun Time",
+    "slug": "fun-time",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-know-it-now-4",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/general-knowledge/know-it-now-4/fun-time",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "general-knowledge",
+    "bookSlug": "know-it-now-4",
+    "chapterSlug": "fun-time",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-general-knowledge-class-4-icse",
+        "slug": "general-knowledge",
+        "title": "General Knowledge",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-know-it-now-4",
+        "slug": "know-it-now-4",
+        "title": "KNOW IT NOW 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-know-it-now-4-place-names",
+    "title": "Place Names",
+    "slug": "place-names",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-know-it-now-4",
+    "orderIndex": 6,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/general-knowledge/know-it-now-4/place-names",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "general-knowledge",
+    "bookSlug": "know-it-now-4",
+    "chapterSlug": "place-names",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-general-knowledge-class-4-icse",
+        "slug": "general-knowledge",
+        "title": "General Knowledge",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-know-it-now-4",
+        "slug": "know-it-now-4",
+        "title": "KNOW IT NOW 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-know-it-now-4-around-the-world",
+    "title": "Around the World",
+    "slug": "around-the-world",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-know-it-now-4",
+    "orderIndex": 7,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/general-knowledge/know-it-now-4/around-the-world",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "general-knowledge",
+    "bookSlug": "know-it-now-4",
+    "chapterSlug": "around-the-world",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-general-knowledge-class-4-icse",
+        "slug": "general-knowledge",
+        "title": "General Knowledge",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-know-it-now-4",
+        "slug": "know-it-now-4",
+        "title": "KNOW IT NOW 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-know-it-now-4-countries-capitals-and-currencies",
+    "title": "Countries, Capitals and Currencies",
+    "slug": "countries-capitals-and-currencies",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-know-it-now-4",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/general-knowledge/know-it-now-4/countries-capitals-and-currencies",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "general-knowledge",
+    "bookSlug": "know-it-now-4",
+    "chapterSlug": "countries-capitals-and-currencies",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-general-knowledge-class-4-icse",
+        "slug": "general-knowledge",
+        "title": "General Knowledge",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-know-it-now-4",
+        "slug": "know-it-now-4",
+        "title": "KNOW IT NOW 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-know-it-now-4-world",
+    "title": "World",
+    "slug": "world",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-know-it-now-4",
+    "orderIndex": 9,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/general-knowledge/know-it-now-4/world",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "general-knowledge",
+    "bookSlug": "know-it-now-4",
+    "chapterSlug": "world",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-general-knowledge-class-4-icse",
+        "slug": "general-knowledge",
+        "title": "General Knowledge",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-know-it-now-4",
+        "slug": "know-it-now-4",
+        "title": "KNOW IT NOW 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-know-it-now-4-great-indian-personalities",
+    "title": "Great Indian Personalities",
+    "slug": "great-indian-personalities",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-know-it-now-4",
+    "orderIndex": 10,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/general-knowledge/know-it-now-4/great-indian-personalities",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "general-knowledge",
+    "bookSlug": "know-it-now-4",
+    "chapterSlug": "great-indian-personalities",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-general-knowledge-class-4-icse",
+        "slug": "general-knowledge",
+        "title": "General Knowledge",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-know-it-now-4",
+        "slug": "know-it-now-4",
+        "title": "KNOW IT NOW 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-know-it-now-4-know-india",
+    "title": "Know India",
+    "slug": "know-india",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-know-it-now-4",
+    "orderIndex": 11,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/general-knowledge/know-it-now-4/know-india",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "general-knowledge",
+    "bookSlug": "know-it-now-4",
+    "chapterSlug": "know-india",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-general-knowledge-class-4-icse",
+        "slug": "general-knowledge",
+        "title": "General Knowledge",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-know-it-now-4",
+        "slug": "know-it-now-4",
+        "title": "KNOW IT NOW 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-know-it-now-4-places-of-interest",
+    "title": "Places of Interest",
+    "slug": "places-of-interest",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-know-it-now-4",
+    "orderIndex": 12,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/general-knowledge/know-it-now-4/places-of-interest",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "general-knowledge",
+    "bookSlug": "know-it-now-4",
+    "chapterSlug": "places-of-interest",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-general-knowledge-class-4-icse",
+        "slug": "general-knowledge",
+        "title": "General Knowledge",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-know-it-now-4",
+        "slug": "know-it-now-4",
+        "title": "KNOW IT NOW 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-know-it-now-4-festivals",
+    "title": "Festivals",
+    "slug": "festivals",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-know-it-now-4",
+    "orderIndex": 13,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/general-knowledge/know-it-now-4/festivals",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "general-knowledge",
+    "bookSlug": "know-it-now-4",
+    "chapterSlug": "festivals",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-general-knowledge-class-4-icse",
+        "slug": "general-knowledge",
+        "title": "General Knowledge",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-know-it-now-4",
+        "slug": "know-it-now-4",
+        "title": "KNOW IT NOW 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-know-it-now-4-the-world-of-science",
+    "title": "The World of Science",
+    "slug": "the-world-of-science",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-know-it-now-4",
+    "orderIndex": 14,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/general-knowledge/know-it-now-4/the-world-of-science",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "general-knowledge",
+    "bookSlug": "know-it-now-4",
+    "chapterSlug": "the-world-of-science",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-general-knowledge-class-4-icse",
+        "slug": "general-knowledge",
+        "title": "General Knowledge",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-know-it-now-4",
+        "slug": "know-it-now-4",
+        "title": "KNOW IT NOW 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-know-it-now-4-measurements",
+    "title": "Measurements",
+    "slug": "measurements",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-know-it-now-4",
+    "orderIndex": 15,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/general-knowledge/know-it-now-4/measurements",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "general-knowledge",
+    "bookSlug": "know-it-now-4",
+    "chapterSlug": "measurements",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-general-knowledge-class-4-icse",
+        "slug": "general-knowledge",
+        "title": "General Knowledge",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-know-it-now-4",
+        "slug": "know-it-now-4",
+        "title": "KNOW IT NOW 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-know-it-now-4-computers",
+    "title": "Computers",
+    "slug": "computers",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-know-it-now-4",
+    "orderIndex": 16,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/general-knowledge/know-it-now-4/computers",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "general-knowledge",
+    "bookSlug": "know-it-now-4",
+    "chapterSlug": "computers",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-general-knowledge-class-4-icse",
+        "slug": "general-knowledge",
+        "title": "General Knowledge",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-know-it-now-4",
+        "slug": "know-it-now-4",
+        "title": "KNOW IT NOW 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-know-it-now-4-plant-world",
+    "title": "Plant World",
+    "slug": "plant-world",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-know-it-now-4",
+    "orderIndex": 17,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/general-knowledge/know-it-now-4/plant-world",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "general-knowledge",
+    "bookSlug": "know-it-now-4",
+    "chapterSlug": "plant-world",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-general-knowledge-class-4-icse",
+        "slug": "general-knowledge",
+        "title": "General Knowledge",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-know-it-now-4",
+        "slug": "know-it-now-4",
+        "title": "KNOW IT NOW 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-know-it-now-4-birds",
+    "title": "Birds",
+    "slug": "birds",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-know-it-now-4",
+    "orderIndex": 18,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/general-knowledge/know-it-now-4/birds",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "general-knowledge",
+    "bookSlug": "know-it-now-4",
+    "chapterSlug": "birds",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-general-knowledge-class-4-icse",
+        "slug": "general-knowledge",
+        "title": "General Knowledge",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-know-it-now-4",
+        "slug": "know-it-now-4",
+        "title": "KNOW IT NOW 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-know-it-now-4-environment",
+    "title": "Environment",
+    "slug": "environment",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-know-it-now-4",
+    "orderIndex": 19,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/general-knowledge/know-it-now-4/environment",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "general-knowledge",
+    "bookSlug": "know-it-now-4",
+    "chapterSlug": "environment",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-general-knowledge-class-4-icse",
+        "slug": "general-knowledge",
+        "title": "General Knowledge",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-know-it-now-4",
+        "slug": "know-it-now-4",
+        "title": "KNOW IT NOW 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-know-it-now-4-conservation-of-resources",
+    "title": "Conservation of Resources",
+    "slug": "conservation-of-resources",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-know-it-now-4",
+    "orderIndex": 20,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/general-knowledge/know-it-now-4/conservation-of-resources",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "general-knowledge",
+    "bookSlug": "know-it-now-4",
+    "chapterSlug": "conservation-of-resources",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-general-knowledge-class-4-icse",
+        "slug": "general-knowledge",
+        "title": "General Knowledge",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-know-it-now-4",
+        "slug": "know-it-now-4",
+        "title": "KNOW IT NOW 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-know-it-now-4-natural-disasters",
+    "title": "Natural Disasters",
+    "slug": "natural-disasters",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-know-it-now-4",
+    "orderIndex": 21,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/general-knowledge/know-it-now-4/natural-disasters",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "general-knowledge",
+    "bookSlug": "know-it-now-4",
+    "chapterSlug": "natural-disasters",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-general-knowledge-class-4-icse",
+        "slug": "general-knowledge",
+        "title": "General Knowledge",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-know-it-now-4",
+        "slug": "know-it-now-4",
+        "title": "KNOW IT NOW 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-know-it-now-4-sports",
+    "title": "Sports",
+    "slug": "sports",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-know-it-now-4",
+    "orderIndex": 22,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/general-knowledge/know-it-now-4/sports",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "general-knowledge",
+    "bookSlug": "know-it-now-4",
+    "chapterSlug": "sports",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-general-knowledge-class-4-icse",
+        "slug": "general-knowledge",
+        "title": "General Knowledge",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-know-it-now-4",
+        "slug": "know-it-now-4",
+        "title": "KNOW IT NOW 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-know-it-now-4-indian-sports-personalities",
+    "title": "Indian Sports Personalities",
+    "slug": "indian-sports-personalities",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-know-it-now-4",
+    "orderIndex": 23,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/general-knowledge/know-it-now-4/indian-sports-personalities",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "general-knowledge",
+    "bookSlug": "know-it-now-4",
+    "chapterSlug": "indian-sports-personalities",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-general-knowledge-class-4-icse",
+        "slug": "general-knowledge",
+        "title": "General Knowledge",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-know-it-now-4",
+        "slug": "know-it-now-4",
+        "title": "KNOW IT NOW 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-know-it-now-4-international-sports-awards",
+    "title": "International Sports Awards",
+    "slug": "international-sports-awards",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-know-it-now-4",
+    "orderIndex": 24,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/general-knowledge/know-it-now-4/international-sports-awards",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "general-knowledge",
+    "bookSlug": "know-it-now-4",
+    "chapterSlug": "international-sports-awards",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-general-knowledge-class-4-icse",
+        "slug": "general-knowledge",
+        "title": "General Knowledge",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-know-it-now-4",
+        "slug": "know-it-now-4",
+        "title": "KNOW IT NOW 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-know-it-now-4-education-and-occupations",
+    "title": "Education and Occupations",
+    "slug": "education-and-occupations",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-know-it-now-4",
+    "orderIndex": 25,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/general-knowledge/know-it-now-4/education-and-occupations",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "general-knowledge",
+    "bookSlug": "know-it-now-4",
+    "chapterSlug": "education-and-occupations",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-general-knowledge-class-4-icse",
+        "slug": "general-knowledge",
+        "title": "General Knowledge",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-know-it-now-4",
+        "slug": "know-it-now-4",
+        "title": "KNOW IT NOW 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-know-it-now-4-homophones",
+    "title": "Homophones",
+    "slug": "homophones",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-know-it-now-4",
+    "orderIndex": 26,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/general-knowledge/know-it-now-4/homophones",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "general-knowledge",
+    "bookSlug": "know-it-now-4",
+    "chapterSlug": "homophones",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-general-knowledge-class-4-icse",
+        "slug": "general-knowledge",
+        "title": "General Knowledge",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-know-it-now-4",
+        "slug": "know-it-now-4",
+        "title": "KNOW IT NOW 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-know-it-now-4-vocabulary",
+    "title": "Vocabulary",
+    "slug": "vocabulary",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-know-it-now-4",
+    "orderIndex": 27,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/general-knowledge/know-it-now-4/vocabulary",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "general-knowledge",
+    "bookSlug": "know-it-now-4",
+    "chapterSlug": "vocabulary",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-general-knowledge-class-4-icse",
+        "slug": "general-knowledge",
+        "title": "General Knowledge",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-know-it-now-4",
+        "slug": "know-it-now-4",
+        "title": "KNOW IT NOW 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-know-it-now-4-food",
+    "title": "Food",
+    "slug": "food",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-know-it-now-4",
+    "orderIndex": 28,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/general-knowledge/know-it-now-4/food",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "general-knowledge",
+    "bookSlug": "know-it-now-4",
+    "chapterSlug": "food",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-general-knowledge-class-4-icse",
+        "slug": "general-knowledge",
+        "title": "General Knowledge",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-know-it-now-4",
+        "slug": "know-it-now-4",
+        "title": "KNOW IT NOW 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-know-it-now-4-hindu-mythology",
+    "title": "Hindu Mythology",
+    "slug": "hindu-mythology",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-know-it-now-4",
+    "orderIndex": 29,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/general-knowledge/know-it-now-4/hindu-mythology",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "general-knowledge",
+    "bookSlug": "know-it-now-4",
+    "chapterSlug": "hindu-mythology",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-general-knowledge-class-4-icse",
+        "slug": "general-knowledge",
+        "title": "General Knowledge",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-know-it-now-4",
+        "slug": "know-it-now-4",
+        "title": "KNOW IT NOW 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-know-it-now-4-awards-and-accolades",
+    "title": "Awards and Accolades",
+    "slug": "awards-and-accolades",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-know-it-now-4",
+    "orderIndex": 30,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/general-knowledge/know-it-now-4/awards-and-accolades",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "general-knowledge",
+    "bookSlug": "know-it-now-4",
+    "chapterSlug": "awards-and-accolades",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-general-knowledge-class-4-icse",
+        "slug": "general-knowledge",
+        "title": "General Knowledge",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-know-it-now-4",
+        "slug": "know-it-now-4",
+        "title": "KNOW IT NOW 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-know-it-now-4-time",
+    "title": "Time",
+    "slug": "time",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-know-it-now-4",
+    "orderIndex": 31,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/general-knowledge/know-it-now-4/time",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "general-knowledge",
+    "bookSlug": "know-it-now-4",
+    "chapterSlug": "time",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-general-knowledge-class-4-icse",
+        "slug": "general-knowledge",
+        "title": "General Knowledge",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-know-it-now-4",
+        "slug": "know-it-now-4",
+        "title": "KNOW IT NOW 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-know-it-now-4-money-and-currency",
+    "title": "Money and Currency",
+    "slug": "money-and-currency",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-know-it-now-4",
+    "orderIndex": 32,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/general-knowledge/know-it-now-4/money-and-currency",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "general-knowledge",
+    "bookSlug": "know-it-now-4",
+    "chapterSlug": "money-and-currency",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-general-knowledge-class-4-icse",
+        "slug": "general-knowledge",
+        "title": "General Knowledge",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-know-it-now-4",
+        "slug": "know-it-now-4",
+        "title": "KNOW IT NOW 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-know-it-now-4-practice-question-paper-for-olympiad-i",
+    "title": "Practice Question Paper for Olympiad - I",
+    "slug": "practice-question-paper-for-olympiad-i",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-know-it-now-4",
+    "orderIndex": 33,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/general-knowledge/know-it-now-4/practice-question-paper-for-olympiad-i",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "general-knowledge",
+    "bookSlug": "know-it-now-4",
+    "chapterSlug": "practice-question-paper-for-olympiad-i",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-general-knowledge-class-4-icse",
+        "slug": "general-knowledge",
+        "title": "General Knowledge",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-know-it-now-4",
+        "slug": "know-it-now-4",
+        "title": "KNOW IT NOW 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-know-it-now-4-practice-question-paper-for-olympiad-ii",
+    "title": "Practice Question Paper for Olympiad - II",
+    "slug": "practice-question-paper-for-olympiad-ii",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-know-it-now-4",
+    "orderIndex": 34,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/general-knowledge/know-it-now-4/practice-question-paper-for-olympiad-ii",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "general-knowledge",
+    "bookSlug": "know-it-now-4",
+    "chapterSlug": "practice-question-paper-for-olympiad-ii",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-general-knowledge-class-4-icse",
+        "slug": "general-knowledge",
+        "title": "General Knowledge",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-know-it-now-4",
+        "slug": "know-it-now-4",
+        "title": "KNOW IT NOW 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-know-it-now-4-brain-o",
+    "title": "Brain - O",
+    "slug": "brain-o",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-know-it-now-4",
+    "orderIndex": 35,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/general-knowledge/know-it-now-4/brain-o",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "general-knowledge",
+    "bookSlug": "know-it-now-4",
+    "chapterSlug": "brain-o",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-general-knowledge-class-4-icse",
+        "slug": "general-knowledge",
+        "title": "General Knowledge",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-know-it-now-4",
+        "slug": "know-it-now-4",
+        "title": "KNOW IT NOW 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-the-inner-circle-4-all-things-bright-and-beautiful",
+    "title": "All Things Bright and Beautiful",
+    "slug": "all-things-bright-and-beautiful",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-the-inner-circle-4",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/value-education/the-inner-circle-4/all-things-bright-and-beautiful",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "value-education",
+    "bookSlug": "the-inner-circle-4",
+    "chapterSlug": "all-things-bright-and-beautiful",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-value-education-class-4-icse",
+        "slug": "value-education",
+        "title": "Value Education",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-the-inner-circle-4",
+        "slug": "the-inner-circle-4",
+        "title": "The Inner Circle 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-the-inner-circle-4-the-day-of-silence",
+    "title": "The Day of Silence",
+    "slug": "the-day-of-silence",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-the-inner-circle-4",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/value-education/the-inner-circle-4/the-day-of-silence",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "value-education",
+    "bookSlug": "the-inner-circle-4",
+    "chapterSlug": "the-day-of-silence",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-value-education-class-4-icse",
+        "slug": "value-education",
+        "title": "Value Education",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-the-inner-circle-4",
+        "slug": "the-inner-circle-4",
+        "title": "The Inner Circle 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-the-inner-circle-4-the-clever-frog",
+    "title": "The Clever Frog",
+    "slug": "the-clever-frog",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-the-inner-circle-4",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/value-education/the-inner-circle-4/the-clever-frog",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "value-education",
+    "bookSlug": "the-inner-circle-4",
+    "chapterSlug": "the-clever-frog",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-value-education-class-4-icse",
+        "slug": "value-education",
+        "title": "Value Education",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-the-inner-circle-4",
+        "slug": "the-inner-circle-4",
+        "title": "The Inner Circle 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-the-inner-circle-4-sparky-hooves",
+    "title": "Sparky Hooves",
+    "slug": "sparky-hooves",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-the-inner-circle-4",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/value-education/the-inner-circle-4/sparky-hooves",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "value-education",
+    "bookSlug": "the-inner-circle-4",
+    "chapterSlug": "sparky-hooves",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-value-education-class-4-icse",
+        "slug": "value-education",
+        "title": "Value Education",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-the-inner-circle-4",
+        "slug": "the-inner-circle-4",
+        "title": "The Inner Circle 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-the-inner-circle-4-the-magic-paintbrush",
+    "title": "The Magic Paintbrush",
+    "slug": "the-magic-paintbrush",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-the-inner-circle-4",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/value-education/the-inner-circle-4/the-magic-paintbrush",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "value-education",
+    "bookSlug": "the-inner-circle-4",
+    "chapterSlug": "the-magic-paintbrush",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-value-education-class-4-icse",
+        "slug": "value-education",
+        "title": "Value Education",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-the-inner-circle-4",
+        "slug": "the-inner-circle-4",
+        "title": "The Inner Circle 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-the-inner-circle-4-best-friend-sudama",
+    "title": "Best Friend Sudama",
+    "slug": "best-friend-sudama",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-the-inner-circle-4",
+    "orderIndex": 6,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/value-education/the-inner-circle-4/best-friend-sudama",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "value-education",
+    "bookSlug": "the-inner-circle-4",
+    "chapterSlug": "best-friend-sudama",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-value-education-class-4-icse",
+        "slug": "value-education",
+        "title": "Value Education",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-the-inner-circle-4",
+        "slug": "the-inner-circle-4",
+        "title": "The Inner Circle 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-the-inner-circle-4-the-dream-village",
+    "title": "The Dream Village",
+    "slug": "the-dream-village",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-the-inner-circle-4",
+    "orderIndex": 7,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/value-education/the-inner-circle-4/the-dream-village",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "value-education",
+    "bookSlug": "the-inner-circle-4",
+    "chapterSlug": "the-dream-village",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-value-education-class-4-icse",
+        "slug": "value-education",
+        "title": "Value Education",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-the-inner-circle-4",
+        "slug": "the-inner-circle-4",
+        "title": "The Inner Circle 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-the-inner-circle-4-chirag-s-determined-walk",
+    "title": "Chirag's Determined Walk",
+    "slug": "chirag-s-determined-walk",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-the-inner-circle-4",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/value-education/the-inner-circle-4/chirag-s-determined-walk",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "value-education",
+    "bookSlug": "the-inner-circle-4",
+    "chapterSlug": "chirag-s-determined-walk",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-value-education-class-4-icse",
+        "slug": "value-education",
+        "title": "Value Education",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-the-inner-circle-4",
+        "slug": "the-inner-circle-4",
+        "title": "The Inner Circle 4",
+        "type": "textbook"
+      }
+    ]
   }
 ]

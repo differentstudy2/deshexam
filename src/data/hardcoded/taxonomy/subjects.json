@@ -1888,5 +1888,155 @@
         "type": "class"
       }
     ]
+  },
+  {
+    "id": "subject-social-studies-class-4-icse",
+    "title": "Social Studies",
+    "slug": "social-studies",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-4-icse",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/social-studies",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "social-studies",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-english-grammar-class-4-icse",
+    "title": "English Grammar",
+    "slug": "english-grammar",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-4-icse",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english-grammar",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english-grammar",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-general-knowledge-class-4-icse",
+    "title": "General Knowledge",
+    "slug": "general-knowledge",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-4-icse",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/general-knowledge",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "general-knowledge",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-value-education-class-4-icse",
+    "title": "Value Education",
+    "slug": "value-education",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-4-icse",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/value-education",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "value-education",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-english-class-4-icse",
+    "title": "English",
+    "slug": "english",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-4-icse",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      }
+    ]
   }
 ]
