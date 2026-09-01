@@ -2038,5 +2038,155 @@
         "type": "class"
       }
     ]
+  },
+  {
+    "id": "subject-bengali-class-4-icse",
+    "title": "Bengali",
+    "slug": "bengali",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-4-icse",
+    "orderIndex": 6,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-mathematics-class-4-icse",
+    "title": "Mathematics",
+    "slug": "mathematics",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-4-icse",
+    "orderIndex": 7,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/mathematics",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "mathematics",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-science-class-4-icse",
+    "title": "Science",
+    "slug": "science",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-4-icse",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/science",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "science",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-bengali-grammar-class-4-icse",
+    "title": "Bengali Grammar",
+    "slug": "bengali-grammar",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-4-icse",
+    "orderIndex": 9,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali-grammar",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali-grammar",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-computer-class-4-icse",
+    "title": "Computer Studies",
+    "slug": "computer-studies",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-4-icse",
+    "orderIndex": 10,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/computer-studies",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "computer-studies",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      }
+    ]
   }
 ]

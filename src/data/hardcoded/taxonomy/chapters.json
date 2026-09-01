@@ -27249,5 +27249,4301 @@
         "type": "textbook"
       }
     ]
+  },
+  {
+    "id": "chapter-conquer-english-4-if-i-could-soar-up-into-the-great-sky",
+    "title": "If I Could Soar Up into the Great Sky",
+    "slug": "if-i-could-soar-up-into-the-great-sky",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-conquer-english-4",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english/conquer-english-4/if-i-could-soar-up-into-the-great-sky",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english",
+    "bookSlug": "conquer-english-4",
+    "chapterSlug": "if-i-could-soar-up-into-the-great-sky",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-4-icse",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-conquer-english-4",
+        "slug": "conquer-english-4",
+        "title": "CONQUER ENGLISH Course Book 4",
+        "type": "textbook"
+      }
+    ],
+    "author": "Santhini Govindan"
+  },
+  {
+    "id": "chapter-conquer-english-4-the-clever-merchant",
+    "title": "The Clever Merchant",
+    "slug": "the-clever-merchant",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-conquer-english-4",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english/conquer-english-4/the-clever-merchant",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english",
+    "bookSlug": "conquer-english-4",
+    "chapterSlug": "the-clever-merchant",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-4-icse",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-conquer-english-4",
+        "slug": "conquer-english-4",
+        "title": "CONQUER ENGLISH Course Book 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-conquer-english-4-the-koala-bear",
+    "title": "The Koala Bear",
+    "slug": "the-koala-bear",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-conquer-english-4",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english/conquer-english-4/the-koala-bear",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english",
+    "bookSlug": "conquer-english-4",
+    "chapterSlug": "the-koala-bear",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-4-icse",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-conquer-english-4",
+        "slug": "conquer-english-4",
+        "title": "CONQUER ENGLISH Course Book 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-conquer-english-4-the-tree",
+    "title": "The Tree",
+    "slug": "the-tree",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-conquer-english-4",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english/conquer-english-4/the-tree",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english",
+    "bookSlug": "conquer-english-4",
+    "chapterSlug": "the-tree",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-4-icse",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-conquer-english-4",
+        "slug": "conquer-english-4",
+        "title": "CONQUER ENGLISH Course Book 4",
+        "type": "textbook"
+      }
+    ],
+    "author": "Keki N Daruwalla"
+  },
+  {
+    "id": "chapter-conquer-english-4-a-kurta-for-bapu",
+    "title": "A Kurta for Bapu",
+    "slug": "a-kurta-for-bapu",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-conquer-english-4",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english/conquer-english-4/a-kurta-for-bapu",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english",
+    "bookSlug": "conquer-english-4",
+    "chapterSlug": "a-kurta-for-bapu",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-4-icse",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-conquer-english-4",
+        "slug": "conquer-english-4",
+        "title": "CONQUER ENGLISH Course Book 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-conquer-english-4-i-played-a-game",
+    "title": "I Played a Game",
+    "slug": "i-played-a-game",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-conquer-english-4",
+    "orderIndex": 6,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english/conquer-english-4/i-played-a-game",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english",
+    "bookSlug": "conquer-english-4",
+    "chapterSlug": "i-played-a-game",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-4-icse",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-conquer-english-4",
+        "slug": "conquer-english-4",
+        "title": "CONQUER ENGLISH Course Book 4",
+        "type": "textbook"
+      }
+    ],
+    "author": "Edward Lear"
+  },
+  {
+    "id": "chapter-conquer-english-4-butterfly-lipstick-part-i",
+    "title": "Butterfly Lipstick (Part I)",
+    "slug": "butterfly-lipstick-part-i",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-conquer-english-4",
+    "orderIndex": 7,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english/conquer-english-4/butterfly-lipstick-part-i",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english",
+    "bookSlug": "conquer-english-4",
+    "chapterSlug": "butterfly-lipstick-part-i",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-4-icse",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-conquer-english-4",
+        "slug": "conquer-english-4",
+        "title": "CONQUER ENGLISH Course Book 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-conquer-english-4-butterfly-lipstick-part-ii",
+    "title": "Butterfly Lipstick (Part II)",
+    "slug": "butterfly-lipstick-part-ii",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-conquer-english-4",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english/conquer-english-4/butterfly-lipstick-part-ii",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english",
+    "bookSlug": "conquer-english-4",
+    "chapterSlug": "butterfly-lipstick-part-ii",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-4-icse",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-conquer-english-4",
+        "slug": "conquer-english-4",
+        "title": "CONQUER ENGLISH Course Book 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-conquer-english-4-a-dog-named-rocky",
+    "title": "A Dog Named Rocky",
+    "slug": "a-dog-named-rocky",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-conquer-english-4",
+    "orderIndex": 9,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english/conquer-english-4/a-dog-named-rocky",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english",
+    "bookSlug": "conquer-english-4",
+    "chapterSlug": "a-dog-named-rocky",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-4-icse",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-conquer-english-4",
+        "slug": "conquer-english-4",
+        "title": "CONQUER ENGLISH Course Book 4",
+        "type": "textbook"
+      }
+    ],
+    "author": "Swapna Dutta"
+  },
+  {
+    "id": "chapter-conquer-english-4-everyday-things",
+    "title": "Everyday Things",
+    "slug": "everyday-things",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-conquer-english-4",
+    "orderIndex": 10,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english/conquer-english-4/everyday-things",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english",
+    "bookSlug": "conquer-english-4",
+    "chapterSlug": "everyday-things",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-4-icse",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-conquer-english-4",
+        "slug": "conquer-english-4",
+        "title": "CONQUER ENGLISH Course Book 4",
+        "type": "textbook"
+      }
+    ],
+    "author": "Jean Ayer"
+  },
+  {
+    "id": "chapter-conquer-english-4-tom-whitewashes-the-fence",
+    "title": "Tom Whitewashes the Fence",
+    "slug": "tom-whitewashes-the-fence",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-conquer-english-4",
+    "orderIndex": 11,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english/conquer-english-4/tom-whitewashes-the-fence",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english",
+    "bookSlug": "conquer-english-4",
+    "chapterSlug": "tom-whitewashes-the-fence",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-4-icse",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-conquer-english-4",
+        "slug": "conquer-english-4",
+        "title": "CONQUER ENGLISH Course Book 4",
+        "type": "textbook"
+      }
+    ],
+    "author": "Mark Twain"
+  },
+  {
+    "id": "chapter-conquer-english-4-the-little-fir-tree",
+    "title": "The Little Fir Tree",
+    "slug": "the-little-fir-tree",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-conquer-english-4",
+    "orderIndex": 12,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english/conquer-english-4/the-little-fir-tree",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english",
+    "bookSlug": "conquer-english-4",
+    "chapterSlug": "the-little-fir-tree",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-4-icse",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-conquer-english-4",
+        "slug": "conquer-english-4",
+        "title": "CONQUER ENGLISH Course Book 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-conquer-english-4-if-my-wheelchair-had-wings",
+    "title": "If My Wheelchair Had Wings",
+    "slug": "if-my-wheelchair-had-wings",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-conquer-english-4",
+    "orderIndex": 13,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english/conquer-english-4/if-my-wheelchair-had-wings",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english",
+    "bookSlug": "conquer-english-4",
+    "chapterSlug": "if-my-wheelchair-had-wings",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-4-icse",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-conquer-english-4",
+        "slug": "conquer-english-4",
+        "title": "CONQUER ENGLISH Course Book 4",
+        "type": "textbook"
+      }
+    ],
+    "author": "Ankita Panda"
+  },
+  {
+    "id": "chapter-conquer-english-4-a-special-tree",
+    "title": "A Special Tree",
+    "slug": "a-special-tree",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-conquer-english-4",
+    "orderIndex": 14,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english/conquer-english-4/a-special-tree",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english",
+    "bookSlug": "conquer-english-4",
+    "chapterSlug": "a-special-tree",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-4-icse",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-conquer-english-4",
+        "slug": "conquer-english-4",
+        "title": "CONQUER ENGLISH Course Book 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-conquer-english-4-doctor-doctor",
+    "title": "Doctor, Doctor",
+    "slug": "doctor-doctor",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-conquer-english-4",
+    "orderIndex": 15,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english/conquer-english-4/doctor-doctor",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english",
+    "bookSlug": "conquer-english-4",
+    "chapterSlug": "doctor-doctor",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-english-class-4-icse",
+        "slug": "english",
+        "title": "English",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-conquer-english-4",
+        "slug": "conquer-english-4",
+        "title": "CONQUER ENGLISH Course Book 4",
+        "type": "textbook"
+      }
+    ],
+    "author": "Sudha Murty"
+  },
+  {
+    "id": "chapter-bengali-literature-4-1",
+    "title": "ধরাতল",
+    "slug": "ধরাতল",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bengali-literature-4",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali/bengali-literature-4/ধরাতল",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali",
+    "bookSlug": "bengali-literature-4",
+    "chapterSlug": "ধরাতল",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-class-4-icse",
+        "slug": "bengali",
+        "title": "Bengali",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bengali-literature-4",
+        "slug": "bengali-literature-4",
+        "title": "Bengali Literature 4",
+        "type": "textbook"
+      }
+    ],
+    "author": "রবীন্দ্রনাথ ঠাকুর"
+  },
+  {
+    "id": "chapter-bengali-literature-4-2",
+    "title": "নন্দলাল",
+    "slug": "নন্দলাল",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bengali-literature-4",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali/bengali-literature-4/নন্দলাল",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali",
+    "bookSlug": "bengali-literature-4",
+    "chapterSlug": "নন্দলাল",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-class-4-icse",
+        "slug": "bengali",
+        "title": "Bengali",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bengali-literature-4",
+        "slug": "bengali-literature-4",
+        "title": "Bengali Literature 4",
+        "type": "textbook"
+      }
+    ],
+    "author": "দ্বিজেন্দ্রলাল রায়"
+  },
+  {
+    "id": "chapter-bengali-literature-4-3",
+    "title": "সংকল্প",
+    "slug": "সংকল্প",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bengali-literature-4",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali/bengali-literature-4/সংকল্প",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali",
+    "bookSlug": "bengali-literature-4",
+    "chapterSlug": "সংকল্প",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-class-4-icse",
+        "slug": "bengali",
+        "title": "Bengali",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bengali-literature-4",
+        "slug": "bengali-literature-4",
+        "title": "Bengali Literature 4",
+        "type": "textbook"
+      }
+    ],
+    "author": "গুরুসদয় দত্ত"
+  },
+  {
+    "id": "chapter-bengali-literature-4-4",
+    "title": "পরোপকার",
+    "slug": "পরোপকার",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bengali-literature-4",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali/bengali-literature-4/পরোপকার",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali",
+    "bookSlug": "bengali-literature-4",
+    "chapterSlug": "পরোপকার",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-class-4-icse",
+        "slug": "bengali",
+        "title": "Bengali",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bengali-literature-4",
+        "slug": "bengali-literature-4",
+        "title": "Bengali Literature 4",
+        "type": "textbook"
+      }
+    ],
+    "author": "রজনীকান্ত সেন"
+  },
+  {
+    "id": "chapter-bengali-literature-4-5",
+    "title": "মনুষ্যত্ব",
+    "slug": "মনুষ্যত্ব",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bengali-literature-4",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali/bengali-literature-4/মনুষ্যত্ব",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali",
+    "bookSlug": "bengali-literature-4",
+    "chapterSlug": "মনুষ্যত্ব",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-class-4-icse",
+        "slug": "bengali",
+        "title": "Bengali",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bengali-literature-4",
+        "slug": "bengali-literature-4",
+        "title": "Bengali Literature 4",
+        "type": "textbook"
+      }
+    ],
+    "author": "কুসুমকুমারী দাশ"
+  },
+  {
+    "id": "chapter-bengali-literature-4-6",
+    "title": "ঘুম-ভাঙানি",
+    "slug": "ঘুম-ভাঙানি",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bengali-literature-4",
+    "orderIndex": 6,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali/bengali-literature-4/ঘুম-ভাঙানি",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali",
+    "bookSlug": "bengali-literature-4",
+    "chapterSlug": "ঘুম-ভাঙানি",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-class-4-icse",
+        "slug": "bengali",
+        "title": "Bengali",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bengali-literature-4",
+        "slug": "bengali-literature-4",
+        "title": "Bengali Literature 4",
+        "type": "textbook"
+      }
+    ],
+    "author": "মোহিতলাল মজুমদার"
+  },
+  {
+    "id": "chapter-bengali-literature-4-7",
+    "title": "মালগাড়ি",
+    "slug": "মালগাড়ি",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bengali-literature-4",
+    "orderIndex": 7,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali/bengali-literature-4/মালগাড়ি",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali",
+    "bookSlug": "bengali-literature-4",
+    "chapterSlug": "মালগাড়ি",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-class-4-icse",
+        "slug": "bengali",
+        "title": "Bengali",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bengali-literature-4",
+        "slug": "bengali-literature-4",
+        "title": "Bengali Literature 4",
+        "type": "textbook"
+      }
+    ],
+    "author": "প্রেমেন্দ্র মিত্র"
+  },
+  {
+    "id": "chapter-bengali-literature-4-8",
+    "title": "ছড়া কাটার ছড়া",
+    "slug": "ছড়া-কাটার-ছড়া",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bengali-literature-4",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali/bengali-literature-4/ছড়া-কাটার-ছড়া",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali",
+    "bookSlug": "bengali-literature-4",
+    "chapterSlug": "ছড়া-কাটার-ছড়া",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-class-4-icse",
+        "slug": "bengali",
+        "title": "Bengali",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bengali-literature-4",
+        "slug": "bengali-literature-4",
+        "title": "Bengali Literature 4",
+        "type": "textbook"
+      }
+    ],
+    "author": "অজিত দত্ত"
+  },
+  {
+    "id": "chapter-bengali-literature-4-9",
+    "title": "ঘাসফড়িং",
+    "slug": "ঘাসফড়িং",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bengali-literature-4",
+    "orderIndex": 9,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali/bengali-literature-4/ঘাসফড়িং",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali",
+    "bookSlug": "bengali-literature-4",
+    "chapterSlug": "ঘাসফড়িং",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-class-4-icse",
+        "slug": "bengali",
+        "title": "Bengali",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bengali-literature-4",
+        "slug": "bengali-literature-4",
+        "title": "Bengali Literature 4",
+        "type": "textbook"
+      }
+    ],
+    "author": "অরুণ মিত্র"
+  },
+  {
+    "id": "chapter-bengali-literature-4-10",
+    "title": "বাঘ!",
+    "slug": "বাঘ",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bengali-literature-4",
+    "orderIndex": 10,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali/bengali-literature-4/বাঘ",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali",
+    "bookSlug": "bengali-literature-4",
+    "chapterSlug": "বাঘ",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-class-4-icse",
+        "slug": "bengali",
+        "title": "Bengali",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bengali-literature-4",
+        "slug": "bengali-literature-4",
+        "title": "Bengali Literature 4",
+        "type": "textbook"
+      }
+    ],
+    "author": "নবনীতা দেবসেন"
+  },
+  {
+    "id": "chapter-bengali-literature-4-11",
+    "title": "মেলার মজা",
+    "slug": "মেলার-মজা",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bengali-literature-4",
+    "orderIndex": 11,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali/bengali-literature-4/মেলার-মজা",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali",
+    "bookSlug": "bengali-literature-4",
+    "chapterSlug": "মেলার-মজা",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-class-4-icse",
+        "slug": "bengali",
+        "title": "Bengali",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bengali-literature-4",
+        "slug": "bengali-literature-4",
+        "title": "Bengali Literature 4",
+        "type": "textbook"
+      }
+    ],
+    "author": "রবীন্দ্রনাথ ঠাকুর"
+  },
+  {
+    "id": "chapter-bengali-literature-4-12",
+    "title": "নরহরি দাস",
+    "slug": "নরহরি-দাস",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bengali-literature-4",
+    "orderIndex": 12,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali/bengali-literature-4/নরহরি-দাস",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali",
+    "bookSlug": "bengali-literature-4",
+    "chapterSlug": "নরহরি-দাস",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-class-4-icse",
+        "slug": "bengali",
+        "title": "Bengali",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bengali-literature-4",
+        "slug": "bengali-literature-4",
+        "title": "Bengali Literature 4",
+        "type": "textbook"
+      }
+    ],
+    "author": "উপেন্দ্রকিশোর রায়চৌধুরী"
+  },
+  {
+    "id": "chapter-bengali-literature-4-13",
+    "title": "কুমোরে-পোকার বাসাবাড়ি",
+    "slug": "কুমোরে-পোকার-বাসাবাড়ি",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bengali-literature-4",
+    "orderIndex": 13,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali/bengali-literature-4/কুমোরে-পোকার-বাসাবাড়ি",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali",
+    "bookSlug": "bengali-literature-4",
+    "chapterSlug": "কুমোরে-পোকার-বাসাবাড়ি",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-class-4-icse",
+        "slug": "bengali",
+        "title": "Bengali",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bengali-literature-4",
+        "slug": "bengali-literature-4",
+        "title": "Bengali Literature 4",
+        "type": "textbook"
+      }
+    ],
+    "author": "গোপালচন্দ্র ভট্টাচার্য"
+  },
+  {
+    "id": "chapter-bengali-literature-4-14",
+    "title": "লোভে পাপ",
+    "slug": "লোভে-পাপ",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bengali-literature-4",
+    "orderIndex": 14,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali/bengali-literature-4/লোভে-পাপ",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali",
+    "bookSlug": "bengali-literature-4",
+    "chapterSlug": "লোভে-পাপ",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-class-4-icse",
+        "slug": "bengali",
+        "title": "Bengali",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bengali-literature-4",
+        "slug": "bengali-literature-4",
+        "title": "Bengali Literature 4",
+        "type": "textbook"
+      }
+    ],
+    "author": "ইন্দিরা দেবী"
+  },
+  {
+    "id": "chapter-bengali-literature-4-15",
+    "title": "সাথি",
+    "slug": "সাথি",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bengali-literature-4",
+    "orderIndex": 15,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali/bengali-literature-4/সাথি",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali",
+    "bookSlug": "bengali-literature-4",
+    "chapterSlug": "সাথি",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-class-4-icse",
+        "slug": "bengali",
+        "title": "Bengali",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bengali-literature-4",
+        "slug": "bengali-literature-4",
+        "title": "Bengali Literature 4",
+        "type": "textbook"
+      }
+    ],
+    "author": "অবনীন্দ্রনাথ ঠাকুর"
+  },
+  {
+    "id": "chapter-bengali-literature-4-16",
+    "title": "আলো",
+    "slug": "আলো",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bengali-literature-4",
+    "orderIndex": 16,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali/bengali-literature-4/আলো",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali",
+    "bookSlug": "bengali-literature-4",
+    "chapterSlug": "আলো",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-class-4-icse",
+        "slug": "bengali",
+        "title": "Bengali",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bengali-literature-4",
+        "slug": "bengali-literature-4",
+        "title": "Bengali Literature 4",
+        "type": "textbook"
+      }
+    ],
+    "author": "লীলা মজুমদার"
+  },
+  {
+    "id": "chapter-bengali-literature-4-17",
+    "title": "একুশের তাৎপর্য",
+    "slug": "একুশের-তাৎপর্য",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bengali-literature-4",
+    "orderIndex": 17,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali/bengali-literature-4/একুশের-তাৎপর্য",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali",
+    "bookSlug": "bengali-literature-4",
+    "chapterSlug": "একুশের-তাৎপর্য",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-class-4-icse",
+        "slug": "bengali",
+        "title": "Bengali",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bengali-literature-4",
+        "slug": "bengali-literature-4",
+        "title": "Bengali Literature 4",
+        "type": "textbook"
+      }
+    ],
+    "author": "আবুল ফজল"
+  },
+  {
+    "id": "chapter-bengali-literature-4-18",
+    "title": "আকাশের দুই বন্ধু",
+    "slug": "আকাশের-দুই-বন্ধু",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bengali-literature-4",
+    "orderIndex": 18,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali/bengali-literature-4/আকাশের-দুই-বন্ধু",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali",
+    "bookSlug": "bengali-literature-4",
+    "chapterSlug": "আকাশের-দুই-বন্ধু",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-class-4-icse",
+        "slug": "bengali",
+        "title": "Bengali",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bengali-literature-4",
+        "slug": "bengali-literature-4",
+        "title": "Bengali Literature 4",
+        "type": "textbook"
+      }
+    ],
+    "author": "শৈলেন ঘোষ"
+  },
+  {
+    "id": "chapter-bengali-literature-4-19",
+    "title": "মায়াদ্বীপ",
+    "slug": "মায়াদ্বীপ",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bengali-literature-4",
+    "orderIndex": 19,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali/bengali-literature-4/মায়াদ্বীপ",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali",
+    "bookSlug": "bengali-literature-4",
+    "chapterSlug": "মায়াদ্বীপ",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-class-4-icse",
+        "slug": "bengali",
+        "title": "Bengali",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bengali-literature-4",
+        "slug": "bengali-literature-4",
+        "title": "Bengali Literature 4",
+        "type": "textbook"
+      }
+    ],
+    "author": "সুনীল গঙ্গোপাধ্যায়"
+  },
+  {
+    "id": "chapter-bengali-literature-4-20",
+    "title": "এক ভূতুড়ে কাণ্ড",
+    "slug": "এক-ভূতুড়ে-কাণ্ড",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-bengali-literature-4",
+    "orderIndex": 20,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali/bengali-literature-4/এক-ভূতুড়ে-কাণ্ড",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali",
+    "bookSlug": "bengali-literature-4",
+    "chapterSlug": "এক-ভূতুড়ে-কাণ্ড",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-class-4-icse",
+        "slug": "bengali",
+        "title": "Bengali",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-bengali-literature-4",
+        "slug": "bengali-literature-4",
+        "title": "Bengali Literature 4",
+        "type": "textbook"
+      }
+    ],
+    "author": "শিবরাম চক্রবর্তী"
+  },
+  {
+    "id": "chapter-innovative-mathematics-4-1",
+    "title": "Large Numbers",
+    "slug": "large-numbers",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-innovative-mathematics-4",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/mathematics/innovative-mathematics-4/large-numbers",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "mathematics",
+    "bookSlug": "innovative-mathematics-4",
+    "chapterSlug": "large-numbers",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-4-icse",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-innovative-mathematics-4",
+        "slug": "innovative-mathematics-4",
+        "title": "Innovative Mathematics Class 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-innovative-mathematics-4-2",
+    "title": "Addition and Subtraction",
+    "slug": "addition-and-subtraction",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-innovative-mathematics-4",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/mathematics/innovative-mathematics-4/addition-and-subtraction",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "mathematics",
+    "bookSlug": "innovative-mathematics-4",
+    "chapterSlug": "addition-and-subtraction",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-4-icse",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-innovative-mathematics-4",
+        "slug": "innovative-mathematics-4",
+        "title": "Innovative Mathematics Class 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-innovative-mathematics-4-3",
+    "title": "Multiplication",
+    "slug": "multiplication",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-innovative-mathematics-4",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/mathematics/innovative-mathematics-4/multiplication",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "mathematics",
+    "bookSlug": "innovative-mathematics-4",
+    "chapterSlug": "multiplication",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-4-icse",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-innovative-mathematics-4",
+        "slug": "innovative-mathematics-4",
+        "title": "Innovative Mathematics Class 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-innovative-mathematics-4-4",
+    "title": "Division",
+    "slug": "division",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-innovative-mathematics-4",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/mathematics/innovative-mathematics-4/division",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "mathematics",
+    "bookSlug": "innovative-mathematics-4",
+    "chapterSlug": "division",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-4-icse",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-innovative-mathematics-4",
+        "slug": "innovative-mathematics-4",
+        "title": "Innovative Mathematics Class 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-innovative-mathematics-4-5",
+    "title": "Playing with Numbers",
+    "slug": "playing-with-numbers",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-innovative-mathematics-4",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/mathematics/innovative-mathematics-4/playing-with-numbers",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "mathematics",
+    "bookSlug": "innovative-mathematics-4",
+    "chapterSlug": "playing-with-numbers",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-4-icse",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-innovative-mathematics-4",
+        "slug": "innovative-mathematics-4",
+        "title": "Innovative Mathematics Class 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-innovative-mathematics-4-6",
+    "title": "Fractions and Decimals",
+    "slug": "fractions-and-decimals",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-innovative-mathematics-4",
+    "orderIndex": 6,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/mathematics/innovative-mathematics-4/fractions-and-decimals",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "mathematics",
+    "bookSlug": "innovative-mathematics-4",
+    "chapterSlug": "fractions-and-decimals",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-4-icse",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-innovative-mathematics-4",
+        "slug": "innovative-mathematics-4",
+        "title": "Innovative Mathematics Class 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-innovative-mathematics-4-7",
+    "title": "Geometry",
+    "slug": "geometry",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-innovative-mathematics-4",
+    "orderIndex": 7,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/mathematics/innovative-mathematics-4/geometry",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "mathematics",
+    "bookSlug": "innovative-mathematics-4",
+    "chapterSlug": "geometry",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-4-icse",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-innovative-mathematics-4",
+        "slug": "innovative-mathematics-4",
+        "title": "Innovative Mathematics Class 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-innovative-mathematics-4-8",
+    "title": "Perimeter and Area",
+    "slug": "perimeter-and-area",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-innovative-mathematics-4",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/mathematics/innovative-mathematics-4/perimeter-and-area",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "mathematics",
+    "bookSlug": "innovative-mathematics-4",
+    "chapterSlug": "perimeter-and-area",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-4-icse",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-innovative-mathematics-4",
+        "slug": "innovative-mathematics-4",
+        "title": "Innovative Mathematics Class 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-innovative-mathematics-4-9",
+    "title": "Symmetry",
+    "slug": "symmetry",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-innovative-mathematics-4",
+    "orderIndex": 9,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/mathematics/innovative-mathematics-4/symmetry",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "mathematics",
+    "bookSlug": "innovative-mathematics-4",
+    "chapterSlug": "symmetry",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-4-icse",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-innovative-mathematics-4",
+        "slug": "innovative-mathematics-4",
+        "title": "Innovative Mathematics Class 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-innovative-mathematics-4-10",
+    "title": "Measurement",
+    "slug": "measurement",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-innovative-mathematics-4",
+    "orderIndex": 10,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/mathematics/innovative-mathematics-4/measurement",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "mathematics",
+    "bookSlug": "innovative-mathematics-4",
+    "chapterSlug": "measurement",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-4-icse",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-innovative-mathematics-4",
+        "slug": "innovative-mathematics-4",
+        "title": "Innovative Mathematics Class 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-innovative-mathematics-4-11",
+    "title": "Time and Calendar",
+    "slug": "time-and-calendar",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-innovative-mathematics-4",
+    "orderIndex": 11,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/mathematics/innovative-mathematics-4/time-and-calendar",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "mathematics",
+    "bookSlug": "innovative-mathematics-4",
+    "chapterSlug": "time-and-calendar",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-4-icse",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-innovative-mathematics-4",
+        "slug": "innovative-mathematics-4",
+        "title": "Innovative Mathematics Class 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-innovative-mathematics-4-12",
+    "title": "Money",
+    "slug": "money",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-innovative-mathematics-4",
+    "orderIndex": 12,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/mathematics/innovative-mathematics-4/money",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "mathematics",
+    "bookSlug": "innovative-mathematics-4",
+    "chapterSlug": "money",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-4-icse",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-innovative-mathematics-4",
+        "slug": "innovative-mathematics-4",
+        "title": "Innovative Mathematics Class 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-innovative-mathematics-4-13",
+    "title": "Data Handling",
+    "slug": "data-handling",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-innovative-mathematics-4",
+    "orderIndex": 13,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/mathematics/innovative-mathematics-4/data-handling",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "mathematics",
+    "bookSlug": "innovative-mathematics-4",
+    "chapterSlug": "data-handling",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-4-icse",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-innovative-mathematics-4",
+        "slug": "innovative-mathematics-4",
+        "title": "Innovative Mathematics Class 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-innovative-mathematics-4-14",
+    "title": "Patterns",
+    "slug": "patterns",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-innovative-mathematics-4",
+    "orderIndex": 14,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/mathematics/innovative-mathematics-4/patterns",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "mathematics",
+    "bookSlug": "innovative-mathematics-4",
+    "chapterSlug": "patterns",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-4-icse",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-innovative-mathematics-4",
+        "slug": "innovative-mathematics-4",
+        "title": "Innovative Mathematics Class 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-innovative-mathematics-4-15",
+    "title": "Practice Papers",
+    "slug": "practice-papers",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-innovative-mathematics-4",
+    "orderIndex": 15,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/mathematics/innovative-mathematics-4/practice-papers",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "mathematics",
+    "bookSlug": "innovative-mathematics-4",
+    "chapterSlug": "practice-papers",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-4-icse",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-innovative-mathematics-4",
+        "slug": "innovative-mathematics-4",
+        "title": "Innovative Mathematics Class 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-innovative-mathematics-4-16",
+    "title": "ANSWERS",
+    "slug": "answers",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-innovative-mathematics-4",
+    "orderIndex": 16,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/mathematics/innovative-mathematics-4/answers",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "mathematics",
+    "bookSlug": "innovative-mathematics-4",
+    "chapterSlug": "answers",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-4-icse",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-innovative-mathematics-4",
+        "slug": "innovative-mathematics-4",
+        "title": "Innovative Mathematics Class 4",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-innovative-science-1",
+    "title": "Human Body: Food we Eat",
+    "slug": "human-body-food-we-eat",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-innovative-science-4",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/science/innovative-science/human-body-food-we-eat",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "science",
+    "bookSlug": "innovative-science",
+    "chapterSlug": "human-body-food-we-eat",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-4-icse",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-innovative-science-4",
+        "slug": "innovative-science",
+        "title": "Innovative Science",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-innovative-science-2",
+    "title": "Human Body: The Teeth",
+    "slug": "human-body-the-teeth",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-innovative-science-4",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/science/innovative-science/human-body-the-teeth",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "science",
+    "bookSlug": "innovative-science",
+    "chapterSlug": "human-body-the-teeth",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-4-icse",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-innovative-science-4",
+        "slug": "innovative-science",
+        "title": "Innovative Science",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-innovative-science-3",
+    "title": "The Digestive and Excretory Systems",
+    "slug": "the-digestive-and-excretory-systems",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-innovative-science-4",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/science/innovative-science/the-digestive-and-excretory-systems",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "science",
+    "bookSlug": "innovative-science",
+    "chapterSlug": "the-digestive-and-excretory-systems",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-4-icse",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-innovative-science-4",
+        "slug": "innovative-science",
+        "title": "Innovative Science",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-innovative-science-4",
+    "title": "Adaptation in Animals",
+    "slug": "adaptation-in-animals",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-innovative-science-4",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/science/innovative-science/adaptation-in-animals",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "science",
+    "bookSlug": "innovative-science",
+    "chapterSlug": "adaptation-in-animals",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-4-icse",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-innovative-science-4",
+        "slug": "innovative-science",
+        "title": "Innovative Science",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-innovative-science-5",
+    "title": "Adaptation in Plants",
+    "slug": "adaptation-in-plants",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-innovative-science-4",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/science/innovative-science/adaptation-in-plants",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "science",
+    "bookSlug": "innovative-science",
+    "chapterSlug": "adaptation-in-plants",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-4-icse",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-innovative-science-4",
+        "slug": "innovative-science",
+        "title": "Innovative Science",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-innovative-science-6",
+    "title": "Plants in the Surroundings and Environment",
+    "slug": "plants-in-the-surroundings-and-environment",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-innovative-science-4",
+    "orderIndex": 6,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/science/innovative-science/plants-in-the-surroundings-and-environment",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "science",
+    "bookSlug": "innovative-science",
+    "chapterSlug": "plants-in-the-surroundings-and-environment",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-4-icse",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-innovative-science-4",
+        "slug": "innovative-science",
+        "title": "Innovative Science",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-innovative-science-7",
+    "title": "Air",
+    "slug": "air",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-innovative-science-4",
+    "orderIndex": 7,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/science/innovative-science/air",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "science",
+    "bookSlug": "innovative-science",
+    "chapterSlug": "air",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-4-icse",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-innovative-science-4",
+        "slug": "innovative-science",
+        "title": "Innovative Science",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-innovative-science-8",
+    "title": "Materials and Solutions",
+    "slug": "materials-and-solutions",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-innovative-science-4",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/science/innovative-science/materials-and-solutions",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "science",
+    "bookSlug": "innovative-science",
+    "chapterSlug": "materials-and-solutions",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-4-icse",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-innovative-science-4",
+        "slug": "innovative-science",
+        "title": "Innovative Science",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-innovative-science-9",
+    "title": "Light",
+    "slug": "light",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-innovative-science-4",
+    "orderIndex": 9,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/science/innovative-science/light",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "science",
+    "bookSlug": "innovative-science",
+    "chapterSlug": "light",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-4-icse",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-innovative-science-4",
+        "slug": "innovative-science",
+        "title": "Innovative Science",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-innovative-science-10",
+    "title": "Measurement",
+    "slug": "measurement",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-innovative-science-4",
+    "orderIndex": 10,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/science/innovative-science/measurement",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "science",
+    "bookSlug": "innovative-science",
+    "chapterSlug": "measurement",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-4-icse",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-innovative-science-4",
+        "slug": "innovative-science",
+        "title": "Innovative Science",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-innovative-science-11",
+    "title": "Push and Pull",
+    "slug": "push-and-pull",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-innovative-science-4",
+    "orderIndex": 11,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/science/innovative-science/push-and-pull",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "science",
+    "bookSlug": "innovative-science",
+    "chapterSlug": "push-and-pull",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-4-icse",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-innovative-science-4",
+        "slug": "innovative-science",
+        "title": "Innovative Science",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-innovative-science-12",
+    "title": "Friction as a Force",
+    "slug": "friction-as-a-force",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-innovative-science-4",
+    "orderIndex": 12,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/science/innovative-science/friction-as-a-force",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "science",
+    "bookSlug": "innovative-science",
+    "chapterSlug": "friction-as-a-force",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-4-icse",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-innovative-science-4",
+        "slug": "innovative-science",
+        "title": "Innovative Science",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-byakoron-sathi-1",
+    "title": "ভাষা ও ব্যাকরণ",
+    "slug": "ভাষা-ও-ব্যাকরণ",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-byakoron-sathi-4",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali-grammar/byakoron-sathi/ভাষা-ও-ব্যাকরণ",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali-grammar",
+    "bookSlug": "byakoron-sathi",
+    "chapterSlug": "ভাষা-ও-ব্যাকরণ",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-grammar-class-4-icse",
+        "slug": "bengali-grammar",
+        "title": "Bengali Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-byakoron-sathi-4",
+        "slug": "byakoron-sathi",
+        "title": "ব্যাকরণ সাথী",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-byakoron-sathi-2",
+    "title": "ধ্বনি ও তার শ্রেণীবিভাগ",
+    "slug": "ধ্বনি-ও-তার-শ্রেণীবিভাগ",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-byakoron-sathi-4",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali-grammar/byakoron-sathi/ধ্বনি-ও-তার-শ্রেণীবিভাগ",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali-grammar",
+    "bookSlug": "byakoron-sathi",
+    "chapterSlug": "ধ্বনি-ও-তার-শ্রেণীবিভাগ",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-grammar-class-4-icse",
+        "slug": "bengali-grammar",
+        "title": "Bengali Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-byakoron-sathi-4",
+        "slug": "byakoron-sathi",
+        "title": "ব্যাকরণ সাথী",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-byakoron-sathi-3",
+    "title": "শব্দ, পদ ও বাক্য",
+    "slug": "শব্দ-পদ-ও-বাক্য",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-byakoron-sathi-4",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali-grammar/byakoron-sathi/শব্দ-পদ-ও-বাক্য",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali-grammar",
+    "bookSlug": "byakoron-sathi",
+    "chapterSlug": "শব্দ-পদ-ও-বাক্য",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-grammar-class-4-icse",
+        "slug": "bengali-grammar",
+        "title": "Bengali Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-byakoron-sathi-4",
+        "slug": "byakoron-sathi",
+        "title": "ব্যাকরণ সাথী",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-byakoron-sathi-4",
+    "title": "পদপরিচয়",
+    "slug": "পদপরিচয়",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-byakoron-sathi-4",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali-grammar/byakoron-sathi/পদপরিচয়",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali-grammar",
+    "bookSlug": "byakoron-sathi",
+    "chapterSlug": "পদপরিচয়",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-grammar-class-4-icse",
+        "slug": "bengali-grammar",
+        "title": "Bengali Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-byakoron-sathi-4",
+        "slug": "byakoron-sathi",
+        "title": "ব্যাকরণ সাথী",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-byakoron-sathi-5",
+    "title": "বচন",
+    "slug": "বচন",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-byakoron-sathi-4",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali-grammar/byakoron-sathi/বচন",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali-grammar",
+    "bookSlug": "byakoron-sathi",
+    "chapterSlug": "বচন",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-grammar-class-4-icse",
+        "slug": "bengali-grammar",
+        "title": "Bengali Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-byakoron-sathi-4",
+        "slug": "byakoron-sathi",
+        "title": "ব্যাকরণ সাথী",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-byakoron-sathi-6",
+    "title": "পুরুষ / পক্ষ",
+    "slug": "পুরুষ-পক্ষ",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-byakoron-sathi-4",
+    "orderIndex": 6,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali-grammar/byakoron-sathi/পুরুষ-পক্ষ",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali-grammar",
+    "bookSlug": "byakoron-sathi",
+    "chapterSlug": "পুরুষ-পক্ষ",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-grammar-class-4-icse",
+        "slug": "bengali-grammar",
+        "title": "Bengali Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-byakoron-sathi-4",
+        "slug": "byakoron-sathi",
+        "title": "ব্যাকরণ সাথী",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-byakoron-sathi-7",
+    "title": "লিঙ্গ",
+    "slug": "লিঙ্গ",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-byakoron-sathi-4",
+    "orderIndex": 7,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali-grammar/byakoron-sathi/লিঙ্গ",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali-grammar",
+    "bookSlug": "byakoron-sathi",
+    "chapterSlug": "লিঙ্গ",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-grammar-class-4-icse",
+        "slug": "bengali-grammar",
+        "title": "Bengali Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-byakoron-sathi-4",
+        "slug": "byakoron-sathi",
+        "title": "ব্যাকরণ সাথী",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-byakoron-sathi-8",
+    "title": "স্বরসন্ধি",
+    "slug": "স্বরসন্ধি",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-byakoron-sathi-4",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali-grammar/byakoron-sathi/স্বরসন্ধি",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali-grammar",
+    "bookSlug": "byakoron-sathi",
+    "chapterSlug": "স্বরসন্ধি",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-grammar-class-4-icse",
+        "slug": "bengali-grammar",
+        "title": "Bengali Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-byakoron-sathi-4",
+        "slug": "byakoron-sathi",
+        "title": "ব্যাকরণ সাথী",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-byakoron-sathi-9",
+    "title": "ক্রিয়ার কাল",
+    "slug": "ক্রিয়ার-কাল",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-byakoron-sathi-4",
+    "orderIndex": 9,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali-grammar/byakoron-sathi/ক্রিয়ার-কাল",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali-grammar",
+    "bookSlug": "byakoron-sathi",
+    "chapterSlug": "ক্রিয়ার-কাল",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-grammar-class-4-icse",
+        "slug": "bengali-grammar",
+        "title": "Bengali Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-byakoron-sathi-4",
+        "slug": "byakoron-sathi",
+        "title": "ব্যাকরণ সাথী",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-byakoron-sathi-10",
+    "title": "কারক সম্পর্কে প্রাথমিক ধারণা",
+    "slug": "কারক-সম্পর্কে-প্রাথমিক-ধারণা",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-byakoron-sathi-4",
+    "orderIndex": 10,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali-grammar/byakoron-sathi/কারক-সম্পর্কে-প্রাথমিক-ধারণা",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali-grammar",
+    "bookSlug": "byakoron-sathi",
+    "chapterSlug": "কারক-সম্পর্কে-প্রাথমিক-ধারণা",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-grammar-class-4-icse",
+        "slug": "bengali-grammar",
+        "title": "Bengali Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-byakoron-sathi-4",
+        "slug": "byakoron-sathi",
+        "title": "ব্যাকরণ সাথী",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-byakoron-sathi-11",
+    "title": "পদপরিবর্তন",
+    "slug": "পদপরিবর্তন",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-byakoron-sathi-4",
+    "orderIndex": 11,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali-grammar/byakoron-sathi/পদপরিবর্তন",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali-grammar",
+    "bookSlug": "byakoron-sathi",
+    "chapterSlug": "পদপরিবর্তন",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-grammar-class-4-icse",
+        "slug": "bengali-grammar",
+        "title": "Bengali Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-byakoron-sathi-4",
+        "slug": "byakoron-sathi",
+        "title": "ব্যাকরণ সাথী",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-byakoron-sathi-12",
+    "title": "বিপরীতার্থক শব্দ",
+    "slug": "বিপরীতার্থক-শব্দ",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-byakoron-sathi-4",
+    "orderIndex": 12,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali-grammar/byakoron-sathi/বিপরীতার্থক-শব্দ",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali-grammar",
+    "bookSlug": "byakoron-sathi",
+    "chapterSlug": "বিপরীতার্থক-শব্দ",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-grammar-class-4-icse",
+        "slug": "bengali-grammar",
+        "title": "Bengali Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-byakoron-sathi-4",
+        "slug": "byakoron-sathi",
+        "title": "ব্যাকরণ সাথী",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-byakoron-sathi-13",
+    "title": "এককথায় প্রকাশ",
+    "slug": "এককথায়-প্রকাশ",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-byakoron-sathi-4",
+    "orderIndex": 13,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali-grammar/byakoron-sathi/এককথায়-প্রকাশ",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali-grammar",
+    "bookSlug": "byakoron-sathi",
+    "chapterSlug": "এককথায়-প্রকাশ",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-grammar-class-4-icse",
+        "slug": "bengali-grammar",
+        "title": "Bengali Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-byakoron-sathi-4",
+        "slug": "byakoron-sathi",
+        "title": "ব্যাকরণ সাথী",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-byakoron-sathi-14",
+    "title": "সমার্থক শব্দ",
+    "slug": "সমার্থক-শব্দ",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-byakoron-sathi-4",
+    "orderIndex": 14,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali-grammar/byakoron-sathi/সমার্থক-শব্দ",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali-grammar",
+    "bookSlug": "byakoron-sathi",
+    "chapterSlug": "সমার্থক-শব্দ",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-grammar-class-4-icse",
+        "slug": "bengali-grammar",
+        "title": "Bengali Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-byakoron-sathi-4",
+        "slug": "byakoron-sathi",
+        "title": "ব্যাকরণ সাথী",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-byakoron-sathi-15",
+    "title": "সমোচ্চারিত ভিন্নার্থক শব্দ",
+    "slug": "সমোচ্চারিত-ভিন্নার্থক-শব্দ",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-byakoron-sathi-4",
+    "orderIndex": 15,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali-grammar/byakoron-sathi/সমোচ্চারিত-ভিন্নার্থক-শব্দ",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali-grammar",
+    "bookSlug": "byakoron-sathi",
+    "chapterSlug": "সমোচ্চারিত-ভিন্নার্থক-শব্দ",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-grammar-class-4-icse",
+        "slug": "bengali-grammar",
+        "title": "Bengali Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-byakoron-sathi-4",
+        "slug": "byakoron-sathi",
+        "title": "ব্যাকরণ সাথী",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-byakoron-sathi-16",
+    "title": "শুদ্ধ বানান",
+    "slug": "শুদ্ধ-বানান",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-byakoron-sathi-4",
+    "orderIndex": 16,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali-grammar/byakoron-sathi/শুদ্ধ-বানান",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali-grammar",
+    "bookSlug": "byakoron-sathi",
+    "chapterSlug": "শুদ্ধ-বানান",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-grammar-class-4-icse",
+        "slug": "bengali-grammar",
+        "title": "Bengali Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-byakoron-sathi-4",
+        "slug": "byakoron-sathi",
+        "title": "ব্যাকরণ সাথী",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-byakoron-sathi-17",
+    "title": "বাক্যে ছেদচিহ্নের ব্যবহার",
+    "slug": "বাক্যে-ছেদচিহ্নের-ব্যবহার",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-byakoron-sathi-4",
+    "orderIndex": 17,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali-grammar/byakoron-sathi/বাক্যে-ছেদচিহ্নের-ব্যবহার",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali-grammar",
+    "bookSlug": "byakoron-sathi",
+    "chapterSlug": "বাক্যে-ছেদচিহ্নের-ব্যবহার",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-grammar-class-4-icse",
+        "slug": "bengali-grammar",
+        "title": "Bengali Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-byakoron-sathi-4",
+        "slug": "byakoron-sathi",
+        "title": "ব্যাকরণ সাথী",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-byakoron-sathi-18",
+    "title": "বোধপরীক্ষণ",
+    "slug": "বোধপরীক্ষণ",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-byakoron-sathi-4",
+    "orderIndex": 18,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali-grammar/byakoron-sathi/বোধপরীক্ষণ",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali-grammar",
+    "bookSlug": "byakoron-sathi",
+    "chapterSlug": "বোধপরীক্ষণ",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-grammar-class-4-icse",
+        "slug": "bengali-grammar",
+        "title": "Bengali Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-byakoron-sathi-4",
+        "slug": "byakoron-sathi",
+        "title": "ব্যাকরণ সাথী",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-byakoron-sathi-19",
+    "title": "পত্রলিখন",
+    "slug": "পত্রলিখন",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-byakoron-sathi-4",
+    "orderIndex": 19,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali-grammar/byakoron-sathi/পত্রলিখন",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali-grammar",
+    "bookSlug": "byakoron-sathi",
+    "chapterSlug": "পত্রলিখন",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-grammar-class-4-icse",
+        "slug": "bengali-grammar",
+        "title": "Bengali Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-byakoron-sathi-4",
+        "slug": "byakoron-sathi",
+        "title": "ব্যাকরণ সাথী",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-byakoron-sathi-20",
+    "title": "অনুচ্ছেদ রচনা",
+    "slug": "অনুচ্ছেদ-রচনা",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-byakoron-sathi-4",
+    "orderIndex": 20,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali-grammar/byakoron-sathi/অনুচ্ছেদ-রচনা",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali-grammar",
+    "bookSlug": "byakoron-sathi",
+    "chapterSlug": "অনুচ্ছেদ-রচনা",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-grammar-class-4-icse",
+        "slug": "bengali-grammar",
+        "title": "Bengali Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-byakoron-sathi-4",
+        "slug": "byakoron-sathi",
+        "title": "ব্যাকরণ সাথী",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-byakoron-sathi-21",
+    "title": "পর্বভিত্তিক নমুনা প্রশ্নপত্র",
+    "slug": "পর্বভিত্তিক-নমুনা-প্রশ্নপত্র",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-byakoron-sathi-4",
+    "orderIndex": 21,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali-grammar/byakoron-sathi/পর্বভিত্তিক-নমুনা-প্রশ্নপত্র",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali-grammar",
+    "bookSlug": "byakoron-sathi",
+    "chapterSlug": "পর্বভিত্তিক-নমুনা-প্রশ্নপত্র",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-grammar-class-4-icse",
+        "slug": "bengali-grammar",
+        "title": "Bengali Grammar",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-byakoron-sathi-4",
+        "slug": "byakoron-sathi",
+        "title": "ব্যাকরণ সাথী",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-icse-computer-studies-1",
+    "title": "Computer: Storage and Memory Device",
+    "slug": "computer-storage-and-memory-device",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-icse-computer-studies-4",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/computer-studies/icse-computer-studies/computer-storage-and-memory-device",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "computer-studies",
+    "bookSlug": "icse-computer-studies",
+    "chapterSlug": "computer-storage-and-memory-device",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-computer-class-4-icse",
+        "slug": "computer-studies",
+        "title": "Computer Studies",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-icse-computer-studies-4",
+        "slug": "icse-computer-studies",
+        "title": "ICSE Computer Studies",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-icse-computer-studies-2",
+    "title": "GUI Operating System: Desktop Management",
+    "slug": "gui-operating-system-desktop-management",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-icse-computer-studies-4",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/computer-studies/icse-computer-studies/gui-operating-system-desktop-management",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "computer-studies",
+    "bookSlug": "icse-computer-studies",
+    "chapterSlug": "gui-operating-system-desktop-management",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-computer-class-4-icse",
+        "slug": "computer-studies",
+        "title": "Computer Studies",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-icse-computer-studies-4",
+        "slug": "icse-computer-studies",
+        "title": "ICSE Computer Studies",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-icse-computer-studies-3",
+    "title": "Tools of Word Processor",
+    "slug": "tools-of-word-processor",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-icse-computer-studies-4",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/computer-studies/icse-computer-studies/tools-of-word-processor",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "computer-studies",
+    "bookSlug": "icse-computer-studies",
+    "chapterSlug": "tools-of-word-processor",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-computer-class-4-icse",
+        "slug": "computer-studies",
+        "title": "Computer Studies",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-icse-computer-studies-4",
+        "slug": "icse-computer-studies",
+        "title": "ICSE Computer Studies",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-icse-computer-studies-4",
+    "title": "Formatting in Word 2016",
+    "slug": "formatting-in-word-2016",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-icse-computer-studies-4",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/computer-studies/icse-computer-studies/formatting-in-word-2016",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "computer-studies",
+    "bookSlug": "icse-computer-studies",
+    "chapterSlug": "formatting-in-word-2016",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-computer-class-4-icse",
+        "slug": "computer-studies",
+        "title": "Computer Studies",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-icse-computer-studies-4",
+        "slug": "icse-computer-studies",
+        "title": "ICSE Computer Studies",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-icse-computer-studies-5",
+    "title": "The Internet: Web Browser",
+    "slug": "the-internet-web-browser",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-icse-computer-studies-4",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/computer-studies/icse-computer-studies/the-internet-web-browser",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "computer-studies",
+    "bookSlug": "icse-computer-studies",
+    "chapterSlug": "the-internet-web-browser",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-computer-class-4-icse",
+        "slug": "computer-studies",
+        "title": "Computer Studies",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-icse-computer-studies-4",
+        "slug": "icse-computer-studies",
+        "title": "ICSE Computer Studies",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-icse-computer-studies-6",
+    "title": "PowerPoint 2016",
+    "slug": "powerpoint-2016",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-icse-computer-studies-4",
+    "orderIndex": 6,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/computer-studies/icse-computer-studies/powerpoint-2016",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "computer-studies",
+    "bookSlug": "icse-computer-studies",
+    "chapterSlug": "powerpoint-2016",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-computer-class-4-icse",
+        "slug": "computer-studies",
+        "title": "Computer Studies",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-icse-computer-studies-4",
+        "slug": "icse-computer-studies",
+        "title": "ICSE Computer Studies",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-icse-computer-studies-7",
+    "title": "Stepwise Thinking",
+    "slug": "stepwise-thinking",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-icse-computer-studies-4",
+    "orderIndex": 7,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/computer-studies/icse-computer-studies/stepwise-thinking",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "computer-studies",
+    "bookSlug": "icse-computer-studies",
+    "chapterSlug": "stepwise-thinking",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-computer-class-4-icse",
+        "slug": "computer-studies",
+        "title": "Computer Studies",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-icse-computer-studies-4",
+        "slug": "icse-computer-studies",
+        "title": "ICSE Computer Studies",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-icse-computer-studies-8",
+    "title": "Features of File Management",
+    "slug": "features-of-file-management",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-icse-computer-studies-4",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/computer-studies/icse-computer-studies/features-of-file-management",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "computer-studies",
+    "bookSlug": "icse-computer-studies",
+    "chapterSlug": "features-of-file-management",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-computer-class-4-icse",
+        "slug": "computer-studies",
+        "title": "Computer Studies",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-icse-computer-studies-4",
+        "slug": "icse-computer-studies",
+        "title": "ICSE Computer Studies",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-icse-computer-studies-9",
+    "title": "Desktop Customization in Windows 11",
+    "slug": "desktop-customization-in-windows-11",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-icse-computer-studies-4",
+    "orderIndex": 9,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/computer-studies/icse-computer-studies/desktop-customization-in-windows-11",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "computer-studies",
+    "bookSlug": "icse-computer-studies",
+    "chapterSlug": "desktop-customization-in-windows-11",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-computer-class-4-icse",
+        "slug": "computer-studies",
+        "title": "Computer Studies",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-icse-computer-studies-4",
+        "slug": "icse-computer-studies",
+        "title": "ICSE Computer Studies",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-icse-computer-studies-10",
+    "title": "LUIS",
+    "slug": "luis",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-icse-computer-studies-4",
+    "orderIndex": 10,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/computer-studies/icse-computer-studies/luis",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "computer-studies",
+    "bookSlug": "icse-computer-studies",
+    "chapterSlug": "luis",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-computer-class-4-icse",
+        "slug": "computer-studies",
+        "title": "Computer Studies",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-icse-computer-studies-4",
+        "slug": "icse-computer-studies",
+        "title": "ICSE Computer Studies",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-icse-computer-studies-11",
+    "title": "Blockly Games: Puzzle",
+    "slug": "blockly-games-puzzle",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-icse-computer-studies-4",
+    "orderIndex": 11,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/computer-studies/icse-computer-studies/blockly-games-puzzle",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "computer-studies",
+    "bookSlug": "icse-computer-studies",
+    "chapterSlug": "blockly-games-puzzle",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-computer-class-4-icse",
+        "slug": "computer-studies",
+        "title": "Computer Studies",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-icse-computer-studies-4",
+        "slug": "icse-computer-studies",
+        "title": "ICSE Computer Studies",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-icse-computer-studies-12",
+    "title": "AI in Smart Homes",
+    "slug": "ai-in-smart-homes",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-icse-computer-studies-4",
+    "orderIndex": 12,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/computer-studies/icse-computer-studies/ai-in-smart-homes",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "computer-studies",
+    "bookSlug": "icse-computer-studies",
+    "chapterSlug": "ai-in-smart-homes",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-computer-class-4-icse",
+        "slug": "computer-studies",
+        "title": "Computer Studies",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-icse-computer-studies-4",
+        "slug": "icse-computer-studies",
+        "title": "ICSE Computer Studies",
+        "type": "textbook"
+      }
+    ]
+  },
+  {
+    "id": "chapter-icse-computer-studies-13",
+    "title": "Computer Science Olympiad",
+    "slug": "computer-science-olympiad",
+    "type": "chapter",
+    "track": "academic",
+    "parentId": "textbook-icse-computer-studies-4",
+    "orderIndex": 13,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/computer-studies/icse-computer-studies/computer-science-olympiad",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "computer-studies",
+    "bookSlug": "icse-computer-studies",
+    "chapterSlug": "computer-science-olympiad",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-computer-class-4-icse",
+        "slug": "computer-studies",
+        "title": "Computer Studies",
+        "type": "subject"
+      },
+      {
+        "id": "textbook-icse-computer-studies-4",
+        "slug": "icse-computer-studies",
+        "title": "ICSE Computer Studies",
+        "type": "textbook"
+      }
+    ]
   }
 ]

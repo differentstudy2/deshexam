@@ -2329,5 +2329,193 @@
         "type": "subject"
       }
     ]
+  },
+  {
+    "id": "textbook-bengali-literature-4",
+    "title": "Bengali Literature 4",
+    "slug": "bengali-literature-4",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-bengali-class-4-icse",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali/bengali-literature-4",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali",
+    "textbookSlug": "bengali-literature-4",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-class-4-icse",
+        "slug": "bengali",
+        "title": "Bengali",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-innovative-mathematics-4",
+    "title": "Innovative Mathematics Class 4",
+    "slug": "innovative-mathematics-4",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-mathematics-class-4-icse",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/mathematics/innovative-mathematics-4",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "mathematics",
+    "textbookSlug": "innovative-mathematics-4",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-mathematics-class-4-icse",
+        "slug": "mathematics",
+        "title": "Mathematics",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-innovative-science-4",
+    "title": "Innovative Science",
+    "slug": "innovative-science",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-science-class-4-icse",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/science/innovative-science",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "science",
+    "textbookSlug": "innovative-science",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "author": "Raina Bajaj",
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-science-class-4-icse",
+        "slug": "science",
+        "title": "Science",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-byakoron-sathi-4",
+    "title": "ব্যাকরণ সাথী",
+    "slug": "byakoron-sathi",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-bengali-grammar-class-4-icse",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali-grammar/byakoron-sathi",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali-grammar",
+    "textbookSlug": "byakoron-sathi",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "author": "ড. অমল পাল",
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-bengali-grammar-class-4-icse",
+        "slug": "bengali-grammar",
+        "title": "Bengali Grammar",
+        "type": "subject"
+      }
+    ]
+  },
+  {
+    "id": "textbook-icse-computer-studies-4",
+    "title": "ICSE Computer Studies",
+    "slug": "icse-computer-studies",
+    "type": "textbook",
+    "track": "academic",
+    "parentId": "subject-computer-class-4-icse",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/computer-studies/icse-computer-studies",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "computer-studies",
+    "textbookSlug": "icse-computer-studies",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "author": "Preeti Vasudeva",
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      },
+      {
+        "id": "subject-computer-class-4-icse",
+        "slug": "computer-studies",
+        "title": "Computer Studies",
+        "type": "subject"
+      }
+    ]
   }
 ]
