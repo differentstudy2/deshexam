@@ -8,7 +8,8 @@ type Props = {
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const params = await props.params;
-  const boardSlug = params.board.toUpperCase(); // e.g. "wbbse" -> "WBBSE"
+  const boardParam = decodeURIComponent(params.board);
+  const boardSlug = boardParam.toUpperCase(); // e.g. "wbbse" -> "WBBSE"
 
   const title = `${boardSlug} Academy – All Classes, Subjects & Notes | DeshExam`;
   const description = `Access ${boardSlug} textbooks, chapter-wise notes, MCQs, SAQ, LAQ, mock tests, and practice materials for better exam preparation.`;
@@ -66,8 +67,9 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
 export default async function BoardAcademyPage(props: Props) {
   const params = await props.params;
-  const boardSlug = params.board.toUpperCase();
-  const url = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/academy/${params.board}`;
+  const boardParam = decodeURIComponent(params.board);
+  const boardSlug = boardParam.toUpperCase();
+  const url = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/academy/${boardParam}`;
 
   const collectionSchema = {
     "@context": "https://schema.org",
@@ -130,7 +132,7 @@ export default async function BoardAcademyPage(props: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }}
       />
-      <AcademyClient preSelectedBoardSlug={params.board} />
+      <AcademyClient preSelectedBoardSlug={boardParam} />
     </>
   );
 }

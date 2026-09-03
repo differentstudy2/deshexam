@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: { params: Promise<{ segments?: string[] }> }): Promise<Metadata> {
   const resolvedParams = await params;
-  const segments = resolvedParams.segments || [];
+  const segments = (resolvedParams.segments || []).map(decodeURIComponent);
   if (segments.length === 0) return { title: 'Academy Guide' };
 
   const requestedPath = segments.join('/');
