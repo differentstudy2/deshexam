@@ -18,12 +18,31 @@ type ResourceViewerDialogProps = {
   onOpenChange: (open: boolean) => void;
 };
 
+function getYouTubeId(url: string) {
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+  const match = url.match(regExp);
+  return (match && match[2].length === 11) ? match[2] : null;
+}
+
 export function ResourceViewerDialog({ resource, open, onOpenChange }: ResourceViewerDialogProps) {
   if (!resource) return null;
 
   const renderContent = () => {
     switch (resource.type) {
       case 'video':
+        const youTubeId = getYouTubeId(resource.url);
+        if (youTubeId) {
+          return (
+            <iframe
+              src={`https://www.youtube.com/embed/${youTubeId}`}
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              title={resource.title}
+              className="w-full aspect-video rounded-md"
+            ></iframe>
+          );
+        }
         return (
           <video controls autoPlay className="w-full rounded-md">
             <source src={resource.url} type="video/mp4" />

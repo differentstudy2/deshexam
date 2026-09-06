@@ -1,0 +1,32 @@
+{
+  "id": "hardcoded-math-practice",
+  "slug": "class-10-math-demo-practice",
+  "title": "Class 10 Mathematics Demo Practice Set",
+  "description": "দশম শ্রেণির গণিত — বীজগণিত, জ্যামিতি ও পরিসংখ্যান থেকে তৈরি এই Practice Set। WBBSE পাঠ্যক্রম অনুসরণ করে।",
+  "status": "Published",
+  "difficulty": "Hard",
+  "language": "Bengali",
+  "questionType": "MCQ",
+  "questionCount": 50,
+  "questionIds": [],
+  "durationMin": 45,
+  "totalMarks": 50,
+  "passingMarks": 20,
+  "negativeMarking": 0,
+  "attemptsAllowed": 0,
+  "accessType": "free",
+  "attemptCount": 1870,
+  "averageScore": 48,
+  "instructions": "* মোট ৫০টি প্রশ্ন, সময় ৪৫ মিনিট।\n* Calculator ব্যবহার করা যাবে না।\n* সব প্রশ্ন MCQ ফরম্যাটে।",
+  "examRules": "",
+  "tags": [
+    "Mathematics",
+    "Class 10",
+    "WBBSE"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2025-01-01T00:00:00Z",
+  "boardId": "WBBSE",
+  "classId": "Class 10",
+  "subjectId": "Mathematics"
+}

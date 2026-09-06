@@ -1,21 +1,20 @@
 
-
 import { getContentById } from '@/lib/firebase/firestore';
 import type { Metadata, ResolvingMetadata } from 'next';
 import TestClientPage from './test-client-page';
+import BlogClientPage from './blog-client-page';
 import { notFound } from 'next/navigation';
+import { formatTitleForBrowser } from '@/lib/utils';
 
 type Props = {
-  params: { id: string };
-  searchParams: { [key: string]: string | string[] | undefined };
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
-export async function generateMetadata(
-  { params }: Props,
-  parent: ResolvingMetadata
-): Promise<Metadata> {
-  const id = params.id;
-  const test = await getContentById(id);
+export async function generateMetadata(props: Props, parent: ResolvingMetadata): Promise<Metadata> {
+  const params = await props.params;
+  const { id } = params;
+  const test: any = await getContentById(id);
 
   if (!test) {
     return {
@@ -27,8 +26,8 @@ export async function generateMetadata(
   const previousImages = (await parent).openGraph?.images || [];
 
   return {
-    title: test.title,
-    description: `Take the ${test.title} mock test on DeshExam. ${test.description}`,
+    title: formatTitleForBrowser(test.title),
+    description: `Take the ${formatTitleForBrowser(test.title)} mock test on DeshExam. ${formatTitleForBrowser(test.description)}`,
     keywords: [test.title, test.subject, test.testType, 'mock test', 'online test', 'exam preparation'],
     openGraph: {
       images: [`https://picsum.photos/seed/${id}/400/225`, ...previousImages],
@@ -36,37 +35,73 @@ export async function generateMetadata(
   };
 }
 
-export default async function TestPage({ params }: Props) {
-  const test = await getContentById(params.id);
+export default async function TestPage(props: Props) {
+  const params = await props.params;
+  const { id } = params;
+  const testData: any = await getContentById(id);
 
-  if (!test) {
+  if (!testData) {
     notFound();
   }
-  
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Article',
-    mainEntityOfPage: {
-      '@type': 'WebPage',
-      '@id': `https://deshexam.com/mock-test/${test.id}`,
-    },
-    headline: test.title,
-    description: test.description,
-    image: `https://picsum.photos/seed/${test.id}/400/225`,
-    author: {
-      '@type': 'Organization',
-      name: 'DeshExam',
-    },
-    publisher: {
-      '@type': 'Organization',
-      name: 'DeshExam',
-      logo: {
-        '@type': 'ImageObject',
-        url: 'https://deshexam.com/logo.png',
-      },
-    },
-    datePublished: test.createdAt,
+
+  // Serialize Firestore Timestamps
+  const test: any = {
+      ...testData,
+      createdAt: testData.createdAt?.toDate ? testData.createdAt.toDate().toISOString() : new Date().toISOString(),
+      updatedAt: testData.updatedAt?.toDate ? testData.updatedAt.toDate().toISOString() : null,
+      publishedAt: testData.publishedAt?.toDate ? testData.publishedAt.toDate().toISOString() : (testData.publishedAt || null),
   };
+
+  const primaryType = Array.isArray(test.testType) ? test.testType[0] : test.testType;
+  const typeSlug = (primaryType || 'content').toLowerCase().replace(/\s+/g, '-');
+  const cleanTitle = formatTitleForBrowser(test.title);
+
+  const isArticle = ['blog', 'news', 'job'].includes(typeSlug);
+
+  const jsonLd = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'LearningResource',
+      'name': cleanTitle,
+      'description': formatTitleForBrowser(test.description),
+      'learningResourceType': 'Assessment',
+      'educationalLevel': test.class || 'All Levels',
+      'about': {
+          '@type': 'Thing',
+          'name': test.subject
+      },
+      'author': {
+        '@type': 'Organization',
+        'name': 'DeshExam',
+      },
+      'image': test.featureImage || `https://picsum.photos/seed/${test.id}/400/225`,
+      'datePublished': test.createdAt,
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      'itemListElement': [
+        {
+          '@type': 'ListItem',
+          'position': 1,
+          'name': 'Home',
+          'item': `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/`
+        },
+        {
+          '@type': 'ListItem',
+          'position': 2,
+          'name': primaryType || 'Content',
+          'item': `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/${typeSlug}s`
+        },
+        {
+          '@type': 'ListItem',
+          'position': 3,
+          'name': cleanTitle,
+          'item': `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/content/${test.id}`
+        }
+      ]
+    }
+  ];
 
   return (
     <>
@@ -74,8 +109,11 @@ export default async function TestPage({ params }: Props) {
             type="application/ld+json"
             dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        <TestClientPage test={test} />
+        {isArticle ? (
+          <BlogClientPage test={test as any} />
+        ) : (
+          <TestClientPage test={test as any} />
+        )}
     </>
   );
 }
-

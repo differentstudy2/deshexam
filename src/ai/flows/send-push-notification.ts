@@ -13,37 +13,30 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { getMessaging } from 'firebase-admin/messaging';
 import { initializeApp, getApps, cert, App } from 'firebase-admin/app';
 
-// Correctly format the service account credentials to avoid parsing errors.
-const serviceAccount = {
-  "type": "service_account",
-  "project_id": "studio-8356746366-699c1",
-  "private_key_id": "7da97ffe20a44b66d4a2256be7dc2e8ad6c50915",
-  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDBUenx4hAEofyH\n/gcdRKtdAUpTsuYjoYS/9vdPA7Q1n6Mg9H8AgWIjNTI724zsA+abaN+ygVn//ah8\nBnK+YJ81rMvihzRH1Q60k27jLw5n12CCzWxPUwmYtNmJdbFddioN614O04vr/sJW\nbF0ntr+ybCUJZ5tJuaEYDTrcQiYVUfH5kxG2Yy2txm4mDdAi+KOnNP1ow5ySuGc6\n439nPPGTWXyADV45I4OVmbaOq3/cnVu9/HC4BZCaRK60s2wT+bDdOMTt7TVB+Hq2\n0QAmutef8t50bkHJfNrDwMEqBbOkzcVRtmKqBqO+v7+BLZgv0UD6rp0HrvPP0Pk9\noZYv1NU1AgMBAAECggEAVq3s0HjFJ96dxTggZn4ou83dTsQTLny4cf5BCxulDLok\nQZ1+6HIa16B9gptBh32EQ8B1NKuM+Bv7FIkrn7LhEAcHb+2hgmfEbTEB8jliIytN\n6bhDzRl1XxQPyfOMcFSQLKeRB+LQhSM4bdmutyTYtR6KSLo8xYTG92rPLn02aC4L\nS3w7ER/1nLaXeBKu0UAuwZpojrVYeAOboHYa+jFyCArLHd8v48vaiOzvWTc77VMK\nX20OYEQ4vLeExNtiXvYh+5MkS/IEpZQ1GBwp9ZH0RbGZXRtuzg8emjRff5s9Ckqz\n7dGH0rSlcIDt/4AVuDUQMWuuJt+j2Q9ELPnsG1YPjQKBgQDmbpTP+aUiJYaUe2Wj\nMlMKooQ0udlnwq0gXaXUp15As6qlzeoKHPjlWSX5F2geIwe6L5Fibr0yKoWXjsvj\n4qddqLem7nze3vdRvLgVvXdQeg65KdYIU1damFISCEfU6IiLdnQUWK9RROYaSYIV\nHNYmfKLFvZPwXJua/QCZFqMk2wKBgQDWxSq3uEXdxXUoLnMctdUn9PAeRKpAIFda\nPSuV/r184HFC6N0akWEFbkwz9tXqRVUzRtQbH/TxhUEEEM+/F5u5NzH85EfvYWKo\neSZbibL0cTT5dJ0w5vDC+EsmlwYhPxLTWO7rIWC6034hg/fjN2hHIwQ0T4R3D1e3\nngdReJ+DLwKBgQCIUjUhUIw7xj12zAWV5WixKvHRi30tYEMxmZVIV/dviZrT2hyx\n/O/WJsZLNWi4I3snz4pP1DmDWxqLTcQbPfRLeUukqwQeiYOAzIeO/PaAGqVpL3Ha\nnQtZojEzT8jHEQXuk5Yaj1iwWHVUadZWDSg3vpZBK2VA1liL+U8IQhcj7wKBgELN\np2DoB4tY3P03nYSjpn68OGgh0ZcKuEEQX9tTFluecHxwdD3MVJJc4YUUVSt+j2bY\ntCcPxJ/PZA7Ar+3viPeOjJTt6NYzw31F2cGFTk2sXN7u/+nzG5Z5pt6FAVocBV4J\n/p7SjgTuvf/szZE2bdAauzcOONTTx+QMWphj3bHvAoGBAKsLlVagw3JWmM1j1Z3S\nXGcCcSsSZweEv1MkGugPIkKil8K6M9aCIM/LtLP2Jpakic/fwXvhyd3E1FLmWciu\ni562O9G3NcW2/u8QYpvQRd7H+ArV9TiI/5sToiG5rY5c+grb1161LLxBRdCnTMbt\nue4Dcfwh2csj89ouCQ9q5NiQ\n-----END PRIVATE KEY-----\n".replace(/\\n/g, '\n'),
-  "client_email": "firebase-adminsdk-fbsvc@studio-8356746366-699c1.iam.gserviceaccount.com",
-  "client_id": "109571252283045065353",
-  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-  "token_uri": "https://oauth2.googleapis.com/token",
-  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40studio-8356746366-699c1.iam.gserviceaccount.com",
-  "universe_domain": "googleapis.com"
-};
+// Initialize Firebase Admin SDK with a unique name to avoid conflicts
+const adminAppName = 'firebase-admin-app-deshexam';
+let adminApp: App;
 
-// Initialize Firebase Admin SDK
-let app: App;
-if (!getApps().length) {
-    app = initializeApp({
+if (!getApps().some(app => app.name === adminAppName)) {
+    const serviceAccount = JSON.parse(process.env.GCP_SA_KEY || '{}');
+    if (serviceAccount.private_key) {
+        serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
+    }
+    
+    adminApp = initializeApp({
         credential: cert(serviceAccount),
-    });
+    }, adminAppName);
 } else {
-  app = getApps()[0];
+  adminApp = getApps().find(app => app.name === adminAppName)!;
 }
 
-const db = getFirestore(app);
+const db = getFirestore(adminApp, "deshexam");
 
 const PushNotificationInputSchema = z.object({
   title: z.string().describe('The title of the notification.'),
   body: z.string().describe('The main message content of the notification.'),
   link: z.string().url().optional().describe('The URL to open when the notification is clicked.'),
+  imageUrl: z.string().url().optional().describe('The URL of the banner image to show in the notification.'),
 });
 export type PushNotificationInput = z.infer<typeof PushNotificationInputSchema>;
 
@@ -57,7 +50,7 @@ const sendPushNotificationFlow = ai.defineFlow(
     inputSchema: PushNotificationInputSchema,
     outputSchema: z.void(),
   },
-  async ({ title, body, link }) => {
+  async ({ title, body, link, imageUrl }) => {
     try {
       const tokensSnapshot = await db.collection('fcmTokens').get();
       if (tokensSnapshot.empty) {
@@ -76,30 +69,60 @@ const sendPushNotificationFlow = ai.defineFlow(
         notification: {
           title,
           body,
+          imageUrl,
         },
         webpush: {
           fcm_options: {
-            link: link || 'https://deshexam.com',
+            link: link || `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}`,
           },
           notification: {
             icon: '/icon.png',
+            image: imageUrl,
           },
         },
         tokens: tokens,
       };
 
-      const response = await getMessaging(app).sendEachForMulticast(message as any);
+      const response = await getMessaging(adminApp).sendEachForMulticast(message as any);
       console.log(`${response.successCount} messages were sent successfully`);
+
+      // Save campaign history
+      const { FieldValue } = await import('firebase-admin/firestore');
+      await db.collection('pushCampaigns').add({
+        title,
+        body,
+        type: 'Push',
+        audience: tokens.length,
+        sentCount: response.successCount,
+        failedCount: response.failureCount,
+        status: 'Sent',
+        createdAt: FieldValue.serverTimestamp(),
+      });
 
       if (response.failureCount > 0) {
         const failedTokens: string[] = [];
         response.responses.forEach((resp, idx) => {
           if (!resp.success) {
-            failedTokens.push(tokens[idx]);
+            // Check for specific error codes related to expired/invalid tokens
+            const errCode = resp.error?.code;
+            if (errCode === 'messaging/invalid-registration-token' ||
+                errCode === 'messaging/registration-token-not-registered') {
+              failedTokens.push(tokens[idx]);
+            }
           }
         });
-        console.log('List of tokens that caused failures: ' + failedTokens);
-        // Here you might want to remove the failed tokens from your database
+        console.log(`Found ${failedTokens.length} dead tokens. Removing from database...`);
+        
+        // Remove failed tokens from Firestore in chunks of 500
+        for (let i = 0; i < failedTokens.length; i += 500) {
+          const batch = db.batch();
+          failedTokens.slice(i, i + 500).forEach(token => {
+            const docRef = db.collection('fcmTokens').doc(token);
+            batch.delete(docRef);
+          });
+          await batch.commit();
+        }
+        console.log(`Successfully cleaned up ${failedTokens.length} expired tokens.`);
       }
 
     } catch (error) {

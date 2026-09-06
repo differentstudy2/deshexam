@@ -1,0 +1,996 @@
+{
+  "id": "sahaj-path-dwitiya-bhag-lesson-2",
+  "slug": "sahaj-path-dwitiya-bhag-lesson-2-quiz",
+  "title": "সহজ পাঠ দ্বিতীয় ভাগ: দ্বিতীয় পাঠ | আজ আদ্যনাথবাবুর কন্যার বিয়ে ও হাট কবিতা Quiz",
+  "description": "রবীন্দ্রনাথ ঠাকুরের সহজ পাঠ দ্বিতীয় ভাগ বইয়ের দ্বিতীয় পাঠ এবং বিখ্যাত হাট (কুমোর-পাড়ার গোরুর গাড়ি) কবিতার সম্পূর্ণ টেক্সট পড়ুন।",
+  "status": "Published",
+  "difficulty": "Easy",
+  "language": "Bengali",
+  "questionType": "MCQ",
+  "questionCount": 60,
+  "questionIds": [],
+  "durationMin": 60,
+  "totalMarks": 60,
+  "passingMarks": 42,
+  "negativeMarking": 0,
+  "attemptsAllowed": 0,
+  "accessType": "free",
+  "attemptCount": 15600,
+  "averageScore": 72,
+  "instructions": "* মোট ২০টি প্রশ্ন, সময় ১৫ মিনিট।\n* কোনো নেগেটিভ মার্কিং নেই।\n* Quiz শেষে সঠিক উত্তর দেখতে পাবেন।",
+  "examRules": "",
+  "tags": [
+    "GK",
+    "General Knowledge",
+    "Quiz",
+    "WBBSE",
+    "Bengali",
+    "Class 2"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "questions": [
+    {
+      "id": "q1",
+      "questionText": "আদ্যনাথবাবুর কন্যার নাম কী?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "উমা",
+        "b": "শ্যামা",
+        "c": "রমা",
+        "d": "সীতা"
+      },
+      "correctAnswer": "b",
+      "explanation": "গল্পে বলা হয়েছে, আদ্যনাথবাবুর কন্যার নাম শ্যামা।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q2",
+      "questionText": "শ্যামার বরের নাম কী?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "সৌম্য",
+        "b": "ধৌম্যনাথ",
+        "c": "বৈদ্যনাথ",
+        "d": "রম্যনাথ"
+      },
+      "correctAnswer": "c",
+      "explanation": "গল্প অনুযায়ী, শ্যামার বরের নাম বৈদ্যনাথ।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q3",
+      "questionText": "আদ্যনাথবাবুর বাড়ি কোথায়?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "অহল্যাপাড়ায়",
+        "b": "বক্সীগঞ্জে",
+        "c": "কুমোর-পাড়ায়",
+        "d": "শল্যপুরে"
+      },
+      "correctAnswer": "d",
+      "explanation": "বিয়ে হচ্ছে আদ্যনাথবাবুর শল্যপুরের বাড়িতে।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q4",
+      "questionText": "বরের বাড়ি কোথায়?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "শল্যপুরে",
+        "b": "অহল্যাপাড়ায়",
+        "c": "বক্সীগঞ্জে",
+        "d": "পদ্মাপাড়ে"
+      },
+      "correctAnswer": "b",
+      "explanation": "গল্পে উল্লেখ আছে, বরের (বৈদ্যনাথের) বাড়ি অহল্যাপাড়ায়।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q5",
+      "questionText": "বৈদ্যনাথ কার সঙ্গে পাটের ব্যবসা করেন?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "তার ভাই সৌম্যর সঙ্গে",
+        "b": "ধৌম্যনাথের সঙ্গে",
+        "c": "রম্যনাথের সঙ্গে",
+        "d": "আদ্যনাথবাবুর সঙ্গে"
+      },
+      "correctAnswer": "a",
+      "explanation": "বৈদ্যনাথ এবং তার ভাই সৌম্য মিলে পাটের ব্যবসা করেন।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q6",
+      "questionText": "ধৌম্যনাথ কোথায় পড়ে?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "ইস্কুলে",
+        "b": "মাদ্রাসায়",
+        "c": "কলেজে",
+        "d": "বিশ্ববিদ্যালয়ে"
+      },
+      "correctAnswer": "c",
+      "explanation": "বৈদ্যনাথের ভাই ধৌম্যনাথ কলেজে পড়ে।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q7",
+      "questionText": "রম্যনাথ কোথায় পড়ে?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "কলেজে",
+        "b": "ইস্কুলে",
+        "c": "বাড়িতে",
+        "d": "বিদেশে"
+      },
+      "correctAnswer": "b",
+      "explanation": "বৈদ্যনাথের আরেক ভাই রম্যনাথ ইস্কুলে পড়ে।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q8",
+      "questionText": "আদ্যনাথবাবু কেমন ধরনের মানুষ?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "কৃপণ ও রাগী",
+        "b": "দান-ধ্যান পুণ্যকাজে মন",
+        "c": "খুব অলস",
+        "d": "শুধু ব্যবসা করেন"
+      },
+      "correctAnswer": "b",
+      "explanation": "আদ্যনাথ বড়ো ভালো লোক, দান-ধ্যান পুণ্যকাজে তাঁর মন এবং তিনি দেশের জন্য অনেক কাজ করেন।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q9",
+      "questionText": "আদ্যনাথবাবুর ভৃত্যের নাম কী?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "কানাই",
+        "b": "মদন",
+        "c": "সত্য",
+        "d": "বংশীবদন"
+      },
+      "correctAnswer": "c",
+      "explanation": "আদ্যনাথবাবু তাঁর ভৃত্য সত্যকে লেখকের কাছে পাঠিয়েছিলেন।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q10",
+      "questionText": "চাষীরা কেন বিয়েবাড়িতে ভিড় ক’রে এসেছে?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "গান শোনার জন্য",
+        "b": "তারা এ বৎসর ভালো শস্য পেয়েছে বলে",
+        "c": "বিয়েতে নিমন্ত্রণ ছিল বলে",
+        "d": "তারা বিনামূল্যে খাবার পাবে বলে"
+      },
+      "correctAnswer": "b",
+      "explanation": "চাষীরা এ বৎসর ভালো শস্য পেয়েছে, তাই খুশিতে তারা ভিড় ক’রে এসেছে।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q11",
+      "questionText": "ছেলেরা খুশী হয়ে কী করছে?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "বই পড়ছে",
+        "b": "গান গাইছে",
+        "c": "নৃত্য করছে ও ব্যাটবল খেলছে",
+        "d": "ঘুমাচ্ছে"
+      },
+      "correctAnswer": "c",
+      "explanation": "ছেলেরা খুশী হয়ে নৃত্য করচে এবং কেউ বা ব্যাটবল খেলছে।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q12",
+      "questionText": "খেলোয়াড় ছেলেদের ক্যাপ্টেনের নাম কী?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "নিত্যশরণ",
+        "b": "রম্যনাথ",
+        "c": "সৌম্য",
+        "d": "সত্য"
+      },
+      "correctAnswer": "a",
+      "explanation": "ব্যাটবল খেলা ছেলেদের ক্যাপ্টেন হলো নিত্যশরণ।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q13",
+      "questionText": "গোরুর গাড়িটি কোথা থেকে আসছে?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "তাঁতি-পাড়া থেকে",
+        "b": "জেলে-পাড়া থেকে",
+        "c": "কুমোর-পাড়া থেকে",
+        "d": "অহল্যাপাড়া থেকে"
+      },
+      "correctAnswer": "c",
+      "explanation": "কবিতায় আছে, 'কুমোর-পাড়ার গোরুর গাড়ি'।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q14",
+      "questionText": "গোরুর গাড়িতে কী বোঝাই করা আছে?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "ধান ও চাল",
+        "b": "কল্‌‍সি ও হাঁড়ি",
+        "c": "পাটের বস্তা",
+        "d": "খড়ের আঁটি"
+      },
+      "correctAnswer": "b",
+      "explanation": "কুমোর-পাড়ার গোরুর গাড়িতে 'বোঝাই-করা কল্‌‍সি হাঁড়ি'।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q15",
+      "questionText": "গোরুর গাড়ি কে চালায়?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "মদন",
+        "b": "কানাই",
+        "c": "বংশীবদন",
+        "d": "সত্য"
+      },
+      "correctAnswer": "c",
+      "explanation": "কবিতায় বলা হয়েছে, 'গাড়ি চালায় বংশীবদন'।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q16",
+      "questionText": "বংশীবদনের সঙ্গে কে যায়?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "তার ভাই",
+        "b": "তার ছেলে",
+        "c": "তার ভাগ্নে মদন",
+        "d": "অন্ধ কানাই"
+      },
+      "correctAnswer": "c",
+      "explanation": "বংশীবদনের সঙ্গে যে যায় সে হলো তার ভাগ্নে মদন।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q17",
+      "questionText": "হাট কোন দিন বসে?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "রবিবারে",
+        "b": "শুক্রবারে",
+        "c": "সোমবারে",
+        "d": "বৃহস্পতিবারে"
+      },
+      "correctAnswer": "b",
+      "explanation": "কবিতায় উল্লেখ আছে, 'হাট বসেচে শুক্রবারে'।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q18",
+      "questionText": "হাট কোথায় বসেছে?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "শল্যপুরে",
+        "b": "অহল্যাপাড়ায়",
+        "c": "বক্সীগঞ্জে পদ্মাপারে",
+        "d": "কুমোর-পাড়ায়"
+      },
+      "correctAnswer": "c",
+      "explanation": "হাট বসেছে বক্সীগঞ্জে, পদ্মানদীর পারে।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q19",
+      "questionText": "হাটে কোন কোন সবজি বিক্রি হচ্ছে?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "আলু ও পটল",
+        "b": "উচ্ছে, বেগুন, পটল ও মূলো",
+        "c": "লাউ ও কুমড়ো",
+        "d": "টমেটো ও গাজর"
+      },
+      "correctAnswer": "b",
+      "explanation": "হাটে বিক্রির জন্য উচ্ছে, বেগুন, পটল এবং মূলো আনা হয়েছে।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q20",
+      "questionText": "হাটে বিক্রি হওয়া ধামা ও কুলো কী দিয়ে তৈরি?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "বাঁশের",
+        "b": "প্লাস্টিকের",
+        "c": "বেতের",
+        "d": "মাটির"
+      },
+      "correctAnswer": "c",
+      "explanation": "কবিতায় 'বেতের বোনা ধামা কুলো' বলা হয়েছে।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q21",
+      "questionText": "শীতের জন্য হাটে কী বিক্রি হচ্ছে?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "সোয়েটার",
+        "b": "নক‍্‌শাকাটা র‍্যাপার",
+        "c": "চাদর",
+        "d": "কম্বল"
+      },
+      "correctAnswer": "b",
+      "explanation": "হাটে 'শীতের র‍্যাপার নক‍্‌শাকাটা' বিক্রি হচ্ছে।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q22",
+      "questionText": "শহর থেকে কী আনা হয়েছে?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "দামি জুতো",
+        "b": "রঙিন জামা",
+        "c": "সস্তা ছাতা",
+        "d": "মাটির হাঁড়ি"
+      },
+      "correctAnswer": "c",
+      "explanation": "কবিতায় বলা হয়েছে, 'শহর থেকে সস্তা ছাতা' আনা হয়েছে।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q23",
+      "questionText": "কল্‌‍সি-ভরা কীসে মাছি উড়ে বেড়াচ্ছে?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "দুধে",
+        "b": "জলে",
+        "c": "এখো গুড়ে",
+        "d": "মিষ্টিতে"
+      },
+      "correctAnswer": "c",
+      "explanation": "'কল্‌‍সি-ভরা এখো গুড়ে মাছি যত বেড়ায় উড়ে'—অর্থাৎ এখো গুড়ে মাছি উড়ছে।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q24",
+      "questionText": "ঘাটে নৌকো বেয়ে খড়ের আঁটি কে আনল?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "চাষীর ছেলে",
+        "b": "চাষীর মেয়ে",
+        "c": "জেলের মেয়ে",
+        "d": "বংশীবদন"
+      },
+      "correctAnswer": "b",
+      "explanation": "কবিতায় আছে, 'খড়ের আঁটি নৌকো বেয়ে আন‌ল ঘাটে চাষীর মেয়ে'।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q25",
+      "questionText": "অন্ধ কানাই পথের ধারে কী করে?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "বাঁশি বাজায়",
+        "b": "সবজি বিক্রি করে",
+        "c": "গান শুনিয়ে ভিক্ষে করে",
+        "d": "ঘুমাচ্ছে"
+      },
+      "correctAnswer": "c",
+      "explanation": "অন্ধ কানাই পথের ‘পরে গান শুনিয়ে ভিক্ষে করে।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q26",
+      "questionText": "পাড়ার ছেলেরা কোথায় সাঁতার কাটে?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "পুকুরে",
+        "b": "নদীতে",
+        "c": "স্নানের ঘাটে",
+        "d": "খালে"
+      },
+      "correctAnswer": "c",
+      "explanation": "পাড়ার ছেলে স্নানের ঘাটে জল ছিটিয়ে সাঁতার কাটে।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q27",
+      "questionText": "হাটে কোন কোন শস্য বিক্রি হতে দেখা যায়?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "ধান ও গম",
+        "b": "সর্ষে, ছোলা, ময়দা, আটা",
+        "c": "ডাল ও চাল",
+        "d": "ভুট্টা ও যব"
+      },
+      "correctAnswer": "b",
+      "explanation": "হাটের জিনিসপত্রের মধ্যে সর্ষে, ছোলা, ময়দা, আটা ইত্যাদির কথা বলা হয়েছে।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q28",
+      "questionText": "আদ্যনাথবাবুর আঙিনায় কী বাজছে?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "রেডিও",
+        "b": "বাদ্য",
+        "c": "শঙ্খ",
+        "d": "বাঁশি"
+      },
+      "correctAnswer": "b",
+      "explanation": "বিয়েবাড়িতে আঙিনায় বাদ্য বাজছে।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q29",
+      "questionText": "রান্নার কোন কোন তৈজসপত্র হাটে বিক্রি হচ্ছে?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "থালা ও বাটি",
+        "b": "গ্লাস ও চামচ",
+        "c": "ঝাঁঝ‍্‌রি, কড়া, বেড়ি, হাতা",
+        "d": "কেটলি ও ফ্রাইপ্যান"
+      },
+      "correctAnswer": "c",
+      "explanation": "লোহা বা ধাতুর তৈরি 'ঝাঁঝ‍্‌রি কড়া বেড়ি হাতা' হাটে বিক্রি হচ্ছে।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q30",
+      "questionText": "লেখক কোথায় বসে ছেলেদের খেলা দেখছেন?",
+      "questionType": "MCQ",
+      "options": {
+        "a": "ভিতরে ঘরে",
+        "b": "ছাদের উপর",
+        "c": "বাইরে বসে",
+        "d": "মাঠে দাঁড়িয়ে"
+      },
+      "correctAnswer": "c",
+      "explanation": "ভিতরে ভিড় থাকায় লেখক অগত্যা বাইরে বসে আছেন এবং ছেলেদের খেলা দেখছেন।",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q31",
+      "questionText": "<p>গোরুর গাড়িটি কোন পাড়া থেকে আসছে?</p>",
+      "questionType": "MCQ",
+      "options": {
+        "a": "জেলে-পাড়া",
+        "b": "কুমোর-পাড়া",
+        "c": "কামার-পাড়া",
+        "d": "তাঁতি-পাড়া"
+      },
+      "correctAnswer": "b",
+      "explanation": "<p>কবিতার শুরুতেই আছে, 'কুমোর-পাড়ার গোরুর গাড়ি'। তাই গাড়িটি কুমোর-পাড়া থেকে আসছে।</p>",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q32",
+      "questionText": "<p>গোরুর গাড়িতে কী বোঝাই করা আছে?</p>",
+      "questionType": "MCQ",
+      "options": {
+        "a": "ধান ও চাল",
+        "b": "ফল ও মিষ্টি",
+        "c": "কল্‌সি ও হাঁড়ি",
+        "d": "মাছ ও তরকারি"
+      },
+      "correctAnswer": "c",
+      "explanation": "<p>কুমোরেরা মাটির জিনিস বানায়। তাই গোরুর গাড়িতে 'কল্‌সি হাঁড়ি' বোঝাই করা আছে।</p>",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q33",
+      "questionText": "<p>গোরুর গাড়িটি কে চালাচ্ছে?</p>",
+      "questionType": "MCQ",
+      "options": {
+        "a": "মদন",
+        "b": "বংশীবদন",
+        "c": "কানাই",
+        "d": "আদ্যনাথ"
+      },
+      "correctAnswer": "b",
+      "explanation": "<p>কবিতায় বলা হয়েছে, 'গাড়ি চালায় বংশীবদন'।</p>",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q34",
+      "questionText": "<p>বংশীবদনের সাথে কে যাচ্ছে?</p>",
+      "questionType": "MCQ",
+      "options": {
+        "a": "তার ভাই",
+        "b": "তার ছেলে",
+        "c": "তার ভাগ্নে মদন",
+        "d": "তার বন্ধু"
+      },
+      "correctAnswer": "c",
+      "explanation": "<p>গাড়ি চালক বংশীবদনের সাথে তার 'ভাগ্নে মদন' যাচ্ছে।</p>",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q35",
+      "questionText": "<p>মদন সম্পর্কে বংশীবদনের কী হয়?</p>",
+      "questionType": "MCQ",
+      "options": {
+        "a": "ভাইপো",
+        "b": "ভাগ্নে",
+        "c": "নাতি",
+        "d": "ছেলে"
+      },
+      "correctAnswer": "b",
+      "explanation": "<p>কবিতায় স্পষ্ট করে লেখা আছে 'সঙ্গে-যে যায় ভাগ্নে মদন'।</p>",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q36",
+      "questionText": "<p>হাট কোন বারে বসেছে?</p>",
+      "questionType": "MCQ",
+      "options": {
+        "a": "রবিবারে",
+        "b": "সোমবারে",
+        "c": "বৃহস্পতিবারে",
+        "d": "শুক্রবারে"
+      },
+      "correctAnswer": "d",
+      "explanation": "<p>কবিতায় বলা হয়েছে, 'হাট বসেচে শুক্রবারে'।</p>",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q37",
+      "questionText": "<p>হাট কোথায় বসেছে?</p>",
+      "questionType": "MCQ",
+      "options": {
+        "a": "শল্যপুরে",
+        "b": "বক্সীগঞ্জে",
+        "c": "অহল্যাপাড়ায়",
+        "d": "কলকাতায়"
+      },
+      "correctAnswer": "b",
+      "explanation": "<p>বক্সীগঞ্জে হাট বসেছে।</p>",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q38",
+      "questionText": "<p>বক্সীগঞ্জ হাটটি কোন নদীর পাড়ে অবস্থিত?</p>",
+      "questionType": "MCQ",
+      "options": {
+        "a": "গঙ্গাপারে",
+        "b": "যমুনাহপারে",
+        "c": "পদ্মাপারে",
+        "d": "মেঘনাপারে"
+      },
+      "correctAnswer": "c",
+      "explanation": "<p>কবিতায় আছে, 'বক্সীগঞ্জে পদ্মাপারে'। অর্থাৎ, হাটটি পদ্মা নদীর তীরে বসেছে।</p>",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q39",
+      "questionText": "<p>হাটে কারা জিনিসপত্র বেচাকেনা করতে আসে?</p>",
+      "questionType": "MCQ",
+      "options": {
+        "a": "শহরের মানুষ",
+        "b": "গ্রামের মানুষ",
+        "c": "বিদেশি মানুষ",
+        "d": "রাজার লোকেরা"
+      },
+      "correctAnswer": "b",
+      "explanation": "<p>'গ্রামের মানুষ বেচে কেনে'— অর্থাৎ আশেপাশের গ্রামের মানুষেরাই হাটে আসে।</p>",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q40",
+      "questionText": "<p>নিচের কোন সবজিটি হাটে বিক্রি হচ্ছে না?</p>",
+      "questionType": "MCQ",
+      "options": {
+        "a": "উচ্ছে",
+        "b": "বেগুন",
+        "c": "পটল",
+        "d": "আলু"
+      },
+      "correctAnswer": "d",
+      "explanation": "<p>কবিতায় 'উচ্ছে বেগুন পটল মূলো'-র কথা আছে, কিন্তু আলুর কথা বলা নেই।</p>",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q41",
+      "questionText": "<p>হাটে বিক্রি হওয়া ধামা ও কুলো কী দিয়ে বোনা?</p>",
+      "questionType": "MCQ",
+      "options": {
+        "a": "বাঁশের",
+        "b": "বেতের",
+        "c": "প্লাস্টিকের",
+        "d": "কাঠের"
+      },
+      "correctAnswer": "b",
+      "explanation": "<p>কবিতায় আছে, 'বেতের বোনা ধামা কুলো'।</p>",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q42",
+      "questionText": "<p>হাটে কী ধরনের র‍্যাপার (চাদর) পাওয়া যাচ্ছে?</p>",
+      "questionType": "MCQ",
+      "options": {
+        "a": "নক্‌শাকাটা",
+        "b": "সাদা রঙের",
+        "c": "রেশমি",
+        "d": "ছেঁড়া"
+      },
+      "correctAnswer": "a",
+      "explanation": "<p>শীতের হাত থেকে বাঁচতে হাটে 'শীতের র‍্যাপার নক্‌শাকাটা' পাওয়া যাচ্ছে।</p>",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q43",
+      "questionText": "<p>সর্ষে, ছোলা এবং আটার সাথে আর কী বিক্রি হচ্ছে?</p>",
+      "questionType": "MCQ",
+      "options": {
+        "a": "চাল",
+        "b": "ডাল",
+        "c": "ময়দা",
+        "d": "নুন"
+      },
+      "correctAnswer": "c",
+      "explanation": "<p>কবিতায় 'সর্ষে ছোলা ময়দা আটা' একসাথে বলা হয়েছে।</p>",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q44",
+      "questionText": "<p>রান্নার জন্য হাটে কোন জিনিসগুলো বিক্রি হচ্ছে?</p>",
+      "questionType": "MCQ",
+      "options": {
+        "a": "ঝাঁঝ্‌রি, কড়া, বেড়ি, হাতা",
+        "b": "থালা, বাটি, গ্লাস",
+        "c": "চামচ ও কাঁটা",
+        "d": "হাঁড়ি ও পাতিল"
+      },
+      "correctAnswer": "a",
+      "explanation": "<p>লোহা বা পিতলের তৈরি রান্নার সরঞ্জাম 'ঝাঁঝ্‌রি কড়া বেড়ি হাতা' হাটে পাওয়া যাচ্ছে।</p>",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q45",
+      "questionText": "<p>হাটে বিক্রি হওয়া ছাতাগুলো কোথা থেকে এসেছে?</p>",
+      "questionType": "MCQ",
+      "options": {
+        "a": "গ্রাম থেকে",
+        "b": "শহর থেকে",
+        "c": "বিদেশ থেকে",
+        "d": "বাজার থেকে"
+      },
+      "correctAnswer": "b",
+      "explanation": "<p>কবিতায় বলা হয়েছে, 'শহর থেকে সস্তা ছাতা' আনা হয়েছে।</p>",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q46",
+      "questionText": "<p>শহর থেকে আনা ছাতাগুলোর দাম কেমন?</p>",
+      "questionType": "MCQ",
+      "options": {
+        "a": "খুব দামি",
+        "b": "সস্তা",
+        "c": "ফ্রি",
+        "d": "মাঝারি"
+      },
+      "correctAnswer": "b",
+      "explanation": "<p>কবিতায় ছাতাগুলোকে 'সস্তা ছাতা' বলা হয়েছে, অর্থাৎ এদের দাম কম।</p>",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q47",
+      "questionText": "<p>কল্‌সি ভরে হাটে কী বিক্রি হচ্ছে?</p>",
+      "questionType": "MCQ",
+      "options": {
+        "a": "জল",
+        "b": "দুধ",
+        "c": "এখো গুড়",
+        "d": "মধু"
+      },
+      "correctAnswer": "c",
+      "explanation": "<p>কল্‌সি ভর্তি করে 'এখো গুড়' বা আখের গুড় বিক্রি হচ্ছে।</p>",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q48",
+      "questionText": "<p>এখো গুড়ের চারপাশে কারা উড়ে বেড়াচ্ছে?</p>",
+      "questionType": "MCQ",
+      "options": {
+        "a": "মৌমাছি",
+        "b": "প্রজাপতি",
+        "c": "মাছি",
+        "d": "মশা"
+      },
+      "correctAnswer": "c",
+      "explanation": "<p>গুড় খুব মিষ্টি হওয়ায় তার লোভে 'মাছি যত বেড়ায় উড়ে'।</p>",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q49",
+      "questionText": "<p>ঘাটে খড়ের আঁটি কে আনল?</p>",
+      "questionType": "MCQ",
+      "options": {
+        "a": "চাষীর মেয়ে",
+        "b": "চাষীর ছেলে",
+        "c": "জেলের মেয়ে",
+        "d": "মাঝি"
+      },
+      "correctAnswer": "a",
+      "explanation": "<p>কবিতায় আছে, 'আন‌ল ঘাটে চাষীর মেয়ে' খড়ের আঁটি।</p>",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q50",
+      "questionText": "<p>চাষীর মেয়ে কীসে করে খড়ের আঁটি নিয়ে এল?</p>",
+      "questionType": "MCQ",
+      "options": {
+        "a": "গোরুর গাড়িতে",
+        "b": "নৌকো বেয়ে",
+        "c": "মাথায় করে",
+        "d": "ভ্যানে করে"
+      },
+      "correctAnswer": "b",
+      "explanation": "<p>চাষীর মেয়ে 'নৌকো বেয়ে' জলপথে খড়ের আঁটি নিয়ে এসেছে।</p>",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q51",
+      "questionText": "<p>পথের ধারে কে বসে আছে?</p>",
+      "questionType": "MCQ",
+      "options": {
+        "a": "বংশীবদন",
+        "b": "মদন",
+        "c": "অন্ধ কানাই",
+        "d": "চাষী"
+      },
+      "correctAnswer": "c",
+      "explanation": "<p>অন্ধ কানাই পথের ধারে ('পথের পরে') বসে আছে।</p>",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q52",
+      "questionText": "<p>অন্ধ কানাই কী করছে?</p>",
+      "questionType": "MCQ",
+      "options": {
+        "a": "জিনিস বিক্রি করছে",
+        "b": "গান শুনিয়ে ভিক্ষে করছে",
+        "c": "ঘুমাচ্ছে",
+        "d": "গল্প বলছে"
+      },
+      "correctAnswer": "b",
+      "explanation": "<p>কানাই চোখে দেখতে পায় না, তাই সে 'গান শুনিয়ে ভিক্ষে করে'।</p>",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q53",
+      "questionText": "<p>স্নানের ঘাটে কারা সাঁতার কাটছে?</p>",
+      "questionType": "MCQ",
+      "options": {
+        "a": "পাড়ার ছেলে",
+        "b": "গ্রামের চাষীরা",
+        "c": "শহরের মানুষ",
+        "d": "মেয়েরা"
+      },
+      "correctAnswer": "a",
+      "explanation": "<p>কবিতার শেষে বলা হয়েছে, 'পাড়ার ছেলে স্নানের ঘাটে' সাঁতার কাটছে।</p>",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q54",
+      "questionText": "<p>পাড়ার ছেলেরা স্নানের ঘাটে কী ছিটিয়ে সাঁতার কাটছে?</p>",
+      "questionType": "MCQ",
+      "options": {
+        "a": "কাদা",
+        "b": "ফুল",
+        "c": "জল",
+        "d": "বালি"
+      },
+      "correctAnswer": "c",
+      "explanation": "<p>ছোটরা নদীতে আনন্দ করে 'জল ছিটিয়ে সাঁতার কাটে'।</p>",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q55",
+      "questionText": "<p>'কুমোর' কাদের বলা হয়?</p>",
+      "questionType": "MCQ",
+      "options": {
+        "a": "যারা কাপড় বোনে",
+        "b": "যারা লোহার কাজ করে",
+        "c": "যারা মাটির জিনিস বানায়",
+        "d": "যারা কাঠ কাটে"
+      },
+      "correctAnswer": "c",
+      "explanation": "<p>কুমোরেরা মাটি দিয়ে সুন্দর সুন্দর হাঁড়ি, কলসি ইত্যাদি তৈরি করে। তাই গোরুর গাড়িতে মাটির কলসি ছিল।</p>",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q56",
+      "questionText": "<p>কবিতায় 'মূলো'-র সাথে আর কোন কোন সবজির নাম আছে?</p>",
+      "questionType": "MCQ",
+      "options": {
+        "a": "লাউ, কুমড়ো",
+        "b": "উচ্ছে, বেগুন, পটল",
+        "c": "ঢেঁড়স, শসা",
+        "d": "টমেটো, গাজর"
+      },
+      "correctAnswer": "b",
+      "explanation": "<p>কবিতায় সবজির লাইনে আছে: 'উচ্ছে বেগুন পটল মূলো'।</p>",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q57",
+      "questionText": "<p>'এখো গুড়' বলতে কী বোঝায়?</p>",
+      "questionType": "MCQ",
+      "options": {
+        "a": "খেজুরের গুড়",
+        "b": "তালের গুড়",
+        "c": "আখের গুড়",
+        "d": "মিছরি"
+      },
+      "correctAnswer": "c",
+      "explanation": "<p>এখো গুড় মানে হলো আখ (ইক্ষু) থেকে তৈরি করা মিষ্টি গুড়।</p>",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q58",
+      "questionText": "<p>নদীতে নৌকো বেয়ে কে এল?</p>",
+      "questionType": "MCQ",
+      "options": {
+        "a": "মদন",
+        "b": "বংশীবদন",
+        "c": "চাষীর মেয়ে",
+        "d": "কানাই"
+      },
+      "correctAnswer": "c",
+      "explanation": "<p>খড়ের আঁটি নিয়ে 'চাষীর মেয়ে' নৌকো বেয়ে ঘাটে এসেছিল।</p>",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q59",
+      "questionText": "<p>'বেতের বোনা' জিনিসগুলো কী কাজে লাগে?</p>",
+      "questionType": "MCQ",
+      "options": {
+        "a": "জল খেতে",
+        "b": "চাল ও ধান ঝাড়তে বা রাখতে",
+        "c": "রান্না করতে",
+        "d": "বই পড়তে"
+      },
+      "correctAnswer": "b",
+      "explanation": "<p>বেতের বোনা 'ধামা ও কুলো' সাধারণত ধান, চাল বা শস্য রাখা এবং পরিষ্কার করার কাজে লাগে।</p>",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    },
+    {
+      "id": "q60",
+      "questionText": "<p>কবিতাটিতে গ্রামের কোন পরিবেশের কথা বলা হয়েছে?</p>",
+      "questionType": "MCQ",
+      "options": {
+        "a": "স্কুলের পরিবেশ",
+        "b": "খেলার মাঠ",
+        "c": "গ্রামের হাটের পরিবেশ",
+        "d": "বিয়ের বাড়ি"
+      },
+      "correctAnswer": "c",
+      "explanation": "<p>পুরো কবিতাটিতে বক্সীগঞ্জে শুক্রবারের একটি ব্যস্ত 'হাট'-এর সুন্দর বর্ণনা দেওয়া হয়েছে।</p>",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published"
+    }
+  ],
+  "boardId": "WBBSE",
+  "classId": "Class 2",
+  "subjectId": "Bengali"
+}

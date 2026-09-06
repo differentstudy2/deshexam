@@ -1,0 +1,33 @@
+{
+  "id": "hardcoded-current-affairs-quiz",
+  "slug": "current-affairs-demo-quiz-2025",
+  "title": "Current Affairs Demo Quiz — 2025",
+  "description": "২০২৫ সালের গুরুত্বপূর্ণ Current Affairs নিয়ে এই Quiz। প্রতিযোগিতামূলক পরীক্ষার প্রস্তুতির জন্য আদর্শ।",
+  "status": "Published",
+  "difficulty": "Medium",
+  "language": "Bengali",
+  "questionType": "MCQ",
+  "questionCount": 15,
+  "questionIds": [],
+  "durationMin": 10,
+  "totalMarks": 15,
+  "passingMarks": 9,
+  "negativeMarking": 0,
+  "attemptsAllowed": 0,
+  "accessType": "free",
+  "attemptCount": 2100,
+  "averageScore": 55,
+  "instructions": "* মোট ১৫টি প্রশ্ন, সময় ১০ মিনিট।\n* কোনো নেগেটিভ মার্কিং নেই।",
+  "examRules": "",
+  "tags": [
+    "Current Affairs",
+    "2025",
+    "Quiz",
+    "All"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2025-01-01T00:00:00Z",
+  "boardId": "All",
+  "classId": "All",
+  "subjectId": "Current Affairs"
+}
