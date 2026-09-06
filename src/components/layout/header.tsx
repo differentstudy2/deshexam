@@ -42,7 +42,7 @@ const mainNavLinks: NavLinkType[] = [
     icon: <BookOpen className="h-5 w-5" />,
     subItems: [
       { href: "/academy", label: "All Boards", icon: <Library className="h-4 w-4" /> },
-      { href: "/academy/ncert", label: "NCERT", icon: <BookOpen className="h-4 w-4" /> },
+      { href: "/academy/wbbpe", label: "WBBPE", icon: <BookOpen className="h-4 w-4" /> },
       { href: "/academy/wbbse", label: "WBBSE", icon: <BookOpen className="h-4 w-4" /> },
       { href: "/academy/wbchse", label: "WBCHSE", icon: <BookOpen className="h-4 w-4" /> },
       { href: "/academy/cbse", label: "CBSE", icon: <BookOpen className="h-4 w-4" /> },
@@ -54,7 +54,7 @@ const mainNavLinks: NavLinkType[] = [
     label: "Solutions",
     icon: <ClipboardList className="h-5 w-5" />,
     subItems: [
-      { href: "/solutions/ncert", label: "NCERT Solutions", icon: <Book className="h-4 w-4" /> },
+      { href: "/solutions/wbbpe", label: "WBBPE Solutions", icon: <Book className="h-4 w-4" /> },
       { href: "/solutions/wbbse", label: "WBBSE Solutions", icon: <Book className="h-4 w-4" /> },
       { href: "/solutions/wbchse", label: "WBCHSE Solutions", icon: <Book className="h-4 w-4" /> },
       { href: "/solutions/cbse", label: "CBSE Solutions", icon: <Book className="h-4 w-4" /> },

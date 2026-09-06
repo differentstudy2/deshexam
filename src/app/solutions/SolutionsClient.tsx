@@ -22,7 +22,7 @@ const CARD_GRADIENTS = [
 
 const BOARD_CONFIGS = [
   { id: 'wbbse', name: 'WBBSE', slugs: ['wb-board', 'wbbme', 'wbbse'] },
-  { id: 'ncert', name: 'NCERT', slugs: ['ncert'] },
+  { id: 'wbbpe', name: 'WBBPE', slugs: ['wbbpe'] },
   { id: 'cbse', name: 'CBSE', slugs: ['cbse-board', 'cbse'] },
   { id: 'wbchse', name: 'WBCHSE', slugs: ['wbchse'] },
   { id: 'icse', name: 'ICSE', slugs: ['icse-board', 'icse'] }

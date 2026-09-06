@@ -1,4 +1,4 @@
-[
+﻿[
   {
     "id": "class-8-cbse",
     "title": "Class 8",
@@ -575,139 +575,139 @@
     ]
   },
   {
-    "id": "class-kg1-ncert",
+    "id": "class-kg1-wbbpe",
     "title": "KG 1",
     "slug": "kg-1",
     "type": "class",
     "track": "academic",
-    "parentId": "board-ncert",
+    "parentId": "board-wbbpe",
     "orderIndex": 1,
     "status": "published",
-    "fullSlug": "ncert/kg-1",
-    "boardSlug": "ncert",
+    "fullSlug": "wbbpe/kg-1",
+    "boardSlug": "wbbpe",
     "classSlug": "kg-1",
     "isIndexable": true,
     "isHardcoded": true,
     "ancestors": [
       {
-        "id": "board-ncert",
-        "slug": "ncert",
-        "title": "NCERT",
+        "id": "board-wbbpe",
+        "slug": "wbbpe",
+        "title": "wbbpe",
         "type": "board"
       }
     ]
   },
   {
-    "id": "class-kg2-ncert",
+    "id": "class-kg2-wbbpe",
     "title": "KG 2",
     "slug": "kg-2",
     "type": "class",
     "track": "academic",
-    "parentId": "board-ncert",
+    "parentId": "board-wbbpe",
     "orderIndex": 2,
     "status": "published",
-    "fullSlug": "ncert/kg-2",
-    "boardSlug": "ncert",
+    "fullSlug": "wbbpe/kg-2",
+    "boardSlug": "wbbpe",
     "classSlug": "kg-2",
     "isIndexable": true,
     "isHardcoded": true,
     "ancestors": [
       {
-        "id": "board-ncert",
-        "slug": "ncert",
-        "title": "NCERT",
+        "id": "board-wbbpe",
+        "slug": "wbbpe",
+        "title": "wbbpe",
         "type": "board"
       }
     ]
   },
   {
-    "id": "class-1-ncert",
+    "id": "class-1-wbbpe",
     "title": "Class 1",
     "slug": "class-1",
     "type": "class",
     "track": "academic",
-    "parentId": "board-ncert",
+    "parentId": "board-wbbpe",
     "orderIndex": 3,
     "status": "published",
-    "fullSlug": "ncert/class-1",
-    "boardSlug": "ncert",
+    "fullSlug": "wbbpe/class-1",
+    "boardSlug": "wbbpe",
     "classSlug": "class-1",
     "isIndexable": true,
     "isHardcoded": true,
     "ancestors": [
       {
-        "id": "board-ncert",
-        "slug": "ncert",
-        "title": "NCERT",
+        "id": "board-wbbpe",
+        "slug": "wbbpe",
+        "title": "wbbpe",
         "type": "board"
       }
     ]
   },
   {
-    "id": "class-2-ncert",
+    "id": "class-2-wbbpe",
     "title": "Class 2",
     "slug": "class-2",
     "type": "class",
     "track": "academic",
-    "parentId": "board-ncert",
+    "parentId": "board-wbbpe",
     "orderIndex": 4,
     "status": "published",
-    "fullSlug": "ncert/class-2",
-    "boardSlug": "ncert",
+    "fullSlug": "wbbpe/class-2",
+    "boardSlug": "wbbpe",
     "classSlug": "class-2",
     "isIndexable": true,
     "isHardcoded": true,
     "ancestors": [
       {
-        "id": "board-ncert",
-        "slug": "ncert",
-        "title": "NCERT",
+        "id": "board-wbbpe",
+        "slug": "wbbpe",
+        "title": "wbbpe",
         "type": "board"
       }
     ]
   },
   {
-    "id": "class-3-ncert",
+    "id": "class-3-wbbpe",
     "title": "Class 3",
     "slug": "class-3",
     "type": "class",
     "track": "academic",
-    "parentId": "board-ncert",
+    "parentId": "board-wbbpe",
     "orderIndex": 5,
     "status": "published",
-    "fullSlug": "ncert/class-3",
-    "boardSlug": "ncert",
+    "fullSlug": "wbbpe/class-3",
+    "boardSlug": "wbbpe",
     "classSlug": "class-3",
     "isIndexable": true,
     "isHardcoded": true,
     "ancestors": [
       {
-        "id": "board-ncert",
-        "slug": "ncert",
-        "title": "NCERT",
+        "id": "board-wbbpe",
+        "slug": "wbbpe",
+        "title": "wbbpe",
         "type": "board"
       }
     ]
   },
   {
-    "id": "class-4-ncert",
+    "id": "class-4-wbbpe",
     "title": "Class 4",
     "slug": "class-4",
     "type": "class",
     "track": "academic",
-    "parentId": "board-ncert",
+    "parentId": "board-wbbpe",
     "orderIndex": 6,
     "status": "published",
-    "fullSlug": "ncert/class-4",
-    "boardSlug": "ncert",
+    "fullSlug": "wbbpe/class-4",
+    "boardSlug": "wbbpe",
     "classSlug": "class-4",
     "isIndexable": true,
     "isHardcoded": true,
     "ancestors": [
       {
-        "id": "board-ncert",
-        "slug": "ncert",
-        "title": "NCERT",
+        "id": "board-wbbpe",
+        "slug": "wbbpe",
+        "title": "wbbpe",
         "type": "board"
       }
     ]
@@ -943,3 +943,4 @@
     ]
   }
 ]
+

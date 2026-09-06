@@ -148,6 +148,20 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [qBgColor, setQBgColor] = useState('bg-white/90 dark:bg-gray-800/90');
     const [qTextColor, setQTextColor] = useState('default');
     const [animSpeed, setAnimSpeed] = useState(0.8);
+    const [isPrintWithAnswers, setIsPrintWithAnswers] = useState(true);
+    const [isPrintAsList, setIsPrintAsList] = useState(true);
+
+    const taxonomyString = [chapterName, topicName].filter(Boolean).join(' | ');
+    let displayTitle = classLine;
+    let displayTaxonomy = taxonomyString;
+
+    if (taxonomyString && classLine.includes(taxonomyString)) {
+        displayTitle = classLine.replace(taxonomyString, '').replace(/^[-|\s]+/, '').replace(/[-|\s]+$/, '').trim();
+        if (!displayTitle) {
+            displayTitle = taxonomyString;
+            displayTaxonomy = '';
+        }
+    }
 
     const getBgThemeClasses = () => {
         switch (bgTheme) {
@@ -1253,10 +1267,10 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 headerTitleAlign === 'right' ? 'items-end text-right' :
                                     'items-center text-center'
                                 }`}>
-                                <h1 className="font-extrabold text-indigo-950 dark:text-gray-100 tracking-tight line-clamp-1 md:line-clamp-none" style={{ fontSize: `${1.1 * headerScale * headerTitleScale}rem` }}>{classLine}</h1>
-                                {(chapterName || topicName) && (
+                                <h1 className="font-extrabold text-indigo-950 dark:text-gray-100 tracking-tight line-clamp-1 md:line-clamp-none" style={{ fontSize: `${1.1 * headerScale * headerTitleScale}rem` }}>{displayTitle}</h1>
+                                {displayTaxonomy && (
                                     <div className="text-indigo-700 dark:text-gray-400 font-bold tracking-wider uppercase mt-1" style={{ fontSize: `${0.75 * headerScale * headerTitleScale}rem` }}>
-                                        {[chapterName, topicName].filter(Boolean).join(' | ')}
+                                        {displayTaxonomy}
                                     </div>
                                 )}
                             </div>
@@ -1709,6 +1723,28 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                         </button>
                                                     </div>
                                                 </div>
+
+                                                <div>
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
+                                                        <span className="flex items-center gap-2"><Printer className="w-4 h-4 text-indigo-500" /> Print Settings</span>
+                                                    </div>
+                                                    <div className="space-y-3">
+                                                        <div className="flex items-center justify-between">
+                                                            <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Include Correct Answers</span>
+                                                            <button onClick={() => setIsPrintWithAnswers(!isPrintWithAnswers)} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${isPrintWithAnswers ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}>
+                                                                <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${isPrintWithAnswers ? 'translate-x-5' : 'translate-x-1'}`} />
+                                                            </button>
+                                                        </div>
+                                                        <div className="flex items-center justify-between">
+                                                            <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Print as Continuous List</span>
+                                                            <button onClick={() => setIsPrintAsList(!isPrintAsList)} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${isPrintAsList ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}>
+                                                                <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${isPrintAsList ? 'translate-x-5' : 'translate-x-1'}`} />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <hr className="border-gray-100 dark:border-gray-800" />
 
                                                 <div>
                                                     <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
@@ -2422,9 +2458,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     })();
 
                     return (
-                        <div key={idx} className={`w-full h-[100vh] flex items-center justify-center select-none font-sans overflow-hidden transition-colors duration-500 ${isDarkMode ? 'dark bg-gray-900' : 'bg-[#f8fbff]'}`} style={{ pageBreakAfter: 'always' }}>
+                        <div key={idx} className={`w-full ${isPrintAsList ? 'py-8' : 'h-[100vh]'} flex items-center justify-center select-none font-sans ${isPrintAsList ? '' : 'overflow-hidden'} transition-colors duration-500 ${isDarkMode ? 'dark bg-gray-900' : 'bg-[#f8fbff]'}`} style={{ pageBreakAfter: isPrintAsList ? 'auto' : 'always', pageBreakInside: 'avoid' }}>
                             {/* Main Presentation Area Only (No side banners) */}
-                            <div className={`responsive-fonts relative w-full h-full ${getBgThemeClasses()} flex flex-col shadow-2xl overflow-hidden z-10 transition-colors duration-500`}>
+                            <div className={`responsive-fonts relative w-full ${isPrintAsList ? '' : 'h-full'} ${getBgThemeClasses()} flex flex-col shadow-2xl ${isPrintAsList ? '' : 'overflow-hidden'} z-10 transition-colors duration-500`}>
                                 {bgTheme !== 'video' && (
                                     <div className={`absolute inset-0 z-0 pointer-events-none transition-opacity duration-300 ${getBgThemeOverlayClasses()}`} style={{ opacity: bgOpacity / 100 }} />
                                 )}
@@ -2461,11 +2497,11 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                 <span className="text-indigo-800/80 dark:text-gray-400 font-bold tracking-widest uppercase mt-0.5 text-[10px]">Learn • Practice • Succeed</span>
                                             </div>
                                         </div>
-                                        <div className={`flex-1 w-full px-6 flex flex-col justify-center ${headerTitleAlign === 'left' ? 'items-start text-left' : headerTitleAlign === 'right' ? 'items-end text-right' : 'items-center text-center'}`}>
-                                            <h1 className="font-extrabold text-indigo-950 dark:text-gray-100 tracking-tight text-lg">{classLine}</h1>
-                                            {(chapterName || topicName) && (
+                                        <div className={`flex-1 w-full px-6 flex flex-col justify-center ${isPrintAsList || headerTitleAlign === 'left' ? 'items-start text-left' : headerTitleAlign === 'right' ? 'items-end text-right' : 'items-center text-center'}`}>
+                                            <h1 className="font-extrabold text-indigo-950 dark:text-gray-100 tracking-tight text-lg">{displayTitle}</h1>
+                                            {displayTaxonomy && (
                                                 <div className="text-indigo-700 dark:text-gray-400 font-bold tracking-wider uppercase mt-1 text-xs">
-                                                    {[chapterName, topicName].filter(Boolean).join(' | ')}
+                                                    {displayTaxonomy}
                                                 </div>
                                             )}
                                         </div>
@@ -2478,9 +2514,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 )}
 
                                 {/* Question & Options */}
-                                <div className="flex-1 w-full relative flex flex-col items-center px-12 py-10 z-10 justify-center">
+                                <div className={`flex-1 w-full relative flex flex-col px-12 py-10 z-10 ${isPrintAsList ? 'items-start justify-start' : 'items-center justify-center'}`}>
                                     <div
-                                        className={`w-full max-w-[90%] xl:max-w-6xl rounded-3xl p-12 shadow-[0_20px_50px_rgba(0,0,0,0.1)] backdrop-blur-sm border transition-all duration-500 relative z-20 ${qBgColor} border-white/20 dark:border-gray-700/50`}
+                                        className={`w-full ${isPrintAsList ? 'max-w-full' : 'max-w-[90%] xl:max-w-6xl'} rounded-3xl p-12 shadow-[0_20px_50px_rgba(0,0,0,0.1)] backdrop-blur-sm border transition-all duration-500 relative z-20 ${qBgColor} border-white/20 dark:border-gray-700/50`}
                                         style={{
                                             boxShadow: isDarkMode ? '0 20px 40px -10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1)' : '0 20px 40px -10px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.5)',
                                             backgroundImage: `linear-gradient(to right, ${isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'} 1px, transparent 1px)`,
@@ -2502,7 +2538,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                             </div>
                                         </div>
 
-                                        <div className={optionsLayout === 'grid' ? "grid grid-cols-2 gap-x-12 gap-y-10" : "flex flex-col gap-8 max-w-4xl mx-auto"}>
+                                        <div className={optionsLayout === 'grid' ? "grid grid-cols-2 gap-x-12 gap-y-10" : `flex flex-col gap-8 ${isPrintAsList ? 'w-full' : 'max-w-4xl mx-auto'}`}>
                                             {opts.map((opt: any, oIdx: number) => {
                                                 const optLetter = q.language === 'Bangla' || !q.language ? bnOptionsMap[opt.key] : opt.key.toUpperCase();
                                                 const colorThemes = [
@@ -2514,9 +2550,17 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                 ];
                                                 const theme = colorThemes[oIdx % colorThemes.length];
 
+                                                const isCorrect = q.correctAnswer && q.correctAnswer.toLowerCase().includes(opt.key);
+                                                const printContainerClass = isPrintWithAnswers && isCorrect
+                                                    ? `flex items-center gap-5 py-2 px-3 rounded-xl border-2 border-[#34A853] bg-[#f0fdf4] min-h-[50px] !print-color-adjust-exact`
+                                                    : `flex items-center gap-5 py-2 px-3 rounded-xl border-2 shadow-[0_4px_12px_rgba(0,0,0,0.04)] ${theme.bg} ${theme.border} min-h-[50px]`;
+                                                const printLetterClass = isPrintWithAnswers && isCorrect
+                                                    ? `shrink-0 w-14 h-14 flex items-center justify-center rounded-full text-2xl font-black bg-[#34A853] text-white !print-color-adjust-exact`
+                                                    : `shrink-0 w-14 h-14 flex items-center justify-center rounded-full text-2xl font-black ${theme.letterBg} ${theme.letterText}`;
+
                                                 return (
-                                                    <div key={opt.key} className={`flex items-center gap-5 py-2 px-3 rounded-xl border-2 shadow-[0_4px_12px_rgba(0,0,0,0.04)] ${theme.bg} ${theme.border} min-h-[50px]`}>
-                                                        <div className={`shrink-0 w-14 h-14 flex items-center justify-center rounded-full text-2xl font-black ${theme.letterBg} ${theme.letterText}`}>
+                                                    <div key={opt.key} className={printContainerClass}>
+                                                        <div className={printLetterClass}>
                                                             {optLetter}
                                                         </div>
                                                         <div className="prose dark:prose-invert max-w-none text-black dark:text-gray-100 font-bold text-[24px] flex items-center [&_*]:!text-[24px] [&_*]:!leading-tight [&_*]:!m-0">
@@ -2524,6 +2568,11 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                                 {opt.text}
                                                             </ReactMarkdown>
                                                         </div>
+                                                        {isPrintWithAnswers && isCorrect && (
+                                                            <div className="shrink-0 text-white bg-[#34A853] rounded-full p-1.5 shadow-sm ml-auto !print-color-adjust-exact">
+                                                                <Check className="w-7 h-7 stroke-[3]" />
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 );
                                             })}
