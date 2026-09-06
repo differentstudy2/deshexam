@@ -150,6 +150,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [animSpeed, setAnimSpeed] = useState(0.8);
     const [isPrintWithAnswers, setIsPrintWithAnswers] = useState(true);
     const [isPrintAsList, setIsPrintAsList] = useState(true);
+    const [isPrintBothVersions, setIsPrintBothVersions] = useState(false);
 
     const taxonomyString = [chapterName, topicName].filter(Boolean).join(' | ');
     let displayTitle = classLine;
@@ -1741,6 +1742,15 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                                 <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${isPrintAsList ? 'translate-x-5' : 'translate-x-1'}`} />
                                                             </button>
                                                         </div>
+                                                        <div className="flex items-center justify-between">
+                                                            <div className="flex flex-col">
+                                                                <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Print Both Versions</span>
+                                                                <span className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">Test copy + Answer key</span>
+                                                            </div>
+                                                            <button onClick={() => setIsPrintBothVersions(!isPrintBothVersions)} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${isPrintBothVersions ? 'bg-indigo-600' : 'bg-gray-300 dark:bg-gray-700'}`}>
+                                                                <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${isPrintBothVersions ? 'translate-x-5' : 'translate-x-1'}`} />
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </div>
 
@@ -2457,130 +2467,151 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                         return arr.filter((x: any) => x.text);
                     })();
 
-                    return (
-                        <div key={idx} className={`w-full ${isPrintAsList ? 'py-8' : 'h-[100vh]'} flex items-center justify-center select-none font-sans ${isPrintAsList ? '' : 'overflow-hidden'} transition-colors duration-500 ${isDarkMode ? 'dark bg-gray-900' : 'bg-[#f8fbff]'}`} style={{ pageBreakAfter: isPrintAsList ? 'auto' : 'always', pageBreakInside: 'avoid' }}>
-                            {/* Main Presentation Area Only (No side banners) */}
-                            <div className={`responsive-fonts relative w-full ${isPrintAsList ? '' : 'h-full'} ${getBgThemeClasses()} flex flex-col shadow-2xl ${isPrintAsList ? '' : 'overflow-hidden'} z-10 transition-colors duration-500`}>
-                                {bgTheme !== 'video' && (
-                                    <div className={`absolute inset-0 z-0 pointer-events-none transition-opacity duration-300 ${getBgThemeOverlayClasses()}`} style={{ opacity: bgOpacity / 100 }} />
-                                )}
+                    const renderQuestion = (isAnswerKey) => {
+                        const showHighlight = isAnswerKey || (isPrintWithAnswers && !isPrintBothVersions);
+                        const keyPrefix = isAnswerKey ? `ak-${idx}` : `test-${idx}`;
 
-                                <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-                                    <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-200/30 blur-[100px]"></div>
-                                    <div className="absolute bottom-[-10%] right-[-5%] w-[50%] h-[50%] rounded-full bg-pink-200/30 blur-[100px]"></div>
-                                    <div className="absolute top-[20%] right-[10%] w-[30%] h-[30%] rounded-full bg-purple-200/30 blur-[80px]"></div>
-                                    <div className="absolute top-0 left-0 w-full h-full" style={{ backgroundImage: 'radial-gradient(rgba(99, 102, 241, 0.06) 2px, transparent 2px)', backgroundSize: '32px 32px', opacity: 0.8 }}></div>
-                                    <div className="absolute top-[15%] right-[-5%] w-72 h-72 rounded-full border-[1px] border-indigo-200/40 opacity-60"></div>
-                                    <div className="absolute top-[18%] right-[-2%] w-56 h-56 rounded-full border-[1px] border-purple-200/40 opacity-60"></div>
-                                    <div className="absolute bottom-[20%] left-[5%] w-48 h-48 rounded-full border-[1px] border-pink-200/40 opacity-60"></div>
-                                </div>
+                        return (
+                            <div key={keyPrefix} className={`w-full ${isPrintAsList ? 'py-8' : 'h-[100vh]'} flex items-center justify-center select-none font-sans ${isPrintAsList ? '' : 'overflow-hidden'} transition-colors duration-500 ${isDarkMode ? 'dark bg-gray-900' : 'bg-[#f8fbff]'}`} style={{ pageBreakAfter: isPrintAsList ? 'auto' : 'always', pageBreakInside: 'avoid' }}>
+                                {/* Main Presentation Area Only (No side banners) */}
+                                <div className={`responsive-fonts relative w-full ${isPrintAsList ? '' : 'h-full'} ${getBgThemeClasses()} flex flex-col shadow-2xl ${isPrintAsList ? '' : 'overflow-hidden'} z-10 transition-colors duration-500`}>
+                                    {bgTheme !== 'video' && (
+                                        <div className={`absolute inset-0 z-0 pointer-events-none transition-opacity duration-300 ${getBgThemeOverlayClasses()}`} style={{ opacity: bgOpacity / 100 }} />
+                                    )}
 
-                                {wmVisible && wmText && (
-                                    <div 
-                                        className="absolute inset-0 pointer-events-none z-[60] overflow-hidden" 
-                                        style={{ 
-                                            backgroundImage: `url("data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${wmSpacing}" height="${wmSpacing}"><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="${wmSize}" font-family="sans-serif" font-weight="900" fill="${isDarkMode ? '%23ffffff' : '%23000000'}" fill-opacity="${isDarkMode ? Math.max(wmOpacity, 0.15) : wmOpacity}" transform="rotate(-35 ${wmSpacing/2} ${wmSpacing/2})">${wmText}</text></svg>`)}")`,
-                                            backgroundRepeat: 'repeat'
-                                        }} 
-                                    />
-                                )}
-
-                                {/* Header */}
-                                {showHeader && (
-                                    <div
-                                        className="shrink-0 bg-gradient-to-r from-indigo-50 via-white to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 border-b border-indigo-100/50 dark:border-gray-700/50 flex flex-row justify-between items-center w-full z-30 shadow-sm relative px-6 py-4"
-                                    >
-                                        <div className="flex items-center gap-3 w-1/3">
-                                            {showLogo && <img src="/icons/icon-192x192.png" alt="DeshExam" className="h-10 w-auto object-contain drop-shadow-sm rounded-full bg-white p-1" />}
-                                            <div className="flex flex-col justify-center">
-                                                <span className="font-extrabold text-indigo-950 dark:text-gray-100 leading-tight text-lg">DESH EXAM</span>
-                                                <span className="text-indigo-800/80 dark:text-gray-400 font-bold tracking-widest uppercase mt-0.5 text-[10px]">Learn • Practice • Succeed</span>
-                                            </div>
-                                        </div>
-                                        <div className={`flex-1 w-full px-6 flex flex-col justify-center ${isPrintAsList || headerTitleAlign === 'left' ? 'items-start text-left' : headerTitleAlign === 'right' ? 'items-end text-right' : 'items-center text-center'}`}>
-                                            <h1 className="font-extrabold text-indigo-950 dark:text-gray-100 tracking-tight text-lg">{displayTitle}</h1>
-                                            {displayTaxonomy && (
-                                                <div className="text-indigo-700 dark:text-gray-400 font-bold tracking-wider uppercase mt-1 text-xs">
-                                                    {displayTaxonomy}
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="flex items-center justify-end shrink-0 w-1/3">
-                                            <div className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-full font-extrabold tracking-widest shadow-md flex items-center justify-center whitespace-nowrap px-6 py-2 text-sm">
-                                                MOCK TEST
-                                            </div>
-                                        </div>
+                                    <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+                                        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-200/30 blur-[100px]"></div>
+                                        <div className="absolute bottom-[-10%] right-[-5%] w-[50%] h-[50%] rounded-full bg-pink-200/30 blur-[100px]"></div>
+                                        <div className="absolute top-[20%] right-[10%] w-[30%] h-[30%] rounded-full bg-purple-200/30 blur-[80px]"></div>
+                                        <div className="absolute top-0 left-0 w-full h-full" style={{ backgroundImage: 'radial-gradient(rgba(99, 102, 241, 0.06) 2px, transparent 2px)', backgroundSize: '32px 32px', opacity: 0.8 }}></div>
+                                        {!isAnswerKey && (
+                                            <>
+                                                <div className="absolute top-[15%] right-[-5%] w-72 h-72 rounded-full border-[1px] border-indigo-200/40 opacity-60"></div>
+                                                <div className="absolute top-[18%] right-[-2%] w-56 h-56 rounded-full border-[1px] border-purple-200/40 opacity-60"></div>
+                                                <div className="absolute bottom-[20%] left-[5%] w-48 h-48 rounded-full border-[1px] border-pink-200/40 opacity-60"></div>
+                                            </>
+                                        )}
                                     </div>
-                                )}
 
-                                {/* Question & Options */}
-                                <div className={`flex-1 w-full relative flex flex-col px-12 py-10 z-10 ${isPrintAsList ? 'items-start justify-start' : 'items-center justify-center'}`}>
-                                    <div
-                                        className={`w-full ${isPrintAsList ? 'max-w-full' : 'max-w-[90%] xl:max-w-6xl'} rounded-3xl p-12 shadow-[0_20px_50px_rgba(0,0,0,0.1)] backdrop-blur-sm border transition-all duration-500 relative z-20 ${qBgColor} border-white/20 dark:border-gray-700/50`}
-                                        style={{
-                                            boxShadow: isDarkMode ? '0 20px 40px -10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1)' : '0 20px 40px -10px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.5)',
-                                            backgroundImage: `linear-gradient(to right, ${isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'} 1px, transparent 1px)`,
-                                            backgroundSize: '24px 24px'
-                                        }}
-                                    >
-                                        <div className="flex items-start gap-4 mb-12 border-b border-gray-200/50 dark:border-gray-700/50 pb-10">
-                                            <div className="flex items-center gap-4 shrink-0">
-                                                <span className="font-black text-[32px] bg-clip-text text-transparent bg-gradient-to-br from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 drop-shadow-sm">
-                                                    Q{idx + 1}.
-                                                </span>
+                                    {wmVisible && wmText && (
+                                        <div 
+                                            className="absolute inset-0 pointer-events-none z-[60] overflow-hidden" 
+                                            style={{ 
+                                                backgroundImage: `url("data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${wmSpacing}" height="${wmSpacing}"><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="${wmSize}" font-family="sans-serif" font-weight="900" fill="${isDarkMode ? '%23ffffff' : '%23000000'}" fill-opacity="${isDarkMode ? Math.max(wmOpacity, 0.15) : wmOpacity}" transform="rotate(-35 ${wmSpacing/2} ${wmSpacing/2})">${wmText}</text></svg>`)}")`,
+                                                backgroundRepeat: 'repeat'
+                                            }} 
+                                        />
+                                    )}
+
+                                    {/* Header */}
+                                    {showHeader && (
+                                        <div
+                                            className={isAnswerKey 
+                                                ? "shrink-0 bg-gradient-to-r from-green-50 via-white to-indigo-50 border-b border-green-100/50 flex flex-row justify-between items-center w-full z-30 shadow-sm relative px-6 py-4"
+                                                : "shrink-0 bg-gradient-to-r from-indigo-50 via-white to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 border-b border-indigo-100/50 dark:border-gray-700/50 flex flex-row justify-between items-center w-full z-30 shadow-sm relative px-6 py-4"}
+                                        >
+                                            <div className="flex items-center gap-3 w-1/3">
+                                                {showLogo && <img src="/icons/icon-192x192.png" alt="DeshExam" className="h-10 w-auto object-contain drop-shadow-sm rounded-full bg-white p-1" />}
+                                                <div className="flex flex-col justify-center">
+                                                    <span className="font-extrabold text-indigo-950 dark:text-gray-100 leading-tight text-lg">DESH EXAM</span>
+                                                    <span className="text-indigo-800/80 dark:text-gray-400 font-bold tracking-widest uppercase mt-0.5 text-[10px]">Learn • Practice • Succeed</span>
+                                                </div>
                                             </div>
-                                            <div className="flex-1 w-full relative pt-1">
-                                                <div className={`prose max-w-none prose-p:font-black font-black text-[32px] leading-snug ${qTextColor !== 'default' ? 'text-[var(--q-color)]' : 'text-gray-900 dark:text-gray-100'} [&_*]:!text-[32px] [&_*]:!leading-snug [&>p]:m-0`} style={{ '--q-color': qTextColor !== 'default' ? qTextColor : undefined } as React.CSSProperties}>
-                                                    <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
-                                                        {q.questionText}
-                                                    </ReactMarkdown>
+                                            <div className={`flex-1 w-full px-6 flex flex-col justify-center ${isPrintAsList || headerTitleAlign === 'left' ? 'items-start text-left' : headerTitleAlign === 'right' ? 'items-end text-right' : 'items-center text-center'}`}>
+                                                <h1 className="font-extrabold text-indigo-950 dark:text-gray-100 tracking-tight text-lg">{displayTitle}</h1>
+                                                {displayTaxonomy && (
+                                                    <div className="text-indigo-700 dark:text-gray-400 font-bold tracking-wider uppercase mt-1 text-xs">
+                                                        {displayTaxonomy}
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="flex items-center justify-end shrink-0 w-1/3">
+                                                <div className={isAnswerKey 
+                                                    ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-full font-extrabold tracking-widest shadow-md flex items-center justify-center whitespace-nowrap px-6 py-2 text-sm"
+                                                    : "bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-full font-extrabold tracking-widest shadow-md flex items-center justify-center whitespace-nowrap px-6 py-2 text-sm"}
+                                                >
+                                                    {isAnswerKey ? "ANSWER KEY" : "MOCK TEST"}
                                                 </div>
                                             </div>
                                         </div>
+                                    )}
 
-                                        <div className={optionsLayout === 'grid' ? "grid grid-cols-2 gap-x-12 gap-y-10" : `flex flex-col gap-8 ${isPrintAsList ? 'w-full' : 'max-w-4xl mx-auto'}`}>
-                                            {opts.map((opt: any, oIdx: number) => {
-                                                const optLetter = q.language === 'Bangla' || !q.language ? bnOptionsMap[opt.key] : opt.key.toUpperCase();
-                                                const colorThemes = [
-                                                    { border: 'border-[#4285F4]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#4285F4]/75', letterText: 'text-white' },
-                                                    { border: 'border-[#34A853]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#34A853]/75', letterText: 'text-white' },
-                                                    { border: 'border-[#F9AB00]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#F9AB00]/75', letterText: 'text-white' },
-                                                    { border: 'border-[#EA4335]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#EA4335]/75', letterText: 'text-white' },
-                                                    { border: 'border-[#9C27B0]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#9C27B0]/75', letterText: 'text-white' },
-                                                ];
-                                                const theme = colorThemes[oIdx % colorThemes.length];
-
-                                                const isCorrect = q.correctAnswer && q.correctAnswer.toLowerCase().includes(opt.key);
-                                                const printContainerClass = isPrintWithAnswers && isCorrect
-                                                    ? `flex items-center gap-5 py-2 px-3 rounded-xl border-2 border-[#34A853] bg-[#f0fdf4] min-h-[50px] !print-color-adjust-exact`
-                                                    : `flex items-center gap-5 py-2 px-3 rounded-xl border-2 shadow-[0_4px_12px_rgba(0,0,0,0.04)] ${theme.bg} ${theme.border} min-h-[50px]`;
-                                                const printLetterClass = isPrintWithAnswers && isCorrect
-                                                    ? `shrink-0 w-14 h-14 flex items-center justify-center rounded-full text-2xl font-black bg-[#34A853] text-white !print-color-adjust-exact`
-                                                    : `shrink-0 w-14 h-14 flex items-center justify-center rounded-full text-2xl font-black ${theme.letterBg} ${theme.letterText}`;
-
-                                                return (
-                                                    <div key={opt.key} className={printContainerClass}>
-                                                        <div className={printLetterClass}>
-                                                            {optLetter}
-                                                        </div>
-                                                        <div className="prose dark:prose-invert max-w-none text-black dark:text-gray-100 font-bold text-[24px] flex items-center [&_*]:!text-[24px] [&_*]:!leading-tight [&_*]:!m-0">
-                                                            <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
-                                                                {opt.text}
-                                                            </ReactMarkdown>
-                                                        </div>
-                                                        {isPrintWithAnswers && isCorrect && (
-                                                            <div className="shrink-0 text-white bg-[#34A853] rounded-full p-1.5 shadow-sm ml-auto !print-color-adjust-exact">
-                                                                <Check className="w-7 h-7 stroke-[3]" />
-                                                            </div>
-                                                        )}
+                                    {/* Question & Options */}
+                                    <div className={`flex-1 w-full relative flex flex-col px-12 py-10 z-10 ${isPrintAsList ? 'items-start justify-start' : 'items-center justify-center'}`}>
+                                        <div
+                                            className={`w-full ${isPrintAsList ? 'max-w-full' : 'max-w-[90%] xl:max-w-6xl'} rounded-3xl p-12 shadow-[0_20px_50px_rgba(0,0,0,0.1)] backdrop-blur-sm border transition-all duration-500 relative z-20 ${qBgColor} border-white/20 dark:border-gray-700/50`}
+                                            style={{
+                                                boxShadow: isDarkMode ? '0 20px 40px -10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1)' : '0 20px 40px -10px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.5)',
+                                                backgroundImage: `linear-gradient(to right, ${isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'} 1px, transparent 1px)`,
+                                                backgroundSize: '24px 24px'
+                                            }}
+                                        >
+                                            <div className="flex items-start gap-4 mb-12 border-b border-gray-200/50 dark:border-gray-700/50 pb-10">
+                                                <div className="flex items-center gap-4 shrink-0">
+                                                    <span className={`font-black text-[32px] bg-clip-text text-transparent bg-gradient-to-br drop-shadow-sm ${isAnswerKey ? 'from-green-600 to-emerald-600' : 'from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400'}`}>
+                                                        Q{idx + 1}.
+                                                    </span>
+                                                </div>
+                                                <div className="flex-1 w-full relative pt-1">
+                                                    <div className={`prose max-w-none prose-p:font-black font-black text-[32px] leading-snug ${qTextColor !== 'default' ? 'text-[var(--q-color)]' : 'text-gray-900 dark:text-gray-100'} [&_*]:!text-[32px] [&_*]:!leading-snug [&>p]:m-0`} style={{ '--q-color': qTextColor !== 'default' ? qTextColor : undefined } as React.CSSProperties}>
+                                                        <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
+                                                            {q.questionText}
+                                                        </ReactMarkdown>
                                                     </div>
-                                                );
-                                            })}
+                                                </div>
+                                            </div>
+
+                                            <div className={optionsLayout === 'grid' ? "grid grid-cols-2 gap-x-12 gap-y-10" : `flex flex-col gap-8 ${isPrintAsList ? 'w-full' : 'max-w-4xl mx-auto'}`}>
+                                                {opts.map((opt: any, oIdx: number) => {
+                                                    const optLetter = q.language === 'Bangla' || !q.language ? bnOptionsMap[opt.key] : opt.key.toUpperCase();
+                                                    const colorThemes = [
+                                                        { border: 'border-[#4285F4]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#4285F4]/75', letterText: 'text-white' },
+                                                        { border: 'border-[#34A853]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#34A853]/75', letterText: 'text-white' },
+                                                        { border: 'border-[#F9AB00]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#F9AB00]/75', letterText: 'text-white' },
+                                                        { border: 'border-[#EA4335]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#EA4335]/75', letterText: 'text-white' },
+                                                        { border: 'border-[#9C27B0]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#9C27B0]/75', letterText: 'text-white' },
+                                                    ];
+                                                    const theme = colorThemes[oIdx % colorThemes.length];
+
+                                                    const isCorrect = q.correctAnswer && q.correctAnswer.toLowerCase().includes(opt.key);
+                                                    const printContainerClass = showHighlight && isCorrect
+                                                        ? `flex items-center gap-5 py-2 px-3 rounded-xl border-2 border-[#34A853] bg-[#f0fdf4] min-h-[50px] !print-color-adjust-exact`
+                                                        : `flex items-center gap-5 py-2 px-3 rounded-xl border-2 shadow-[0_4px_12px_rgba(0,0,0,0.04)] ${theme.bg} ${theme.border} min-h-[50px]`;
+                                                    const printLetterClass = showHighlight && isCorrect
+                                                        ? `shrink-0 w-14 h-14 flex items-center justify-center rounded-full text-2xl font-black bg-[#34A853] text-white !print-color-adjust-exact`
+                                                        : `shrink-0 w-14 h-14 flex items-center justify-center rounded-full text-2xl font-black ${theme.letterBg} ${theme.letterText}`;
+
+                                                    return (
+                                                        <div key={opt.key} className={printContainerClass}>
+                                                            <div className={printLetterClass}>
+                                                                {optLetter}
+                                                            </div>
+                                                            <div className="prose dark:prose-invert max-w-none text-black dark:text-gray-100 font-bold text-[24px] flex items-center [&_*]:!text-[24px] [&_*]:!leading-tight [&_*]:!m-0">
+                                                                <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
+                                                                    {opt.text}
+                                                                </ReactMarkdown>
+                                                            </div>
+                                                            {showHighlight && isCorrect && (
+                                                                <div className="shrink-0 text-white bg-[#34A853] rounded-full p-1.5 shadow-sm ml-auto !print-color-adjust-exact">
+                                                                    <Check className="w-7 h-7 stroke-[3]" />
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        );
+                    };
+
+                    return (
+                        <React.Fragment key={idx}>
+                            {renderQuestion(false)}
+                            {isPrintBothVersions && renderQuestion(true)}
+                        </React.Fragment>
                     );
                 })}
             </div>
