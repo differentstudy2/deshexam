@@ -130,6 +130,30 @@ const TRANSITION_VARIANTS: Record<TransitionType, { initial: any; exit: any }> =
 const remarkPluginsList = [remarkGfm, remarkMath];
 const rehypePluginsList = [rehypeKatex, rehypeRaw];
 
+const getWatermarkSvg = (spacing: number, size: number, opacity: number, text: string, dark: boolean) => {
+    const cleanText = text.trim();
+    let textElements = '';
+    const saffron = dark ? '#FFA057' : '#FF671F';
+    const green = dark ? '#22C55E' : '#046A38';
+    const effectiveOpacity = opacity > 0 ? Math.max(opacity, dark ? 0.16 : 0.14) : 0;
+
+    if (cleanText.toUpperCase() === 'DESHEXAM') {
+        textElements = `<tspan fill="${saffron}" fill-opacity="${effectiveOpacity}">DESH</tspan><tspan dx="4" fill="${green}" fill-opacity="${effectiveOpacity}">EXAM</tspan>`;
+    } else if (cleanText.toUpperCase() === 'DESH EXAM') {
+        textElements = `<tspan fill="${saffron}" fill-opacity="${effectiveOpacity}">DESH</tspan><tspan dx="4" fill="${green}" fill-opacity="${effectiveOpacity}">EXAM</tspan>`;
+    } else {
+        const words = cleanText.split(/\s+/);
+        if (words.length >= 2) {
+            textElements = `<tspan fill="${saffron}" fill-opacity="${effectiveOpacity}">${words[0]} </tspan><tspan fill="${green}" fill-opacity="${effectiveOpacity}">${words.slice(1).join(' ')}</tspan>`;
+        } else {
+            textElements = `<tspan fill="${saffron}" fill-opacity="${effectiveOpacity}">${cleanText}</tspan>`;
+        }
+    }
+
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${spacing}" height="${spacing}"><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="${size}" font-family="sans-serif" font-weight="900" transform="rotate(-35 ${spacing / 2} ${spacing / 2})">${textElements}</text></svg>`;
+    return `url("data:image/svg+xml;utf8,${encodeURIComponent(svg)}")`;
+};
+
 
 
 interface PresentationOverlayProps {
@@ -157,9 +181,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [isTimerEnabled, setIsTimerEnabled] = useState(true);
     const [timerSeconds, setTimerSeconds] = useState(0);
     const [wmText, setWmText] = useState('DESHEXAM');
-    const [wmOpacity, setWmOpacity] = useState(0.05);
+    const [wmOpacity, setWmOpacity] = useState(0.18);
     const [wmSize, setWmSize] = useState(15);
-    const [wmSpacing, setWmSpacing] = useState(100);
+    const [wmSpacing, setWmSpacing] = useState(120);
     const [wmVisible, setWmVisible] = useState(true);
 
     // ── Feature 7: Multi-language UI ──────────────────────────────────────────
@@ -241,7 +265,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [selectedVideo, setSelectedVideo] = useState(VIDEO_OPTIONS[0].url);
     const [videoOpacity, setVideoOpacity] = useState(40);
     const [bgOpacity, setBgOpacity] = useState(100);
-    const [qBgColor, setQBgColor] = useState('bg-white/90 dark:bg-gray-800/90');
+    const [qBgColor, setQBgColor] = useState('bg-white dark:bg-gray-800');
     const [qTextColor, setQTextColor] = useState('default');
     const [animSpeed, setAnimSpeed] = useState(0.8);
     const [isPrintWithAnswers, setIsPrintWithAnswers] = useState(true);
@@ -1395,9 +1419,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     {/* Background Watermarks */}
                     {wmVisible && wmText && (
                         <div
-                            className="absolute inset-0 pointer-events-none z-[60] overflow-hidden"
+                            className="absolute inset-0 pointer-events-none z-0 overflow-hidden"
                             style={{
-                                backgroundImage: `url("data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${wmSpacing}" height="${wmSpacing}"><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="${wmSize}" font-family="sans-serif" font-weight="900" fill="${isDarkMode ? '%23ffffff' : '%23000000'}" fill-opacity="${isDarkMode ? Math.max(wmOpacity, 0.15) : wmOpacity}" transform="rotate(-35 ${wmSpacing / 2} ${wmSpacing / 2})">${wmText}</text></svg>`)}")`,
+                                backgroundImage: getWatermarkSvg(wmSpacing, wmSize, wmOpacity, wmText, isDarkMode),
                                 backgroundRepeat: 'repeat'
                             }}
                         />
@@ -1447,9 +1471,25 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 {showLogo && (
                                     <div className="flex items-center gap-2 md:gap-3">
                                         <img src="/icons/icon-192x192.png" alt="DeshExam" style={{ height: `${2.25 * headerScale}rem` }} className="w-auto object-contain drop-shadow-sm rounded-full bg-white p-1" />
-                                        <div className="flex flex-col justify-center">
-                                            <span className="font-extrabold text-indigo-950 dark:text-gray-100 leading-tight" style={{ fontSize: `${1.1 * headerScale}rem` }}>DESH EXAM</span>
-                                            <span className="text-indigo-800/80 dark:text-gray-400 font-bold tracking-widest uppercase mt-0.5" style={{ fontSize: `${0.55 * headerScale}rem` }}>Learn • Practice • Succeed</span>
+                                        <div className="flex flex-col justify-center select-none">
+                                            <div className="flex items-center gap-1.5 font-black leading-tight tracking-tight drop-shadow-sm" style={{ fontSize: `${1.15 * headerScale}rem` }}>
+                                                {/* Saffron / Kesari */}
+                                                <span className="bg-gradient-to-r from-[#FF671F] to-[#FF8C38] dark:from-[#FFA057] dark:to-[#FFB877] bg-clip-text text-transparent font-black tracking-tight">
+                                                    DESH
+                                                </span>
+                                                {/* India Green */}
+                                                <span className="bg-gradient-to-r from-[#046A38] to-[#138808] dark:from-[#22C55E] dark:to-[#4ADE80] bg-clip-text text-transparent font-black tracking-tight">
+                                                    EXAM
+                                                </span>
+                                            </div>
+                                            {/* Tagline in Tiranga Colors */}
+                                            <div className="flex items-center gap-1 font-extrabold tracking-widest uppercase mt-0.5" style={{ fontSize: `${0.55 * headerScale}rem` }}>
+                                                <span className="text-[#FF671F] dark:text-[#FFA057]">Learn</span>
+                                                <span className="text-[#000080] dark:text-[#60A5FA] font-bold">•</span>
+                                                <span className="text-slate-700 dark:text-slate-200">Practice</span>
+                                                <span className="text-[#000080] dark:text-[#60A5FA] font-bold">•</span>
+                                                <span className="text-[#046A38] dark:text-[#4ADE80]">Succeed</span>
+                                            </div>
                                         </div>
                                     </div>
                                 )}
@@ -1735,7 +1775,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                                     {/* Question */}
                                     <div
-                                        className={`flex items-start gap-3 md:gap-4 w-full max-w-5xl mt-8 md:mt-2 transition-all duration-300 ${qBgColor !== 'transparent' ? `${qBgColor} p-4 md:p-6 rounded-2xl border border-gray-200/50 dark:border-gray-700/50 backdrop-blur-md shadow-lg` : ''}`}
+                                        className={`flex items-start gap-3 md:gap-4 w-full max-w-5xl mt-8 md:mt-2 transition-all duration-300 relative z-10 ${qBgColor !== 'transparent' ? `${qBgColor} p-4 md:p-6 rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-lg` : ''}`}
                                         style={{
                                             '--q-color': qTextColor !== 'default' ? qTextColor : undefined,
                                             ...(qBgColor !== 'transparent' && bgTheme === 'dots' ? {
@@ -1778,37 +1818,37 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                                             // Colors closely matching the image
                                             const colorThemes = [
-                                                { border: 'border-[#4285F4]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#4285F4]/75', letterText: 'text-white' }, // Blue
-                                                { border: 'border-[#34A853]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#34A853]/75', letterText: 'text-white' }, // Green
-                                                { border: 'border-[#F9AB00]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#F9AB00]/75', letterText: 'text-white' }, // Yellow/Orange
-                                                { border: 'border-[#EA4335]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#EA4335]/75', letterText: 'text-white' }, // Red
-                                                { border: 'border-[#9C27B0]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#9C27B0]/75', letterText: 'text-white' }, // Purple
+                                                { border: 'border-[#4285F4]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#4285F4]/75', letterText: 'text-white' }, // Blue
+                                                { border: 'border-[#34A853]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#34A853]/75', letterText: 'text-white' }, // Green
+                                                { border: 'border-[#F9AB00]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#F9AB00]/75', letterText: 'text-white' }, // Yellow/Orange
+                                                { border: 'border-[#EA4335]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#EA4335]/75', letterText: 'text-white' }, // Red
+                                                { border: 'border-[#9C27B0]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#9C27B0]/75', letterText: 'text-white' }, // Purple
                                             ];
 
                                             const theme = colorThemes[oIdx % colorThemes.length];
 
-                                            let containerClasses = `flex items-center gap-3 md:gap-4 py-1.5 px-3 rounded-lg border-2 transition-all duration-300 shadow-[0_4px_12px_rgba(0,0,0,0.04)] ${theme.bg} ${theme.border}`;
+                                            let containerClasses = `flex items-center gap-3 md:gap-4 py-1.5 px-3 rounded-lg border-2 transition-all duration-300 shadow-[0_4px_12px_rgba(0,0,0,0.04)] relative z-10 ${theme.bg} ${theme.border}`;
                                             let letterClasses = `shrink-0 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full text-lg md:text-xl font-black transition-colors duration-300 ${theme.letterBg} ${theme.letterText}`;
 
                                             if (step === 0) {
                                                 if (eliminatedOptions.includes(opt.key)) {
-                                                    containerClasses = `flex items-center gap-3 md:gap-4 py-1.5 px-3 rounded-lg border-2 transition-all duration-300 opacity-40 grayscale border-gray-300 bg-gray-50 dark:bg-gray-800/50`;
+                                                    containerClasses = `flex items-center gap-3 md:gap-4 py-1.5 px-3 rounded-lg border-2 transition-all duration-300 opacity-40 grayscale border-gray-300 bg-gray-50 dark:bg-gray-800 relative z-10`;
                                                     letterClasses = `shrink-0 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full text-lg md:text-xl font-black transition-colors duration-300 bg-gray-300 text-gray-500`;
                                                 } else if (isSelected) {
-                                                    containerClasses = `flex items-center gap-3 md:gap-4 py-1.5 px-3 rounded-lg border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(66,133,244,0.15)] bg-[#e8f0fe] dark:bg-[#4285F4]/20 border-[#4285F4] transform scale-[1.02] cursor-pointer ring-2 ring-[#4285F4]/30`;
+                                                    containerClasses = `flex items-center gap-3 md:gap-4 py-1.5 px-3 rounded-lg border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(66,133,244,0.15)] bg-[#e8f0fe] dark:bg-[#1e293b] border-[#4285F4] transform scale-[1.02] cursor-pointer ring-2 ring-[#4285F4]/30 relative z-10`;
                                                     letterClasses = `shrink-0 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full text-lg md:text-xl font-black transition-colors duration-300 bg-[#4285F4] text-white`;
                                                 } else {
                                                     containerClasses += ` hover:scale-[1.01] hover:shadow-md cursor-pointer hover:border-gray-300`;
                                                 }
                                             } else {
                                                 if (showCorrect) {
-                                                    containerClasses = `flex items-center gap-3 md:gap-4 py-1.5 px-3 rounded-lg border-2 ring-4 ring-[#34A853]/30 bg-[#f0fdf4] dark:bg-[#34A853]/20 border-[#34A853] z-10 relative animate-pop-in`;
+                                                    containerClasses = `flex items-center gap-3 md:gap-4 py-1.5 px-3 rounded-lg border-2 ring-4 ring-[#34A853]/30 bg-[#f0fdf4] dark:bg-[#064e3b] border-[#34A853] z-10 relative animate-pop-in`;
                                                     letterClasses = `shrink-0 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full text-lg md:text-xl font-black transition-colors duration-300 bg-[#34A853] text-white`;
                                                 } else if (showWrong && isSelected) {
-                                                    containerClasses = `flex items-center gap-3 md:gap-4 py-1.5 px-3 rounded-lg border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(234,67,53,0.15)] bg-[#fce8e6] dark:bg-[#EA4335]/20 border-[#EA4335] transform scale-[1.02]`;
+                                                    containerClasses = `flex items-center gap-3 md:gap-4 py-1.5 px-3 rounded-lg border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(234,67,53,0.15)] bg-[#fce8e6] dark:bg-[#7f1d1d] border-[#EA4335] transform scale-[1.02] relative z-10`;
                                                     letterClasses = `shrink-0 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full text-lg md:text-xl font-black transition-colors duration-300 bg-[#EA4335] text-white`;
                                                 } else if (showWrong) {
-                                                    containerClasses = `flex items-center gap-3 md:gap-4 py-1.5 px-3 rounded-lg border-2 transition-all duration-300 shadow-sm bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 opacity-60`;
+                                                    containerClasses = `flex items-center gap-3 md:gap-4 py-1.5 px-3 rounded-lg border-2 transition-all duration-300 shadow-sm bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 opacity-60 relative z-10`;
                                                     // letterClasses keeps its default theme color
                                                 }
                                             }
@@ -3066,9 +3106,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                                     {wmVisible && wmText && (
                                         <div
-                                            className="absolute inset-0 pointer-events-none z-[60] overflow-hidden"
+                                            className="absolute inset-0 pointer-events-none z-0 overflow-hidden"
                                             style={{
-                                                backgroundImage: `url("data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${wmSpacing}" height="${wmSpacing}"><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="${wmSize}" font-family="sans-serif" font-weight="900" fill="${isDarkMode ? '%23ffffff' : '%23000000'}" fill-opacity="${isDarkMode ? Math.max(wmOpacity, 0.15) : wmOpacity}" transform="rotate(-35 ${wmSpacing / 2} ${wmSpacing / 2})">${wmText}</text></svg>`)}")`,
+                                                backgroundImage: getWatermarkSvg(wmSpacing, wmSize, wmOpacity, wmText, isDarkMode),
                                                 backgroundRepeat: 'repeat'
                                             }}
                                         />
@@ -3136,11 +3176,11 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                 {opts.map((opt: any, oIdx: number) => {
                                                     const optLetter = uiLang === 'bn' ? bnOptionsMap[opt.key] : opt.key.toUpperCase();
                                                     const colorThemes = [
-                                                        { border: 'border-[#4285F4]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#4285F4]/75', letterText: 'text-white' },
-                                                        { border: 'border-[#34A853]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#34A853]/75', letterText: 'text-white' },
-                                                        { border: 'border-[#F9AB00]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#F9AB00]/75', letterText: 'text-white' },
-                                                        { border: 'border-[#EA4335]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#EA4335]/75', letterText: 'text-white' },
-                                                        { border: 'border-[#9C27B0]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#9C27B0]/75', letterText: 'text-white' },
+                                                        { border: 'border-[#4285F4]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#4285F4]/75', letterText: 'text-white' },
+                                                        { border: 'border-[#34A853]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#34A853]/75', letterText: 'text-white' },
+                                                        { border: 'border-[#F9AB00]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#F9AB00]/75', letterText: 'text-white' },
+                                                        { border: 'border-[#EA4335]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#EA4335]/75', letterText: 'text-white' },
+                                                        { border: 'border-[#9C27B0]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#9C27B0]/75', letterText: 'text-white' },
                                                     ];
                                                     const theme = colorThemes[oIdx % colorThemes.length];
 
