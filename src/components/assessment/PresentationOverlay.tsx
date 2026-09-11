@@ -1747,11 +1747,12 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     {/* Header */}
                     {showHeader && (
                         <div
-                            className="shrink-0 bg-gradient-to-r from-indigo-50 via-white to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 border-b border-indigo-100/50 dark:border-gray-700/50 flex flex-col md:flex-row justify-between items-center w-full z-30 shadow-sm relative transition-all duration-500 px-3 md:px-6"
+                            className="shrink-0 bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 dark:from-indigo-900 dark:via-violet-900 dark:to-purple-900 border-b border-indigo-400/30 dark:border-indigo-700/50 flex flex-col md:flex-row justify-between items-center w-full z-30 relative transition-all duration-500 px-3 md:px-6"
                             style={{
                                 paddingTop: `${0.75 * headerScale}rem`,
                                 paddingBottom: `${0.75 * headerScale}rem`,
-                                gap: `${0.5 * headerScale}rem`
+                                gap: `${0.5 * headerScale}rem`,
+                                boxShadow: '0 4px 20px rgba(109,40,217,0.3), 0 1px 0 rgba(255,255,255,0.12)'
                             }}
                         >
                             {/* Logo Area */}
@@ -1762,21 +1763,21 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                         <div className="flex flex-col justify-center select-none">
                                             <div className="flex items-center gap-1.5 font-black leading-tight tracking-tight drop-shadow-sm" style={{ fontSize: `${1.15 * headerScale}rem` }}>
                                                 {/* Saffron / Kesari */}
-                                                <span className="bg-gradient-to-r from-[#FF671F] to-[#FF8C38] dark:from-[#FFA057] dark:to-[#FFB877] bg-clip-text text-transparent font-black tracking-tight">
+                                                <span className="text-[#FF9F57] font-black tracking-tight drop-shadow-sm">
                                                     DESH
                                                 </span>
-                                                {/* India Green */}
-                                                <span className="bg-gradient-to-r from-[#046A38] to-[#138808] dark:from-[#22C55E] dark:to-[#4ADE80] bg-clip-text text-transparent font-black tracking-tight">
+                                                {/* Light white-green for purple bg */}
+                                                <span className="text-white font-black tracking-tight drop-shadow-sm">
                                                     EXAM
                                                 </span>
                                             </div>
-                                            {/* Tagline in Tiranga Colors */}
+                                            {/* Tagline — white tones for purple bg */}
                                             <div className="flex items-center gap-1 font-extrabold tracking-widest uppercase mt-0.5" style={{ fontSize: `${0.55 * headerScale}rem` }}>
-                                                <span className="text-[#FF671F] dark:text-[#FFA057]">Learn</span>
-                                                <span className="text-[#000080] dark:text-[#60A5FA] font-bold">•</span>
-                                                <span className="text-slate-700 dark:text-slate-200">Practice</span>
-                                                <span className="text-[#000080] dark:text-[#60A5FA] font-bold">•</span>
-                                                <span className="text-[#046A38] dark:text-[#4ADE80]">Succeed</span>
+                                                <span className="text-orange-300">Learn</span>
+                                                <span className="text-white/60 font-bold">•</span>
+                                                <span className="text-white/80">Practice</span>
+                                                <span className="text-white/60 font-bold">•</span>
+                                                <span className="text-emerald-300">Succeed</span>
                                             </div>
                                         </div>
                                     </div>
@@ -1798,9 +1799,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 headerTitleAlign === 'right' ? 'items-end text-right' :
                                     'items-center text-center'
                                 }`}>
-                                <h1 className="font-extrabold text-indigo-950 dark:text-gray-100 tracking-tight line-clamp-1 md:line-clamp-none" style={{ fontSize: `${1.1 * headerScale * headerTitleScale}rem` }}>{displayTitle}</h1>
+                                <h1 className="font-extrabold text-white dark:text-gray-100 tracking-tight line-clamp-1 md:line-clamp-none drop-shadow-sm" style={{ fontSize: `${1.1 * headerScale * headerTitleScale}rem` }}>{displayTitle}</h1>
                                 {displayTaxonomy && (
-                                    <div className="text-indigo-700 dark:text-gray-400 font-bold tracking-wider uppercase mt-1" style={{ fontSize: `${0.75 * headerScale * headerTitleScale}rem` }}>
+                                    <div className="text-indigo-300 dark:text-indigo-400 font-bold tracking-wider uppercase mt-1" style={{ fontSize: `${0.75 * headerScale * headerTitleScale}rem` }}>
                                         {displayTaxonomy}
                                     </div>
                                 )}
@@ -1811,7 +1812,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 {/* Score Badge Button */}
                                 <button
                                     onClick={() => setIsScoreVisible(!isScoreVisible)}
-                                    className={`flex items-center gap-1.5 px-2.5 py-1.5 md:py-2 rounded-full transition-all shadow-sm shrink-0 font-bold text-xs border border-indigo-100 dark:border-gray-600 ${isScoreVisible ? 'bg-green-500 text-white ring-2 ring-green-300' : 'bg-white/90 hover:bg-white text-indigo-600 dark:bg-gray-800/90 dark:hover:bg-gray-700 dark:text-indigo-400'}`}
+                                    className={`flex items-center gap-1.5 px-2.5 py-1.5 md:py-2 rounded-full transition-all shadow-sm shrink-0 font-bold text-xs border border-indigo-600/50 ${isScoreVisible ? 'bg-green-500 text-white ring-2 ring-green-300' : 'bg-white/10 hover:bg-white/20 text-indigo-200 dark:bg-white/10 dark:hover:bg-white/20 dark:text-indigo-300'}`}
                                     title="Session Score"
                                 >
                                     <BarChart2 className="w-4 h-4" />
@@ -1821,7 +1822,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 <div className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-full font-extrabold tracking-widest shadow-md flex items-center justify-center whitespace-nowrap" style={{ fontSize: `${0.85 * headerScale}rem`, padding: `${0.5 * headerScale}rem ${1.25 * headerScale}rem` }}>
                                     MOCK TEST
                                 </div>
-                                <button onClick={closePresentation} className="bg-white/90 dark:bg-gray-800 hover:bg-white dark:hover:bg-gray-700 rounded-full text-indigo-600 dark:text-indigo-400 shadow-sm border border-indigo-100 dark:border-gray-600 transition-all hover:scale-105 flex items-center justify-center shrink-0" style={{ width: `${2.75 * headerScale}rem`, height: `${2.75 * headerScale}rem` }} title="Close Presentation">
+                                <button onClick={closePresentation} className="bg-white/10 hover:bg-white/20 dark:bg-white/10 dark:hover:bg-white/20 rounded-full text-white shadow-sm border border-white/20 transition-all hover:scale-105 flex items-center justify-center shrink-0" style={{ width: `${2.75 * headerScale}rem`, height: `${2.75 * headerScale}rem` }} title="Close Presentation">
                                     <X style={{ width: `${1.4 * headerScale}rem`, height: `${1.4 * headerScale}rem` }} strokeWidth={2.5} />
                                 </button>
                             </div>
@@ -2402,8 +2403,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     </div>
 
                     {/* Footer */}
-                    <div className="shrink-0 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-800 dark:via-gray-800 dark:to-gray-800 border-t border-indigo-100 dark:border-gray-700 py-2 px-2 md:pl-12 md:pr-8 flex justify-between items-center w-full z-30 shadow-[0_-2px_10px_rgba(0,0,0,0.02)] relative transition-colors duration-500 overflow-visible">
-                        <div className="hidden md:flex items-center text-indigo-900/70 dark:text-gray-400 font-semibold text-sm md:text-lg whitespace-nowrap mr-2 md:mr-4">
+                    <div className="shrink-0 bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 dark:from-indigo-900 dark:via-violet-900 dark:to-purple-900 border-t border-indigo-400/30 dark:border-indigo-700/50 py-2 px-2 md:pl-12 md:pr-8 flex justify-between items-center w-full z-30 relative transition-colors duration-500 overflow-visible" style={{ boxShadow: '0 -4px 20px rgba(109,40,217,0.3), 0 -1px 0 rgba(255,255,255,0.12)' }}>
+                        <div className="hidden md:flex items-center text-indigo-200/80 dark:text-indigo-300/70 font-semibold text-sm md:text-lg whitespace-nowrap mr-2 md:mr-4">
                             © DeshExam.app
                         </div>
 
@@ -2412,7 +2413,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 {/* Read Aloud Toggle Button (Footer) */}
                                 <button
                                     onClick={() => handleReadAloud()}
-                                    className={`p-2 md:p-3 rounded-full transition-all shadow-sm shrink-0 ${isSpeaking ? 'bg-indigo-600 text-white ring-2 ring-indigo-300' : 'bg-white/60 hover:bg-white text-indigo-600 dark:bg-gray-700/60 dark:hover:bg-gray-700 dark:text-gray-300'}`}
+                                    className={`p-2 md:p-3 rounded-full transition-all shrink-0 ${isSpeaking ? 'bg-green-500 text-white ring-2 ring-green-300' : 'bg-green-500/80 hover:bg-green-500 text-white'}`}
                                     title={isSpeaking ? "Stop Reading (R)" : "Read Aloud (R)"}
                                 >
                                     {isSpeaking ? <Pause className="w-5 h-5 md:w-6 md:h-6 fill-current" /> : <Play className="w-5 h-5 md:w-6 md:h-6 fill-current" />}
@@ -2421,7 +2422,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 {/* Dark Mode Toggle Button */}
                                 <button
                                     onClick={() => setIsDarkMode(!isDarkMode)}
-                                    className="p-2 md:p-3 rounded-full transition-all shadow-sm bg-white/60 hover:bg-white text-indigo-600 dark:bg-gray-700/60 dark:hover:bg-gray-700 dark:text-gray-300 shrink-0"
+                                    className="p-2 md:p-3 rounded-full transition-all bg-blue-500/80 hover:bg-blue-500 text-white shrink-0"
                                     title="Toggle Dark Mode (Shift+N)"
                                 >
                                     {isDarkMode ? <Sun className="w-5 h-5 md:w-6 md:h-6" /> : <Moon className="w-5 h-5 md:w-6 md:h-6" />}
@@ -2430,16 +2431,16 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 {/* Language Toggle Button */}
                                 <button
                                     onClick={() => setUiLang(l => l === 'bn' ? 'en' : 'bn')}
-                                    className="px-2.5 py-1.5 md:px-3 md:py-2 rounded-full transition-all shadow-sm bg-white/60 hover:bg-white text-indigo-600 dark:bg-gray-700/60 dark:hover:bg-gray-700 dark:text-gray-200 border border-indigo-100/60 dark:border-gray-600 shrink-0 font-bold text-xs flex items-center gap-1.5 hover:scale-105 active:scale-95"
+                                    className="px-2.5 py-1.5 md:px-3 md:py-2 rounded-full transition-all bg-indigo-500/80 hover:bg-indigo-500 text-white border border-white/20 shrink-0 font-bold text-xs flex items-center gap-1.5 hover:scale-105 active:scale-95"
                                     title="Toggle Language (বাং/EN)"
                                 >
-                                    <Globe className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
+                                    <Globe className="w-4 h-4 text-white/80" />
                                     <span>{uiLang === 'bn' ? 'বাং' : 'EN'}</span>
                                 </button>
                                 {/* Fullscreen Toggle Button */}
                                 <button
                                     onClick={toggleFullscreen}
-                                    className="p-2 md:p-3 rounded-full transition-all shadow-sm bg-white/60 hover:bg-white text-indigo-600 dark:bg-gray-700/60 dark:hover:bg-gray-700 dark:text-gray-300 shrink-0"
+                                    className="p-2 md:p-3 rounded-full transition-all bg-teal-500/80 hover:bg-teal-500 text-white shrink-0"
                                     title="Toggle Fullscreen (F11)"
                                 >
                                     {isFullscreen ? <Minimize className="w-5 h-5 md:w-6 md:h-6" /> : <Maximize className="w-5 h-5 md:w-6 md:h-6" />}
@@ -2448,7 +2449,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 {/* Print Button */}
                                 <button
                                     onClick={() => window.print()}
-                                    className="hidden md:block p-2 md:p-3 rounded-full transition-all shadow-sm bg-white/60 hover:bg-white text-indigo-600 dark:bg-gray-700/60 dark:hover:bg-gray-700 dark:text-gray-300 shrink-0"
+                                    className="hidden md:block p-2 md:p-3 rounded-full transition-all bg-slate-500/80 hover:bg-slate-500 text-white shrink-0"
                                     title="Print Slides (Ctrl+P)"
                                 >
                                     <Printer className="w-5 h-5 md:w-6 md:h-6" />
@@ -2458,7 +2459,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 {/* Spotlight Toggle Button */}
                                 <button
                                     onClick={() => setIsSpotlightActive(!isSpotlightActive)}
-                                    className={`hidden sm:block p-2 md:p-3 rounded-full transition-all shadow-sm shrink-0 ${isSpotlightActive ? 'bg-yellow-500 text-white ring-2 ring-yellow-300' : 'bg-white/60 hover:bg-white text-indigo-600 dark:bg-gray-700/60 dark:hover:bg-gray-700 dark:text-gray-300'}`}
+                                    className={`hidden sm:block p-2 md:p-3 rounded-full transition-all shrink-0 ${isSpotlightActive ? 'bg-amber-400 text-white ring-2 ring-amber-200' : 'bg-amber-500/80 hover:bg-amber-500 text-white'}`}
                                     title="Toggle Spotlight (Shift+F)"
                                 >
                                     <Focus className="w-5 h-5 md:w-6 md:h-6" />
@@ -2467,7 +2468,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 {/* Whiteboard Toggle Button */}
                                 <button
                                     onClick={() => setIsWhiteboardMode(!isWhiteboardMode)}
-                                    className={`hidden md:block p-2 md:p-3 rounded-full transition-all shadow-sm shrink-0 ${isWhiteboardMode ? 'bg-indigo-600 text-white ring-2 ring-indigo-300' : 'bg-white/60 hover:bg-white text-indigo-600 dark:bg-gray-700/60 dark:hover:bg-gray-700 dark:text-gray-300'}`}
+                                    className={`hidden md:block p-2 md:p-3 rounded-full transition-all shrink-0 ${isWhiteboardMode ? 'bg-violet-400 text-white ring-2 ring-violet-200' : 'bg-violet-500/80 hover:bg-violet-500 text-white'}`}
                                     title="Toggle Whiteboard Mode (Shift+W)"
                                 >
                                     <Presentation className="w-5 h-5 md:w-6 md:h-6" />
@@ -2476,7 +2477,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 {/* Pen Toggle Button */}
                                 <button
                                     onClick={() => setIsPenActive(!isPenActive)}
-                                    className={`p-2 md:p-3 rounded-full transition-all shadow-sm shrink-0 ${isPenActive ? 'bg-red-500 text-white ring-2 ring-red-300' : 'bg-white/60 hover:bg-white text-indigo-600 dark:bg-gray-700/60 dark:hover:bg-gray-700 dark:text-gray-300'}`}
+                                    className={`p-2 md:p-3 rounded-full transition-all shrink-0 ${isPenActive ? 'bg-rose-500 text-white ring-2 ring-rose-300' : 'bg-rose-500/80 hover:bg-rose-500 text-white'}`}
                                     title="Toggle Pen Tool (Shift+D)"
                                 >
                                     <Pen className="w-5 h-5 md:w-6 md:h-6" />
@@ -2486,7 +2487,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 <div className="relative shrink-0 hidden md:block">
                                     <button
                                         onClick={() => setIsShortcutsOpen(!isShortcutsOpen)}
-                                        className={`p-2 md:p-3 rounded-full transition-all shadow-sm ${isShortcutsOpen ? 'bg-indigo-600 text-white ring-2 ring-indigo-300' : 'bg-white/60 hover:bg-white text-indigo-600 dark:bg-gray-700/60 dark:hover:bg-gray-700 dark:text-gray-300'}`}
+                                        className={`p-2 md:p-3 rounded-full transition-all ${isShortcutsOpen ? 'bg-gray-400 text-white ring-2 ring-gray-200' : 'bg-gray-500/80 hover:bg-gray-500 text-white'}`}
                                         title="Keyboard Shortcuts (Shift+?)"
                                     >
                                         <Keyboard className="w-5 h-5 md:w-6 md:h-6" />
@@ -2526,7 +2527,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 <div className="relative shrink-0">
                                     <button
                                         onClick={() => setIsSettingsOpen(!isSettingsOpen)}
-                                        className={`p-2 md:p-3 rounded-full transition-all shadow-sm ${isSettingsOpen ? 'bg-indigo-600 text-white ring-2 ring-indigo-300' : 'bg-white/60 hover:bg-white text-indigo-600 dark:bg-gray-700/60 dark:hover:bg-gray-700 dark:text-gray-300'}`}
+                                        className={`p-2 md:p-3 rounded-full transition-all ${isSettingsOpen ? 'bg-orange-500 text-white ring-2 ring-orange-300' : 'bg-orange-500/80 hover:bg-orange-500 text-white'}`}
                                         title="Display Settings"
                                     >
                                         <Settings className={`w-5 h-5 md:w-6 md:h-6 transition-transform duration-300 ${isSettingsOpen ? 'rotate-90' : ''}`} />
