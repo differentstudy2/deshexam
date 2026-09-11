@@ -135,7 +135,7 @@ const getWatermarkSvg = (spacing: number, size: number, opacity: number, text: s
     let textElements = '';
     const saffron = dark ? '#FFA057' : '#FF671F';
     const green = dark ? '#22C55E' : '#046A38';
-    const effectiveOpacity = opacity > 0 ? Math.max(opacity, dark ? 0.32 : 0.28) : 0;
+    const effectiveOpacity = opacity > 0 ? Math.max(opacity, dark ? 0.27 : 0.23) : 0;
 
     if (cleanText.toUpperCase() === 'DESHEXAM') {
         textElements = `<tspan fill="${saffron}" fill-opacity="${effectiveOpacity}">DESH</tspan><tspan dx="4" fill="${green}" fill-opacity="${effectiveOpacity}">EXAM</tspan>`;
@@ -196,7 +196,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [isTimerEnabled, setIsTimerEnabled] = useState(true);
     const [timerSeconds, setTimerSeconds] = useState(0);
     const [wmText, setWmText] = useState('DESHEXAM');
-    const [wmOpacity, setWmOpacity] = useState(0.28);
+    const [wmOpacity, setWmOpacity] = useState(0.23);
     const [wmSize, setWmSize] = useState(13);
     const [wmSpacing, setWmSpacing] = useState(80);
     const [wmVisible, setWmVisible] = useState(true);
