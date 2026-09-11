@@ -9,6 +9,9 @@ import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
 import Confetti from 'react-dom-confetti';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '@/hooks/use-auth';
+import { saveExamAttempt, getTopScorersForAssessment } from '@/lib/firebase/student-analytics';
+import { getUserProfile } from '@/lib/firebase/firestore';
 
 const MUSIC_OPTIONS = [
     { id: 'lofi', name: 'Lo-Fi Chill', url: '/audio/lofi.mp3' },
@@ -55,7 +58,7 @@ const CONFETTI_CONFIG = {
 };
 
 import 'katex/dist/katex.min.css';
-import { X, ChevronLeft, ChevronRight, Play, Pause, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize, LayoutGrid, Sun, Moon, Eraser, Square, Circle, ArrowUpRight, Type, Presentation, ZoomIn, Volume2, VolumeX, MonitorPlay, Lightbulb, MessageCircle, Stamp, Droplet, Music, AlignLeft, Keyboard, Printer } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Play, Pause, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize, LayoutGrid, Sun, Moon, Eraser, Square, Circle, ArrowUpRight, Type, Presentation, ZoomIn, Volume2, VolumeX, MonitorPlay, Lightbulb, MessageCircle, Stamp, Droplet, Music, AlignLeft, Keyboard, Printer, Trophy, Globe, BarChart2 } from 'lucide-react';
 
 const bnOptionsMap: Record<string, string> = {
     a: 'ক',
@@ -63,6 +66,65 @@ const bnOptionsMap: Record<string, string> = {
     c: 'গ',
     d: 'ঘ',
     e: 'ঙ'
+};
+
+const bnNumbersMap: Record<number, string> = {
+    0: '০', 1: '১', 2: '২', 3: '৩', 4: '৪',
+    5: '৫', 6: '৬', 7: '৭', 8: '৮', 9: '৯'
+};
+
+const toBanglaNumber = (n: number): string =>
+    String(n).split('').map(d => bnNumbersMap[parseInt(d)] ?? d).join('');
+
+const UI_LABELS = {
+    bn: {
+        settings: 'সেটিংস',
+        close: 'বন্ধ',
+        leaderboard: 'লিডারবোর্ড',
+        score: 'স্কোর',
+        correct: 'সঠিক',
+        wrong: 'ভুল',
+        unanswered: 'উত্তরহীন',
+        sessionScore: 'সেশন স্কোর',
+        transition: 'ট্রানজিশন',
+        layout: 'লেআউট',
+        zoomReset: 'জুম রিসেট',
+        language: 'ভাষা',
+        finalScore: 'চূড়ান্ত ফলাফল',
+        topScorers: 'শীর্ষ স্কোরার',
+        page: 'পাতা',
+        countdown: 'কাউন্টডাউন',
+    },
+    en: {
+        settings: 'Settings',
+        close: 'Close',
+        leaderboard: 'Leaderboard',
+        score: 'Score',
+        correct: 'Correct',
+        wrong: 'Wrong',
+        unanswered: 'Unanswered',
+        sessionScore: 'Session Score',
+        transition: 'Transition',
+        layout: 'Layout',
+        zoomReset: 'Reset Zoom',
+        language: 'Language',
+        finalScore: 'Final Results',
+        topScorers: 'Top Scorers',
+        page: 'Page',
+        countdown: 'Countdown',
+    }
+} as const;
+
+type UiLang = 'bn' | 'en';
+type TransitionType = 'slide' | 'zoom' | 'flip' | 'fade' | 'bounce';
+type LayoutTemplate = 'default' | 'fullscreen_q' | 'split' | 'minimal' | 'card';
+
+const TRANSITION_VARIANTS: Record<TransitionType, { initial: any; exit: any }> = {
+    slide: { initial: { x: 60, opacity: 0 }, exit: { x: -60, opacity: 0 } },
+    zoom: { initial: { scale: 0.85, opacity: 0 }, exit: { scale: 1.1, opacity: 0 } },
+    flip: { initial: { rotateY: 90, opacity: 0 }, exit: { rotateY: -90, opacity: 0 } },
+    fade: { initial: { opacity: 0 }, exit: { opacity: 0 } },
+    bounce: { initial: { y: -50, opacity: 0 }, exit: { y: 50, opacity: 0 } },
 };
 
 const remarkPluginsList = [remarkGfm, remarkMath];
@@ -81,6 +143,7 @@ interface PresentationOverlayProps {
 }
 
 export default function PresentationOverlay({ questions, classLine, chapterName, topicName, autoStart, onClose, isPremiumUser }: PresentationOverlayProps) {
+    const { user } = useAuth();
     const [isOpen, setIsOpen] = useState(false);
     const [currentSlide, setCurrentSlide] = useState(0);
     const [step, setStep] = useState(0); // 0: Question, 1: Show Answer, 2: Show Explanation
@@ -98,6 +161,39 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [wmSize, setWmSize] = useState(15);
     const [wmSpacing, setWmSpacing] = useState(100);
     const [wmVisible, setWmVisible] = useState(true);
+
+    // ── Feature 7: Multi-language UI ──────────────────────────────────────────
+    const [uiLang, setUiLang] = useState<UiLang>('bn');
+    const L = UI_LABELS[uiLang];
+
+    // ── Feature 1: Slide Transition ──────────────────────────────────────────
+    const [transitionType, setTransitionType] = useState<TransitionType>('slide');
+
+    // ── Feature 5: Layout Template ───────────────────────────────────────────
+    const [layoutTemplate, setLayoutTemplate] = useState<LayoutTemplate>('default');
+
+    // ── Feature 2: Circular Countdown Timer ──────────────────────────────────
+    const [timerMode, setTimerMode] = useState<'stopwatch' | 'countdown'>('stopwatch');
+    const [countdownTotal, setCountdownTotal] = useState(30);
+
+
+
+    // ── Feature 4: Zoom/Pan ──────────────────────────────────────────────────
+    const [contentZoom, setContentZoom] = useState(1);
+    const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
+    const isPanningRef = useRef(false);
+    const panStartRef = useRef({ x: 0, y: 0, ox: 0, oy: 0 });
+    const lastTouchDistRef = useRef<number | null>(null);
+
+    // ── Feature 8: Session Score + Firebase Leaderboard ──────────────────────
+    const [sessionScore, setSessionScore] = useState({ correct: 0, wrong: 0, skipped: 0 });
+    const [isScoreVisible, setIsScoreVisible] = useState(false);
+    const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
+    const [leaderboardData, setLeaderboardData] = useState<any[]>([]);
+    const [leaderboardLoading, setLeaderboardLoading] = useState(false);
+    const [isFinalScoreOpen, setIsFinalScoreOpen] = useState(false);
+    const answeredSlidesRef = useRef<Set<number>>(new Set());
+    const [userDisplayName, setUserDisplayName] = useState<string>('You');
     const [optionsLayout, setOptionsLayout] = useState<'grid' | 'list'>('grid');
     const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -203,6 +299,101 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
             textInputRef.current.focus();
         }
     }, [textInput]);
+
+    // ── Feature 8: Load user display name ────────────────────────────────────
+    useEffect(() => {
+        if (!user) return;
+        getUserProfile(user.uid).then((p: any) => {
+            if (p?.displayName) setUserDisplayName(p.displayName);
+            else if (user.email) setUserDisplayName((user.email as string).split('@')[0]);
+        }).catch(() => { });
+    }, [user]);
+
+
+
+    // ── Feature 4: Zoom reset on slide change ─────────────────────────────────
+    useEffect(() => {
+        setContentZoom(1);
+        setPanOffset({ x: 0, y: 0 });
+    }, [currentSlide]);
+
+    // ── Feature 4: Wheel zoom handler ─────────────────────────────────────────
+    const handleContentWheel = useCallback((e: React.WheelEvent<HTMLDivElement>) => {
+        if (isPenActive) return;
+        if (e.ctrlKey || e.metaKey) {
+            e.preventDefault();
+            setContentZoom(z => Math.min(3, Math.max(0.5, z - e.deltaY * 0.001)));
+        } else if (contentZoom > 1) {
+            e.preventDefault();
+            setPanOffset(p => ({ x: p.x - e.deltaX, y: p.y - e.deltaY }));
+        }
+    }, [isPenActive, contentZoom]);
+
+    // ── Feature 4: Touch pinch-to-zoom ────────────────────────────────────────
+    const handleContentTouchMove = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+        if (e.touches.length === 2) {
+            const d = Math.hypot(
+                e.touches[0].clientX - e.touches[1].clientX,
+                e.touches[0].clientY - e.touches[1].clientY
+            );
+            if (lastTouchDistRef.current !== null) {
+                const delta = d - lastTouchDistRef.current;
+                setContentZoom(z => Math.min(3, Math.max(0.5, z + delta * 0.01)));
+            }
+            lastTouchDistRef.current = d;
+        }
+    }, []);
+
+    const handleContentTouchEnd = useCallback(() => {
+        lastTouchDistRef.current = null;
+    }, []);
+
+    // ── Feature 2: Computed timer display values ──────────────────────────────
+    const timerDisplay = useMemo(() => {
+        if (timerMode === 'countdown') {
+            const remaining = Math.max(0, countdownTotal - timerSeconds);
+            return { secs: remaining, total: countdownTotal, pct: remaining / countdownTotal };
+        }
+        return { secs: timerSeconds, total: null as null, pct: null as null };
+    }, [timerMode, timerSeconds, countdownTotal]);
+
+    // ── Feature 8: Update session score ──────────────────────────────────────
+    const updateSessionScore = useCallback((slideIdx: number, isCorrect: boolean) => {
+        if (answeredSlidesRef.current.has(slideIdx)) return;
+        answeredSlidesRef.current.add(slideIdx);
+        setSessionScore(prev => ({
+            ...prev,
+            correct: prev.correct + (isCorrect ? 1 : 0),
+            wrong: prev.wrong + (isCorrect ? 0 : 1),
+        }));
+    }, []);
+
+    // ── Feature 8: Fetch leaderboard ──────────────────────────────────────────
+    const fetchLeaderboard = useCallback(async (assessmentId: string) => {
+        setLeaderboardLoading(true);
+        try {
+            const data = await getTopScorersForAssessment(assessmentId, 10);
+            setLeaderboardData(data);
+        } catch (e) {
+            console.error('Leaderboard fetch failed', e);
+        } finally {
+            setLeaderboardLoading(false);
+        }
+    }, []);
+
+    // ── Feature 8: Save final score to Firebase ───────────────────────────────
+    const saveFinalScore = useCallback(async () => {
+        if (!user || (sessionScore.correct + sessionScore.wrong) === 0) return;
+        const assessmentId = `presentation_${classLine.substring(0, 40)}`;
+        const scoreData = {
+            correct: sessionScore.correct,
+            wrong: sessionScore.wrong,
+            skipped: questions.length - sessionScore.correct - sessionScore.wrong,
+            score: sessionScore.correct,
+            total: questions.length,
+        };
+        await saveExamAttempt(user.uid, assessmentId, scoreData).catch(console.error);
+    }, [user, sessionScore, classLine, questions.length]);
 
     const finalizeText = useCallback(() => {
         if (!textInput || !textInput.text.trim()) {
@@ -564,9 +755,14 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     };
 
     const handleTimerPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+        if (e.button !== 0) return;
         setIsDraggingTimer(true);
         dragStartPos.current = { x: e.clientX - timerPos.x, y: e.clientY - timerPos.y };
-        (e.target as HTMLElement).setPointerCapture(e.pointerId);
+        try {
+            e.currentTarget.setPointerCapture(e.pointerId);
+        } catch {
+            // fallback
+        }
     };
 
     const handleTimerPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -578,8 +774,14 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     };
 
     const handleTimerPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
-        setIsDraggingTimer(false);
-        (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+        if (isDraggingTimer) {
+            setIsDraggingTimer(false);
+            try {
+                e.currentTarget.releasePointerCapture(e.pointerId);
+            } catch {
+                // ignore
+            }
+        }
     };
 
     useEffect(() => {
@@ -1081,7 +1283,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 </div>
 
                 {/* Main Presentation Area */}
-                <div 
+                <div
                     className={`responsive-fonts flex-1 min-w-0 relative w-full h-full ${getBgThemeClasses()} flex flex-col shadow-2xl overflow-hidden shrink-0 z-10 xl:rounded-xl xl:border xl:border-gray-200 dark:border-gray-800 transition-colors duration-500 ${isPenActive && drawingTool === 'laser' ? 'cursor-none [&_*]:cursor-none' : ''}`}
                     onPointerMove={(e) => {
                         if (isPenActive && drawingTool === 'laser') {
@@ -1192,12 +1394,12 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                     {/* Background Watermarks */}
                     {wmVisible && wmText && (
-                        <div 
-                            className="absolute inset-0 pointer-events-none z-[60] overflow-hidden" 
-                            style={{ 
-                                backgroundImage: `url("data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${wmSpacing}" height="${wmSpacing}"><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="${wmSize}" font-family="sans-serif" font-weight="900" fill="${isDarkMode ? '%23ffffff' : '%23000000'}" fill-opacity="${isDarkMode ? Math.max(wmOpacity, 0.15) : wmOpacity}" transform="rotate(-35 ${wmSpacing/2} ${wmSpacing/2})">${wmText}</text></svg>`)}")`,
+                        <div
+                            className="absolute inset-0 pointer-events-none z-[60] overflow-hidden"
+                            style={{
+                                backgroundImage: `url("data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${wmSpacing}" height="${wmSpacing}"><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="${wmSize}" font-family="sans-serif" font-weight="900" fill="${isDarkMode ? '%23ffffff' : '%23000000'}" fill-opacity="${isDarkMode ? Math.max(wmOpacity, 0.15) : wmOpacity}" transform="rotate(-35 ${wmSpacing / 2} ${wmSpacing / 2})">${wmText}</text></svg>`)}")`,
                                 backgroundRepeat: 'repeat'
-                            }} 
+                            }}
                         />
                     )}
 
@@ -1278,6 +1480,26 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                             {/* Desktop Actions */}
                             <div className="hidden md:flex items-center gap-3 justify-end shrink-0">
+                                {/* Language Toggle Button */}
+                                <button
+                                    onClick={() => setUiLang(l => l === 'bn' ? 'en' : 'bn')}
+                                    className="flex items-center gap-1 px-2.5 py-1.5 md:px-3 md:py-2 rounded-full transition-all shadow-sm bg-white/90 hover:bg-white text-indigo-600 dark:bg-gray-800/90 dark:hover:bg-gray-700 dark:text-indigo-400 border border-indigo-100 dark:border-gray-600 shrink-0 font-bold text-xs"
+                                    title="Toggle Language (বাং/EN)"
+                                >
+                                    <Globe className="w-4 h-4" />
+                                    <span>{uiLang === 'bn' ? 'বাং' : 'EN'}</span>
+                                </button>
+
+                                {/* Score Badge Button */}
+                                <button
+                                    onClick={() => setIsScoreVisible(!isScoreVisible)}
+                                    className={`flex items-center gap-1.5 px-2.5 py-1.5 md:py-2 rounded-full transition-all shadow-sm shrink-0 font-bold text-xs border border-indigo-100 dark:border-gray-600 ${isScoreVisible ? 'bg-green-500 text-white ring-2 ring-green-300' : 'bg-white/90 hover:bg-white text-indigo-600 dark:bg-gray-800/90 dark:hover:bg-gray-700 dark:text-indigo-400'}`}
+                                    title="Session Score"
+                                >
+                                    <BarChart2 className="w-4 h-4" />
+                                    <span>{sessionScore.correct}/{sessionScore.correct + sessionScore.wrong}</span>
+                                </button>
+
                                 <div className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-full font-extrabold tracking-widest shadow-md flex items-center justify-center whitespace-nowrap" style={{ fontSize: `${0.85 * headerScale}rem`, padding: `${0.5 * headerScale}rem ${1.25 * headerScale}rem` }}>
                                     MOCK TEST
                                 </div>
@@ -1288,6 +1510,198 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                         </div>
                     )}
 
+                    {/* Floating Draggable Clock Timer ("ঘড়ির মতো" Analog + Digital Watch Face with Light/Dark Theme Support) */}
+                    {isTimerEnabled && (() => {
+                        const sec = timerDisplay.secs;
+                        const min = Math.floor(sec / 60);
+                        const s = sec % 60;
+                        const secondDeg = (s * 6); // 6 deg per second (0 to 354)
+                        const minuteDeg = ((min % 60) * 6) + (s * 0.1); // 6 deg per minute + second offset
+
+                        // Theme-tailored colors
+                        const colors = isDarkMode ? {
+                            bezelBg: 'bg-gradient-to-br from-slate-800 via-slate-900 to-black',
+                            bezelBorder: 'border-slate-700/80',
+                            bezelShadow: 'shadow-[0_16px_36px_rgba(0,0,0,0.7),inset_0_1px_2px_rgba(255,255,255,0.15)]',
+                            ringGlow: 'ring-4 ring-cyan-500/20',
+                            crownBg: 'bg-gradient-to-b from-slate-600 via-slate-700 to-slate-800 border-slate-600',
+                            dialGrad1: '#0f172a',
+                            dialGrad2: '#020617',
+                            outerRing: '#334155',
+                            majorTick: '#f8fafc',
+                            minorTick: '#64748b',
+                            minuteHand: '#f1f5f9',
+                            secondHand: '#ff3b30',
+                            centerCap: '#ff3b30',
+                            digitalBg: 'bg-black/90 border-cyan-500/40 text-cyan-400 shadow-[0_0_12px_rgba(6,182,212,0.25)]',
+                        } : {
+                            bezelBg: 'bg-gradient-to-br from-slate-100 via-white to-slate-200',
+                            bezelBorder: 'border-slate-300',
+                            bezelShadow: 'shadow-[0_12px_28px_rgba(0,0,0,0.12),inset_0_2px_4px_rgba(255,255,255,0.9)]',
+                            ringGlow: 'ring-4 ring-blue-500/15',
+                            crownBg: 'bg-gradient-to-b from-slate-200 via-slate-400 to-slate-300 border-slate-400',
+                            dialGrad1: '#ffffff',
+                            dialGrad2: '#e2e8f0',
+                            outerRing: '#cbd5e1',
+                            majorTick: '#0f172a',
+                            minorTick: '#94a3b8',
+                            minuteHand: '#1e293b',
+                            secondHand: '#dc2626',
+                            centerCap: '#dc2626',
+                            digitalBg: 'bg-slate-900 border-slate-700 text-cyan-300 shadow-md',
+                        };
+
+                        return (
+                            <div
+                                style={{ transform: `translate(${timerPos.x}px, ${timerPos.y}px)` }}
+                                className={`absolute ${showHeader ? 'top-[70px] md:top-[76px]' : 'top-4'} right-4 md:right-8 z-[70] select-none touch-none transition-all duration-300 ${
+                                    isDraggingTimer
+                                        ? 'cursor-grabbing scale-105 drop-shadow-[0_20px_40px_rgba(59,130,246,0.35)]'
+                                        : 'cursor-grab hover:drop-shadow-[0_12px_30px_rgba(59,130,246,0.25)] hover:scale-105'
+                                }`}
+                                onPointerDown={handleTimerPointerDown}
+                                onPointerMove={handleTimerPointerMove}
+                                onPointerUp={handleTimerPointerUp}
+                                onPointerCancel={handleTimerPointerUp}
+                                onDoubleClick={() => setTimerPos({ x: 0, y: 0 })}
+                                title="Clock Timer (Drag to move / Double-click to reset)"
+                            >
+                                {/* Watch Case & Crown */}
+                                <div className="relative flex flex-col items-center">
+                                    {/* Classic Stopwatch Top Crown / Button */}
+                                    <div className="flex items-center justify-center -mb-1 z-10 pointer-events-none">
+                                        <div className={`w-5 h-2 rounded-t-md border-t border-x shadow-sm ${colors.crownBg}`} />
+                                    </div>
+
+                                    {/* Circular Clock Face */}
+                                    <div className={`relative w-[88px] h-[88px] md:w-[96px] md:h-[96px] rounded-full p-1 border-[2.5px] backdrop-blur-xl ${colors.bezelBg} ${colors.bezelBorder} ${colors.bezelShadow} ${colors.ringGlow} transition-colors duration-500`}>
+                                        <svg className="w-full h-full pointer-events-none" viewBox="0 0 100 100">
+                                            <defs>
+                                                <radialGradient id="clockDialGrad" cx="50%" cy="50%" r="50%">
+                                                    <stop offset="60%" stopColor={colors.dialGrad1} />
+                                                    <stop offset="100%" stopColor={colors.dialGrad2} />
+                                                </radialGradient>
+                                            </defs>
+
+                                            {/* Dial Base with Radial Gradient */}
+                                            <circle cx="50" cy="50" r="46" fill="url(#clockDialGrad)" stroke={colors.outerRing} strokeWidth="1" />
+
+                                            {/* Countdown Mode Progress Arc (if countdown mode) */}
+                                            {timerMode === 'countdown' && timerDisplay.pct !== null && (
+                                                <circle
+                                                    cx="50"
+                                                    cy="50"
+                                                    r="43.5"
+                                                    fill="none"
+                                                    stroke={timerDisplay.pct > 0.5 ? '#22c55e' : timerDisplay.pct > 0.25 ? '#f59e0b' : '#ef4444'}
+                                                    strokeWidth="3.5"
+                                                    strokeDasharray={`${timerDisplay.pct * 273.3} 273.3`}
+                                                    strokeLinecap="round"
+                                                    transform="rotate(-90 50 50)"
+                                                    className="transition-all duration-1000"
+                                                />
+                                            )}
+
+                                            {/* 60 Minute/Second Dots */}
+                                            {[...Array(60)].map((_, i) => {
+                                                if (i % 5 === 0) return null; // handled by major ticks
+                                                const angle = i * 6;
+                                                return (
+                                                    <circle
+                                                        key={`dot-${i}`}
+                                                        cx="50"
+                                                        cy="8"
+                                                        r="0.75"
+                                                        fill={colors.minorTick}
+                                                        transform={`rotate(${angle} 50 50)`}
+                                                    />
+                                                );
+                                            })}
+
+                                            {/* 12 Hour / 5-Sec Dial Ticks */}
+                                            {[...Array(12)].map((_, i) => {
+                                                const angle = i * 30;
+                                                const isCardinal = i % 3 === 0;
+                                                return (
+                                                    <line
+                                                        key={`tick-${i}`}
+                                                        x1="50"
+                                                        y1={isCardinal ? "7" : "9"}
+                                                        x2="50"
+                                                        y2="14"
+                                                        stroke={isCardinal ? colors.majorTick : colors.minorTick}
+                                                        strokeWidth={isCardinal ? "2.5" : "1.5"}
+                                                        strokeLinecap="round"
+                                                        transform={`rotate(${angle} 50 50)`}
+                                                    />
+                                                );
+                                            })}
+
+                                            {/* Clock Numerals (12, 3, 9) */}
+                                            <text x="50" y="22" textAnchor="middle" fontSize="6.5" fontWeight="900" fontFamily="sans-serif" fill={colors.majorTick} opacity="0.85">12</text>
+                                            <text x="79" y="52.5" textAnchor="middle" fontSize="6.5" fontWeight="900" fontFamily="sans-serif" fill={colors.majorTick} opacity="0.85">3</text>
+                                            <text x="21" y="52.5" textAnchor="middle" fontSize="6.5" fontWeight="900" fontFamily="sans-serif" fill={colors.majorTick} opacity="0.85">9</text>
+
+                                            {/* Minute Hand */}
+                                            <line
+                                                x1="50"
+                                                y1="50"
+                                                x2="50"
+                                                y2="25"
+                                                stroke={colors.minuteHand}
+                                                strokeWidth="2.8"
+                                                strokeLinecap="round"
+                                                className="transition-transform duration-500 ease-out"
+                                                transform={`rotate(${minuteDeg} 50 50)`}
+                                            />
+
+                                            {/* Second Hand (Classic sweep/tick hand) */}
+                                            <g
+                                                className="transition-transform duration-300 ease-out"
+                                                transform={`rotate(${secondDeg} 50 50)`}
+                                            >
+                                                {/* Counterweight Tail */}
+                                                <line
+                                                    x1="50"
+                                                    y1="50"
+                                                    x2="50"
+                                                    y2="60"
+                                                    stroke={step >= 1 ? '#9ca3af' : colors.secondHand}
+                                                    strokeWidth="2.5"
+                                                    strokeLinecap="round"
+                                                />
+                                                {/* Long Second Hand Needle */}
+                                                <line
+                                                    x1="50"
+                                                    y1="50"
+                                                    x2="50"
+                                                    y2="13"
+                                                    stroke={step >= 1 ? '#9ca3af' : colors.secondHand}
+                                                    strokeWidth="1.6"
+                                                    strokeLinecap="round"
+                                                />
+                                                <circle cx="50" cy="13" r="1.8" fill={step >= 1 ? '#9ca3af' : colors.secondHand} />
+                                            </g>
+
+                                            {/* Center Pivot Jewel */}
+                                            <circle cx="50" cy="50" r="3.5" fill={step >= 1 ? '#6b7280' : colors.centerCap} stroke={isDarkMode ? '#0f172a' : '#ffffff'} strokeWidth="1.2" />
+                                        </svg>
+
+                                        {/* Digital Time Badge on the Clock Face */}
+                                        <div className={`absolute bottom-1.5 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full font-mono text-[10px] md:text-[11px] font-black tracking-wider flex items-center gap-1 border pointer-events-none ${colors.digitalBg}`}>
+                                            {step === 0 && (
+                                                <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse inline-block" />
+                                            )}
+                                            <span>
+                                                {String(min).padStart(2, '0')}:{String(s).padStart(2, '0')}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })()}
+
                     {/* Hidden Audio Elements */}
                     <audio ref={lofiAudioRef} src={selectedMusic} loop />
                     <audio ref={popAudioRef} src="/audio/correct-pop.mp3" preload="auto" />
@@ -1296,61 +1710,33 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     {/* Main Content Area */}
                     <div ref={scrollContainerRef} className="flex-1 w-full relative flex flex-col items-center px-4 md:px-24 py-6 md:py-12 z-10 overflow-y-auto custom-scrollbar gap-8">
 
-                        {/* Floating Controls (Timer & Read Aloud) */}
-                        <div
-                            className={`absolute top-24 right-4 md:top-28 md:right-10 flex items-stretch gap-2 md:gap-3 z-[60]`}
-                            style={{ transform: `translate(${timerPos.x}px, ${timerPos.y}px)` }}
-                        >
-                            {isTimerEnabled && (
-                                <div
-                                    className={`flex items-center gap-1.5 md:gap-3 px-3 py-1.5 md:px-5 md:py-2.5 rounded-xl md:rounded-2xl backdrop-blur-xl border select-none transition-all duration-300 font-mono text-lg md:text-[26px] font-black tracking-widest ${step >= 1
-                                        ? 'bg-gray-100/90 dark:bg-gray-800/90 border-gray-200/50 dark:border-gray-700/50 text-gray-400 dark:text-gray-500 shadow-sm'
-                                        : 'bg-white/95 dark:bg-gray-800/95 border-blue-200/60 dark:border-blue-900/60 text-[#1e3a8a] dark:text-blue-100 shadow-[0_8px_32px_rgba(59,130,246,0.15)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.3)] ring-1 ring-blue-100 dark:ring-blue-900/50'
-                                        } ${isDraggingTimer ? 'cursor-grabbing scale-105 shadow-[0_16px_48px_rgba(59,130,246,0.25)] ring-blue-300 dark:ring-blue-700' : 'cursor-grab hover:shadow-[0_12px_40px_rgba(59,130,246,0.2)] hover:scale-[1.02]'}`}
-                                    onPointerDown={handleTimerPointerDown}
-                                    onPointerMove={handleTimerPointerMove}
-                                    onPointerUp={handleTimerPointerUp}
-                                    onPointerCancel={handleTimerPointerUp}
-                                >
-                                    <div className="relative flex items-center justify-center shrink-0">
-                                        <Clock className={`w-5 h-5 md:w-7 md:h-7 transition-colors duration-300 ${step >= 1 ? 'text-gray-400 dark:text-gray-500' : 'text-blue-600 dark:text-blue-400'} pointer-events-none`} />
-                                        {step === 0 && (
-                                            <span className="absolute -top-1 -right-1 flex h-2 w-2 md:h-2.5 md:w-2.5 pointer-events-none">
-                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                                <span className="relative inline-flex rounded-full h-2 w-2 md:h-2.5 md:w-2.5 bg-red-500"></span>
-                                            </span>
-                                        )}
-                                    </div>
-                                    <span className="pointer-events-none drop-shadow-sm flex items-center w-[60px] md:w-[90px] justify-center">
-                                        {String(Math.floor(timerSeconds / 60)).padStart(2, '0')}
-                                        <span className={`${step === 0 && timerSeconds % 2 === 0 ? 'opacity-100' : step === 0 ? 'opacity-50' : 'opacity-100'} transition-opacity duration-300 mx-0.5`}>:</span>
-                                        {String(timerSeconds % 60).padStart(2, '0')}
-                                    </span>
-                                </div>
-                            )}
-
-
-                        </div>
-
                         {/* Zoomable Content Wrapper */}
                         <div
                             className="w-full flex flex-col items-center flex-1 transition-transform duration-100 ease-out"
-                            style={isMagnified ? { transform: 'scale(1.7)', transformOrigin: `${magnifierPos.x}% ${magnifierPos.y}%` } : {}}
+                            style={isMagnified
+                                ? { transform: 'scale(1.7)', transformOrigin: `${magnifierPos.x}% ${magnifierPos.y}%` }
+                                : contentZoom !== 1
+                                    ? { transform: `scale(${contentZoom}) translate(${panOffset.x}px, ${panOffset.y}px)`, transformOrigin: 'center center' }
+                                    : {}
+                            }
+                            onWheel={handleContentWheel}
+                            onTouchMove={handleContentTouchMove}
+                            onTouchEnd={handleContentTouchEnd}
                         >
                             <AnimatePresence mode="wait">
                                 <motion.div
                                     key={currentSlide}
-                                    initial={{ opacity: 0, x: 40 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: -40 }}
+                                    initial={{ ...TRANSITION_VARIANTS[transitionType].initial }}
+                                    animate={{ opacity: 1, x: 0, y: 0, scale: 1, rotateY: 0 }}
+                                    exit={{ ...TRANSITION_VARIANTS[transitionType].exit }}
                                     transition={{ duration: animSpeed, ease: 'easeOut' }}
                                     className="w-full flex flex-col items-center flex-1"
                                 >
 
                                     {/* Question */}
-                                    <div 
+                                    <div
                                         className={`flex items-start gap-3 md:gap-4 w-full max-w-5xl mt-8 md:mt-2 transition-all duration-300 ${qBgColor !== 'transparent' ? `${qBgColor} p-4 md:p-6 rounded-2xl border border-gray-200/50 dark:border-gray-700/50 backdrop-blur-md shadow-lg` : ''}`}
-                                        style={{ 
+                                        style={{
                                             '--q-color': qTextColor !== 'default' ? qTextColor : undefined,
                                             ...(qBgColor !== 'transparent' && bgTheme === 'dots' ? {
                                                 backgroundImage: `radial-gradient(${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'} 1.5px, transparent 1.5px)`,
@@ -1364,7 +1750,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                             })
                                         } as unknown as React.CSSProperties}
                                     >
-                                        <span className={`font-extrabold leading-normal shrink-0 ${bgTheme === 'video' ? 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]' : 'text-indigo-600 dark:text-blue-400 drop-shadow-sm'}`} style={{ fontSize: 'var(--q-size)' }}>Q{currentSlide + 1}.</span>
+                                        <span className={`font-extrabold leading-normal shrink-0 ${bgTheme === 'video' ? 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]' : 'text-indigo-600 dark:text-blue-400 drop-shadow-sm'}`} style={{ fontSize: 'var(--q-size)' }}>{uiLang === 'bn' ? toBanglaNumber(currentSlide + 1) : currentSlide + 1}.</span>
                                         <div className={`prose dark:prose-invert max-w-none prose-p:font-extrabold text-[length:var(--q-size)] leading-normal text-left font-extrabold capitalize [&_*]:!text-[length:var(--q-size)] [&_*]:!leading-normal [&_*]:!m-0 ${qTextColor !== 'default' ? 'text-[var(--q-color)] [&_*]:!text-[var(--q-color)] drop-shadow-sm [&_*]:!drop-shadow-sm' : (bgTheme === 'video' ? 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] [&_*]:!text-white [&_*]:!drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]' : 'text-slate-900 dark:text-white [&_*]:!text-slate-900 dark:[&_*]:!text-white')}`}>
                                             <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
                                                 {q.questionText}
@@ -1490,6 +1876,11 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                                     // Reset on wrong answer
                                                                     setConsecutiveCorrect(0);
                                                                 }
+                                                                // Feature 8: Track session score
+                                                                if (q.correctAnswer) {
+                                                                    const isCorrect = q.correctAnswer.toLowerCase().trim().includes(opt.key);
+                                                                    updateSessionScore(currentSlide, isCorrect);
+                                                                }
                                                             }
                                                         }}
                                                     >
@@ -1571,10 +1962,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     {/* Footer */}
                     <div className="shrink-0 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-800 dark:via-gray-800 dark:to-gray-800 border-t border-indigo-100 dark:border-gray-700 py-2 px-2 md:pl-12 md:pr-8 flex justify-between items-center w-full z-30 shadow-[0_-2px_10px_rgba(0,0,0,0.02)] relative transition-colors duration-500 overflow-visible">
                         <div className="hidden md:flex items-center text-indigo-900/70 dark:text-gray-400 font-semibold text-sm md:text-lg whitespace-nowrap mr-2 md:mr-4">
-                            © DeshExam
-                        </div>
-                        <div className="hidden lg:flex items-center text-indigo-900/70 dark:text-gray-400 font-semibold text-lg tracking-wide whitespace-nowrap">
-                            www.deshexam.com
+                            © DeshExam.app
                         </div>
 
                         <div className="flex items-center gap-2 md:gap-4 lg:gap-8 ml-auto w-full md:w-auto justify-center md:justify-end">
@@ -1614,6 +2002,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     <Printer className="w-5 h-5 md:w-6 md:h-6" />
                                 </button>
 
+
                                 {/* Spotlight Toggle Button */}
                                 <button
                                     onClick={() => setIsSpotlightActive(!isSpotlightActive)}
@@ -1651,7 +2040,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                         <Keyboard className="w-5 h-5 md:w-6 md:h-6" />
                                     </button>
 
-                                     {isShortcutsOpen && (
+                                    {isShortcutsOpen && (
                                         <div className="fixed bottom-[80px] left-1/2 -translate-x-1/2 md:absolute md:bottom-full md:left-auto md:right-0 md:translate-x-0 md:mb-4 bg-white dark:bg-gray-900 !bg-opacity-100 !opacity-100 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)] p-5 w-[90vw] sm:w-[400px] z-[70] animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[70vh] md:max-h-[60vh]">
                                             <div className="flex justify-between items-center mb-4 pb-3 border-b border-gray-100 dark:border-gray-800 shrink-0">
                                                 <h3 className="font-bold text-gray-800 dark:text-gray-200 text-lg flex items-center gap-2">
@@ -1826,6 +2215,50 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                             </>
                                                         )}
                                                     </div>
+                                                </div>
+
+                                                <hr className="border-gray-100 dark:border-gray-800" />
+
+                                                {/* Transition Type */}
+                                                <div>
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                                                        <span className="flex items-center gap-2"><Play className="w-4 h-4 text-indigo-500" /> {L.transition}</span>
+                                                    </div>
+                                                    <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl flex-wrap gap-1">
+                                                        {(['slide', 'zoom', 'flip', 'fade', 'bounce'] as const).map(t => (
+                                                            <button key={t} onClick={() => setTransitionType(t)} className={`flex-1 py-1 px-1 text-[10px] font-bold rounded-lg capitalize transition-colors ${transitionType === t ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>{t}</button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+
+                                                {/* Layout Template */}
+                                                <div>
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                                                        <span className="flex items-center gap-2"><LayoutGrid className="w-4 h-4 text-indigo-500" /> {L.layout}</span>
+                                                    </div>
+                                                    <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl flex-wrap gap-1">
+                                                        {([['default', 'Default'], ['split', 'Split'], ['minimal', 'Minimal'], ['card', 'Card'], ['fullscreen_q', 'FullQ']] as const).map(([val, label]) => (
+                                                            <button key={val} onClick={() => setLayoutTemplate(val as LayoutTemplate)} className={`flex-1 py-1 px-1 text-[10px] font-bold rounded-lg capitalize transition-colors ${layoutTemplate === val ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>{label}</button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+
+                                                {/* Countdown Timer Settings */}
+                                                <div>
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                                                        <span className="flex items-center gap-2"><Clock className="w-4 h-4 text-indigo-500" /> {L.countdown}</span>
+                                                    </div>
+                                                    <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl mb-2">
+                                                        <button onClick={() => setTimerMode('stopwatch')} className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors ${timerMode === 'stopwatch' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400'}`}>Stopwatch</button>
+                                                        <button onClick={() => setTimerMode('countdown')} className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors ${timerMode === 'countdown' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400'}`}>Countdown</button>
+                                                    </div>
+                                                    {timerMode === 'countdown' && (
+                                                        <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                            <span className="text-xs font-bold text-gray-500 dark:text-gray-400 min-w-[40px]">Secs</span>
+                                                            <input type="range" min="10" max="300" step="5" value={countdownTotal} onChange={e => setCountdownTotal(Number(e.target.value))} className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500" />
+                                                            <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-10 text-right">{countdownTotal}s</span>
+                                                        </div>
+                                                    )}
                                                 </div>
 
                                                 <hr className="border-gray-100 dark:border-gray-800" />
@@ -2248,7 +2681,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                         {!isPremiumUser && (
                                                             <div className="absolute inset-0 z-10 bg-gray-50/40 dark:bg-gray-900/60 backdrop-blur-[1.5px] rounded-xl flex items-center justify-center mt-6">
                                                                 <a href="/pricing" className="bg-gradient-to-r from-amber-500 to-orange-600 text-white text-[10px] font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 hover:scale-105 transition-transform cursor-pointer">
-                                                                    <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
                                                                     Premium Only
                                                                 </a>
                                                             </div>
@@ -2438,6 +2871,144 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     </div>
                 </div>
 
+
+
+                {/* ── Session Score Overlay ── */}
+                <AnimatePresence>
+                    {isScoreVisible && (
+                        <motion.div
+                            key="score-overlay"
+                            initial={{ x: 80, opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            exit={{ x: 80, opacity: 0 }}
+                            className="fixed top-20 right-4 z-[60] bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-2xl p-4 w-52"
+                        >
+                            <div className="flex items-center justify-between mb-3">
+                                <h3 className="font-bold text-sm text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                                    <BarChart2 className="w-4 h-4 text-green-500" />
+                                    {L.sessionScore}
+                                </h3>
+                                <button onClick={() => setIsScoreVisible(false)} className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-full"><X className="w-3.5 h-3.5" /></button>
+                            </div>
+                            <div className="space-y-2">
+                                <div className="flex justify-between items-center text-xs">
+                                    <span className="flex items-center gap-1.5 font-semibold text-green-600 dark:text-green-400"><span className="w-2 h-2 rounded-full bg-green-500 inline-block"></span>{L.correct}</span>
+                                    <span className="font-black text-green-600 dark:text-green-400">{uiLang === 'bn' ? toBanglaNumber(sessionScore.correct) : sessionScore.correct}</span>
+                                </div>
+                                <div className="flex justify-between items-center text-xs">
+                                    <span className="flex items-center gap-1.5 font-semibold text-red-600 dark:text-red-400"><span className="w-2 h-2 rounded-full bg-red-500 inline-block"></span>{L.wrong}</span>
+                                    <span className="font-black text-red-600 dark:text-red-400">{uiLang === 'bn' ? toBanglaNumber(sessionScore.wrong) : sessionScore.wrong}</span>
+                                </div>
+                                <div className="flex justify-between items-center text-xs">
+                                    <span className="flex items-center gap-1.5 font-semibold text-gray-400"><span className="w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600 inline-block"></span>{L.unanswered}</span>
+                                    <span className="font-black text-gray-500">{uiLang === 'bn' ? toBanglaNumber(questions.length - sessionScore.correct - sessionScore.wrong) : questions.length - sessionScore.correct - sessionScore.wrong}</span>
+                                </div>
+                            </div>
+                            {/* Progress bar */}
+                            <div className="mt-3 h-2 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden flex gap-0.5">
+                                <div className="bg-green-500 h-full rounded-full transition-all" style={{ width: `${(sessionScore.correct / questions.length) * 100}%` }} />
+                                <div className="bg-red-500 h-full rounded-full transition-all" style={{ width: `${(sessionScore.wrong / questions.length) * 100}%` }} />
+                            </div>
+                            <div className="mt-3 flex gap-2">
+                                <button
+                                    onClick={() => { const aid = `presentation_${classLine.substring(0, 40)}`; fetchLeaderboard(aid); setIsLeaderboardOpen(true); }}
+                                    className="flex-1 text-[10px] font-bold py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors flex items-center justify-center gap-1"
+                                >
+                                    <Trophy className="w-3 h-3" />{L.leaderboard}
+                                </button>
+                                <button
+                                    onClick={async () => { await saveFinalScore(); setIsFinalScoreOpen(true); }}
+                                    className="flex-1 text-[10px] font-bold py-1.5 rounded-lg bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/50 transition-colors"
+                                >
+                                    {L.finalScore}
+                                </button>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {/* ── Leaderboard Modal ── */}
+                <AnimatePresence>
+                    {isLeaderboardOpen && (
+                        <motion.div
+                            key="leaderboard"
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.9 }}
+                            className="fixed inset-0 z-[70] flex items-center justify-center p-4"
+                        >
+                            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsLeaderboardOpen(false)} />
+                            <div className="relative bg-white dark:bg-gray-900 rounded-3xl shadow-2xl p-6 w-full max-w-md border border-gray-200 dark:border-gray-700">
+                                <div className="flex items-center justify-between mb-5">
+                                    <h2 className="font-black text-lg text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                                        <Trophy className="w-5 h-5 text-amber-500" />
+                                        {L.topScorers}
+                                    </h2>
+                                    <button onClick={() => setIsLeaderboardOpen(false)} className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"><X className="w-5 h-5" /></button>
+                                </div>
+                                {leaderboardLoading ? (
+                                    <div className="flex items-center justify-center py-8"><div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" /></div>
+                                ) : leaderboardData.length === 0 ? (
+                                    <p className="text-center text-gray-500 dark:text-gray-400 py-8 text-sm">No scores yet. Be the first!</p>
+                                ) : (
+                                    <div className="space-y-2">
+                                        {leaderboardData.map((entry: any, idx: number) => (
+                                            <div key={idx} className={`flex items-center gap-3 p-3 rounded-xl border ${idx === 0 ? 'bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800' : 'bg-gray-50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-700/50'}`}>
+                                                <span className={`font-black text-lg w-7 text-center ${idx === 0 ? 'text-amber-500' : idx === 1 ? 'text-gray-400' : idx === 2 ? 'text-orange-400' : 'text-gray-400'}`}>{idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : idx + 1}</span>
+                                                <div className="flex-1">
+                                                    <p className="font-bold text-sm text-gray-800 dark:text-gray-200">{entry.userId === user?.uid ? userDisplayName + ' (You)' : (entry.displayName || 'Student')}</p>
+                                                    <p className="text-xs text-gray-500 dark:text-gray-400">{entry.scoreData?.correct || 0}/{entry.scoreData?.total || questions.length} correct</p>
+                                                </div>
+                                                <span className="font-black text-indigo-600 dark:text-indigo-400">{entry.scoreData?.score || 0}pts</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {/* ── Final Score Modal ── */}
+                <AnimatePresence>
+                    {isFinalScoreOpen && (
+                        <motion.div
+                            key="final-score"
+                            initial={{ opacity: 0, scale: 0.85 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.85 }}
+                            className="fixed inset-0 z-[70] flex items-center justify-center p-4"
+                        >
+                            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setIsFinalScoreOpen(false)} />
+                            <div className="relative bg-gradient-to-br from-white to-indigo-50 dark:from-gray-900 dark:to-indigo-950 rounded-3xl shadow-2xl p-8 w-full max-w-sm border border-indigo-100 dark:border-indigo-800/50 text-center">
+                                <div className="text-5xl mb-4">{sessionScore.correct / questions.length >= 0.8 ? '🎉' : sessionScore.correct / questions.length >= 0.5 ? '👍' : '💪'}</div>
+                                <h2 className="font-black text-2xl text-gray-900 dark:text-gray-100 mb-1">{L.finalScore}</h2>
+                                <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">{classLine}</p>
+                                <div className="flex justify-center gap-6 mb-6">
+                                    <div className="text-center"><p className="text-3xl font-black text-green-500">{uiLang === 'bn' ? toBanglaNumber(sessionScore.correct) : sessionScore.correct}</p><p className="text-xs font-semibold text-gray-500 mt-1">{L.correct}</p></div>
+                                    <div className="text-center"><p className="text-3xl font-black text-red-500">{uiLang === 'bn' ? toBanglaNumber(sessionScore.wrong) : sessionScore.wrong}</p><p className="text-xs font-semibold text-gray-500 mt-1">{L.wrong}</p></div>
+                                    <div className="text-center"><p className="text-3xl font-black text-gray-400">{uiLang === 'bn' ? toBanglaNumber(questions.length - sessionScore.correct - sessionScore.wrong) : questions.length - sessionScore.correct - sessionScore.wrong}</p><p className="text-xs font-semibold text-gray-500 mt-1">{L.unanswered}</p></div>
+                                </div>
+                                <div className="h-3 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden flex mb-4">
+                                    <div className="bg-green-500 h-full transition-all" style={{ width: `${(sessionScore.correct / questions.length) * 100}%` }} />
+                                    <div className="bg-red-500 h-full transition-all" style={{ width: `${(sessionScore.wrong / questions.length) * 100}%` }} />
+                                </div>
+                                <p className="font-black text-4xl text-indigo-600 dark:text-indigo-400 mb-6">{Math.round((sessionScore.correct / questions.length) * 100)}%</p>
+                                <button onClick={() => setIsFinalScoreOpen(false)} className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl font-bold shadow-lg hover:shadow-xl transition-all hover:scale-105">Close</button>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {/* ── Zoom/Pan Indicator ── */}
+                {contentZoom !== 1 && (
+                    <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[55] flex items-center gap-2 bg-black/70 text-white text-xs font-bold px-3 py-1.5 rounded-full">
+                        <ZoomIn className="w-3.5 h-3.5" />
+                        <span>{Math.round(contentZoom * 100)}%</span>
+                        <button onClick={() => { setContentZoom(1); setPanOffset({ x: 0, y: 0 }); }} className="ml-1 underline opacity-70 hover:opacity-100">{L.zoomReset}</button>
+                    </div>
+                )}
+
                 {/* Spotlight Overlay */}
                 {isSpotlightActive && (
                     <div
@@ -2467,7 +3038,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                         return arr.filter((x: any) => x.text);
                     })();
 
-                    const renderQuestion = (isAnswerKey) => {
+                    const renderQuestion = (isAnswerKey: boolean) => {
                         const showHighlight = isAnswerKey || (isPrintWithAnswers && !isPrintBothVersions);
                         const keyPrefix = isAnswerKey ? `ak-${idx}` : `test-${idx}`;
 
@@ -2494,19 +3065,19 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     </div>
 
                                     {wmVisible && wmText && (
-                                        <div 
-                                            className="absolute inset-0 pointer-events-none z-[60] overflow-hidden" 
-                                            style={{ 
-                                                backgroundImage: `url("data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${wmSpacing}" height="${wmSpacing}"><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="${wmSize}" font-family="sans-serif" font-weight="900" fill="${isDarkMode ? '%23ffffff' : '%23000000'}" fill-opacity="${isDarkMode ? Math.max(wmOpacity, 0.15) : wmOpacity}" transform="rotate(-35 ${wmSpacing/2} ${wmSpacing/2})">${wmText}</text></svg>`)}")`,
+                                        <div
+                                            className="absolute inset-0 pointer-events-none z-[60] overflow-hidden"
+                                            style={{
+                                                backgroundImage: `url("data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${wmSpacing}" height="${wmSpacing}"><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="${wmSize}" font-family="sans-serif" font-weight="900" fill="${isDarkMode ? '%23ffffff' : '%23000000'}" fill-opacity="${isDarkMode ? Math.max(wmOpacity, 0.15) : wmOpacity}" transform="rotate(-35 ${wmSpacing / 2} ${wmSpacing / 2})">${wmText}</text></svg>`)}")`,
                                                 backgroundRepeat: 'repeat'
-                                            }} 
+                                            }}
                                         />
                                     )}
 
                                     {/* Header */}
                                     {showHeader && (
                                         <div
-                                            className={isAnswerKey 
+                                            className={isAnswerKey
                                                 ? "shrink-0 bg-gradient-to-r from-green-50 via-white to-indigo-50 border-b border-green-100/50 flex flex-row justify-between items-center w-full z-30 shadow-sm relative px-6 py-4"
                                                 : "shrink-0 bg-gradient-to-r from-indigo-50 via-white to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 border-b border-indigo-100/50 dark:border-gray-700/50 flex flex-row justify-between items-center w-full z-30 shadow-sm relative px-6 py-4"}
                                         >
@@ -2526,7 +3097,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                 )}
                                             </div>
                                             <div className="flex items-center justify-end shrink-0 w-1/3">
-                                                <div className={isAnswerKey 
+                                                <div className={isAnswerKey
                                                     ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-full font-extrabold tracking-widest shadow-md flex items-center justify-center whitespace-nowrap px-6 py-2 text-sm"
                                                     : "bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-full font-extrabold tracking-widest shadow-md flex items-center justify-center whitespace-nowrap px-6 py-2 text-sm"}
                                                 >
@@ -2563,7 +3134,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                                             <div className={optionsLayout === 'grid' ? "grid grid-cols-2 gap-x-12 gap-y-10" : `flex flex-col gap-8 ${isPrintAsList ? 'w-full' : 'max-w-4xl mx-auto'}`}>
                                                 {opts.map((opt: any, oIdx: number) => {
-                                                    const optLetter = q.language === 'Bangla' || !q.language ? bnOptionsMap[opt.key] : opt.key.toUpperCase();
+                                                    const optLetter = uiLang === 'bn' ? bnOptionsMap[opt.key] : opt.key.toUpperCase();
                                                     const colorThemes = [
                                                         { border: 'border-[#4285F4]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#4285F4]/75', letterText: 'text-white' },
                                                         { border: 'border-[#34A853]/50', bg: 'bg-white dark:bg-gray-800/90', letterBg: 'bg-[#34A853]/75', letterText: 'text-white' },
