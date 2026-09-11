@@ -58,7 +58,7 @@ const CONFETTI_CONFIG = {
 };
 
 import 'katex/dist/katex.min.css';
-import { X, ChevronLeft, ChevronRight, Play, Pause, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize, LayoutGrid, Sun, Moon, Eraser, Square, Circle, ArrowUpRight, Type, Presentation, ZoomIn, Volume2, VolumeX, MonitorPlay, Lightbulb, MessageCircle, Stamp, Droplet, Music, AlignLeft, Keyboard, Printer, Trophy, Globe, BarChart2 } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Play, Pause, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize, LayoutGrid, Sun, Moon, Eraser, Square, Circle, ArrowUpRight, Type, Presentation, ZoomIn, Volume2, VolumeX, MonitorPlay, Lightbulb, MessageCircle, Stamp, Droplet, Music, AlignLeft, Keyboard, Printer, Trophy, Globe, BarChart2, Sparkles } from 'lucide-react';
 
 const bnOptionsMap: Record<string, string> = {
     a: 'ক',
@@ -116,6 +116,178 @@ const UI_LABELS = {
 } as const;
 
 type UiLang = 'bn' | 'en';
+
+const enOptionsMap: Record<string, string> = {
+    'ক': 'A', 'খ': 'B', 'গ': 'C', 'ঘ': 'D', 'ঙ': 'E',
+    '০': '0', '১': '1', '২': '2', '৩': '3', '৪': '4',
+    '৫': '5', '৬': '6', '৭': '7', '৮': '8', '৯': '9'
+};
+
+const getOptionLabel = (key: string, lang: UiLang): string => {
+    const k = (key || '').toLowerCase();
+    if (lang === 'bn') {
+        return bnOptionsMap[k] || bnNumbersMap[parseInt(k)] || key;
+    } else {
+        return enOptionsMap[key] || enOptionsMap[k] || k.toUpperCase();
+    }
+};
+
+const CELEBRATION_PRAISES = [
+    {
+        titleBn: 'চমৎকার উত্তর! 🎯',
+        titleEn: 'BRILLIANT ANSWER! 🎯',
+        subtitleBn: 'অসাধারণ নির্ভুলতা! একদম নিখুঁত উত্তর',
+        subtitleEn: 'Outstanding precision! Perfectly spot on',
+        emojiLeft: '🎯',
+        emojiRight: '✨',
+        gradient: 'from-amber-500 via-emerald-400 to-teal-500',
+        textGradient: 'from-emerald-600 via-teal-500 to-cyan-600 dark:from-emerald-400 dark:via-teal-300 dark:to-cyan-400',
+        glow: 'rgba(16, 185, 129, 0.45)'
+    },
+    {
+        titleBn: 'অসাধারণ পারফরম্যান্স! 🌟',
+        titleEn: 'OUTSTANDING PERFORMANCE! 🌟',
+        subtitleBn: 'দারুণ প্রস্তুতি! আপনার মেধা প্রশংসনীয়',
+        subtitleEn: 'Incredible sharpness! Keep up this great momentum',
+        emojiLeft: '🌟',
+        emojiRight: '🏆',
+        gradient: 'from-yellow-400 via-amber-500 to-orange-500',
+        textGradient: 'from-amber-600 via-orange-500 to-yellow-500 dark:from-yellow-300 dark:via-amber-400 dark:to-orange-400',
+        glow: 'rgba(245, 158, 11, 0.45)'
+    },
+    {
+        titleBn: 'একদম সঠিক! ১০০% পারফেক্ট! 💯',
+        titleEn: 'SPOT ON! 100% PERFECT! 💯',
+        subtitleBn: 'একদম নিখুঁত সমাধান! সাবাশ!',
+        subtitleEn: '100% Correct! Pure excellence in action',
+        emojiLeft: '💯',
+        emojiRight: '🔥',
+        gradient: 'from-rose-500 via-pink-500 to-violet-500',
+        textGradient: 'from-rose-600 via-pink-500 to-purple-600 dark:from-rose-400 dark:via-pink-300 dark:to-purple-300',
+        glow: 'rgba(244, 63, 94, 0.45)'
+    },
+    {
+        titleBn: 'তুখোড় মেধা! সুপার্ব! 🚀',
+        titleEn: 'MIND-BLOWING! SUPERB! 🚀',
+        subtitleBn: 'অবিশ্বাস্য গতি ও নিখুঁত জ্ঞান!',
+        subtitleEn: 'Incredible mastery and quick thinking!',
+        emojiLeft: '🚀',
+        emojiRight: '⚡',
+        gradient: 'from-blue-500 via-indigo-500 to-purple-500',
+        textGradient: 'from-blue-600 via-indigo-600 to-purple-600 dark:from-blue-400 dark:via-indigo-300 dark:to-purple-300',
+        glow: 'rgba(99, 102, 241, 0.45)'
+    },
+    {
+        titleBn: 'দারুণ উত্তর! চ্যাম্পিয়ন! 🏆',
+        titleEn: 'CHAMPION MOVE! 🏆',
+        subtitleBn: 'বিজয়ীর মতো সঠিক উত্তর দিয়েছেন!',
+        subtitleEn: 'A champion-tier answer! Truly commendable',
+        emojiLeft: '🏆',
+        emojiRight: '🎉',
+        gradient: 'from-amber-400 via-yellow-400 to-emerald-400',
+        textGradient: 'from-amber-500 via-orange-500 to-emerald-600 dark:from-amber-300 dark:via-yellow-300 dark:to-emerald-400',
+        glow: 'rgba(234, 179, 8, 0.5)'
+    },
+    {
+        titleBn: 'সাবাশ! এগিয়ে যাও! 👏',
+        titleEn: 'BRAVO! KEEP IT UP! 👏',
+        subtitleBn: 'ধারাবাহিক প্রচেষ্টা আপনাকে শীর্ষে নিয়ে যাবে',
+        subtitleEn: 'Consistent excellence leads to victory',
+        emojiLeft: '👏',
+        emojiRight: '💫',
+        gradient: 'from-teal-400 via-cyan-500 to-blue-500',
+        textGradient: 'from-teal-600 via-cyan-600 to-blue-600 dark:from-teal-300 dark:via-cyan-300 dark:to-blue-300',
+        glow: 'rgba(6, 182, 212, 0.45)'
+    },
+    {
+        titleBn: 'পারফেক্ট শট! অসাধারণ! ⚡',
+        titleEn: 'PERFECT SHOT! GENIUS! ⚡',
+        subtitleBn: 'অনবদ্য টাইমিং ও নির্ভুল জ্ঞান!',
+        subtitleEn: 'Impeccable timing and supreme accuracy!',
+        emojiLeft: '⚡',
+        emojiRight: '💥',
+        gradient: 'from-violet-500 via-purple-500 to-pink-500',
+        textGradient: 'from-violet-600 via-purple-600 to-pink-600 dark:from-violet-300 dark:via-purple-300 dark:to-pink-300',
+        glow: 'rgba(168, 85, 247, 0.45)'
+    }
+];
+
+// Confetti piece types: rect=rectangle, square=square, circle=round dot, ribbon=long strip
+const CONFETTI_COLORS = ['#f43f5e','#fb923c','#facc15','#4ade80','#34d399','#38bdf8','#818cf8','#e879f9','#f472b6','#a78bfa','#2dd4bf','#fbbf24'];
+const CELEBRATION_PARTICLES: { left: string; top: string; delay: number; color: string; w: number; h: number; shape: 'rect'|'square'|'circle'|'ribbon'; rot: number }[] = [
+    // Top row
+    { left: '3%',  top: '4%',  delay: 0.03, color: '#f43f5e', w: 12, h: 7,  shape: 'rect',   rot: -30 },
+    { left: '10%', top: '2%',  delay: 0.07, color: '#facc15', w: 9,  h: 9,  shape: 'square', rot: 20  },
+    { left: '18%', top: '6%',  delay: 0.05, color: '#34d399', w: 14, h: 6,  shape: 'rect',   rot: 45  },
+    { left: '27%', top: '3%',  delay: 0.10, color: '#38bdf8', w: 8,  h: 8,  shape: 'circle', rot: 0   },
+    { left: '35%', top: '7%',  delay: 0.06, color: '#e879f9', w: 16, h: 5,  shape: 'ribbon', rot: -15 },
+    { left: '44%', top: '2%',  delay: 0.12, color: '#fb923c', w: 10, h: 10, shape: 'square', rot: 35  },
+    { left: '53%', top: '5%',  delay: 0.08, color: '#818cf8', w: 13, h: 6,  shape: 'rect',   rot: -50 },
+    { left: '62%', top: '3%',  delay: 0.11, color: '#4ade80', w: 8,  h: 8,  shape: 'circle', rot: 0   },
+    { left: '71%', top: '6%',  delay: 0.04, color: '#f472b6', w: 11, h: 5,  shape: 'rect',   rot: 25  },
+    { left: '80%', top: '2%',  delay: 0.09, color: '#fbbf24', w: 9,  h: 9,  shape: 'square', rot: -40 },
+    { left: '89%', top: '5%',  delay: 0.06, color: '#2dd4bf', w: 15, h: 5,  shape: 'ribbon', rot: 10  },
+    { left: '95%', top: '3%',  delay: 0.13, color: '#f43f5e', w: 8,  h: 8,  shape: 'circle', rot: 0   },
+
+    // Upper-mid row
+    { left: '1%',  top: '18%', delay: 0.14, color: '#38bdf8', w: 12, h: 6,  shape: 'rect',   rot: 55  },
+    { left: '8%',  top: '22%', delay: 0.18, color: '#e879f9', w: 9,  h: 9,  shape: 'square', rot: -25 },
+    { left: '16%', top: '16%', delay: 0.11, color: '#facc15', w: 7,  h: 7,  shape: 'circle', rot: 0   },
+    { left: '24%', top: '24%', delay: 0.20, color: '#f43f5e', w: 18, h: 5,  shape: 'ribbon', rot: -35 },
+    { left: '33%', top: '19%', delay: 0.16, color: '#34d399', w: 11, h: 7,  shape: 'rect',   rot: 40  },
+    { left: '42%', top: '23%', delay: 0.13, color: '#818cf8', w: 8,  h: 8,  shape: 'square', rot: 15  },
+    { left: '51%', top: '17%', delay: 0.19, color: '#fb923c', w: 9,  h: 9,  shape: 'circle', rot: 0   },
+    { left: '60%', top: '25%', delay: 0.15, color: '#2dd4bf', w: 14, h: 5,  shape: 'ribbon', rot: 60  },
+    { left: '69%', top: '20%', delay: 0.22, color: '#f472b6', w: 12, h: 7,  shape: 'rect',   rot: -20 },
+    { left: '78%', top: '17%', delay: 0.10, color: '#4ade80', w: 8,  h: 8,  shape: 'square', rot: 30  },
+    { left: '87%', top: '22%', delay: 0.17, color: '#fbbf24', w: 7,  h: 7,  shape: 'circle', rot: 0   },
+    { left: '94%', top: '19%', delay: 0.21, color: '#f43f5e', w: 16, h: 5,  shape: 'ribbon', rot: -45 },
+
+    // Left side
+    { left: '2%',  top: '36%', delay: 0.16, color: '#818cf8', w: 11, h: 6,  shape: 'rect',   rot: 70  },
+    { left: '5%',  top: '50%', delay: 0.24, color: '#facc15', w: 8,  h: 8,  shape: 'square', rot: -55 },
+    { left: '1%',  top: '63%', delay: 0.30, color: '#34d399', w: 7,  h: 7,  shape: 'circle', rot: 0   },
+    { left: '6%',  top: '76%', delay: 0.36, color: '#38bdf8', w: 15, h: 5,  shape: 'ribbon', rot: 30  },
+
+    // Right side
+    { left: '93%', top: '36%', delay: 0.14, color: '#e879f9', w: 12, h: 6,  shape: 'rect',   rot: -60 },
+    { left: '96%', top: '50%', delay: 0.22, color: '#fb923c', w: 8,  h: 8,  shape: 'square', rot: 40  },
+    { left: '92%', top: '63%', delay: 0.28, color: '#f472b6', w: 7,  h: 7,  shape: 'circle', rot: 0   },
+    { left: '95%', top: '76%', delay: 0.34, color: '#fbbf24', w: 16, h: 4,  shape: 'ribbon', rot: -20 },
+
+    // Center scatter
+    { left: '22%', top: '40%', delay: 0.25, color: '#f43f5e', w: 10, h: 10, shape: 'square', rot: 25  },
+    { left: '32%', top: '55%', delay: 0.18, color: '#4ade80', w: 9,  h: 5,  shape: 'rect',   rot: -40 },
+    { left: '45%', top: '43%', delay: 0.22, color: '#38bdf8', w: 7,  h: 7,  shape: 'circle', rot: 0   },
+    { left: '56%', top: '57%', delay: 0.20, color: '#facc15', w: 13, h: 5,  shape: 'ribbon', rot: 50  },
+    { left: '67%', top: '42%', delay: 0.26, color: '#818cf8', w: 10, h: 6,  shape: 'rect',   rot: -30 },
+    { left: '75%', top: '56%', delay: 0.15, color: '#e879f9', w: 8,  h: 8,  shape: 'square', rot: 65  },
+
+    // Lower-mid row
+    { left: '4%',  top: '66%', delay: 0.28, color: '#f472b6', w: 12, h: 6,  shape: 'rect',   rot: -15 },
+    { left: '13%', top: '70%', delay: 0.32, color: '#2dd4bf', w: 9,  h: 9,  shape: 'square', rot: 45  },
+    { left: '22%', top: '64%', delay: 0.26, color: '#fbbf24', w: 8,  h: 8,  shape: 'circle', rot: 0   },
+    { left: '31%', top: '72%', delay: 0.34, color: '#f43f5e', w: 17, h: 4,  shape: 'ribbon', rot: -55 },
+    { left: '41%', top: '67%', delay: 0.30, color: '#34d399', w: 11, h: 7,  shape: 'rect',   rot: 35  },
+    { left: '51%', top: '73%', delay: 0.36, color: '#818cf8', w: 8,  h: 8,  shape: 'square', rot: -20 },
+    { left: '61%', top: '66%', delay: 0.24, color: '#fb923c', w: 7,  h: 7,  shape: 'circle', rot: 0   },
+    { left: '71%', top: '71%', delay: 0.32, color: '#38bdf8', w: 14, h: 5,  shape: 'ribbon', rot: 25  },
+    { left: '81%', top: '65%', delay: 0.28, color: '#e879f9', w: 10, h: 6,  shape: 'rect',   rot: -70 },
+    { left: '90%', top: '70%', delay: 0.38, color: '#4ade80', w: 9,  h: 9,  shape: 'square', rot: 50  },
+
+    // Bottom row
+    { left: '2%',  top: '83%', delay: 0.34, color: '#facc15', w: 11, h: 6,  shape: 'rect',   rot: 20  },
+    { left: '11%', top: '87%', delay: 0.28, color: '#f43f5e', w: 8,  h: 8,  shape: 'circle', rot: 0   },
+    { left: '20%', top: '82%', delay: 0.38, color: '#2dd4bf', w: 15, h: 5,  shape: 'ribbon', rot: -40 },
+    { left: '30%', top: '89%', delay: 0.32, color: '#818cf8', w: 9,  h: 9,  shape: 'square', rot: 60  },
+    { left: '40%', top: '84%', delay: 0.40, color: '#fb923c', w: 12, h: 6,  shape: 'rect',   rot: -25 },
+    { left: '50%', top: '88%', delay: 0.36, color: '#4ade80', w: 7,  h: 7,  shape: 'circle', rot: 0   },
+    { left: '60%', top: '83%', delay: 0.30, color: '#f472b6', w: 16, h: 4,  shape: 'ribbon', rot: 35  },
+    { left: '70%', top: '89%', delay: 0.42, color: '#fbbf24', w: 10, h: 10, shape: 'square', rot: -50 },
+    { left: '80%', top: '84%', delay: 0.34, color: '#38bdf8', w: 12, h: 5,  shape: 'rect',   rot: 45  },
+    { left: '90%', top: '87%', delay: 0.38, color: '#e879f9', w: 8,  h: 8,  shape: 'circle', rot: 0   },
+];
+
 type TransitionType = 'slide' | 'zoom' | 'flip' | 'fade' | 'bounce';
 type LayoutTemplate = 'default' | 'fullscreen_q' | 'split' | 'minimal' | 'card';
 
@@ -190,6 +362,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [optFontScale, setOptFontScale] = useState(1);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [isNavigatorOpen, setIsNavigatorOpen] = useState(false);
+    const activeSlideBtnRef = useRef<HTMLButtonElement>(null);
     const [isDarkMode, setIsDarkMode] = useState(false);
     const [mode, setMode] = useState<'test' | 'read'>('test');
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -263,6 +436,47 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const lofiAudioRef = useRef<HTMLAudioElement>(null);
     const popAudioRef = useRef<HTMLAudioElement>(null);
     const wowAudioRef = useRef<HTMLAudioElement>(null);
+    const winAudioRef = useRef<HTMLAudioElement>(null);
+
+    const [virtualCursor, setVirtualCursor] = useState<{
+        visible: boolean;
+        x: number;
+        y: number;
+        isClicking: boolean;
+    }>({
+        visible: false,
+        x: 0,
+        y: 0,
+        isClicking: false
+    });
+
+    const [showCelebration, setShowCelebration] = useState(false);
+    const [isCelebrationEnabled, setIsCelebrationEnabled] = useState(true);
+    const [isCelebrationSoundEnabled, setIsCelebrationSoundEnabled] = useState(true);
+    const [currentPraise, setCurrentPraise] = useState(CELEBRATION_PRAISES[0]);
+    const praiseIdxRef = useRef(0);
+
+    const triggerCelebration = useCallback(() => {
+        if (!isCelebrationEnabled) return;
+        const nextPraise = CELEBRATION_PRAISES[praiseIdxRef.current % CELEBRATION_PRAISES.length];
+        praiseIdxRef.current += 1;
+        setCurrentPraise(nextPraise);
+        setShowCelebration(true);
+
+        if (isCelebrationSoundEnabled) {
+            if (winAudioRef.current) {
+                winAudioRef.current.currentTime = 0;
+                winAudioRef.current.play().catch(console.warn);
+            } else if (wowAudioRef.current) {
+                wowAudioRef.current.currentTime = 0;
+                wowAudioRef.current.play().catch(console.warn);
+            }
+        }
+
+        setTimeout(() => {
+            setShowCelebration(false);
+        }, 2400);
+    }, [isCelebrationEnabled, isCelebrationSoundEnabled]);
 
     const [isConfettiActive, setIsConfettiActive] = useState(false);
     const [isLofiEnabled, setIsLofiEnabled] = useState(false);
@@ -356,6 +570,12 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         setPanOffset({ x: 0, y: 0 });
     }, [currentSlide]);
 
+    useEffect(() => {
+        if (isNavigatorOpen && activeSlideBtnRef.current) {
+            activeSlideBtnRef.current.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        }
+    }, [isNavigatorOpen]);
+
     // ── Feature 4: Wheel zoom handler ─────────────────────────────────────────
     const handleContentWheel = useCallback((e: React.WheelEvent<HTMLDivElement>) => {
         if (isPenActive) return;
@@ -406,6 +626,56 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
             wrong: prev.wrong + (isCorrect ? 0 : 1),
         }));
     }, []);
+
+    const triggerHumanClick = useCallback((targetKey: string, onDone?: () => void) => {
+        const optionEl = document.getElementById(`option-card-${targetKey}`);
+        if (!optionEl) {
+            setSelectedOption(targetKey);
+            setStep(1);
+            triggerCelebration();
+            if (onDone) onDone();
+            return;
+        }
+
+        const rect = optionEl.getBoundingClientRect();
+        const targetX = rect.left + 36;
+        const targetY = rect.top + rect.height / 2;
+
+        const startX = Math.min(window.innerWidth - 80, Math.max(120, targetX + 240 + (Math.random() * 60 - 30)));
+        const startY = Math.min(window.innerHeight - 80, targetY + 160 + (Math.random() * 50 - 25));
+
+        setVirtualCursor({ visible: true, x: startX, y: startY, isClicking: false });
+
+        const glideTimer = setTimeout(() => {
+            setVirtualCursor(prev => ({ ...prev, x: targetX, y: targetY }));
+        }, 60);
+
+        const clickTimer = setTimeout(() => {
+            setVirtualCursor(prev => ({ ...prev, isClicking: true }));
+
+            setSelectedOption(targetKey);
+            setStep(1);
+
+            setConsecutiveCorrect(prev => prev + 1);
+            setIsConfettiActive(true);
+            setTimeout(() => setIsConfettiActive(false), 2400);
+
+            // Trigger grand celebration with dynamic praise and victory fanfare
+            triggerCelebration();
+
+            updateSessionScore(currentSlide, true);
+
+            setTimeout(() => {
+                setVirtualCursor({ visible: false, x: 0, y: 0, isClicking: false });
+                if (onDone) onDone();
+            }, 600);
+        }, 850);
+
+        return () => {
+            clearTimeout(glideTimer);
+            clearTimeout(clickTimer);
+        };
+    }, [currentSlide, triggerCelebration, updateSessionScore]);
 
     // ── Feature 8: Fetch leaderboard ──────────────────────────────────────────
     const fetchLeaderboard = useCallback(async (assessmentId: string) => {
@@ -859,14 +1129,15 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
             optionKeys.forEach((key) => {
                 const optText = q.options![key as keyof typeof q.options];
                 if (optText) {
-                    textToRead += `${bnOptionsMap[key] || key.toUpperCase()}: ${cleanMarkdown(optText)}. `;
+                    const optLabel = getOptionLabel(key, uiLang);
+                    textToRead += `${optLabel}: ${cleanMarkdown(optText)}. `;
                 }
             });
         }
 
         const currentSlideLocal = currentSlide;
         const utterance = new SpeechSynthesisUtterance(textToRead);
-        utterance.lang = q.language === 'Bangla' ? 'bn-BD' : 'en-US';
+        utterance.lang = uiLang === 'bn' ? 'bn-BD' : 'en-US';
 
         utterance.onend = () => {
             if (isAutoPlayRef.current && stepRef.current === 0 && q.correctAnswer) {
@@ -874,36 +1145,35 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 const optionKeys = ['a', 'b', 'c', 'd', 'e'].filter(k => q.options && q.options[k as keyof typeof q.options]);
                 const validKey = optionKeys.find(k => correctKey.includes(k));
                 if (validKey) {
-                    setSelectedOption(validKey);
-                    setStep(1);
+                    triggerHumanClick(validKey, () => {
+                        const isBangla = q.language === 'Bangla';
+                        const correctOptText = cleanMarkdown(q.options![validKey as keyof typeof q.options] || '');
+                        const correctText = isBangla
+                            ? `সঠিক উত্তর: ${bnOptionsMap[validKey]}, ${correctOptText}`
+                            : `Correct Answer is: ${validKey.toUpperCase()}, ${correctOptText}`;
 
-                    const isBangla = q.language === 'Bangla';
-                    const correctOptText = cleanMarkdown(q.options![validKey as keyof typeof q.options] || '');
-                    const correctText = isBangla
-                        ? `সঠিক উত্তর: ${bnOptionsMap[validKey]}, ${correctOptText}`
-                        : `Correct Answer is: ${validKey.toUpperCase()}, ${correctOptText}`;
+                        const correctUtterance = new SpeechSynthesisUtterance(correctText);
+                        correctUtterance.lang = isBangla ? 'bn-BD' : 'en-US';
 
-                    const correctUtterance = new SpeechSynthesisUtterance(correctText);
-                    correctUtterance.lang = isBangla ? 'bn-BD' : 'en-US';
-
-                    correctUtterance.onend = () => {
-                        setIsSpeaking(false);
-                        setTimeout(() => {
-                            if (isAutoPlayRef.current) {
-                                setCurrentSlide(prev => {
-                                    if (prev === currentSlideLocal && prev < questions.length - 1) {
-                                        setStep(0);
-                                        setSelectedOption(null);
-                                        setTimerSeconds(0);
-                                        return prev + 1;
-                                    }
-                                    return prev;
-                                });
-                            }
-                        }, 1500);
-                    };
-                    correctUtterance.onerror = () => setIsSpeaking(false);
-                    window.speechSynthesis.speak(correctUtterance);
+                        correctUtterance.onend = () => {
+                            setIsSpeaking(false);
+                            setTimeout(() => {
+                                if (isAutoPlayRef.current) {
+                                    setCurrentSlide(prev => {
+                                        if (prev === currentSlideLocal && prev < questions.length - 1) {
+                                            setStep(0);
+                                            setSelectedOption(null);
+                                            setTimerSeconds(0);
+                                            return prev + 1;
+                                        }
+                                        return prev;
+                                    });
+                                }
+                            }, 1500);
+                        };
+                        correctUtterance.onerror = () => setIsSpeaking(false);
+                        window.speechSynthesis.speak(correctUtterance);
+                    });
                 } else {
                     setIsSpeaking(false);
                 }
@@ -1196,6 +1466,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                         if (currentQ && currentQ.options && currentQ.options[key as keyof typeof currentQ.options]) {
                             setSelectedOption(key);
                             setStep(1);
+                            if (currentQ.correctAnswer && currentQ.correctAnswer.toLowerCase().trim().includes(key)) {
+                                triggerCelebration();
+                            }
                         }
                     }
                 }
@@ -1535,16 +1808,6 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                             {/* Desktop Actions */}
                             <div className="hidden md:flex items-center gap-3 justify-end shrink-0">
-                                {/* Language Toggle Button */}
-                                <button
-                                    onClick={() => setUiLang(l => l === 'bn' ? 'en' : 'bn')}
-                                    className="flex items-center gap-1 px-2.5 py-1.5 md:px-3 md:py-2 rounded-full transition-all shadow-sm bg-white/90 hover:bg-white text-indigo-600 dark:bg-gray-800/90 dark:hover:bg-gray-700 dark:text-indigo-400 border border-indigo-100 dark:border-gray-600 shrink-0 font-bold text-xs"
-                                    title="Toggle Language (বাং/EN)"
-                                >
-                                    <Globe className="w-4 h-4" />
-                                    <span>{uiLang === 'bn' ? 'বাং' : 'EN'}</span>
-                                </button>
-
                                 {/* Score Badge Button */}
                                 <button
                                     onClick={() => setIsScoreVisible(!isScoreVisible)}
@@ -1609,7 +1872,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                         return (
                             <div
                                 style={{ transform: `translate(${timerPos.x}px, ${timerPos.y}px)` }}
-                                className={`absolute ${showHeader ? 'top-[70px] md:top-[76px]' : 'top-4'} right-4 md:right-8 z-[70] select-none touch-none transition-all duration-300 ${isDraggingTimer
+                                className={`absolute ${showHeader ? 'top-[70px] md:top-[76px]' : 'top-4'} right-2 md:right-3 z-[70] select-none touch-none transition-all duration-300 ${isDraggingTimer
                                         ? 'cursor-grabbing scale-105 drop-shadow-[0_20px_40px_rgba(59,130,246,0.35)]'
                                         : 'cursor-grab hover:drop-shadow-[0_12px_30px_rgba(59,130,246,0.25)] hover:scale-105'
                                     }`}
@@ -1741,15 +2004,17 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                             <circle cx="50" cy="50" r="3.5" fill={step >= 1 ? '#6b7280' : colors.centerCap} stroke={isDarkMode ? '#0f172a' : '#ffffff'} strokeWidth="1.2" />
                                         </svg>
 
-                                        {/* Digital Time Badge on the Clock Face */}
-                                        <div className={`absolute bottom-1.5 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full font-mono text-[10px] md:text-[11px] font-black tracking-wider flex items-center gap-1 border pointer-events-none ${colors.digitalBg}`}>
-                                            {step === 0 && (
-                                                <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse inline-block" />
-                                            )}
-                                            <span>
-                                                {String(min).padStart(2, '0')}:{String(s).padStart(2, '0')}
-                                            </span>
-                                        </div>
+
+                                    </div>
+
+                                    {/* Digital Time Badge — below clock face */}
+                                    <div className={`mt-1 px-3 py-0.5 rounded-full font-mono text-[10px] md:text-[11px] font-black tracking-wider flex items-center gap-1 border pointer-events-none ${colors.digitalBg}`}>
+                                        {step === 0 && (
+                                            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse inline-block" />
+                                        )}
+                                        <span>
+                                            {String(min).padStart(2, '0')}:{String(s).padStart(2, '0')}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -1760,6 +2025,126 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     <audio ref={lofiAudioRef} src={selectedMusic} loop />
                     <audio ref={popAudioRef} src="/audio/correct-pop.mp3" preload="auto" />
                     <audio ref={wowAudioRef} src="/audio/wow.mp3" preload="auto" />
+                    <audio ref={winAudioRef} src="/audio/win.mp3" preload="auto" />
+
+                    {/* ── Grand Full-Page Celebration Across Entire Screen ── */}
+                    <AnimatePresence>
+                        {showCelebration && (
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: 0.5, ease: 'easeInOut' }}
+                                className="fixed inset-0 z-[999998] pointer-events-none select-none overflow-hidden flex items-center justify-center"
+                            >
+                                {/* Full Page Ambient Radiant Glow */}
+                                <div
+                                    className="absolute inset-0 opacity-40 dark:opacity-50 transition-opacity"
+                                    style={{
+                                        background: `radial-gradient(ellipse at center, ${currentPraise.glow} 0%, rgba(0,0,0,0) 70%)`
+                                    }}
+                                />
+
+                                {/* Floating Celebration Confetti Paper Pieces */}
+                                {CELEBRATION_PARTICLES.map((p, idx) => (
+                                    <motion.div
+                                        key={idx}
+                                        initial={{ opacity: 0, y: -40, rotate: p.rot - 180, scale: 0 }}
+                                        animate={{
+                                            opacity: [0, 1, 1, 0.9],
+                                            y: [-40, 30, 10, 20],
+                                            rotate: [p.rot - 180, p.rot + 60, p.rot - 30, p.rot],
+                                            scale: [0, 1.15, 0.95, 1]
+                                        }}
+                                        exit={{ opacity: 0, y: 80, scale: 0, transition: { duration: 0.5, ease: 'easeIn' } }}
+                                        transition={{
+                                            duration: 1.4,
+                                            delay: p.delay,
+                                            ease: [0.22, 1, 0.36, 1]
+                                        }}
+                                        style={{
+                                            position: 'absolute',
+                                            left: p.left,
+                                            top: p.top,
+                                            width: p.w,
+                                            height: p.h,
+                                            backgroundColor: p.color,
+                                            borderRadius: p.shape === 'circle' ? '50%' : p.shape === 'ribbon' ? '2px' : p.shape === 'square' ? '2px' : '3px',
+                                            boxShadow: `0 2px 8px ${p.color}88`,
+                                            transformOrigin: 'center center',
+                                        }}
+                                    />
+                                ))}
+
+                                {/* Grand Floating Central Praise Badge - Transparent Glass Card with rounded-[0.5rem] */}
+                                <motion.div
+                                    initial={{ scale: 0.5, opacity: 0, y: 80 }}
+                                    animate={{ scale: 1, opacity: 1, y: 0 }}
+                                    exit={{ scale: 0.75, opacity: 0, y: -40, transition: { duration: 0.35, ease: 'easeIn' } }}
+                                    transition={{ type: 'spring', stiffness: 220, damping: 22, mass: 0.9 }}
+                                    className="relative z-10 flex flex-col items-center justify-center max-w-[92vw] sm:max-w-xl md:max-w-2xl px-4"
+                                >
+                                    <div className={`relative bg-gradient-to-r ${currentPraise.gradient} p-[2px] rounded-[0.5rem] shadow-[0_20px_70px_rgba(0,0,0,0.5)] backdrop-blur-md`}>
+                                        <div className="bg-slate-950/70 dark:bg-black/75 backdrop-blur-2xl px-6 sm:px-10 md:px-12 py-6 sm:py-7 md:py-8 rounded-[calc(0.5rem-2px)] flex flex-col items-center text-center gap-3.5 border border-white/20 shadow-2xl">
+                                            {/* Top animated emoji flair */}
+                                            <div className="flex items-center gap-3 sm:gap-5">
+                                                <motion.span
+                                                animate={{ y: [0, -8, 0] }}
+                                                transition={{ repeat: Infinity, duration: 1.4, ease: 'easeInOut' }}
+                                                className="text-4xl sm:text-5xl md:text-6xl inline-block"
+                                            >{currentPraise.emojiLeft}</motion.span>
+                                                <motion.span
+                                                    animate={{ scale: [1, 1.25, 1], rotate: [0, 15, -15, 0] }}
+                                                    transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}
+                                                    className="text-3xl sm:text-4xl md:text-5xl inline-block"
+                                                >✨</motion.span>
+                                                <motion.span
+                                                    animate={{ y: [0, -8, 0] }}
+                                                    transition={{ repeat: Infinity, duration: 1.4, ease: 'easeInOut', delay: 0.2 }}
+                                                    className="text-4xl sm:text-5xl md:text-6xl inline-block"
+                                                >{currentPraise.emojiRight}</motion.span>
+                                            </div>
+
+                                            {/* Dynamic Appreciation Title */}
+                                            <h2 className={`text-2xl sm:text-3xl md:text-5xl font-black tracking-wide bg-gradient-to-r ${currentPraise.textGradient} bg-clip-text text-transparent drop-shadow-sm uppercase leading-tight`}>
+                                                {uiLang === 'bn' ? currentPraise.titleBn : currentPraise.titleEn}
+                                            </h2>
+
+                                            {/* Subtitle Praise */}
+                                            <p className="text-xs sm:text-sm md:text-base font-bold text-slate-100 dark:text-slate-200 tracking-wide max-w-md drop-shadow-sm">
+                                                {uiLang === 'bn' ? currentPraise.subtitleBn : currentPraise.subtitleEn}
+                                            </p>
+
+                                            {/* Accuracy badge pill with 0.5rem radius */}
+                                            <div className="mt-1 px-4 py-1.5 rounded-[0.5rem] bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 dark:text-emerald-300 font-black text-xs md:text-sm tracking-wider uppercase flex items-center gap-2 shadow-xs backdrop-blur-sm">
+                                                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                                                {uiLang === 'bn' ? '১০০% নির্ভুল উত্তর' : '100% Accurate Answer'}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+
+                    {/* Virtual Cursor Animation */}
+                    {virtualCursor.visible && (
+                        <div
+                            className="fixed pointer-events-none z-[999999] transition-all duration-700 ease-out"
+                            style={{
+                                left: `${virtualCursor.x}px`,
+                                top: `${virtualCursor.y}px`,
+                                transform: `translate(-2px, -2px) ${virtualCursor.isClicking ? 'scale(0.85)' : 'scale(1)'}`
+                            }}
+                        >
+                            <div className="relative">
+                                <MousePointer2 className="w-8 h-8 text-blue-600 fill-blue-500 drop-shadow-[0_4px_10px_rgba(0,0,0,0.4)]" />
+                                {virtualCursor.isClicking && (
+                                    <span className="absolute -top-1 -left-1 w-10 h-10 rounded-full bg-blue-500/40 animate-ping" />
+                                )}
+                            </div>
+                        </div>
+                    )}
 
                     {/* Main Content Area */}
                     <div ref={scrollContainerRef} className="flex-1 w-full relative flex flex-col items-center px-4 md:px-24 py-6 md:py-12 z-10 overflow-y-auto custom-scrollbar gap-8">
@@ -1824,7 +2209,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     >
                                         {parsedOptions.length > 0 && parsedOptions.map((opt: { key: string, text: string }, oIdx: number) => {
                                             const isCorrect = q.correctAnswer && q.correctAnswer.toLowerCase().includes(opt.key);
-                                            const optLetter = q.language === 'Bangla' || !q.language ? bnOptionsMap[opt.key] : opt.key.toUpperCase();
+                                            const optLetter = getOptionLabel(opt.key, uiLang);
 
                                             const showCorrect = step >= 1 && isCorrect;
                                             const showWrong = step >= 1 && !isCorrect;
@@ -1862,8 +2247,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     containerClasses = `flex items-center gap-3 md:gap-4 py-1.5 px-3 rounded-lg border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(234,67,53,0.15)] bg-[#fce8e6] dark:bg-[#7f1d1d] border-[#EA4335] transform scale-[1.02] relative z-10`;
                                                     letterClasses = `shrink-0 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full text-lg md:text-xl font-black transition-colors duration-300 bg-[#EA4335] text-white`;
                                                 } else if (showWrong) {
-                                                    containerClasses = `flex items-center gap-3 md:gap-4 py-1.5 px-3 rounded-lg border-2 transition-all duration-300 shadow-sm bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 opacity-60 relative z-10`;
-                                                    // letterClasses keeps its default theme color
+                                                    containerClasses = `flex items-center gap-3 md:gap-4 py-1.5 px-3 rounded-lg border-2 transition-all duration-300 shadow-sm bg-yellow-50 dark:bg-yellow-950/50 border-yellow-400 dark:border-yellow-600 relative z-10`;
+                                                    letterClasses = `shrink-0 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full text-lg md:text-xl font-black transition-colors duration-300 bg-yellow-300 dark:bg-yellow-700 text-yellow-800 dark:text-yellow-100`;
                                                 }
                                             }
                                             return (
@@ -1879,6 +2264,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                         <Confetti active={isConfettiActive && isSelected && showCorrect} config={CONFETTI_CONFIG} />
                                                     </div>
                                                     <div
+                                                        id={`option-card-${opt.key}`}
                                                         className={containerClasses}
                                                         style={{
                                                             ...(bgTheme === 'dots' ? {
@@ -1906,11 +2292,14 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                                 setSelectedOption(opt.key);
                                                                 setStep(1);
 
-                                                                // Trigger confetti and sound if correct
+                                                                // Trigger confetti and celebration if correct (Single Question Perform)
                                                                 if (q.correctAnswer && q.correctAnswer.toLowerCase().trim().includes(opt.key)) {
                                                                     const newConsecutive = consecutiveCorrect + 1;
                                                                     setConsecutiveCorrect(newConsecutive);
                                                                     setIsConfettiActive(true);
+
+                                                                    // Show celebration on single question answer!
+                                                                    triggerCelebration();
 
                                                                     if (newConsecutive > 0 && newConsecutive % 5 === 0) {
                                                                         // Play WOW sound every 5 consecutive correct answers
@@ -1919,8 +2308,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                                             wowAudioRef.current.play().catch(e => console.warn('Wow audio failed:', e));
                                                                         }
                                                                     } else {
-                                                                        // Normal pop sound
-                                                                        if (popAudioRef.current) {
+                                                                        if (!isCelebrationSoundEnabled && popAudioRef.current) {
                                                                             popAudioRef.current.currentTime = 0;
                                                                             popAudioRef.current.play().catch(e => console.warn('Pop audio failed:', e));
                                                                         }
@@ -2037,6 +2425,16 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     title="Toggle Dark Mode (Shift+N)"
                                 >
                                     {isDarkMode ? <Sun className="w-5 h-5 md:w-6 md:h-6" /> : <Moon className="w-5 h-5 md:w-6 md:h-6" />}
+                                </button>
+
+                                {/* Language Toggle Button */}
+                                <button
+                                    onClick={() => setUiLang(l => l === 'bn' ? 'en' : 'bn')}
+                                    className="px-2.5 py-1.5 md:px-3 md:py-2 rounded-full transition-all shadow-sm bg-white/60 hover:bg-white text-indigo-600 dark:bg-gray-700/60 dark:hover:bg-gray-700 dark:text-gray-200 border border-indigo-100/60 dark:border-gray-600 shrink-0 font-bold text-xs flex items-center gap-1.5 hover:scale-105 active:scale-95"
+                                    title="Toggle Language (বাং/EN)"
+                                >
+                                    <Globe className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
+                                    <span>{uiLang === 'bn' ? 'বাং' : 'EN'}</span>
                                 </button>
                                 {/* Fullscreen Toggle Button */}
                                 <button
@@ -2793,45 +3191,133 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                             </div>
 
-                            <div className="relative hidden md:flex items-center justify-center shrink-0 ml-auto md:ml-0">
+                            <div className="relative flex items-center justify-center shrink-0">
                                 <button
                                     onClick={() => setIsNavigatorOpen(!isNavigatorOpen)}
-                                    className={`flex items-center gap-1.5 md:gap-2 px-2.5 py-1.5 md:px-4 md:py-2 rounded-xl transition-all shadow-sm font-semibold text-xs md:text-lg ${isNavigatorOpen ? 'bg-indigo-600 text-white ring-2 ring-indigo-300' : 'bg-white/60 hover:bg-white text-indigo-700 dark:bg-gray-700/60 dark:hover:bg-gray-700 dark:text-gray-200'}`}
+                                    className={`p-2 md:p-3 rounded-full transition-all shadow-sm shrink-0 ${isNavigatorOpen ? 'bg-indigo-600 text-white ring-2 ring-indigo-300' : 'bg-white/60 hover:bg-white text-indigo-600 dark:bg-gray-700/60 dark:hover:bg-gray-700 dark:text-gray-300'}`}
                                     title="Slide Navigator"
                                 >
-                                    <LayoutGrid className="w-4 h-4 md:w-5 md:h-5" />
-                                    <span className="hidden sm:inline">Page </span>{String(currentSlide + 1).padStart(2, '0')} <span className="text-[10px] md:text-sm opacity-70">/ {questions.length}</span>
+                                    <LayoutGrid className="w-5 h-5 md:w-6 md:h-6" />
                                 </button>
 
                                 {isNavigatorOpen && (
-                                    <div className="absolute bottom-[calc(100%+10px)] right-0 md:left-1/2 md:-translate-x-1/2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-2xl p-4 md:p-5 w-[280px] sm:w-[320px] z-50 animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[50vh]">
-                                        <div className="flex justify-between items-center mb-3 pb-3 border-b border-gray-100 dark:border-gray-800 shrink-0">
-                                            <h3 className="font-bold text-gray-800 dark:text-gray-200 text-sm md:text-base flex items-center gap-2">
-                                                <LayoutGrid className="w-4 h-4 md:w-5 md:h-5 text-gray-500 dark:text-gray-400" /> Slide Navigator
-                                            </h3>
-                                            <button onClick={() => setIsNavigatorOpen(false)} className="p-1 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
-                                                <X className="w-4 h-4 md:w-5 md:h-5" />
-                                            </button>
+                                    <div className="absolute bottom-[calc(100%+12px)] right-0 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-2xl p-3.5 sm:p-4 w-[320px] sm:w-[350px] z-50 animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[440px]">
+                                        {/* Professional Balanced Header */}
+                                        <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800 shrink-0">
+                                            <div className="flex items-center gap-2.5">
+                                                <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                                                    <LayoutGrid className="w-4 h-4" />
+                                                </div>
+                                                <div>
+                                                    <h4 className="font-bold text-sm text-gray-800 dark:text-gray-100 leading-tight">
+                                                        {uiLang === 'bn' ? 'স্লাইড নেভিগেটর' : 'Slide Navigator'}
+                                                    </h4>
+                                                    <p className="text-[11px] text-gray-400 dark:text-gray-500 font-medium">
+                                                        {uiLang === 'bn' ? 'যেকোনো প্রশ্নে সরাসরি যান' : 'Jump to question'}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-1.5">
+                                                <span className="text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/80 px-2 py-0.5 rounded-full border border-blue-200/50 dark:border-blue-900/50">
+                                                    {uiLang === 'bn'
+                                                        ? `${toBanglaNumber(currentSlide + 1)} / ${toBanglaNumber(questions.length)}`
+                                                        : `${currentSlide + 1} / ${questions.length}`}
+                                                </span>
+                                                <button
+                                                    onClick={() => setIsNavigatorOpen(false)}
+                                                    className="w-7 h-7 flex items-center justify-center text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                                                    title="Close"
+                                                >
+                                                    <X className="w-4 h-4" />
+                                                </button>
+                                            </div>
                                         </div>
 
-                                        <div className="overflow-y-auto custom-scrollbar pr-2 pb-2">
-                                            <div className="grid grid-cols-5 gap-2">
-                                                {questions.map((_, idx) => (
-                                                    <button
-                                                        key={idx}
-                                                        onClick={() => {
-                                                            setCurrentSlide(idx);
-                                                            setStep(mode === 'read' ? 2 : 0);
-                                                            setSelectedOption(null);
-                                                            setTimerSeconds(0);
-                                                            setIsNavigatorOpen(false);
-                                                        }}
-                                                        className={`w-full aspect-square rounded-lg flex items-center justify-center text-xs md:text-sm font-bold transition-all ${currentSlide === idx ? 'bg-blue-600 text-white shadow-md scale-105' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-blue-900/50 hover:text-blue-600 dark:hover:text-blue-400'}`}
-                                                    >
-                                                        {idx + 1}
-                                                    </button>
-                                                ))}
+                                        {/* Status Legend */}
+                                        <div className="flex items-center justify-between px-0.5 py-2.5 text-xs text-gray-600 dark:text-gray-400 font-medium shrink-0">
+                                            <span className="flex items-center gap-1.5">
+                                                <span className="w-2.5 h-2.5 rounded-full bg-blue-600 ring-2 ring-blue-300 dark:ring-blue-800" />
+                                                <span className="text-gray-800 dark:text-gray-200 font-semibold">{uiLang === 'bn' ? 'বর্তমান' : 'Current'}</span>
+                                            </span>
+                                            <span className="flex items-center gap-1.5">
+                                                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                                                <span>{uiLang === 'bn' ? 'উত্তর' : 'Done'} ({uiLang === 'bn' ? toBanglaNumber(answeredSlidesRef.current.size) : answeredSlidesRef.current.size})</span>
+                                            </span>
+                                            <span className="flex items-center gap-1.5">
+                                                <span className="w-2.5 h-2.5 rounded-full bg-gray-300 dark:bg-gray-600" />
+                                                <span>{uiLang === 'bn' ? 'বাকি' : 'Left'} ({uiLang === 'bn' ? toBanglaNumber(questions.length - answeredSlidesRef.current.size) : questions.length - answeredSlidesRef.current.size})</span>
+                                            </span>
+                                        </div>
+
+                                        {/* Grid of Slide Numbers */}
+                                        <div className="overflow-y-auto custom-scrollbar pr-1 pb-1 flex-1">
+                                            <div className="grid grid-cols-6 gap-2">
+                                                {questions.map((_, idx) => {
+                                                    const isCurrent = currentSlide === idx;
+                                                    const isAnswered = answeredSlidesRef.current.has(idx);
+
+                                                    let tileClasses = "h-10 w-full rounded-xl flex items-center justify-center text-xs sm:text-sm font-bold transition-all relative select-none cursor-pointer ";
+
+                                                    if (isCurrent) {
+                                                        tileClasses += "bg-blue-600 text-white font-extrabold shadow-md shadow-blue-500/35 ring-2 ring-blue-400 ring-offset-2 ring-offset-white dark:ring-offset-gray-900 scale-105 z-10";
+                                                    } else if (isAnswered) {
+                                                        tileClasses += "bg-emerald-500 hover:bg-emerald-600 text-white font-bold shadow-xs";
+                                                    } else {
+                                                        tileClasses += "bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-200 border border-gray-200/80 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400";
+                                                    }
+
+                                                    return (
+                                                        <button
+                                                            key={idx}
+                                                            ref={isCurrent ? activeSlideBtnRef : undefined}
+                                                            onClick={() => {
+                                                                setCurrentSlide(idx);
+                                                                setStep(mode === 'read' ? 2 : 0);
+                                                                setSelectedOption(null);
+                                                                setTimerSeconds(0);
+                                                                setIsNavigatorOpen(false);
+                                                            }}
+                                                            className={tileClasses}
+                                                            title={`Question ${idx + 1}`}
+                                                        >
+                                                            <span>{uiLang === 'bn' ? toBanglaNumber(idx + 1) : idx + 1}</span>
+                                                        </button>
+                                                    );
+                                                })}
                                             </div>
+                                        </div>
+
+                                        {/* Footer Quick Jumps */}
+                                        <div className="flex items-center justify-between pt-2.5 mt-2.5 border-t border-gray-100 dark:border-gray-800 text-xs font-bold text-gray-500 dark:text-gray-400 shrink-0">
+                                            <button
+                                                onClick={() => {
+                                                    setCurrentSlide(0);
+                                                    setStep(mode === 'read' ? 2 : 0);
+                                                    setSelectedOption(null);
+                                                    setTimerSeconds(0);
+                                                    setIsNavigatorOpen(false);
+                                                }}
+                                                className="hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-1 transition-colors px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 active:scale-95"
+                                            >
+                                                <ChevronLeft className="w-3.5 h-3.5" />
+                                                <span>{uiLang === 'bn' ? 'প্রথম' : 'First'}</span>
+                                            </button>
+                                            <span className="text-[11px] font-extrabold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-2.5 py-0.5 rounded-full border border-blue-100 dark:border-blue-900/50">
+                                                {Math.round(((currentSlide + 1) / Math.max(questions.length, 1)) * 100)}%
+                                            </span>
+                                            <button
+                                                onClick={() => {
+                                                    setCurrentSlide(questions.length - 1);
+                                                    setStep(mode === 'read' ? 2 : 0);
+                                                    setSelectedOption(null);
+                                                    setTimerSeconds(0);
+                                                    setIsNavigatorOpen(false);
+                                                }}
+                                                className="hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-1 transition-colors px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 active:scale-95"
+                                            >
+                                                <span>{uiLang === 'bn' ? 'শেষ' : 'Last'}</span>
+                                                <ChevronRight className="w-3.5 h-3.5" />
+                                            </button>
                                         </div>
                                     </div>
                                 )}
@@ -3188,7 +3674,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                                             <div className={optionsLayout === 'grid' ? "grid grid-cols-2 gap-x-12 gap-y-10" : `flex flex-col gap-8 ${isPrintAsList ? 'w-full' : 'max-w-4xl mx-auto'}`}>
                                                 {opts.map((opt: any, oIdx: number) => {
-                                                    const optLetter = uiLang === 'bn' ? bnOptionsMap[opt.key] : opt.key.toUpperCase();
+                                                    const optLetter = getOptionLabel(opt.key, uiLang);
                                                     const colorThemes = [
                                                         { border: 'border-[#4285F4]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#4285F4]/75', letterText: 'text-white' },
                                                         { border: 'border-[#34A853]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#34A853]/75', letterText: 'text-white' },
