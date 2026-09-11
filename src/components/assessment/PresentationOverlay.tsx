@@ -1461,7 +1461,19 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 }
                 if (step === 0) {
                     const key = e.key.toLowerCase();
-                    if (['a', 'b', 'c', 'd', 'e'].includes(key)) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const currentQ = questions[currentSlide];
+                        if (currentQ && currentQ.correctAnswer) {
+                            const correctKey = currentQ.correctAnswer.toLowerCase().trim();
+                            const validKeys = ['a', 'b', 'c', 'd', 'e'];
+                            const matchedKey = validKeys.find(k => correctKey.includes(k));
+                            if (matchedKey) {
+                                const btn = document.getElementById(`option-card-${matchedKey}`);
+                                if (btn) btn.click();
+                            }
+                        }
+                    } else if (['a', 'b', 'c', 'd', 'e'].includes(key)) {
                         const currentQ = questions[currentSlide];
                         if (currentQ && currentQ.options && currentQ.options[key as keyof typeof currentQ.options]) {
                             setSelectedOption(key);
@@ -1785,9 +1797,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                                 {/* Mobile Actions */}
                                 <div className="flex md:hidden items-center gap-2 shrink-0">
-                                    <div className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-full font-bold tracking-widest shadow-md flex items-center justify-center whitespace-nowrap" style={{ fontSize: `${0.7 * headerScale}rem`, padding: `${0.35 * headerScale}rem ${0.8 * headerScale}rem` }}>
-                                        MOCK TEST
-                                    </div>
+
                                     <button onClick={closePresentation} className="bg-white/90 dark:bg-gray-800 hover:bg-white dark:hover:bg-gray-700 rounded-full text-indigo-600 dark:text-indigo-400 shadow-sm border border-indigo-100 dark:border-gray-600 transition-colors flex items-center justify-center shrink-0" style={{ width: `${2.2 * headerScale}rem`, height: `${2.2 * headerScale}rem` }}>
                                         <X style={{ width: `${1.2 * headerScale}rem`, height: `${1.2 * headerScale}rem` }} strokeWidth={2.5} />
                                     </button>
@@ -1801,8 +1811,18 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 }`}>
                                 <h1 className="font-extrabold text-white dark:text-gray-100 tracking-tight line-clamp-1 md:line-clamp-none drop-shadow-sm" style={{ fontSize: `${1.1 * headerScale * headerTitleScale}rem` }}>{displayTitle}</h1>
                                 {displayTaxonomy && (
-                                    <div className="text-indigo-300 dark:text-indigo-400 font-bold tracking-wider uppercase mt-1" style={{ fontSize: `${0.75 * headerScale * headerTitleScale}rem` }}>
-                                        {displayTaxonomy}
+                                    <div className="flex items-center flex-wrap gap-1 font-bold tracking-wider uppercase mt-1" style={{ fontSize: `${0.72 * headerScale * headerTitleScale}rem` }}>
+                                        {displayTaxonomy.split('•').map((part, i) => (
+                                            <span key={i} className="flex items-center gap-1">
+                                                {i > 0 && <span className="text-white/40 mx-0.5">•</span>}
+                                                <span className={
+                                                    i === 0 ? 'text-amber-300 drop-shadow-sm' :
+                                                    i === 1 ? 'text-cyan-300 drop-shadow-sm' :
+                                                    i === 2 ? 'text-lime-300 drop-shadow-sm' :
+                                                    'text-pink-300 drop-shadow-sm'
+                                                }>{part.trim()}</span>
+                                            </span>
+                                        ))}
                                     </div>
                                 )}
                             </div>
@@ -1812,16 +1832,24 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 {/* Score Badge Button */}
                                 <button
                                     onClick={() => setIsScoreVisible(!isScoreVisible)}
-                                    className={`flex items-center gap-1.5 px-2.5 py-1.5 md:py-2 rounded-full transition-all shadow-sm shrink-0 font-bold text-xs border border-indigo-600/50 ${isScoreVisible ? 'bg-green-500 text-white ring-2 ring-green-300' : 'bg-white/10 hover:bg-white/20 text-indigo-200 dark:bg-white/10 dark:hover:bg-white/20 dark:text-indigo-300'}`}
+                                    className="flex items-center gap-1 shrink-0 hover:scale-105 transition-all"
                                     title="Session Score"
                                 >
-                                    <BarChart2 className="w-4 h-4" />
-                                    <span>{sessionScore.correct}/{sessionScore.correct + sessionScore.wrong}</span>
+                                    {/* Correct */}
+                                    <span className="flex items-center gap-1 bg-emerald-500/90 hover:bg-emerald-500 text-white px-2.5 py-1.5 rounded-l-full font-black text-xs shadow-md border border-emerald-400/50" style={{ fontSize: `${0.8 * headerScale}rem` }}>
+                                        <span className="text-emerald-100">✓</span>
+                                        <span>{sessionScore.correct}</span>
+                                    </span>
+                                    {/* Divider */}
+                                    <span className="bg-white/20 text-white/60 px-1 py-1.5 font-bold text-xs" style={{ fontSize: `${0.75 * headerScale}rem` }}>/</span>
+                                    {/* Wrong */}
+                                    <span className="flex items-center gap-1 bg-rose-500/90 hover:bg-rose-500 text-white px-2.5 py-1.5 rounded-r-full font-black text-xs shadow-md border border-rose-400/50" style={{ fontSize: `${0.8 * headerScale}rem` }}>
+                                        <span>{sessionScore.wrong}</span>
+                                        <span className="text-rose-100">✗</span>
+                                    </span>
                                 </button>
 
-                                <div className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-full font-extrabold tracking-widest shadow-md flex items-center justify-center whitespace-nowrap" style={{ fontSize: `${0.85 * headerScale}rem`, padding: `${0.5 * headerScale}rem ${1.25 * headerScale}rem` }}>
-                                    MOCK TEST
-                                </div>
+
                                 <button onClick={closePresentation} className="bg-white/10 hover:bg-white/20 dark:bg-white/10 dark:hover:bg-white/20 rounded-full text-white shadow-sm border border-white/20 transition-all hover:scale-105 flex items-center justify-center shrink-0" style={{ width: `${2.75 * headerScale}rem`, height: `${2.75 * headerScale}rem` }} title="Close Presentation">
                                     <X style={{ width: `${1.4 * headerScale}rem`, height: `${1.4 * headerScale}rem` }} strokeWidth={2.5} />
                                 </button>
@@ -2175,7 +2203,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                                     {/* Question */}
                                     <div
-                                        className={`flex items-start gap-3 md:gap-4 w-full max-w-5xl mt-8 md:mt-2 transition-all duration-300 relative z-10 ${qBgColor !== 'transparent' ? `${qBgColor} p-4 md:p-6 rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-lg` : ''}`}
+                                        className={`flex items-start gap-3 md:gap-4 w-full max-w-5xl mt-8 md:mt-2 transition-all duration-300 relative z-10 ${qBgColor !== 'transparent' ? `${qBgColor} p-4 md:p-6 rounded-lg border border-gray-200/50 dark:border-gray-700/50 shadow-xl` : ''}`}
                                         style={{
                                             '--q-color': qTextColor !== 'default' ? qTextColor : undefined,
                                             ...(qBgColor !== 'transparent' && bgTheme === 'dots' ? {
@@ -2198,16 +2226,29 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                         </div>
                                     </div>
 
-                                    {/* Options */}
-                                    <motion.div
-                                        className={optionsLayout === 'grid' ? "grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 w-full max-w-6xl mt-12 md:mt-16" : "flex flex-col gap-y-3 w-[90%] md:w-fit md:min-w-[500px] max-w-5xl mt-12 md:mt-12 mx-auto"}
-                                        initial="hidden"
-                                        animate="visible"
-                                        variants={{
-                                            hidden: {},
-                                            visible: { transition: { staggerChildren: animSpeed / 2 } }
-                                        }}
-                                    >
+                                    {/* Options Area with Side Navigation */}
+                                    <div className="relative w-full max-w-[1200px] flex justify-center mt-12 md:mt-16 mx-auto">
+                                        {/* Prev Arrow */}
+                                        {currentSlide > 0 && (
+                                            <div className="absolute left-[-10px] md:left-[-50px] lg:left-[-70px] top-1/2 -translate-y-1/2 z-[45] group hidden md:block">
+                                                <button
+                                                    onClick={prevStep}
+                                                    className="p-3 bg-white/70 hover:bg-white dark:bg-gray-800/70 dark:hover:bg-gray-800 text-indigo-600 dark:text-indigo-400 rounded-full shadow-lg backdrop-blur-sm border border-gray-200 dark:border-gray-600 transition-all hover:scale-110 active:scale-95"
+                                                >
+                                                    <ChevronLeft className="w-8 h-8" strokeWidth={2.5} />
+                                                </button>
+                                            </div>
+                                        )}
+
+                                        <motion.div
+                                            className={optionsLayout === 'grid' ? "grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 w-full max-w-6xl" : "flex flex-col gap-y-3 w-[90%] md:w-fit md:min-w-[500px] max-w-5xl mx-auto"}
+                                            initial="hidden"
+                                            animate="visible"
+                                            variants={{
+                                                hidden: {},
+                                                visible: { transition: { staggerChildren: animSpeed / 2 } }
+                                            }}
+                                        >
                                         {parsedOptions.length > 0 && parsedOptions.map((opt: { key: string, text: string }, oIdx: number) => {
                                             const isCorrect = q.correctAnswer && q.correctAnswer.toLowerCase().includes(opt.key);
                                             const optLetter = getOptionLabel(opt.key, uiLang);
@@ -2372,7 +2413,20 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                 </motion.div>
                                             );
                                         })}
-                                    </motion.div>
+                                        </motion.div>
+
+                                        {/* Next Arrow */}
+                                        {currentSlide < questions.length - 1 && (
+                                            <div className="absolute right-[-10px] md:right-[-50px] lg:right-[-70px] top-1/2 -translate-y-1/2 z-[45] group hidden md:block">
+                                                <button
+                                                    onClick={nextStep}
+                                                    className="p-3 bg-white/70 hover:bg-white dark:bg-gray-800/70 dark:hover:bg-gray-800 text-indigo-600 dark:text-indigo-400 rounded-full shadow-lg backdrop-blur-sm border border-gray-200 dark:border-gray-600 transition-all hover:scale-110 active:scale-95"
+                                                >
+                                                    <ChevronRight className="w-8 h-8" strokeWidth={2.5} />
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
 
                                     {/* Explanation */}
                                     {step >= 2 && q.explanation && isExpEnabled && (
@@ -3324,15 +3378,6 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 )}
                             </div>
 
-                            {/* Controls */}
-                            <div className="flex gap-2 md:gap-3 shrink-0">
-                                <button onClick={prevStep} className="p-2 md:p-3 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full text-gray-700 dark:text-gray-200 transition-all active:scale-95">
-                                    <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
-                                </button>
-                                <button onClick={nextStep} className="p-2 md:p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-md transition-all active:scale-95">
-                                    <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
-                                </button>
-                            </div>
                         </div>
                     </div>
 
