@@ -135,7 +135,7 @@ const getWatermarkSvg = (spacing: number, size: number, opacity: number, text: s
     let textElements = '';
     const saffron = dark ? '#FFA057' : '#FF671F';
     const green = dark ? '#22C55E' : '#046A38';
-    const effectiveOpacity = opacity > 0 ? Math.max(opacity, dark ? 0.16 : 0.14) : 0;
+    const effectiveOpacity = opacity > 0 ? Math.max(opacity, dark ? 0.32 : 0.28) : 0;
 
     if (cleanText.toUpperCase() === 'DESHEXAM') {
         textElements = `<tspan fill="${saffron}" fill-opacity="${effectiveOpacity}">DESH</tspan><tspan dx="4" fill="${green}" fill-opacity="${effectiveOpacity}">EXAM</tspan>`;
@@ -167,7 +167,22 @@ interface PresentationOverlayProps {
 }
 
 export default function PresentationOverlay({ questions, classLine, chapterName, topicName, autoStart, onClose, isPremiumUser }: PresentationOverlayProps) {
-    const { user } = useAuth();
+    const { user, userProfile } = useAuth();
+    const [fetchedIsAdmin, setFetchedIsAdmin] = useState(false);
+
+    useEffect(() => {
+        if (user?.uid) {
+            getUserProfile(user.uid).then(p => {
+                if (p?.role === 'admin' || p?.isAdmin === true) {
+                    setFetchedIsAdmin(true);
+                }
+            }).catch(console.error);
+        }
+    }, [user?.uid]);
+
+    const isAdmin = fetchedIsAdmin || userProfile?.role === 'admin' || userProfile?.isAdmin === true;
+    const canUsePremium = isPremiumUser || isAdmin || userProfile?.subscriptionPlan === 'pro' || userProfile?.subscriptionPlan === 'pass';
+
     const [isOpen, setIsOpen] = useState(false);
     const [currentSlide, setCurrentSlide] = useState(0);
     const [step, setStep] = useState(0); // 0: Question, 1: Show Answer, 2: Show Explanation
@@ -181,9 +196,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [isTimerEnabled, setIsTimerEnabled] = useState(true);
     const [timerSeconds, setTimerSeconds] = useState(0);
     const [wmText, setWmText] = useState('DESHEXAM');
-    const [wmOpacity, setWmOpacity] = useState(0.18);
-    const [wmSize, setWmSize] = useState(15);
-    const [wmSpacing, setWmSpacing] = useState(120);
+    const [wmOpacity, setWmOpacity] = useState(0.28);
+    const [wmSize, setWmSize] = useState(13);
+    const [wmSpacing, setWmSpacing] = useState(80);
     const [wmVisible, setWmVisible] = useState(true);
 
     // ── Feature 7: Multi-language UI ──────────────────────────────────────────
@@ -1594,11 +1609,10 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                         return (
                             <div
                                 style={{ transform: `translate(${timerPos.x}px, ${timerPos.y}px)` }}
-                                className={`absolute ${showHeader ? 'top-[70px] md:top-[76px]' : 'top-4'} right-4 md:right-8 z-[70] select-none touch-none transition-all duration-300 ${
-                                    isDraggingTimer
+                                className={`absolute ${showHeader ? 'top-[70px] md:top-[76px]' : 'top-4'} right-4 md:right-8 z-[70] select-none touch-none transition-all duration-300 ${isDraggingTimer
                                         ? 'cursor-grabbing scale-105 drop-shadow-[0_20px_40px_rgba(59,130,246,0.35)]'
                                         : 'cursor-grab hover:drop-shadow-[0_12px_30px_rgba(59,130,246,0.25)] hover:scale-105'
-                                }`}
+                                    }`}
                                 onPointerDown={handleTimerPointerDown}
                                 onPointerMove={handleTimerPointerMove}
                                 onPointerUp={handleTimerPointerUp}
@@ -2718,7 +2732,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                                                 <div>
                                                     <div className="relative">
-                                                        {!isPremiumUser && (
+                                                        {!canUsePremium && (
                                                             <div className="absolute inset-0 z-10 bg-gray-50/40 dark:bg-gray-900/60 backdrop-blur-[1.5px] rounded-xl flex items-center justify-center mt-6">
                                                                 <a href="/pricing" className="bg-gradient-to-r from-amber-500 to-orange-600 text-white text-[10px] font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 hover:scale-105 transition-transform cursor-pointer">
                                                                     <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
@@ -2726,14 +2740,14 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                                 </a>
                                                             </div>
                                                         )}
-                                                        <div className={`text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 flex items-center justify-between ${!isPremiumUser ? 'opacity-50' : ''}`}>
+                                                        <div className={`text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 flex items-center justify-between ${!canUsePremium ? 'opacity-50' : ''}`}>
                                                             <span className="flex items-center gap-2"><Stamp className="w-4 h-4 text-indigo-500" /> Watermark</span>
                                                             <button onClick={() => setWmVisible(!wmVisible)} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${wmVisible ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}>
                                                                 <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${wmVisible ? 'translate-x-5' : 'translate-x-1'}`} />
                                                             </button>
                                                         </div>
                                                         {wmVisible && (
-                                                            <div className={`flex flex-col gap-3 bg-gray-50 dark:bg-gray-800/80 p-2.5 rounded-xl border border-gray-100 dark:border-gray-700 shadow-inner ${!isPremiumUser ? 'opacity-50 pointer-events-none select-none' : ''}`}>
+                                                            <div className={`flex flex-col gap-3 bg-gray-50 dark:bg-gray-800/80 p-2.5 rounded-xl border border-gray-100 dark:border-gray-700 shadow-inner ${!canUsePremium ? 'opacity-50 pointer-events-none select-none' : ''}`}>
                                                                 <input
                                                                     type="text"
                                                                     value={wmText}
@@ -2744,7 +2758,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                                 <div className="flex items-center gap-3">
                                                                     <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-16 whitespace-nowrap">Opacity</span>
                                                                     <input
-                                                                        type="range" min="0" max="0.3" step="0.01"
+                                                                        type="range" min="0" max="0.6" step="0.01"
                                                                         value={wmOpacity} onChange={(e) => setWmOpacity(Number(e.target.value))}
                                                                         className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
                                                                     />
@@ -2762,7 +2776,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                                 <div className="flex items-center gap-3">
                                                                     <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-16 whitespace-nowrap">Spacing</span>
                                                                     <input
-                                                                        type="range" min="100" max="1000" step="10"
+                                                                        type="range" min="50" max="500" step="5"
                                                                         value={wmSpacing} onChange={(e) => setWmSpacing(Number(e.target.value))}
                                                                         className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
                                                                     />

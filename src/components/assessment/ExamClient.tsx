@@ -220,7 +220,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
     getUserProfile(user.uid).then(profile => {
       const userPlan = profile?.subscriptionPlan || null;
       const isAdmin = profile?.role === 'admin' || profile?.isAdmin === true;
-      setIsPremiumUser(userPlan === 'pro' || userPlan === 'pass');
+      setIsPremiumUser(isAdmin || userPlan === 'pro' || userPlan === 'pass');
 
       if (mockTest.accessType === 'free' || !mockTest.accessType) {
         setHasAccess(true);
