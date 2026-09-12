@@ -453,6 +453,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [showCelebration, setShowCelebration] = useState(false);
     const [isCelebrationEnabled, setIsCelebrationEnabled] = useState(true);
     const [isCelebrationSoundEnabled, setIsCelebrationSoundEnabled] = useState(true);
+    const [celebrationDuration, setCelebrationDuration] = useState(2);
     const [isAutoChangeQuestion, setIsAutoChangeQuestion] = useState(true);
     const [autoChangeDelay, setAutoChangeDelay] = useState(3);
     const [currentPraise, setCurrentPraise] = useState(CELEBRATION_PRAISES[0]);
@@ -464,24 +465,22 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         praiseIdxRef.current += 1;
         setCurrentPraise(nextPraise);
         
-        setTimeout(() => {
-            setShowCelebration(true);
+        setShowCelebration(true);
 
-            if (isCelebrationSoundEnabled) {
-                if (winAudioRef.current) {
-                    winAudioRef.current.currentTime = 0;
-                    winAudioRef.current.play().catch(console.warn);
-                } else if (wowAudioRef.current) {
-                    wowAudioRef.current.currentTime = 0;
-                    wowAudioRef.current.play().catch(console.warn);
-                }
+        if (isCelebrationSoundEnabled) {
+            if (winAudioRef.current) {
+                winAudioRef.current.currentTime = 0;
+                winAudioRef.current.play().catch(console.warn);
+            } else if (wowAudioRef.current) {
+                wowAudioRef.current.currentTime = 0;
+                wowAudioRef.current.play().catch(console.warn);
             }
+        }
 
-            setTimeout(() => {
-                setShowCelebration(false);
-            }, 2000);
-        }, 1000);
-    }, [isCelebrationEnabled, isCelebrationSoundEnabled]);
+        setTimeout(() => {
+            setShowCelebration(false);
+        }, celebrationDuration * 1000);
+    }, [isCelebrationEnabled, isCelebrationSoundEnabled, celebrationDuration]);
 
     const [isConfettiActive, setIsConfettiActive] = useState(false);
     const [isLofiEnabled, setIsLofiEnabled] = useState(false);
@@ -495,7 +494,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [selectedMusic, setSelectedMusic] = useState(MUSIC_OPTIONS[0].url);
     const [musicVolume, setMusicVolume] = useState(0.5);
     const [consecutiveCorrect, setConsecutiveCorrect] = useState(0);
-    const [bgTheme, setBgTheme] = useState<'default' | 'mesh' | 'grid' | 'dots' | 'video'>('dots');
+    const [bgTheme, setBgTheme] = useState<'default' | 'mesh' | 'grid' | 'dots' | 'video' | 'midnight' | 'aurora' | 'sunset'>('dots');
     const [selectedVideo, setSelectedVideo] = useState(VIDEO_OPTIONS[0].url);
     const [videoOpacity, setVideoOpacity] = useState(40);
     const [bgOpacity, setBgOpacity] = useState(100);
@@ -524,6 +523,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
             case 'grid': return 'bg-[#f8fafc] dark:bg-gray-900';
             case 'dots': return 'bg-[#f8fafc] dark:bg-gray-900';
             case 'video': return 'bg-black/90 text-white';
+            case 'midnight': return 'bg-slate-950 text-white';
+            case 'aurora': return 'bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#022c22] text-white';
+            case 'sunset': return 'bg-gradient-to-br from-[#4c1d95] via-[#9f1239] to-[#fb923c] text-white';
             default: return 'bg-slate-50 dark:bg-slate-950';
         }
     };
@@ -533,7 +535,10 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
             case 'mesh': return 'bg-gradient-to-br from-indigo-100 via-purple-50 to-teal-100 dark:from-indigo-950 dark:via-purple-900 dark:to-teal-950';
             case 'grid': return 'bg-[linear-gradient(to_right,#8080801a_1px,transparent_1px),linear-gradient(to_bottom,#8080801a_1px,transparent_1px)] bg-[size:24px_24px]';
             case 'dots': return 'bg-[radial-gradient(#cbd5e1_1.5px,transparent_1.5px)] dark:bg-[radial-gradient(#374151_1.5px,transparent_1.5px)] [background-size:20px_20px]';
-            case 'video': return '';
+            case 'midnight': return 'bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))]';
+            case 'video':
+            case 'aurora':
+            case 'sunset': return '';
             default: return 'bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.25),rgba(255,255,255,0))] dark:bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.2),rgba(255,255,255,0))]';
         }
     };
@@ -764,6 +769,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
         const resizeCanvas = () => {
             const canvas = canvasRef.current;
+            const activeCanvas = activeCanvasRef.current;
             if (!canvas) return;
             const newWidth = canvas.offsetWidth;
             const newHeight = canvas.offsetHeight;
@@ -772,9 +778,6 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
             if (newWidth === 0 || newHeight === 0) return;
 
             if (canvas.width !== newWidth || canvas.height !== newHeight) {
-                // If the new dimensions are zero, don't set them, just return
-                if (newWidth === 0 || newHeight === 0) return;
-
                 canvas.width = newWidth;
                 canvas.height = newHeight;
                 const context = canvas.getContext('2d');
@@ -783,6 +786,11 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     context.lineJoin = 'round';
                     contextRef.current = context;
                 }
+            }
+
+            if (activeCanvas && (activeCanvas.width !== newWidth || activeCanvas.height !== newHeight)) {
+                activeCanvas.width = newWidth;
+                activeCanvas.height = newHeight;
             }
         };
 
@@ -882,19 +890,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         const canvas = canvasRef.current;
         if (!canvas) return;
 
-        // Force resize if incorrect right before drawing
-        const expectedWidth = canvas.offsetWidth;
-        const expectedHeight = canvas.offsetHeight;
-        if (expectedWidth > 0 && expectedHeight > 0 && (canvas.width !== expectedWidth || canvas.height !== expectedHeight)) {
-            canvas.width = expectedWidth;
-            canvas.height = expectedHeight;
-            const newCtx = canvas.getContext('2d');
-            if (newCtx) {
-                newCtx.lineCap = 'round';
-                newCtx.lineJoin = 'round';
-                contextRef.current = newCtx;
-            }
-        }
+
 
         isDrawing.current = true;
         try {
@@ -921,11 +917,6 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const redrawActiveStroke = () => {
         const canvas = activeCanvasRef.current;
         if (!canvas) return;
-
-        if (canvas.width !== canvas.offsetWidth || canvas.height !== canvas.offsetHeight) {
-            canvas.width = canvas.offsetWidth;
-            canvas.height = canvas.offsetHeight;
-        }
 
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
@@ -1679,7 +1670,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     {/* Active Stroke Canvas (Top Layer) */}
                     <canvas
                         ref={activeCanvasRef}
-                        className={`absolute inset-0 w-full h-full z-30 touch-none ${isPenActive && drawingTool !== 'laser' ? 'pointer-events-auto cursor-none' : 'pointer-events-none'}`}
+                        className={`absolute inset-0 w-full h-full z-30 touch-none ${isPenActive && drawingTool !== 'laser' ? 'pointer-events-auto' : 'pointer-events-none'} ${isPenActive && drawingTool !== 'laser' && drawingTool !== 'pen' ? 'cursor-none' : ''}`}
+                        style={isPenActive && drawingTool === 'pen' ? { cursor: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 24 24'><path d='M0 0l6 2 13 13a3 3 0 0 1-4 4L2 6z' fill='${encodeURIComponent(penColor)}' stroke='white' stroke-width='1.5' stroke-linejoin='round'/><path d='M6 2L2 6' stroke='white' stroke-width='1.5' stroke-linecap='round'/></svg>") 0 0, crosshair` } : undefined}
                         onPointerDown={startDrawing}
                         onPointerMove={draw}
                         onPointerUp={stopDrawing}
@@ -1693,10 +1685,10 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     />
 
                     {/* Custom Mouse Cursor for Presentation Tools */}
-                    {isPenActive && (
+                    {isPenActive && drawingTool !== 'pen' && (
                         <div
                             ref={cursorRef}
-                            className="absolute z-40 pointer-events-none"
+                            className="absolute z-40 pointer-events-none flex items-center justify-center"
                             style={{
                                 left: -100,
                                 top: -100,
@@ -2649,6 +2641,46 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                                                 <div>
                                                     <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
+                                                        <span className="flex items-center gap-2"><Sparkles className="w-4 h-4 text-indigo-500" /> Celebration Settings</span>
+                                                    </div>
+                                                    <div className="space-y-3">
+                                                        <div className="flex items-center justify-between">
+                                                            <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Enable Celebration</span>
+                                                            <button onClick={() => setIsCelebrationEnabled(!isCelebrationEnabled)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${isCelebrationEnabled ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-gray-700'}`}>
+                                                                <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ${isCelebrationEnabled ? 'translate-x-5' : 'translate-x-1'}`} />
+                                                            </button>
+                                                        </div>
+                                                        {isCelebrationEnabled && (
+                                                            <>
+                                                                <div className="flex items-center justify-between mt-2 pl-4 md:pl-6">
+                                                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Celebration Sound</span>
+                                                                    <button onClick={() => setIsCelebrationSoundEnabled(!isCelebrationSoundEnabled)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${isCelebrationSoundEnabled ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-gray-700'}`}>
+                                                                        <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ${isCelebrationSoundEnabled ? 'translate-x-5' : 'translate-x-1'}`} />
+                                                                    </button>
+                                                                </div>
+                                                                <div className="flex items-center justify-between mt-2 pl-4 md:pl-6">
+                                                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Duration</span>
+                                                                    <select
+                                                                        value={celebrationDuration}
+                                                                        onChange={(e) => setCelebrationDuration(Number(e.target.value))}
+                                                                        className="text-xs font-medium bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-2 py-1 outline-none focus:border-indigo-500 dark:text-gray-200"
+                                                                    >
+                                                                        <option value={1}>1 Second</option>
+                                                                        <option value={2}>2 Seconds</option>
+                                                                        <option value={3}>3 Seconds</option>
+                                                                        <option value={4}>4 Seconds</option>
+                                                                        <option value={5}>5 Seconds</option>
+                                                                    </select>
+                                                                </div>
+                                                            </>
+                                                        )}
+                                                    </div>
+                                                </div>
+
+                                                <hr className="border-gray-100 dark:border-gray-800" />
+
+                                                <div>
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
                                                         <span className="flex items-center gap-2"><Printer className="w-4 h-4 text-indigo-500" /> Print Settings</span>
                                                     </div>
                                                     <div className="space-y-3">
@@ -2764,17 +2796,6 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     </div>
                                                 </div>
 
-                                                {/* Layout Template */}
-                                                <div>
-                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
-                                                        <span className="flex items-center gap-2"><LayoutGrid className="w-4 h-4 text-indigo-500" /> {L.layout}</span>
-                                                    </div>
-                                                    <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl flex-wrap gap-1">
-                                                        {([['default', 'Default'], ['split', 'Split'], ['minimal', 'Minimal'], ['card', 'Card'], ['fullscreen_q', 'FullQ']] as const).map(([val, label]) => (
-                                                            <button key={val} onClick={() => setLayoutTemplate(val as LayoutTemplate)} className={`flex-1 py-1 px-1 text-[10px] font-bold rounded-lg capitalize transition-colors ${layoutTemplate === val ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>{label}</button>
-                                                        ))}
-                                                    </div>
-                                                </div>
 
                                                 {/* Countdown Timer Settings */}
                                                 <div>
@@ -2821,11 +2842,14 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                         <span className="flex items-center gap-2"><LayoutGrid className="w-4 h-4 text-indigo-500" /> Background Theme</span>
                                                     </div>
                                                     <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl flex-wrap gap-1">
-                                                        <button onClick={() => setBgTheme('default')} className={`flex-1 py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'default' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Default</button>
-                                                        <button onClick={() => setBgTheme('mesh')} className={`flex-1 py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'mesh' ? 'bg-white dark:bg-gray-700 text-purple-600 dark:text-purple-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Mesh</button>
-                                                        <button onClick={() => setBgTheme('grid')} className={`flex-1 py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'grid' ? 'bg-white dark:bg-gray-700 text-emerald-600 dark:text-emerald-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Grid</button>
-                                                        <button onClick={() => setBgTheme('dots')} className={`flex-1 py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'dots' ? 'bg-white dark:bg-gray-700 text-orange-600 dark:text-orange-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Dots</button>
-                                                        <button onClick={() => setBgTheme('video')} className={`flex-1 py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'video' ? 'bg-white dark:bg-gray-700 text-rose-600 dark:text-rose-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Video</button>
+                                                        <button onClick={() => setBgTheme('default')} className={`flex-1 min-w-[22%] py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'default' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Default</button>
+                                                        <button onClick={() => setBgTheme('mesh')} className={`flex-1 min-w-[22%] py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'mesh' ? 'bg-white dark:bg-gray-700 text-purple-600 dark:text-purple-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Mesh</button>
+                                                        <button onClick={() => setBgTheme('grid')} className={`flex-1 min-w-[22%] py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'grid' ? 'bg-white dark:bg-gray-700 text-emerald-600 dark:text-emerald-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Grid</button>
+                                                        <button onClick={() => setBgTheme('dots')} className={`flex-1 min-w-[22%] py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'dots' ? 'bg-white dark:bg-gray-700 text-orange-600 dark:text-orange-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Dots</button>
+                                                        <button onClick={() => setBgTheme('video')} className={`flex-1 min-w-[22%] py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'video' ? 'bg-white dark:bg-gray-700 text-rose-600 dark:text-rose-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Video</button>
+                                                        <button onClick={() => setBgTheme('midnight')} className={`flex-1 min-w-[22%] py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'midnight' ? 'bg-white dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Midnight</button>
+                                                        <button onClick={() => setBgTheme('aurora')} className={`flex-1 min-w-[22%] py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'aurora' ? 'bg-white dark:bg-gray-700 text-teal-600 dark:text-teal-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Aurora</button>
+                                                        <button onClick={() => setBgTheme('sunset')} className={`flex-1 min-w-[22%] py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'sunset' ? 'bg-white dark:bg-gray-700 text-pink-600 dark:text-pink-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Sunset</button>
                                                     </div>
                                                     {bgTheme === 'video' && (
                                                         <div className="mt-2 space-y-2">
@@ -3455,7 +3479,66 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             }
                         }
                     ` }} />
+                    {/* Floating Presentation Tools (Right Edge) */}
+                    {isPenActive && (
+                        <div className="absolute right-4 bottom-8 z-[70] bg-slate-900/95 backdrop-blur-xl p-1 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.4)] border border-slate-700/50 flex flex-col gap-1 w-9 items-center animate-in slide-in-from-right-10 fade-in duration-300">
+                            
+                            <button onClick={() => setDrawingTool('laser')} className={`p-0.5 rounded-lg transition-all ${drawingTool === 'laser' ? 'bg-red-500/20 text-red-400 border border-red-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Laser (Shift+L)">
+                                <MousePointer2 className="w-4 h-4" />
+                            </button>
+                            <button onClick={() => setDrawingTool('pen')} className={`p-0.5 rounded-lg transition-all ${drawingTool === 'pen' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Pen (Shift+P)">
+                                <Pen className="w-4 h-4" />
+                            </button>
+                            <button onClick={() => setDrawingTool('highlighter')} className={`p-0.5 rounded-lg transition-all ${drawingTool === 'highlighter' ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Marker (Shift+M)">
+                                <Highlighter className="w-4 h-4" />
+                            </button>
+                            <button onClick={() => setDrawingTool('eraser')} className={`p-0.5 rounded-lg transition-all ${drawingTool === 'eraser' ? 'bg-slate-500/40 text-white border border-slate-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Eraser (Shift+E)">
+                                <Eraser className="w-4 h-4" />
+                            </button>
+                            
+                            <hr className="w-full border-slate-700/50 my-0.5" />
+                            
+                            <button onClick={() => setDrawingTool('rectangle')} className={`p-0.5 rounded-lg transition-all ${drawingTool === 'rectangle' ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Rectangle (Shift+B)">
+                                <Square className="w-4 h-4" />
+                            </button>
+                            <button onClick={() => setDrawingTool('circle')} className={`p-0.5 rounded-lg transition-all ${drawingTool === 'circle' ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Circle (Shift+C)">
+                                <Circle className="w-4 h-4" />
+                            </button>
 
+                            <hr className="w-full border-slate-700/50 my-0.5" />
+
+                            <button onClick={clearCanvas} className="p-0.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all" title="Clear Canvas (Shift+Del)">
+                                <Trash2 className="w-4 h-4" />
+                            </button>
+
+                            <hr className="w-full border-slate-700/50 my-0.5" />
+
+                            {/* Color Picker Group */}
+                            <div className={`relative group mt-0.5 mb-0.5 transition-opacity ${drawingTool === 'laser' || drawingTool === 'magnifier' ? 'opacity-30 pointer-events-none' : 'opacity-100'}`}>
+                                {/* The main color button */}
+                                <div className="w-5 h-5 mx-auto relative rounded-full overflow-hidden border border-slate-600 hover:border-slate-400 transition-all cursor-pointer shadow-sm" title="Choose Color">
+                                    <div className="absolute inset-0 pointer-events-none" style={{ backgroundColor: penColor }}></div>
+                                    <input
+                                        type="color"
+                                        value={penColor}
+                                        onChange={e => setPenColor(e.target.value)}
+                                        className="absolute inset-[-10px] w-[50px] h-[50px] cursor-pointer opacity-0"
+                                    />
+                                </div>
+                                {/* Flyout for quick colors */}
+                                <div className="absolute right-full top-1/2 -translate-y-1/2 mr-3 hidden group-hover:flex bg-slate-900/95 backdrop-blur-xl p-1.5 rounded-2xl border border-slate-700/50 shadow-xl gap-1.5 animate-in slide-in-from-right-2 fade-in duration-200">
+                                    {['#ef4444', '#3b82f6', '#22c55e', '#facc15', '#ffffff'].map(c => (
+                                        <button
+                                            key={c}
+                                            onClick={() => setPenColor(c)}
+                                            className={`w-5 h-5 rounded-full border-2 ${penColor === c ? 'border-white scale-110 shadow-lg' : 'border-transparent hover:scale-110'} transition-all`}
+                                            style={{ backgroundColor: c }}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                 </div>
 
