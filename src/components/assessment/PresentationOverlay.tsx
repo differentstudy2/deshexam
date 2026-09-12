@@ -453,6 +453,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [showCelebration, setShowCelebration] = useState(false);
     const [isCelebrationEnabled, setIsCelebrationEnabled] = useState(true);
     const [isCelebrationSoundEnabled, setIsCelebrationSoundEnabled] = useState(true);
+    const [isAutoChangeQuestion, setIsAutoChangeQuestion] = useState(true);
+    const [autoChangeDelay, setAutoChangeDelay] = useState(3);
     const [currentPraise, setCurrentPraise] = useState(CELEBRATION_PRAISES[0]);
     const praiseIdxRef = useRef(0);
 
@@ -461,21 +463,24 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         const nextPraise = CELEBRATION_PRAISES[praiseIdxRef.current % CELEBRATION_PRAISES.length];
         praiseIdxRef.current += 1;
         setCurrentPraise(nextPraise);
-        setShowCelebration(true);
-
-        if (isCelebrationSoundEnabled) {
-            if (winAudioRef.current) {
-                winAudioRef.current.currentTime = 0;
-                winAudioRef.current.play().catch(console.warn);
-            } else if (wowAudioRef.current) {
-                wowAudioRef.current.currentTime = 0;
-                wowAudioRef.current.play().catch(console.warn);
-            }
-        }
-
+        
         setTimeout(() => {
-            setShowCelebration(false);
-        }, 2400);
+            setShowCelebration(true);
+
+            if (isCelebrationSoundEnabled) {
+                if (winAudioRef.current) {
+                    winAudioRef.current.currentTime = 0;
+                    winAudioRef.current.play().catch(console.warn);
+                } else if (wowAudioRef.current) {
+                    wowAudioRef.current.currentTime = 0;
+                    wowAudioRef.current.play().catch(console.warn);
+                }
+            }
+
+            setTimeout(() => {
+                setShowCelebration(false);
+            }, 2000);
+        }, 1000);
     }, [isCelebrationEnabled, isCelebrationSoundEnabled]);
 
     const [isConfettiActive, setIsConfettiActive] = useState(false);
@@ -1292,6 +1297,20 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         }
     }, [step, currentSlide, questions, mode, isExpEnabled, isOptionExpEnabled]);
 
+    const nextStepRef = useRef(nextStep);
+    useEffect(() => {
+        nextStepRef.current = nextStep;
+    });
+
+    useEffect(() => {
+        if (isAutoChangeQuestion && step === 1) {
+            const timer = setTimeout(() => {
+                nextStepRef.current?.();
+            }, autoChangeDelay * 1000);
+            return () => clearTimeout(timer);
+        }
+    }, [isAutoChangeQuestion, step, autoChangeDelay]);
+
     const prevStep = useCallback(() => {
         if (mode === 'read') {
             if (currentSlide > 0) {
@@ -1368,39 +1387,12 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
 
+            // --- Unmodified / System Keys ---
             if (e.key === 'Escape') {
-                if (isSettingsOpen) {
-                    setIsSettingsOpen(false);
-                } else if (isNavigatorOpen) {
-                    setIsNavigatorOpen(false);
-                } else {
-                    closePresentation();
-                }
-                return;
-            }
-
-            if (e.key.toLowerCase() === 's') {
-                setIsSettingsOpen(prev => !prev);
-                return;
-            }
-
-            if (e.key.toLowerCase() === 't') {
-                setIsTimerEnabled(prev => !prev);
-                return;
-            }
-
-            if (e.key.toLowerCase() === 'm') {
-                setMode(prev => prev === 'test' ? 'read' : 'test');
-                return;
-            }
-
-            if (e.key === 'D') {
-                setIsPenActive(prev => !prev);
-                return;
-            }
-
-            if (e.key === 'F') {
-                setIsSpotlightActive(prev => !prev);
+                if (isSettingsOpen) setIsSettingsOpen(false);
+                else if (isNavigatorOpen) setIsNavigatorOpen(false);
+                else if (isShortcutsOpen) setIsShortcutsOpen(false);
+                else closePresentation();
                 return;
             }
 
@@ -1410,45 +1402,83 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 return;
             }
 
-            if (e.key === 'C' || e.key === 'Delete' || e.key === 'Backspace') {
+            // --- Modifiers (Shift) ---
+            if (e.shiftKey) {
+                if (e.key === '?') {
+                    setIsShortcutsOpen(prev => !prev);
+                    return;
+                }
+                if (e.key === 'R' || e.key === 'r') {
+                    handleReadAloudRef.current?.();
+                    return;
+                }
+                if (e.key === 'N' || e.key === 'n') {
+                    setIsDarkMode(prev => !prev);
+                    return;
+                }
+                if (e.key === 'F' || e.key === 'f') {
+                    setIsSpotlightActive(prev => !prev);
+                    return;
+                }
+                if (e.key === 'W' || e.key === 'w') {
+                    setIsWhiteboardMode(prev => !prev);
+                    return;
+                }
+                if (e.key === 'D' || e.key === 'd') {
+                    setIsPenActive(prev => !prev);
+                    return;
+                }
+                if (e.key === 'C' || e.key === 'c') {
+                    clearCanvas();
+                    return;
+                }
+                if (e.key === 'O' || e.key === 'o') {
+                    setIsOptionExpEnabled(prev => !prev);
+                    return;
+                }
+                if (e.key === 'X' || e.key === 'x') {
+                    // Show explanation
+                    const currentQ = questions[currentSlide];
+                    if (currentQ && (currentQ.explanation || (currentQ.optionExplanations && Object.keys(currentQ.optionExplanations).length > 0))) {
+                        setStep(2);
+                    }
+                    return;
+                }
+                return; // Ignore other shift keys to prevent conflicts
+            }
+
+            // --- Special Action Keys ---
+            if (e.key === 'Delete' || e.key === 'Backspace') {
                 clearCanvas();
                 return;
             }
 
-            if (e.key.toLowerCase() === 'q') {
-                setQFontScale(s => Math.max(0.6, s - 0.1));
+            // --- Single Letter Shortcuts (No Modifiers) ---
+            // Prevent conflicts with 'a', 'b', 'c', 'd', 'e'
+            const key = e.key.toLowerCase();
+            
+            if (key === 's') {
+                setIsSettingsOpen(prev => !prev);
                 return;
             }
-            if (e.key.toLowerCase() === 'w') {
-                setQFontScale(s => Math.min(2.0, s + 0.1));
+            if (key === 't') {
+                setIsTimerEnabled(prev => !prev);
                 return;
             }
-            if (e.key.toLowerCase() === 'o') {
-                setOptFontScale(s => Math.max(0.6, s - 0.1));
-                return;
-            }
-            if (e.key.toLowerCase() === 'p') {
-                setOptFontScale(s => Math.min(2.0, s + 0.1));
-                return;
-            }
-            if (e.key === '[') {
-                setExpFontScale(s => Math.max(0.6, s - 0.1));
-                return;
-            }
-            if (e.key === ']') {
-                setExpFontScale(s => Math.min(2.0, s + 0.1));
+            if (key === 'm') {
+                setMode(prev => prev === 'test' ? 'read' : 'test');
                 return;
             }
 
-            if (e.key.toLowerCase() === 'l') {
-                setOptionsLayout('list');
-                return;
-            }
-
-            if (e.key.toLowerCase() === 'g') {
-                setOptionsLayout('grid');
-                return;
-            }
+            // Undocumented but useful font & layout shortcuts
+            if (key === 'q') { setQFontScale(s => Math.max(0.6, s - 0.1)); return; }
+            if (key === 'w') { setQFontScale(s => Math.min(2.0, s + 0.1)); return; }
+            if (key === 'o') { setOptFontScale(s => Math.max(0.6, s - 0.1)); return; }
+            if (key === 'p') { setOptFontScale(s => Math.min(2.0, s + 0.1)); return; }
+            if (key === '[') { setExpFontScale(s => Math.max(0.6, s - 0.1)); return; }
+            if (key === ']') { setExpFontScale(s => Math.min(2.0, s + 0.1)); return; }
+            if (key === 'l') { setOptionsLayout('list'); return; }
+            if (key === 'g') { setOptionsLayout('grid'); return; }
 
             if (!isSettingsOpen) {
                 if (e.key === 'ArrowRight' || e.key === ' ') {
@@ -1460,7 +1490,6 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     prevStep();
                 }
                 if (step === 0) {
-                    const key = e.key.toLowerCase();
                     if (e.key === 'Enter') {
                         e.preventDefault();
                         const currentQ = questions[currentSlide];
@@ -1469,8 +1498,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             const validKeys = ['a', 'b', 'c', 'd', 'e'];
                             const matchedKey = validKeys.find(k => correctKey.includes(k));
                             if (matchedKey) {
-                                const btn = document.getElementById(`option-card-${matchedKey}`);
-                                if (btn) btn.click();
+                                triggerHumanClick(matchedKey);
                             }
                         }
                     } else if (['a', 'b', 'c', 'd', 'e'].includes(key)) {
@@ -1489,7 +1517,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [isOpen, closePresentation, nextStep, prevStep, isSettingsOpen, step, currentSlide, questions, clearCanvas]);
+    }, [isOpen, closePresentation, nextStep, prevStep, isSettingsOpen, step, currentSlide, questions, clearCanvas, triggerHumanClick]);
     const currentQ = questions[currentSlide];
 
     const parsedOptions = useMemo(() => {
@@ -2113,42 +2141,40 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     transition={{ type: 'spring', stiffness: 220, damping: 22, mass: 0.9 }}
                                     className="relative z-10 flex flex-col items-center justify-center max-w-[92vw] sm:max-w-xl md:max-w-2xl px-4"
                                 >
-                                    <div className={`relative bg-gradient-to-r ${currentPraise.gradient} p-[2px] rounded-[0.5rem] shadow-[0_20px_70px_rgba(0,0,0,0.5)] backdrop-blur-md`}>
-                                        <div className="bg-slate-950/70 dark:bg-black/75 backdrop-blur-2xl px-6 sm:px-10 md:px-12 py-6 sm:py-7 md:py-8 rounded-[calc(0.5rem-2px)] flex flex-col items-center text-center gap-3.5 border border-white/20 shadow-2xl">
-                                            {/* Top animated emoji flair */}
-                                            <div className="flex items-center gap-3 sm:gap-5">
-                                                <motion.span
+                                    <div className="relative bg-white/50 dark:bg-black/50 backdrop-blur-xl px-6 sm:px-10 md:px-12 py-6 sm:py-7 md:py-8 rounded-[0.5rem] flex flex-col items-center text-center gap-3.5 border-2 border-white/60 dark:border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.2)]">
+                                        {/* Top animated emoji flair */}
+                                        <div className="flex items-center gap-3 sm:gap-5">
+                                            <motion.span
                                                 animate={{ y: [0, -8, 0] }}
                                                 transition={{ repeat: Infinity, duration: 1.4, ease: 'easeInOut' }}
-                                                className="text-4xl sm:text-5xl md:text-6xl inline-block"
+                                                className="text-4xl sm:text-5xl md:text-6xl inline-block drop-shadow-md"
                                             >{currentPraise.emojiLeft}</motion.span>
-                                                <motion.span
-                                                    animate={{ scale: [1, 1.25, 1], rotate: [0, 15, -15, 0] }}
-                                                    transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}
-                                                    className="text-3xl sm:text-4xl md:text-5xl inline-block"
-                                                >✨</motion.span>
-                                                <motion.span
-                                                    animate={{ y: [0, -8, 0] }}
-                                                    transition={{ repeat: Infinity, duration: 1.4, ease: 'easeInOut', delay: 0.2 }}
-                                                    className="text-4xl sm:text-5xl md:text-6xl inline-block"
-                                                >{currentPraise.emojiRight}</motion.span>
-                                            </div>
+                                            <motion.span
+                                                animate={{ scale: [1, 1.25, 1], rotate: [0, 15, -15, 0] }}
+                                                transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}
+                                                className="text-3xl sm:text-4xl md:text-5xl inline-block drop-shadow-md"
+                                            >✨</motion.span>
+                                            <motion.span
+                                                animate={{ y: [0, -8, 0] }}
+                                                transition={{ repeat: Infinity, duration: 1.4, ease: 'easeInOut', delay: 0.2 }}
+                                                className="text-4xl sm:text-5xl md:text-6xl inline-block drop-shadow-md"
+                                            >{currentPraise.emojiRight}</motion.span>
+                                        </div>
 
-                                            {/* Dynamic Appreciation Title */}
-                                            <h2 className={`text-2xl sm:text-3xl md:text-5xl font-black tracking-wide bg-gradient-to-r ${currentPraise.textGradient} bg-clip-text text-transparent drop-shadow-sm uppercase leading-tight`}>
-                                                {uiLang === 'bn' ? currentPraise.titleBn : currentPraise.titleEn}
-                                            </h2>
+                                        {/* Dynamic Appreciation Title */}
+                                        <h2 className={`text-2xl sm:text-3xl md:text-5xl font-black tracking-wide bg-gradient-to-r ${currentPraise.textGradient} bg-clip-text text-transparent drop-shadow-[0_2px_4px_rgba(255,255,255,0.5)] dark:drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] uppercase leading-tight`}>
+                                            {uiLang === 'bn' ? currentPraise.titleBn : currentPraise.titleEn}
+                                        </h2>
 
-                                            {/* Subtitle Praise */}
-                                            <p className="text-xs sm:text-sm md:text-base font-bold text-slate-100 dark:text-slate-200 tracking-wide max-w-md drop-shadow-sm">
-                                                {uiLang === 'bn' ? currentPraise.subtitleBn : currentPraise.subtitleEn}
-                                            </p>
+                                        {/* Subtitle Praise */}
+                                        <p className="text-xs sm:text-sm md:text-base font-bold text-slate-800 dark:text-slate-100 tracking-wide max-w-md drop-shadow-sm">
+                                            {uiLang === 'bn' ? currentPraise.subtitleBn : currentPraise.subtitleEn}
+                                        </p>
 
-                                            {/* Accuracy badge pill with 0.5rem radius */}
-                                            <div className="mt-1 px-4 py-1.5 rounded-[0.5rem] bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 dark:text-emerald-300 font-black text-xs md:text-sm tracking-wider uppercase flex items-center gap-2 shadow-xs backdrop-blur-sm">
-                                                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                                                {uiLang === 'bn' ? '১০০% নির্ভুল উত্তর' : '100% Accurate Answer'}
-                                            </div>
+                                        {/* Accuracy badge pill with 0.5rem radius */}
+                                        <div className="mt-1 px-4 py-1.5 rounded-[0.5rem] bg-emerald-50/80 dark:bg-emerald-500/20 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 font-black text-xs md:text-sm tracking-wider uppercase flex items-center gap-2 shadow-sm backdrop-blur-md">
+                                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+                                            {uiLang === 'bn' ? '১০০% নির্ভুল উত্তর' : '100% Accurate Answer'}
                                         </div>
                                     </div>
                                 </motion.div>
@@ -2581,20 +2607,20 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 <div className="relative shrink-0">
                                     <button
                                         onClick={() => setIsSettingsOpen(!isSettingsOpen)}
-                                        className={`p-2 md:p-3 rounded-full transition-all ${isSettingsOpen ? 'bg-orange-500 text-white ring-2 ring-orange-300' : 'bg-orange-500/80 hover:bg-orange-500 text-white'}`}
+                                        className={`p-2 md:p-3 rounded-full transition-all duration-300 ${isSettingsOpen ? 'bg-indigo-600 text-white shadow-[0_0_20px_rgba(79,70,229,0.4)] scale-105' : 'bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 hover:bg-white dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 hover:scale-105 shadow-lg'}`}
                                         title="Display Settings"
                                     >
-                                        <Settings className={`w-5 h-5 md:w-6 md:h-6 transition-transform duration-300 ${isSettingsOpen ? 'rotate-90' : ''}`} />
+                                        <Settings className={`w-5 h-5 md:w-6 md:h-6 transition-transform duration-500 ${isSettingsOpen ? 'rotate-90' : ''}`} />
                                     </button>
 
                                     {isSettingsOpen && (
-                                        <div className="fixed bottom-[80px] left-1/2 -translate-x-1/2 md:absolute md:bottom-full md:left-auto md:right-0 md:translate-x-0 md:mb-4 bg-white dark:bg-gray-900 !bg-opacity-100 !opacity-100 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)] p-5 w-[90vw] sm:w-[340px] z-[70] animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[70vh] md:max-h-[60vh]">
-                                            <div className="flex justify-between items-center mb-4 pb-3 border-b border-gray-100 dark:border-gray-800 shrink-0">
-                                                <h3 className="font-bold text-gray-800 dark:text-gray-200 text-lg flex items-center gap-2">
-                                                    <Settings className="w-5 h-5 text-gray-500 dark:text-gray-400" /> Settings
-                                                    <kbd className="ml-1 text-[10px] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-1.5 py-0.5 rounded text-gray-500 dark:text-gray-400 font-mono shadow-sm">S</kbd>
+                                        <div className="fixed bottom-[90px] left-1/2 -translate-x-1/2 md:absolute md:bottom-full md:left-auto md:right-0 md:translate-x-0 md:mb-6 bg-white/90 dark:bg-gray-950/90 backdrop-blur-3xl border border-white/50 dark:border-white/10 rounded-3xl shadow-[0_40px_80px_-20px_rgba(0,0,0,0.4)] p-6 w-[92vw] sm:w-[380px] z-[70] animate-in fade-in zoom-in-95 duration-300 flex flex-col max-h-[75vh] md:max-h-[65vh] ring-1 ring-black/5 dark:ring-white/5">
+                                            <div className="flex justify-between items-center mb-5 pb-4 border-b border-gray-200/50 dark:border-gray-800/50 shrink-0">
+                                                <h3 className="font-extrabold bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent text-xl flex items-center gap-2">
+                                                    <Settings className="w-6 h-6 text-indigo-500" /> Settings
+                                                    <kbd className="ml-2 text-[10px] bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800 px-1.5 py-0.5 rounded-md text-indigo-500 font-mono shadow-sm">S</kbd>
                                                 </h3>
-                                                <button onClick={() => setIsSettingsOpen(false)} className="p-1 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
+                                                <button onClick={() => setIsSettingsOpen(false)} className="p-1.5 bg-gray-100 dark:bg-gray-900 text-gray-400 hover:bg-rose-100 dark:hover:bg-rose-900/30 rounded-full hover:text-rose-500 dark:hover:text-rose-400 transition-all">
                                                     <X className="w-5 h-5" />
                                                 </button>
                                             </div>
@@ -2628,14 +2654,14 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     <div className="space-y-3">
                                                         <div className="flex items-center justify-between">
                                                             <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Include Correct Answers</span>
-                                                            <button onClick={() => setIsPrintWithAnswers(!isPrintWithAnswers)} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${isPrintWithAnswers ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}>
-                                                                <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${isPrintWithAnswers ? 'translate-x-5' : 'translate-x-1'}`} />
+                                                            <button onClick={() => setIsPrintWithAnswers(!isPrintWithAnswers)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${isPrintWithAnswers ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-gray-700'}`}>
+                                                                <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ${isPrintWithAnswers ? 'translate-x-5' : 'translate-x-1'}`} />
                                                             </button>
                                                         </div>
                                                         <div className="flex items-center justify-between">
                                                             <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Print as Continuous List</span>
-                                                            <button onClick={() => setIsPrintAsList(!isPrintAsList)} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${isPrintAsList ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}>
-                                                                <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${isPrintAsList ? 'translate-x-5' : 'translate-x-1'}`} />
+                                                            <button onClick={() => setIsPrintAsList(!isPrintAsList)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${isPrintAsList ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-gray-700'}`}>
+                                                                <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ${isPrintAsList ? 'translate-x-5' : 'translate-x-1'}`} />
                                                             </button>
                                                         </div>
                                                         <div className="flex items-center justify-between">
@@ -2643,8 +2669,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                                 <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Print Both Versions</span>
                                                                 <span className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">Test copy + Answer key</span>
                                                             </div>
-                                                            <button onClick={() => setIsPrintBothVersions(!isPrintBothVersions)} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${isPrintBothVersions ? 'bg-indigo-600' : 'bg-gray-300 dark:bg-gray-700'}`}>
-                                                                <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${isPrintBothVersions ? 'translate-x-5' : 'translate-x-1'}`} />
+                                                            <button onClick={() => setIsPrintBothVersions(!isPrintBothVersions)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${isPrintBothVersions ? 'bg-indigo-600' : 'bg-gray-200 dark:bg-gray-700'}`}>
+                                                                <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ${isPrintBothVersions ? 'translate-x-5' : 'translate-x-1'}`} />
                                                             </button>
                                                         </div>
                                                     </div>
@@ -2681,16 +2707,16 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     <div className="space-y-3">
                                                         <div className="flex items-center justify-between">
                                                             <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Show Header</span>
-                                                            <button onClick={() => setShowHeader(!showHeader)} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${showHeader ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}>
-                                                                <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${showHeader ? 'translate-x-5' : 'translate-x-1'}`} />
+                                                            <button onClick={() => setShowHeader(!showHeader)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${showHeader ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-gray-700'}`}>
+                                                                <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ${showHeader ? 'translate-x-5' : 'translate-x-1'}`} />
                                                             </button>
                                                         </div>
                                                         {showHeader && (
                                                             <>
                                                                 <div className="flex items-center justify-between">
                                                                     <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Show Logo</span>
-                                                                    <button onClick={() => setShowLogo(!showLogo)} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${showLogo ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}>
-                                                                        <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${showLogo ? 'translate-x-5' : 'translate-x-1'}`} />
+                                                                    <button onClick={() => setShowLogo(!showLogo)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${showLogo ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-gray-700'}`}>
+                                                                        <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ${showLogo ? 'translate-x-5' : 'translate-x-1'}`} />
                                                                     </button>
                                                                 </div>
                                                                 <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
@@ -2895,6 +2921,31 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                         <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isTimerEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
                                                     </button>
                                                 </div>
+
+                                                <div className="flex items-center justify-between mt-4">
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                                        <Clock className="w-4 h-4 text-indigo-500" /> Auto Change Question
+                                                    </div>
+                                                    <button onClick={() => setIsAutoChangeQuestion(!isAutoChangeQuestion)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${isAutoChangeQuestion ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-gray-700'}`}>
+                                                        <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ${isAutoChangeQuestion ? 'translate-x-5' : 'translate-x-1'}`} />
+                                                    </button>
+                                                </div>
+                                                {isAutoChangeQuestion && (
+                                                    <div className="flex items-center justify-between mt-2 pl-6">
+                                                        <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Delay Time</span>
+                                                        <select
+                                                            value={autoChangeDelay}
+                                                            onChange={(e) => setAutoChangeDelay(Number(e.target.value))}
+                                                            className="text-xs font-medium bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-2 py-1 outline-none focus:border-indigo-500 dark:text-gray-200"
+                                                        >
+                                                            <option value={1}>1 Second</option>
+                                                            <option value={2}>2 Seconds</option>
+                                                            <option value={3}>3 Seconds</option>
+                                                            <option value={4}>4 Seconds</option>
+                                                            <option value={5}>5 Seconds</option>
+                                                        </select>
+                                                    </div>
+                                                )}
 
                                                 <hr className="border-gray-100 dark:border-gray-800" />
 
