@@ -417,6 +417,10 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [isDraggingTimer, setIsDraggingTimer] = useState(false);
     const dragStartPos = useRef({ x: 0, y: 0 });
 
+    // ── Mobile Swipe Gesture State ────────────────────────────────────────────
+    const swipeTouchStartX = useRef<number | null>(null);
+    const swipeTouchStartY = useRef<number | null>(null);
+
     // Pen Tool State
     const [isPenActive, setIsPenActive] = useState(false);
     const [penColor, setPenColor] = useState('#ef4444');
@@ -1322,6 +1326,29 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         }
     }, [step, currentSlide, mode]);
 
+    // ── Mobile Swipe Gesture Handlers ────────────────────────────────────────
+    const handleSwipeTouchStart = useCallback((e: React.TouchEvent) => {
+        if (isPenActive) return;
+        swipeTouchStartX.current = e.touches[0].clientX;
+        swipeTouchStartY.current = e.touches[0].clientY;
+    }, [isPenActive]);
+
+    const handleSwipeTouchEnd = useCallback((e: React.TouchEvent) => {
+        if (isPenActive || swipeTouchStartX.current === null || swipeTouchStartY.current === null) return;
+        const dx = e.changedTouches[0].clientX - swipeTouchStartX.current;
+        const dy = e.changedTouches[0].clientY - swipeTouchStartY.current;
+        // Only trigger horizontal swipe if it's more horizontal than vertical
+        if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
+            if (dx < 0) {
+                nextStep();
+            } else {
+                prevStep();
+            }
+        }
+        swipeTouchStartX.current = null;
+        swipeTouchStartY.current = null;
+    }, [isPenActive, nextStep, prevStep]);
+
     useEffect(() => {
         if (mode === 'read') {
             setStep(2);
@@ -1633,6 +1660,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             draw(e);
                         }
                     }}
+                    onTouchStart={handleSwipeTouchStart}
+                    onTouchEnd={handleSwipeTouchEnd}
                 >
 
                     {/* Background Pattern Overlay */}
@@ -1787,6 +1816,13 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 boxShadow: '0 4px 20px rgba(109,40,217,0.3), 0 1px 0 rgba(255,255,255,0.12)'
                             }}
                         >
+                            {/* Mobile Progress Bar — top of header */}
+                            <div className="absolute bottom-0 left-0 w-full h-[3px] z-50 pointer-events-none md:hidden">
+                                <div
+                                    className="h-full bg-gradient-to-r from-yellow-300 via-orange-300 to-pink-300 transition-all duration-500 ease-out"
+                                    style={{ width: `${((currentSlide + 1) / questions.length) * 100}%` }}
+                                />
+                            </div>
                             {/* Logo Area */}
                             <div className="flex items-center w-full md:w-auto justify-between md:justify-start">
                                 {showLogo && (
@@ -1817,7 +1853,13 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                                 {/* Mobile Actions */}
                                 <div className="flex md:hidden items-center gap-2 shrink-0">
-
+                                    {/* Mobile: Question counter pill */}
+                                    <span className="bg-white/20 backdrop-blur-sm text-white font-black text-xs px-2.5 py-1 rounded-full border border-white/30">
+                                        {uiLang === 'bn'
+                                            ? `${toBanglaNumber(currentSlide + 1)}/${toBanglaNumber(questions.length)}`
+                                            : `${currentSlide + 1}/${questions.length}`
+                                        }
+                                    </span>
                                     <button onClick={closePresentation} className="bg-white/90 dark:bg-gray-800 hover:bg-white dark:hover:bg-gray-700 rounded-full text-indigo-600 dark:text-indigo-400 shadow-sm border border-indigo-100 dark:border-gray-600 transition-colors flex items-center justify-center shrink-0" style={{ width: `${2.2 * headerScale}rem`, height: `${2.2 * headerScale}rem` }}>
                                         <X style={{ width: `${1.2 * headerScale}rem`, height: `${1.2 * headerScale}rem` }} strokeWidth={2.5} />
                                     </button>
@@ -1825,7 +1867,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             </div>
 
                             {/* Title Area */}
-                            <div className={`flex-1 w-full md:px-6 flex flex-col justify-center ${headerTitleAlign === 'left' ? 'items-start text-left' :
+                            <div className={`flex-1 w-[calc(100%+1.5rem)] -mx-3 -mb-[0.75rem] px-3 py-2.5 mt-2 bg-slate-900 dark:bg-black border-t border-slate-700 md:w-full md:mx-0 md:mb-0 md:px-6 md:py-0 md:mt-0 md:bg-transparent md:border-t-0 md:shadow-none flex flex-col justify-center ${headerTitleAlign === 'left' ? 'items-start text-left' :
                                 headerTitleAlign === 'right' ? 'items-end text-right' :
                                     'items-center text-center'
                                 }`}>
@@ -1921,7 +1963,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                         return (
                             <div
                                 style={{ transform: `translate(${timerPos.x}px, ${timerPos.y}px)` }}
-                                className={`absolute ${showHeader ? 'top-[70px] md:top-[76px]' : 'top-4'} right-2 md:right-3 z-[70] select-none touch-none transition-all duration-300 ${isDraggingTimer
+                                className={`absolute ${showHeader ? 'top-[130px] md:top-[76px]' : 'top-4'} right-2 md:right-3 z-[70] select-none touch-none transition-all duration-300 ${isDraggingTimer
                                         ? 'cursor-grabbing scale-105 drop-shadow-[0_20px_40px_rgba(59,130,246,0.35)]'
                                         : 'cursor-grab hover:drop-shadow-[0_12px_30px_rgba(59,130,246,0.25)] hover:scale-105'
                                     }`}
@@ -2480,7 +2522,27 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             © DeshExam.app
                         </div>
 
-                        <div className="flex items-center gap-2 md:gap-4 lg:gap-8 ml-auto w-full md:w-auto justify-center md:justify-end">
+                        {/* ── Mobile Prev/Next Navigation Buttons ── */}
+                        <div className="flex md:hidden items-center shrink-0 gap-1">
+                            <button
+                                onClick={prevStep}
+                                disabled={currentSlide === 0 && step === 0}
+                                className="flex items-center justify-center w-11 h-11 rounded-full bg-white/15 hover:bg-white/25 active:scale-95 text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed border border-white/20"
+                                title="Previous"
+                            >
+                                <ChevronLeft className="w-6 h-6" strokeWidth={2.5} />
+                            </button>
+                            <button
+                                onClick={nextStep}
+                                disabled={currentSlide === questions.length - 1 && step >= 1}
+                                className="flex items-center justify-center w-11 h-11 rounded-full bg-white/15 hover:bg-white/25 active:scale-95 text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed border border-white/20"
+                                title="Next"
+                            >
+                                <ChevronRight className="w-6 h-6" strokeWidth={2.5} />
+                            </button>
+                        </div>
+
+                        <div className="flex items-center gap-2 md:gap-4 lg:gap-8 ml-auto w-auto md:w-auto justify-center md:justify-end">
                             <div className="flex items-center gap-2 md:gap-4">
                                 {/* Read Aloud Toggle Button (Footer) */}
                                 <button
@@ -2512,7 +2574,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 {/* Fullscreen Toggle Button */}
                                 <button
                                     onClick={toggleFullscreen}
-                                    className="p-2 md:p-3 rounded-full transition-all bg-teal-500/80 hover:bg-teal-500 text-white shrink-0"
+                                    className="hidden md:block p-2 md:p-3 rounded-full transition-all bg-teal-500/80 hover:bg-teal-500 text-white shrink-0"
                                     title="Toggle Fullscreen (F11)"
                                 >
                                     {isFullscreen ? <Minimize className="w-5 h-5 md:w-6 md:h-6" /> : <Maximize className="w-5 h-5 md:w-6 md:h-6" />}
