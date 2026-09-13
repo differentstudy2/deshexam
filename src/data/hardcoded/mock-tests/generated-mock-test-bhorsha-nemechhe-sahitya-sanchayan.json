@@ -31,6 +31,7 @@
   "questions": [
     {
       "id": "q1",
+      "questionType": "MCQ",
       "Question": "বর্ষা নামার ফলে কিসের অবসান ঘটেছে?",
       "Language": "Bengali",
       "Option A": "গর্মি",
@@ -49,6 +50,7 @@
     },
     {
       "id": "q2",
+      "questionType": "MCQ",
       "Question": "আকাশে কিসের গর্জন চলছে?",
       "Language": "Bengali",
       "Option A": "বাতাসের",
@@ -67,6 +69,7 @@
     },
     {
       "id": "q3",
+      "questionType": "MCQ",
       "Question": "মেঘের গর্জনের সঙ্গে আর কিসের চমকানি দেখা যাচ্ছে?",
       "Language": "Bengali",
       "Option A": "বিদ্যুতের",
@@ -85,6 +88,7 @@
     },
     {
       "id": "q4",
+      "questionType": "MCQ",
       "Question": "কোথাকার পর্বতে ঝর্নার জল বেড়ে উঠেছে?",
       "Language": "Bengali",
       "Option A": "হিমালয়",
@@ -103,6 +107,7 @@
     },
     {
       "id": "q5",
+      "questionType": "MCQ",
       "Question": "কোন নদীতে বন্যা দেখা দিয়েছে?",
       "Language": "Bengali",
       "Option A": "গঙ্গা",
@@ -121,6 +126,7 @@
     },
     {
       "id": "q6",
+      "questionType": "MCQ",
       "Question": "বন্যার জল কিসের ক্ষেত ডুবিয়ে দিয়েছে?",
       "Language": "Bengali",
       "Option A": "ধান",
@@ -139,6 +145,7 @@
     },
     {
       "id": "q7",
+      "questionType": "MCQ",
       "Question": "কার আঙিনায় প্লাবনের জল উঠে এসেছে?",
       "Language": "Bengali",
       "Option A": "রামনাথের",
@@ -157,6 +164,7 @@
     },
     {
       "id": "q8",
+      "questionType": "MCQ",
       "Question": "দুর্গানাথের ঘরের কিসের বেড়া ভেঙে গিয়েছে?",
       "Language": "Bengali",
       "Option A": "বাঁশের",
@@ -164,7 +172,7 @@
       "Option C": "ইটের",
       "Option D": "টিনের",
       "Correct Answer": "b",
-      "Explanation": "পানির তোড়ে দুর্গানাথের ঘরের শক্ত দর্মার বেড়াটি ভেঙে নষ্ট হয়ে গিয়েছে।",
+      "Explanation": "পানির তোড়ে দুর্গানাথের ঘরের শক্ত দর্মার বেড়াটি ভেঙে নষ্ট হয়ে গিয়েছে।",
       "Explanation A": "বাঁশ সাধারণ বেড়া তৈরির কাজে ব্যবহূত হয়।",
       "Explanation B": "সঠিক! পাঠ্যাংশ অনুসারে দুর্গানাথের 'দর্মার বেড়া ভেঙে গেল'।",
       "Explanation C": "ইট দিয়ে পাকা দেওয়াল তৈরি করা হয়ে থাকে।",
@@ -175,6 +183,7 @@
     },
     {
       "id": "q9",
+      "questionType": "MCQ",
       "Question": "কাদের বেচারা বলে বর্ণনা করা হয়েছে এবং তাদের দুর্গতি হয়েছে?",
       "Language": "Bengali",
       "Option A": "গোরুগুলোর",
@@ -193,6 +202,7 @@
     },
     {
       "id": "q10",
+      "questionType": "MCQ",
       "Question": "গোরুগুলো কোথায় দাঁড়িয়ে কষ্ট পাচ্ছে?",
       "Language": "Bengali",
       "Option A": "এক হাঁটু পাঁকে",
@@ -211,6 +221,7 @@
     },
     {
       "id": "q11",
+      "questionType": "MCQ",
       "Question": "দুর্যোগের কারণে কাদের কাজকর্ম সব বন্ধ হয়ে গেছে?",
       "Language": "Bengali",
       "Option A": "কামারদের",
@@ -229,6 +240,7 @@
     },
     {
       "id": "q12",
+      "questionType": "MCQ",
       "Question": "বর্ষায় ঘরে ঘরে কী রোগের প্রাদুর্ভাব ঘটেছে?",
       "Language": "Bengali",
       "Option A": "জ্বর-কাশি",
@@ -247,6 +259,7 @@
     },
     {
       "id": "q13",
+      "questionType": "MCQ",
       "Question": "কর্তাবাবু কী প’রে বাইরে বের হয়েছেন?",
       "Language": "Bengali",
       "Option A": "চাদর",
@@ -254,7 +267,7 @@
       "Option C": "কোট",
       "Option D": "শাল",
       "Correct Answer": "b",
-      "Explanation": "বৃষ্টি থেকে বাঁচতে কর্তাবাবু গায়ে বর্ষাতি বা রেইনকোট জড়িয়ে বাইরে বের হয়েছেন।",
+      "Explanation": "বৃষ্টি থেকে বাঁচতে কর্তাবাবু গায়ে বর্ষাতি বা রেইনকোট জড়িয়ে বাইরে বের হয়েছেন।",
       "Explanation A": "চাদর শীতের দিনে গায়ে দেওয়ার জন্য ব্যবহৃত হয়।",
       "Explanation B": "সঠিক! পাঠ্যাংশে আছে 'কর্তাবাবু বর্ষাতি প’রে চলেছেন'।",
       "Explanation C": "কোট একটি সাধারণ পোশাক যা বৃষ্টি প্রতিরোধ করে না।",
@@ -265,6 +278,7 @@
     },
     {
       "id": "q14",
+      "questionType": "MCQ",
       "Question": "কর্তাবাবুর সঙ্গে কে চলেছে?",
       "Language": "Bengali",
       "Option A": "আর্দালি তুর্কি মিঞা",
@@ -283,24 +297,26 @@
     },
     {
       "id": "q15",
+      "questionType": "MCQ",
       "Question": "মাটির গর্তগুলো জলে ভ’রে গিয়ে কিসের বাসায় পরিণত হয়েছে?",
       "Language": "Bengali",
       "Option A": "সাপের",
       "Option B": "ব্যাঙের",
       "Option C": "মাছের",
-      "Option D": "পিঁপড়ের",
+      "Option D": "পিঁপড়ের",
       "Correct Answer": "b",
       "Explanation": "বৃষ্টির জলে গর্তগুলি পূর্ণ হয়ে যাওয়ায় সেগুলি ব্যাঙের বাসে পরিণত হয়েছে।",
       "Explanation A": "সাপ গর্তে থাকে তবে জলে গর্ত ভরলে ব্যাঙ আসে।",
       "Explanation B": "সঠিক! পাঠ্য অনুসারে 'গর্ত সব ভ’রে গিয়ে ব্যাঙের বাসা হল'।",
       "Explanation C": "মাছ প্রধানত নদী, নালা বা পুকুরের জলে থাকে।",
-      "Explanation D": "পিঁপড়ে শুকনো মাটিতে বাসা তৈরি করে।",
+      "Explanation D": "পিঁপড়ে শুকনো মাটিতে বাসা তৈরি করে।",
       "marks": 1,
       "difficulty": "Easy",
       "status": "Published"
     },
     {
       "id": "q16",
+      "questionType": "MCQ",
       "Question": "পাড়ার নর্দমাগুলোর কী অবস্থা হয়েছে?",
       "Language": "Bengali",
       "Option A": "শুকিয়ে গেছে",
@@ -319,6 +335,7 @@
     },
     {
       "id": "q17",
+      "questionType": "MCQ",
       "Question": "'গর্মি' শব্দটির অর্থ কী?",
       "Language": "Bengali",
       "Option A": "শীতলতা",
@@ -337,6 +354,7 @@
     },
     {
       "id": "q18",
+      "questionType": "MCQ",
       "Question": "'আঙিনা' শব্দটির সঠিক অর্থ কী?",
       "Language": "Bengali",
       "Option A": "উঠোন",
@@ -355,6 +373,7 @@
     },
     {
       "id": "q19",
+      "questionType": "MCQ",
       "Question": "'পাঁক' শব্দটির সমার্থক শব্দ কোনটি?",
       "Language": "Bengali",
       "Option A": "জল",
@@ -362,17 +381,18 @@
       "Option C": "বালি",
       "Option D": "ধুলো",
       "Correct Answer": "b",
-      "Explanation": "মাটি ও জলের মিশ্রণে তৈরি নরম কর্দমাক্ত অংশকে পাঁক বা কাদা বলা হয়।",
+      "Explanation": "মাটি ও জলের মিশ্রণে তৈরি নরম কর্দমাক্ত অংশকে পাঁক বা কাদা বলা হয়।",
       "Explanation A": "জল হলো তরল জীবনদায়ী পদার্থ।",
       "Explanation B": "সঠিক! 'পাঁক' শব্দটির অর্থ হলো কাদা বা কর্দম।",
       "Explanation C": "বালি হলো ক্ষুদ্র শিলাকণা।",
-      "Explanation D": "ধুলো হলো শুকনো সূক্ষ্ম মাটির গুঁড়ো।",
+      "Explanation D": "ধুলো হলো শুকনো সূক্ষ্ম মাটির গুঁড়ো।",
       "marks": 1,
       "difficulty": "Easy",
       "status": "Published"
     },
     {
       "id": "q20",
+      "questionType": "MCQ",
       "Question": "'আর্দালি' বলতে সাধারণত কাকে বোঝায়?",
       "Language": "Bengali",
       "Option A": "শিক্ষক",
@@ -384,7 +404,7 @@
       "Explanation A": "শিক্ষক হলেন যিনি শিক্ষা দান করেন।",
       "Explanation B": "সঠিক! 'আর্দালি' বলতে কোনো কর্মকর্তা বা কর্তার অনুচর বা ভৃত্যকে বোঝায়।",
       "Explanation C": "ডাক্তার হলেন চিকিৎসা সেবা প্রদানকারী ব্যক্তি।",
-      "Explanation D": "নৌকার মাঝি যিনি নদী বা জলাশয়ে নৌকা চালান।",
+      "Explanation D": "নৌকার মাঝি যিনি নদী বা জলাশয়ে নৌকা চালান।",
       "marks": 1,
       "difficulty": "Easy",
       "status": "Published"
