@@ -213,79 +213,79 @@ const CELEBRATION_PRAISES = [
 ];
 
 // Confetti piece types: rect=rectangle, square=square, circle=round dot, ribbon=long strip
-const CONFETTI_COLORS = ['#f43f5e','#fb923c','#facc15','#4ade80','#34d399','#38bdf8','#818cf8','#e879f9','#f472b6','#a78bfa','#2dd4bf','#fbbf24'];
-const CELEBRATION_PARTICLES: { left: string; top: string; delay: number; color: string; w: number; h: number; shape: 'rect'|'square'|'circle'|'ribbon'; rot: number }[] = [
+const CONFETTI_COLORS = ['#f43f5e', '#fb923c', '#facc15', '#4ade80', '#34d399', '#38bdf8', '#818cf8', '#e879f9', '#f472b6', '#a78bfa', '#2dd4bf', '#fbbf24'];
+const CELEBRATION_PARTICLES: { left: string; top: string; delay: number; color: string; w: number; h: number; shape: 'rect' | 'square' | 'circle' | 'ribbon'; rot: number }[] = [
     // Top row
-    { left: '3%',  top: '4%',  delay: 0.03, color: '#f43f5e', w: 12, h: 7,  shape: 'rect',   rot: -30 },
-    { left: '10%', top: '2%',  delay: 0.07, color: '#facc15', w: 9,  h: 9,  shape: 'square', rot: 20  },
-    { left: '18%', top: '6%',  delay: 0.05, color: '#34d399', w: 14, h: 6,  shape: 'rect',   rot: 45  },
-    { left: '27%', top: '3%',  delay: 0.10, color: '#38bdf8', w: 8,  h: 8,  shape: 'circle', rot: 0   },
-    { left: '35%', top: '7%',  delay: 0.06, color: '#e879f9', w: 16, h: 5,  shape: 'ribbon', rot: -15 },
-    { left: '44%', top: '2%',  delay: 0.12, color: '#fb923c', w: 10, h: 10, shape: 'square', rot: 35  },
-    { left: '53%', top: '5%',  delay: 0.08, color: '#818cf8', w: 13, h: 6,  shape: 'rect',   rot: -50 },
-    { left: '62%', top: '3%',  delay: 0.11, color: '#4ade80', w: 8,  h: 8,  shape: 'circle', rot: 0   },
-    { left: '71%', top: '6%',  delay: 0.04, color: '#f472b6', w: 11, h: 5,  shape: 'rect',   rot: 25  },
-    { left: '80%', top: '2%',  delay: 0.09, color: '#fbbf24', w: 9,  h: 9,  shape: 'square', rot: -40 },
-    { left: '89%', top: '5%',  delay: 0.06, color: '#2dd4bf', w: 15, h: 5,  shape: 'ribbon', rot: 10  },
-    { left: '95%', top: '3%',  delay: 0.13, color: '#f43f5e', w: 8,  h: 8,  shape: 'circle', rot: 0   },
+    { left: '3%', top: '4%', delay: 0.03, color: '#f43f5e', w: 12, h: 7, shape: 'rect', rot: -30 },
+    { left: '10%', top: '2%', delay: 0.07, color: '#facc15', w: 9, h: 9, shape: 'square', rot: 20 },
+    { left: '18%', top: '6%', delay: 0.05, color: '#34d399', w: 14, h: 6, shape: 'rect', rot: 45 },
+    { left: '27%', top: '3%', delay: 0.10, color: '#38bdf8', w: 8, h: 8, shape: 'circle', rot: 0 },
+    { left: '35%', top: '7%', delay: 0.06, color: '#e879f9', w: 16, h: 5, shape: 'ribbon', rot: -15 },
+    { left: '44%', top: '2%', delay: 0.12, color: '#fb923c', w: 10, h: 10, shape: 'square', rot: 35 },
+    { left: '53%', top: '5%', delay: 0.08, color: '#818cf8', w: 13, h: 6, shape: 'rect', rot: -50 },
+    { left: '62%', top: '3%', delay: 0.11, color: '#4ade80', w: 8, h: 8, shape: 'circle', rot: 0 },
+    { left: '71%', top: '6%', delay: 0.04, color: '#f472b6', w: 11, h: 5, shape: 'rect', rot: 25 },
+    { left: '80%', top: '2%', delay: 0.09, color: '#fbbf24', w: 9, h: 9, shape: 'square', rot: -40 },
+    { left: '89%', top: '5%', delay: 0.06, color: '#2dd4bf', w: 15, h: 5, shape: 'ribbon', rot: 10 },
+    { left: '95%', top: '3%', delay: 0.13, color: '#f43f5e', w: 8, h: 8, shape: 'circle', rot: 0 },
 
     // Upper-mid row
-    { left: '1%',  top: '18%', delay: 0.14, color: '#38bdf8', w: 12, h: 6,  shape: 'rect',   rot: 55  },
-    { left: '8%',  top: '22%', delay: 0.18, color: '#e879f9', w: 9,  h: 9,  shape: 'square', rot: -25 },
-    { left: '16%', top: '16%', delay: 0.11, color: '#facc15', w: 7,  h: 7,  shape: 'circle', rot: 0   },
-    { left: '24%', top: '24%', delay: 0.20, color: '#f43f5e', w: 18, h: 5,  shape: 'ribbon', rot: -35 },
-    { left: '33%', top: '19%', delay: 0.16, color: '#34d399', w: 11, h: 7,  shape: 'rect',   rot: 40  },
-    { left: '42%', top: '23%', delay: 0.13, color: '#818cf8', w: 8,  h: 8,  shape: 'square', rot: 15  },
-    { left: '51%', top: '17%', delay: 0.19, color: '#fb923c', w: 9,  h: 9,  shape: 'circle', rot: 0   },
-    { left: '60%', top: '25%', delay: 0.15, color: '#2dd4bf', w: 14, h: 5,  shape: 'ribbon', rot: 60  },
-    { left: '69%', top: '20%', delay: 0.22, color: '#f472b6', w: 12, h: 7,  shape: 'rect',   rot: -20 },
-    { left: '78%', top: '17%', delay: 0.10, color: '#4ade80', w: 8,  h: 8,  shape: 'square', rot: 30  },
-    { left: '87%', top: '22%', delay: 0.17, color: '#fbbf24', w: 7,  h: 7,  shape: 'circle', rot: 0   },
-    { left: '94%', top: '19%', delay: 0.21, color: '#f43f5e', w: 16, h: 5,  shape: 'ribbon', rot: -45 },
+    { left: '1%', top: '18%', delay: 0.14, color: '#38bdf8', w: 12, h: 6, shape: 'rect', rot: 55 },
+    { left: '8%', top: '22%', delay: 0.18, color: '#e879f9', w: 9, h: 9, shape: 'square', rot: -25 },
+    { left: '16%', top: '16%', delay: 0.11, color: '#facc15', w: 7, h: 7, shape: 'circle', rot: 0 },
+    { left: '24%', top: '24%', delay: 0.20, color: '#f43f5e', w: 18, h: 5, shape: 'ribbon', rot: -35 },
+    { left: '33%', top: '19%', delay: 0.16, color: '#34d399', w: 11, h: 7, shape: 'rect', rot: 40 },
+    { left: '42%', top: '23%', delay: 0.13, color: '#818cf8', w: 8, h: 8, shape: 'square', rot: 15 },
+    { left: '51%', top: '17%', delay: 0.19, color: '#fb923c', w: 9, h: 9, shape: 'circle', rot: 0 },
+    { left: '60%', top: '25%', delay: 0.15, color: '#2dd4bf', w: 14, h: 5, shape: 'ribbon', rot: 60 },
+    { left: '69%', top: '20%', delay: 0.22, color: '#f472b6', w: 12, h: 7, shape: 'rect', rot: -20 },
+    { left: '78%', top: '17%', delay: 0.10, color: '#4ade80', w: 8, h: 8, shape: 'square', rot: 30 },
+    { left: '87%', top: '22%', delay: 0.17, color: '#fbbf24', w: 7, h: 7, shape: 'circle', rot: 0 },
+    { left: '94%', top: '19%', delay: 0.21, color: '#f43f5e', w: 16, h: 5, shape: 'ribbon', rot: -45 },
 
     // Left side
-    { left: '2%',  top: '36%', delay: 0.16, color: '#818cf8', w: 11, h: 6,  shape: 'rect',   rot: 70  },
-    { left: '5%',  top: '50%', delay: 0.24, color: '#facc15', w: 8,  h: 8,  shape: 'square', rot: -55 },
-    { left: '1%',  top: '63%', delay: 0.30, color: '#34d399', w: 7,  h: 7,  shape: 'circle', rot: 0   },
-    { left: '6%',  top: '76%', delay: 0.36, color: '#38bdf8', w: 15, h: 5,  shape: 'ribbon', rot: 30  },
+    { left: '2%', top: '36%', delay: 0.16, color: '#818cf8', w: 11, h: 6, shape: 'rect', rot: 70 },
+    { left: '5%', top: '50%', delay: 0.24, color: '#facc15', w: 8, h: 8, shape: 'square', rot: -55 },
+    { left: '1%', top: '63%', delay: 0.30, color: '#34d399', w: 7, h: 7, shape: 'circle', rot: 0 },
+    { left: '6%', top: '76%', delay: 0.36, color: '#38bdf8', w: 15, h: 5, shape: 'ribbon', rot: 30 },
 
     // Right side
-    { left: '93%', top: '36%', delay: 0.14, color: '#e879f9', w: 12, h: 6,  shape: 'rect',   rot: -60 },
-    { left: '96%', top: '50%', delay: 0.22, color: '#fb923c', w: 8,  h: 8,  shape: 'square', rot: 40  },
-    { left: '92%', top: '63%', delay: 0.28, color: '#f472b6', w: 7,  h: 7,  shape: 'circle', rot: 0   },
-    { left: '95%', top: '76%', delay: 0.34, color: '#fbbf24', w: 16, h: 4,  shape: 'ribbon', rot: -20 },
+    { left: '93%', top: '36%', delay: 0.14, color: '#e879f9', w: 12, h: 6, shape: 'rect', rot: -60 },
+    { left: '96%', top: '50%', delay: 0.22, color: '#fb923c', w: 8, h: 8, shape: 'square', rot: 40 },
+    { left: '92%', top: '63%', delay: 0.28, color: '#f472b6', w: 7, h: 7, shape: 'circle', rot: 0 },
+    { left: '95%', top: '76%', delay: 0.34, color: '#fbbf24', w: 16, h: 4, shape: 'ribbon', rot: -20 },
 
     // Center scatter
-    { left: '22%', top: '40%', delay: 0.25, color: '#f43f5e', w: 10, h: 10, shape: 'square', rot: 25  },
-    { left: '32%', top: '55%', delay: 0.18, color: '#4ade80', w: 9,  h: 5,  shape: 'rect',   rot: -40 },
-    { left: '45%', top: '43%', delay: 0.22, color: '#38bdf8', w: 7,  h: 7,  shape: 'circle', rot: 0   },
-    { left: '56%', top: '57%', delay: 0.20, color: '#facc15', w: 13, h: 5,  shape: 'ribbon', rot: 50  },
-    { left: '67%', top: '42%', delay: 0.26, color: '#818cf8', w: 10, h: 6,  shape: 'rect',   rot: -30 },
-    { left: '75%', top: '56%', delay: 0.15, color: '#e879f9', w: 8,  h: 8,  shape: 'square', rot: 65  },
+    { left: '22%', top: '40%', delay: 0.25, color: '#f43f5e', w: 10, h: 10, shape: 'square', rot: 25 },
+    { left: '32%', top: '55%', delay: 0.18, color: '#4ade80', w: 9, h: 5, shape: 'rect', rot: -40 },
+    { left: '45%', top: '43%', delay: 0.22, color: '#38bdf8', w: 7, h: 7, shape: 'circle', rot: 0 },
+    { left: '56%', top: '57%', delay: 0.20, color: '#facc15', w: 13, h: 5, shape: 'ribbon', rot: 50 },
+    { left: '67%', top: '42%', delay: 0.26, color: '#818cf8', w: 10, h: 6, shape: 'rect', rot: -30 },
+    { left: '75%', top: '56%', delay: 0.15, color: '#e879f9', w: 8, h: 8, shape: 'square', rot: 65 },
 
     // Lower-mid row
-    { left: '4%',  top: '66%', delay: 0.28, color: '#f472b6', w: 12, h: 6,  shape: 'rect',   rot: -15 },
-    { left: '13%', top: '70%', delay: 0.32, color: '#2dd4bf', w: 9,  h: 9,  shape: 'square', rot: 45  },
-    { left: '22%', top: '64%', delay: 0.26, color: '#fbbf24', w: 8,  h: 8,  shape: 'circle', rot: 0   },
-    { left: '31%', top: '72%', delay: 0.34, color: '#f43f5e', w: 17, h: 4,  shape: 'ribbon', rot: -55 },
-    { left: '41%', top: '67%', delay: 0.30, color: '#34d399', w: 11, h: 7,  shape: 'rect',   rot: 35  },
-    { left: '51%', top: '73%', delay: 0.36, color: '#818cf8', w: 8,  h: 8,  shape: 'square', rot: -20 },
-    { left: '61%', top: '66%', delay: 0.24, color: '#fb923c', w: 7,  h: 7,  shape: 'circle', rot: 0   },
-    { left: '71%', top: '71%', delay: 0.32, color: '#38bdf8', w: 14, h: 5,  shape: 'ribbon', rot: 25  },
-    { left: '81%', top: '65%', delay: 0.28, color: '#e879f9', w: 10, h: 6,  shape: 'rect',   rot: -70 },
-    { left: '90%', top: '70%', delay: 0.38, color: '#4ade80', w: 9,  h: 9,  shape: 'square', rot: 50  },
+    { left: '4%', top: '66%', delay: 0.28, color: '#f472b6', w: 12, h: 6, shape: 'rect', rot: -15 },
+    { left: '13%', top: '70%', delay: 0.32, color: '#2dd4bf', w: 9, h: 9, shape: 'square', rot: 45 },
+    { left: '22%', top: '64%', delay: 0.26, color: '#fbbf24', w: 8, h: 8, shape: 'circle', rot: 0 },
+    { left: '31%', top: '72%', delay: 0.34, color: '#f43f5e', w: 17, h: 4, shape: 'ribbon', rot: -55 },
+    { left: '41%', top: '67%', delay: 0.30, color: '#34d399', w: 11, h: 7, shape: 'rect', rot: 35 },
+    { left: '51%', top: '73%', delay: 0.36, color: '#818cf8', w: 8, h: 8, shape: 'square', rot: -20 },
+    { left: '61%', top: '66%', delay: 0.24, color: '#fb923c', w: 7, h: 7, shape: 'circle', rot: 0 },
+    { left: '71%', top: '71%', delay: 0.32, color: '#38bdf8', w: 14, h: 5, shape: 'ribbon', rot: 25 },
+    { left: '81%', top: '65%', delay: 0.28, color: '#e879f9', w: 10, h: 6, shape: 'rect', rot: -70 },
+    { left: '90%', top: '70%', delay: 0.38, color: '#4ade80', w: 9, h: 9, shape: 'square', rot: 50 },
 
     // Bottom row
-    { left: '2%',  top: '83%', delay: 0.34, color: '#facc15', w: 11, h: 6,  shape: 'rect',   rot: 20  },
-    { left: '11%', top: '87%', delay: 0.28, color: '#f43f5e', w: 8,  h: 8,  shape: 'circle', rot: 0   },
-    { left: '20%', top: '82%', delay: 0.38, color: '#2dd4bf', w: 15, h: 5,  shape: 'ribbon', rot: -40 },
-    { left: '30%', top: '89%', delay: 0.32, color: '#818cf8', w: 9,  h: 9,  shape: 'square', rot: 60  },
-    { left: '40%', top: '84%', delay: 0.40, color: '#fb923c', w: 12, h: 6,  shape: 'rect',   rot: -25 },
-    { left: '50%', top: '88%', delay: 0.36, color: '#4ade80', w: 7,  h: 7,  shape: 'circle', rot: 0   },
-    { left: '60%', top: '83%', delay: 0.30, color: '#f472b6', w: 16, h: 4,  shape: 'ribbon', rot: 35  },
+    { left: '2%', top: '83%', delay: 0.34, color: '#facc15', w: 11, h: 6, shape: 'rect', rot: 20 },
+    { left: '11%', top: '87%', delay: 0.28, color: '#f43f5e', w: 8, h: 8, shape: 'circle', rot: 0 },
+    { left: '20%', top: '82%', delay: 0.38, color: '#2dd4bf', w: 15, h: 5, shape: 'ribbon', rot: -40 },
+    { left: '30%', top: '89%', delay: 0.32, color: '#818cf8', w: 9, h: 9, shape: 'square', rot: 60 },
+    { left: '40%', top: '84%', delay: 0.40, color: '#fb923c', w: 12, h: 6, shape: 'rect', rot: -25 },
+    { left: '50%', top: '88%', delay: 0.36, color: '#4ade80', w: 7, h: 7, shape: 'circle', rot: 0 },
+    { left: '60%', top: '83%', delay: 0.30, color: '#f472b6', w: 16, h: 4, shape: 'ribbon', rot: 35 },
     { left: '70%', top: '89%', delay: 0.42, color: '#fbbf24', w: 10, h: 10, shape: 'square', rot: -50 },
-    { left: '80%', top: '84%', delay: 0.34, color: '#38bdf8', w: 12, h: 5,  shape: 'rect',   rot: 45  },
-    { left: '90%', top: '87%', delay: 0.38, color: '#e879f9', w: 8,  h: 8,  shape: 'circle', rot: 0   },
+    { left: '80%', top: '84%', delay: 0.34, color: '#38bdf8', w: 12, h: 5, shape: 'rect', rot: 45 },
+    { left: '90%', top: '87%', delay: 0.38, color: '#e879f9', w: 8, h: 8, shape: 'circle', rot: 0 },
 ];
 
 type TransitionType = 'slide' | 'zoom' | 'flip' | 'fade' | 'bounce';
@@ -326,7 +326,41 @@ const getWatermarkSvg = (spacing: number, size: number, opacity: number, text: s
     return `url("data:image/svg+xml;utf8,${encodeURIComponent(svg)}")`;
 };
 
+const MetallicScrew = ({ rotation = 0, className = '' }: { rotation?: number; className?: string }) => (
+    <div
+        className={`relative w-4 h-4 md:w-5 md:h-5 rounded-full shrink-0 ${className}`}
+        style={{
+            background: 'radial-gradient(circle at 35% 35%, #ffffff 0%, #cbd5e1 28%, #94a3b8 62%, #64748b 85%, #334155 100%)',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.32), inset 0 1px 1px rgba(255,255,255,0.85), inset 0 -1px 1px rgba(0,0,0,0.45)',
+            border: '1px solid rgba(71, 85, 105, 0.45)'
+        }}
+    >
+        {/* Inner concentric ring */}
+        <div className="absolute inset-[1.5px] rounded-full border border-white/50 pointer-events-none" />
 
+        {/* Screw head Phillips cross slot */}
+        <div
+            className="absolute inset-0 flex items-center justify-center pointer-events-none"
+            style={{ transform: `rotate(${rotation}deg)` }}
+        >
+            {/* Horizontal slot */}
+            <div
+                className="absolute bg-slate-700/90 rounded-[0.5px] shadow-[inset_0_0.5px_1px_rgba(0,0,0,0.9)]"
+                style={{ width: '56%', height: '2px' }}
+            />
+            {/* Vertical slot */}
+            <div
+                className="absolute bg-slate-700/90 rounded-[0.5px] shadow-[inset_0_0.5px_1px_rgba(0,0,0,0.9)]"
+                style={{ height: '56%', width: '2px' }}
+            />
+            {/* Center dimple */}
+            <div className="w-1 h-1 rounded-full bg-slate-900 shadow-inner" />
+        </div>
+
+        {/* Specular gleam */}
+        <div className="absolute top-[1.5px] left-[1.5px] w-1.5 h-1.5 rounded-full bg-white/80 blur-[0.3px] pointer-events-none" />
+    </div>
+);
 
 interface PresentationOverlayProps {
     questions: any[];
@@ -369,7 +403,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [isTimerEnabled, setIsTimerEnabled] = useState(true);
     const [timerSeconds, setTimerSeconds] = useState(0);
     const [wmText, setWmText] = useState('DESHEXAM');
-    const [wmOpacity, setWmOpacity] = useState(0.23);
+    const [wmOpacity, setWmOpacity] = useState(0.10);
     const [wmSize, setWmSize] = useState(13);
     const [wmSpacing, setWmSpacing] = useState(80);
     const [wmVisible, setWmVisible] = useState(true);
@@ -416,10 +450,6 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [timerPos, setTimerPos] = useState({ x: 0, y: 0 });
     const [isDraggingTimer, setIsDraggingTimer] = useState(false);
     const dragStartPos = useRef({ x: 0, y: 0 });
-
-    // ── Mobile Swipe Gesture State ────────────────────────────────────────────
-    const swipeTouchStartX = useRef<number | null>(null);
-    const swipeTouchStartY = useRef<number | null>(null);
 
     // Pen Tool State
     const [isPenActive, setIsPenActive] = useState(false);
@@ -468,7 +498,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         const nextPraise = CELEBRATION_PRAISES[praiseIdxRef.current % CELEBRATION_PRAISES.length];
         praiseIdxRef.current += 1;
         setCurrentPraise(nextPraise);
-        
+
         setShowCelebration(true);
 
         if (isCelebrationSoundEnabled) {
@@ -655,14 +685,24 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         const targetX = rect.left + 36;
         const targetY = rect.top + rect.height / 2;
 
-        const startX = Math.min(window.innerWidth - 80, Math.max(120, targetX + 240 + (Math.random() * 60 - 30)));
-        const startY = Math.min(window.innerHeight - 80, targetY + 160 + (Math.random() * 50 - 25));
+        const startX = Math.min(window.innerWidth - 80, Math.max(120, targetX + 200 + (Math.random() * 80 - 40)));
+        const startY = Math.min(window.innerHeight - 80, targetY + 150 + (Math.random() * 60 - 30));
+
+        // Mid waypoint for a natural arc feel
+        const midX = (startX + targetX) / 2 + (Math.random() * 40 - 20);
+        const midY = (startY + targetY) / 2 - 30;
 
         setVirtualCursor({ visible: true, x: startX, y: startY, isClicking: false });
 
+        // Step 1: glide to midpoint
+        const midTimer = setTimeout(() => {
+            setVirtualCursor(prev => ({ ...prev, x: midX, y: midY }));
+        }, 80);
+
+        // Step 2: glide to target
         const glideTimer = setTimeout(() => {
             setVirtualCursor(prev => ({ ...prev, x: targetX, y: targetY }));
-        }, 60);
+        }, 480);
 
         const clickTimer = setTimeout(() => {
             setVirtualCursor(prev => ({ ...prev, isClicking: true }));
@@ -682,10 +722,11 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
             setTimeout(() => {
                 setVirtualCursor({ visible: false, x: 0, y: 0, isClicking: false });
                 if (onDone) onDone();
-            }, 600);
-        }, 850);
+            }, 800);
+        }, 1100);
 
         return () => {
+            clearTimeout(midTimer);
             clearTimeout(glideTimer);
             clearTimeout(clickTimer);
         };
@@ -752,6 +793,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [isSpotlightActive, setIsSpotlightActive] = useState(false);
     const [spotlightPos, setSpotlightPos] = useState({ x: 0, y: 0 });
 
+    // Spotlight mouse tracking
     useEffect(() => {
         if (!isSpotlightActive) return;
         const handleMouseMove = (e: MouseEvent) => {
@@ -1136,8 +1178,59 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         }
 
         const currentSlideLocal = currentSlide;
+
+        // Build a map: charOffset → which DOM element to point to
+        const qText = cleanMarkdown(q.questionText) + '. ';
+        const optionKeys = ['a', 'b', 'c', 'd', 'e'].filter(k => q.options && q.options[k as keyof typeof q.options]);
+
+        // Segment offsets: [{ startChar, endChar, elementId }]
+        const segments: { startChar: number; endChar: number; elementId: string | 'question' }[] = [];
+        let cursor = 0;
+        segments.push({ startChar: 0, endChar: qText.length, elementId: 'question' });
+        cursor = qText.length;
+        optionKeys.forEach((key) => {
+            const optText = q.options![key as keyof typeof q.options];
+            if (optText) {
+                const label = getOptionLabel(key, uiLang);
+                const segLen = `${label}: ${cleanMarkdown(optText)}. `.length;
+                segments.push({ startChar: cursor, endChar: cursor + segLen, elementId: `option-card-${key}` });
+                cursor += segLen;
+            }
+        });
+
+        // Wavy cursor animation helper: position synced with speech charIndex
+        let wavePhase = 0;
+        const animateCursorToElement = (elId: string | 'question', charIdx: number, seg: { startChar: number; endChar: number }) => {
+            let el: HTMLElement | null = null;
+            if (elId === 'question') {
+                el = document.querySelector('[data-read-cursor-target="question"]') as HTMLElement | null;
+            } else {
+                el = document.getElementById(elId);
+            }
+            if (!el) return;
+
+            const rect = el.getBoundingClientRect();
+            wavePhase += 1;
+
+            // Relative progress within this segment (0 → 1) matches speech position
+            const segLen = Math.max(1, seg.endChar - seg.startChar);
+            const relProgress = Math.min(1, (charIdx - seg.startChar) / segLen);
+            const waveX = rect.left + 24 + relProgress * Math.max(0, rect.width - 48);
+            // Slight sinusoidal dip below the text
+            const waveY = rect.bottom + 8 + Math.sin(wavePhase * 1.4) * 4;
+
+            setVirtualCursor({ visible: true, x: waveX, y: waveY, isClicking: false });
+        };
+
         const utterance = new SpeechSynthesisUtterance(textToRead);
         utterance.lang = uiLang === 'bn' ? 'bn-BD' : 'en-US';
+
+        utterance.onboundary = (event: SpeechSynthesisEvent) => {
+            const charIdx = event.charIndex;
+            const seg = segments.find(s => charIdx >= s.startChar && charIdx < s.endChar);
+            if (seg) animateCursorToElement(seg.elementId, charIdx, seg);
+        };
+
 
         utterance.onend = () => {
             if (isAutoPlayRef.current && stepRef.current === 0 && q.correctAnswer) {
@@ -1179,9 +1272,13 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 }
             } else {
                 setIsSpeaking(false);
+                setVirtualCursor({ visible: false, x: 0, y: 0, isClicking: false });
             }
         };
-        utterance.onerror = () => setIsSpeaking(false);
+        utterance.onerror = () => {
+            setIsSpeaking(false);
+            setVirtualCursor({ visible: false, x: 0, y: 0, isClicking: false });
+        };
 
         window.speechSynthesis.speak(utterance);
         setIsSpeaking(true);
@@ -1326,29 +1423,6 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         }
     }, [step, currentSlide, mode]);
 
-    // ── Mobile Swipe Gesture Handlers ────────────────────────────────────────
-    const handleSwipeTouchStart = useCallback((e: React.TouchEvent) => {
-        if (isPenActive) return;
-        swipeTouchStartX.current = e.touches[0].clientX;
-        swipeTouchStartY.current = e.touches[0].clientY;
-    }, [isPenActive]);
-
-    const handleSwipeTouchEnd = useCallback((e: React.TouchEvent) => {
-        if (isPenActive || swipeTouchStartX.current === null || swipeTouchStartY.current === null) return;
-        const dx = e.changedTouches[0].clientX - swipeTouchStartX.current;
-        const dy = e.changedTouches[0].clientY - swipeTouchStartY.current;
-        // Only trigger horizontal swipe if it's more horizontal than vertical
-        if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
-            if (dx < 0) {
-                nextStep();
-            } else {
-                prevStep();
-            }
-        }
-        swipeTouchStartX.current = null;
-        swipeTouchStartY.current = null;
-    }, [isPenActive, nextStep, prevStep]);
-
     useEffect(() => {
         if (mode === 'read') {
             setStep(2);
@@ -1474,7 +1548,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
             // --- Single Letter Shortcuts (No Modifiers) ---
             // Prevent conflicts with 'a', 'b', 'c', 'd', 'e'
             const key = e.key.toLowerCase();
-            
+
             if (key === 's') {
                 setIsSettingsOpen(prev => !prev);
                 return;
@@ -1507,9 +1581,10 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     e.preventDefault();
                     prevStep();
                 }
-                if (step === 0) {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (step === 0) {
+                        // step 0: উত্তর দেওয়া হয়নি → correct answer দেখাও
                         const currentQ = questions[currentSlide];
                         if (currentQ && currentQ.correctAnswer) {
                             const correctKey = currentQ.correctAnswer.toLowerCase().trim();
@@ -1519,7 +1594,13 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 triggerHumanClick(matchedKey);
                             }
                         }
-                    } else if (['a', 'b', 'c', 'd', 'e'].includes(key)) {
+                    } else {
+                        // step >= 1: উত্তর দেওয়া হয়েছে → next slide-এ যাও
+                        nextStep();
+                    }
+                }
+                if (step === 0) {
+                    if (['a', 'b', 'c', 'd', 'e'].includes(key)) {
                         const currentQ = questions[currentSlide];
                         if (currentQ && currentQ.options && currentQ.options[key as keyof typeof currentQ.options]) {
                             setSelectedOption(key);
@@ -1568,7 +1649,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
     return createPortal(
         <>
-            <div className={`print:hidden fixed inset-0 w-full h-full z-[99999] flex items-center justify-between xl:gap-[0.1rem] xl:p-[0.1rem] select-none font-sans overflow-hidden transition-colors duration-500 ${isDarkMode ? 'dark bg-gray-900' : 'bg-[#f8fbff]'}`}>
+            <div className={`print:hidden fixed inset-0 w-full h-full z-[99999] flex items-center justify-between p-3 mb-3 gap-1 md:gap-1 xl:gap-1 select-none font-sans overflow-hidden transition-colors duration-500 ${isDarkMode ? 'dark bg-gray-900' : 'bg-[#f8fbff]'}`}>
                 <style>{`
                     @keyframes popIn {
                         0% { transform: scale(1); box-shadow: 0 0 0 rgba(52,168,83,0); }
@@ -1654,14 +1735,12 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                 {/* Main Presentation Area */}
                 <div
-                    className={`responsive-fonts flex-1 min-w-0 relative w-full h-full ${getBgThemeClasses()} flex flex-col shadow-2xl overflow-hidden shrink-0 z-10 xl:rounded-xl xl:border xl:border-gray-200 dark:border-gray-800 transition-colors duration-500 ${isPenActive && drawingTool === 'laser' ? 'cursor-none [&_*]:cursor-none' : ''}`}
+                    className={`responsive-fonts flex-1 min-w-0 relative w-full h-full ${getBgThemeClasses()} flex flex-col shadow-2xl overflow-hidden shrink-0 z-10 rounded-xl md:rounded-2xl border border-gray-200/80 dark:border-gray-800 transition-colors duration-500 ${isPenActive && drawingTool === 'laser' ? 'cursor-none [&_*]:cursor-none' : ''}`}
                     onPointerMove={(e) => {
                         if (isPenActive && drawingTool === 'laser') {
                             draw(e);
                         }
                     }}
-                    onTouchStart={handleSwipeTouchStart}
-                    onTouchEnd={handleSwipeTouchEnd}
                 >
 
                     {/* Background Pattern Overlay */}
@@ -1767,13 +1846,38 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                     {/* Background Watermarks */}
                     {wmVisible && wmText && (
-                        <div
-                            className="absolute inset-0 pointer-events-none z-0 overflow-hidden"
-                            style={{
-                                backgroundImage: getWatermarkSvg(wmSpacing, wmSize, wmOpacity, wmText, isDarkMode),
-                                backgroundRepeat: 'repeat'
-                            }}
-                        />
+                        <>
+                            <style>{`
+                                .watermark-mask {
+                                    mask-image: linear-gradient(#000, #000), linear-gradient(#000, #000), linear-gradient(#000, #000), linear-gradient(#000, #000);
+                                    -webkit-mask-image: linear-gradient(#000, #000), linear-gradient(#000, #000), linear-gradient(#000, #000), linear-gradient(#000, #000);
+                                    
+                                    /* Mobile sizes (less side margins) */
+                                    mask-size: 100% 100px, 100% 100px, 16px 100%, 16px 100%;
+                                    -webkit-mask-size: 100% 100px, 100% 100px, 16px 100%, 16px 100%;
+                                    
+                                    mask-position: top center, bottom center, left center, right center;
+                                    -webkit-mask-position: top center, bottom center, left center, right center;
+                                    mask-repeat: no-repeat;
+                                    -webkit-mask-repeat: no-repeat;
+                                }
+                                @media (min-width: 768px) {
+                                    .watermark-mask {
+                                        /* Desktop sizes (larger side margins matching md:px-24) */
+                                        mask-size: 100% 120px, 100% 120px, 96px 100%, 96px 100%;
+                                        -webkit-mask-size: 100% 120px, 100% 120px, 96px 100%, 96px 100%;
+                                    }
+                                }
+                            `}</style>
+                            <div
+                                className="absolute inset-0 pointer-events-none z-0 overflow-hidden watermark-mask"
+                                style={{
+                                    backgroundImage: getWatermarkSvg(wmSpacing, wmSize, wmOpacity, wmText, isDarkMode),
+                                    backgroundRepeat: 'repeat',
+                                    backgroundPosition: '0px -30px'
+                                }}
+                            />
+                        </>
                     )}
 
                     {/* Whiteboard Layer */}
@@ -1816,13 +1920,6 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 boxShadow: '0 4px 20px rgba(109,40,217,0.3), 0 1px 0 rgba(255,255,255,0.12)'
                             }}
                         >
-                            {/* Mobile Progress Bar — top of header */}
-                            <div className="absolute bottom-0 left-0 w-full h-[3px] z-50 pointer-events-none md:hidden">
-                                <div
-                                    className="h-full bg-gradient-to-r from-yellow-300 via-orange-300 to-pink-300 transition-all duration-500 ease-out"
-                                    style={{ width: `${((currentSlide + 1) / questions.length) * 100}%` }}
-                                />
-                            </div>
                             {/* Logo Area */}
                             <div className="flex items-center w-full md:w-auto justify-between md:justify-start">
                                 {showLogo && (
@@ -1853,13 +1950,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                                 {/* Mobile Actions */}
                                 <div className="flex md:hidden items-center gap-2 shrink-0">
-                                    {/* Mobile: Question counter pill */}
-                                    <span className="bg-white/20 backdrop-blur-sm text-white font-black text-xs px-2.5 py-1 rounded-full border border-white/30">
-                                        {uiLang === 'bn'
-                                            ? `${toBanglaNumber(currentSlide + 1)}/${toBanglaNumber(questions.length)}`
-                                            : `${currentSlide + 1}/${questions.length}`
-                                        }
-                                    </span>
+
                                     <button onClick={closePresentation} className="bg-white/90 dark:bg-gray-800 hover:bg-white dark:hover:bg-gray-700 rounded-full text-indigo-600 dark:text-indigo-400 shadow-sm border border-indigo-100 dark:border-gray-600 transition-colors flex items-center justify-center shrink-0" style={{ width: `${2.2 * headerScale}rem`, height: `${2.2 * headerScale}rem` }}>
                                         <X style={{ width: `${1.2 * headerScale}rem`, height: `${1.2 * headerScale}rem` }} strokeWidth={2.5} />
                                     </button>
@@ -1867,7 +1958,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             </div>
 
                             {/* Title Area */}
-                            <div className={`flex-1 w-[calc(100%+1.5rem)] -mx-3 -mb-[0.75rem] px-3 py-2.5 mt-2 bg-slate-900 dark:bg-black border-t border-slate-700 md:w-full md:mx-0 md:mb-0 md:px-6 md:py-0 md:mt-0 md:bg-transparent md:border-t-0 md:shadow-none flex flex-col justify-center ${headerTitleAlign === 'left' ? 'items-start text-left' :
+                            <div className={`flex-1 w-full md:px-6 flex flex-col justify-center ${headerTitleAlign === 'left' ? 'items-start text-left' :
                                 headerTitleAlign === 'right' ? 'items-end text-right' :
                                     'items-center text-center'
                                 }`}>
@@ -1879,9 +1970,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                 {i > 0 && <span className="text-white/40 mx-0.5">•</span>}
                                                 <span className={
                                                     i === 0 ? 'text-amber-300 drop-shadow-sm' :
-                                                    i === 1 ? 'text-cyan-300 drop-shadow-sm' :
-                                                    i === 2 ? 'text-lime-300 drop-shadow-sm' :
-                                                    'text-pink-300 drop-shadow-sm'
+                                                        i === 1 ? 'text-cyan-300 drop-shadow-sm' :
+                                                            i === 2 ? 'text-lime-300 drop-shadow-sm' :
+                                                                'text-pink-300 drop-shadow-sm'
                                                 }>{part.trim()}</span>
                                             </span>
                                         ))}
@@ -1963,9 +2054,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                         return (
                             <div
                                 style={{ transform: `translate(${timerPos.x}px, ${timerPos.y}px)` }}
-                                className={`absolute ${showHeader ? 'top-[130px] md:top-[76px]' : 'top-4'} right-2 md:right-3 z-[70] select-none touch-none transition-all duration-300 ${isDraggingTimer
-                                        ? 'cursor-grabbing scale-105 drop-shadow-[0_20px_40px_rgba(59,130,246,0.35)]'
-                                        : 'cursor-grab hover:drop-shadow-[0_12px_30px_rgba(59,130,246,0.25)] hover:scale-105'
+                                className={`absolute ${showHeader ? 'top-[70px] md:top-[76px]' : 'top-4'} right-2 md:right-3 z-[70] select-none touch-none transition-all duration-300 ${isDraggingTimer
+                                    ? 'cursor-grabbing scale-105 drop-shadow-[0_20px_40px_rgba(59,130,246,0.35)]'
+                                    : 'cursor-grab hover:drop-shadow-[0_12px_30px_rgba(59,130,246,0.25)] hover:scale-105'
                                     }`}
                                 onPointerDown={handleTimerPointerDown}
                                 onPointerMove={handleTimerPointerMove}
@@ -2216,27 +2307,83 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                         )}
                     </AnimatePresence>
 
-                    {/* Virtual Cursor Animation */}
+                    {/* Virtual Cursor Animation — only during auto-click */}
                     {virtualCursor.visible && (
                         <div
-                            className="fixed pointer-events-none z-[999999] transition-all duration-700 ease-out"
+                            className="fixed pointer-events-none z-[999999]"
                             style={{
                                 left: `${virtualCursor.x}px`,
                                 top: `${virtualCursor.y}px`,
-                                transform: `translate(-2px, -2px) ${virtualCursor.isClicking ? 'scale(0.85)' : 'scale(1)'}`
+                                transform: `translate(-4px, -4px) ${virtualCursor.isClicking ? 'scale(0.80)' : 'scale(1)'}`,
+                                transition: virtualCursor.isClicking
+                                    ? 'transform 0.08s ease-in'
+                                    : virtualCursor.visible
+                                        ? 'left 0.38s cubic-bezier(0.25,0.46,0.45,0.94), top 0.38s cubic-bezier(0.25,0.46,0.45,0.94), transform 0.12s ease-out'
+                                        : 'left 0s, top 0s, transform 0.12s ease-out',
+                                filter: virtualCursor.isClicking
+                                    ? 'drop-shadow(0 0 12px rgba(59,130,246,0.95)) drop-shadow(0 0 24px rgba(99,102,241,0.7))'
+                                    : 'drop-shadow(0 4px 14px rgba(0,0,0,0.5)) drop-shadow(0 0 8px rgba(59,130,246,0.45))'
                             }}
                         >
+                            {/* Outer glow halo — only during auto-click animation */}
+                            {virtualCursor.visible && (
+                                <div
+                                    className="absolute rounded-full"
+                                    style={{
+                                        width: virtualCursor.isClicking ? '52px' : '40px',
+                                        height: virtualCursor.isClicking ? '52px' : '40px',
+                                        top: '50%', left: '50%',
+                                        transform: 'translate(-50%, -50%)',
+                                        background: virtualCursor.isClicking
+                                            ? 'radial-gradient(circle, rgba(99,102,241,0.35) 0%, transparent 70%)'
+                                            : 'radial-gradient(circle, rgba(59,130,246,0.2) 0%, transparent 70%)',
+                                        transition: 'all 0.12s ease'
+                                    }}
+                                />
+                            )}
                             <div className="relative">
-                                <MousePointer2 className="w-8 h-8 text-blue-600 fill-blue-500 drop-shadow-[0_4px_10px_rgba(0,0,0,0.4)]" />
+                                {/* Main cursor SVG */}
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="44" height="44"
+                                    viewBox="0 0 24 24"
+                                    style={{ display: 'block' }}
+                                >
+                                    {/* White stroke outline for contrast */}
+                                    <path
+                                        d="M4 0 L4 17 L8 13 L11.5 21 L13.5 20 L10 12 L15 12 Z"
+                                        fill="white"
+                                        stroke="white"
+                                        strokeWidth="1"
+                                        strokeLinejoin="round"
+                                    />
+                                    {/* Main blue cursor */}
+                                    <path
+                                        d="M4 0 L4 17 L8 13 L11.5 21 L13.5 20 L10 12 L15 12 Z"
+                                        fill={virtualCursor.isClicking ? '#4f46e5' : '#2563eb'}
+                                        stroke="#1e40af"
+                                        strokeWidth="0.6"
+                                        strokeLinejoin="round"
+                                    />
+                                </svg>
+
+                                {/* Click ripple rings — only during auto-click */}
                                 {virtualCursor.isClicking && (
-                                    <span className="absolute -top-1 -left-1 w-10 h-10 rounded-full bg-blue-500/40 animate-ping" />
+                                    <>
+                                        <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full border-2 border-indigo-400 animate-ping" />
+                                        <span
+                                            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-blue-400/30"
+                                            style={{ animation: 'ping 0.5s ease-out 0.15s 1 forwards' }}
+                                        />
+                                        <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-indigo-500/50 blur-[1px]" />
+                                    </>
                                 )}
                             </div>
                         </div>
                     )}
 
                     {/* Main Content Area */}
-                    <div ref={scrollContainerRef} className="flex-1 w-full relative flex flex-col items-center px-4 md:px-24 py-6 md:py-12 z-10 overflow-y-auto custom-scrollbar gap-8">
+                    <div ref={scrollContainerRef} className="flex-1 w-full relative flex flex-col items-center px-4 md:px-24 py-6 md:py-12 z-10 overflow-y-auto overflow-x-hidden custom-scrollbar gap-8">
 
                         {/* Zoomable Content Wrapper */}
                         <div
@@ -2263,9 +2410,13 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                                     {/* Question */}
                                     <div
-                                        className={`flex items-start gap-3 md:gap-4 w-full max-w-5xl mt-8 md:mt-2 transition-all duration-300 relative z-10 ${qBgColor !== 'transparent' ? `${qBgColor} p-4 md:p-6 rounded-lg border border-gray-200/50 dark:border-gray-700/50 shadow-xl` : ''}`}
+                                        className={`flex flex-col items-center justify-center gap-4 w-[94%] sm:w-full min-w-[300px] md:min-w-[600px] max-w-4xl xl:max-w-5xl min-h-[120px] md:min-h-[160px] mx-auto mt-1 md:mt-1 transition-all duration-300 relative z-10 rounded-t-2xl rounded-b-[0.5rem] border shadow-[0_8px_32px_rgba(0,0,0,0.10)] p-6 md:p-8 md:px-10 ${qBgColor !== 'transparent' ? `${qBgColor} border-gray-200/50 dark:border-gray-700/50` : 'bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-gray-100/80 dark:border-slate-700/40'}`}
                                         style={{
                                             '--q-color': qTextColor !== 'default' ? qTextColor : undefined,
+                                            borderTopColor: bgTheme === 'video' ? 'rgba(255,255,255,0.4)' : [
+                                                '#6366f1', '#3b82f6', '#10b981', '#f43f5e', '#f59e0b', '#a855f7'
+                                            ][currentSlide % 6],
+                                            borderTopWidth: '4px',
                                             ...(qBgColor !== 'transparent' && bgTheme === 'dots' ? {
                                                 backgroundImage: `radial-gradient(${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'} 1.5px, transparent 1.5px)`,
                                                 backgroundSize: '16px 16px'
@@ -2278,8 +2429,35 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                             })
                                         } as unknown as React.CSSProperties}
                                     >
-                                        <span className={`font-extrabold leading-normal shrink-0 ${bgTheme === 'video' ? 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]' : 'text-indigo-600 dark:text-blue-400 drop-shadow-sm'}`} style={{ fontSize: 'var(--q-size)' }}>{uiLang === 'bn' ? toBanglaNumber(currentSlide + 1) : currentSlide + 1}.</span>
-                                        <div className={`prose dark:prose-invert max-w-none prose-p:font-extrabold text-[length:var(--q-size)] leading-normal text-left font-extrabold capitalize [&_*]:!text-[length:var(--q-size)] [&_*]:!leading-normal [&_*]:!m-0 ${qTextColor !== 'default' ? 'text-[var(--q-color)] [&_*]:!text-[var(--q-color)] drop-shadow-sm [&_*]:!drop-shadow-sm' : (bgTheme === 'video' ? 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] [&_*]:!text-white [&_*]:!drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]' : 'text-slate-900 dark:text-white [&_*]:!text-slate-900 dark:[&_*]:!text-white')}`}>
+                                        {/* Question Number Badge */}
+                                        <div className="absolute -top-8 md:-top-10 left-1/2 -translate-x-1/2 flex items-center justify-center z-20">
+                                            <div className={`w-16 h-16 md:w-20 md:h-20 flex items-center justify-center rounded-full shadow-xl border-2 backdrop-blur-md font-black text-3xl md:text-5xl ${bgTheme === 'video' ? 'bg-black/50 border-white/30 text-white' : `${[
+                                                'from-indigo-600 to-violet-600 dark:from-indigo-500 dark:to-violet-500',
+                                                'from-blue-600 to-cyan-600 dark:from-blue-500 dark:to-cyan-500',
+                                                'from-emerald-600 to-teal-600 dark:from-emerald-500 dark:to-teal-500',
+                                                'from-rose-600 to-pink-600 dark:from-rose-500 dark:to-pink-500',
+                                                'from-amber-500 to-orange-500 dark:from-amber-400 dark:to-orange-500',
+                                                'from-fuchsia-600 to-purple-600 dark:from-fuchsia-500 dark:to-purple-500'
+                                            ][currentSlide % 6]} bg-gradient-to-tr border-white dark:border-slate-800 text-white`}`}>
+                                                {uiLang === 'bn' ? toBanglaNumber(currentSlide + 1) : currentSlide + 1}
+                                            </div>
+                                        </div>
+
+                                        {/* Top-Left Metallic Rivets / Screws (৩টি তারকাঁটা/স্ক্রু) */}
+                                        <div className="absolute top-2.5 md:top-3.5 left-4 md:left-8 flex items-center gap-2 md:gap-2.5 z-20 pointer-events-none select-none">
+                                            <MetallicScrew rotation={15} />
+                                            <MetallicScrew rotation={68} />
+                                            <MetallicScrew rotation={125} />
+                                        </div>
+
+                                        {/* Top-Right Metallic Rivets / Screws (৩টি তারকাঁটা/স্ক্রু) */}
+                                        <div className="absolute top-2.5 md:top-3.5 right-4 md:right-8 flex items-center gap-2 md:gap-2.5 z-20 pointer-events-none select-none">
+                                            <MetallicScrew rotation={35} />
+                                            <MetallicScrew rotation={95} />
+                                            <MetallicScrew rotation={155} />
+                                        </div>
+
+                                        <div data-read-cursor-target="question" className={`prose dark:prose-invert max-w-none w-full prose-p:font-extrabold text-[length:var(--q-size)] leading-relaxed text-left font-extrabold [&_*]:!text-[length:var(--q-size)] [&_*]:!leading-relaxed [&_*]:!m-0 ${qTextColor !== 'default' ? 'text-[var(--q-color)] [&_*]:!text-[var(--q-color)] drop-shadow-sm [&_*]:!drop-shadow-sm' : (bgTheme === 'video' ? 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] [&_*]:!text-white [&_*]:!drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]' : 'text-slate-900 dark:text-white [&_*]:!text-slate-900 dark:[&_*]:!text-white')}`}>
                                             <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
                                                 {q.questionText}
                                             </ReactMarkdown>
@@ -2287,7 +2465,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     </div>
 
                                     {/* Options Area with Side Navigation */}
-                                    <div className="relative w-full max-w-[1200px] flex justify-center mt-12 md:mt-16 mx-auto">
+                                    <div className="relative w-full max-w-[1200px] flex justify-center mt-6 md:mt-8 mb-4 mx-auto">
                                         {/* Prev Arrow */}
                                         {currentSlide > 0 && (
                                             <div className="absolute left-[-10px] md:left-[-50px] lg:left-[-70px] top-1/2 -translate-y-1/2 z-[45] group hidden md:block">
@@ -2301,7 +2479,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                         )}
 
                                         <motion.div
-                                            className={optionsLayout === 'grid' ? "grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 w-full max-w-6xl" : "flex flex-col gap-y-3 w-[90%] md:w-fit md:min-w-[500px] max-w-5xl mx-auto"}
+                                            className={optionsLayout === 'grid' ? "grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 w-full max-w-6xl" : "flex flex-col gap-y-3 w-[90%] sm:w-fit min-w-[300px] md:min-w-[450px] lg:min-w-[500px] max-w-4xl mx-auto"}
                                             initial="hidden"
                                             animate="visible"
                                             variants={{
@@ -2309,170 +2487,170 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                 visible: { transition: { staggerChildren: animSpeed / 2 } }
                                             }}
                                         >
-                                        {parsedOptions.length > 0 && parsedOptions.map((opt: { key: string, text: string }, oIdx: number) => {
-                                            const isCorrect = q.correctAnswer && q.correctAnswer.toLowerCase().includes(opt.key);
-                                            const optLetter = getOptionLabel(opt.key, uiLang);
+                                            {parsedOptions.length > 0 && parsedOptions.map((opt: { key: string, text: string }, oIdx: number) => {
+                                                const isCorrect = q.correctAnswer && q.correctAnswer.toLowerCase().includes(opt.key);
+                                                const optLetter = getOptionLabel(opt.key, uiLang);
 
-                                            const showCorrect = step >= 1 && isCorrect;
-                                            const showWrong = step >= 1 && !isCorrect;
-                                            const isSelected = selectedOption === opt.key;
+                                                const showCorrect = step >= 1 && isCorrect;
+                                                const showWrong = step >= 1 && !isCorrect;
+                                                const isSelected = selectedOption === opt.key;
 
-                                            // Colors closely matching the image
-                                            const colorThemes = [
-                                                { border: 'border-[#4285F4]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#4285F4]/75', letterText: 'text-white' }, // Blue
-                                                { border: 'border-[#34A853]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#34A853]/75', letterText: 'text-white' }, // Green
-                                                { border: 'border-[#F9AB00]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#F9AB00]/75', letterText: 'text-white' }, // Yellow/Orange
-                                                { border: 'border-[#EA4335]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#EA4335]/75', letterText: 'text-white' }, // Red
-                                                { border: 'border-[#9C27B0]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#9C27B0]/75', letterText: 'text-white' }, // Purple
-                                            ];
+                                                // Colors closely matching the image
+                                                const colorThemes = [
+                                                    { border: 'border-[#4285F4]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#4285F4]', letterText: 'text-white' }, // Blue
+                                                    { border: 'border-[#34A853]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#34A853]', letterText: 'text-white' }, // Green
+                                                    { border: 'border-[#F9AB00]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#F9AB00]', letterText: 'text-white' }, // Yellow/Orange
+                                                    { border: 'border-[#EA4335]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#EA4335]', letterText: 'text-white' }, // Red
+                                                    { border: 'border-[#9C27B0]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#9C27B0]', letterText: 'text-white' }, // Purple
+                                                ];
 
-                                            const theme = colorThemes[oIdx % colorThemes.length];
+                                                const theme = colorThemes[oIdx % colorThemes.length];
 
-                                            let containerClasses = `flex items-center gap-3 md:gap-4 py-1.5 px-3 rounded-lg border-2 transition-all duration-300 shadow-[0_4px_12px_rgba(0,0,0,0.04)] relative z-10 ${theme.bg} ${theme.border}`;
-                                            let letterClasses = `shrink-0 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full text-lg md:text-xl font-black transition-colors duration-300 ${theme.letterBg} ${theme.letterText}`;
+                                                let containerClasses = `flex items-center gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 transition-all duration-200 shadow-[0_4px_12px_rgba(0,0,0,0.04)] relative z-10 select-none ${theme.bg} ${theme.border}`;
+                                                let letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 ${theme.letterBg} ${theme.letterText}`;
 
-                                            if (step === 0) {
-                                                if (eliminatedOptions.includes(opt.key)) {
-                                                    containerClasses = `flex items-center gap-3 md:gap-4 py-1.5 px-3 rounded-lg border-2 transition-all duration-300 opacity-40 grayscale border-gray-300 bg-gray-50 dark:bg-gray-800 relative z-10`;
-                                                    letterClasses = `shrink-0 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full text-lg md:text-xl font-black transition-colors duration-300 bg-gray-300 text-gray-500`;
-                                                } else if (isSelected) {
-                                                    containerClasses = `flex items-center gap-3 md:gap-4 py-1.5 px-3 rounded-lg border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(66,133,244,0.15)] bg-[#e8f0fe] dark:bg-[#1e293b] border-[#4285F4] transform scale-[1.02] cursor-pointer ring-2 ring-[#4285F4]/30 relative z-10`;
-                                                    letterClasses = `shrink-0 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full text-lg md:text-xl font-black transition-colors duration-300 bg-[#4285F4] text-white`;
+                                                if (step === 0) {
+                                                    if (eliminatedOptions.includes(opt.key)) {
+                                                        containerClasses = `flex items-center gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 transition-all duration-200 opacity-40 grayscale border-gray-300 bg-gray-50 dark:bg-gray-800 relative z-10 cursor-not-allowed select-none`;
+                                                        letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 bg-gray-300 text-gray-500`;
+                                                    } else if (isSelected) {
+                                                        containerClasses = `flex items-center gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 transition-all duration-200 shadow-[0_8px_20px_rgba(66,133,244,0.15)] bg-[#e8f0fe] dark:bg-[#1e293b] border-[#4285F4] scale-[1.02] cursor-pointer ring-2 ring-[#4285F4]/30 relative z-10 select-none active:scale-[0.99]`;
+                                                        letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 bg-[#4285F4] text-white`;
+                                                    } else {
+                                                        containerClasses += ` hover:scale-[1.02] hover:shadow-md cursor-pointer hover:border-gray-300 active:scale-[0.99]`;
+                                                    }
                                                 } else {
-                                                    containerClasses += ` hover:scale-[1.01] hover:shadow-md cursor-pointer hover:border-gray-300`;
+                                                    if (showCorrect) {
+                                                        containerClasses = `flex items-center gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 ring-4 ring-[#34A853]/30 bg-[#f0fdf4] dark:bg-[#064e3b] border-[#34A853] z-10 relative animate-pop-in select-none`;
+                                                        letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 bg-[#34A853] text-white`;
+                                                    } else if (showWrong && isSelected) {
+                                                        containerClasses = `flex items-center gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 transition-all duration-200 shadow-[0_8px_20px_rgba(234,67,53,0.15)] bg-[#fce8e6] dark:bg-[#7f1d1d] border-[#EA4335] scale-[1.02] relative z-10 select-none`;
+                                                        letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 bg-[#EA4335] text-white`;
+                                                    } else if (showWrong) {
+                                                        containerClasses = `flex items-center gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 transition-all duration-200 shadow-sm bg-yellow-50 dark:bg-yellow-950/50 border-yellow-400 dark:border-yellow-600 relative z-10 select-none`;
+                                                        letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 bg-yellow-300 dark:bg-yellow-700 text-yellow-800 dark:text-yellow-100`;
+                                                    }
                                                 }
-                                            } else {
-                                                if (showCorrect) {
-                                                    containerClasses = `flex items-center gap-3 md:gap-4 py-1.5 px-3 rounded-lg border-2 ring-4 ring-[#34A853]/30 bg-[#f0fdf4] dark:bg-[#064e3b] border-[#34A853] z-10 relative animate-pop-in`;
-                                                    letterClasses = `shrink-0 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full text-lg md:text-xl font-black transition-colors duration-300 bg-[#34A853] text-white`;
-                                                } else if (showWrong && isSelected) {
-                                                    containerClasses = `flex items-center gap-3 md:gap-4 py-1.5 px-3 rounded-lg border-2 transition-all duration-300 shadow-[0_8px_20px_rgba(234,67,53,0.15)] bg-[#fce8e6] dark:bg-[#7f1d1d] border-[#EA4335] transform scale-[1.02] relative z-10`;
-                                                    letterClasses = `shrink-0 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full text-lg md:text-xl font-black transition-colors duration-300 bg-[#EA4335] text-white`;
-                                                } else if (showWrong) {
-                                                    containerClasses = `flex items-center gap-3 md:gap-4 py-1.5 px-3 rounded-lg border-2 transition-all duration-300 shadow-sm bg-yellow-50 dark:bg-yellow-950/50 border-yellow-400 dark:border-yellow-600 relative z-10`;
-                                                    letterClasses = `shrink-0 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full text-lg md:text-xl font-black transition-colors duration-300 bg-yellow-300 dark:bg-yellow-700 text-yellow-800 dark:text-yellow-100`;
-                                                }
-                                            }
-                                            return (
-                                                <motion.div
-                                                    key={opt.key}
-                                                    variants={{
-                                                        hidden: { opacity: 0, y: 20 },
-                                                        visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100, damping: 14 } }
-                                                    }}
-                                                    className="flex flex-col gap-2 w-full relative"
-                                                >
-                                                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none">
-                                                        <Confetti active={isConfettiActive && isSelected && showCorrect} config={CONFETTI_CONFIG} />
-                                                    </div>
-                                                    <div
-                                                        id={`option-card-${opt.key}`}
-                                                        className={containerClasses}
-                                                        style={{
-                                                            ...(bgTheme === 'dots' ? {
-                                                                backgroundImage: `radial-gradient(${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'} 1.5px, transparent 1.5px)`,
-                                                                backgroundSize: '12px 12px'
-                                                            } : bgTheme === 'grid' ? {
-                                                                backgroundImage: `linear-gradient(to right, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px)`,
-                                                                backgroundSize: '12px 12px'
-                                                            } : {
-                                                                backgroundImage: 'none',
-                                                                backgroundSize: 'auto'
-                                                            })
+                                                return (
+                                                    <motion.div
+                                                        key={opt.key}
+                                                        variants={{
+                                                            hidden: { opacity: 0, y: 20 },
+                                                            visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100, damping: 14 } }
                                                         }}
-                                                        onContextMenu={(e) => {
-                                                            e.preventDefault();
-                                                            if (step === 0) {
-                                                                setEliminatedOptions(prev =>
-                                                                    prev.includes(opt.key) ? prev.filter(k => k !== opt.key) : [...prev, opt.key]
-                                                                );
-                                                            }
-                                                        }}
-                                                        onClick={() => {
-                                                            if (step === 0) {
-                                                                if (eliminatedOptions.includes(opt.key)) return;
-                                                                setSelectedOption(opt.key);
-                                                                setStep(1);
-
-                                                                // Trigger confetti and celebration if correct (Single Question Perform)
-                                                                if (q.correctAnswer && q.correctAnswer.toLowerCase().trim().includes(opt.key)) {
-                                                                    const newConsecutive = consecutiveCorrect + 1;
-                                                                    setConsecutiveCorrect(newConsecutive);
-                                                                    setIsConfettiActive(true);
-
-                                                                    // Show celebration on single question answer!
-                                                                    triggerCelebration();
-
-                                                                    if (newConsecutive > 0 && newConsecutive % 5 === 0) {
-                                                                        // Play WOW sound every 5 consecutive correct answers
-                                                                        if (wowAudioRef.current) {
-                                                                            wowAudioRef.current.currentTime = 0;
-                                                                            wowAudioRef.current.play().catch(e => console.warn('Wow audio failed:', e));
-                                                                        }
-                                                                    } else {
-                                                                        if (!isCelebrationSoundEnabled && popAudioRef.current) {
-                                                                            popAudioRef.current.currentTime = 0;
-                                                                            popAudioRef.current.play().catch(e => console.warn('Pop audio failed:', e));
-                                                                        }
-                                                                    }
-                                                                    setTimeout(() => setIsConfettiActive(false), 2000);
-                                                                } else {
-                                                                    // Reset on wrong answer
-                                                                    setConsecutiveCorrect(0);
-                                                                }
-                                                                // Feature 8: Track session score
-                                                                if (q.correctAnswer) {
-                                                                    const isCorrect = q.correctAnswer.toLowerCase().trim().includes(opt.key);
-                                                                    updateSessionScore(currentSlide, isCorrect);
-                                                                }
-                                                            }
-                                                        }}
+                                                        className="flex flex-col gap-2 w-full relative"
                                                     >
-                                                        <div className={letterClasses}>
-                                                            {optLetter}
+                                                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none">
+                                                            <Confetti active={isConfettiActive && isSelected && showCorrect} config={CONFETTI_CONFIG} />
                                                         </div>
-                                                        <div className={`prose dark:prose-invert max-w-none text-slate-900 dark:text-white [&_*]:!text-slate-900 dark:[&_*]:!text-white [&>p]:m-0 [&>p]:text-[length:var(--opt-size)] [&>p]:font-semibold [&>p]:leading-snug flex-1 capitalize ${eliminatedOptions.includes(opt.key) && step === 0 ? 'line-through opacity-50' : ''}`}>
-                                                            <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
-                                                                {opt.text}
-                                                            </ReactMarkdown>
-                                                        </div>
-
-                                                        {step >= 1 && showCorrect && (
-                                                            <motion.div
-                                                                initial={{ x: -200, opacity: 0, scale: 0.5 }}
-                                                                animate={{ x: 0, opacity: 1, scale: 1 }}
-                                                                transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
-                                                                className="shrink-0 text-white bg-[#34A853] rounded-full p-1.5 shadow-sm relative z-20"
-                                                            >
-                                                                <Check className="w-7 h-7 stroke-[3]" />
-                                                            </motion.div>
-                                                        )}
-                                                        {step >= 1 && showWrong && isSelected && (
-                                                            <motion.div
-                                                                initial={{ x: -200, opacity: 0, scale: 0.5 }}
-                                                                animate={{ x: 0, opacity: 1, scale: 1 }}
-                                                                transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
-                                                                className="shrink-0 text-white bg-[#EA4335] rounded-full p-1.5 shadow-sm relative z-20"
-                                                            >
-                                                                <X className="w-7 h-7 stroke-[3]" />
-                                                            </motion.div>
-                                                        )}
-                                                    </div>
-
-                                                    {/* Option Explanation */}
-                                                    {step >= 2 && isOptionExpEnabled && q.optionExplanations?.[opt.key] && (
                                                         <div
-                                                            className="ml-4 mt-2 pl-4 pr-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-50/90 dark:bg-gray-800/90 rounded-xl border-l-4 border-l-[#4285F4] shadow-sm animate-in fade-in duration-500 prose dark:prose-invert max-w-none [&>p]:m-0 [&_*]:!text-[length:var(--exp-size)]"
-                                                            style={{ fontSize: 'var(--exp-size)' }}
+                                                            id={`option-card-${opt.key}`}
+                                                            className={containerClasses}
+                                                            style={{
+                                                                ...(bgTheme === 'dots' ? {
+                                                                    backgroundImage: `radial-gradient(${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'} 1.5px, transparent 1.5px)`,
+                                                                    backgroundSize: '12px 12px'
+                                                                } : bgTheme === 'grid' ? {
+                                                                    backgroundImage: `linear-gradient(to right, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px)`,
+                                                                    backgroundSize: '12px 12px'
+                                                                } : {
+                                                                    backgroundImage: 'none',
+                                                                    backgroundSize: 'auto'
+                                                                })
+                                                            }}
+                                                            onContextMenu={(e) => {
+                                                                e.preventDefault();
+                                                                if (step === 0) {
+                                                                    setEliminatedOptions(prev =>
+                                                                        prev.includes(opt.key) ? prev.filter(k => k !== opt.key) : [...prev, opt.key]
+                                                                    );
+                                                                }
+                                                            }}
+                                                            onClick={() => {
+                                                                if (step === 0) {
+                                                                    if (eliminatedOptions.includes(opt.key)) return;
+                                                                    setSelectedOption(opt.key);
+                                                                    setStep(1);
+
+                                                                    // Trigger confetti and celebration if correct (Single Question Perform)
+                                                                    if (q.correctAnswer && q.correctAnswer.toLowerCase().trim().includes(opt.key)) {
+                                                                        const newConsecutive = consecutiveCorrect + 1;
+                                                                        setConsecutiveCorrect(newConsecutive);
+                                                                        setIsConfettiActive(true);
+
+                                                                        // Show celebration on single question answer!
+                                                                        triggerCelebration();
+
+                                                                        if (newConsecutive > 0 && newConsecutive % 5 === 0) {
+                                                                            // Play WOW sound every 5 consecutive correct answers
+                                                                            if (wowAudioRef.current) {
+                                                                                wowAudioRef.current.currentTime = 0;
+                                                                                wowAudioRef.current.play().catch(e => console.warn('Wow audio failed:', e));
+                                                                            }
+                                                                        } else {
+                                                                            if (!isCelebrationSoundEnabled && popAudioRef.current) {
+                                                                                popAudioRef.current.currentTime = 0;
+                                                                                popAudioRef.current.play().catch(e => console.warn('Pop audio failed:', e));
+                                                                            }
+                                                                        }
+                                                                        setTimeout(() => setIsConfettiActive(false), 2000);
+                                                                    } else {
+                                                                        // Reset on wrong answer
+                                                                        setConsecutiveCorrect(0);
+                                                                    }
+                                                                    // Feature 8: Track session score
+                                                                    if (q.correctAnswer) {
+                                                                        const isCorrect = q.correctAnswer.toLowerCase().trim().includes(opt.key);
+                                                                        updateSessionScore(currentSlide, isCorrect);
+                                                                    }
+                                                                }
+                                                            }}
                                                         >
-                                                            <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
-                                                                {q.optionExplanations[opt.key]}
-                                                            </ReactMarkdown>
+                                                            <div className={letterClasses} style={{ fontSize: 'var(--opt-size)' }}>
+                                                                {optLetter}
+                                                            </div>
+                                                            <div className={`prose dark:prose-invert max-w-none text-slate-900 dark:text-white [&_*]:!text-slate-900 dark:[&_*]:!text-white [&>p]:m-0 [&>p]:text-[length:var(--opt-size)] [&>p]:font-semibold [&>p]:leading-snug flex-1 capitalize ${eliminatedOptions.includes(opt.key) && step === 0 ? 'line-through opacity-50' : ''}`}>
+                                                                <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
+                                                                    {opt.text}
+                                                                </ReactMarkdown>
+                                                            </div>
+
+                                                            {step >= 1 && showCorrect && (
+                                                                <motion.div
+                                                                    initial={{ x: -200, opacity: 0, scale: 0.5 }}
+                                                                    animate={{ x: 0, opacity: 1, scale: 1 }}
+                                                                    transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
+                                                                    className="shrink-0 text-white bg-[#34A853] rounded-full p-1.5 shadow-sm relative z-20"
+                                                                >
+                                                                    <Check className="w-7 h-7 stroke-[3]" />
+                                                                </motion.div>
+                                                            )}
+                                                            {step >= 1 && showWrong && isSelected && (
+                                                                <motion.div
+                                                                    initial={{ x: -200, opacity: 0, scale: 0.5 }}
+                                                                    animate={{ x: 0, opacity: 1, scale: 1 }}
+                                                                    transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
+                                                                    className="shrink-0 text-white bg-[#EA4335] rounded-full p-1.5 shadow-sm relative z-20"
+                                                                >
+                                                                    <X className="w-7 h-7 stroke-[3]" />
+                                                                </motion.div>
+                                                            )}
                                                         </div>
-                                                    )}
-                                                </motion.div>
-                                            );
-                                        })}
+
+                                                        {/* Option Explanation */}
+                                                        {step >= 2 && isOptionExpEnabled && q.optionExplanations?.[opt.key] && (
+                                                            <div
+                                                                className="ml-4 mt-2 pl-4 pr-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-50/90 dark:bg-gray-800/90 rounded-xl border-l-4 border-l-[#4285F4] shadow-sm animate-in fade-in duration-500 prose dark:prose-invert max-w-none [&>p]:m-0 [&_*]:!text-[length:var(--exp-size)]"
+                                                                style={{ fontSize: 'var(--exp-size)' }}
+                                                            >
+                                                                <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
+                                                                    {q.optionExplanations[opt.key]}
+                                                                </ReactMarkdown>
+                                                            </div>
+                                                        )}
+                                                    </motion.div>
+                                                );
+                                            })}
                                         </motion.div>
 
                                         {/* Next Arrow */}
@@ -2522,27 +2700,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             © DeshExam.app
                         </div>
 
-                        {/* ── Mobile Prev/Next Navigation Buttons ── */}
-                        <div className="flex md:hidden items-center shrink-0 gap-1">
-                            <button
-                                onClick={prevStep}
-                                disabled={currentSlide === 0 && step === 0}
-                                className="flex items-center justify-center w-11 h-11 rounded-full bg-white/15 hover:bg-white/25 active:scale-95 text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed border border-white/20"
-                                title="Previous"
-                            >
-                                <ChevronLeft className="w-6 h-6" strokeWidth={2.5} />
-                            </button>
-                            <button
-                                onClick={nextStep}
-                                disabled={currentSlide === questions.length - 1 && step >= 1}
-                                className="flex items-center justify-center w-11 h-11 rounded-full bg-white/15 hover:bg-white/25 active:scale-95 text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed border border-white/20"
-                                title="Next"
-                            >
-                                <ChevronRight className="w-6 h-6" strokeWidth={2.5} />
-                            </button>
-                        </div>
-
-                        <div className="flex items-center gap-2 md:gap-4 lg:gap-8 ml-auto w-auto md:w-auto justify-center md:justify-end">
+                        <div className="flex items-center gap-2 md:gap-4 lg:gap-8 ml-auto w-full md:w-auto justify-center md:justify-end">
                             <div className="flex items-center gap-2 md:gap-4">
                                 {/* Read Aloud Toggle Button (Footer) */}
                                 <button
@@ -2574,7 +2732,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 {/* Fullscreen Toggle Button */}
                                 <button
                                     onClick={toggleFullscreen}
-                                    className="hidden md:block p-2 md:p-3 rounded-full transition-all bg-teal-500/80 hover:bg-teal-500 text-white shrink-0"
+                                    className="p-2 md:p-3 rounded-full transition-all bg-teal-500/80 hover:bg-teal-500 text-white shrink-0"
                                     title="Toggle Fullscreen (F11)"
                                 >
                                     {isFullscreen ? <Minimize className="w-5 h-5 md:w-6 md:h-6" /> : <Maximize className="w-5 h-5 md:w-6 md:h-6" />}
@@ -3544,7 +3702,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     {/* Floating Presentation Tools (Right Edge) */}
                     {isPenActive && (
                         <div className="absolute right-4 bottom-8 z-[70] bg-slate-900/95 backdrop-blur-xl p-1 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.4)] border border-slate-700/50 flex flex-col gap-1 w-9 items-center animate-in slide-in-from-right-10 fade-in duration-300">
-                            
+
                             <button onClick={() => setDrawingTool('laser')} className={`p-0.5 rounded-lg transition-all ${drawingTool === 'laser' ? 'bg-red-500/20 text-red-400 border border-red-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Laser (Shift+L)">
                                 <MousePointer2 className="w-4 h-4" />
                             </button>
@@ -3557,9 +3715,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             <button onClick={() => setDrawingTool('eraser')} className={`p-0.5 rounded-lg transition-all ${drawingTool === 'eraser' ? 'bg-slate-500/40 text-white border border-slate-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Eraser (Shift+E)">
                                 <Eraser className="w-4 h-4" />
                             </button>
-                            
+
                             <hr className="w-full border-slate-700/50 my-0.5" />
-                            
+
                             <button onClick={() => setDrawingTool('rectangle')} className={`p-0.5 rounded-lg transition-all ${drawingTool === 'rectangle' ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Rectangle (Shift+B)">
                                 <Square className="w-4 h-4" />
                             </button>
