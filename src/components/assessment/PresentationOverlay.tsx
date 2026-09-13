@@ -8,6 +8,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
 import Confetti from 'react-dom-confetti';
+import canvasConfetti from 'canvas-confetti';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/hooks/use-auth';
 import { saveExamAttempt, getTopScorersForAssessment } from '@/lib/firebase/student-analytics';
@@ -50,11 +51,11 @@ const VIDEO_OPTIONS = [
 ];
 
 const CONFETTI_CONFIG = {
-    spread: 90,
-    elementCount: 70,
-    duration: 3000,
-    startVelocity: 30,
-    colors: ['#34A853', '#FABB05', '#4285F4', '#EA4335']
+    spread: 360,           // Spread in all directions
+    elementCount: 350,     // More paper pieces (rangin tukro)
+    duration: 5000,        // Last longer
+    startVelocity: 70,     // Shoot further to cover the page
+    colors: ['#34A853', '#FABB05', '#4285F4', '#EA4335', '#f43f5e', '#a78bfa', '#fb923c']
 };
 
 import 'katex/dist/katex.min.css';
@@ -493,13 +494,45 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [currentPraise, setCurrentPraise] = useState(CELEBRATION_PRAISES[0]);
     const praiseIdxRef = useRef(0);
 
-    const triggerCelebration = useCallback(() => {
+    const triggerCelebration = useCallback((consecutiveCount: number) => {
         if (!isCelebrationEnabled) return;
+        // Only show celebration card every 10 consecutive correct answers
+        if (consecutiveCount === 0 || consecutiveCount % 10 !== 0) return;
+
         const nextPraise = CELEBRATION_PRAISES[praiseIdxRef.current % CELEBRATION_PRAISES.length];
         praiseIdxRef.current += 1;
         setCurrentPraise(nextPraise);
 
         setShowCelebration(true);
+
+        // --- Realistic Fireworks with canvas-confetti ---
+        const duration = 5 * 1000;
+        const animationEnd = Date.now() + duration;
+        const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 99999 };
+
+        function randomInRange(min: number, max: number) {
+            return Math.random() * (max - min) + min;
+        }
+
+        const interval: any = setInterval(function () {
+            const timeLeft = animationEnd - Date.now();
+
+            if (timeLeft <= 0) {
+                return clearInterval(interval);
+            }
+
+            const particleCount = 50 * (timeLeft / duration);
+            // Fire from two sides of the screen
+            canvasConfetti(Object.assign({}, defaults, { 
+                particleCount, 
+                origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } 
+            }));
+            canvasConfetti(Object.assign({}, defaults, { 
+                particleCount, 
+                origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } 
+            }));
+        }, 250);
+        // ------------------------------------------------
 
         if (isCelebrationSoundEnabled) {
             if (winAudioRef.current) {
@@ -676,7 +709,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         if (!optionEl) {
             setSelectedOption(targetKey);
             setStep(1);
-            triggerCelebration();
+            const newConsecutive = consecutiveCorrect + 1;
+            setConsecutiveCorrect(newConsecutive);
+            triggerCelebration(newConsecutive);
             if (onDone) onDone();
             return;
         }
@@ -710,12 +745,13 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
             setSelectedOption(targetKey);
             setStep(1);
 
-            setConsecutiveCorrect(prev => prev + 1);
+            const newConsecutive = consecutiveCorrect + 1;
+            setConsecutiveCorrect(newConsecutive);
             setIsConfettiActive(true);
             setTimeout(() => setIsConfettiActive(false), 2400);
 
-            // Trigger grand celebration with dynamic praise and victory fanfare
-            triggerCelebration();
+            // Trigger grand celebration with dynamic praise and victory fanfare every 10 correct
+            triggerCelebration(newConsecutive);
 
             updateSessionScore(currentSlide, true);
 
@@ -730,7 +766,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
             clearTimeout(glideTimer);
             clearTimeout(clickTimer);
         };
-    }, [currentSlide, triggerCelebration, updateSessionScore]);
+    }, [currentSlide, triggerCelebration, updateSessionScore, consecutiveCorrect]);
 
     // ── Feature 8: Fetch leaderboard ──────────────────────────────────────────
     const fetchLeaderboard = useCallback(async (assessmentId: string) => {
@@ -1166,35 +1202,31 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
         let textToRead = cleanMarkdown(q.questionText) + '. ';
 
-        if (q.options) {
-            const optionKeys = ['a', 'b', 'c', 'd', 'e'].filter(k => q.options && q.options[k as keyof typeof q.options]);
-            optionKeys.forEach((key) => {
-                const optText = q.options![key as keyof typeof q.options];
-                if (optText) {
-                    const optLabel = getOptionLabel(key, uiLang);
-                    textToRead += `${optLabel}: ${cleanMarkdown(optText)}. `;
-                }
-            });
-        }
+        // Collect valid option keys once (used for both textToRead and cursor segments)
+        const optionKeys = ['a', 'b', 'c', 'd', 'e'].filter(k => q.options && q.options[k as keyof typeof q.options]);
+        optionKeys.forEach((key) => {
+            const optText = q.options![key as keyof typeof q.options];
+            if (optText) {
+                const optLabel = getOptionLabel(key, uiLang);
+                textToRead += `${optLabel}: ${cleanMarkdown(optText)}. `;
+            }
+        });
 
         const currentSlideLocal = currentSlide;
 
-        // Build a map: charOffset → which DOM element to point to
+        // Build char-offset → DOM element segment map for reading cursor
         const qText = cleanMarkdown(q.questionText) + '. ';
-        const optionKeys = ['a', 'b', 'c', 'd', 'e'].filter(k => q.options && q.options[k as keyof typeof q.options]);
-
-        // Segment offsets: [{ startChar, endChar, elementId }]
         const segments: { startChar: number; endChar: number; elementId: string | 'question' }[] = [];
-        let cursor = 0;
+        let cursorPos = 0;
         segments.push({ startChar: 0, endChar: qText.length, elementId: 'question' });
-        cursor = qText.length;
+        cursorPos = qText.length;
         optionKeys.forEach((key) => {
             const optText = q.options![key as keyof typeof q.options];
             if (optText) {
                 const label = getOptionLabel(key, uiLang);
                 const segLen = `${label}: ${cleanMarkdown(optText)}. `.length;
-                segments.push({ startChar: cursor, endChar: cursor + segLen, elementId: `option-card-${key}` });
-                cursor += segLen;
+                segments.push({ startChar: cursorPos, endChar: cursorPos + segLen, elementId: `option-card-${key}` });
+                cursorPos += segLen;
             }
         });
 
@@ -1233,22 +1265,27 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
 
         utterance.onend = () => {
+            // Hide reading cursor when question+options reading is done
+            setVirtualCursor({ visible: false, x: 0, y: 0, isClicking: false });
+
             if (isAutoPlayRef.current && stepRef.current === 0 && q.correctAnswer) {
                 const correctKey = q.correctAnswer.toLowerCase().trim();
-                const optionKeys = ['a', 'b', 'c', 'd', 'e'].filter(k => q.options && q.options[k as keyof typeof q.options]);
-                const validKey = optionKeys.find(k => correctKey.includes(k));
+                const allOptKeys = ['a', 'b', 'c', 'd', 'e'].filter(k => q.options && q.options[k as keyof typeof q.options]);
+                const validKey = allOptKeys.find(k => correctKey.includes(k));
                 if (validKey) {
-                    triggerHumanClick(validKey, () => {
-                        const isBangla = q.language === 'Bangla';
-                        const correctOptText = cleanMarkdown(q.options![validKey as keyof typeof q.options] || '');
-                        const correctText = isBangla
-                            ? `সঠিক উত্তর: ${bnOptionsMap[validKey]}, ${correctOptText}`
-                            : `Correct Answer is: ${validKey.toUpperCase()}, ${correctOptText}`;
+                    const isBangla = uiLang === 'bn';
+                    const correctOptText = cleanMarkdown(q.options![validKey as keyof typeof q.options] || '');
+                    const correctText = isBangla
+                        ? `সঠিক উত্তর: ${bnOptionsMap[validKey]}, ${correctOptText}`
+                        : `Correct Answer is: ${validKey.toUpperCase()}, ${correctOptText}`;
 
-                        const correctUtterance = new SpeechSynthesisUtterance(correctText);
-                        correctUtterance.lang = isBangla ? 'bn-BD' : 'en-US';
+                    // Step 1: বলো সঠিক উত্তর কী
+                    const correctUtterance = new SpeechSynthesisUtterance(correctText);
+                    correctUtterance.lang = isBangla ? 'bn-BD' : 'en-US';
 
-                        correctUtterance.onend = () => {
+                    correctUtterance.onend = () => {
+                        // Step 2: তারপর click animation করো
+                        triggerHumanClick(validKey, () => {
                             setIsSpeaking(false);
                             setTimeout(() => {
                                 if (isAutoPlayRef.current) {
@@ -1263,16 +1300,15 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     });
                                 }
                             }, 1500);
-                        };
-                        correctUtterance.onerror = () => setIsSpeaking(false);
-                        window.speechSynthesis.speak(correctUtterance);
-                    });
+                        });
+                    };
+                    correctUtterance.onerror = () => setIsSpeaking(false);
+                    window.speechSynthesis.speak(correctUtterance);
                 } else {
                     setIsSpeaking(false);
                 }
             } else {
                 setIsSpeaking(false);
-                setVirtualCursor({ visible: false, x: 0, y: 0, isClicking: false });
             }
         };
         utterance.onerror = () => {
@@ -1606,7 +1642,15 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             setSelectedOption(key);
                             setStep(1);
                             if (currentQ.correctAnswer && currentQ.correctAnswer.toLowerCase().trim().includes(key)) {
-                                triggerCelebration();
+                                const newConsecutive = consecutiveCorrect + 1;
+                                setConsecutiveCorrect(newConsecutive);
+                                triggerCelebration(newConsecutive);
+                                setIsConfettiActive(true);
+                                setTimeout(() => setIsConfettiActive(false), 2400);
+                                updateSessionScore(currentSlide, true);
+                            } else {
+                                setConsecutiveCorrect(0);
+                                updateSessionScore(currentSlide, false);
                             }
                         }
                     }
@@ -1616,7 +1660,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [isOpen, closePresentation, nextStep, prevStep, isSettingsOpen, step, currentSlide, questions, clearCanvas, triggerHumanClick]);
+    }, [isOpen, closePresentation, nextStep, prevStep, isSettingsOpen, step, currentSlide, questions, clearCanvas, triggerHumanClick, consecutiveCorrect, updateSessionScore, triggerCelebration]);
     const currentQ = questions[currentSlide];
 
     const parsedOptions = useMemo(() => {
@@ -2578,8 +2622,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                                         setConsecutiveCorrect(newConsecutive);
                                                                         setIsConfettiActive(true);
 
-                                                                        // Show celebration on single question answer!
-                                                                        triggerCelebration();
+                                                                        // Show celebration on every 10 consecutive correct answers
+                                                                        triggerCelebration(newConsecutive);
 
                                                                         if (newConsecutive > 0 && newConsecutive % 5 === 0) {
                                                                             // Play WOW sound every 5 consecutive correct answers
@@ -2704,11 +2748,21 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             <div className="flex items-center gap-2 md:gap-4">
                                 {/* Read Aloud Toggle Button (Footer) */}
                                 <button
-                                    onClick={() => handleReadAloud()}
-                                    className={`p-2 md:p-3 rounded-full transition-all shrink-0 ${isSpeaking ? 'bg-green-500 text-white ring-2 ring-green-300' : 'bg-green-500/80 hover:bg-green-500 text-white'}`}
-                                    title={isSpeaking ? "Stop Reading (R)" : "Read Aloud (R)"}
+                                    onClick={() => {
+                                        if (isAutoPlayReadAloud || isSpeaking) {
+                                            setIsAutoPlayReadAloud(false);
+                                            window.speechSynthesis.cancel();
+                                            setIsSpeaking(false);
+                                        } else {
+                                            setIsAutoPlayReadAloud(true);
+                                            // If not on step 0, manually start reading so user gets immediate feedback
+                                            if (step !== 0) handleReadAloud(true);
+                                        }
+                                    }}
+                                    className={`p-2 md:p-3 rounded-full transition-all shrink-0 ${isAutoPlayReadAloud || isSpeaking ? 'bg-green-500 text-white ring-2 ring-green-300' : 'bg-green-500/80 hover:bg-green-500 text-white'}`}
+                                    title={isAutoPlayReadAloud || isSpeaking ? "Stop Auto Read (R)" : "Start Auto Read (R)"}
                                 >
-                                    {isSpeaking ? <Pause className="w-5 h-5 md:w-6 md:h-6 fill-current" /> : <Play className="w-5 h-5 md:w-6 md:h-6 fill-current" />}
+                                    {isAutoPlayReadAloud || isSpeaking ? <Pause className="w-5 h-5 md:w-6 md:h-6 fill-current" /> : <Play className="w-5 h-5 md:w-6 md:h-6 fill-current" />}
                                 </button>
 
                                 {/* Dark Mode Toggle Button */}
