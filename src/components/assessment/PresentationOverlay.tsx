@@ -390,7 +390,14 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const isAdmin = fetchedIsAdmin || userProfile?.role === 'admin' || userProfile?.isAdmin === true;
     const canUsePremium = isPremiumUser || isAdmin || userProfile?.subscriptionPlan === 'pro' || userProfile?.subscriptionPlan === 'pass';
 
-    const [isOpen, setIsOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState(autoStart === true);
+
+    useEffect(() => {
+        if (autoStart) {
+            setIsOpen(true);
+        }
+    }, [autoStart]);
+
     const [currentSlide, setCurrentSlide] = useState(0);
     const [step, setStep] = useState(0); // 0: Question, 1: Show Answer, 2: Show Explanation
     const [qFontScale, setQFontScale] = useState(1);

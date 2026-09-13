@@ -41,24 +41,24 @@ function loadAllFromFolder(folderName: string): any[] {
   }
 }
 
-export function getHardcodedMockTest(slug: string): any | null {
+export function getHardcodedMockTest(slugOrId: string): any | null {
   const all = loadAllFromFolder('mock-tests');
-  const found = all.find(t => t.slug === slug) ?? null;
-  if (!found) console.log(`[hardcoded-loader] mock-test slug "${slug}" not found. Available:`, all.map(t => t.slug));
+  const found = all.find(t => t.slug === slugOrId || t.id === slugOrId) ?? null;
+  if (!found) console.log(`[hardcoded-loader] mock-test "${slugOrId}" not found.`);
   return found;
 }
 
-export function getHardcodedQuiz(slug: string): any | null {
+export function getHardcodedQuiz(slugOrId: string): any | null {
   const all = loadAllFromFolder('quizzes');
-  const found = all.find(t => t.slug === slug) ?? null;
-  if (!found) console.log(`[hardcoded-loader] quiz slug "${slug}" not found. Available:`, all.map(t => t.slug));
+  const found = all.find(t => t.slug === slugOrId || t.id === slugOrId) ?? null;
+  if (!found) console.log(`[hardcoded-loader] quiz "${slugOrId}" not found.`);
   return found;
 }
 
-export function getHardcodedPracticeSet(slug: string): any | null {
+export function getHardcodedPracticeSet(slugOrId: string): any | null {
   const all = loadAllFromFolder('practice');
-  const found = all.find(t => t.slug === slug) ?? null;
-  if (!found) console.log(`[hardcoded-loader] practice slug "${slug}" not found. Available:`, all.map(t => t.slug));
+  const found = all.find(t => t.slug === slugOrId || t.id === slugOrId) ?? null;
+  if (!found) console.log(`[hardcoded-loader] practice "${slugOrId}" not found.`);
   return found;
 }
 
