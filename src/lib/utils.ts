@@ -37,8 +37,11 @@ export const serializeTimestamps = (data: any): any => {
   if (!data) return data;
   if (Array.isArray(data)) return data.map(item => serializeTimestamps(item));
   if (typeof data === 'object' && data !== null) {
-      if (data.hasOwnProperty('seconds') && typeof (data as any).toDate === 'function') {
+      if (typeof (data as any).toDate === 'function') {
           return (data as any).toDate().toISOString();
+      }
+      if (typeof data.seconds === 'number' && (typeof data.nanoseconds === 'number' || typeof data._nanoseconds === 'number')) {
+          return new Date(data.seconds * 1000 + ((data.nanoseconds || data._nanoseconds || 0) / 1000000)).toISOString();
       }
       const newObj: { [key: string]: any } = {};
       for (const key in data) newObj[key] = serializeTimestamps(data[key]);
