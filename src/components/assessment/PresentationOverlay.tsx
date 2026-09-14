@@ -482,6 +482,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const winAudioRef = useRef<HTMLAudioElement>(null);
     const slideRef = useRef<HTMLDivElement>(null);
     const [isSavingImage, setIsSavingImage] = useState(false);
+    const [downloadAllSlides, setDownloadAllSlides] = useState(false);
+    const [saveWithCorrectOption, setSaveWithCorrectOption] = useState(false);
 
     const [virtualCursor, setVirtualCursor] = useState<{
         visible: boolean;
@@ -796,61 +798,95 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         if (!slideRef.current || isSavingImage) return;
         setIsSavingImage(true);
 
-        // Patch CSSStyleSheet.prototype.cssRules so cross-origin sheets
-        // silently return [] instead of throwing SecurityError.
-        // dom-to-image-more iterates document.styleSheets and this prevents
-        // the uncatchable exception for CDN stylesheets (KaTeX, Google Fonts).
-        const cssSheetProto = CSSStyleSheet.prototype;
-        const origDescriptor = Object.getOwnPropertyDescriptor(cssSheetProto, 'cssRules')!;
-        Object.defineProperty(cssSheetProto, 'cssRules', {
-            configurable: true,
-            get() {
-                try {
-                    return origDescriptor.get!.call(this);
-                } catch {
-                    return []; // silently skip cross-origin sheets
-                }
-            },
-        });
+        const originalSlide = currentSlide;
+        const originalStep = step;
+        const originalSelected = selectedOption;
 
-        // Suppress the Status:404 warning for data-URI SVG backgrounds
-        const origConsoleError = console.error;
-        console.error = (...args: any[]) => {
-            const msg = String(args[0] ?? '');
-            if (msg.includes('Status:404') || msg.includes('data:image/svg+xml')) return;
-            origConsoleError.apply(console, args);
+        const captureSlide = async (slideIdx: number) => {
+            setCurrentSlide(slideIdx);
+            
+            if (saveWithCorrectOption) {
+                const q = questions[slideIdx];
+                if (q && q.correctAnswer) {
+                    setStep(1);
+                    setSelectedOption(q.correctAnswer.toLowerCase().trim());
+                } else {
+                    setStep(0);
+                    setSelectedOption(null);
+                }
+            } else {
+                setStep(0);
+                setSelectedOption(null);
+            }
+            
+            // Wait for React to render the new state
+            await new Promise(r => setTimeout(r, 600));
+
+            // Patch CSSStyleSheet.prototype.cssRules so cross-origin sheets
+            // silently return [] instead of throwing SecurityError.
+            const cssSheetProto = CSSStyleSheet.prototype;
+            const origDescriptor = Object.getOwnPropertyDescriptor(cssSheetProto, 'cssRules')!;
+            Object.defineProperty(cssSheetProto, 'cssRules', {
+                configurable: true,
+                get() {
+                    try { return origDescriptor.get!.call(this); }
+                    catch { return []; }
+                },
+            });
+
+            // Suppress the Status:404 warning for data-URI SVG backgrounds
+            const origConsoleError = console.error;
+            console.error = (...args: any[]) => {
+                const msg = String(args[0] ?? '');
+                if (msg.includes('Status:404') || msg.includes('data:image/svg+xml')) return;
+                origConsoleError.apply(console, args);
+            };
+
+            try {
+                const el = slideRef.current;
+                if (!el) return;
+                const scale = 2;
+                const dataUrl = await domtoimage.toPng(el, {
+                    quality: 1,
+                    width: el.offsetWidth * scale,
+                    height: el.offsetHeight * scale,
+                    style: {
+                        transform: `scale(${scale})`,
+                        transformOrigin: 'top left',
+                        width: `${el.offsetWidth}px`,
+                        height: `${el.offsetHeight}px`,
+                    },
+                    filter: (node: Node) => {
+                        return (node as Element).tagName !== 'CANVAS';
+                    },
+                });
+                const link = document.createElement('a');
+                link.download = `deshexam-slide-${slideIdx + 1}.png`;
+                link.href = dataUrl;
+                link.click();
+            } catch (e) {
+                origConsoleError(`Failed to save image for slide ${slideIdx + 1}:`, e);
+            } finally {
+                Object.defineProperty(cssSheetProto, 'cssRules', origDescriptor);
+                console.error = origConsoleError;
+            }
         };
 
         try {
-            const el = slideRef.current;
-            const scale = 2;
-            const dataUrl = await domtoimage.toPng(el, {
-                quality: 1,
-                width: el.offsetWidth * scale,
-                height: el.offsetHeight * scale,
-                style: {
-                    transform: `scale(${scale})`,
-                    transformOrigin: 'top left',
-                    width: `${el.offsetWidth}px`,
-                    height: `${el.offsetHeight}px`,
-                },
-                filter: (node: Node) => {
-                    return (node as Element).tagName !== 'CANVAS';
-                },
-            });
-            const link = document.createElement('a');
-            link.download = `deshexam-slide-${currentSlide + 1}.png`;
-            link.href = dataUrl;
-            link.click();
-        } catch (e) {
-            origConsoleError('Failed to save image:', e);
+            if (downloadAllSlides) {
+                for (let i = 0; i < questions.length; i++) {
+                    await captureSlide(i);
+                }
+            } else {
+                await captureSlide(currentSlide);
+            }
         } finally {
-            // Always restore both patches
-            Object.defineProperty(cssSheetProto, 'cssRules', origDescriptor);
-            console.error = origConsoleError;
+            setCurrentSlide(originalSlide);
+            setStep(originalStep);
+            setSelectedOption(originalSelected);
             setIsSavingImage(false);
         }
-    }, [isSavingImage, currentSlide]);
+    }, [isSavingImage, currentSlide, questions, step, selectedOption, downloadAllSlides, saveWithCorrectOption]);
 
     // ── Feature 8: Save final score to Firebase ───────────────────────────────
     const saveFinalScore = useCallback(async () => {
@@ -3037,6 +3073,32 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                                 </div>
                                                             </>
                                                         )}
+                                                    </div>
+                                                </div>
+
+                                                <div className="bg-gray-50/50 dark:bg-gray-900/40 border border-gray-200/60 dark:border-gray-800/60 rounded-2xl p-4 mb-4 shadow-sm backdrop-blur-sm">
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
+                                                        <span className="flex items-center gap-2"><ImageDown className="w-4 h-4 text-indigo-500" /> Export Settings</span>
+                                                    </div>
+                                                    <div className="space-y-3">
+                                                        <div className="flex items-center justify-between">
+                                                            <div className="flex flex-col">
+                                                                <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Download All Slides</span>
+                                                                <span className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">Save every slide at once</span>
+                                                            </div>
+                                                            <button onClick={() => setDownloadAllSlides(!downloadAllSlides)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${downloadAllSlides ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-gray-700'}`}>
+                                                                <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ${downloadAllSlides ? 'translate-x-5' : 'translate-x-1'}`} />
+                                                            </button>
+                                                        </div>
+                                                        <div className="flex items-center justify-between">
+                                                            <div className="flex flex-col">
+                                                                <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Save with Correct Option</span>
+                                                                <span className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">Show answer in the image</span>
+                                                            </div>
+                                                            <button onClick={() => setSaveWithCorrectOption(!saveWithCorrectOption)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${saveWithCorrectOption ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-gray-700'}`}>
+                                                                <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ${saveWithCorrectOption ? 'translate-x-5' : 'translate-x-1'}`} />
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </div>
 
