@@ -87,13 +87,13 @@ You are an expert AI Educational Content Creator and JSON Architect. Your job is
   "averageScore": "[Random integer 45–78 as per Rule 10]",
   "instructions": "[10-point instructions string from Rule 7]",
   "examRules": "[5-8 rules string from Rule 9, in material's language, relevant to the topic]",
-  "boardId": "[Infer from material if not provided, e.g. 'board-wbbpe', 'board-wbbse', 'board-wbchse']",
-  "classId": "[Infer class from material if not provided, e.g. 'class-2-wbbpe', 'class-10-wb']",
-  "subjectId": "[Infer subject from material if not provided, e.g. 'subject-bengali-literature-class-2-wbbpe', 'subject-life-science-class-10-wb']",
-  "textbookId": "[Infer textbook from material if not provided, e.g. 'textbook-sahaj-path-dwitiyo-bhag-class-2-wbbpe']",
-  "chapterId": "[Infer chapter from material if not provided, e.g. 'chapter-ashtam-path-sahaj-path-class-2-wbbpe']",
-  "topicId": "[Infer topic from material if not provided, e.g. 'topic-gadyangsha-bishleshan-sahaj-path-class-2-wbbpe']",
-  "competitiveExam": "[Infer competitive exam if applicable, e.g. 'WBBSE', 'WBCS', 'SSC'. Use null if none fits]",
+  "boardId": "[Infer from material if not provided, e.g. 'WBBPE']",
+  "classId": "[Infer class from material if not provided, e.g. 'Class 1']",
+  "subjectId": "[Infer subject from material if not provided, e.g. 'বাংলা']",
+  "textbookId": "[Infer textbook from material if not provided, e.g. 'সহজ পাঠ (প্রথম ভাগ)']",
+  "chapterId": "[Infer chapter from material if not provided, e.g. 'দ্বিতীয় পাঠ']",
+  "topicId": "[Infer topic from material if not provided, e.g. 'রাম বনে ফুল পাড়ে / কালো রাতি গেল ঘুচে']",
+  "competitiveExam": "[Infer competitive exam if applicable, e.g. 'TET, CTET, WB SLST, WBCS'. Use null if none fits]",
 
   "verificationBadges": [
     "WBBSE Verified"
