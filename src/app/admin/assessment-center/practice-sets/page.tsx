@@ -20,6 +20,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
+import PresentationOverlay from '@/components/assessment/PresentationOverlay';
 
 export default function PracticeSetsPage() {
     const { toast } = useToast();
@@ -28,6 +29,10 @@ export default function PracticeSetsPage() {
     const [loading, setLoading] = useState(true);
     const [editData, setEditData] = useState<Partial<PracticeSet>>({});
     
+    // Quick View State
+    const [previewTest, setPreviewTest] = useState<PracticeSet | null>(null);
+    const [isLoadingOverlay, setIsLoadingOverlay] = useState(false);
+
     // Add Review Modal State
     const [reviewTest, setReviewTest] = useState<PracticeSet | null>(null);
     const [reviewForm, setReviewForm] = useState({ name: '', rating: 5, content: '' });
@@ -138,6 +143,27 @@ export default function PracticeSetsPage() {
             toast({ title: 'Error fetching practice sets', variant: 'destructive' });
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleQuickView = async (test: PracticeSet) => {
+        if (test.questions && test.questions.length > 0) {
+            setPreviewTest(test);
+            return;
+        }
+        if (test.questionIds && test.questionIds.length > 0) {
+            setIsLoadingOverlay(true);
+            try {
+                const { getQuestionsByIds } = await import('@/lib/firebase/question-bank');
+                const questions = await getQuestionsByIds(test.questionIds);
+                setPreviewTest({ ...test, questions });
+            } catch (e) {
+                console.error('Failed to load questions', e);
+            } finally {
+                setIsLoadingOverlay(false);
+            }
+        } else {
+            toast({ title: 'No questions found', variant: 'destructive' });
         }
     };
 
@@ -340,7 +366,29 @@ export default function PracticeSetsPage() {
     }
 
     return (
-        <div className="p-4 md:p-6 space-y-6 overflow-hidden">
+        <div className="p-4 md:p-6 space-y-6 overflow-hidden relative">
+            {/* Loading Overlay */}
+            {isLoadingOverlay && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl p-6 flex flex-col items-center gap-3 shadow-2xl">
+                        <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+                        <p className="text-sm font-medium text-gray-700 dark:text-gray-200">Loading questions...</p>
+                    </div>
+                </div>
+            )}
+
+            {/* Quick View Modal */}
+            {previewTest && (
+                <div className="fixed inset-0 z-50 overflow-hidden bg-gray-900">
+                    <PresentationOverlay 
+                        questions={previewTest.questions || []} 
+                        classLine={previewTest.title}
+                        autoStart={true}
+                        onClose={() => setPreviewTest(null)}
+                    />
+                </div>
+            )}
+
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <h1 className="text-2xl sm:text-3xl font-bold">Practice Sets</h1>
                 <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto justify-between sm:justify-end">
@@ -561,10 +609,8 @@ export default function PracticeSetsPage() {
                                                             <Eye className="mr-2 h-4 w-4" /> View on Site
                                                         </Link>
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuItem asChild>
-                                                        <Link href={`/presentation/${test.slug || test.id}`} target="_blank" className="cursor-pointer text-indigo-600 dark:text-indigo-400">
-                                                            <Presentation className="mr-2 h-4 w-4" /> Present
-                                                        </Link>
+                                                    <DropdownMenuItem onClick={() => handleQuickView(test)} className="cursor-pointer text-indigo-600 dark:text-indigo-400">
+                                                        <Presentation className="mr-2 h-4 w-4" /> Present
                                                     </DropdownMenuItem>
                                                     {!(test as any).isHardcoded && (
                                                         <>
@@ -693,10 +739,8 @@ export default function PracticeSetsPage() {
                                                                         <Eye className="mr-2 h-4 w-4" /> View on Site
                                                                     </Link>
                                                                 </DropdownMenuItem>
-                                                                <DropdownMenuItem asChild>
-                                                                    <Link href={`/presentation/${test.slug || test.id}`} target="_blank" className="cursor-pointer text-indigo-600 dark:text-indigo-400">
-                                                                        <Presentation className="mr-2 h-4 w-4" /> Present
-                                                                    </Link>
+                                                                <DropdownMenuItem onClick={() => handleQuickView(test)} className="cursor-pointer text-indigo-600 dark:text-indigo-400">
+                                                                    <Presentation className="mr-2 h-4 w-4" /> Present
                                                                 </DropdownMenuItem>
                                                                 {!(test as any).isHardcoded && (
                                                                     <>
