@@ -576,7 +576,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [qTextColor, setQTextColor] = useState('default');
     const [animSpeed, setAnimSpeed] = useState(0.8);
     const [isPrintWithAnswers, setIsPrintWithAnswers] = useState(true);
-    const [isPrintAsList, setIsPrintAsList] = useState(true);
+    const [isPrintAsList, setIsPrintAsList] = useState(false);
     const [isPrintBothVersions, setIsPrintBothVersions] = useState(false);
 
     const taxonomyString = [chapterName, topicName].filter(Boolean).join(' | ');

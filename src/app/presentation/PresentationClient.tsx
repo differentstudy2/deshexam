@@ -4,6 +4,7 @@ import React, { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Play, BookOpen, Clock, Award, ChevronRight, Search, Layers, CheckCircle2, Eye, Printer } from 'lucide-react';
 import PresentationOverlay from '@/components/assessment/PresentationOverlay';
+import { getHardcodedTaxonomyNodes } from '@/data/hardcoded/taxonomy';
 
 export interface Assessment {
     id: string;
@@ -15,9 +16,13 @@ export interface Assessment {
     questionCount?: number;
     totalQuestions?: number;
     classId?: string;
+    textbookId?: string;
     chapter?: string;
+    chapterId?: string;
     topic?: string;
+    topicId?: string;
     subjectId?: string;
+    boardId?: string;
     difficulty?: string;
     language?: string;
     durationMin?: number;
@@ -65,6 +70,58 @@ export default function PresentationClient({ assessments }: { assessments: Asses
         }
         return counts;
     }, [assessments]);
+
+    // Resolve taxonomy node titles once
+    const taxonomyNodes = useMemo(() => getHardcodedTaxonomyNodes(), []);
+    const getTaxonomyTitle = (id?: string, language?: string) => {
+        if (!id) return null;
+        if (/^[a-zA-Z0-9]{20}$/.test(id)) return null; // Ignore raw Firebase IDs
+
+        const node = taxonomyNodes.find(n => n.id === id);
+        let title = node ? node.title : id;
+
+        if (language === 'Bengali') {
+            const translations: Record<string, string> = {
+                'Class 1': 'প্রথম শ্রেণি',
+                'Class 2': 'দ্বিতীয় শ্রেণি',
+                'Class 3': 'তৃতীয় শ্রেণি',
+                'Class 4': 'চতুর্থ শ্রেণি',
+                'Class 5': 'পঞ্চম শ্রেণি',
+                'Class 6': 'ষষ্ঠ শ্রেণি',
+                'Class 7': 'সপ্তম শ্রেণি',
+                'Class 8': 'অষ্টম শ্রেণি',
+                'Class 9': 'নবম শ্রেণি',
+                'Class 10': 'দশম শ্রেণি',
+                'Class 11': 'একাদশ শ্রেণি',
+                'Class 12': 'দ্বাদশ শ্রেণি',
+                'Bengali Literature': 'বাংলা',
+                'Bengali': 'বাংলা',
+                'English': 'ইংরেজি',
+                'Mathematics': 'গণিত',
+                'Environmental Science': 'পরিবেশ বিজ্ঞান',
+                'Life Science': 'জীবন বিজ্ঞান',
+                'Physical Science': 'ভৌত বিজ্ঞান',
+                'History': 'ইতিহাস',
+                'Geography': 'ভূগোল',
+                'WBBSE': 'WBBSE',
+                'WBBPE': 'WBBPE',
+                'WBCHSE': 'WBCHSE',
+                'Sahaj Path': 'সহজ পাঠ',
+                'Sahaj Path Pratham Bhag': 'সহজ পাঠ প্রথম ভাগ',
+                'Sahaj Path Dwitiyo Bhag': 'সহজ পাঠ দ্বিতীয় ভাগ',
+                'Amar Ganit': 'আমার গণিত',
+                'Amader Paribesh': 'আমাদের পরিবেশ',
+                'Bhasha Path': 'ভাষা পাঠ',
+                'Sahityamela': 'সাহিত্যমেলা',
+                'Pata Bahar': 'পাতাবাহার'
+            };
+            if (translations[title]) {
+                title = translations[title];
+            }
+        }
+
+        return title;
+    };
 
     const filtered = useMemo(() => {
         return assessments.filter(t => {
@@ -250,7 +307,7 @@ export default function PresentationClient({ assessments }: { assessments: Asses
                                     {/* Top Row: Subject/Type + Difficulty */}
                                     <div className="flex items-center justify-between mb-3 gap-2">
                                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-gradient-to-r ${gradient} text-white truncate max-w-[140px]`}>
-                                            {test.subjectId || test.type || 'General'}
+                                            {test.type || 'Mock Test'}
                                         </span>
                                         <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium shrink-0 ${diffStyle}`}>
                                             {difficulty}
@@ -262,12 +319,28 @@ export default function PresentationClient({ assessments }: { assessments: Asses
                                         {test.title}
                                     </h3>
 
-                                    {/* Chapter / Class */}
-                                    {(test.chapter || test.classId) && (
-                                        <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1 mb-3">
-                                            {test.chapter || test.classId}
-                                        </p>
-                                    )}
+                                    {/* Subject / Chapter / Class */}
+                                    {(() => {
+                                        const boardTitle = getTaxonomyTitle(test.boardId, test.language);
+                                        const classTitle = getTaxonomyTitle(test.classId, test.language);
+                                        const subjectTitle = getTaxonomyTitle(test.subjectId, test.language);
+                                        
+                                        const textbookTitle = getTaxonomyTitle(test.textbookId, test.language);
+                                        const chapterTitle = test.chapter || getTaxonomyTitle(test.chapterId, test.language);
+                                        const topicTitle = test.topic || getTaxonomyTitle(test.topicId, test.language);
+                                        
+                                        const line1 = [boardTitle, classTitle, subjectTitle].filter(Boolean).join(' • ');
+                                        const line2 = [textbookTitle, chapterTitle, topicTitle].filter(Boolean).join(' • ');
+
+                                        if (!line1 && !line2) return null;
+
+                                        return (
+                                            <div className="mb-3">
+                                                {line1 && <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1 font-medium">{line1}</p>}
+                                                {line2 && <p className="text-xs text-gray-400 dark:text-gray-500 line-clamp-1 font-medium mt-0.5">{line2}</p>}
+                                            </div>
+                                        );
+                                    })()}
 
                                     {/* Meta Info */}
                                     <div className="flex items-center gap-3 mt-auto pt-2 mb-4 border-t border-gray-50 dark:border-gray-700/50">

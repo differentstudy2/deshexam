@@ -13627,5 +13627,43 @@
         "type": "topic"
       }
     ]
+  },
+  {
+    "id": "topic-gadyangsha-bishleshan-sahaj-path-class-2-wbbpe",
+    "title": "গদ্যাংশ বিশ্লেষণ",
+    "slug": "gadyangsha-bishleshan",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-ashtam-path-sahaj-path-class-2-wbbpe",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wbbpe-board/class-2/bengali-literature/sahaj-path-dwitiyo-bhag/ashtam-path/gadyangsha-bishleshan",
+    "boardSlug": "wbbpe-board",
+    "classSlug": "class-2",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahaj-path-dwitiyo-bhag",
+    "chapterSlug": "ashtam-path",
+    "topicSlug": "gadyangsha-bishleshan",
+    "isIndexable": true,
+    "isHardcoded": true
+  },
+  {
+    "id": "topic-reading-comprehension-sahaj-path-class-2-wbbpe",
+    "title": "Reading Comprehension",
+    "slug": "reading-comprehension",
+    "type": "topic",
+    "track": "academic",
+    "parentId": "chapter-usri-nadir-jharna-sahaj-path-class-2-wbbpe",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "wbbpe-board/class-2/bengali-literature/sahaj-path-dwitiyo-bhag/usri-nadir-jharna/reading-comprehension",
+    "boardSlug": "wbbpe-board",
+    "classSlug": "class-2",
+    "subjectSlug": "bengali-literature",
+    "textbookSlug": "sahaj-path-dwitiyo-bhag",
+    "chapterSlug": "usri-nadir-jharna",
+    "topicSlug": "reading-comprehension",
+    "isIndexable": true,
+    "isHardcoded": true
   }
 ]

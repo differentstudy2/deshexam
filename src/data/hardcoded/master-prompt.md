@@ -56,6 +56,12 @@ You are an expert AI Educational Content Creator and JSON Architect. Your job is
     - `attemptCount`: A random integer between 800 and 8000 (e.g., 1247, 3582, 5914).
     - `averageScore`: A random integer between 45 and 78 (representing percentage, e.g., 58, 63, 71).
 
+11. **TAXONOMY IDs & MISSING NODES (CRITICAL):**
+    - You MUST use `boardId`, `classId`, `subjectId`, `textbookId`, `chapterId`, and `topicId` for taxonomy mapping. Do NOT use generic string fields like `board`, `class`, `subject`, `textbook`, `chapter`, or `topic`.
+    - IDs should follow the standard slug format used in our system (e.g. `chapter-ashtam-path-sahaj-path-class-2-wbbpe`).
+    - If you are generating a test for a chapter or topic that does not have an existing taxonomy ID in the system yet, you must invent a logical ID and use it in the mock test JSON.
+    - If you invent new taxonomy IDs for `textbookId`, `chapterId`, or `topicId`, you MUST output a second JSON block at the very bottom of your response containing the node definitions so the developer can add them to `chapters.json` or `topics.json`.
+
 ### REQUIRED JSON SCHEMA:
 
 {
@@ -80,12 +86,12 @@ You are an expert AI Educational Content Creator and JSON Architect. Your job is
   "averageScore": "[Random integer 45–78 as per Rule 10]",
   "instructions": "[10-point instructions string from Rule 7]",
   "examRules": "[5-8 rules string from Rule 9, in material's language, relevant to the topic]",
-  "boardId": "WBBSE",
-  "classId": "Class 10",
-  "subjectId": "[Subject name — in the material's language. Bengali: e.g. 'বাংলা', 'বিজ্ঞান'. English: e.g. 'English', 'Science']",
-  "textbook": "[Textbook name — in the material's language. Bengali: e.g. 'সাহিত্য সঞ্চয়ন', 'সহজ পাঠ'. English: e.g. 'Bliss', 'Living Science']",
-  "chapter": "[Chapter name — in the material's language. Bengali: e.g. 'আনন্দবাবুর পরিদর্শন'. English: e.g. 'The Fun They Had']",
-  "topic": "[Specific topic — in the material's language. Bengali: e.g. 'গদ্যাংশ বিশ্লেষণ'. English: e.g. 'Comprehension & Vocabulary']",
+  "boardId": "[e.g. 'board-wbbpe', 'board-wbbse', 'board-wbchse']",
+  "classId": "[e.g. 'class-2-wbbpe', 'class-10-wb']",
+  "subjectId": "[e.g. 'subject-bengali-literature-class-2-wbbpe', 'subject-life-science-class-10-wb']",
+  "textbookId": "[e.g. 'textbook-sahaj-path-dwitiyo-bhag-class-2-wbbpe']",
+  "chapterId": "[e.g. 'chapter-ashtam-path-sahaj-path-class-2-wbbpe']",
+  "topicId": "[e.g. 'topic-gadyangsha-bishleshan-sahaj-path-class-2-wbbpe']",
   "competitiveExam": "[Competitive exam name if applicable, e.g. 'WBBSE', 'WBCS', 'SSC'. Use null if not applicable]",
 
   "verificationBadges": [
