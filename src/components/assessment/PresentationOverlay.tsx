@@ -14,6 +14,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { saveExamAttempt, getTopScorersForAssessment } from '@/lib/firebase/student-analytics';
 import { getUserProfile } from '@/lib/firebase/firestore';
 import domtoimage from 'dom-to-image-more';
+import jsPDF from 'jspdf';
 
 const MUSIC_OPTIONS = [
     { id: 'lofi', name: 'Lo-Fi Chill', url: '/audio/lofi.mp3' },
@@ -60,7 +61,7 @@ const CONFETTI_CONFIG = {
 };
 
 import 'katex/dist/katex.min.css';
-import { X, ChevronLeft, ChevronRight, Play, Pause, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize, LayoutGrid, Sun, Moon, Eraser, Square, Circle, ArrowUpRight, Type, Presentation, ZoomIn, Volume2, VolumeX, MonitorPlay, Lightbulb, MessageCircle, Stamp, Droplet, Music, AlignLeft, Keyboard, Printer, Trophy, Globe, BarChart2, Sparkles, ImageDown } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Play, Pause, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize, LayoutGrid, Sun, Moon, Eraser, Square, Circle, ArrowUpRight, Type, Presentation, ZoomIn, Volume2, VolumeX, MonitorPlay, Lightbulb, MessageCircle, Stamp, Droplet, Music, AlignLeft, Keyboard, Printer, Trophy, Globe, BarChart2, Sparkles, ImageDown, FileDown } from 'lucide-react';
 
 const bnOptionsMap: Record<string, string> = {
     a: 'ক',
@@ -374,6 +375,45 @@ interface PresentationOverlayProps {
     isPremiumUser?: boolean;
 }
 
+const SevenSegmentDigit = ({ digit, style }: { digit: string, style?: React.CSSProperties }) => {
+    const s = {
+        '0': [1, 1, 1, 1, 1, 1, 0],
+        '1': [0, 1, 1, 0, 0, 0, 0],
+        '2': [1, 1, 0, 1, 1, 0, 1],
+        '3': [1, 1, 1, 1, 0, 0, 1],
+        '4': [0, 1, 1, 0, 0, 1, 1],
+        '5': [1, 0, 1, 1, 0, 1, 1],
+        '6': [1, 0, 1, 1, 1, 1, 1],
+        '7': [1, 1, 1, 0, 0, 0, 0],
+        '8': [1, 1, 1, 1, 1, 1, 1],
+        '9': [1, 1, 1, 1, 0, 1, 1],
+    }[digit] || [0, 0, 0, 0, 0, 0, 0];
+
+    const act = "#ff1515";
+    const inact = "#300a0a";
+
+    return (
+        <svg viewBox="0 0 54 96" className="w-[0.6em] h-[1.5em] inline-block -skew-x-[6deg]" style={{ filter: 'drop-shadow(0 0 3px rgba(255,0,0,0.4))', ...style }}>
+            <polygon points="10,5 44,5 39,13 15,13" fill={s[0] ? act : inact} />
+            <polygon points="46,7 51,12 51,44 46,40 40,35 40,12" fill={s[1] ? act : inact} />
+            <polygon points="46,55 51,52 51,88 46,91 40,86 40,60" fill={s[2] ? act : inact} />
+            <polygon points="10,93 44,93 39,85 15,85" fill={s[3] ? act : inact} />
+            <polygon points="8,55 3,52 3,88 8,91 14,86 14,60" fill={s[4] ? act : inact} />
+            <polygon points="8,7 3,12 3,44 8,40 14,35 14,12" fill={s[5] ? act : inact} />
+            <polygon points="10,48 15,44 39,44 44,48 39,52 15,52" fill={s[6] ? act : inact} />
+        </svg>
+    );
+};
+
+const SevenSegmentColon = () => {
+    return (
+        <svg viewBox="0 0 20 96" className="w-[0.3em] h-[1.5em] inline-block -skew-x-[6deg]" style={{ filter: 'drop-shadow(0 0 3px rgba(255,0,0,0.4))' }}>
+            <circle cx="10" cy="34" r="5" fill="#ff1515" />
+            <circle cx="10" cy="62" r="5" fill="#ff1515" />
+        </svg>
+    );
+};
+
 export default function PresentationOverlay({ questions, classLine, chapterName, topicName, autoStart, onClose, isPremiumUser }: PresentationOverlayProps) {
     const { user, userProfile } = useAuth();
     const [fetchedIsAdmin, setFetchedIsAdmin] = useState(false);
@@ -404,6 +444,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [qFontScale, setQFontScale] = useState(1);
     const [optFontScale, setOptFontScale] = useState(1);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+    const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
     const [isNavigatorOpen, setIsNavigatorOpen] = useState(false);
     const activeSlideBtnRef = useRef<HTMLButtonElement>(null);
     const [isDarkMode, setIsDarkMode] = useState(false);
@@ -1784,6 +1825,91 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         return arr;
     }, [currentQ]);
 
+    const downloadPdf = async () => {
+        if (!slideRef.current || isGeneratingPdf) return;
+        setIsGeneratingPdf(true);
+        
+        const originalSlide = currentSlide;
+        const originalStep = step;
+        const originalSelected = selectedOption;
+
+        try {
+            const pdf = new jsPDF('landscape', 'mm', 'a4');
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            const pageHeight = pdf.internal.pageSize.getHeight();
+
+            const cssSheetProto = CSSStyleSheet.prototype;
+            const origDescriptor = Object.getOwnPropertyDescriptor(cssSheetProto, 'cssRules')!;
+            Object.defineProperty(cssSheetProto, 'cssRules', {
+                configurable: true,
+                get() {
+                    try { return origDescriptor.get!.call(this); }
+                    catch { return []; }
+                },
+            });
+
+            const origConsoleError = console.error;
+            console.error = (...args: any[]) => {
+                const msg = String(args[0] ?? '');
+                if (msg.includes('Status:404') || msg.includes('data:image/svg+xml')) return;
+                origConsoleError.apply(console, args);
+            };
+
+            for (let i = 0; i < questions.length; i++) {
+                setCurrentSlide(i);
+                
+                if (saveWithCorrectOption) {
+                    const q = questions[i];
+                    if (q && q.correctAnswer) {
+                        setStep(1);
+                        setSelectedOption(q.correctAnswer.toLowerCase().trim());
+                    } else {
+                        setStep(0);
+                        setSelectedOption(null);
+                    }
+                } else {
+                    setStep(0);
+                    setSelectedOption(null);
+                }
+
+                await new Promise(r => setTimeout(r, 600));
+
+                const el = slideRef.current;
+                if (!el) continue;
+                
+                const scale = 2;
+                const dataUrl = await domtoimage.toPng(el, {
+                    quality: 1,
+                    width: el.offsetWidth * scale,
+                    height: el.offsetHeight * scale,
+                    style: {
+                        transform: `scale(${scale})`,
+                        transformOrigin: 'top left',
+                        width: `${el.offsetWidth}px`,
+                        height: `${el.offsetHeight}px`,
+                    },
+                    filter: (node: Node) => (node as Element).tagName !== 'CANVAS',
+                });
+
+                if (i > 0) pdf.addPage();
+                pdf.addImage(dataUrl, 'PNG', 0, 0, pageWidth, pageHeight);
+            }
+
+            pdf.save(`${chapterName || 'DeshExam-Presentation'}.pdf`);
+
+            Object.defineProperty(cssSheetProto, 'cssRules', origDescriptor);
+            console.error = origConsoleError;
+
+        } catch (error) {
+            console.error("Error generating PDF:", error);
+        } finally {
+            setCurrentSlide(originalSlide);
+            setStep(originalStep);
+            setSelectedOption(originalSelected);
+            setIsGeneratingPdf(false);
+        }
+    };
+
     if (!isOpen) {
         return (
             <button
@@ -1898,23 +2024,21 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 >
                     {/* Railway Station Style Digital Timer */}
                     {isTimerEnabled && (
-                        <div className="absolute top-12 right-0 md:top-16 md:right-0 z-[60] bg-[#0a0a0a] border-2 border-[#1f1f1f] rounded px-2.5 py-1 shadow-[inset_0_0_8px_rgba(0,0,0,1),0_4px_12px_rgba(0,0,0,0.4)] pointer-events-none flex flex-col items-center justify-center min-w-[90px] md:min-w-[90px]">
-                            <span className="text-[#ef4444] text-[7px] md:text-[8px] font-bold uppercase tracking-[0.2em] opacity-80 mb-[2px]" style={{ textShadow: '0 0 3px #ef4444' }}>Time Left</span>
-                            <div
-                                className="font-mono font-black text-lg md:text-xl text-[#ef4444] tracking-[0.1em] leading-none"
-                                style={{
-                                    fontFamily: '"Courier New", Courier, monospace',
-                                    textShadow: '0 0 4px #ef4444, 0 0 10px #ef4444'
-                                }}
-                            >
+                        <div className="absolute top-12 right-0 md:top-16 md:right-0 z-[60] bg-[#0c0c0c] border-2 border-[#222] rounded-lg px-1.5 py-1 md:px-2 md:py-1.5 shadow-[inset_0_0_15px_rgba(0,0,0,1),0_5px_15px_rgba(0,0,0,0.6)] pointer-events-none flex flex-col items-center justify-center">
+                            <div className="flex items-center justify-center text-[18px] md:text-[24px] gap-0">
                                 {(() => {
                                     const timeLeft = Math.max(0, (questions.length * countdownTotal) - totalExamTimeElapsed);
                                     const h = Math.floor(timeLeft / 3600);
                                     const m = Math.floor((timeLeft % 3600) / 60);
                                     const s = timeLeft % 60;
-                                    return h > 0
+
+                                    const timeStr = h > 0
                                         ? `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
                                         : `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+
+                                    return timeStr.split('').map((char, i) =>
+                                        char === ':' ? <SevenSegmentColon key={i} /> : <SevenSegmentDigit key={i} digit={char} />
+                                    );
                                 })()}
                             </div>
                         </div>
@@ -2634,6 +2758,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                             <MetallicScrew rotation={155} />
                                         </div>
 
+                                        {/* Subtle horizontal divider line */}
+                                        <div className="w-full border-t border-gray-200 dark:border-gray-700/60 mt-1 md:mt-2 mb-1"></div>
+
                                         <div data-read-cursor-target="question" className={`prose dark:prose-invert max-w-none w-full prose-p:font-extrabold text-[length:var(--q-size)] leading-relaxed text-left font-extrabold [&_*]:!text-[length:var(--q-size)] [&_*]:!leading-relaxed [&_*]:!m-0 ${qTextColor !== 'default' ? 'text-[var(--q-color)] [&_*]:!text-[var(--q-color)] drop-shadow-sm [&_*]:!drop-shadow-sm' : (bgTheme === 'video' ? 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] [&_*]:!text-white [&_*]:!drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]' : 'text-slate-900 dark:text-white [&_*]:!text-slate-900 dark:[&_*]:!text-white')}`}>
                                             <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
                                                 {q.questionText}
@@ -2946,6 +3073,22 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     {isSavingImage
                                         ? <span className="w-5 h-5 md:w-6 md:h-6 flex items-center justify-center"><svg className="animate-spin" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="white" strokeWidth="3" strokeDasharray="31.4" strokeDashoffset="10" /></svg></span>
                                         : <ImageDown className="w-5 h-5 md:w-6 md:h-6" />
+                                    }
+                                </button>
+
+                                {/* Download PDF Button */}
+                                <button
+                                    onClick={downloadPdf}
+                                    disabled={isGeneratingPdf}
+                                    className={`hidden md:block p-2 md:p-3 rounded-full transition-all text-white shrink-0 ${isGeneratingPdf
+                                        ? 'bg-blue-400/60 cursor-wait'
+                                        : 'bg-blue-500/80 hover:bg-blue-500'
+                                        }`}
+                                    title="Download Presentation as PDF"
+                                >
+                                    {isGeneratingPdf
+                                        ? <span className="w-5 h-5 md:w-6 md:h-6 flex items-center justify-center"><svg className="animate-spin" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="white" strokeWidth="3" strokeDasharray="31.4" strokeDashoffset="10" /></svg></span>
+                                        : <FileDown className="w-5 h-5 md:w-6 md:h-6" />
                                     }
                                 </button>
 
