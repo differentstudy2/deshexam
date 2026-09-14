@@ -795,6 +795,32 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const handleSaveAsImage = useCallback(async () => {
         if (!slideRef.current || isSavingImage) return;
         setIsSavingImage(true);
+
+        // Patch CSSStyleSheet.prototype.cssRules so cross-origin sheets
+        // silently return [] instead of throwing SecurityError.
+        // dom-to-image-more iterates document.styleSheets and this prevents
+        // the uncatchable exception for CDN stylesheets (KaTeX, Google Fonts).
+        const cssSheetProto = CSSStyleSheet.prototype;
+        const origDescriptor = Object.getOwnPropertyDescriptor(cssSheetProto, 'cssRules')!;
+        Object.defineProperty(cssSheetProto, 'cssRules', {
+            configurable: true,
+            get() {
+                try {
+                    return origDescriptor.get!.call(this);
+                } catch {
+                    return []; // silently skip cross-origin sheets
+                }
+            },
+        });
+
+        // Suppress the Status:404 warning for data-URI SVG backgrounds
+        const origConsoleError = console.error;
+        console.error = (...args: any[]) => {
+            const msg = String(args[0] ?? '');
+            if (msg.includes('Status:404') || msg.includes('data:image/svg+xml')) return;
+            origConsoleError.apply(console, args);
+        };
+
         try {
             const el = slideRef.current;
             const scale = 2;
@@ -809,7 +835,6 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     height: `${el.offsetHeight}px`,
                 },
                 filter: (node: Node) => {
-                    // Exclude drawing canvases
                     return (node as Element).tagName !== 'CANVAS';
                 },
             });
@@ -818,8 +843,11 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
             link.href = dataUrl;
             link.click();
         } catch (e) {
-            console.error('Failed to save image:', e);
+            origConsoleError('Failed to save image:', e);
         } finally {
+            // Always restore both patches
+            Object.defineProperty(cssSheetProto, 'cssRules', origDescriptor);
+            console.error = origConsoleError;
             setIsSavingImage(false);
         }
     }, [isSavingImage, currentSlide]);
