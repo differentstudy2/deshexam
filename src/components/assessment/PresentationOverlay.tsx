@@ -1896,7 +1896,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     </div>
 
                     {/* Background Watermarks */}
-                    {wmVisible && wmText && isPrintAsList && (
+                    {wmVisible && wmText && (
                         <>
                             <style>{`
                                 .watermark-mask {
@@ -1961,7 +1961,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     )}
 
                     {/* Header */}
-                    {showHeader && isPrintAsList && (
+                    {showHeader && (
                         <div
                             className="shrink-0 bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 dark:from-indigo-900 dark:via-violet-900 dark:to-purple-900 border-b border-indigo-400/30 dark:border-indigo-700/50 flex flex-col md:flex-row justify-between items-center w-full z-30 relative transition-all duration-500 px-3 md:px-6"
                             style={{
@@ -4077,35 +4077,68 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                                     {/* Header */}
                                     {showHeader && (
-                                        <div
-                                            className={isAnswerKey
-                                                ? "shrink-0 bg-gradient-to-r from-green-50 via-white to-indigo-50 border-b border-green-100/50 flex flex-row justify-between items-center w-full z-30 shadow-sm relative px-6 py-4"
-                                                : "shrink-0 bg-gradient-to-r from-indigo-50 via-white to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 border-b border-indigo-100/50 dark:border-gray-700/50 flex flex-row justify-between items-center w-full z-30 shadow-sm relative px-6 py-4"}
-                                        >
-                                            <div className="flex items-center gap-3 w-1/3">
-                                                {showLogo && <img src="/icons/icon-192x192.png" alt="DeshExam" className="h-10 w-auto object-contain drop-shadow-sm rounded-full bg-white p-1" />}
-                                                <div className="flex flex-col justify-center">
-                                                    <span className="font-extrabold text-indigo-950 dark:text-gray-100 leading-tight text-lg">DESH EXAM</span>
-                                                    <span className="text-indigo-800/80 dark:text-gray-400 font-bold tracking-widest uppercase mt-0.5 text-[10px]">Learn • Practice • Succeed</span>
-                                                </div>
-                                            </div>
-                                            <div className={`flex-1 w-full px-6 flex flex-col justify-center ${isPrintAsList || headerTitleAlign === 'left' ? 'items-start text-left' : headerTitleAlign === 'right' ? 'items-end text-right' : 'items-center text-center'}`}>
-                                                <h1 className="font-extrabold text-indigo-950 dark:text-gray-100 tracking-tight text-lg">{displayTitle}</h1>
-                                                {displayTaxonomy && (
-                                                    <div className="text-indigo-700 dark:text-gray-400 font-bold tracking-wider uppercase mt-1 text-xs">
-                                                        {displayTaxonomy}
+                                        isPrintAsList ? (
+                                            <div
+                                                className={isAnswerKey
+                                                    ? "shrink-0 bg-gradient-to-r from-green-50 via-white to-indigo-50 border-b border-green-100/50 flex flex-row justify-between items-center w-full z-30 shadow-sm relative px-6 py-4 !print-color-adjust-exact"
+                                                    : "shrink-0 bg-gradient-to-r from-indigo-50 via-white to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 border-b border-indigo-100/50 dark:border-gray-700/50 flex flex-row justify-between items-center w-full z-30 shadow-sm relative px-6 py-4 !print-color-adjust-exact"}
+                                            >
+                                                <div className="flex items-center gap-3 w-1/3">
+                                                    {showLogo && <img src="/icons/icon-192x192.png" alt="DeshExam" className="h-10 w-auto object-contain drop-shadow-sm rounded-full bg-white p-1" />}
+                                                    <div className="flex flex-col justify-center">
+                                                        <span className="font-extrabold text-indigo-950 dark:text-gray-100 leading-tight text-lg">DESH EXAM</span>
+                                                        <span className="text-indigo-800/80 dark:text-gray-400 font-bold tracking-widest uppercase mt-0.5 text-[10px]">Learn • Practice • Succeed</span>
                                                     </div>
-                                                )}
-                                            </div>
-                                            <div className="flex items-center justify-end shrink-0 w-1/3">
-                                                <div className={isAnswerKey
-                                                    ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-full font-extrabold tracking-widest shadow-md flex items-center justify-center whitespace-nowrap px-6 py-2 text-sm"
-                                                    : "bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-full font-extrabold tracking-widest shadow-md flex items-center justify-center whitespace-nowrap px-6 py-2 text-sm"}
-                                                >
-                                                    {isAnswerKey ? "ANSWER KEY" : "MOCK TEST"}
+                                                </div>
+                                                <div className={`flex-1 w-full px-6 flex flex-col justify-center ${isPrintAsList || headerTitleAlign === 'left' ? 'items-start text-left' : headerTitleAlign === 'right' ? 'items-end text-right' : 'items-center text-center'}`}>
+                                                    <h1 className="font-extrabold text-indigo-950 dark:text-gray-100 tracking-tight text-lg">{displayTitle}</h1>
+                                                    {displayTaxonomy && (
+                                                        <div className="text-indigo-700 dark:text-gray-400 font-bold tracking-wider uppercase mt-1 text-xs">
+                                                            {displayTaxonomy}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="flex items-center justify-end shrink-0 w-1/3">
+                                                    <div className={isAnswerKey
+                                                        ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-full font-extrabold tracking-widest shadow-md flex items-center justify-center whitespace-nowrap px-6 py-2 text-sm !print-color-adjust-exact"
+                                                        : "bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-full font-extrabold tracking-widest shadow-md flex items-center justify-center whitespace-nowrap px-6 py-2 text-sm !print-color-adjust-exact"}
+                                                    >
+                                                        {isAnswerKey ? "ANSWER KEY" : "MOCK TEST"}
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        ) : (
+                                            <div className={`shrink-0 w-full px-4 sm:px-6 md:px-8 py-3 md:py-4 flex items-center justify-between border-b relative z-30 transition-colors duration-300 shadow-sm ${bgTheme === 'video'
+                                                ? 'bg-black/40 border-white/10 backdrop-blur-md'
+                                                : isDarkMode
+                                                    ? 'bg-[#111827] border-gray-800'
+                                                    : 'bg-[#7c3aed] border-purple-600'
+                                                } !print-color-adjust-exact`}>
+                                                
+                                                <div className="flex items-center gap-3 w-1/3">
+                                                    {showLogo && (
+                                                        <div className="relative">
+                                                            <div className="absolute inset-0 bg-white rounded-full blur-md opacity-20"></div>
+                                                            <img src="/icons/icon-192x192.png" alt="DeshExam" className="h-10 md:h-12 w-auto object-contain drop-shadow-lg relative z-10 rounded-full bg-white p-1" />
+                                                        </div>
+                                                    )}
+                                                    <div className="flex flex-col justify-center">
+                                                        <span className={`font-black leading-none text-lg md:text-xl ${bgTheme === 'video' ? 'text-white drop-shadow-md' : isDarkMode ? 'text-white' : 'text-white'}`}>DESH EXAM</span>
+                                                        <span className={`font-bold tracking-[0.2em] uppercase mt-1 text-[8px] md:text-[9px] ${bgTheme === 'video' ? 'text-white/80' : isDarkMode ? 'text-gray-400' : 'text-purple-200'}`}>Learn • Practice • Succeed</span>
+                                                    </div>
+                                                </div>
+                                                <div className={`flex-1 w-full px-2 flex flex-col justify-center items-center text-center`}>
+                                                    <h1 className={`font-extrabold tracking-tight text-base md:text-lg lg:text-xl line-clamp-1 ${bgTheme === 'video' ? 'text-white drop-shadow-md' : isDarkMode ? 'text-white' : 'text-white'}`}>{displayTitle}</h1>
+                                                    {displayTaxonomy && (
+                                                        <div className={`font-bold tracking-wider uppercase mt-1 text-[10px] md:text-xs ${bgTheme === 'video' ? 'text-white/90 drop-shadow-md' : isDarkMode ? 'text-gray-300' : 'text-purple-100/90'}`}>
+                                                            {displayTaxonomy}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="flex flex-row items-center justify-end gap-2 shrink-0 w-1/3">
+                                                </div>
+                                            </div>
+                                        )
                                     )}
 
                                     {/* Question & Options */}
@@ -4289,6 +4322,14 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                             </div>
                                         )}
                                     </div>
+                                    
+                                    {!isPrintAsList && (
+                                        <div className={`shrink-0 w-full px-4 sm:px-6 md:px-8 py-3 flex items-center justify-between relative z-30 transition-colors duration-300 ${bgTheme === 'video' ? 'bg-black/40 border-t border-white/10 backdrop-blur-md' : isDarkMode ? 'bg-[#111827] border-t border-gray-800' : 'bg-[#7c3aed] border-t border-purple-600'} !print-color-adjust-exact`}>
+                                            <div className="text-white/90 text-sm font-medium tracking-wide !print-color-adjust-exact">
+                                                © DeshExam.app
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         );
