@@ -1896,7 +1896,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     </div>
 
                     {/* Background Watermarks */}
-                    {wmVisible && wmText && (
+                    {wmVisible && wmText && isPrintAsList && (
                         <>
                             <style>{`
                                 .watermark-mask {
@@ -1961,7 +1961,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     )}
 
                     {/* Header */}
-                    {showHeader && (
+                    {showHeader && isPrintAsList && (
                         <div
                             className="shrink-0 bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 dark:from-indigo-900 dark:via-violet-900 dark:to-purple-900 border-b border-indigo-400/30 dark:border-indigo-700/50 flex flex-col md:flex-row justify-between items-center w-full z-30 relative transition-all duration-500 px-3 md:px-6"
                             style={{
@@ -4109,70 +4109,185 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     )}
 
                                     {/* Question & Options */}
-                                    <div className={`flex-1 w-full relative flex flex-col px-12 py-10 z-10 ${isPrintAsList ? 'items-start justify-start' : 'items-center justify-center'}`}>
-                                        <div
-                                            className={`w-full ${isPrintAsList ? 'max-w-full' : 'max-w-[90%] xl:max-w-6xl'} rounded-3xl p-12 shadow-[0_20px_50px_rgba(0,0,0,0.1)] backdrop-blur-sm border transition-all duration-500 relative z-20 ${qBgColor} border-white/20 dark:border-gray-700/50`}
-                                            style={{
-                                                boxShadow: isDarkMode ? '0 20px 40px -10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1)' : '0 20px 40px -10px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.5)',
-                                                backgroundImage: `linear-gradient(to right, ${isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'} 1px, transparent 1px)`,
-                                                backgroundSize: '24px 24px'
-                                            }}
-                                        >
-                                            <div className="flex items-start gap-4 mb-12 border-b border-gray-200/50 dark:border-gray-700/50 pb-10">
-                                                <div className="flex items-center gap-4 shrink-0">
-                                                    <span className={`font-black text-[32px] bg-clip-text text-transparent bg-gradient-to-br drop-shadow-sm ${isAnswerKey ? 'from-green-600 to-emerald-600' : 'from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400'}`}>
-                                                        Q{idx + 1}.
-                                                    </span>
+                                    <div className={`flex-1 w-full relative flex flex-col ${isPrintAsList ? 'px-12 py-10 z-10 items-start justify-start' : 'items-center justify-center gap-8 z-10'}`}>
+                                        
+                                        {isPrintAsList ? (
+                                            <div
+                                                className={`w-full max-w-full rounded-3xl p-12 shadow-[0_20px_50px_rgba(0,0,0,0.1)] backdrop-blur-sm border transition-all duration-500 relative z-20 ${qBgColor} border-white/20 dark:border-gray-700/50`}
+                                                style={{
+                                                    boxShadow: isDarkMode ? '0 20px 40px -10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1)' : '0 20px 40px -10px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.5)',
+                                                    backgroundImage: `linear-gradient(to right, ${isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'} 1px, transparent 1px)`,
+                                                    backgroundSize: '24px 24px'
+                                                }}
+                                            >
+                                                <div className="flex items-start gap-4 mb-12 border-b border-gray-200/50 dark:border-gray-700/50 pb-10">
+                                                    <div className="flex items-center gap-4 shrink-0">
+                                                        <span className={`font-black text-[32px] bg-clip-text text-transparent bg-gradient-to-br drop-shadow-sm ${isAnswerKey ? 'from-green-600 to-emerald-600' : 'from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400'}`}>
+                                                            Q{idx + 1}.
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex-1 w-full relative pt-1">
+                                                        <div className={`prose max-w-none prose-p:font-black font-black text-[32px] leading-snug ${qTextColor !== 'default' ? 'text-[var(--q-color)]' : 'text-gray-900 dark:text-gray-100'} [&_*]:!text-[32px] [&_*]:!leading-snug [&>p]:m-0`} style={{ '--q-color': qTextColor !== 'default' ? qTextColor : undefined } as React.CSSProperties}>
+                                                            <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
+                                                                {q.questionText}
+                                                            </ReactMarkdown>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <div className="flex-1 w-full relative pt-1">
-                                                    <div className={`prose max-w-none prose-p:font-black font-black text-[32px] leading-snug ${qTextColor !== 'default' ? 'text-[var(--q-color)]' : 'text-gray-900 dark:text-gray-100'} [&_*]:!text-[32px] [&_*]:!leading-snug [&>p]:m-0`} style={{ '--q-color': qTextColor !== 'default' ? qTextColor : undefined } as React.CSSProperties}>
+
+                                                <div className={optionsLayout === 'grid' ? "grid grid-cols-2 gap-x-12 gap-y-10" : `flex flex-col gap-8 w-full`}>
+                                                    {opts.map((opt: any, oIdx: number) => {
+                                                        const optLetter = getOptionLabel(opt.key, uiLang);
+                                                        const colorThemes = [
+                                                            { border: 'border-[#4285F4]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#4285F4]/75', letterText: 'text-white' },
+                                                            { border: 'border-[#34A853]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#34A853]/75', letterText: 'text-white' },
+                                                            { border: 'border-[#F9AB00]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#F9AB00]/75', letterText: 'text-white' },
+                                                            { border: 'border-[#EA4335]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#EA4335]/75', letterText: 'text-white' },
+                                                            { border: 'border-[#9C27B0]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#9C27B0]/75', letterText: 'text-white' },
+                                                        ];
+                                                        const theme = colorThemes[oIdx % colorThemes.length];
+
+                                                        const isCorrect = q.correctAnswer && q.correctAnswer.toLowerCase().includes(opt.key);
+                                                        const printContainerClass = showHighlight && isCorrect
+                                                            ? `flex items-center gap-5 py-2 px-3 rounded-xl border-2 border-[#34A853] bg-[#f0fdf4] min-h-[50px] !print-color-adjust-exact`
+                                                            : `flex items-center gap-5 py-2 px-3 rounded-xl border-2 shadow-[0_4px_12px_rgba(0,0,0,0.04)] ${theme.bg} ${theme.border} min-h-[50px]`;
+                                                        const printLetterClass = showHighlight && isCorrect
+                                                            ? `shrink-0 w-14 h-14 flex items-center justify-center rounded-full text-2xl font-black bg-[#34A853] text-white !print-color-adjust-exact`
+                                                            : `shrink-0 w-14 h-14 flex items-center justify-center rounded-full text-2xl font-black ${theme.letterBg} ${theme.letterText}`;
+
+                                                        return (
+                                                            <div key={opt.key} className={printContainerClass}>
+                                                                <div className={printLetterClass}>
+                                                                    {optLetter}
+                                                                </div>
+                                                                <div className="prose dark:prose-invert max-w-none text-black dark:text-gray-100 font-bold text-[24px] flex items-center [&_*]:!text-[24px] [&_*]:!leading-tight [&_*]:!m-0">
+                                                                    <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
+                                                                        {opt.text}
+                                                                    </ReactMarkdown>
+                                                                </div>
+                                                                {showHighlight && isCorrect && (
+                                                                    <div className="shrink-0 text-white bg-[#34A853] rounded-full p-1.5 shadow-sm ml-auto !print-color-adjust-exact">
+                                                                        <Check className="w-7 h-7 stroke-[3]" />
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="w-full flex flex-col items-center flex-1 !print-color-adjust-exact mt-8">
+                                                <div
+                                                    className={`flex flex-col items-center justify-center gap-4 w-[94%] sm:w-full min-w-[300px] md:min-w-[600px] max-w-4xl xl:max-w-5xl min-h-[120px] md:min-h-[160px] mx-auto mt-1 md:mt-1 transition-all duration-300 relative z-10 rounded-t-2xl rounded-b-[0.5rem] border shadow-[0_8px_32px_rgba(0,0,0,0.10)] p-6 md:p-8 md:px-10 ${qBgColor !== 'transparent' ? `${qBgColor} border-gray-200/50 dark:border-gray-700/50` : 'bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-gray-100/80 dark:border-slate-700/40'} !print-color-adjust-exact`}
+                                                    style={{
+                                                        '--q-color': qTextColor !== 'default' ? qTextColor : undefined,
+                                                        borderTopColor: bgTheme === 'video' ? 'rgba(255,255,255,0.4)' : [
+                                                            '#6366f1', '#3b82f6', '#10b981', '#f43f5e', '#f59e0b', '#a855f7'
+                                                        ][idx % 6],
+                                                        borderTopWidth: '4px',
+                                                        ...(qBgColor !== 'transparent' && bgTheme === 'dots' ? {
+                                                            backgroundImage: `radial-gradient(${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'} 1.5px, transparent 1.5px)`,
+                                                            backgroundSize: '16px 16px'
+                                                        } : qBgColor !== 'transparent' && bgTheme === 'grid' ? {
+                                                            backgroundImage: `linear-gradient(to right, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px)`,
+                                                            backgroundSize: '16px 16px'
+                                                        } : {
+                                                            backgroundImage: 'none',
+                                                            backgroundSize: 'auto'
+                                                        })
+                                                    } as unknown as React.CSSProperties}
+                                                >
+                                                    <div className="absolute -top-8 md:-top-10 left-1/2 -translate-x-1/2 flex items-center justify-center z-20 !print-color-adjust-exact">
+                                                        <div className={`w-16 h-16 md:w-20 md:h-20 flex items-center justify-center rounded-full shadow-xl border-2 backdrop-blur-md font-black text-3xl md:text-5xl ${bgTheme === 'video' ? 'bg-black/50 border-white/30 text-white' : `${[
+                                                            'from-indigo-600 to-violet-600 dark:from-indigo-500 dark:to-violet-500',
+                                                            'from-blue-600 to-cyan-600 dark:from-blue-500 dark:to-cyan-500',
+                                                            'from-emerald-600 to-teal-600 dark:from-emerald-500 dark:to-teal-500',
+                                                            'from-rose-600 to-pink-600 dark:from-rose-500 dark:to-pink-500',
+                                                            'from-amber-500 to-orange-500 dark:from-amber-400 dark:to-orange-500',
+                                                            'from-fuchsia-600 to-purple-600 dark:from-fuchsia-500 dark:to-purple-500'
+                                                        ][idx % 6]} bg-gradient-to-tr border-white dark:border-slate-800 text-white`}`}>
+                                                            {uiLang === 'bn' ? toBanglaNumber(idx + 1) : idx + 1}
+                                                        </div>
+                                                    </div>
+                                                    <div className="absolute top-2.5 md:top-3.5 left-4 md:left-8 flex items-center gap-2 md:gap-2.5 z-20 pointer-events-none select-none !print-color-adjust-exact">
+                                                        <MetallicScrew rotation={15} />
+                                                        <MetallicScrew rotation={68} />
+                                                        <MetallicScrew rotation={125} />
+                                                    </div>
+                                                    <div className="absolute top-2.5 md:top-3.5 right-4 md:right-8 flex items-center gap-2 md:gap-2.5 z-20 pointer-events-none select-none !print-color-adjust-exact">
+                                                        <MetallicScrew rotation={35} />
+                                                        <MetallicScrew rotation={95} />
+                                                        <MetallicScrew rotation={155} />
+                                                    </div>
+                                                    <div className={`prose dark:prose-invert max-w-none w-full prose-p:font-extrabold text-[length:var(--q-size)] leading-relaxed text-left font-extrabold [&_*]:!text-[length:var(--q-size)] [&_*]:!leading-relaxed [&_*]:!m-0 ${qTextColor !== 'default' ? 'text-[var(--q-color)] [&_*]:!text-[var(--q-color)] drop-shadow-sm [&_*]:!drop-shadow-sm' : (bgTheme === 'video' ? 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] [&_*]:!text-white [&_*]:!drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]' : 'text-slate-900 dark:text-white [&_*]:!text-slate-900 dark:[&_*]:!text-white')}`}>
                                                         <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
                                                             {q.questionText}
                                                         </ReactMarkdown>
                                                     </div>
                                                 </div>
-                                            </div>
 
-                                            <div className={optionsLayout === 'grid' ? "grid grid-cols-2 gap-x-12 gap-y-10" : `flex flex-col gap-8 ${isPrintAsList ? 'w-full' : 'max-w-4xl mx-auto'}`}>
-                                                {opts.map((opt: any, oIdx: number) => {
-                                                    const optLetter = getOptionLabel(opt.key, uiLang);
-                                                    const colorThemes = [
-                                                        { border: 'border-[#4285F4]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#4285F4]/75', letterText: 'text-white' },
-                                                        { border: 'border-[#34A853]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#34A853]/75', letterText: 'text-white' },
-                                                        { border: 'border-[#F9AB00]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#F9AB00]/75', letterText: 'text-white' },
-                                                        { border: 'border-[#EA4335]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#EA4335]/75', letterText: 'text-white' },
-                                                        { border: 'border-[#9C27B0]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#9C27B0]/75', letterText: 'text-white' },
-                                                    ];
-                                                    const theme = colorThemes[oIdx % colorThemes.length];
+                                                <div className="relative w-full max-w-[1200px] flex justify-center mt-6 md:mt-8 mb-4 mx-auto !print-color-adjust-exact">
+                                                    <div className={optionsLayout === 'grid' ? "grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 w-full max-w-6xl" : "flex flex-col gap-y-3 w-[90%] sm:w-fit min-w-[300px] md:min-w-[450px] lg:min-w-[500px] max-w-4xl mx-auto"}>
+                                                        {opts.map((opt: any, oIdx: number) => {
+                                                            const isCorrect = q.correctAnswer && q.correctAnswer.toLowerCase().includes(opt.key);
+                                                            const optLetter = getOptionLabel(opt.key, uiLang);
+                                                            const showCorrect = showHighlight && isCorrect;
+                                                            
+                                                            const colorThemes = [
+                                                                { border: 'border-[#4285F4]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#4285F4]', letterText: 'text-white' }, // Blue
+                                                                { border: 'border-[#34A853]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#34A853]', letterText: 'text-white' }, // Green
+                                                                { border: 'border-[#F9AB00]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#F9AB00]', letterText: 'text-white' }, // Yellow/Orange
+                                                                { border: 'border-[#EA4335]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#EA4335]', letterText: 'text-white' }, // Red
+                                                                { border: 'border-[#9C27B0]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#9C27B0]', letterText: 'text-white' }, // Purple
+                                                            ];
+                                                            const theme = colorThemes[oIdx % colorThemes.length];
 
-                                                    const isCorrect = q.correctAnswer && q.correctAnswer.toLowerCase().includes(opt.key);
-                                                    const printContainerClass = showHighlight && isCorrect
-                                                        ? `flex items-center gap-5 py-2 px-3 rounded-xl border-2 border-[#34A853] bg-[#f0fdf4] min-h-[50px] !print-color-adjust-exact`
-                                                        : `flex items-center gap-5 py-2 px-3 rounded-xl border-2 shadow-[0_4px_12px_rgba(0,0,0,0.04)] ${theme.bg} ${theme.border} min-h-[50px]`;
-                                                    const printLetterClass = showHighlight && isCorrect
-                                                        ? `shrink-0 w-14 h-14 flex items-center justify-center rounded-full text-2xl font-black bg-[#34A853] text-white !print-color-adjust-exact`
-                                                        : `shrink-0 w-14 h-14 flex items-center justify-center rounded-full text-2xl font-black ${theme.letterBg} ${theme.letterText}`;
+                                                            let containerClasses = `flex items-center gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 transition-all duration-200 shadow-[0_4px_12px_rgba(0,0,0,0.04)] relative z-10 select-none ${theme.bg} ${theme.border} !print-color-adjust-exact`;
+                                                            let letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 ${theme.letterBg} ${theme.letterText} !print-color-adjust-exact`;
 
-                                                    return (
-                                                        <div key={opt.key} className={printContainerClass}>
-                                                            <div className={printLetterClass}>
-                                                                {optLetter}
-                                                            </div>
-                                                            <div className="prose dark:prose-invert max-w-none text-black dark:text-gray-100 font-bold text-[24px] flex items-center [&_*]:!text-[24px] [&_*]:!leading-tight [&_*]:!m-0">
-                                                                <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
-                                                                    {opt.text}
-                                                                </ReactMarkdown>
-                                                            </div>
-                                                            {showHighlight && isCorrect && (
-                                                                <div className="shrink-0 text-white bg-[#34A853] rounded-full p-1.5 shadow-sm ml-auto !print-color-adjust-exact">
-                                                                    <Check className="w-7 h-7 stroke-[3]" />
+                                                            if (showCorrect) {
+                                                                containerClasses = `flex items-center gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 ring-4 ring-[#34A853]/30 bg-[#f0fdf4] dark:bg-[#064e3b] border-[#34A853] z-10 relative select-none !print-color-adjust-exact`;
+                                                                letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 bg-[#34A853] text-white !print-color-adjust-exact`;
+                                                            }
+
+                                                            return (
+                                                                <div key={opt.key} className="flex flex-col gap-2 w-full relative !print-color-adjust-exact">
+                                                                    <div
+                                                                        className={containerClasses}
+                                                                        style={{
+                                                                            ...(bgTheme === 'dots' ? {
+                                                                                backgroundImage: `radial-gradient(${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'} 1.5px, transparent 1.5px)`,
+                                                                                backgroundSize: '12px 12px'
+                                                                            } : bgTheme === 'grid' ? {
+                                                                                backgroundImage: `linear-gradient(to right, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px)`,
+                                                                                backgroundSize: '12px 12px'
+                                                                            } : {
+                                                                                backgroundImage: 'none',
+                                                                                backgroundSize: 'auto'
+                                                                            })
+                                                                        }}
+                                                                    >
+                                                                        <div className={letterClasses}>
+                                                                            {optLetter}
+                                                                        </div>
+                                                                        <div className="prose dark:prose-invert max-w-none w-full leading-snug flex-1 font-bold text-[length:calc(var(--q-size)*0.85)] [&_*]:!text-[length:calc(var(--q-size)*0.85)] [&_*]:!leading-snug [&_*]:!m-0 text-slate-800 dark:text-slate-100">
+                                                                            <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
+                                                                                {opt.text}
+                                                                            </ReactMarkdown>
+                                                                        </div>
+                                                                        {showCorrect && (
+                                                                            <div className="shrink-0 text-white bg-[#34A853] rounded-full p-1 shadow-sm ml-auto z-10 !print-color-adjust-exact">
+                                                                                <Check className="w-5 h-5 md:w-6 md:h-6 stroke-[3]" />
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
                                                                 </div>
-                                                            )}
-                                                        </div>
-                                                    );
-                                                })}
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
