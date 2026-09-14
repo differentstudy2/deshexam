@@ -4,6 +4,9 @@
   "title": "Madhyamik Science Demo Mock Test 2025",
   "description": "মাধ্যমিক পরীক্ষার জন্য Physical Science ও Life Science বিভাগ থেকে তৈরি এই Demo Mock Test। WBBSE syllabus অনুযায়ী প্রশ্ন।",
   "thumbnail": "https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?w=800&q=80",
+  "boardId": "board-wb",
+  "classId": "class-10-wb",
+  "subjectId": "subject-life-science-class-10-wb",
   "status": "Published",
   "difficulty": "Easy",
   "language": "Bengali",
@@ -192,8 +195,5 @@
       "difficulty": "Easy",
       "status": "Published"
     }
-  ],
-  "boardId": "WBBSE",
-  "classId": "Class 10",
-  "subjectId": "Science"
+  ]
 }
