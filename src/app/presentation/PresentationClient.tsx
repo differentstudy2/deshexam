@@ -124,13 +124,13 @@ export default function PresentationClient({ assessments }: { assessments: Asses
         }
 
         if (printQuestions.length > 0) {
-            sessionStorage.setItem('deshexam_print_test', JSON.stringify({
+            localStorage.setItem('deshexam_print_test', JSON.stringify({
                 title: test.title,
                 classId: test.classId,
                 subjectId: test.subjectId,
                 questions: printQuestions
             }));
-            router.push('/e-question-builder/create-question?load_print_test=1');
+            window.open('/e-question-builder/create-question?load_print_test=1', '_blank');
         } else {
             alert('No questions found to print.');
         }

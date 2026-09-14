@@ -119,14 +119,18 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
   const [examMap, setExamMap] = useState<Record<string, string>>({});
   const [yearMap, setYearMap] = useState<Record<string, string>>({});
   const [boardMap, setBoardMap] = useState<Record<string, string>>({});
+  const [classMap, setClassMap] = useState<Record<string, string>>({});
+  const [subjectMap, setSubjectMap] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const fetchTaxonomies = async () => {
       try {
-        const [exams, years, boards] = await Promise.all([
+        const [exams, years, boards, classes, subjects] = await Promise.all([
           getTaxonomyNodes('exam'),
           getTaxonomyNodes('year'),
-          getTaxonomyNodes('board')
+          getTaxonomyNodes('board'),
+          getTaxonomyNodes('class'),
+          getTaxonomyNodes('subject')
         ]);
         const eMap: Record<string, string> = {};
         exams.forEach((e: any) => eMap[e.id] = e.name);
@@ -137,12 +141,19 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
         const bMap: Record<string, string> = {};
         boards.forEach((b: any) => bMap[b.id] = b.name);
         setBoardMap(bMap);
+        const cMap: Record<string, string> = {};
+        classes.forEach((c: any) => cMap[c.id] = c.name);
+        setClassMap(cMap);
+        const sMap: Record<string, string> = {};
+        subjects.forEach((s: any) => sMap[s.id] = s.name);
+        setSubjectMap(sMap);
       } catch (e) {
         console.error("Failed to load taxonomies", e);
       }
     };
     fetchTaxonomies();
   }, []);
+
 
   // Page Setup State
   const [isPageSetupOpen, setIsPageSetupOpen] = useState(false);
@@ -187,6 +198,17 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
   const [headerTextbookName, setHeaderTextbookName] = useState('');
   const [headerSubjectName, setHeaderSubjectName] = useState('');
   const [headerChapterName, setHeaderChapterName] = useState('');
+  
+  useEffect(() => {
+    // Resolve class ID to name if it's an ID
+    if (headerClassName && classMap[headerClassName]) {
+      setHeaderClassName(classMap[headerClassName]);
+    }
+    // Resolve subject ID to name if it's an ID
+    if (headerSubjectName && subjectMap[headerSubjectName]) {
+      setHeaderSubjectName(subjectMap[headerSubjectName]);
+    }
+  }, [classMap, subjectMap, headerClassName, headerSubjectName]);
 
 
   const [headerTime, setHeaderTime] = useState('');
@@ -247,12 +269,12 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
     if (typeof window !== 'undefined') {
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get('load_print_test') === '1') {
-        const printData = sessionStorage.getItem('deshexam_print_test');
+        const printData = localStorage.getItem('deshexam_print_test');
         if (printData) {
           try {
             const parsed = JSON.parse(printData);
             if (parsed.questions && Array.isArray(parsed.questions)) {
-              setSelectedQuestions(parsed.questions);
+              setQuestions(parsed.questions);
             }
             if (parsed.title) {
               setHeaderTitle(parsed.title);
@@ -267,6 +289,9 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
             const newUrl = new URL(window.location.href);
             newUrl.searchParams.delete('load_print_test');
             window.history.replaceState({}, '', newUrl.toString());
+            
+            // Clean up localStorage to prevent accidental reloads
+            localStorage.removeItem('deshexam_print_test');
           } catch (e) {
             console.error('Error loading print test from sessionStorage', e);
           }
