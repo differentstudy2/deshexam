@@ -13,6 +13,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/hooks/use-auth';
 import { saveExamAttempt, getTopScorersForAssessment } from '@/lib/firebase/student-analytics';
 import { getUserProfile } from '@/lib/firebase/firestore';
+import domtoimage from 'dom-to-image-more';
 
 const MUSIC_OPTIONS = [
     { id: 'lofi', name: 'Lo-Fi Chill', url: '/audio/lofi.mp3' },
@@ -59,7 +60,7 @@ const CONFETTI_CONFIG = {
 };
 
 import 'katex/dist/katex.min.css';
-import { X, ChevronLeft, ChevronRight, Play, Pause, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize, LayoutGrid, Sun, Moon, Eraser, Square, Circle, ArrowUpRight, Type, Presentation, ZoomIn, Volume2, VolumeX, MonitorPlay, Lightbulb, MessageCircle, Stamp, Droplet, Music, AlignLeft, Keyboard, Printer, Trophy, Globe, BarChart2, Sparkles } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Play, Pause, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize, LayoutGrid, Sun, Moon, Eraser, Square, Circle, ArrowUpRight, Type, Presentation, ZoomIn, Volume2, VolumeX, MonitorPlay, Lightbulb, MessageCircle, Stamp, Droplet, Music, AlignLeft, Keyboard, Printer, Trophy, Globe, BarChart2, Sparkles, ImageDown } from 'lucide-react';
 
 const bnOptionsMap: Record<string, string> = {
     a: 'ক',
@@ -479,6 +480,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const popAudioRef = useRef<HTMLAudioElement>(null);
     const wowAudioRef = useRef<HTMLAudioElement>(null);
     const winAudioRef = useRef<HTMLAudioElement>(null);
+    const slideRef = useRef<HTMLDivElement>(null);
+    const [isSavingImage, setIsSavingImage] = useState(false);
 
     const [virtualCursor, setVirtualCursor] = useState<{
         visible: boolean;
@@ -787,6 +790,39 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
             setLeaderboardLoading(false);
         }
     }, []);
+
+    // ── Save as Image ─────────────────────────────────────────────────────────
+    const handleSaveAsImage = useCallback(async () => {
+        if (!slideRef.current || isSavingImage) return;
+        setIsSavingImage(true);
+        try {
+            const el = slideRef.current;
+            const scale = 2;
+            const dataUrl = await domtoimage.toPng(el, {
+                quality: 1,
+                width: el.offsetWidth * scale,
+                height: el.offsetHeight * scale,
+                style: {
+                    transform: `scale(${scale})`,
+                    transformOrigin: 'top left',
+                    width: `${el.offsetWidth}px`,
+                    height: `${el.offsetHeight}px`,
+                },
+                filter: (node: Node) => {
+                    // Exclude drawing canvases
+                    return (node as Element).tagName !== 'CANVAS';
+                },
+            });
+            const link = document.createElement('a');
+            link.download = `deshexam-slide-${currentSlide + 1}.png`;
+            link.href = dataUrl;
+            link.click();
+        } catch (e) {
+            console.error('Failed to save image:', e);
+        } finally {
+            setIsSavingImage(false);
+        }
+    }, [isSavingImage, currentSlide]);
 
     // ── Feature 8: Save final score to Firebase ───────────────────────────────
     const saveFinalScore = useCallback(async () => {
@@ -1786,6 +1822,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                 {/* Main Presentation Area */}
                 <div
+                    ref={slideRef}
                     className={`responsive-fonts flex-1 min-w-0 relative w-full h-full ${getBgThemeClasses()} flex flex-col shadow-2xl overflow-hidden shrink-0 z-10 rounded-xl md:rounded-2xl border border-gray-200/80 dark:border-gray-800 transition-colors duration-500 ${isPenActive && drawingTool === 'laser' ? 'cursor-none [&_*]:cursor-none' : ''}`}
                     onPointerMove={(e) => {
                         if (isPenActive && drawingTool === 'laser') {
@@ -2808,6 +2845,23 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     <Printer className="w-5 h-5 md:w-6 md:h-6" />
                                 </button>
 
+                                {/* Save as Image Button */}
+                                <button
+                                    onClick={handleSaveAsImage}
+                                    disabled={isSavingImage}
+                                    className={`hidden md:block p-2 md:p-3 rounded-full transition-all text-white shrink-0 ${
+                                        isSavingImage
+                                            ? 'bg-pink-400/60 cursor-wait'
+                                            : 'bg-pink-500/80 hover:bg-pink-500'
+                                    }`}
+                                    title="Save Slide as Image"
+                                >
+                                    {isSavingImage
+                                        ? <span className="w-5 h-5 md:w-6 md:h-6 flex items-center justify-center"><svg className="animate-spin" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="white" strokeWidth="3" strokeDasharray="31.4" strokeDashoffset="10"/></svg></span>
+                                        : <ImageDown className="w-5 h-5 md:w-6 md:h-6" />
+                                    }
+                                </button>
+
 
                                 {/* Spotlight Toggle Button */}
                                 <button
@@ -2888,10 +2942,10 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                                     {isSettingsOpen && (
                                         <div className="fixed bottom-[90px] left-1/2 -translate-x-1/2 md:absolute md:bottom-full md:left-auto md:right-0 md:translate-x-0 md:mb-6 bg-white/90 dark:bg-gray-950/90 backdrop-blur-3xl border border-white/50 dark:border-white/10 rounded-3xl shadow-[0_40px_80px_-20px_rgba(0,0,0,0.4)] p-6 w-[92vw] sm:w-[380px] z-[70] animate-in fade-in zoom-in-95 duration-300 flex flex-col max-h-[75vh] md:max-h-[65vh] ring-1 ring-black/5 dark:ring-white/5">
-                                            <div className="flex justify-between items-center mb-5 pb-4 border-b border-gray-200/50 dark:border-gray-800/50 shrink-0">
+                                            <div className="flex justify-between items-center mb-5 p-4 bg-gray-50/50 dark:bg-gray-900/40 border border-gray-200/60 dark:border-gray-800/60 rounded-2xl shadow-sm backdrop-blur-sm shrink-0">
                                                 <h3 className="font-extrabold bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent text-xl flex items-center gap-2">
                                                     <Settings className="w-6 h-6 text-indigo-500" /> Settings
-                                                    <kbd className="ml-2 text-[10px] bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800 px-1.5 py-0.5 rounded-md text-indigo-500 font-mono shadow-sm">S</kbd>
+                                                    <kbd className="ml-2 text-[11px] bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800 px-2 py-1 rounded-md text-indigo-500 font-mono shadow-sm border-b-[2px]">S</kbd>
                                                 </h3>
                                                 <button onClick={() => setIsSettingsOpen(false)} className="p-1.5 bg-gray-100 dark:bg-gray-900 text-gray-400 hover:bg-rose-100 dark:hover:bg-rose-900/30 rounded-full hover:text-rose-500 dark:hover:text-rose-400 transition-all">
                                                     <X className="w-5 h-5" />
@@ -2899,10 +2953,10 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                             </div>
 
                                             <div className="space-y-5 overflow-y-auto custom-scrollbar pr-2 pb-2">
-                                                <div>
+                                                <div className="bg-gray-50/50 dark:bg-gray-900/40 border border-gray-200/60 dark:border-gray-800/60 rounded-2xl p-4 mb-4 shadow-sm backdrop-blur-sm">
                                                     <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
                                                         <span className="flex items-center gap-2"><MonitorPlay className="w-4 h-4 text-indigo-500" /> Presentation Mode</span>
-                                                        <kbd className="text-[10px] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-1.5 py-0.5 rounded text-gray-500 dark:text-gray-400 font-mono shadow-sm">M</kbd>
+                                                        <kbd className="text-[11px] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-2 py-1 rounded text-gray-500 dark:text-gray-400 font-mono shadow-sm border-b-[2px]">M</kbd>
                                                     </div>
                                                     <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl">
                                                         <button
@@ -2920,7 +2974,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     </div>
                                                 </div>
 
-                                                <div>
+                                                <div className="bg-gray-50/50 dark:bg-gray-900/40 border border-gray-200/60 dark:border-gray-800/60 rounded-2xl p-4 mb-4 shadow-sm backdrop-blur-sm">
                                                     <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
                                                         <span className="flex items-center gap-2"><Sparkles className="w-4 h-4 text-indigo-500" /> Celebration Settings</span>
                                                     </div>
@@ -2958,9 +3012,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     </div>
                                                 </div>
 
-                                                <hr className="border-gray-100 dark:border-gray-800" />
+                                                
 
-                                                <div>
+                                                <div className="bg-gray-50/50 dark:bg-gray-900/40 border border-gray-200/60 dark:border-gray-800/60 rounded-2xl p-4 mb-4 shadow-sm backdrop-blur-sm">
                                                     <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
                                                         <span className="flex items-center gap-2"><Printer className="w-4 h-4 text-indigo-500" /> Print Settings</span>
                                                     </div>
@@ -2989,9 +3043,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     </div>
                                                 </div>
 
-                                                <hr className="border-gray-100 dark:border-gray-800" />
+                                                
 
-                                                <div>
+                                                <div className="bg-gray-50/50 dark:bg-gray-900/40 border border-gray-200/60 dark:border-gray-800/60 rounded-2xl p-4 mb-4 shadow-sm backdrop-blur-sm">
                                                     <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
                                                         <span className="flex items-center gap-2"><LayoutGrid className="w-4 h-4 text-indigo-500" /> Options Layout</span>
                                                     </div>
@@ -3011,9 +3065,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     </div>
                                                 </div>
 
-                                                <hr className="border-gray-100 dark:border-gray-800" />
+                                                
 
-                                                <div>
+                                                <div className="bg-gray-50/50 dark:bg-gray-900/40 border border-gray-200/60 dark:border-gray-800/60 rounded-2xl p-4 mb-4 shadow-sm backdrop-blur-sm">
                                                     <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
                                                         <span className="flex items-center gap-2"><LayoutGrid className="w-4 h-4 text-indigo-500" /> Header Settings</span>
                                                     </div>
@@ -3063,10 +3117,10 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     </div>
                                                 </div>
 
-                                                <hr className="border-gray-100 dark:border-gray-800" />
+                                                
 
                                                 {/* Transition Type */}
-                                                <div>
+                                                <div className="bg-gray-50/50 dark:bg-gray-900/40 border border-gray-200/60 dark:border-gray-800/60 rounded-2xl p-4 mb-4 shadow-sm backdrop-blur-sm">
                                                     <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                                                         <span className="flex items-center gap-2"><Play className="w-4 h-4 text-indigo-500" /> {L.transition}</span>
                                                     </div>
@@ -3079,7 +3133,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
 
                                                 {/* Countdown Timer Settings */}
-                                                <div>
+                                                <div className="bg-gray-50/50 dark:bg-gray-900/40 border border-gray-200/60 dark:border-gray-800/60 rounded-2xl p-4 mb-4 shadow-sm backdrop-blur-sm">
                                                     <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                                                         <span className="flex items-center gap-2"><Clock className="w-4 h-4 text-indigo-500" /> {L.countdown}</span>
                                                     </div>
@@ -3096,9 +3150,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     )}
                                                 </div>
 
-                                                <hr className="border-gray-100 dark:border-gray-800" />
+                                                
 
-                                                <div>
+                                                <div className="bg-gray-50/50 dark:bg-gray-900/40 border border-gray-200/60 dark:border-gray-800/60 rounded-2xl p-4 mb-4 shadow-sm backdrop-blur-sm">
                                                     <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
                                                         <span className="flex items-center gap-2"><Play className="w-4 h-4 text-indigo-500" /> Animation Speed</span>
                                                     </div>
@@ -3116,9 +3170,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     </div>
                                                 </div>
 
-                                                <hr className="border-gray-100 dark:border-gray-800" />
+                                                
 
-                                                <div>
+                                                <div className="bg-gray-50/50 dark:bg-gray-900/40 border border-gray-200/60 dark:border-gray-800/60 rounded-2xl p-4 mb-4 shadow-sm backdrop-blur-sm">
                                                     <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
                                                         <span className="flex items-center gap-2"><LayoutGrid className="w-4 h-4 text-indigo-500" /> Background Theme</span>
                                                     </div>
@@ -3173,9 +3227,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     )}
                                                 </div>
 
-                                                <hr className="border-gray-100 dark:border-gray-800" />
+                                                
 
-                                                <div>
+                                                <div className="bg-gray-50/50 dark:bg-gray-900/40 border border-gray-200/60 dark:border-gray-800/60 rounded-2xl p-4 mb-4 shadow-sm backdrop-blur-sm">
                                                     <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
                                                         <span className="flex items-center gap-2"><Highlighter className="w-4 h-4 text-indigo-500" /> Question Styling</span>
                                                     </div>
@@ -3211,13 +3265,14 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     </div>
                                                 </div>
 
-                                                <hr className="border-gray-100 dark:border-gray-800" />
+                                                
 
+                                                <div className="bg-gray-50/50 dark:bg-gray-900/40 border border-gray-200/60 dark:border-gray-800/60 rounded-2xl p-4 mb-4 shadow-sm backdrop-blur-sm flex flex-col gap-4">
                                                 <div className="flex items-center justify-between">
                                                     <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
                                                         <Clock className="w-4 h-4 text-indigo-500" />
                                                         Question Timer
-                                                        <kbd className="ml-auto text-[10px] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-1.5 py-0.5 rounded text-gray-500 dark:text-gray-400 font-mono shadow-sm">T</kbd>
+                                                        <kbd className="ml-auto text-[11px] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-2 py-1 rounded text-gray-500 dark:text-gray-400 font-mono shadow-sm border-b-[2px]">T</kbd>
                                                     </div>
                                                     <button
                                                         onClick={() => setIsTimerEnabled(!isTimerEnabled)}
@@ -3251,14 +3306,15 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                         </select>
                                                     </div>
                                                 )}
+                                                </div>
 
-                                                <hr className="border-gray-100 dark:border-gray-800" />
+                                                
 
                                                 <div className="flex items-center justify-between">
                                                     <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
                                                         <Volume2 className="w-4 h-4 text-indigo-500" />
                                                         Auto Play Read Aloud
-                                                        <kbd className="ml-auto text-[10px] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-1.5 py-0.5 rounded text-gray-500 dark:text-gray-400 font-mono shadow-sm">Shift+A</kbd>
+                                                        <kbd className="ml-auto text-[11px] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-2 py-1 rounded text-gray-500 dark:text-gray-400 font-mono shadow-sm border-b-[2px]">Shift+A</kbd>
                                                     </div>
                                                     <button
                                                         onClick={() => setIsAutoPlayReadAloud(!isAutoPlayReadAloud)}
@@ -3268,7 +3324,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     </button>
                                                 </div>
 
-                                                <hr className="border-gray-100 dark:border-gray-800" />
+                                                
 
                                                 <div className="flex flex-col gap-2">
                                                     <div className="flex items-center justify-between">
@@ -3321,12 +3377,12 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     )}
                                                 </div>
 
-                                                <hr className="border-gray-100 dark:border-gray-800" />
+                                                
 
                                                 <div className="flex items-center justify-between">
                                                     <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
                                                         <Lightbulb className="w-4 h-4 text-indigo-500" /> Show Explanation
-                                                        <kbd className="ml-auto text-[10px] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-1.5 py-0.5 rounded text-gray-500 dark:text-gray-400 font-mono shadow-sm">Shift+X</kbd>
+                                                        <kbd className="ml-auto text-[11px] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-2 py-1 rounded text-gray-500 dark:text-gray-400 font-mono shadow-sm border-b-[2px]">Shift+X</kbd>
                                                     </div>
                                                     <button
                                                         onClick={() => setIsExpEnabled(!isExpEnabled)}
@@ -3339,7 +3395,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                 <div className="flex items-center justify-between">
                                                     <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
                                                         <MessageCircle className="w-4 h-4 text-indigo-500" /> Show Options Explanation
-                                                        <kbd className="ml-auto text-[10px] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-1.5 py-0.5 rounded text-gray-500 dark:text-gray-400 font-mono shadow-sm">Shift+O</kbd>
+                                                        <kbd className="ml-auto text-[11px] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-2 py-1 rounded text-gray-500 dark:text-gray-400 font-mono shadow-sm border-b-[2px]">Shift+O</kbd>
                                                     </div>
                                                     <button
                                                         onClick={() => setIsOptionExpEnabled(!isOptionExpEnabled)}
@@ -3349,60 +3405,60 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     </button>
                                                 </div>
 
-                                                <hr className="border-gray-100 dark:border-gray-800" />
+                                                
 
-                                                <div>
+                                                <div className="bg-gray-50/50 dark:bg-gray-900/40 border border-gray-200/60 dark:border-gray-800/60 rounded-2xl p-4 mb-4 shadow-sm backdrop-blur-sm">
                                                     <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between">
                                                         <span className="flex items-center gap-2"><Type className="w-4 h-4 text-indigo-500" /> Question Font Size</span>
                                                         <span className="text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 rounded text-xs py-0.5">{Math.round(qFontScale * 100)}%</span>
                                                     </div>
                                                     <div className="flex items-center bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 w-full overflow-hidden shadow-inner">
                                                         <button onClick={() => setQFontScale(s => Math.max(0.6, s - 0.1))} className="flex-1 py-2 flex justify-center items-center gap-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 font-bold border-r border-gray-200 dark:border-gray-700 transition-colors">
-                                                            A- <kbd className="text-[10px] bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 px-1.5 py-0.5 rounded text-gray-500 dark:text-gray-400 font-mono shadow-sm">Q</kbd>
+                                                            A- <kbd className="text-[11px] bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 px-2 py-1 rounded text-gray-500 dark:text-gray-400 font-mono shadow-sm border-b-[2px]">Q</kbd>
                                                         </button>
                                                         <button onClick={() => setQFontScale(s => Math.min(2.0, s + 0.1))} className="flex-1 py-2 flex justify-center items-center gap-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 font-bold transition-colors">
-                                                            A+ <kbd className="text-[10px] bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 px-1.5 py-0.5 rounded text-gray-500 dark:text-gray-400 font-mono shadow-sm">W</kbd>
+                                                            A+ <kbd className="text-[11px] bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 px-2 py-1 rounded text-gray-500 dark:text-gray-400 font-mono shadow-sm border-b-[2px]">W</kbd>
                                                         </button>
                                                     </div>
                                                 </div>
 
-                                                <div>
+                                                <div className="bg-gray-50/50 dark:bg-gray-900/40 border border-gray-200/60 dark:border-gray-800/60 rounded-2xl p-4 mb-4 shadow-sm backdrop-blur-sm">
                                                     <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between">
                                                         <span className="flex items-center gap-2"><Type className="w-4 h-4 text-green-500" /> Options Font Size</span>
                                                         <span className="text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/30 px-2 rounded text-xs py-0.5">{Math.round(optFontScale * 100)}%</span>
                                                     </div>
                                                     <div className="flex items-center bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 w-full overflow-hidden shadow-inner">
                                                         <button onClick={() => setOptFontScale(s => Math.max(0.6, s - 0.1))} className="flex-1 py-2 flex justify-center items-center gap-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 font-bold border-r border-gray-200 dark:border-gray-700 transition-colors">
-                                                            A- <kbd className="text-[10px] bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 px-1.5 py-0.5 rounded text-gray-500 dark:text-gray-400 font-mono shadow-sm">O</kbd>
+                                                            A- <kbd className="text-[11px] bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 px-2 py-1 rounded text-gray-500 dark:text-gray-400 font-mono shadow-sm border-b-[2px]">O</kbd>
                                                         </button>
                                                         <button onClick={() => setOptFontScale(s => Math.min(2.0, s + 0.1))} className="flex-1 py-2 flex justify-center items-center gap-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 font-bold transition-colors">
-                                                            A+ <kbd className="text-[10px] bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 px-1.5 py-0.5 rounded text-gray-500 dark:text-gray-400 font-mono shadow-sm">P</kbd>
+                                                            A+ <kbd className="text-[11px] bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 px-2 py-1 rounded text-gray-500 dark:text-gray-400 font-mono shadow-sm border-b-[2px]">P</kbd>
                                                         </button>
                                                     </div>
                                                 </div>
 
-                                                <div>
+                                                <div className="bg-gray-50/50 dark:bg-gray-900/40 border border-gray-200/60 dark:border-gray-800/60 rounded-2xl p-4 mb-4 shadow-sm backdrop-blur-sm">
                                                     <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between">
                                                         <span className="flex items-center gap-2"><Type className="w-4 h-4 text-purple-500" /> Explanation Font Size</span>
                                                         <span className="text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/30 px-2 rounded text-xs py-0.5">{Math.round(expFontScale * 100)}%</span>
                                                     </div>
                                                     <div className="flex items-center bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 w-full overflow-hidden shadow-inner">
                                                         <button onClick={() => setExpFontScale(s => Math.max(0.6, s - 0.1))} className="flex-1 py-2 flex justify-center items-center gap-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 font-bold border-r border-gray-200 dark:border-gray-700 transition-colors">
-                                                            A- <kbd className="text-[10px] bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 px-1.5 py-0.5 rounded text-gray-500 dark:text-gray-400 font-mono shadow-sm">[</kbd>
+                                                            A- <kbd className="text-[11px] bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 px-2 py-1 rounded text-gray-500 dark:text-gray-400 font-mono shadow-sm border-b-[2px]">[</kbd>
                                                         </button>
                                                         <button onClick={() => setExpFontScale(s => Math.min(2.0, s + 0.1))} className="flex-1 py-2 flex justify-center items-center gap-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 font-bold transition-colors">
-                                                            A+ <kbd className="text-[10px] bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 px-1.5 py-0.5 rounded text-gray-500 dark:text-gray-400 font-mono shadow-sm">]</kbd>
+                                                            A+ <kbd className="text-[11px] bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 px-2 py-1 rounded text-gray-500 dark:text-gray-400 font-mono shadow-sm border-b-[2px]">]</kbd>
                                                         </button>
                                                     </div>
                                                 </div>
 
-                                                <hr className="border-gray-100 dark:border-gray-800" />
+                                                
 
                                                 <div className="flex items-center justify-between">
                                                     <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
                                                         <Focus className="w-4 h-4 text-yellow-500" />
                                                         Spotlight Mode
-                                                        <kbd className="ml-auto text-[10px] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-1.5 py-0.5 rounded text-gray-500 dark:text-gray-400 font-mono shadow-sm">Shift+F</kbd>
+                                                        <kbd className="ml-auto text-[11px] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-2 py-1 rounded text-gray-500 dark:text-gray-400 font-mono shadow-sm border-b-[2px]">Shift+F</kbd>
                                                     </div>
                                                     <button
                                                         onClick={() => setIsSpotlightActive(!isSpotlightActive)}
@@ -3412,13 +3468,13 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     </button>
                                                 </div>
 
-                                                <hr className="border-gray-100 dark:border-gray-800" />
+                                                
 
-                                                <div>
+                                                <div className="bg-gray-50/50 dark:bg-gray-900/40 border border-gray-200/60 dark:border-gray-800/60 rounded-2xl p-4 mb-4 shadow-sm backdrop-blur-sm">
                                                     <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 flex items-center justify-between">
                                                         <span className="flex items-center gap-2"><Pen className="w-4 h-4 text-indigo-500" /> Presentation Tools</span>
                                                         <div className="flex items-center gap-2">
-                                                            <kbd className="text-[10px] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-1.5 py-0.5 rounded text-gray-500 dark:text-gray-400 font-mono shadow-sm">Shift+D</kbd>
+                                                            <kbd className="text-[11px] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-2 py-1 rounded text-gray-500 dark:text-gray-400 font-mono shadow-sm border-b-[2px]">Shift+D</kbd>
                                                             <button onClick={() => setIsPenActive(!isPenActive)} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${isPenActive ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}>
                                                                 <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${isPenActive ? 'translate-x-5' : 'translate-x-1'}`} />
                                                             </button>
@@ -3531,13 +3587,13 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                                 onClick={clearCanvas}
                                                                 className="w-full py-2 text-red-500 dark:text-red-400 bg-red-50 dark:bg-red-950/40 hover:bg-red-100 dark:hover:bg-red-900/40 rounded-lg border border-red-200/50 dark:border-red-900/50 transition-colors flex items-center justify-center gap-1.5 text-xs font-bold"
                                                             >
-                                                                <Trash2 className="w-4 h-4" /> Clear Canvas <kbd className="ml-1 text-[10px] bg-white dark:bg-gray-900 border border-red-200 dark:border-red-900 px-1.5 py-0.5 rounded text-red-500 dark:text-red-400 font-mono shadow-sm">Shift+C</kbd>
+                                                                <Trash2 className="w-4 h-4" /> Clear Canvas <kbd className="ml-1 text-[11px] bg-white dark:bg-gray-900 border border-red-200 dark:border-red-900 px-2 py-1 rounded text-red-500 dark:text-red-400 font-mono shadow-sm border-b-[2px]">Shift+C</kbd>
                                                             </button>
                                                         </div>
                                                     )}
                                                 </div>
 
-                                                <hr className="border-gray-100 dark:border-gray-800" />
+                                                
 
                                                 <div>
                                                     <div className="relative">
@@ -4260,7 +4316,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                 </div>
 
                                                 <div className="relative w-full max-w-[1200px] flex justify-center mt-6 md:mt-8 mb-4 mx-auto !print-color-adjust-exact">
-                                                    <div className={optionsLayout === 'grid' ? "grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 w-full max-w-6xl" : "flex flex-col gap-y-3 w-[90%] sm:w-fit min-w-[300px] md:min-w-[450px] lg:min-w-[500px] max-w-4xl mx-auto"}>
+                                                    <div className={optionsLayout === 'grid' ? "grid grid-cols-2 gap-x-6 gap-y-6 w-[94%] sm:w-full max-w-4xl xl:max-w-5xl mx-auto" : "flex flex-col gap-y-3 w-[94%] sm:w-full max-w-4xl xl:max-w-5xl mx-auto"}>
                                                         {opts.map((opt: any, oIdx: number) => {
                                                             const isCorrect = q.correctAnswer && q.correctAnswer.toLowerCase().includes(opt.key);
                                                             const optLetter = getOptionLabel(opt.key, uiLang);
