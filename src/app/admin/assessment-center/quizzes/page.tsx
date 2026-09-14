@@ -13,7 +13,7 @@ import { getTaxonomyNodesByTrack, TaxonomyNode } from '@/lib/firebase/taxonomy';
 import { AssessmentEditor } from '@/components/admin/AssessmentEditor';
 import Link from 'next/link';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
-import { Star, MessageSquare, Wand2, Copy as CopyIcon, CheckSquare, MoreVertical, Unlock, Lock, ImageIcon, LayoutGrid, List, Search, Printer } from 'lucide-react';
+import { Star, MessageSquare, Wand2, Copy as CopyIcon, CheckSquare, MoreVertical, Unlock, Lock, ImageIcon, LayoutGrid, List, Search, Printer, Presentation } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
@@ -534,6 +534,11 @@ export default function QuizzesPage() {
                                                             <Eye className="mr-2 h-4 w-4" /> View on Site
                                                         </Link>
                                                     </DropdownMenuItem>
+                                                    <DropdownMenuItem asChild>
+                                                        <Link href={`/presentation/${test.slug || test.id}`} target="_blank" className="cursor-pointer text-indigo-600 dark:text-indigo-400">
+                                                            <Presentation className="mr-2 h-4 w-4" /> Present
+                                                        </Link>
+                                                    </DropdownMenuItem>
                                                     {!(test as any).isHardcoded && (
                                                         <>
                                                             <DropdownMenuItem onClick={() => handleEdit(test)} className="cursor-pointer">
@@ -666,6 +671,11 @@ export default function QuizzesPage() {
                                                             <DropdownMenuItem asChild>
                                                                 <Link href={`/quiz/${test.slug}`} target="_blank" className="cursor-pointer">
                                                                     <Eye className="mr-2 h-4 w-4" /> View on Site
+                                                                </Link>
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuItem asChild>
+                                                                <Link href={`/presentation/${test.slug || test.id}`} target="_blank" className="cursor-pointer text-indigo-600 dark:text-indigo-400">
+                                                                    <Presentation className="mr-2 h-4 w-4" /> Present
                                                                 </Link>
                                                             </DropdownMenuItem>
                                                             {!(test as any).isHardcoded && (

@@ -242,6 +242,39 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
   const [isMobileSettingsOpen, setIsMobileSettingsOpen] = useState(false);
   const [zoom, setZoom] = useState(1);
 
+  // Load Print Test from SessionStorage if load_print_test=1
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('load_print_test') === '1') {
+        const printData = sessionStorage.getItem('deshexam_print_test');
+        if (printData) {
+          try {
+            const parsed = JSON.parse(printData);
+            if (parsed.questions && Array.isArray(parsed.questions)) {
+              setSelectedQuestions(parsed.questions);
+            }
+            if (parsed.title) {
+              setHeaderTitle(parsed.title);
+              // Also update default title to prevent overwrite
+              setHeaderClassName(parsed.classId || parsed.title);
+            }
+            if (parsed.subjectId) {
+              setHeaderSubjectName(parsed.subjectId);
+            }
+            
+            // Clean up the URL state
+            const newUrl = new URL(window.location.href);
+            newUrl.searchParams.delete('load_print_test');
+            window.history.replaceState({}, '', newUrl.toString());
+          } catch (e) {
+            console.error('Error loading print test from sessionStorage', e);
+          }
+        }
+      }
+    }
+  }, []);
+
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 1024) {

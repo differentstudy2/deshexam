@@ -2,7 +2,8 @@
 
 import React, { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { Play, BookOpen, Clock, Award, ChevronRight, Search, Layers, CheckCircle2 } from 'lucide-react';
+import { Play, BookOpen, Clock, Award, ChevronRight, Search, Layers, CheckCircle2, Eye, Printer } from 'lucide-react';
+import PresentationOverlay from '@/components/assessment/PresentationOverlay';
 
 export interface Assessment {
     id: string;
@@ -86,8 +87,79 @@ export default function PresentationClient({ assessments }: { assessments: Asses
         return assessments.reduce((acc, t) => acc + getQuestionCount(t), 0);
     }, [assessments]);
 
+    const [previewTest, setPreviewTest] = useState<any>(null);
+    const [isLoadingOverlay, setIsLoadingOverlay] = useState(false);
+
+    const handleQuickView = async (test: Assessment) => {
+        if (test.questions && test.questions.length > 0) {
+            setPreviewTest(test);
+            return;
+        }
+        if (test.questionIds && test.questionIds.length > 0) {
+            setIsLoadingOverlay(true);
+            try {
+                const { getQuestionsByIds } = await import('@/lib/firebase/question-bank');
+                const questions = await getQuestionsByIds(test.questionIds);
+                setPreviewTest({ ...test, questions });
+            } catch (e) {
+                console.error('Failed to load questions', e);
+            } finally {
+                setIsLoadingOverlay(false);
+            }
+        }
+    };
+
+    const handlePrintRedirect = async (test: Assessment) => {
+        let printQuestions = test.questions || [];
+        if (printQuestions.length === 0 && test.questionIds && test.questionIds.length > 0) {
+            setIsLoadingOverlay(true);
+            try {
+                const { getQuestionsByIds } = await import('@/lib/firebase/question-bank');
+                printQuestions = await getQuestionsByIds(test.questionIds);
+            } catch (e) {
+                console.error('Failed to load questions for printing', e);
+            } finally {
+                setIsLoadingOverlay(false);
+            }
+        }
+
+        if (printQuestions.length > 0) {
+            sessionStorage.setItem('deshexam_print_test', JSON.stringify({
+                title: test.title,
+                classId: test.classId,
+                subjectId: test.subjectId,
+                questions: printQuestions
+            }));
+            router.push('/e-question-builder/create-question?load_print_test=1');
+        } else {
+            alert('No questions found to print.');
+        }
+    };
+
     return (
-        <div className="w-full">
+        <div className="w-full relative">
+            {/* Loading Overlay */}
+            {isLoadingOverlay && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl p-6 flex flex-col items-center gap-3 shadow-2xl">
+                        <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+                        <p className="text-sm font-medium text-gray-700 dark:text-gray-200">Loading questions...</p>
+                    </div>
+                </div>
+            )}
+
+            {/* Quick View Modal */}
+            {previewTest && (
+                <div className="fixed inset-0 z-50 overflow-hidden bg-gray-900">
+                    <PresentationOverlay 
+                        questions={previewTest.questions} 
+                        classLine={previewTest.title}
+                        autoStart={true}
+                        onClose={() => setPreviewTest(null)}
+                    />
+                </div>
+            )}
+
             {/* Stats Row */}
             <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-6">
                 <div className="bg-white dark:bg-gray-800/80 border border-gray-100 dark:border-gray-700/60 rounded-2xl p-4 text-center shadow-sm">
@@ -217,15 +289,30 @@ export default function PresentationClient({ assessments }: { assessments: Asses
                                         ) : null}
                                     </div>
 
-                                    {/* Present Button */}
-                                    <button
-                                        onClick={() => router.push(`/presentation/${test.slug || test.id}`)}
-                                        className={`w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-gradient-to-r ${gradient} text-white text-xs sm:text-sm font-semibold shadow-sm hover:opacity-95 transition-all group-hover:shadow-md cursor-pointer`}
-                                    >
-                                        <Play className="w-3.5 h-3.5 fill-white" />
-                                        Present
-                                        <ChevronRight className="w-3.5 h-3.5 ml-auto opacity-80 group-hover:translate-x-0.5 transition-transform" />
-                                    </button>
+                                    {/* Action Buttons */}
+                                    <div className="flex items-center gap-1.5 mt-2">
+                                        <button
+                                            onClick={() => router.push(`/presentation/${test.slug || test.id}`)}
+                                            className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-gradient-to-r ${gradient} text-white text-xs sm:text-sm font-semibold shadow-sm hover:opacity-95 transition-all group-hover:shadow-md cursor-pointer`}
+                                        >
+                                            <Play className="w-3.5 h-3.5 fill-white" />
+                                            Present
+                                        </button>
+                                        <button
+                                            onClick={() => handleQuickView(test)}
+                                            className="p-2 text-gray-500 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-400 rounded-lg transition-colors cursor-pointer shrink-0"
+                                            title="Quick View"
+                                        >
+                                            <Eye className="w-4 h-4" />
+                                        </button>
+                                        <button
+                                            onClick={() => handlePrintRedirect(test)}
+                                            className="p-2 text-gray-500 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-400 rounded-lg transition-colors cursor-pointer shrink-0"
+                                            title="Print Questions"
+                                        >
+                                            <Printer className="w-4 h-4" />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         );

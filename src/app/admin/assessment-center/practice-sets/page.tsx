@@ -15,7 +15,7 @@ import Link from 'next/link';
 import { collection, query, orderBy, limit, startAfter, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
-import { Star, MessageSquare, Wand2, Copy as CopyIcon, CheckSquare, MoreVertical, Unlock, Lock, ImageIcon, LayoutGrid, List, Search, Printer } from 'lucide-react';
+import { Star, MessageSquare, Wand2, Copy as CopyIcon, CheckSquare, MoreVertical, Unlock, Lock, ImageIcon, LayoutGrid, List, Search, Printer, Presentation } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
@@ -557,8 +557,13 @@ export default function PracticeSetsPage() {
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end" className="w-48">
                                                     <DropdownMenuItem asChild>
-                                                        <Link href={`/practice/${test.slug}`} target="_blank" className="cursor-pointer">
+                                                        <Link href={`/practice-sets/${test.slug}`} target="_blank" className="cursor-pointer">
                                                             <Eye className="mr-2 h-4 w-4" /> View on Site
+                                                        </Link>
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem asChild>
+                                                        <Link href={`/presentation/${test.slug || test.id}`} target="_blank" className="cursor-pointer text-indigo-600 dark:text-indigo-400">
+                                                            <Presentation className="mr-2 h-4 w-4" /> Present
                                                         </Link>
                                                     </DropdownMenuItem>
                                                     {!(test as any).isHardcoded && (
@@ -686,6 +691,11 @@ export default function PracticeSetsPage() {
                                                                 <DropdownMenuItem asChild>
                                                                     <Link href={`/practice/${test.slug}`} target="_blank" className="cursor-pointer">
                                                                         <Eye className="mr-2 h-4 w-4" /> View on Site
+                                                                    </Link>
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem asChild>
+                                                                    <Link href={`/presentation/${test.slug || test.id}`} target="_blank" className="cursor-pointer text-indigo-600 dark:text-indigo-400">
+                                                                        <Presentation className="mr-2 h-4 w-4" /> Present
                                                                     </Link>
                                                                 </DropdownMenuItem>
                                                                 {!(test as any).isHardcoded && (
