@@ -4165,74 +4165,72 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                         }
                     ` }} />
                     {/* Floating Presentation Tools (Right Edge) */}
-                    {isPenActive && (
-                        <div className="absolute right-4 bottom-8 z-[70] bg-slate-900/95 backdrop-blur-xl p-1 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.4)] border border-slate-700/50 flex flex-col gap-1 w-9 items-center animate-in slide-in-from-right-10 fade-in duration-300">
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 z-[70] bg-slate-900/95 backdrop-blur-xl p-1 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.4)] border border-slate-700/50 flex flex-col gap-1 w-9 items-center animate-in slide-in-from-right-10 fade-in duration-300">
 
-                            <button onClick={() => setDrawingTool('laser')} className={`p-0.5 rounded-lg transition-all ${drawingTool === 'laser' ? 'bg-red-500/20 text-red-400 border border-red-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Laser (Shift+L)">
-                                <MousePointer2 className="w-4 h-4" />
-                            </button>
-                            <button onClick={() => setDrawingTool('pen')} className={`p-0.5 rounded-lg transition-all ${drawingTool === 'pen' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Pen (Shift+P)">
-                                <Pen className="w-4 h-4" />
-                            </button>
-                            <button onClick={() => setDrawingTool('highlighter')} className={`p-0.5 rounded-lg transition-all ${drawingTool === 'highlighter' ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Marker (Shift+M)">
-                                <Highlighter className="w-4 h-4" />
-                            </button>
-                            <button onClick={() => setDrawingTool('eraser')} className={`p-0.5 rounded-lg transition-all ${drawingTool === 'eraser' ? 'bg-slate-500/40 text-white border border-slate-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Eraser (Shift+E)">
-                                <Eraser className="w-4 h-4" />
-                            </button>
+                        <button onClick={() => { setDrawingTool('laser'); setIsPenActive(true); }} className={`p-0.5 rounded-lg transition-all ${(isPenActive && drawingTool === 'laser') ? 'bg-red-500/20 text-red-400 border border-red-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Laser (Shift+L)">
+                            <MousePointer2 className="w-4 h-4" />
+                        </button>
+                        <button onClick={() => { setDrawingTool('pen'); setIsPenActive(true); }} className={`p-0.5 rounded-lg transition-all ${(isPenActive && drawingTool === 'pen') ? 'bg-blue-500/20 text-blue-400 border border-blue-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Pen (Shift+P)">
+                            <Pen className="w-4 h-4" />
+                        </button>
+                        <button onClick={() => { setDrawingTool('highlighter'); setIsPenActive(true); }} className={`p-0.5 rounded-lg transition-all ${(isPenActive && drawingTool === 'highlighter') ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Marker (Shift+M)">
+                            <Highlighter className="w-4 h-4" />
+                        </button>
+                        <button onClick={() => { setDrawingTool('eraser'); setIsPenActive(true); }} className={`p-0.5 rounded-lg transition-all ${(isPenActive && drawingTool === 'eraser') ? 'bg-slate-500/40 text-white border border-slate-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Eraser (Shift+E)">
+                            <Eraser className="w-4 h-4" />
+                        </button>
 
-                            <hr className="w-full border-slate-700/50 my-0.5" />
+                        <hr className="w-full border-slate-700/50 my-0.5" />
 
-                            <button onClick={() => setDrawingTool('rectangle')} className={`p-0.5 rounded-lg transition-all ${drawingTool === 'rectangle' ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Rectangle (Shift+B)">
-                                <Square className="w-4 h-4" />
-                            </button>
-                            <button onClick={() => setDrawingTool('circle')} className={`p-0.5 rounded-lg transition-all ${drawingTool === 'circle' ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Circle (Shift+C)">
-                                <Circle className="w-4 h-4" />
-                            </button>
-                            <button onClick={() => setDrawingTool('arrow')} className={`p-0.5 rounded-lg transition-all ${drawingTool === 'arrow' ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Arrow (Shift+V)">
-                                <ArrowUpRight className="w-4 h-4" />
-                            </button>
-                            <button onClick={() => setDrawingTool('text')} className={`p-0.5 rounded-lg transition-all ${drawingTool === 'text' ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Text (Shift+T)">
-                                <Type className="w-4 h-4" />
-                            </button>
-                            <button onClick={() => setDrawingTool('magnifier')} className={`p-0.5 rounded-lg transition-all ${drawingTool === 'magnifier' ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Zoom (Shift+Z)">
-                                <ZoomIn className="w-4 h-4" />
-                            </button>
+                        <button onClick={() => { setDrawingTool('rectangle'); setIsPenActive(true); }} className={`p-0.5 rounded-lg transition-all ${(isPenActive && drawingTool === 'rectangle') ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Rectangle (Shift+B)">
+                            <Square className="w-4 h-4" />
+                        </button>
+                        <button onClick={() => { setDrawingTool('circle'); setIsPenActive(true); }} className={`p-0.5 rounded-lg transition-all ${(isPenActive && drawingTool === 'circle') ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Circle (Shift+C)">
+                            <Circle className="w-4 h-4" />
+                        </button>
+                        <button onClick={() => { setDrawingTool('arrow'); setIsPenActive(true); }} className={`p-0.5 rounded-lg transition-all ${(isPenActive && drawingTool === 'arrow') ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Arrow (Shift+V)">
+                            <ArrowUpRight className="w-4 h-4" />
+                        </button>
+                        <button onClick={() => { setDrawingTool('text'); setIsPenActive(true); }} className={`p-0.5 rounded-lg transition-all ${(isPenActive && drawingTool === 'text') ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Text (Shift+T)">
+                            <Type className="w-4 h-4" />
+                        </button>
+                        <button onClick={() => { setDrawingTool('magnifier'); setIsPenActive(true); }} className={`p-0.5 rounded-lg transition-all ${(isPenActive && drawingTool === 'magnifier') ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Zoom (Shift+Z)">
+                            <ZoomIn className="w-4 h-4" />
+                        </button>
 
-                            <hr className="w-full border-slate-700/50 my-0.5" />
+                        <hr className="w-full border-slate-700/50 my-0.5" />
 
-                            <button onClick={clearCanvas} className="p-0.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all" title="Clear Canvas (Shift+Del)">
-                                <Trash2 className="w-4 h-4" />
-                            </button>
+                        <button onClick={clearCanvas} className="p-0.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all" title="Clear Canvas (Shift+Del)">
+                            <Trash2 className="w-4 h-4" />
+                        </button>
 
-                            <hr className="w-full border-slate-700/50 my-0.5" />
+                        <hr className="w-full border-slate-700/50 my-0.5" />
 
-                            {/* Color Picker Group */}
-                            <div className={`relative group mt-0.5 mb-0.5 transition-opacity ${drawingTool === 'laser' || drawingTool === 'magnifier' ? 'opacity-30 pointer-events-none' : 'opacity-100'}`}>
-                                {/* The main color button */}
-                                <div className="w-5 h-5 mx-auto relative rounded-full overflow-hidden border border-slate-600 hover:border-slate-400 transition-all cursor-pointer shadow-sm" title="Choose Color">
-                                    <div className="absolute inset-0 pointer-events-none" style={{ backgroundColor: penColor }}></div>
-                                    <input
-                                        type="color"
-                                        value={penColor}
-                                        onChange={e => setPenColor(e.target.value)}
-                                        className="absolute inset-[-10px] w-[50px] h-[50px] cursor-pointer opacity-0"
+                        {/* Color Picker Group */}
+                        <div className={`relative group mt-0.5 mb-0.5 transition-opacity ${(!isPenActive || drawingTool === 'laser' || drawingTool === 'magnifier') ? 'opacity-30 pointer-events-none' : 'opacity-100'}`}>
+                            {/* The main color button */}
+                            <div className="w-5 h-5 mx-auto relative rounded-full overflow-hidden border border-slate-600 hover:border-slate-400 transition-all cursor-pointer shadow-sm" title="Choose Color">
+                                <div className="absolute inset-0 pointer-events-none" style={{ backgroundColor: penColor }}></div>
+                                <input
+                                    type="color"
+                                    value={penColor}
+                                    onChange={e => { setPenColor(e.target.value); setIsPenActive(true); }}
+                                    className="absolute inset-[-10px] w-[50px] h-[50px] cursor-pointer opacity-0"
+                                />
+                            </div>
+                            {/* Flyout for quick colors */}
+                            <div className="absolute right-full top-1/2 -translate-y-1/2 mr-3 hidden group-hover:flex bg-slate-900/95 backdrop-blur-xl p-1.5 rounded-2xl border border-slate-700/50 shadow-xl gap-1.5 animate-in slide-in-from-right-2 fade-in duration-200">
+                                {['#ef4444', '#3b82f6', '#22c55e', '#facc15', '#ffffff'].map(c => (
+                                    <button
+                                        key={c}
+                                        onClick={() => { setPenColor(c); setIsPenActive(true); }}
+                                        className={`w-5 h-5 rounded-full border-2 ${penColor === c ? 'border-white scale-110 shadow-lg' : 'border-transparent hover:scale-110'} transition-all`}
+                                        style={{ backgroundColor: c }}
                                     />
-                                </div>
-                                {/* Flyout for quick colors */}
-                                <div className="absolute right-full top-1/2 -translate-y-1/2 mr-3 hidden group-hover:flex bg-slate-900/95 backdrop-blur-xl p-1.5 rounded-2xl border border-slate-700/50 shadow-xl gap-1.5 animate-in slide-in-from-right-2 fade-in duration-200">
-                                    {['#ef4444', '#3b82f6', '#22c55e', '#facc15', '#ffffff'].map(c => (
-                                        <button
-                                            key={c}
-                                            onClick={() => setPenColor(c)}
-                                            className={`w-5 h-5 rounded-full border-2 ${penColor === c ? 'border-white scale-110 shadow-lg' : 'border-transparent hover:scale-110'} transition-all`}
-                                            style={{ backgroundColor: c }}
-                                        />
-                                    ))}
-                                </div>
+                                ))}
                             </div>
                         </div>
-                    )}
+                    </div>
 
                 </div>
 
