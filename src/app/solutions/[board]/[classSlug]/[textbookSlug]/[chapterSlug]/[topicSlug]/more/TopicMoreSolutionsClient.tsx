@@ -64,6 +64,13 @@ function McqQuestion({ q, idx, isOpen, toggle }: { q: any; idx: number; isOpen: 
             {q.marks && <span className="text-[10px] text-slate-400">{q.marks} mark</span>}
           </div>
           <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 leading-snug">{q.questionText}</p>
+          {q.statements && q.statements.length > 0 && (
+            <div className="mt-3 flex flex-col gap-1 pl-3 border-l-2 border-slate-300 dark:border-slate-600">
+              {q.statements.map((stmt: string, sIdx: number) => (
+                <p key={sIdx} className="text-[13px] font-semibold text-slate-700 dark:text-slate-300 leading-none whitespace-pre-line">{stmt}</p>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
@@ -148,6 +155,13 @@ function ShortQuestion({ q, idx }: { q: any; idx: number }) {
             {q.marks && <span className="text-[10px] text-slate-400">{q.marks} mark</span>}
           </div>
           <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 leading-snug">{q.questionText}</p>
+          {q.statements && q.statements.length > 0 && (
+            <div className="mt-3 flex flex-col gap-1 pl-3 border-l-2 border-slate-300 dark:border-slate-600">
+              {q.statements.map((stmt: string, sIdx: number) => (
+                <p key={sIdx} className="text-[13px] font-semibold text-slate-700 dark:text-slate-300 leading-none whitespace-pre-line">{stmt}</p>
+              ))}
+            </div>
+          )}
         </div>
       </div>
       <div className="border-t border-slate-100 dark:border-slate-800 px-5 py-3">

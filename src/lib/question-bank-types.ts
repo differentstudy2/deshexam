@@ -61,6 +61,7 @@ export interface QuestionBankEntry {
   // Content
   title?: string;
   questionText: string;
+  statements?: string[];
   
   // Media
   questionImage?: string;

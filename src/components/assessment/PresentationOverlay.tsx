@@ -2713,6 +2713,18 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     <div
                                         className={`flex flex-col items-center justify-center gap-4 w-[94%] sm:w-full min-w-[300px] md:min-w-[600px] max-w-4xl xl:max-w-5xl min-h-[120px] md:min-h-[160px] mx-auto mt-1 md:mt-1 transition-all duration-300 relative z-10 rounded-t-2xl rounded-b-[0.5rem] border shadow-[0_8px_32px_rgba(0,0,0,0.10)] p-6 md:p-8 md:px-10 ${qBgColor !== 'transparent' ? `${qBgColor} border-gray-200/50 dark:border-gray-700/50` : 'bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-gray-100/80 dark:border-slate-700/40'}`}
                                         style={{
+                                            '--q-size': (() => {
+                                                const hasStmts = q.statements && q.statements.length > 0;
+                                                const stmtLines = q.statements ? q.statements.length : 0;
+                                                const stmtLen = q.statements ? q.statements.join(' ').length : 0;
+                                                const tLen = (q.questionText?.length || 0) + stmtLen;
+                                                if (hasStmts) {
+                                                    if (stmtLines >= 4 || tLen > 150) return 'calc(var(--base-q-size) * 0.65)';
+                                                    if (stmtLines >= 2 || tLen > 100) return 'calc(var(--base-q-size) * 0.75)';
+                                                    return 'calc(var(--base-q-size) * 0.85)';
+                                                }
+                                                return tLen > 300 ? 'calc(var(--base-q-size) * 0.75)' : 'var(--base-q-size)';
+                                            })(),
                                             '--q-color': qTextColor !== 'default' ? qTextColor : undefined,
                                             borderTopColor: bgTheme === 'video' ? 'rgba(255,255,255,0.4)' : [
                                                 '#6366f1', '#3b82f6', '#10b981', '#f43f5e', '#f59e0b', '#a855f7'
@@ -2766,6 +2778,17 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                 {q.questionText}
                                             </ReactMarkdown>
                                         </div>
+                                        {q.statements && q.statements.length > 0 && (
+                                            <div className="mt-2 flex flex-col gap-1 w-full pl-3 md:pl-6 border-l-4 border-indigo-200 dark:border-indigo-800/50">
+                                                {q.statements.map((stmt: string, sIdx: number) => (
+                                                    <div key={sIdx} className={`prose dark:prose-invert max-w-none w-full prose-p:font-bold text-[calc(var(--q-size)*0.85)] leading-[1] text-left font-bold [&_*]:!text-[calc(var(--q-size)*0.85)] [&_*]:!leading-[1] [&_*]:!m-0 ${qTextColor !== 'default' ? 'text-[var(--q-color)] [&_*]:!text-[var(--q-color)]' : (bgTheme === 'video' ? 'text-white/90 [&_*]:!text-white/90' : 'text-slate-700 dark:text-gray-300 [&_*]:!text-slate-700 dark:[&_*]:!text-gray-300')}`}>
+                                                        <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
+                                                            {stmt}
+                                                        </ReactMarkdown>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
 
                                     {/* Options Area with Side Navigation */}
@@ -4059,20 +4082,23 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     <style dangerouslySetInnerHTML={{
                         __html: `
                         .responsive-fonts {
-                            --q-size: ${20 * qFontScale}px;
+                            --base-q-size: ${24 * qFontScale}px;
+                            --q-size: var(--base-q-size);
                             --opt-size: ${16 * optFontScale}px;
                             --exp-size: ${15 * expFontScale}px;
                         }
                         @media (min-width: 768px) {
                             .responsive-fonts {
-                                --q-size: ${28 * qFontScale}px;
+                                --base-q-size: ${32 * qFontScale}px;
+                                --q-size: var(--base-q-size);
                                 --opt-size: ${20 * optFontScale}px;
                                 --exp-size: ${18 * expFontScale}px;
                             }
                         }
                         @media (min-width: 1024px) {
                             .responsive-fonts {
-                                --q-size: ${38 * qFontScale}px;
+                                --base-q-size: ${42 * qFontScale}px;
+                                --q-size: var(--base-q-size);
                                 --opt-size: ${30 * optFontScale}px;
                                 --exp-size: ${24 * expFontScale}px;
                             }
@@ -4483,6 +4509,17 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                                 {q.questionText}
                                                             </ReactMarkdown>
                                                         </div>
+                                                        {q.statements && q.statements.length > 0 && (
+                                                            <div className="mt-6 flex flex-col gap-1.5 w-full pl-6 border-l-4 border-gray-300 dark:border-gray-600">
+                                                                {q.statements.map((stmt: string, sIdx: number) => (
+                                                                    <div key={sIdx} className="prose max-w-none prose-p:font-bold font-bold text-[26px] leading-[1] text-gray-700 dark:text-gray-300 [&_*]:!text-[26px] [&_*]:!leading-[1] [&>p]:m-0">
+                                                                        <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
+                                                                            {stmt}
+                                                                        </ReactMarkdown>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </div>
 
@@ -4531,6 +4568,18 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                 <div
                                                     className={`flex flex-col items-center justify-center gap-4 w-[94%] sm:w-full min-w-[300px] md:min-w-[600px] max-w-4xl xl:max-w-5xl min-h-[120px] md:min-h-[160px] mx-auto mt-1 md:mt-1 transition-all duration-300 relative z-10 rounded-t-2xl rounded-b-[0.5rem] border shadow-[0_8px_32px_rgba(0,0,0,0.10)] p-6 md:p-8 md:px-10 ${qBgColor !== 'transparent' ? `${qBgColor} border-gray-200/50 dark:border-gray-700/50` : 'bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-gray-100/80 dark:border-slate-700/40'} !print-color-adjust-exact`}
                                                     style={{
+                                                        '--q-size': (() => {
+                                                            const hasStmts = q.statements && q.statements.length > 0;
+                                                            const stmtLines = q.statements ? q.statements.length : 0;
+                                                            const stmtLen = q.statements ? q.statements.join(' ').length : 0;
+                                                            const tLen = (q.questionText?.length || 0) + stmtLen;
+                                                            if (hasStmts) {
+                                                                if (stmtLines >= 4 || tLen > 150) return 'calc(var(--base-q-size) * 0.65)';
+                                                                if (stmtLines >= 2 || tLen > 100) return 'calc(var(--base-q-size) * 0.75)';
+                                                                return 'calc(var(--base-q-size) * 0.85)';
+                                                            }
+                                                            return tLen > 300 ? 'calc(var(--base-q-size) * 0.75)' : 'var(--base-q-size)';
+                                                        })(),
                                                         '--q-color': qTextColor !== 'default' ? qTextColor : undefined,
                                                         borderTopColor: bgTheme === 'video' ? 'rgba(255,255,255,0.4)' : [
                                                             '#6366f1', '#3b82f6', '#10b981', '#f43f5e', '#f59e0b', '#a855f7'
@@ -4575,6 +4624,17 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                             {q.questionText}
                                                         </ReactMarkdown>
                                                     </div>
+                                                    {q.statements && q.statements.length > 0 && (
+                                                        <div className="mt-4 mb-2 flex flex-col gap-1 w-full pl-4 md:pl-8 border-l-4 border-gray-300 dark:border-gray-600 self-start">
+                                                            {q.statements.map((stmt: string, sIdx: number) => (
+                                                                <div key={sIdx} className={`prose dark:prose-invert max-w-none w-full prose-p:font-bold text-[calc(var(--q-size)*0.85)] leading-[1] text-left font-bold [&_*]:!text-[calc(var(--q-size)*0.85)] [&_*]:!leading-[1] [&_*]:!m-0 ${qTextColor !== 'default' ? 'text-[var(--q-color)] [&_*]:!text-[var(--q-color)]' : 'text-slate-700 dark:text-gray-300 [&_*]:!text-slate-700 dark:[&_*]:!text-gray-300'}`}>
+                                                                    <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
+                                                                        {stmt}
+                                                                    </ReactMarkdown>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    )}
                                                 </div>
 
                                                 <div className="relative w-full max-w-[1200px] flex justify-center mt-6 md:mt-8 mb-4 mx-auto !print-color-adjust-exact">

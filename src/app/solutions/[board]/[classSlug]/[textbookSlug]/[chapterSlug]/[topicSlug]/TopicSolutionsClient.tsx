@@ -61,6 +61,13 @@ function CustomQuestion({ q, idx }: { q: any; idx: number }) {
             {q.marks && <span className="text-[10px] text-slate-400">{q.marks} mark{q.marks > 1 ? 's' : ''}</span>}
           </div>
           <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 leading-snug whitespace-pre-line">{q.questionText}</p>
+          {q.statements && q.statements.length > 0 && (
+            <div className="mt-3 flex flex-col gap-1 pl-3 border-l-2 border-slate-300 dark:border-slate-600">
+              {q.statements.map((stmt: string, sIdx: number) => (
+                <p key={sIdx} className="text-[13px] font-semibold text-slate-700 dark:text-slate-300 leading-none whitespace-pre-line">{stmt}</p>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 

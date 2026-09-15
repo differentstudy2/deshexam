@@ -3,9 +3,9 @@
   "slug": "sahaj-path-dwitiya-bhag-lesson-2-quiz",
   "title": "সহজ পাঠ দ্বিতীয় ভাগ: দ্বিতীয় পাঠ | আজ আদ্যনাথবাবুর কন্যার বিয়ে ও হাট কবিতা Quiz",
   "description": "রবীন্দ্রনাথ ঠাকুরের সহজ পাঠ দ্বিতীয় ভাগ বইয়ের দ্বিতীয় পাঠ এবং বিখ্যাত হাট (কুমোর-পাড়ার গোরুর গাড়ি) কবিতার সম্পূর্ণ টেক্সট পড়ুন।",
-  "boardId": "board-wbbpe",
-  "classId": "class-2-wbbpe",
-  "subjectId": "subject-bengali-literature-class-2-wbbpe",
+  "boardId": "WBBSE",
+  "classId": "Class 2",
+  "subjectId": "Bengali",
   "status": "Published",
   "difficulty": "Easy",
   "language": "Bengali",
@@ -17,7 +17,7 @@
   "passingMarks": 42,
   "negativeMarking": 0,
   "attemptsAllowed": 0,
-  "accessType": "free",
+  "accessType": "premium",
   "attemptCount": 15600,
   "averageScore": 72,
   "instructions": "* মোট ২০টি প্রশ্ন, সময় ১৫ মিনিট।\n* কোনো নেগেটিভ মার্কিং নেই।\n* Quiz শেষে সঠিক উত্তর দেখতে পাবেন।",
@@ -35,6 +35,12 @@
     {
       "id": "q1",
       "questionText": "আদ্যনাথবাবুর কন্যার নাম কী?",
+      "statements": [
+        "I. আদ্যনাথবাবুর মেয়ের নাম হলো শ্যামা।",
+        "II. শ্যামার বিবাহ বৈদ্যনাথের সাথে হবে।",
+        "III. বৈদ্যনাথ শল্যপুরের বাসিন্দা।",
+        "IV. আদ্যনাথবাবু খুব কৃপণ প্রকৃতির মানুষ।"
+      ],
       "questionType": "MCQ",
       "options": {
         "a": "উমা",
@@ -50,7 +56,7 @@
     },
     {
       "id": "q2",
-      "questionText": "শ্যামার বরের নাম কী?",
+      "questionText": "শ্যামার বরের নাম ________?",
       "questionType": "MCQ",
       "options": {
         "a": "সৌম্য",
@@ -182,9 +188,9 @@
       "questionType": "MCQ",
       "options": {
         "a": "গান শোনার জন্য",
-        "b": "তারা এ বৎসর ভালো শস্য পেয়েছে বলে",
+        "b": "ভালো শস্য পেয়েছে বলে",
         "c": "বিয়েতে নিমন্ত্রণ ছিল বলে",
-        "d": "তারা বিনামূল্যে খাবার পাবে বলে"
+        "d": "বিনামূল্যে খাবার পাবে বলে"
       },
       "correctAnswer": "b",
       "explanation": "চাষীরা এ বৎসর ভালো শস্য পেয়েছে, তাই খুশিতে তারা ভিড় ক’রে এসেছে।",
@@ -992,8 +998,5 @@
       "difficulty": "Easy",
       "status": "Published"
     }
-  ],
-  "boardId": "WBBSE",
-  "classId": "Class 2",
-  "subjectId": "Bengali"
+  ]
 }
