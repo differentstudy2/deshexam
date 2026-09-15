@@ -1,0 +1,737 @@
+{
+  "id": "generated-mock-test-class-1-english-spelling",
+  "slug": "class-1-english-spelling-practice-test",
+  "title": "Class 1 English Spelling Practice Test",
+  "description": "This mock test is designed for Class 1 students to practice and improve their basic English spelling skills. It covers essential vocabulary, common words, and picture-based spelling identification to build a strong foundational language base.",
+  "thumbnail": "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&q=80",
+  "status": "Published",
+  "difficulty": "Easy",
+  "language": "English",
+  "questionType": "MCQ",
+  "questionCount": 30,
+  "questionIds": [
+    "q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8", "q9", "q10",
+    "q11", "q12", "q13", "q14", "q15", "q16", "q17", "q18", "q19", "q20",
+    "q21", "q22", "q23", "q24", "q25", "q26", "q27", "q28", "q29", "q30"
+  ],
+  "durationMin": 30,
+  "totalMarks": 30,
+  "passingMarks": 23,
+  "negativeMarking": 0,
+  "attemptsAllowed": 0,
+  "accessType": "free",
+  "attemptCount": 1642,
+  "averageScore": 76,
+  "instructions": "* This exam contains a total of 30 MCQ questions.\n* Each correct answer carries 1 mark.\n* There is no negative marking.\n* Only one option is correct for each question.\n* The timer will start as soon as the exam begins.\n* Try to answer the maximum number of questions within the time limit.\n* You can change your answers before the final submission.\n* After submission, you can review the answer key with explanations.\n* Your progress will be saved even if you refresh the page during the exam.\n* Attempt honestly and use this test to evaluate your preparation.",
+  "examRules": "* No books or notes are allowed during the exam.\n* Use of mobile phones or other devices is strictly prohibited.\n* Select only one correct answer per question.\n* The exam will be auto-submitted when the time runs out.\n* You may retake this exam multiple times.\n* Click the Submit button to view your results.\n* Refresh the page if you face any technical issues.\n* Avoid any form of dishonest practice during the exam.",
+  "boardId": "WBBSE",
+  "classId": "Class 1",
+  "subjectId": "English",
+  "textbookId": "Basic English Reader",
+  "chapterId": "English Spelling Basics",
+  "topicId": "Basic Word Spelling and Vocabulary",
+  "competitiveExam": null,
+  "verificationBadges": [
+    "WBBSE Verified"
+  ],
+  "tags": [
+    "Class 1",
+    "English",
+    "Spelling",
+    "Vocabulary",
+    "Practice Test"
+  ],
+  "createdAt": "2026-09-15T04:55:14Z",
+  "questions": [
+    {
+      "id": "q1",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Choose the correct spelling for a domestic animal that says 'meow'.",
+      "options": {
+        "a": "cta",
+        "b": "cat",
+        "c": "act",
+        "d": "tca"
+      },
+      "correctAnswer": "b",
+      "explanation": "The correct spelling of the animal that meows is 'cat'.",
+      "optionExplanations": {
+        "a": "'cta' is an incorrect letter arrangement for this animal.",
+        "b": "Correct! 'C-A-T' spells cat, a popular pet animal.",
+        "c": "'act' is a verb or noun meaning action, not the animal.",
+        "d": "'tca' is a completely meaningless letter sequence."
+      }
+    },
+    {
+      "id": "q2",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Choose the correct spelling for the animal that barks.",
+      "options": {
+        "a": "dog",
+        "b": "dgo",
+        "c": "god",
+        "d": "ogd"
+      },
+      "correctAnswer": "a",
+      "explanation": "The correct spelling for the barking pet is 'dog'.",
+      "optionExplanations": {
+        "a": "Correct! 'D-O-G' is the correct spelling for dog.",
+        "b": "'dgo' has the letters placed in the wrong order.",
+        "c": "'god' is a completely different word with spiritual meaning.",
+        "d": "'ogd' is an invalid arrangement of letters."
+      }
+    },
+    {
+      "id": "q3",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Select the correct spelling of the red fruit that keeps the doctor away.",
+      "options": {
+        "a": "paple",
+        "b": "aple",
+        "c": "apple",
+        "d": "aelpp"
+      },
+      "correctAnswer": "c",
+      "explanation": "The correct spelling of the fruit apple contains double 'p'.",
+      "optionExplanations": {
+        "a": "'paple' is misspelled with an extra 'p' at the beginning.",
+        "b": "'aple' is missing one of the double 'p' letters.",
+        "c": "Correct! 'A-P-P-L-E' is the correct spelling of apple.",
+        "d": "'aelpp' is a jumbled and incorrect spelling."
+      }
+    },
+    {
+      "id": "q4",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Choose the correct spelling for the yellow fruit that monkeys love to eat.",
+      "options": {
+        "a": "banana",
+        "b": "bannaa",
+        "c": "banaana",
+        "d": "banna"
+      },
+      "correctAnswer": "a",
+      "explanation": "The correct spelling of the fruit banana is b-a-n-a-n-a.",
+      "optionExplanations": {
+        "a": "Correct! 'B-A-N-A-N-A' is the correct spelling for banana.",
+        "b": "'bannaa' has an incorrect ending arrangement.",
+        "c": "'banaana' has extra vowels making it wrong.",
+        "d": "'banna' is missing a syllable and letter."
+      }
+    },
+    {
+      "id": "q5",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Select the correct spelling for the big animal with a trunk.",
+      "options": {
+        "a": "eliphant",
+        "b": "elephant",
+        "c": "elefent",
+        "d": "elaphant"
+      },
+      "correctAnswer": "b",
+      "explanation": "The correct spelling of the large wild animal is 'elephant'.",
+      "optionExplanations": {
+        "a": "'eliphant' uses an incorrect 'i' instead of 'e'.",
+        "b": "Correct! 'E-L-E-P-H-A-N-T' is the correct spelling of elephant.",
+        "c": "'elefent' uses phonetic spelling with 'f' instead of 'ph'.",
+        "d": "'elaphant' uses an incorrect 'a' in the middle."
+      }
+    },
+    {
+      "id": "q6",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Choose the correct spelling for the bird that can talk or mimic sounds.",
+      "options": {
+        "a": "parrot",
+        "b": "parot",
+        "c": "parrat",
+        "d": "perrot"
+      },
+      "correctAnswer": "a",
+      "explanation": "The correct spelling of the green bird with a red beak is 'parrot'.",
+      "optionExplanations": {
+        "a": "Correct! 'P-A-R-R-O-T' is the correct spelling for parrot.",
+        "b": "'parot' is missing the second 'r'.",
+        "c": "'parrat' has an incorrect ending vowel.",
+        "d": "'perrot' uses an incorrect initial vowel 'e'."
+      }
+    },
+    {
+      "id": "q7",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Select the correct spelling for the school building space where you study.",
+      "options": {
+        "a": "scholl",
+        "b": "shool",
+        "c": "school",
+        "d": "skool"
+      },
+      "correctAnswer": "c",
+      "explanation": "The correct spelling of the place of learning is 'school'.",
+      "optionExplanations": {
+        "a": "'scholl' contains an extra 'l'.",
+        "b": "'shool' is missing the letter 'c'.",
+        "c": "Correct! 'S-C-H-O-O-L' is the standard spelling for school.",
+        "d": "'skool' is an informal phonetic spelling, not standard."
+      }
+    },
+    {
+      "id": "q8",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Choose the correct spelling for the book used for drawing or writing notes.",
+      "options": {
+        "a": "cota",
+        "b": "book",
+        "c": "boko",
+        "d": "obok"
+      },
+      "correctAnswer": "b",
+      "explanation": "The correct spelling of an item containing pages for reading or writing is 'book'.",
+      "optionExplanations": {
+        "a": "'cota' is an incorrect combination of letters.",
+        "b": "Correct! 'B-O-O-K' is the correct spelling for book.",
+        "c": "'boko' is an incorrect letter sequence.",
+        "d": "'obok' is a scrambled arrangement."
+      }
+    },
+    {
+      "id": "q9",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Select the correct spelling of the object used with ink or lead to write.",
+      "options": {
+        "a": "pensil",
+        "b": "pencel",
+        "c": "pencil",
+        "d": "pancil"
+      },
+      "correctAnswer": "c",
+      "explanation": "The correct spelling of the writing tool is 'pencil'.",
+      "optionExplanations": {
+        "a": "'pensil' uses an incorrect 's' instead of 'c'.",
+        "b": "'pencel' uses an incorrect 'e' at the end.",
+        "c": "Correct! 'P-E-N-C-I-L' is the correct spelling for pencil.",
+        "d": "'pancil' uses an incorrect vowel 'a'."
+      }
+    },
+    {
+      "id": "q10",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Choose the correct spelling for the water body where fish live.",
+      "options": {
+        "a": "rver",
+        "b": "rivar",
+        "c": "river",
+        "d": "riwer"
+      },
+      "correctAnswer": "c",
+      "explanation": "The correct spelling for a flowing natural stream of water is 'river'.",
+      "optionExplanations": {
+        "a": "'rver' is missing the middle vowel 'i'.",
+        "b": "'rivar' uses an incorrect ending vowel 'a'.",
+        "c": "Correct! 'R-I-V-E-R' is the correct spelling for river.",
+        "d": "'riwer' uses an incorrect consonant 'w'."
+      }
+    },
+    {
+      "id": "q11",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Select the correct spelling of the bright celestial body that shines during the day.",
+      "options": {
+        "a": "suun",
+        "b": "sunn",
+        "c": "sune",
+        "d": "sun"
+      },
+      "correctAnswer": "d",
+      "explanation": "The correct spelling of the daytime star giving us light and heat is 'sun'.",
+      "optionExplanations": {
+        "a": "'suun' has an extra vowel making it incorrect.",
+        "b": "'sunn' has an unnecessary extra 'n'.",
+        "c": "'sune' is misspelled with a silent 'e'.",
+        "d": "Correct! 'S-U-N' is the correct spelling for sun."
+      }
+    },
+    {
+      "id": "q12",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Choose the correct spelling for the natural satellite that shines at night.",
+      "options": {
+        "a": "moon",
+        "b": "monn",
+        "c": "moun",
+        "d": "mune"
+      },
+      "correctAnswer": "a",
+      "explanation": "The correct spelling of the night sky glowing orb is 'moon'.",
+      "optionExplanations": {
+        "a": "Correct! 'M-O-O-N' is the correct spelling for moon.",
+        "b": "'monn' has only one 'o' and double 'n', which is wrong.",
+        "c": "'moun' uses an incorrect vowel combination 'ou'.",
+        "d": "'mune' is an incorrect phonetic spelling."
+      }
+    },
+    {
+      "id": "q13",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Select the correct spelling for the colorful object that flies in the sky with a string.",
+      "options": {
+        "a": "kiet",
+        "b": "kite",
+        "c": "keit",
+        "d": "kyti"
+      },
+      "correctAnswer": "b",
+      "explanation": "The correct spelling of the flying toy is 'kite'.",
+      "optionExplanations": {
+        "a": "'kiet' has letters reversed in the middle.",
+        "b": "Correct! 'K-I-T-E' is the correct spelling for kite.",
+        "c": "'keit' uses an incorrect vowel digraph 'ei'.",
+        "d": "'kyti' uses incorrect consonants and vowels."
+      }
+    },
+    {
+      "id": "q14",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Medium",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Choose the correct spelling for the animal known as the king of the jungle.",
+      "options": {
+        "a": "lien",
+        "b": "line",
+        "c": "lion",
+        "d": "loin"
+      },
+      "correctAnswer": "c",
+      "explanation": "The correct spelling of the wild roaring cat is 'lion'.",
+      "optionExplanations": {
+        "a": "'lien' is a legal term, not the animal.",
+        "b": "'line' is a geometric stroke, not the animal.",
+        "c": "Correct! 'L-I-O-N' is the correct spelling for lion.",
+        "d": "'loin' is a cut of meat, not the animal."
+      }
+    },
+    {
+      "id": "q15",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Medium",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Select the correct spelling of the tall plant with trunk, branches, and green leaves.",
+      "options": {
+        "a": "tre",
+        "b": "tree",
+        "c": "tere",
+        "d": "teer"
+      },
+      "correctAnswer": "b",
+      "explanation": "The correct spelling of the woody perennial plant is 'tree'.",
+      "optionExplanations": {
+        "a": "'tre' is missing one of the double 'e' letters.",
+        "b": "Correct! 'T-R-E-E' is the correct spelling for tree.",
+        "c": "'tere' has letters mixed up incorrectly.",
+        "d": "'teer' is an incorrect arrangement of letters."
+      }
+    },
+    {
+      "id": "q16",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Medium",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Choose the correct spelling for the structure where people live with their families.",
+      "options": {
+        "a": "huose",
+        "b": "houes",
+        "c": "house",
+        "d": "suhoe"
+      },
+      "correctAnswer": "c",
+      "explanation": "The correct spelling of a human dwelling building is 'house'.",
+      "optionExplanations": {
+        "a": "'huose' has the 'o' and 'u' swapped.",
+        "b": "'houes' has the 's' and 'e' swapped at the end.",
+        "c": "Correct! 'H-O-U-S-E' is the correct spelling for house.",
+        "d": "'suhoe' is a completely jumbled word."
+      }
+    },
+    {
+      "id": "q17",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Medium",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Select the correct spelling for the bird that can swim in water and quacks.",
+      "options": {
+        "a": "duck",
+        "b": "duk",
+        "c": "dcuk",
+        "d": "udck"
+      },
+      "correctAnswer": "a",
+      "explanation": "The correct spelling of the swimming water bird is 'duck'.",
+      "optionExplanations": {
+        "a": "Correct! 'D-U-C-K' is the correct spelling for duck.",
+        "b": "'duk' is missing the letter 'c'.",
+        "c": "'dcuk' has letters out of standard order.",
+        "d": "'udck' is an incorrect spelling arrangement."
+      }
+    },
+    {
+      "id": "q18",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Medium",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Choose the correct spelling for the small crawling insect that loves sweet things like sugar.",
+      "options": {
+        "a": "antt",
+        "b": "ant",
+        "c": "nat",
+        "d": "atn"
+      },
+      "correctAnswer": "b",
+      "explanation": "The correct spelling of the tiny social insect is 'ant'.",
+      "optionExplanations": {
+        "a": "'antt' has an extra 't' at the end.",
+        "b": "Correct! 'A-N-T' is the correct spelling for ant.",
+        "c": "'nat' is a nickname or incorrect spelling for this insect.",
+        "d": "'atn' is a jumbled letter sequence."
+      }
+    },
+    {
+      "id": "q19",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Medium",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Select the correct spelling for the farm animal that gives us milk.",
+      "options": {
+        "a": "cow",
+        "b": "cwo",
+        "c": "woc",
+        "d": "ocw"
+      },
+      "correctAnswer": "a",
+      "explanation": "The correct spelling of the milk-giving farm animal is 'cow'.",
+      "optionExplanations": {
+        "a": "Correct! 'C-O-W' is the correct spelling for cow.",
+        "b": "'cwo' has the letters out of order.",
+        "c": "'woc' is an incorrect backward sequence.",
+        "d": "'ocw' is an invalid spelling."
+      }
+    },
+    {
+      "id": "q20",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Medium",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Choose the correct spelling for the farm animal that eats grass and has wool.",
+      "options": {
+        "a": "sheap",
+        "b": "shiep",
+        "c": "sheep",
+        "d": "sehep"
+      },
+      "correctAnswer": "c",
+      "explanation": "The correct spelling of the wool-bearing animal is 'sheep'.",
+      "optionExplanations": {
+        "a": "'sheap' uses an incorrect vowel combination 'ea'.",
+        "b": "'shiep' uses an incorrect vowel combination 'ie'.",
+        "c": "Correct! 'S-H-E-E-P' is the correct spelling for sheep.",
+        "d": "'sehep' has letters arranged incorrectly."
+      }
+    },
+    {
+      "id": "q21",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Medium",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Select the correct spelling for the bird with beautiful colorful feathers that dances when it rains.",
+      "options": {
+        "a": "peacock",
+        "b": "pecock",
+        "c": "peacok",
+        "d": "picock"
+      },
+      "correctAnswer": "a",
+      "explanation": "The correct spelling of our national bird is 'peacock'.",
+      "optionExplanations": {
+        "a": "Correct! 'P-E-A-C-O-C-K' is the correct spelling for peacock.",
+        "b": "'pecock' is missing the letter 'a'.",
+        "c": "'peacok' is missing the final 'k'.",
+        "d": "'picock' uses an incorrect vowel 'i' at the start."
+      }
+    },
+    {
+      "id": "q22",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Medium",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Choose the correct spelling for the vehicle with four wheels that runs on roads.",
+      "options": {
+        "a": "kar",
+        "b": "car",
+        "c": "cra",
+        "d": "arc"
+      },
+      "correctAnswer": "b",
+      "explanation": "The correct spelling of a motor vehicle used for traveling is 'car'.",
+      "optionExplanations": {
+        "a": "'kar' uses a phonetic 'k' instead of standard 'c'.",
+        "b": "Correct! 'C-A-R' is the correct spelling for car.",
+        "c": "'cra' has letters in the wrong order.",
+        "d": "'arc' is a curved geometric shape, not the vehicle."
+      }
+    },
+    {
+      "id": "q23",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Medium",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Select the correct spelling for the transport that runs on iron tracks.",
+      "options": {
+        "a": "trane",
+        "b": "trian",
+        "c": "train",
+        "d": "trani"
+      },
+      "correctAnswer": "c",
+      "explanation": "The correct spelling of the railway vehicle is 'train'.",
+      "optionExplanations": {
+        "a": "'trane' includes a silent 'e' making it incorrect.",
+        "b": "'trian' has an incorrect vowel placement.",
+        "c": "Correct! 'T-R-A-I-N' is the correct spelling for train.",
+        "d": "'trani' uses an incorrect ending vowel 'i'."
+      }
+    },
+    {
+      "id": "q24",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Medium",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Choose the correct spelling for the round object used in games like football or cricket.",
+      "options": {
+        "a": "bal",
+        "b": "ball",
+        "c": "lbla",
+        "d": "lalb"
+      },
+      "correctAnswer": "b",
+      "explanation": "The correct spelling of a spherical playing object is 'ball'.",
+      "optionExplanations": {
+        "a": "'bal' is missing the second 'l'.",
+        "b": "Correct! 'B-A-L-L' is the correct spelling for ball.",
+        "c": "'lbla' is a meaningless jumbled arrangement.",
+        "d": "'lalb' is an incorrect letter combination."
+      }
+    },
+    {
+      "id": "q25",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Medium",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Select the correct spelling for the sweet dairy product used in tea or drunk directly.",
+      "options": {
+        "a": "milck",
+        "b": "mielk",
+        "c": "milk",
+        "d": "mlik"
+      },
+      "correctAnswer": "c",
+      "explanation": "The correct spelling of the white nutritious liquid food is 'milk'.",
+      "optionExplanations": {
+        "a": "'milck' contains an unnecessary 'c'.",
+        "b": "'mielk' has incorrect vowel placement.",
+        "c": "Correct! 'M-I-L-K' is the correct spelling for milk.",
+        "d": "'mlik' has the letters 'l' and 'i' swapped."
+      }
+    },
+    {
+      "id": "q26",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Medium",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Choose the correct spelling for the morning meal eaten before going to school.",
+      "options": {
+        "a": "breakfrast",
+        "b": "breakfast",
+        "c": "brakfast",
+        "d": "brekfast"
+      },
+      "correctAnswer": "b",
+      "explanation": "The correct spelling of the first meal of the day is 'breakfast'.",
+      "optionExplanations": {
+        "a": "'breakfrast' contains an incorrect extra 'r'.",
+        "b": "Correct! 'B-R-E-A-K-F-A-S-T' is the correct spelling for breakfast.",
+        "c": "'brakfast' is missing the letter 'e' in the first syllable.",
+        "d": "'brekfast' is missing the letter 'a' in the first part."
+      }
+    },
+    {
+      "id": "q27",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Medium",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Select the correct spelling for the body part with five fingers used for holding things.",
+      "options": {
+        "a": "hand",
+        "b": "hadn",
+        "c": "hnad",
+        "d": "dhna"
+      },
+      "correctAnswer": "a",
+      "explanation": "The correct spelling of the upper limb extremity is 'hand'.",
+      "optionExplanations": {
+        "a": "Correct! 'H-A-N-D' is the correct spelling for hand.",
+        "b": "'hadn' has the 'n' and 'd' swapped.",
+        "c": "'hnad' has letters out of order.",
+        "d": "'dhna' is a completely jumbled word."
+      }
+    },
+    {
+      "id": "q28",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Medium",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Choose the correct spelling for the body part used for walking and running.",
+      "options": {
+        "a": "fote",
+        "b": "foot",
+        "c": "futo",
+        "d": "toof"
+      },
+      "correctAnswer": "b",
+      "explanation": "The correct spelling of the lower limb base part is 'foot'.",
+      "optionExplanations": {
+        "a": "'fote' uses an incorrect silent 'e'.",
+        "b": "Correct! 'F-O-O-T' is the correct spelling for foot.",
+        "c": "'futo' is an incorrect phonetic spelling.",
+        "d": "'toof' is a backward arrangement of letters."
+      }
+    },
+    {
+      "id": "q29",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Medium",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Select the correct spelling for the colorful bow seen in the sky after rain.",
+      "options": {
+        "a": "rainbou",
+        "b": "rainbo",
+        "c": "rainbow",
+        "d": "renbow"
+      },
+      "correctAnswer": "c",
+      "explanation": "The correct spelling of the meteorological arched color spectrum is 'rainbow'.",
+      "optionExplanations": {
+        "a": "'rainbou' uses an incorrect ending 'ou'.",
+        "b": "'rainbo' is missing the final letter 'w'.",
+        "c": "Correct! 'R-A-I-N-B-O-W' is the correct spelling for rainbow.",
+        "d": "'renbow' uses an incorrect vowel 'e' at the start."
+      }
+    },
+    {
+      "id": "q30",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Medium",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Choose the correct spelling for the bright twinkling bodies seen in the night sky.",
+      "options": {
+        "a": "starre",
+        "b": "stare",
+        "c": "sart",
+        "d": "star"
+      },
+      "correctAnswer": "d",
+      "explanation": "The correct spelling of the luminous astronomical body shining at night is 'star'.",
+      "optionExplanations": {
+        "a": "'starre' uses archaic or incorrect extra letters.",
+        "b": "'stare' means to look fixedly, not the celestial object.",
+        "c": "'sart' has the letters out of sequence.",
+        "d": "Correct! 'S-T-A-R' is the correct spelling for star."
+      }
+    }
+  ]
+}

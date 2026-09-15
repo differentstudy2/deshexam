@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { Play, BookOpen, Clock, Award, ChevronRight, Search, Layers, CheckCircle2, Eye, Printer } from 'lucide-react';
+import { Play, BookOpen, Clock, Award, ChevronRight, Search, Layers, CheckCircle2, Eye, Printer, FileEdit, Users, Target, Unlock, Lock } from 'lucide-react';
 import PresentationOverlay from '@/components/assessment/PresentationOverlay';
 import { getHardcodedTaxonomyNodes } from '@/data/hardcoded/taxonomy';
 
@@ -24,12 +24,15 @@ export interface Assessment {
     subjectId?: string;
     boardId?: string;
     difficulty?: string;
-    language?: string;
     durationMin?: number;
     totalMarks?: number;
+    language?: string;
     thumbnail?: string;
     tags?: string[];
     description?: string;
+    accessType?: string;
+    attemptCount?: number;
+    averageScore?: number;
 }
 
 const DIFFICULTY_STYLES: Record<string, string> = {
@@ -208,9 +211,19 @@ export default function PresentationClient({ assessments }: { assessments: Asses
             {/* Quick View Modal */}
             {previewTest && (
                 <div className="fixed inset-0 z-50 overflow-hidden bg-gray-900">
-                    <PresentationOverlay 
-                        questions={previewTest.questions} 
+                    <PresentationOverlay
+                        questions={previewTest.questions}
                         classLine={previewTest.title}
+                        chapterName={[
+                            getTaxonomyTitle(previewTest.boardId) || previewTest.boardId,
+                            getTaxonomyTitle(previewTest.classId) || previewTest.classId,
+                            getTaxonomyTitle(previewTest.subjectId) || previewTest.subjectId
+                        ].filter(Boolean).join(' • ')}
+                        topicName={[
+                            getTaxonomyTitle(previewTest.textbookId) || previewTest.textbookId,
+                            previewTest.chapter || getTaxonomyTitle(previewTest.chapterId) || previewTest.chapterId,
+                            previewTest.topic || getTaxonomyTitle(previewTest.topicId) || previewTest.topicId
+                        ].filter(Boolean).join(' • ')}
                         autoStart={true}
                         onClose={() => setPreviewTest(null)}
                     />
@@ -248,18 +261,16 @@ export default function PresentationClient({ assessments }: { assessments: Asses
                         <button
                             key={tab.id}
                             onClick={() => setSelectedType(tab.id)}
-                            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
-                                selectedType === tab.id
+                            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${selectedType === tab.id
                                     ? 'bg-indigo-600 text-white shadow-sm'
                                     : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700/50'
-                            }`}
+                                }`}
                         >
                             <span>{tab.label}</span>
-                            <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
-                                selectedType === tab.id
+                            <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${selectedType === tab.id
                                     ? 'bg-white/20 text-white'
                                     : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
-                            }`}>
+                                }`}>
                                 {tab.count}
                             </span>
                         </button>
@@ -288,11 +299,28 @@ export default function PresentationClient({ assessments }: { assessments: Asses
                 </div>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-left">
-                    {filtered.map((test) => {
-                        const gradient = getGradient(test.subjectId);
+                    {filtered.map((test, index) => {
+                        const CARD_GRADIENTS = [
+                            'from-indigo-500 to-violet-600',
+                            'from-emerald-500 to-teal-600',
+                            'from-amber-500 to-orange-600',
+                            'from-rose-500 to-pink-600',
+                            'from-cyan-500 to-blue-600'
+                        ];
+                        const gradient = CARD_GRADIENTS[index % 5];
                         const difficulty = test.difficulty || 'Easy';
                         const diffStyle = DIFFICULTY_STYLES[difficulty] || DIFFICULTY_STYLES['Easy'];
                         const qCount = getQuestionCount(test);
+
+                        const boardTitle = getTaxonomyTitle(test.boardId, test.language);
+                        const classTitle = getTaxonomyTitle(test.classId, test.language);
+                        const subjectTitle = getTaxonomyTitle(test.subjectId, test.language);
+                        const textbookTitle = getTaxonomyTitle(test.textbookId, test.language);
+                        const chapterTitle = test.chapter || getTaxonomyTitle(test.chapterId, test.language);
+                        const topicTitle = test.topic || getTaxonomyTitle(test.topicId, test.language);
+
+                        const line1 = [subjectTitle, textbookTitle].filter(Boolean).join(' • ');
+                        const line2 = [chapterTitle, topicTitle].filter(Boolean).join(' • ');
 
                         return (
                             <div
@@ -306,9 +334,21 @@ export default function PresentationClient({ assessments }: { assessments: Asses
                                 <div className="flex flex-col flex-1 p-4">
                                     {/* Top Row: Subject/Type + Difficulty */}
                                     <div className="flex items-center justify-between mb-3 gap-2">
-                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-gradient-to-r ${gradient} text-white truncate max-w-[140px]`}>
-                                            {test.type || 'Mock Test'}
-                                        </span>
+                                        <div className="flex items-center gap-1.5 overflow-hidden flex-wrap">
+                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-gradient-to-r ${gradient} text-white shrink-0`}>
+                                                {test.type || 'Mock Test'}
+                                            </span>
+                                            {boardTitle && (
+                                                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-gradient-to-r ${CARD_GRADIENTS[(index + 1) % 5]} text-white shrink-0 opacity-95`}>
+                                                    {boardTitle}
+                                                </span>
+                                            )}
+                                            {classTitle && (
+                                                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-gradient-to-r ${CARD_GRADIENTS[(index + 2) % 5]} text-white shrink-0 opacity-95`}>
+                                                    {classTitle}
+                                                </span>
+                                            )}
+                                        </div>
                                         <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium shrink-0 ${diffStyle}`}>
                                             {difficulty}
                                         </span>
@@ -319,45 +359,48 @@ export default function PresentationClient({ assessments }: { assessments: Asses
                                         {test.title}
                                     </h3>
 
-                                    {/* Subject / Chapter / Class */}
-                                    {(() => {
-                                        const boardTitle = getTaxonomyTitle(test.boardId, test.language);
-                                        const classTitle = getTaxonomyTitle(test.classId, test.language);
-                                        const subjectTitle = getTaxonomyTitle(test.subjectId, test.language);
-                                        
-                                        const textbookTitle = getTaxonomyTitle(test.textbookId, test.language);
-                                        const chapterTitle = test.chapter || getTaxonomyTitle(test.chapterId, test.language);
-                                        const topicTitle = test.topic || getTaxonomyTitle(test.topicId, test.language);
-                                        
-                                        const line1 = [boardTitle, classTitle, subjectTitle].filter(Boolean).join(' • ');
-                                        const line2 = [textbookTitle, chapterTitle, topicTitle].filter(Boolean).join(' • ');
-
-                                        if (!line1 && !line2) return null;
-
-                                        return (
-                                            <div className="mb-3">
-                                                {line1 && <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1 font-medium">{line1}</p>}
-                                                {line2 && <p className="text-xs text-gray-400 dark:text-gray-500 line-clamp-1 font-medium mt-0.5">{line2}</p>}
-                                            </div>
-                                        );
-                                    })()}
+                                    {/* Subject / Textbook / Chapter / Topic */}
+                                    {(line1 || line2) && (
+                                        <div className="mb-3 mt-1.5">
+                                            {line1 && <p className="text-xs text-gray-500 dark:text-gray-400 font-medium line-clamp-1">{line1}</p>}
+                                            {line2 && <p className="text-[11px] text-gray-400 dark:text-gray-500 line-clamp-1 font-medium mt-0.5">{line2}</p>}
+                                        </div>
+                                    )}
 
                                     {/* Meta Info */}
-                                    <div className="flex items-center gap-3 mt-auto pt-2 mb-4 border-t border-gray-50 dark:border-gray-700/50">
-                                        <span className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 font-medium">
+                                    <div className="flex items-center gap-1 mt-auto pt-2 mb-4 border-t border-gray-50 dark:border-gray-700/50 flex-wrap">
+                                        <span className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 font-medium shrink-0">
                                             <BookOpen className="w-3.5 h-3.5 text-indigo-500" />
                                             {qCount} Qs
                                         </span>
                                         {test.durationMin ? (
-                                            <span className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 font-medium">
+                                            <span className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 font-medium shrink-0">
                                                 <Clock className="w-3.5 h-3.5 text-amber-500" />
                                                 {test.durationMin}m
                                             </span>
                                         ) : null}
                                         {test.totalMarks ? (
-                                            <span className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 font-medium">
+                                            <span className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 font-medium shrink-0">
                                                 <Award className="w-3.5 h-3.5 text-emerald-500" />
-                                                {test.totalMarks}m
+                                                {test.totalMarks}
+                                            </span>
+                                        ) : null}
+                                        {test.attemptCount !== undefined ? (
+                                            <span className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 font-medium shrink-0">
+                                                <Users className="w-3.5 h-3.5 text-sky-500" />
+                                                {test.attemptCount >= 1000 ? (test.attemptCount / 1000).toFixed(1) + 'k' : test.attemptCount}
+                                            </span>
+                                        ) : null}
+                                        {test.averageScore !== undefined ? (
+                                            <span className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 font-medium shrink-0">
+                                                <Target className="w-3.5 h-3.5 text-rose-500" />
+                                                {test.averageScore}%
+                                            </span>
+                                        ) : null}
+                                        {test.accessType ? (
+                                            <span className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 font-medium shrink-0 capitalize">
+                                                {test.accessType === 'free' ? <Unlock className="w-3.5 h-3.5 text-emerald-500" /> : <Lock className="w-3.5 h-3.5 text-amber-500" />}
+                                                {test.accessType}
                                             </span>
                                         ) : null}
                                     </div>
@@ -371,6 +414,15 @@ export default function PresentationClient({ assessments }: { assessments: Asses
                                             <Play className="w-3.5 h-3.5 fill-white" />
                                             Present
                                         </button>
+                                        <a
+                                            href={`/${(test.type || 'mock-test').toLowerCase().replace(' set', '').replace(/\s+/g, '-')}/${test.slug || test.id}/take`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="p-2 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:hover:bg-indigo-500/20 dark:text-indigo-400 rounded-lg transition-colors cursor-pointer shrink-0 inline-flex border border-indigo-100 dark:border-indigo-500/20"
+                                            title="Take Exam in new tab"
+                                        >
+                                            <FileEdit className="w-4 h-4" />
+                                        </a>
                                         <button
                                             onClick={() => handleQuickView(test)}
                                             className="p-2 text-gray-500 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-400 rounded-lg transition-colors cursor-pointer shrink-0"
