@@ -524,7 +524,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     // Pen Tool State
     const [isPenActive, setIsPenActive] = useState(false);
     const [penColor, setPenColor] = useState('#ef4444');
-    const [penSize, setPenSize] = useState(4);
+    const [penSize, setPenSize] = useState(2);
 
     // Drawing Tool State
     const [drawingTool, setDrawingTool] = useState<'pen' | 'highlighter' | 'laser' | 'eraser' | 'rectangle' | 'circle' | 'arrow' | 'text' | 'magnifier'>('pen');
@@ -1079,10 +1079,17 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         setEliminatedOptions([]);
     }, [currentSlide, clearCanvas]);
 
-    const getCoordinates = (e: any) => {
+    const cachedCanvasRect = useRef<DOMRect | null>(null);
+
+    const getCoordinates = (e: any, updateCache = false) => {
         const canvas = canvasRef.current;
         if (!canvas) return { x: 0, y: 0 };
-        const rect = canvas.getBoundingClientRect();
+        
+        let rect = cachedCanvasRect.current;
+        if (!rect || updateCache) {
+            rect = canvas.getBoundingClientRect();
+            cachedCanvasRect.current = rect;
+        }
 
         let clientX = e.clientX;
         let clientY = e.clientY;
@@ -1102,7 +1109,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const startDrawing = (e: any) => {
         if (!isPenActive) return;
 
-        const { x, y } = getCoordinates(e);
+        const { x, y } = getCoordinates(e, true);
         if (cursorRef.current) {
             cursorRef.current.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`;
         }
@@ -1215,8 +1222,21 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
             return;
         }
 
-        for (let i = 1; i < currentStroke.current.length; i++) {
-            ctx.lineTo(currentStroke.current[i].x, currentStroke.current[i].y);
+        if (currentStroke.current.length < 3) {
+            const b = currentStroke.current[1] || currentStroke.current[0];
+            ctx.lineTo(b.x, b.y);
+        } else {
+            for (let i = 1; i < currentStroke.current.length - 1; i++) {
+                const pt = currentStroke.current[i];
+                const nextPt = currentStroke.current[i + 1];
+                const midPoint = {
+                    x: pt.x + (nextPt.x - pt.x) / 2,
+                    y: pt.y + (nextPt.y - pt.y) / 2
+                };
+                ctx.quadraticCurveTo(pt.x, pt.y, midPoint.x, midPoint.y);
+            }
+            const lastPt = currentStroke.current[currentStroke.current.length - 1];
+            ctx.lineTo(lastPt.x, lastPt.y);
         }
 
         ctx.stroke();
@@ -1249,7 +1269,26 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
         if (!isDrawing.current) return;
 
-        currentStroke.current.push({ x, y });
+        const pushPointFiltered = (px: number, py: number) => {
+            const lastPt = currentStroke.current[currentStroke.current.length - 1];
+            if (!lastPt || Math.hypot(px - lastPt.x, py - lastPt.y) >= 2) {
+                currentStroke.current.push({ x: px, y: py });
+            }
+        };
+
+        if (e.nativeEvent && typeof e.nativeEvent.getCoalescedEvents === 'function') {
+            const events = e.nativeEvent.getCoalescedEvents();
+            if (events && events.length > 0) {
+                for (const ev of events) {
+                    const coords = getCoordinates(ev);
+                    pushPointFiltered(coords.x, coords.y);
+                }
+            } else {
+                pushPointFiltered(x, y);
+            }
+        } else {
+            pushPointFiltered(x, y);
+        }
 
         if (drawingTool === 'eraser') {
             const canvas = canvasRef.current;
@@ -2098,9 +2137,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 ...(drawingTool === 'laser' ? {
                                     width: '8px',
                                     height: '8px',
-                                    backgroundColor: '#ef4444',
+                                    backgroundColor: '#FF0000',
                                     borderRadius: '50%',
-                                    boxShadow: '0 0 8px 3px rgba(239, 68, 68, 0.7), 0 0 12px 6px rgba(239, 68, 68, 0.4)',
+                                    boxShadow: 'none',
                                     border: '1px solid rgba(255,255,255,0.5)'
                                 } : drawingTool === 'highlighter' ? {
                                     width: `${penSize * 5}px`,
@@ -4135,6 +4174,15 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             </button>
                             <button onClick={() => setDrawingTool('circle')} className={`p-0.5 rounded-lg transition-all ${drawingTool === 'circle' ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Circle (Shift+C)">
                                 <Circle className="w-4 h-4" />
+                            </button>
+                            <button onClick={() => setDrawingTool('arrow')} className={`p-0.5 rounded-lg transition-all ${drawingTool === 'arrow' ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Arrow (Shift+V)">
+                                <ArrowUpRight className="w-4 h-4" />
+                            </button>
+                            <button onClick={() => setDrawingTool('text')} className={`p-0.5 rounded-lg transition-all ${drawingTool === 'text' ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Text (Shift+T)">
+                                <Type className="w-4 h-4" />
+                            </button>
+                            <button onClick={() => setDrawingTool('magnifier')} className={`p-0.5 rounded-lg transition-all ${drawingTool === 'magnifier' ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Zoom (Shift+Z)">
+                                <ZoomIn className="w-4 h-4" />
                             </button>
 
                             <hr className="w-full border-slate-700/50 my-0.5" />
