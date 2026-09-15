@@ -40,6 +40,7 @@ export interface ExamConfig {
   accessType?: 'free' | 'subscription' | 'one_time' | 'both';
   allowedSubscriptionPlans?: string[];
   taxonomyLine?: string;
+  language?: string;
 }
 
 interface ExamClientProps {
@@ -2110,6 +2111,7 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                 autoStart={true}
                 onClose={() => setShowPresentationMode(false)}
                 isPremiumUser={isPremiumUser}
+                testLanguage={mockTest.language}
               />
             </div>
           </div>

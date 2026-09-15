@@ -53,6 +53,7 @@ export default function PresentationAutoOpen({ assessment }: { assessment: Asses
                 assessment.chapter || getTaxonomyTitle(assessment.chapterId) || assessment.chapterId, 
                 assessment.topic || getTaxonomyTitle(assessment.topicId) || assessment.topicId
             ].filter(Boolean).join(' • ')}
+            testLanguage={assessment.language}
             autoStart={true}
             onClose={handleClose}
             isPremiumUser={true}

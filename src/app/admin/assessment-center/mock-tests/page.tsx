@@ -356,6 +356,7 @@ export default function MockTestsPage() {
                     <PresentationOverlay 
                         questions={previewTest.questions || []} 
                         classLine={previewTest.title}
+                        testLanguage={previewTest.language}
                         autoStart={true}
                         onClose={() => setPreviewTest(null)}
                     />

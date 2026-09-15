@@ -373,6 +373,7 @@ interface PresentationOverlayProps {
     autoStart?: boolean;
     onClose?: () => void;
     isPremiumUser?: boolean;
+    testLanguage?: string;
 }
 
 const SevenSegmentDigit = ({ digit, style }: { digit: string, style?: React.CSSProperties }) => {
@@ -414,7 +415,7 @@ const SevenSegmentColon = () => {
     );
 };
 
-export default function PresentationOverlay({ questions, classLine, chapterName, topicName, autoStart, onClose, isPremiumUser }: PresentationOverlayProps) {
+export default function PresentationOverlay({ questions, classLine, chapterName, topicName, autoStart, onClose, isPremiumUser, testLanguage }: PresentationOverlayProps) {
     const { user, userProfile } = useAuth();
     const [fetchedIsAdmin, setFetchedIsAdmin] = useState(false);
 
@@ -460,7 +461,13 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [wmVisible, setWmVisible] = useState(true);
 
     // ── Feature 7: Multi-language UI ──────────────────────────────────────────
-    const [uiLang, setUiLang] = useState<UiLang>('bn');
+    const [uiLang, setUiLang] = useState<UiLang>(() => {
+        const lang = testLanguage?.toLowerCase() || '';
+        if (lang.includes('english') || lang.includes('en')) {
+            return 'en';
+        }
+        return 'bn';
+    });
     const L = UI_LABELS[uiLang];
 
     // ── Feature 1: Slide Transition ──────────────────────────────────────────

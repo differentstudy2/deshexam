@@ -149,6 +149,7 @@ export default async function AnswerSheetPage(
                                     classLine={classLine}
                                     chapterName={chapterName}
                                     topicName={topicName}
+                                    testLanguage={test.language}
                                 />
                             </div>
                         </div>

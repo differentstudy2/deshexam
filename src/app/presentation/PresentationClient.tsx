@@ -224,6 +224,7 @@ export default function PresentationClient({ assessments }: { assessments: Asses
                             previewTest.chapter || getTaxonomyTitle(previewTest.chapterId) || previewTest.chapterId,
                             previewTest.topic || getTaxonomyTitle(previewTest.topicId) || previewTest.topicId
                         ].filter(Boolean).join(' • ')}
+                        testLanguage={previewTest.language}
                         autoStart={true}
                         onClose={() => setPreviewTest(null)}
                     />

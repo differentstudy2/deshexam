@@ -103,7 +103,7 @@ export default function QuizzesPage() {
                 console.error("Failed to fetch hardcoded quizzes", e);
             }
             
-            setQuizs([...hardcodedData, ...(firebaseData as Quiz[])]);
+            setQuizzes([...hardcodedData, ...(firebaseData as Quiz[])]);
 
             // Fetch taxonomies
             const allAcademic = await getTaxonomyNodesByTrack('academic');
@@ -358,6 +358,7 @@ export default function QuizzesPage() {
                     <PresentationOverlay 
                         questions={previewTest.questions || []} 
                         classLine={previewTest.title}
+                        testLanguage={previewTest.language}
                         autoStart={true}
                         onClose={() => setPreviewTest(null)}
                     />
