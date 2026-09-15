@@ -1,0 +1,4796 @@
+'use client';
+
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { createPortal } from 'react-dom';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import rehypeRaw from 'rehype-raw';
+import Confetti from 'react-dom-confetti';
+import canvasConfetti from 'canvas-confetti';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '@/hooks/use-auth';
+import { saveExamAttempt, getTopScorersForAssessment } from '@/lib/firebase/student-analytics';
+import { getUserProfile } from '@/lib/firebase/firestore';
+import domtoimage from 'dom-to-image-more';
+import jsPDF from 'jspdf';
+
+const MUSIC_OPTIONS = [
+    { id: 'lofi', name: 'Lo-Fi Chill', url: '/audio/lofi.mp3' },
+    { id: 'ambient', name: 'Ambient Focus', url: '/audio/ambient.mp3' },
+    { id: 'nature', name: 'Nature Sounds', url: '/audio/nature.mp3' },
+    { id: 'piano', name: 'Soft Piano', url: '/audio/piano.mp3' },
+    { id: 'rain', name: 'Rain Sounds', url: '/audio/rain.mp3' },
+    { id: 'binaural', name: 'Binaural Beats', url: '/audio/binaural.mp3' },
+    { id: 'cafe', name: 'Cafe Ambience', url: '/audio/cafe.mp3' },
+    { id: 'jazz', name: 'Smooth Jazz', url: '/audio/jazz.mp3' },
+    { id: 'classic', name: 'Classical Music', url: '/audio/classic.mp3' },
+    { id: 'meditation', name: 'Meditation Bowl', url: '/audio/meditation.mp3' },
+    { id: 'ticking', name: 'Ticking Clock', url: '/audio/ticking.mp3' },
+    { id: 'calc_guess', name: 'A Calculated Guess', url: '/audio/A_Calculated_Guess.mp3' },
+    { id: 'porcelain_rain', name: 'Porcelain Against the Rain', url: '/audio/Porcelain_Against_the_Rain.mp3' },
+    { id: 'sec_solve', name: 'Seconds to Solve', url: '/audio/Seconds_to_Solve.mp3' },
+    { id: 'seven_letters', name: 'Seven Letters Down', url: '/audio/Seven_Letters_Down.mp3' },
+    { id: 'steps_clarity', name: 'Steps Toward Clarity', url: '/audio/Steps_Toward_Clarity.mp3' },
+    { id: 'sunlight_cedar', name: 'Sunlight on Cedar', url: '/audio/Sunlight_on_Cedar.mp3' },
+    { id: 'last_answer', name: 'The Last Answer', url: '/audio/The_Last_Answer.mp3' },
+    { id: 'last_pendulum', name: 'The Last Pendulum', url: '/audio/The_Last_Pendulum.mp3' },
+    { id: 'library_storm', name: 'The Library Storm', url: '/audio/The_Library_Storm.mp3' },
+    { id: 'longest_min', name: 'The Longest Minute', url: '/audio/The_Longest_Minute.mp3' },
+    { id: 'weightless_page', name: 'The Weightless Page', url: '/audio/The_Weightless_Page.mp3' },
+    { id: 'ticking_margin', name: 'Ticking Margin', url: '/audio/Ticking_Margin.mp3' },
+    { id: 'tiptoe_still', name: 'Tiptoe into Stillness', url: '/audio/Tiptoe_into_Stillness.mp3' },
+    { id: 'twelve_stories', name: 'Twelve Stories Above', url: '/audio/Twelve_Stories_Above.mp3' }
+];
+
+const VIDEO_OPTIONS = [
+    { id: 'v1', name: 'High-Tech Digital', url: '/videos/A_high_tech_digital_quiz_backg.mp4' },
+    { id: 'v2', name: 'Abstract Minimalist', url: '/videos/A_seamless_slow_moving_abstra.mp4' },
+    { id: 'v3', name: 'Gold & White', url: '/videos/Slow_elegant_gold_and_white_g.mp4' },
+    { id: 'v4', name: 'Gold & White (Alt)', url: '/videos/Slow_elegant_gold_and_white_g (1).mp4' },
+    { id: 'v5', name: 'Modern TV Studio', url: '/videos/Wide_shot_of_an_empty_modern.mp4' }
+];
+
+const CONFETTI_CONFIG = {
+    spread: 360,           // Spread in all directions
+    elementCount: 120,     // Reduced to prevent stuttering
+    duration: 4000,        // Slightly shorter duration for smooth finish
+    startVelocity: 60,     // Adjusted for better spread with fewer elements
+    colors: ['#34A853', '#FABB05', '#4285F4', '#EA4335', '#f43f5e', '#a78bfa', '#fb923c']
+};
+
+import 'katex/dist/katex.min.css';
+import { X, ChevronLeft, ChevronRight, Play, Pause, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize, LayoutGrid, Sun, Moon, Eraser, Square, Circle, ArrowUpRight, Type, Presentation, ZoomIn, Volume2, VolumeX, MonitorPlay, Lightbulb, MessageCircle, Stamp, Droplet, Music, AlignLeft, Keyboard, Printer, Trophy, Globe, BarChart2, Sparkles, ImageDown, FileDown } from 'lucide-react';
+
+const bnOptionsMap: Record<string, string> = {
+    a: 'ক',
+    b: 'খ',
+    c: 'গ',
+    d: 'ঘ',
+    e: 'ঙ'
+};
+
+const bnNumbersMap: Record<number, string> = {
+    0: '০', 1: '১', 2: '২', 3: '৩', 4: '৪',
+    5: '৫', 6: '৬', 7: '৭', 8: '৮', 9: '৯'
+};
+
+const toBanglaNumber = (n: number): string =>
+    String(n).split('').map(d => bnNumbersMap[parseInt(d)] ?? d).join('');
+
+const UI_LABELS = {
+    bn: {
+        settings: 'সেটিংস',
+        close: 'বন্ধ',
+        leaderboard: 'লিডারবোর্ড',
+        score: 'স্কোর',
+        correct: 'সঠিক',
+        wrong: 'ভুল',
+        unanswered: 'উত্তরহীন',
+        sessionScore: 'সেশন স্কোর',
+        transition: 'ট্রানজিশন',
+        layout: 'লেআউট',
+        zoomReset: 'জুম রিসেট',
+        language: 'ভাষা',
+        finalScore: 'চূড়ান্ত ফলাফল',
+        topScorers: 'শীর্ষ স্কোরার',
+        page: 'পাতা',
+        countdown: 'কাউন্টডাউন',
+    },
+    en: {
+        settings: 'Settings',
+        close: 'Close',
+        leaderboard: 'Leaderboard',
+        score: 'Score',
+        correct: 'Correct',
+        wrong: 'Wrong',
+        unanswered: 'Unanswered',
+        sessionScore: 'Session Score',
+        transition: 'Transition',
+        layout: 'Layout',
+        zoomReset: 'Reset Zoom',
+        language: 'Language',
+        finalScore: 'Final Results',
+        topScorers: 'Top Scorers',
+        page: 'Page',
+        countdown: 'Countdown',
+    }
+} as const;
+
+type UiLang = 'bn' | 'en';
+
+const enOptionsMap: Record<string, string> = {
+    'ক': 'A', 'খ': 'B', 'গ': 'C', 'ঘ': 'D', 'ঙ': 'E',
+    '০': '0', '১': '1', '২': '2', '৩': '3', '৪': '4',
+    '৫': '5', '৬': '6', '৭': '7', '৮': '8', '৯': '9'
+};
+
+const getOptionLabel = (key: string, lang: UiLang): string => {
+    const k = (key || '').toLowerCase();
+    if (lang === 'bn') {
+        return bnOptionsMap[k] || bnNumbersMap[parseInt(k)] || key;
+    } else {
+        return enOptionsMap[key] || enOptionsMap[k] || k.toUpperCase();
+    }
+};
+
+const CELEBRATION_PRAISES = [
+    {
+        titleBn: 'চমৎকার উত্তর! 🎯',
+        titleEn: 'BRILLIANT ANSWER! 🎯',
+        subtitleBn: 'অসাধারণ নির্ভুলতা! একদম নিখুঁত উত্তর',
+        subtitleEn: 'Outstanding precision! Perfectly spot on',
+        emojiLeft: '🎯',
+        emojiRight: '✨',
+        gradient: 'from-amber-500 via-emerald-400 to-teal-500',
+        textGradient: 'from-emerald-600 via-teal-500 to-cyan-600 dark:from-emerald-400 dark:via-teal-300 dark:to-cyan-400',
+        glow: 'rgba(16, 185, 129, 0.45)'
+    },
+    {
+        titleBn: 'অসাধারণ পারফরম্যান্স! 🌟',
+        titleEn: 'OUTSTANDING PERFORMANCE! 🌟',
+        subtitleBn: 'দারুণ প্রস্তুতি! আপনার মেধা প্রশংসনীয়',
+        subtitleEn: 'Incredible sharpness! Keep up this great momentum',
+        emojiLeft: '🌟',
+        emojiRight: '🏆',
+        gradient: 'from-yellow-400 via-amber-500 to-orange-500',
+        textGradient: 'from-amber-600 via-orange-500 to-yellow-500 dark:from-yellow-300 dark:via-amber-400 dark:to-orange-400',
+        glow: 'rgba(245, 158, 11, 0.45)'
+    },
+    {
+        titleBn: 'একদম সঠিক! ১০০% পারফেক্ট! 💯',
+        titleEn: 'SPOT ON! 100% PERFECT! 💯',
+        subtitleBn: 'একদম নিখুঁত সমাধান! সাবাশ!',
+        subtitleEn: '100% Correct! Pure excellence in action',
+        emojiLeft: '💯',
+        emojiRight: '🔥',
+        gradient: 'from-rose-500 via-pink-500 to-violet-500',
+        textGradient: 'from-rose-600 via-pink-500 to-purple-600 dark:from-rose-400 dark:via-pink-300 dark:to-purple-300',
+        glow: 'rgba(244, 63, 94, 0.45)'
+    },
+    {
+        titleBn: 'তুখোড় মেধা! সুপার্ব! 🚀',
+        titleEn: 'MIND-BLOWING! SUPERB! 🚀',
+        subtitleBn: 'অবিশ্বাস্য গতি ও নিখুঁত জ্ঞান!',
+        subtitleEn: 'Incredible mastery and quick thinking!',
+        emojiLeft: '🚀',
+        emojiRight: '⚡',
+        gradient: 'from-blue-500 via-indigo-500 to-purple-500',
+        textGradient: 'from-blue-600 via-indigo-600 to-purple-600 dark:from-blue-400 dark:via-indigo-300 dark:to-purple-300',
+        glow: 'rgba(99, 102, 241, 0.45)'
+    },
+    {
+        titleBn: 'দারুণ উত্তর! চ্যাম্পিয়ন! 🏆',
+        titleEn: 'CHAMPION MOVE! 🏆',
+        subtitleBn: 'বিজয়ীর মতো সঠিক উত্তর দিয়েছেন!',
+        subtitleEn: 'A champion-tier answer! Truly commendable',
+        emojiLeft: '🏆',
+        emojiRight: '🎉',
+        gradient: 'from-amber-400 via-yellow-400 to-emerald-400',
+        textGradient: 'from-amber-500 via-orange-500 to-emerald-600 dark:from-amber-300 dark:via-yellow-300 dark:to-emerald-400',
+        glow: 'rgba(234, 179, 8, 0.5)'
+    },
+    {
+        titleBn: 'সাবাশ! এগিয়ে যাও! 👏',
+        titleEn: 'BRAVO! KEEP IT UP! 👏',
+        subtitleBn: 'ধারাবাহিক প্রচেষ্টা আপনাকে শীর্ষে নিয়ে যাবে',
+        subtitleEn: 'Consistent excellence leads to victory',
+        emojiLeft: '👏',
+        emojiRight: '💫',
+        gradient: 'from-teal-400 via-cyan-500 to-blue-500',
+        textGradient: 'from-teal-600 via-cyan-600 to-blue-600 dark:from-teal-300 dark:via-cyan-300 dark:to-blue-300',
+        glow: 'rgba(6, 182, 212, 0.45)'
+    },
+    {
+        titleBn: 'পারফেক্ট শট! অসাধারণ! ⚡',
+        titleEn: 'PERFECT SHOT! GENIUS! ⚡',
+        subtitleBn: 'অনবদ্য টাইমিং ও নির্ভুল জ্ঞান!',
+        subtitleEn: 'Impeccable timing and supreme accuracy!',
+        emojiLeft: '⚡',
+        emojiRight: '💥',
+        gradient: 'from-violet-500 via-purple-500 to-pink-500',
+        textGradient: 'from-violet-600 via-purple-600 to-pink-600 dark:from-violet-300 dark:via-purple-300 dark:to-pink-300',
+        glow: 'rgba(168, 85, 247, 0.45)'
+    }
+];
+
+// Confetti piece types: rect=rectangle, square=square, circle=round dot, ribbon=long strip
+const CONFETTI_COLORS = ['#f43f5e', '#fb923c', '#facc15', '#4ade80', '#34d399', '#38bdf8', '#818cf8', '#e879f9', '#f472b6', '#a78bfa', '#2dd4bf', '#fbbf24'];
+const CELEBRATION_PARTICLES: { left: string; top: string; delay: number; color: string; w: number; h: number; shape: 'rect' | 'square' | 'circle' | 'ribbon'; rot: number }[] = [
+    // Top row
+    { left: '3%', top: '4%', delay: 0.03, color: '#f43f5e', w: 12, h: 7, shape: 'rect', rot: -30 },
+    { left: '10%', top: '2%', delay: 0.07, color: '#facc15', w: 9, h: 9, shape: 'square', rot: 20 },
+    { left: '18%', top: '6%', delay: 0.05, color: '#34d399', w: 14, h: 6, shape: 'rect', rot: 45 },
+    { left: '27%', top: '3%', delay: 0.10, color: '#38bdf8', w: 8, h: 8, shape: 'circle', rot: 0 },
+    { left: '35%', top: '7%', delay: 0.06, color: '#e879f9', w: 16, h: 5, shape: 'ribbon', rot: -15 },
+    { left: '44%', top: '2%', delay: 0.12, color: '#fb923c', w: 10, h: 10, shape: 'square', rot: 35 },
+    { left: '53%', top: '5%', delay: 0.08, color: '#818cf8', w: 13, h: 6, shape: 'rect', rot: -50 },
+    { left: '62%', top: '3%', delay: 0.11, color: '#4ade80', w: 8, h: 8, shape: 'circle', rot: 0 },
+    { left: '71%', top: '6%', delay: 0.04, color: '#f472b6', w: 11, h: 5, shape: 'rect', rot: 25 },
+    { left: '80%', top: '2%', delay: 0.09, color: '#fbbf24', w: 9, h: 9, shape: 'square', rot: -40 },
+    { left: '89%', top: '5%', delay: 0.06, color: '#2dd4bf', w: 15, h: 5, shape: 'ribbon', rot: 10 },
+    { left: '95%', top: '3%', delay: 0.13, color: '#f43f5e', w: 8, h: 8, shape: 'circle', rot: 0 },
+
+    // Upper-mid row
+    { left: '1%', top: '18%', delay: 0.14, color: '#38bdf8', w: 12, h: 6, shape: 'rect', rot: 55 },
+    { left: '8%', top: '22%', delay: 0.18, color: '#e879f9', w: 9, h: 9, shape: 'square', rot: -25 },
+    { left: '16%', top: '16%', delay: 0.11, color: '#facc15', w: 7, h: 7, shape: 'circle', rot: 0 },
+    { left: '24%', top: '24%', delay: 0.20, color: '#f43f5e', w: 18, h: 5, shape: 'ribbon', rot: -35 },
+    { left: '33%', top: '19%', delay: 0.16, color: '#34d399', w: 11, h: 7, shape: 'rect', rot: 40 },
+    { left: '42%', top: '23%', delay: 0.13, color: '#818cf8', w: 8, h: 8, shape: 'square', rot: 15 },
+    { left: '51%', top: '17%', delay: 0.19, color: '#fb923c', w: 9, h: 9, shape: 'circle', rot: 0 },
+    { left: '60%', top: '25%', delay: 0.15, color: '#2dd4bf', w: 14, h: 5, shape: 'ribbon', rot: 60 },
+    { left: '69%', top: '20%', delay: 0.22, color: '#f472b6', w: 12, h: 7, shape: 'rect', rot: -20 },
+    { left: '78%', top: '17%', delay: 0.10, color: '#4ade80', w: 8, h: 8, shape: 'square', rot: 30 },
+    { left: '87%', top: '22%', delay: 0.17, color: '#fbbf24', w: 7, h: 7, shape: 'circle', rot: 0 },
+    { left: '94%', top: '19%', delay: 0.21, color: '#f43f5e', w: 16, h: 5, shape: 'ribbon', rot: -45 },
+
+    // Left side
+    { left: '2%', top: '36%', delay: 0.16, color: '#818cf8', w: 11, h: 6, shape: 'rect', rot: 70 },
+    { left: '5%', top: '50%', delay: 0.24, color: '#facc15', w: 8, h: 8, shape: 'square', rot: -55 },
+    { left: '1%', top: '63%', delay: 0.30, color: '#34d399', w: 7, h: 7, shape: 'circle', rot: 0 },
+    { left: '6%', top: '76%', delay: 0.36, color: '#38bdf8', w: 15, h: 5, shape: 'ribbon', rot: 30 },
+
+    // Right side
+    { left: '93%', top: '36%', delay: 0.14, color: '#e879f9', w: 12, h: 6, shape: 'rect', rot: -60 },
+    { left: '96%', top: '50%', delay: 0.22, color: '#fb923c', w: 8, h: 8, shape: 'square', rot: 40 },
+    { left: '92%', top: '63%', delay: 0.28, color: '#f472b6', w: 7, h: 7, shape: 'circle', rot: 0 },
+    { left: '95%', top: '76%', delay: 0.34, color: '#fbbf24', w: 16, h: 4, shape: 'ribbon', rot: -20 },
+
+    // Center scatter
+    { left: '22%', top: '40%', delay: 0.25, color: '#f43f5e', w: 10, h: 10, shape: 'square', rot: 25 },
+    { left: '32%', top: '55%', delay: 0.18, color: '#4ade80', w: 9, h: 5, shape: 'rect', rot: -40 },
+    { left: '45%', top: '43%', delay: 0.22, color: '#38bdf8', w: 7, h: 7, shape: 'circle', rot: 0 },
+    { left: '56%', top: '57%', delay: 0.20, color: '#facc15', w: 13, h: 5, shape: 'ribbon', rot: 50 },
+    { left: '67%', top: '42%', delay: 0.26, color: '#818cf8', w: 10, h: 6, shape: 'rect', rot: -30 },
+    { left: '75%', top: '56%', delay: 0.15, color: '#e879f9', w: 8, h: 8, shape: 'square', rot: 65 },
+
+    // Lower-mid row
+    { left: '4%', top: '66%', delay: 0.28, color: '#f472b6', w: 12, h: 6, shape: 'rect', rot: -15 },
+    { left: '13%', top: '70%', delay: 0.32, color: '#2dd4bf', w: 9, h: 9, shape: 'square', rot: 45 },
+    { left: '22%', top: '64%', delay: 0.26, color: '#fbbf24', w: 8, h: 8, shape: 'circle', rot: 0 },
+    { left: '31%', top: '72%', delay: 0.34, color: '#f43f5e', w: 17, h: 4, shape: 'ribbon', rot: -55 },
+    { left: '41%', top: '67%', delay: 0.30, color: '#34d399', w: 11, h: 7, shape: 'rect', rot: 35 },
+    { left: '51%', top: '73%', delay: 0.36, color: '#818cf8', w: 8, h: 8, shape: 'square', rot: -20 },
+    { left: '61%', top: '66%', delay: 0.24, color: '#fb923c', w: 7, h: 7, shape: 'circle', rot: 0 },
+    { left: '71%', top: '71%', delay: 0.32, color: '#38bdf8', w: 14, h: 5, shape: 'ribbon', rot: 25 },
+    { left: '81%', top: '65%', delay: 0.28, color: '#e879f9', w: 10, h: 6, shape: 'rect', rot: -70 },
+    { left: '90%', top: '70%', delay: 0.38, color: '#4ade80', w: 9, h: 9, shape: 'square', rot: 50 },
+
+    // Bottom row
+    { left: '2%', top: '83%', delay: 0.34, color: '#facc15', w: 11, h: 6, shape: 'rect', rot: 20 },
+    { left: '11%', top: '87%', delay: 0.28, color: '#f43f5e', w: 8, h: 8, shape: 'circle', rot: 0 },
+    { left: '20%', top: '82%', delay: 0.38, color: '#2dd4bf', w: 15, h: 5, shape: 'ribbon', rot: -40 },
+    { left: '30%', top: '89%', delay: 0.32, color: '#818cf8', w: 9, h: 9, shape: 'square', rot: 60 },
+    { left: '40%', top: '84%', delay: 0.40, color: '#fb923c', w: 12, h: 6, shape: 'rect', rot: -25 },
+    { left: '50%', top: '88%', delay: 0.36, color: '#4ade80', w: 7, h: 7, shape: 'circle', rot: 0 },
+    { left: '60%', top: '83%', delay: 0.30, color: '#f472b6', w: 16, h: 4, shape: 'ribbon', rot: 35 },
+    { left: '70%', top: '89%', delay: 0.42, color: '#fbbf24', w: 10, h: 10, shape: 'square', rot: -50 },
+    { left: '80%', top: '84%', delay: 0.34, color: '#38bdf8', w: 12, h: 5, shape: 'rect', rot: 45 },
+    { left: '90%', top: '87%', delay: 0.38, color: '#e879f9', w: 8, h: 8, shape: 'circle', rot: 0 },
+];
+
+type TransitionType = 'slide' | 'zoom' | 'flip' | 'fade' | 'bounce';
+type LayoutTemplate = 'default' | 'fullscreen_q' | 'split' | 'minimal' | 'card';
+
+const TRANSITION_VARIANTS: Record<TransitionType, { initial: any; exit: any }> = {
+    slide: { initial: { x: 60, opacity: 0 }, exit: { x: -60, opacity: 0 } },
+    zoom: { initial: { scale: 0.85, opacity: 0 }, exit: { scale: 1.1, opacity: 0 } },
+    flip: { initial: { rotateY: 90, opacity: 0 }, exit: { rotateY: -90, opacity: 0 } },
+    fade: { initial: { opacity: 0 }, exit: { opacity: 0 } },
+    bounce: { initial: { y: -50, opacity: 0 }, exit: { y: 50, opacity: 0 } },
+};
+
+const remarkPluginsList = [remarkGfm, remarkMath];
+const rehypePluginsList = [rehypeKatex, rehypeRaw];
+
+const getWatermarkSvg = (spacing: number, size: number, opacity: number, text: string, dark: boolean) => {
+    const cleanText = text.trim();
+    let textElements = '';
+    const saffron = dark ? '#FFA057' : '#FF671F';
+    const green = dark ? '#22C55E' : '#046A38';
+    const effectiveOpacity = opacity > 0 ? Math.max(opacity, dark ? 0.27 : 0.23) : 0;
+
+    if (cleanText.toUpperCase() === 'DESHEXAM') {
+        textElements = `<tspan fill="${saffron}" fill-opacity="${effectiveOpacity}">DESH</tspan><tspan dx="4" fill="${green}" fill-opacity="${effectiveOpacity}">EXAM</tspan>`;
+    } else if (cleanText.toUpperCase() === 'DESH EXAM') {
+        textElements = `<tspan fill="${saffron}" fill-opacity="${effectiveOpacity}">DESH</tspan><tspan dx="4" fill="${green}" fill-opacity="${effectiveOpacity}">EXAM</tspan>`;
+    } else {
+        const words = cleanText.split(/\s+/);
+        if (words.length >= 2) {
+            textElements = `<tspan fill="${saffron}" fill-opacity="${effectiveOpacity}">${words[0]} </tspan><tspan fill="${green}" fill-opacity="${effectiveOpacity}">${words.slice(1).join(' ')}</tspan>`;
+        } else {
+            textElements = `<tspan fill="${saffron}" fill-opacity="${effectiveOpacity}">${cleanText}</tspan>`;
+        }
+    }
+
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${spacing}" height="${spacing}"><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="${size}" font-family="sans-serif" font-weight="900" transform="rotate(-35 ${spacing / 2} ${spacing / 2})">${textElements}</text></svg>`;
+    return `url("data:image/svg+xml;utf8,${encodeURIComponent(svg)}")`;
+};
+
+const MetallicScrew = ({ rotation = 0, className = '' }: { rotation?: number; className?: string }) => (
+    <div
+        className={`relative w-4 h-4 md:w-5 md:h-5 rounded-full shrink-0 ${className}`}
+        style={{
+            background: 'radial-gradient(circle at 35% 35%, #ffffff 0%, #cbd5e1 28%, #94a3b8 62%, #64748b 85%, #334155 100%)',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.32), inset 0 1px 1px rgba(255,255,255,0.85), inset 0 -1px 1px rgba(0,0,0,0.45)',
+            border: '1px solid rgba(71, 85, 105, 0.45)'
+        }}
+    >
+        {/* Inner concentric ring */}
+        <div className="absolute inset-[1.5px] rounded-full border border-white/50 pointer-events-none" />
+
+        {/* Screw head Phillips cross slot */}
+        <div
+            className="absolute inset-0 flex items-center justify-center pointer-events-none"
+            style={{ transform: `rotate(${rotation}deg)` }}
+        >
+            {/* Horizontal slot */}
+            <div
+                className="absolute bg-slate-700/90 rounded-[0.5px] shadow-[inset_0_0.5px_1px_rgba(0,0,0,0.9)]"
+                style={{ width: '56%', height: '2px' }}
+            />
+            {/* Vertical slot */}
+            <div
+                className="absolute bg-slate-700/90 rounded-[0.5px] shadow-[inset_0_0.5px_1px_rgba(0,0,0,0.9)]"
+                style={{ height: '56%', width: '2px' }}
+            />
+            {/* Center dimple */}
+            <div className="w-1 h-1 rounded-full bg-slate-900 shadow-inner" />
+        </div>
+
+        {/* Specular gleam */}
+        <div className="absolute top-[1.5px] left-[1.5px] w-1.5 h-1.5 rounded-full bg-white/80 blur-[0.3px] pointer-events-none" />
+    </div>
+);
+
+interface PresentationOverlayProps {
+    questions: any[];
+    classLine: string;
+    chapterName?: string;
+    topicName?: string;
+    autoStart?: boolean;
+    onClose?: () => void;
+    isPremiumUser?: boolean;
+    testLanguage?: string;
+}
+
+const SevenSegmentDigit = ({ digit, style }: { digit: string, style?: React.CSSProperties }) => {
+    const s = {
+        '0': [1, 1, 1, 1, 1, 1, 0],
+        '1': [0, 1, 1, 0, 0, 0, 0],
+        '2': [1, 1, 0, 1, 1, 0, 1],
+        '3': [1, 1, 1, 1, 0, 0, 1],
+        '4': [0, 1, 1, 0, 0, 1, 1],
+        '5': [1, 0, 1, 1, 0, 1, 1],
+        '6': [1, 0, 1, 1, 1, 1, 1],
+        '7': [1, 1, 1, 0, 0, 0, 0],
+        '8': [1, 1, 1, 1, 1, 1, 1],
+        '9': [1, 1, 1, 1, 0, 1, 1],
+    }[digit] || [0, 0, 0, 0, 0, 0, 0];
+
+    const act = "#ff1515";
+    const inact = "#300a0a";
+
+    return (
+        <svg viewBox="0 0 54 96" className="w-[0.6em] h-[1.5em] inline-block -skew-x-[6deg]" style={{ filter: 'drop-shadow(0 0 3px rgba(255,0,0,0.4))', ...style }}>
+            <polygon points="10,5 44,5 39,13 15,13" fill={s[0] ? act : inact} />
+            <polygon points="46,7 51,12 51,44 46,40 40,35 40,12" fill={s[1] ? act : inact} />
+            <polygon points="46,55 51,52 51,88 46,91 40,86 40,60" fill={s[2] ? act : inact} />
+            <polygon points="10,93 44,93 39,85 15,85" fill={s[3] ? act : inact} />
+            <polygon points="8,55 3,52 3,88 8,91 14,86 14,60" fill={s[4] ? act : inact} />
+            <polygon points="8,7 3,12 3,44 8,40 14,35 14,12" fill={s[5] ? act : inact} />
+            <polygon points="10,48 15,44 39,44 44,48 39,52 15,52" fill={s[6] ? act : inact} />
+        </svg>
+    );
+};
+
+const SevenSegmentColon = () => {
+    return (
+        <svg viewBox="0 0 20 96" className="w-[0.3em] h-[1.5em] inline-block -skew-x-[6deg]" style={{ filter: 'drop-shadow(0 0 3px rgba(255,0,0,0.4))' }}>
+            <circle cx="10" cy="34" r="5" fill="#ff1515" />
+            <circle cx="10" cy="62" r="5" fill="#ff1515" />
+        </svg>
+    );
+};
+
+export default function PresentationOverlay({ questions, classLine, chapterName, topicName, autoStart, onClose, isPremiumUser, testLanguage }: PresentationOverlayProps) {
+    const { user, userProfile } = useAuth();
+    const [fetchedIsAdmin, setFetchedIsAdmin] = useState(false);
+
+    useEffect(() => {
+        if (user?.uid) {
+            getUserProfile(user.uid).then(p => {
+                if (p?.role === 'admin' || p?.isAdmin === true) {
+                    setFetchedIsAdmin(true);
+                }
+            }).catch(console.error);
+        }
+    }, [user?.uid]);
+
+    const isAdmin = fetchedIsAdmin || userProfile?.role === 'admin' || userProfile?.isAdmin === true;
+    const canUsePremium = isPremiumUser || isAdmin || userProfile?.subscriptionPlan === 'pro' || userProfile?.subscriptionPlan === 'pass';
+
+    const [isOpen, setIsOpen] = useState(autoStart === true);
+
+    useEffect(() => {
+        if (autoStart) {
+            setIsOpen(true);
+        }
+    }, [autoStart]);
+
+    const [currentSlide, setCurrentSlide] = useState(0);
+    const [step, setStep] = useState(0); // 0: Question, 1: Show Answer, 2: Show Explanation
+    const [qFontScale, setQFontScale] = useState(1);
+    const [optFontScale, setOptFontScale] = useState(1);
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+    const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+    const [isNavigatorOpen, setIsNavigatorOpen] = useState(false);
+    const activeSlideBtnRef = useRef<HTMLButtonElement>(null);
+    const [isDarkMode, setIsDarkMode] = useState(false);
+    const [mode, setMode] = useState<'test' | 'read'>('test');
+    const [selectedOption, setSelectedOption] = useState<string | null>(null);
+    const [isTimerEnabled, setIsTimerEnabled] = useState(true);
+    const [timerSeconds, setTimerSeconds] = useState(0);
+    const [totalExamTimeElapsed, setTotalExamTimeElapsed] = useState(0);
+    const [wmText, setWmText] = useState('DESHEXAM');
+    const [wmOpacity, setWmOpacity] = useState(0.10);
+    const [wmSize, setWmSize] = useState(13);
+    const [wmSpacing, setWmSpacing] = useState(80);
+    const [wmVisible, setWmVisible] = useState(true);
+
+    // ── Feature 7: Multi-language UI ──────────────────────────────────────────
+    const [uiLang, setUiLang] = useState<UiLang>(() => {
+        const lang = testLanguage?.toLowerCase() || '';
+        if (lang === 'english' || lang === 'en') {
+            return 'en';
+        }
+        return 'bn';
+    });
+    
+    useEffect(() => {
+        if (testLanguage) {
+            const lang = testLanguage.toLowerCase();
+            if (lang === 'english' || lang === 'en') {
+                setUiLang('en');
+            } else {
+                setUiLang('bn');
+            }
+        }
+    }, [testLanguage]);
+
+    const L = UI_LABELS[uiLang];
+
+    // ── Feature 1: Slide Transition ──────────────────────────────────────────
+    const [transitionType, setTransitionType] = useState<TransitionType>('slide');
+
+    // ── Feature 5: Layout Template ───────────────────────────────────────────
+    const [layoutTemplate, setLayoutTemplate] = useState<LayoutTemplate>('default');
+
+    // ── Feature 2: Circular Countdown Timer ──────────────────────────────────
+    const [timerMode, setTimerMode] = useState<'stopwatch' | 'countdown'>('stopwatch');
+    const [countdownTotal, setCountdownTotal] = useState(30);
+
+
+
+    // ── Feature 4: Zoom/Pan ──────────────────────────────────────────────────
+    const [contentZoom, setContentZoom] = useState(1);
+    const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
+    const isPanningRef = useRef(false);
+    const panStartRef = useRef({ x: 0, y: 0, ox: 0, oy: 0 });
+    const lastTouchDistRef = useRef<number | null>(null);
+
+    // ── Feature 8: Session Score + Firebase Leaderboard ──────────────────────
+    const [sessionScore, setSessionScore] = useState({ correct: 0, wrong: 0, skipped: 0 });
+    const [isScoreVisible, setIsScoreVisible] = useState(false);
+    const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
+    const [leaderboardData, setLeaderboardData] = useState<any[]>([]);
+    const [leaderboardLoading, setLeaderboardLoading] = useState(false);
+    const [isFinalScoreOpen, setIsFinalScoreOpen] = useState(false);
+    const answeredSlidesRef = useRef<Set<number>>(new Set());
+    const [userDisplayName, setUserDisplayName] = useState<string>('You');
+    const [optionsLayout, setOptionsLayout] = useState<'grid' | 'list'>('grid');
+    const [isFullscreen, setIsFullscreen] = useState(false);
+
+    const [isExpEnabled, setIsExpEnabled] = useState(false);
+    const [isOptionExpEnabled, setIsOptionExpEnabled] = useState(false);
+    const [expFontScale, setExpFontScale] = useState(1);
+
+    const [timerPos, setTimerPos] = useState({ x: 0, y: 0 });
+    const [isDraggingTimer, setIsDraggingTimer] = useState(false);
+    const dragStartPos = useRef({ x: 0, y: 0 });
+
+    // Pen Tool State
+    const [isPenActive, setIsPenActive] = useState(false);
+    const [penColor, setPenColor] = useState('#ef4444');
+    const [penSize, setPenSize] = useState(2);
+
+    // Drawing Tool State
+    const [drawingTool, setDrawingTool] = useState<'pen' | 'highlighter' | 'laser' | 'eraser' | 'rectangle' | 'circle' | 'arrow' | 'text' | 'magnifier'>('pen');
+    const [isMagnified, setIsMagnified] = useState(false);
+    const [magnifierPos, setMagnifierPos] = useState({ x: 50, y: 50 });
+    const [isSpeaking, setIsSpeaking] = useState(false);
+    const [isWhiteboardMode, setIsWhiteboardMode] = useState(false);
+    const [isAutoPlayReadAloud, setIsAutoPlayReadAloud] = useState(false);
+    const [textInput, setTextInput] = useState<{ x: number, y: number, text: string } | null>(null);
+    const textInputRef = useRef<HTMLTextAreaElement>(null);
+    const cursorRef = useRef<HTMLDivElement>(null);
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const lofiAudioRef = useRef<HTMLAudioElement>(null);
+    const popAudioRef = useRef<HTMLAudioElement>(null);
+    const wowAudioRef = useRef<HTMLAudioElement>(null);
+    const winAudioRef = useRef<HTMLAudioElement>(null);
+    const slideRef = useRef<HTMLDivElement>(null);
+    const [isSavingImage, setIsSavingImage] = useState(false);
+    const [downloadAllSlides, setDownloadAllSlides] = useState(false);
+    const [saveWithCorrectOption, setSaveWithCorrectOption] = useState(false);
+
+    const [virtualCursor, setVirtualCursor] = useState<{
+        visible: boolean;
+        x: number;
+        y: number;
+        isClicking: boolean;
+    }>({
+        visible: false,
+        x: 0,
+        y: 0,
+        isClicking: false
+    });
+
+    const [showCelebration, setShowCelebration] = useState(false);
+    const [isCelebrationEnabled, setIsCelebrationEnabled] = useState(true);
+    const [isCelebrationSoundEnabled, setIsCelebrationSoundEnabled] = useState(true);
+    const [celebrationDuration, setCelebrationDuration] = useState(5);
+    const [isAutoChangeQuestion, setIsAutoChangeQuestion] = useState(true);
+    const [autoChangeDelay, setAutoChangeDelay] = useState(5);
+    const [currentPraise, setCurrentPraise] = useState(CELEBRATION_PRAISES[0]);
+    const praiseIdxRef = useRef(0);
+
+    const triggerCelebration = useCallback((consecutiveCount: number) => {
+        if (!isCelebrationEnabled) return;
+        // Only show celebration card every 10 consecutive correct answers
+        if (consecutiveCount === 0 || consecutiveCount % 10 !== 0) return;
+
+        const nextPraise = CELEBRATION_PRAISES[praiseIdxRef.current % CELEBRATION_PRAISES.length];
+        praiseIdxRef.current += 1;
+        setCurrentPraise(nextPraise);
+
+        setShowCelebration(true);
+
+        // --- Realistic Fireworks with canvas-confetti ---
+        const duration = 5 * 1000;
+        const animationEnd = Date.now() + duration;
+        const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 99999 };
+
+        function randomInRange(min: number, max: number) {
+            return Math.random() * (max - min) + min;
+        }
+
+        const interval: any = setInterval(function () {
+            const timeLeft = animationEnd - Date.now();
+
+            if (timeLeft <= 0) {
+                return clearInterval(interval);
+            }
+
+            const particleCount = 50 * (timeLeft / duration);
+            // Fire from two sides of the screen
+            canvasConfetti(Object.assign({}, defaults, {
+                particleCount,
+                origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
+            }));
+            canvasConfetti(Object.assign({}, defaults, {
+                particleCount,
+                origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
+            }));
+        }, 250);
+        // ------------------------------------------------
+
+        if (isCelebrationSoundEnabled) {
+            if (winAudioRef.current) {
+                winAudioRef.current.currentTime = 0;
+                winAudioRef.current.play().catch(console.warn);
+            } else if (wowAudioRef.current) {
+                wowAudioRef.current.currentTime = 0;
+                wowAudioRef.current.play().catch(console.warn);
+            }
+        }
+
+        setTimeout(() => {
+            setShowCelebration(false);
+        }, celebrationDuration * 1000);
+    }, [isCelebrationEnabled, isCelebrationSoundEnabled, celebrationDuration]);
+
+    const [isConfettiActive, setIsConfettiActive] = useState(false);
+    const [isLofiEnabled, setIsLofiEnabled] = useState(false);
+    const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
+    const [eliminatedOptions, setEliminatedOptions] = useState<string[]>([]);
+    const [showHeader, setShowHeader] = useState(true);
+    const [showLogo, setShowLogo] = useState(true);
+    const [headerScale, setHeaderScale] = useState(0.9);
+    const [headerTitleScale, setHeaderTitleScale] = useState(0.9);
+    const [headerTitleAlign, setHeaderTitleAlign] = useState<'left' | 'center' | 'right'>('left');
+    const [selectedMusic, setSelectedMusic] = useState(MUSIC_OPTIONS[0].url);
+    const [musicVolume, setMusicVolume] = useState(0.5);
+    const [consecutiveCorrect, setConsecutiveCorrect] = useState(0);
+    const [bgTheme, setBgTheme] = useState<'default' | 'mesh' | 'grid' | 'dots' | 'video' | 'midnight' | 'aurora' | 'sunset'>('dots');
+    const [selectedVideo, setSelectedVideo] = useState(VIDEO_OPTIONS[0].url);
+    const [videoOpacity, setVideoOpacity] = useState(40);
+    const [bgOpacity, setBgOpacity] = useState(100);
+    const [qBgColor, setQBgColor] = useState('bg-white dark:bg-gray-800');
+    const [qTextColor, setQTextColor] = useState('default');
+    const [animSpeed, setAnimSpeed] = useState(0.1);
+    const [isPrintWithAnswers, setIsPrintWithAnswers] = useState(true);
+    const [isPrintAsList, setIsPrintAsList] = useState(false);
+    const [isPrintBothVersions, setIsPrintBothVersions] = useState(false);
+
+    const taxonomyString = [chapterName, topicName].filter(Boolean).join(' | ');
+    let displayTitle = classLine;
+    let displayTaxonomy = taxonomyString;
+
+    if (taxonomyString && classLine.includes(taxonomyString)) {
+        displayTitle = classLine.replace(taxonomyString, '').replace(/^[-|\s]+/, '').replace(/[-|\s]+$/, '').trim();
+        if (!displayTitle) {
+            displayTitle = taxonomyString;
+            displayTaxonomy = '';
+        }
+    }
+
+    const getBgThemeClasses = () => {
+        switch (bgTheme) {
+            case 'mesh': return 'bg-indigo-50 dark:bg-indigo-950';
+            case 'grid': return 'bg-[#f8fafc] dark:bg-gray-900';
+            case 'dots': return 'bg-[#f8fafc] dark:bg-gray-900';
+            case 'video': return 'bg-black/90 text-white';
+            case 'midnight': return 'bg-slate-950 text-white';
+            case 'aurora': return 'bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#022c22] text-white';
+            case 'sunset': return 'bg-gradient-to-br from-[#4c1d95] via-[#9f1239] to-[#fb923c] text-white';
+            default: return 'bg-slate-50 dark:bg-slate-950';
+        }
+    };
+
+    const getBgThemeOverlayClasses = () => {
+        switch (bgTheme) {
+            case 'mesh': return 'bg-gradient-to-br from-indigo-100 via-purple-50 to-teal-100 dark:from-indigo-950 dark:via-purple-900 dark:to-teal-950';
+            case 'grid': return 'bg-[linear-gradient(to_right,#8080801a_1px,transparent_1px),linear-gradient(to_bottom,#8080801a_1px,transparent_1px)] bg-[size:24px_24px]';
+            case 'dots': return 'bg-[radial-gradient(#cbd5e1_1.5px,transparent_1.5px)] dark:bg-[radial-gradient(#374151_1.5px,transparent_1.5px)] [background-size:20px_20px]';
+            case 'midnight': return 'bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))]';
+            case 'video':
+            case 'aurora':
+            case 'sunset': return '';
+            default: return 'bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.25),rgba(255,255,255,0))] dark:bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.2),rgba(255,255,255,0))]';
+        }
+    };
+
+    const isAutoPlayRef = useRef(isAutoPlayReadAloud);
+    const stepRef = useRef(step);
+
+    useEffect(() => {
+        if (lofiAudioRef.current) {
+            lofiAudioRef.current.volume = musicVolume;
+        }
+    }, [musicVolume]);
+
+    useEffect(() => {
+        isAutoPlayRef.current = isAutoPlayReadAloud;
+        stepRef.current = step;
+    }, [isAutoPlayReadAloud, step]);
+
+    useEffect(() => {
+        if (textInput && textInputRef.current) {
+            textInputRef.current.focus();
+        }
+    }, [textInput]);
+
+    // ── Feature 8: Load user display name ────────────────────────────────────
+    useEffect(() => {
+        if (!user) return;
+        getUserProfile(user.uid).then((p: any) => {
+            if (p?.displayName) setUserDisplayName(p.displayName);
+            else if (user.email) setUserDisplayName((user.email as string).split('@')[0]);
+        }).catch(() => { });
+    }, [user]);
+
+
+
+    // ── Feature 4: Zoom reset on slide change ─────────────────────────────────
+    useEffect(() => {
+        setContentZoom(1);
+        setPanOffset({ x: 0, y: 0 });
+    }, [currentSlide]);
+
+    useEffect(() => {
+        if (isNavigatorOpen && activeSlideBtnRef.current) {
+            activeSlideBtnRef.current.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        }
+    }, [isNavigatorOpen]);
+
+    // ── Feature 4: Wheel zoom handler ─────────────────────────────────────────
+    const handleContentWheel = useCallback((e: React.WheelEvent<HTMLDivElement>) => {
+        if (isPenActive) return;
+        if (e.ctrlKey || e.metaKey) {
+            e.preventDefault();
+            setContentZoom(z => Math.min(3, Math.max(0.5, z - e.deltaY * 0.001)));
+        } else if (contentZoom > 1) {
+            e.preventDefault();
+            setPanOffset(p => ({ x: p.x - e.deltaX, y: p.y - e.deltaY }));
+        }
+    }, [isPenActive, contentZoom]);
+
+    // ── Feature 4: Touch pinch-to-zoom ────────────────────────────────────────
+    const handleContentTouchMove = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+        if (e.touches.length === 2) {
+            const d = Math.hypot(
+                e.touches[0].clientX - e.touches[1].clientX,
+                e.touches[0].clientY - e.touches[1].clientY
+            );
+            if (lastTouchDistRef.current !== null) {
+                const delta = d - lastTouchDistRef.current;
+                setContentZoom(z => Math.min(3, Math.max(0.5, z + delta * 0.01)));
+            }
+            lastTouchDistRef.current = d;
+        }
+    }, []);
+
+    const handleContentTouchEnd = useCallback(() => {
+        lastTouchDistRef.current = null;
+    }, []);
+
+    // ── Feature 2: Computed timer display values ──────────────────────────────
+    const timerDisplay = useMemo(() => {
+        if (timerMode === 'countdown') {
+            const remaining = Math.max(0, countdownTotal - timerSeconds);
+            return { secs: remaining, total: countdownTotal, pct: remaining / countdownTotal };
+        }
+        return { secs: timerSeconds, total: null as null, pct: null as null };
+    }, [timerMode, timerSeconds, countdownTotal]);
+
+    // ── Feature 8: Update session score ──────────────────────────────────────
+    const updateSessionScore = useCallback((slideIdx: number, isCorrect: boolean) => {
+        if (answeredSlidesRef.current.has(slideIdx)) return;
+        answeredSlidesRef.current.add(slideIdx);
+        setSessionScore(prev => ({
+            ...prev,
+            correct: prev.correct + (isCorrect ? 1 : 0),
+            wrong: prev.wrong + (isCorrect ? 0 : 1),
+        }));
+    }, []);
+
+    const triggerHumanClick = useCallback((targetKey: string, onDone?: () => void) => {
+        const optionEl = document.getElementById(`option-card-${targetKey}`);
+        if (!optionEl) {
+            setSelectedOption(targetKey);
+            setStep(1);
+            const newConsecutive = consecutiveCorrect + 1;
+            setConsecutiveCorrect(newConsecutive);
+            triggerCelebration(newConsecutive);
+            if (onDone) onDone();
+            return;
+        }
+
+        const rect = optionEl.getBoundingClientRect();
+        const targetX = rect.left + 36;
+        const targetY = rect.top + rect.height / 2;
+
+        const startX = Math.min(window.innerWidth - 80, Math.max(120, targetX + 200 + (Math.random() * 80 - 40)));
+        const startY = Math.min(window.innerHeight - 80, targetY + 150 + (Math.random() * 60 - 30));
+
+        // Mid waypoint for a natural arc feel
+        const midX = (startX + targetX) / 2 + (Math.random() * 40 - 20);
+        const midY = (startY + targetY) / 2 - 30;
+
+        setVirtualCursor({ visible: true, x: startX, y: startY, isClicking: false });
+
+        // Step 1: glide to midpoint
+        const midTimer = setTimeout(() => {
+            setVirtualCursor(prev => ({ ...prev, x: midX, y: midY }));
+        }, 60);
+
+        // Step 2: glide to target
+        const glideTimer = setTimeout(() => {
+            setVirtualCursor(prev => ({ ...prev, x: targetX, y: targetY }));
+        }, 300);
+
+        const clickTimer = setTimeout(() => {
+            setVirtualCursor(prev => ({ ...prev, isClicking: true }));
+
+            setSelectedOption(targetKey);
+            setStep(1);
+
+            const newConsecutive = consecutiveCorrect + 1;
+            setConsecutiveCorrect(newConsecutive);
+            setIsConfettiActive(true);
+            setTimeout(() => setIsConfettiActive(false), 2400);
+
+            // Trigger grand celebration with dynamic praise and victory fanfare every 10 correct
+            triggerCelebration(newConsecutive);
+
+            updateSessionScore(currentSlide, true);
+
+            setTimeout(() => {
+                setVirtualCursor({ visible: false, x: 0, y: 0, isClicking: false });
+                if (onDone) onDone();
+            }, 700);
+        }, 700);
+
+        return () => {
+            clearTimeout(midTimer);
+            clearTimeout(glideTimer);
+            clearTimeout(clickTimer);
+        };
+    }, [currentSlide, triggerCelebration, updateSessionScore, consecutiveCorrect]);
+
+    // ── Feature 8: Fetch leaderboard ──────────────────────────────────────────
+    const fetchLeaderboard = useCallback(async (assessmentId: string) => {
+        setLeaderboardLoading(true);
+        try {
+            const data = await getTopScorersForAssessment(assessmentId, 10);
+            setLeaderboardData(data);
+        } catch (e) {
+            console.error('Leaderboard fetch failed', e);
+        } finally {
+            setLeaderboardLoading(false);
+        }
+    }, []);
+
+    // ── Save as Image ─────────────────────────────────────────────────────────
+    const handleSaveAsImage = useCallback(async () => {
+        if (!slideRef.current || isSavingImage) return;
+        setIsSavingImage(true);
+
+        const originalSlide = currentSlide;
+        const originalStep = step;
+        const originalSelected = selectedOption;
+
+        const captureSlide = async (slideIdx: number) => {
+            setCurrentSlide(slideIdx);
+
+            if (saveWithCorrectOption) {
+                const q = questions[slideIdx];
+                if (q && q.correctAnswer) {
+                    setStep(1);
+                    setSelectedOption(q.correctAnswer.toLowerCase().trim());
+                } else {
+                    setStep(0);
+                    setSelectedOption(null);
+                }
+            } else {
+                setStep(0);
+                setSelectedOption(null);
+            }
+
+            // Wait for React to render the new state
+            await new Promise(r => setTimeout(r, 600));
+
+            // Patch CSSStyleSheet.prototype.cssRules so cross-origin sheets
+            // silently return [] instead of throwing SecurityError.
+            const cssSheetProto = CSSStyleSheet.prototype;
+            const origDescriptor = Object.getOwnPropertyDescriptor(cssSheetProto, 'cssRules')!;
+            Object.defineProperty(cssSheetProto, 'cssRules', {
+                configurable: true,
+                get() {
+                    try { return origDescriptor.get!.call(this); }
+                    catch { return []; }
+                },
+            });
+
+            // Suppress the Status:404 warning for data-URI SVG backgrounds
+            const origConsoleError = console.error;
+            console.error = (...args: any[]) => {
+                const msg = String(args[0] ?? '');
+                if (msg.includes('Status:404') || msg.includes('data:image/svg+xml')) return;
+                origConsoleError.apply(console, args);
+            };
+
+            try {
+                const el = slideRef.current;
+                if (!el) return;
+                const scale = 2;
+                const dataUrl = await domtoimage.toPng(el, {
+                    quality: 1,
+                    width: el.offsetWidth * scale,
+                    height: el.offsetHeight * scale,
+                    style: {
+                        transform: `scale(${scale})`,
+                        transformOrigin: 'top left',
+                        width: `${el.offsetWidth}px`,
+                        height: `${el.offsetHeight}px`,
+                    },
+                    filter: (node: Node) => {
+                        return (node as Element).tagName !== 'CANVAS';
+                    },
+                });
+                const qText = questions[slideIdx]?.questionText?.replace(/[^a-zA-Z0-9\u0980-\u09FF\s]/g, '').trim().substring(0, 50) || `slide-${slideIdx + 1}`;
+                const suffix = saveWithCorrectOption ? 'with_answer' : 'question';
+                const link = document.createElement('a');
+                link.download = `${qText}_${suffix}.png`;
+                link.href = dataUrl;
+                link.click();
+            } catch (e) {
+                origConsoleError(`Failed to save image for slide ${slideIdx + 1}:`, e);
+            } finally {
+                Object.defineProperty(cssSheetProto, 'cssRules', origDescriptor);
+                console.error = origConsoleError;
+            }
+        };
+
+        try {
+            if (downloadAllSlides) {
+                for (let i = 0; i < questions.length; i++) {
+                    await captureSlide(i);
+                }
+            } else {
+                await captureSlide(currentSlide);
+            }
+        } finally {
+            setCurrentSlide(originalSlide);
+            setStep(originalStep);
+            setSelectedOption(originalSelected);
+            setIsSavingImage(false);
+        }
+    }, [isSavingImage, currentSlide, questions, step, selectedOption, downloadAllSlides, saveWithCorrectOption]);
+
+    // ── Feature 8: Save final score to Firebase ───────────────────────────────
+    const saveFinalScore = useCallback(async () => {
+        if (!user || (sessionScore.correct + sessionScore.wrong) === 0) return;
+        const assessmentId = `presentation_${classLine.substring(0, 40)}`;
+        const scoreData = {
+            correct: sessionScore.correct,
+            wrong: sessionScore.wrong,
+            skipped: questions.length - sessionScore.correct - sessionScore.wrong,
+            score: sessionScore.correct,
+            total: questions.length,
+        };
+        await saveExamAttempt(user.uid, assessmentId, scoreData).catch(console.error);
+    }, [user, sessionScore, classLine, questions.length]);
+
+    const finalizeText = useCallback(() => {
+        if (!textInput || !textInput.text.trim()) {
+            setTextInput(null);
+            return;
+        }
+        const canvas = canvasRef.current;
+        const ctx = canvas?.getContext('2d');
+        if (ctx) {
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.globalAlpha = 1.0;
+            ctx.font = `bold ${Math.max(penSize * 3, 16)}px sans-serif`;
+            ctx.fillStyle = penColor;
+            ctx.textBaseline = 'top';
+
+            const lines = textInput.text.split('\n');
+            const lineHeight = Math.max(penSize * 3, 16) * 1.2;
+
+            lines.forEach((line, index) => {
+                ctx.fillText(line, textInput.x, textInput.y + (index * lineHeight));
+            });
+        }
+        setTextInput(null);
+    }, [textInput, penColor, penSize]);
+
+    const handleCanvasWheel = (e: React.WheelEvent<HTMLCanvasElement>) => {
+        if (scrollContainerRef.current) {
+            scrollContainerRef.current.scrollTop += e.deltaY;
+        }
+    };
+
+    // Spotlight State
+    const [isSpotlightActive, setIsSpotlightActive] = useState(false);
+    const [spotlightPos, setSpotlightPos] = useState({ x: 0, y: 0 });
+
+    // Spotlight mouse tracking
+    useEffect(() => {
+        if (!isSpotlightActive) return;
+        const handleMouseMove = (e: MouseEvent) => {
+            setSpotlightPos({ x: e.clientX, y: e.clientY });
+        };
+        window.addEventListener('mousemove', handleMouseMove);
+        return () => window.removeEventListener('mousemove', handleMouseMove);
+    }, [isSpotlightActive]);
+
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const activeCanvasRef = useRef<HTMLCanvasElement>(null);
+    const contextRef = useRef<CanvasRenderingContext2D | null>(null);
+    const isDrawing = useRef(false);
+    const currentStroke = useRef<{ x: number, y: number }[]>([]);
+
+    // Initialize Canvas
+    useEffect(() => {
+        if (!isOpen) return;
+
+        const resizeCanvas = () => {
+            const canvas = canvasRef.current;
+            const activeCanvas = activeCanvasRef.current;
+            if (!canvas) return;
+            const newWidth = canvas.offsetWidth;
+            const newHeight = canvas.offsetHeight;
+
+            // If the new dimensions are zero, don't set them, just return
+            if (newWidth === 0 || newHeight === 0) return;
+
+            if (canvas.width !== newWidth || canvas.height !== newHeight) {
+                canvas.width = newWidth;
+                canvas.height = newHeight;
+                const context = canvas.getContext('2d');
+                if (context) {
+                    context.lineCap = 'round';
+                    context.lineJoin = 'round';
+                    contextRef.current = context;
+                }
+            }
+
+            if (activeCanvas && (activeCanvas.width !== newWidth || activeCanvas.height !== newHeight)) {
+                activeCanvas.width = newWidth;
+                activeCanvas.height = newHeight;
+            }
+        };
+
+        // Call multiple times to ensure we catch the final size after any CSS transitions
+        resizeCanvas();
+        const t1 = setTimeout(resizeCanvas, 100);
+        const t2 = setTimeout(resizeCanvas, 300);
+        const t3 = setTimeout(resizeCanvas, 600);
+
+        window.addEventListener('resize', resizeCanvas);
+        return () => {
+            window.removeEventListener('resize', resizeCanvas);
+            clearTimeout(t1);
+            clearTimeout(t2);
+            clearTimeout(t3);
+        };
+    }, [isOpen]);
+
+    const clearCanvas = useCallback(() => {
+        const canvas = canvasRef.current;
+        const context = contextRef.current;
+        if (canvas && context) {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+        }
+        const activeCanvas = activeCanvasRef.current;
+        if (activeCanvas) {
+            const activeCtx = activeCanvas.getContext('2d');
+            if (activeCtx) {
+                activeCtx.clearRect(0, 0, activeCanvas.width, activeCanvas.height);
+            }
+        }
+    }, []);
+
+    useEffect(() => {
+        clearCanvas();
+        setEliminatedOptions([]);
+    }, [currentSlide, clearCanvas]);
+
+    const cachedCanvasRect = useRef<DOMRect | null>(null);
+
+    const getCoordinates = (e: any, updateCache = false) => {
+        const canvas = canvasRef.current;
+        if (!canvas) return { x: 0, y: 0 };
+        
+        let rect = cachedCanvasRect.current;
+        if (!rect || updateCache) {
+            rect = canvas.getBoundingClientRect();
+            cachedCanvasRect.current = rect;
+        }
+
+        let clientX = e.clientX;
+        let clientY = e.clientY;
+
+        if (clientX === undefined && e.touches && e.touches.length > 0) {
+            clientX = e.touches[0].clientX;
+            clientY = e.touches[0].clientY;
+        }
+
+        return {
+            x: (clientX || 0) - rect.left,
+            y: (clientY || 0) - rect.top
+        };
+    };
+
+    // Drawing Handlers
+    const startDrawing = (e: any) => {
+        if (!isPenActive) return;
+
+        const { x, y } = getCoordinates(e, true);
+        if (cursorRef.current) {
+            cursorRef.current.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`;
+        }
+
+        if (drawingTool === 'laser') {
+            return;
+        }
+
+        if (drawingTool === 'magnifier') {
+            setIsMagnified(true);
+            const rect = activeCanvasRef.current?.getBoundingClientRect();
+            if (rect) {
+                const mx = ((e.clientX - rect.left) / rect.width) * 100;
+                const my = ((e.clientY - rect.top) / rect.height) * 100;
+                setMagnifierPos({ x: mx, y: my });
+            }
+            try {
+                if (e.target && e.target.setPointerCapture && e.pointerId !== undefined) {
+                    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+                }
+            } catch (err) { }
+            return;
+        }
+
+        if (drawingTool === 'text') {
+            if (textInput) {
+                finalizeText();
+            } else {
+                setTextInput({ x, y, text: '' });
+            }
+            return;
+        }
+
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+
+
+        isDrawing.current = true;
+        try {
+            (e.target as HTMLElement).setPointerCapture(e.pointerId);
+        } catch (err) { }
+        currentStroke.current = [{ x, y }];
+        redrawActiveStroke();
+    };
+
+    const drawArrow = (ctx: CanvasRenderingContext2D, fromx: number, fromy: number, tox: number, toy: number) => {
+        const headlen = 15;
+        const dx = tox - fromx;
+        const dy = toy - fromy;
+        const angle = Math.atan2(dy, dx);
+        ctx.beginPath();
+        ctx.moveTo(fromx, fromy);
+        ctx.lineTo(tox, toy);
+        ctx.lineTo(tox - headlen * Math.cos(angle - Math.PI / 6), toy - headlen * Math.sin(angle - Math.PI / 6));
+        ctx.moveTo(tox, toy);
+        ctx.lineTo(tox - headlen * Math.cos(angle + Math.PI / 6), toy - headlen * Math.sin(angle + Math.PI / 6));
+        ctx.stroke();
+    };
+
+    const redrawActiveStroke = () => {
+        const canvas = activeCanvasRef.current;
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        if (currentStroke.current.length === 0) return;
+        if (drawingTool === 'eraser') return;
+
+        ctx.globalAlpha = drawingTool === 'highlighter' ? 0.3 : 1.0;
+        ctx.globalCompositeOperation = drawingTool === 'highlighter' ? 'multiply' : 'source-over';
+        const size = drawingTool === 'highlighter' ? penSize * 5 : penSize;
+
+        ctx.strokeStyle = penColor;
+        ctx.fillStyle = penColor;
+        ctx.lineWidth = size;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+
+        const start = currentStroke.current[0];
+        const current = currentStroke.current[currentStroke.current.length - 1];
+
+        if (drawingTool === 'rectangle') {
+            ctx.strokeRect(start.x, start.y, current.x - start.x, current.y - start.y);
+            return;
+        }
+
+        if (drawingTool === 'circle') {
+            const radius = Math.sqrt(Math.pow(current.x - start.x, 2) + Math.pow(current.y - start.y, 2));
+            ctx.beginPath();
+            ctx.arc(start.x, start.y, radius, 0, 2 * Math.PI);
+            ctx.stroke();
+            return;
+        }
+
+        if (drawingTool === 'arrow') {
+            drawArrow(ctx, start.x, start.y, current.x, current.y);
+            return;
+        }
+
+        ctx.beginPath();
+        ctx.moveTo(start.x, start.y);
+
+        if (currentStroke.current.length === 1) {
+            ctx.arc(start.x, start.y, size / 2, 0, Math.PI * 2);
+            ctx.fill();
+            return;
+        }
+
+        if (currentStroke.current.length < 3) {
+            const b = currentStroke.current[1] || currentStroke.current[0];
+            ctx.lineTo(b.x, b.y);
+        } else {
+            for (let i = 1; i < currentStroke.current.length - 1; i++) {
+                const pt = currentStroke.current[i];
+                const nextPt = currentStroke.current[i + 1];
+                const midPoint = {
+                    x: pt.x + (nextPt.x - pt.x) / 2,
+                    y: pt.y + (nextPt.y - pt.y) / 2
+                };
+                ctx.quadraticCurveTo(pt.x, pt.y, midPoint.x, midPoint.y);
+            }
+            const lastPt = currentStroke.current[currentStroke.current.length - 1];
+            ctx.lineTo(lastPt.x, lastPt.y);
+        }
+
+        ctx.stroke();
+    };
+
+    const draw = (e: any) => {
+        if (!isPenActive) return;
+
+        const { x, y } = getCoordinates(e);
+
+        if (cursorRef.current) {
+            cursorRef.current.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`;
+        }
+
+        if (drawingTool === 'laser' || drawingTool === 'text') {
+            return;
+        }
+
+        if (drawingTool === 'magnifier') {
+            if (isMagnified) {
+                const rect = activeCanvasRef.current?.getBoundingClientRect();
+                if (rect) {
+                    const mx = ((e.clientX - rect.left) / rect.width) * 100;
+                    const my = ((e.clientY - rect.top) / rect.height) * 100;
+                    setMagnifierPos({ x: mx, y: my });
+                }
+            }
+            return;
+        }
+
+        if (!isDrawing.current) return;
+
+        const pushPointFiltered = (px: number, py: number) => {
+            const lastPt = currentStroke.current[currentStroke.current.length - 1];
+            if (!lastPt || Math.hypot(px - lastPt.x, py - lastPt.y) >= 2) {
+                if (drawingTool === 'eraser' && lastPt) {
+                    const canvas = canvasRef.current;
+                    const ctx = canvas?.getContext('2d');
+                    if (ctx) {
+                        ctx.globalCompositeOperation = 'destination-out';
+                        ctx.beginPath();
+                        ctx.moveTo(lastPt.x, lastPt.y);
+                        ctx.lineTo(px, py);
+                        ctx.strokeStyle = 'rgba(0,0,0,1)';
+                        ctx.lineWidth = penSize * 5;
+                        ctx.lineCap = 'round';
+                        ctx.lineJoin = 'round';
+                        ctx.stroke();
+                        ctx.globalCompositeOperation = 'source-over';
+                    }
+                }
+                currentStroke.current.push({ x: px, y: py });
+            }
+        };
+
+        if (e.nativeEvent && typeof e.nativeEvent.getCoalescedEvents === 'function') {
+            const events = e.nativeEvent.getCoalescedEvents();
+            if (events && events.length > 0) {
+                for (const ev of events) {
+                    const coords = getCoordinates(ev);
+                    pushPointFiltered(coords.x, coords.y);
+                }
+            } else {
+                pushPointFiltered(x, y);
+            }
+        } else {
+            pushPointFiltered(x, y);
+        }
+
+        if (drawingTool !== 'eraser') {
+            redrawActiveStroke();
+        }
+    };
+
+    const stopDrawing = (e: any) => {
+        if (drawingTool === 'magnifier') {
+            setIsMagnified(false);
+            try {
+                if (e.target && e.target.releasePointerCapture && e.pointerId !== undefined) {
+                    (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+                }
+            } catch (err) { }
+            return;
+        }
+
+        if (!isDrawing.current) return;
+
+        isDrawing.current = false;
+        try {
+            if (e.target && e.target.releasePointerCapture && e.pointerId !== undefined) {
+                (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+            }
+        } catch (err) { }
+
+        const mainCanvas = canvasRef.current;
+        const activeCanvas = activeCanvasRef.current;
+        if (mainCanvas && activeCanvas && drawingTool !== 'eraser') {
+            const ctx = mainCanvas.getContext('2d');
+            if (ctx) {
+                ctx.drawImage(activeCanvas, 0, 0);
+            }
+            const activeCtx = activeCanvas.getContext('2d');
+            if (activeCtx) {
+                activeCtx.clearRect(0, 0, activeCanvas.width, activeCanvas.height);
+            }
+        }
+        currentStroke.current = [];
+    };
+
+    const handleTimerPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+        if (e.button !== 0) return;
+        setIsDraggingTimer(true);
+        dragStartPos.current = { x: e.clientX - timerPos.x, y: e.clientY - timerPos.y };
+        try {
+            e.currentTarget.setPointerCapture(e.pointerId);
+        } catch {
+            // fallback
+        }
+    };
+
+    const handleTimerPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+        if (!isDraggingTimer) return;
+        setTimerPos({
+            x: e.clientX - dragStartPos.current.x,
+            y: e.clientY - dragStartPos.current.y
+        });
+    };
+
+    const handleTimerPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+        if (isDraggingTimer) {
+            setIsDraggingTimer(false);
+            try {
+                e.currentTarget.releasePointerCapture(e.pointerId);
+            } catch {
+                // ignore
+            }
+        }
+    };
+
+    useEffect(() => {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            setIsSpeaking(false);
+
+            if (isOpen && isAutoPlayReadAloud) {
+                const timer = setTimeout(() => {
+                    handleReadAloud(true);
+                }, 300);
+                return () => clearTimeout(timer);
+            }
+        }
+    }, [currentSlide, isOpen, isAutoPlayReadAloud]);
+
+    const handleReadAloud = (forcePlay = false) => {
+        if (!('speechSynthesis' in window)) return;
+
+        if (isSpeaking && !forcePlay) {
+            window.speechSynthesis.cancel();
+            setIsSpeaking(false);
+            return;
+        }
+
+        const q = questions[currentSlide];
+        if (!q) return;
+
+        // Clean up markdown before reading
+        const cleanMarkdown = (text: string) => text.replace(/[*_#]/g, '').replace(/\[(.*?)\]\(.*?\)/g, '$1');
+
+        let textToRead = cleanMarkdown(q.questionText) + '. ';
+
+        // Collect valid option keys once (used for both textToRead and cursor segments)
+        const optionKeys = ['a', 'b', 'c', 'd', 'e'].filter(k => q.options && q.options[k as keyof typeof q.options]);
+        optionKeys.forEach((key) => {
+            const optText = q.options![key as keyof typeof q.options];
+            if (optText) {
+                const optLabel = getOptionLabel(key, uiLang);
+                textToRead += `${optLabel}: ${cleanMarkdown(optText)}. `;
+            }
+        });
+
+        const currentSlideLocal = currentSlide;
+
+        // Build char-offset → DOM element segment map for reading cursor
+        const qText = cleanMarkdown(q.questionText) + '. ';
+        const segments: { startChar: number; endChar: number; elementId: string | 'question' }[] = [];
+        let cursorPos = 0;
+        segments.push({ startChar: 0, endChar: qText.length, elementId: 'question' });
+        cursorPos = qText.length;
+        optionKeys.forEach((key) => {
+            const optText = q.options![key as keyof typeof q.options];
+            if (optText) {
+                const label = getOptionLabel(key, uiLang);
+                const segLen = `${label}: ${cleanMarkdown(optText)}. `.length;
+                segments.push({ startChar: cursorPos, endChar: cursorPos + segLen, elementId: `option-card-${key}` });
+                cursorPos += segLen;
+            }
+        });
+
+        // Wavy cursor animation helper: position synced with speech charIndex
+        let wavePhase = 0;
+        const animateCursorToElement = (elId: string | 'question', charIdx: number, seg: { startChar: number; endChar: number }) => {
+            let el: HTMLElement | null = null;
+            if (elId === 'question') {
+                el = document.querySelector('[data-read-cursor-target="question"]') as HTMLElement | null;
+            } else {
+                el = document.getElementById(elId);
+            }
+            if (!el) return;
+
+            const rect = el.getBoundingClientRect();
+            wavePhase += 1;
+
+            // Relative progress within this segment (0 → 1) matches speech position
+            const segLen = Math.max(1, seg.endChar - seg.startChar);
+            const relProgress = Math.min(1, (charIdx - seg.startChar) / segLen);
+            const waveX = rect.left + 24 + relProgress * Math.max(0, rect.width - 48);
+            // Slight sinusoidal dip below the text
+            const waveY = rect.bottom + 8 + Math.sin(wavePhase * 1.4) * 4;
+
+            setVirtualCursor({ visible: true, x: waveX, y: waveY, isClicking: false });
+        };
+
+        const utterance = new SpeechSynthesisUtterance(textToRead);
+        utterance.lang = uiLang === 'bn' ? 'bn-BD' : 'en-US';
+
+        utterance.onboundary = (event: SpeechSynthesisEvent) => {
+            const charIdx = event.charIndex;
+            const seg = segments.find(s => charIdx >= s.startChar && charIdx < s.endChar);
+            if (seg) animateCursorToElement(seg.elementId, charIdx, seg);
+        };
+
+
+        utterance.onend = () => {
+            // Hide reading cursor when question+options reading is done
+            setVirtualCursor({ visible: false, x: 0, y: 0, isClicking: false });
+
+            if (isAutoPlayRef.current && stepRef.current === 0 && q.correctAnswer) {
+                const correctKey = q.correctAnswer.toLowerCase().trim();
+                const allOptKeys = ['a', 'b', 'c', 'd', 'e'].filter(k => q.options && q.options[k as keyof typeof q.options]);
+                const validKey = allOptKeys.find(k => correctKey.includes(k));
+                if (validKey) {
+                    const isBangla = uiLang === 'bn';
+                    const correctOptText = cleanMarkdown(q.options![validKey as keyof typeof q.options] || '');
+                    const correctText = isBangla
+                        ? `সঠিক উত্তর: ${bnOptionsMap[validKey]}, ${correctOptText}`
+                        : `Correct Answer is: ${validKey.toUpperCase()}, ${correctOptText}`;
+
+                    // Step 1: বলো সঠিক উত্তর কী
+                    const correctUtterance = new SpeechSynthesisUtterance(correctText);
+                    correctUtterance.lang = isBangla ? 'bn-BD' : 'en-US';
+
+                    correctUtterance.onend = () => {
+                        // Step 2: তারপর click animation করো
+                        triggerHumanClick(validKey, () => {
+                            setIsSpeaking(false);
+                            setTimeout(() => {
+                                if (isAutoPlayRef.current) {
+                                    setCurrentSlide(prev => {
+                                        if (prev === currentSlideLocal && prev < questions.length - 1) {
+                                            setStep(0);
+                                            setSelectedOption(null);
+                                            setTimerSeconds(0);
+                                            return prev + 1;
+                                        }
+                                        return prev;
+                                    });
+                                }
+                            }, 1500);
+                        });
+                    };
+                    correctUtterance.onerror = () => setIsSpeaking(false);
+                    window.speechSynthesis.speak(correctUtterance);
+                } else {
+                    setIsSpeaking(false);
+                }
+            } else {
+                setIsSpeaking(false);
+            }
+        };
+        utterance.onerror = () => {
+            setIsSpeaking(false);
+            setVirtualCursor({ visible: false, x: 0, y: 0, isClicking: false });
+        };
+
+        window.speechSynthesis.speak(utterance);
+        setIsSpeaking(true);
+    };
+
+    const handleReadAloudRef = useRef(handleReadAloud);
+    useEffect(() => {
+        handleReadAloudRef.current = handleReadAloud;
+    });
+
+
+
+    const openPresentation = useCallback(() => {
+        setIsOpen(true);
+        setCurrentSlide(0);
+        setStep(mode === 'read' ? 2 : 0);
+        setSelectedOption(null);
+        setTimerSeconds(0);
+        document.body.style.overflow = 'hidden';
+    }, [mode]);
+
+    useEffect(() => {
+        if (autoStart) {
+            openPresentation();
+        }
+    }, [autoStart, openPresentation]);
+
+    const closePresentation = useCallback(() => {
+        setIsOpen(false);
+        document.body.style.overflow = '';
+        if (document.fullscreenElement && document.exitFullscreen) {
+            document.exitFullscreen().catch(err => console.error(err));
+        }
+        if (onClose) {
+            onClose();
+        }
+    }, [onClose]);
+
+    const nextStep = useCallback(() => {
+        if (mode === 'read') {
+            if (currentSlide < questions.length - 1) {
+                setCurrentSlide(currentSlide + 1);
+                setStep(2);
+                setSelectedOption(null);
+                setTimerSeconds(0);
+            }
+        } else {
+            const currentQ = questions[currentSlide];
+            const hasExp = isExpEnabled && currentQ?.explanation;
+            const hasOptExp = isOptionExpEnabled && currentQ?.optionExplanations && Object.keys(currentQ.optionExplanations).length > 0;
+            const maxStep = (hasExp || hasOptExp) ? 2 : 1;
+
+            if (step < maxStep) {
+                setStep(step + 1);
+            } else if (currentSlide < questions.length - 1) {
+                setCurrentSlide(currentSlide + 1);
+                setStep(0);
+                setSelectedOption(null);
+                setTimerSeconds(0);
+            }
+        }
+    }, [step, currentSlide, questions, mode, isExpEnabled, isOptionExpEnabled]);
+
+    const nextStepRef = useRef(nextStep);
+    useEffect(() => {
+        nextStepRef.current = nextStep;
+    });
+
+    useEffect(() => {
+        if (isAutoChangeQuestion && step === 1) {
+            const timer = setTimeout(() => {
+                nextStepRef.current?.();
+            }, autoChangeDelay * 1000);
+            return () => clearTimeout(timer);
+        }
+    }, [isAutoChangeQuestion, step, autoChangeDelay]);
+
+    const prevStep = useCallback(() => {
+        if (mode === 'read') {
+            if (currentSlide > 0) {
+                setCurrentSlide(currentSlide - 1);
+                setStep(2);
+                setSelectedOption(null);
+                setTimerSeconds(0);
+            }
+        } else {
+            if (step > 0) {
+                setStep(step - 1);
+            } else if (currentSlide > 0) {
+                setCurrentSlide(currentSlide - 1);
+                setStep(2);
+                setSelectedOption(null);
+                setTimerSeconds(0);
+            }
+        }
+    }, [step, currentSlide, mode]);
+
+    useEffect(() => {
+        if (mode === 'read') {
+            setStep(2);
+        } else {
+            setStep(0);
+        }
+    }, [mode]);
+
+    useEffect(() => {
+        if (!isOpen || !isTimerEnabled || step >= 1) return;
+
+        const interval = setInterval(() => {
+            setTimerSeconds(s => s + 1);
+            setTotalExamTimeElapsed(t => t + 1);
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [isOpen, isTimerEnabled, step, currentSlide]);
+
+    useEffect(() => {
+        if (lofiAudioRef.current) {
+            if (isLofiEnabled && isOpen) {
+                lofiAudioRef.current.play().catch(e => console.warn('Audio play failed:', e));
+            } else {
+                lofiAudioRef.current.pause();
+            }
+        }
+    }, [isLofiEnabled, isOpen]);
+
+    useEffect(() => {
+        const handleFullscreenChange = () => {
+            setIsFullscreen(!!document.fullscreenElement);
+        };
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    }, []);
+
+    const toggleFullscreen = useCallback(async () => {
+        if (!document.fullscreenElement) {
+            try {
+                await document.documentElement.requestFullscreen();
+            } catch (err) {
+                console.error('Error attempting to enable fullscreen:', err);
+            }
+        } else {
+            if (document.exitFullscreen) {
+                await document.exitFullscreen();
+            }
+        }
+    }, []);
+
+    useEffect(() => {
+        if (!isOpen) return;
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+
+            // --- Unmodified / System Keys ---
+            if (e.key === 'Escape') {
+                if (isSettingsOpen) setIsSettingsOpen(false);
+                else if (isNavigatorOpen) setIsNavigatorOpen(false);
+                else if (isShortcutsOpen) setIsShortcutsOpen(false);
+                else closePresentation();
+                return;
+            }
+
+            if (e.key === 'F11') {
+                e.preventDefault();
+                toggleFullscreen();
+                return;
+            }
+
+            // --- Modifiers (Shift) ---
+            if (e.shiftKey) {
+                if (e.key === '?') {
+                    setIsShortcutsOpen(prev => !prev);
+                    return;
+                }
+                if (e.key === 'R' || e.key === 'r') {
+                    handleReadAloudRef.current?.();
+                    return;
+                }
+                if (e.key === 'N' || e.key === 'n') {
+                    setIsDarkMode(prev => !prev);
+                    return;
+                }
+                if (e.key === 'F' || e.key === 'f') {
+                    setIsSpotlightActive(prev => !prev);
+                    return;
+                }
+                if (e.key === 'W' || e.key === 'w') {
+                    setIsWhiteboardMode(prev => !prev);
+                    return;
+                }
+                if (e.key === 'D' || e.key === 'd') {
+                    setIsPenActive(prev => !prev);
+                    return;
+                }
+                if (e.key === 'C' || e.key === 'c') {
+                    setIsPenActive(true);
+                    setDrawingTool('circle');
+                    return;
+                }
+                if (e.key === 'O' || e.key === 'o') {
+                    setIsOptionExpEnabled(prev => !prev);
+                    return;
+                }
+                if (e.key === 'X' || e.key === 'x') {
+                    // Show explanation
+                    const currentQ = questions[currentSlide];
+                    if (currentQ && (currentQ.explanation || (currentQ.optionExplanations && Object.keys(currentQ.optionExplanations).length > 0))) {
+                        setStep(2);
+                    }
+                    return;
+                }
+                const key = e.key.toLowerCase();
+                if (['p', 'm', 'l', 'e', 'b', 'v', 't', 'z'].includes(key)) {
+                    setIsPenActive(true);
+                    if (key === 'p') setDrawingTool('pen');
+                    else if (key === 'm') setDrawingTool('highlighter');
+                    else if (key === 'l') setDrawingTool('laser');
+                    else if (key === 'e') setDrawingTool('eraser');
+                    else if (key === 'b') setDrawingTool('rectangle');
+                    else if (key === 'v') setDrawingTool('arrow');
+                    else if (key === 't') setDrawingTool('text');
+                    else if (key === 'z') setDrawingTool('magnifier');
+                    return;
+                }
+                return; // Ignore other shift keys to prevent conflicts
+            }
+
+            // --- Special Action Keys ---
+            if (e.key === 's' || e.key === 'S') {
+                setIsSettingsOpen(prev => !prev);
+                return;
+            }
+            if (e.key === 't' || e.key === 'T') {
+                setIsTimerEnabled(prev => !prev);
+                return;
+            }
+            if (e.key === 'Delete' || e.key === 'Backspace') {
+                clearCanvas();
+                return;
+            }
+
+            // --- Single Letter Shortcuts (No Modifiers) ---
+            // Prevent conflicts with 'a', 'b', 'c', 'd', 'e'
+            const key = e.key.toLowerCase();
+
+            if (key === 's') {
+                setIsSettingsOpen(prev => !prev);
+                return;
+            }
+            if (key === 't') {
+                setIsTimerEnabled(prev => !prev);
+                return;
+            }
+            if (key === 'm') {
+                setMode(prev => prev === 'test' ? 'read' : 'test');
+                return;
+            }
+
+            // Undocumented but useful font & layout shortcuts
+            if (key === 'q') { setQFontScale(s => Math.max(0.6, s - 0.1)); return; }
+            if (key === 'w') { setQFontScale(s => Math.min(2.0, s + 0.1)); return; }
+            if (key === 'o') { setOptFontScale(s => Math.max(0.6, s - 0.1)); return; }
+            if (key === 'p') { setOptFontScale(s => Math.min(2.0, s + 0.1)); return; }
+            if (key === '[') { setExpFontScale(s => Math.max(0.6, s - 0.1)); return; }
+            if (key === ']') { setExpFontScale(s => Math.min(2.0, s + 0.1)); return; }
+            if (key === 'l') { setOptionsLayout('list'); return; }
+            if (key === 'g') { setOptionsLayout('grid'); return; }
+
+            if (!isSettingsOpen) {
+                if (e.key === 'ArrowRight' || e.key === ' ') {
+                    e.preventDefault();
+                    nextStep();
+                }
+                if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    prevStep();
+                }
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (step === 0) {
+                        // step 0: উত্তর দেওয়া হয়নি → correct answer দেখাও
+                        const currentQ = questions[currentSlide];
+                        if (currentQ && currentQ.correctAnswer) {
+                            const correctKey = currentQ.correctAnswer.toLowerCase().trim();
+                            const validKeys = ['a', 'b', 'c', 'd', 'e'];
+                            const matchedKey = validKeys.find(k => correctKey.includes(k));
+                            if (matchedKey) {
+                                triggerHumanClick(matchedKey);
+                            }
+                        }
+                    } else {
+                        // step >= 1: উত্তর দেওয়া হয়েছে → next slide-এ যাও
+                        nextStep();
+                    }
+                }
+                if (step === 0) {
+                    if (['a', 'b', 'c', 'd', 'e'].includes(key)) {
+                        const currentQ = questions[currentSlide];
+                        if (currentQ && currentQ.options && currentQ.options[key as keyof typeof currentQ.options]) {
+                            setSelectedOption(key);
+                            setStep(1);
+                            if (currentQ.correctAnswer && currentQ.correctAnswer.toLowerCase().trim().includes(key)) {
+                                const newConsecutive = consecutiveCorrect + 1;
+                                setConsecutiveCorrect(newConsecutive);
+                                triggerCelebration(newConsecutive);
+                                setIsConfettiActive(true);
+                                setTimeout(() => setIsConfettiActive(false), 2400);
+                                updateSessionScore(currentSlide, true);
+                            } else {
+                                setConsecutiveCorrect(0);
+                                updateSessionScore(currentSlide, false);
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [isOpen, closePresentation, nextStep, prevStep, isSettingsOpen, step, currentSlide, questions, clearCanvas, triggerHumanClick, consecutiveCorrect, updateSessionScore, triggerCelebration]);
+    const currentQ = questions[currentSlide];
+
+    const parsedOptions = useMemo(() => {
+        if (!currentQ || !currentQ.options) return [];
+        const arr = [
+            { key: 'a', text: currentQ.options.a },
+            { key: 'b', text: currentQ.options.b },
+            { key: 'c', text: currentQ.options.c },
+            { key: 'd', text: currentQ.options.d }
+        ];
+        if (currentQ.options.e) arr.push({ key: 'e', text: currentQ.options.e });
+        return arr;
+    }, [currentQ]);
+
+    const downloadPdf = async () => {
+        if (!slideRef.current || isGeneratingPdf) return;
+        setIsGeneratingPdf(true);
+
+        const originalSlide = currentSlide;
+        const originalStep = step;
+        const originalSelected = selectedOption;
+
+        try {
+            const pdf = new jsPDF('landscape', 'mm', 'a4');
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            const pageHeight = pdf.internal.pageSize.getHeight();
+
+            const cssSheetProto = CSSStyleSheet.prototype;
+            const origDescriptor = Object.getOwnPropertyDescriptor(cssSheetProto, 'cssRules')!;
+            Object.defineProperty(cssSheetProto, 'cssRules', {
+                configurable: true,
+                get() {
+                    try { return origDescriptor.get!.call(this); }
+                    catch { return []; }
+                },
+            });
+
+            const origConsoleError = console.error;
+            console.error = (...args: any[]) => {
+                const msg = String(args[0] ?? '');
+                if (msg.includes('Status:404') || msg.includes('data:image/svg+xml')) return;
+                origConsoleError.apply(console, args);
+            };
+
+            for (let i = 0; i < questions.length; i++) {
+                setCurrentSlide(i);
+
+                if (saveWithCorrectOption) {
+                    const q = questions[i];
+                    if (q && q.correctAnswer) {
+                        setStep(1);
+                        setSelectedOption(q.correctAnswer.toLowerCase().trim());
+                    } else {
+                        setStep(0);
+                        setSelectedOption(null);
+                    }
+                } else {
+                    setStep(0);
+                    setSelectedOption(null);
+                }
+
+                await new Promise(r => setTimeout(r, 600));
+
+                const el = slideRef.current;
+                if (!el) continue;
+
+                const scale = 2;
+                const dataUrl = await domtoimage.toPng(el, {
+                    quality: 1,
+                    width: el.offsetWidth * scale,
+                    height: el.offsetHeight * scale,
+                    style: {
+                        transform: `scale(${scale})`,
+                        transformOrigin: 'top left',
+                        width: `${el.offsetWidth}px`,
+                        height: `${el.offsetHeight}px`,
+                    },
+                    filter: (node: Node) => (node as Element).tagName !== 'CANVAS',
+                });
+
+                if (i > 0) pdf.addPage();
+                pdf.addImage(dataUrl, 'PNG', 0, 0, pageWidth, pageHeight);
+            }
+
+            pdf.save(`${chapterName || 'DeshExam-Presentation'}.pdf`);
+
+            Object.defineProperty(cssSheetProto, 'cssRules', origDescriptor);
+            console.error = origConsoleError;
+
+        } catch (error) {
+            console.error("Error generating PDF:", error);
+        } finally {
+            setCurrentSlide(originalSlide);
+            setStep(originalStep);
+            setSelectedOption(originalSelected);
+            setIsGeneratingPdf(false);
+        }
+    };
+
+    if (!isOpen) {
+        return (
+            <button
+                onClick={openPresentation}
+                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg mt-6"
+            >
+                <Play className="w-5 h-5 fill-current" />
+                Start Presentation
+            </button>
+        );
+    }
+
+    const q = questions[currentSlide];
+
+    if (typeof window === 'undefined') return null;
+
+    return createPortal(
+        <>
+            <div className={`print:hidden fixed inset-0 w-full h-full z-[99999] flex items-center justify-between p-3 mb-3 gap-1 md:gap-1 xl:gap-1 select-none font-sans overflow-hidden transition-colors duration-500 ${isDarkMode ? 'dark bg-gray-900' : 'bg-[#f8fbff]'}`}>
+                <style>{`
+                    @keyframes popIn {
+                        0% { transform: scale(1); box-shadow: 0 0 0 rgba(52,168,83,0); }
+                        50% { transform: scale(1.05); box-shadow: 0 0 40px rgba(52,168,83,0.6); }
+                        100% { transform: scale(1.03); box-shadow: 0 0 30px rgba(52,168,83,0.5); }
+                    }
+                    .animate-pop-in {
+                        animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+                    }
+                    @media print {
+                        @page { size: A4 landscape; margin: 10mm; }
+                        body { margin: 0 !important; overflow: visible !important; background: white !important; }
+                        body > *:not(.print-only) { display: none !important; }
+                        .print-only { display: block !important; position: static !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
+                        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                    }
+                `}</style>
+
+                {/* Left Ad Banner (160x600) */}
+                <div className="hidden xl:flex w-[160px] h-[600px] shrink-0 flex-col items-center justify-between bg-gradient-to-b from-[#0a192f] via-[#0b2244] to-[#041128] rounded-xl overflow-hidden shadow-2xl border border-blue-400/20 relative z-10 p-3">
+                    {/* Floating Elements Background */}
+                    <div className="absolute top-[5%] left-[25%] w-16 h-16 rounded-full border border-blue-400/20 bg-blue-500/10 blur-[8px]"></div>
+                    <div className="absolute bottom-[30%] right-[-5%] w-20 h-20 rounded-full bg-blue-400/10 blur-[20px]"></div>
+
+                    {/* Top Logo */}
+                    <div className="flex flex-col items-center w-full z-10 pt-2">
+                        <div className="bg-white/10 px-3 py-2 rounded-lg shadow-lg border border-white/10 backdrop-blur-sm mb-3">
+                            <h2 className="text-[20px] font-extrabold text-white tracking-wide drop-shadow-md">
+                                <span className="text-blue-400">Desh</span>Exam
+                            </h2>
+                        </div>
+                        <div className="text-center">
+                            <h3 className="text-[18px] text-blue-100 mb-1 leading-tight font-medium">সঠিক প্রস্তুতি</h3>
+                            <h3 className="text-[26px] text-white leading-tight font-extrabold">
+                                <span className="text-[#FFD700]">সফলতার</span>
+                            </h3>
+                            <h3 className="text-[26px] text-white leading-tight font-extrabold">চাবিকাঠি!</h3>
+                        </div>
+                    </div>
+
+                    {/* Middle Trophy */}
+                    <div className="flex items-center justify-center text-4xl w-full z-10 drop-shadow-2xl my-2 relative">
+                        <div className="absolute inset-0 bg-blue-400/20 blur-[15px] rounded-full"></div>
+                        🏆
+                    </div>
+
+                    {/* Features List */}
+                    <div className="flex flex-col z-10 w-full space-y-2 mb-2">
+                        <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-lg p-2.5">
+                            <div className="flex flex-col space-y-1.5">
+                                {[
+                                    'Mock Test',
+                                    'Topic Test',
+                                    'Live Exam',
+                                    'PYQ',
+                                    'AI Report',
+                                    'Merit List'
+                                ].map((feature, idx) => (
+                                    <div key={idx} className="flex items-center gap-1.5">
+                                        <Check className="w-4 h-4 text-[#FFB800] shrink-0" />
+                                        <span className="text-gray-100 text-[14px] font-semibold tracking-wide leading-tight">{feature}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Discount Badge */}
+                    <div className="w-full z-10 flex justify-center mb-2">
+                        <div className="bg-red-500/90 text-white text-[11px] font-bold px-3 py-1 rounded-full animate-pulse border border-red-400 shadow-[0_0_10px_rgba(239,68,68,0.5)]">
+                            ⭐ GET 50% OFF ⭐
+                        </div>
+                    </div>
+
+                    {/* CTA Button */}
+                    <div className="w-full z-10 pb-2">
+                        <button className="w-full flex flex-col items-center justify-center py-2 bg-gradient-to-b from-[#2178ff] to-[#0a4bb8] border border-blue-400/50 rounded-lg shadow-[0_4px_10px_rgba(10,75,184,0.4)] hover:scale-105 transition-transform duration-300">
+                            <span className="text-white font-bold text-[16px] drop-shadow-md leading-none mb-1">Subscribe</span>
+                            <span className="text-white font-bold text-[16px] drop-shadow-md leading-none">Today</span>
+                        </button>
+                    </div>
+                </div>
+
+                {/* Main Presentation Area */}
+                <div
+                    ref={slideRef}
+                    className={`responsive-fonts flex-1 min-w-0 relative w-full h-full ${getBgThemeClasses()} flex flex-col shadow-2xl overflow-hidden shrink-0 z-10 rounded-xl md:rounded-2xl border border-gray-200/80 dark:border-gray-800 transition-colors duration-500 ${isPenActive && drawingTool === 'laser' ? 'cursor-none [&_*]:cursor-none' : ''}`}
+                    onPointerMove={(e) => {
+                        if (isPenActive && drawingTool === 'laser') {
+                            draw(e);
+                        }
+                    }}
+                >
+                    {/* Railway Station Style Digital Timer */}
+                    {isTimerEnabled && (
+                        <div className="absolute top-12 right-0 md:top-16 md:right-0 z-[60] bg-[#0c0c0c] border-2 border-[#222] rounded-lg px-1.5 py-1 md:px-2 md:py-1.5 shadow-[inset_0_0_15px_rgba(0,0,0,1),0_5px_15px_rgba(0,0,0,0.6)] pointer-events-none flex flex-col items-center justify-center">
+                            <div className="flex items-center justify-center text-[18px] md:text-[24px] gap-0">
+                                {(() => {
+                                    const timeLeft = Math.max(0, (questions.length * countdownTotal) - totalExamTimeElapsed);
+                                    const h = Math.floor(timeLeft / 3600);
+                                    const m = Math.floor((timeLeft % 3600) / 60);
+                                    const s = timeLeft % 60;
+
+                                    const timeStr = h > 0
+                                        ? `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
+                                        : `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+
+                                    return timeStr.split('').map((char, i) =>
+                                        char === ':' ? <SevenSegmentColon key={i} /> : <SevenSegmentDigit key={i} digit={char} />
+                                    );
+                                })()}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Background Pattern Overlay */}
+                    {bgTheme !== 'video' && (
+                        <div
+                            className={`absolute inset-0 z-0 pointer-events-none transition-opacity duration-300 ${getBgThemeOverlayClasses()}`}
+                            style={{ opacity: bgOpacity / 100 }}
+                        />
+                    )}
+
+                    {/* Video Background */}
+                    {bgTheme === 'video' && (
+                        <>
+                            <video
+                                key={selectedVideo}
+                                autoPlay
+                                loop
+                                muted
+                                playsInline
+                                className="absolute inset-0 w-full h-full object-cover z-0 mix-blend-screen pointer-events-none"
+                                style={{ opacity: videoOpacity / 100 }}
+                            >
+                                <source src={selectedVideo} type="video/mp4" />
+                            </video>
+                            <div className="absolute inset-0 w-full h-full z-0 pointer-events-none bg-[radial-gradient(rgba(255,255,255,0.15)_1.5px,transparent_1.5px)] [background-size:20px_20px]"></div>
+                        </>
+                    )}
+
+                    {/* Main Drawing Canvas */}
+                    <canvas
+                        ref={canvasRef}
+                        className={`absolute inset-0 w-full h-full z-20 pointer-events-none`}
+                    />
+
+                    {/* Active Stroke Canvas (Top Layer) */}
+                    <canvas
+                        ref={activeCanvasRef}
+                        className={`absolute inset-0 w-full h-full z-30 touch-none ${isPenActive && drawingTool !== 'laser' ? 'pointer-events-auto' : 'pointer-events-none'} ${isPenActive && drawingTool !== 'laser' && drawingTool !== 'pen' ? 'cursor-none' : ''}`}
+                        style={isPenActive && drawingTool === 'pen' ? { cursor: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 24 24'><path d='M0 0l6 2 13 13a3 3 0 0 1-4 4L2 6z' fill='${encodeURIComponent(penColor)}' stroke='white' stroke-width='1.5' stroke-linejoin='round'/><path d='M6 2L2 6' stroke='white' stroke-width='1.5' stroke-linecap='round'/></svg>") 0 0, crosshair` } : undefined}
+                        onPointerDown={startDrawing}
+                        onPointerMove={draw}
+                        onPointerUp={stopDrawing}
+                        onPointerCancel={stopDrawing}
+                        onPointerOut={stopDrawing}
+                        onTouchStart={startDrawing}
+                        onTouchMove={draw}
+                        onTouchEnd={stopDrawing}
+                        onTouchCancel={stopDrawing}
+                        onWheel={handleCanvasWheel}
+                    />
+
+                    {/* Custom Mouse Cursor for Presentation Tools */}
+                    {isPenActive && drawingTool !== 'pen' && (
+                        <div
+                            ref={cursorRef}
+                            className="absolute z-40 pointer-events-none flex items-center justify-center"
+                            style={{
+                                left: 0,
+                                top: 0,
+                                transform: 'translate3d(-100px, -100px, 0) translate(-50%, -50%)',
+                                willChange: 'transform',
+                                ...(drawingTool === 'laser' ? {
+                                    width: '8px',
+                                    height: '8px',
+                                    backgroundColor: '#FF0000',
+                                    borderRadius: '50%',
+                                    boxShadow: 'none',
+                                    border: '1px solid rgba(255,255,255,0.5)'
+                                } : drawingTool === 'highlighter' ? {
+                                    width: `${penSize * 5}px`,
+                                    height: `${penSize * 5}px`,
+                                    backgroundColor: penColor,
+                                    opacity: 0.5,
+                                    borderRadius: '50%',
+                                    mixBlendMode: 'multiply'
+                                } : {
+                                    width: `${Math.max(penSize, 8)}px`,
+                                    height: `${Math.max(penSize, 8)}px`,
+                                    border: `2px solid ${penColor}`,
+                                    borderRadius: '50%',
+                                    backgroundColor: 'transparent'
+                                })
+                            }}
+                        />
+                    )}
+
+                    {/* Background Decorations */}
+                    <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+                        {/* Soft glowing mesh gradients */}
+                        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-200/30 blur-[100px]"></div>
+                        <div className="absolute bottom-[-10%] right-[-5%] w-[50%] h-[50%] rounded-full bg-pink-200/30 blur-[100px]"></div>
+                        <div className="absolute top-[20%] right-[10%] w-[30%] h-[30%] rounded-full bg-purple-200/30 blur-[80px]"></div>
+
+                        {/* Dot Pattern */}
+                        <div className="absolute top-0 left-0 w-full h-full" style={{ backgroundImage: 'radial-gradient(rgba(99, 102, 241, 0.06) 2px, transparent 2px)', backgroundSize: '32px 32px', opacity: 0.8 }}></div>
+
+                        {/* Clean geometric lines */}
+                        <div className="absolute top-[15%] right-[-5%] w-72 h-72 rounded-full border-[1px] border-indigo-200/40 opacity-60"></div>
+                        <div className="absolute top-[18%] right-[-2%] w-56 h-56 rounded-full border-[1px] border-purple-200/40 opacity-60"></div>
+                        <div className="absolute bottom-[20%] left-[5%] w-48 h-48 rounded-full border-[1px] border-pink-200/40 opacity-60"></div>
+                        {/* Watermark removed from here, moved to foreground */}
+                    </div>
+
+                    {/* Background Watermarks */}
+                    {wmVisible && wmText && (
+                        <>
+                            <style>{`
+                                .watermark-mask {
+                                    mask-image: linear-gradient(#000, #000), linear-gradient(#000, #000), linear-gradient(#000, #000), linear-gradient(#000, #000);
+                                    -webkit-mask-image: linear-gradient(#000, #000), linear-gradient(#000, #000), linear-gradient(#000, #000), linear-gradient(#000, #000);
+                                    
+                                    /* Mobile sizes (less side margins) */
+                                    mask-size: 100% 100px, 100% 100px, 16px 100%, 16px 100%;
+                                    -webkit-mask-size: 100% 100px, 100% 100px, 16px 100%, 16px 100%;
+                                    
+                                    mask-position: top center, bottom center, left center, right center;
+                                    -webkit-mask-position: top center, bottom center, left center, right center;
+                                    mask-repeat: no-repeat;
+                                    -webkit-mask-repeat: no-repeat;
+                                }
+                                @media (min-width: 768px) {
+                                    .watermark-mask {
+                                        /* Desktop sizes (larger side margins matching md:px-24) */
+                                        mask-size: 100% 120px, 100% 120px, 96px 100%, 96px 100%;
+                                        -webkit-mask-size: 100% 120px, 100% 120px, 96px 100%, 96px 100%;
+                                    }
+                                }
+                            `}</style>
+                            <div
+                                className="absolute inset-0 pointer-events-none z-0 overflow-hidden watermark-mask"
+                                style={{
+                                    backgroundImage: getWatermarkSvg(wmSpacing, wmSize, wmOpacity, wmText, isDarkMode),
+                                    backgroundRepeat: 'repeat',
+                                    backgroundPosition: '0px -30px'
+                                }}
+                            />
+                        </>
+                    )}
+
+                    {/* Whiteboard Layer */}
+                    {isWhiteboardMode && (
+                        <div className={`absolute inset-0 z-[15] transition-colors duration-500 ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`} />
+                    )}
+
+                    {/* Text Input Overlay */}
+                    {textInput && (
+                        <textarea
+                            ref={textInputRef}
+                            value={textInput.text}
+                            onChange={(e) => setTextInput({ ...textInput, text: e.target.value })}
+                            onBlur={finalizeText}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' && !e.shiftKey) {
+                                    e.preventDefault();
+                                    finalizeText();
+                                }
+                            }}
+                            style={{
+                                left: textInput.x,
+                                top: textInput.y,
+                                color: penColor,
+                                fontSize: `${Math.max(penSize * 3, 16)}px`,
+                                fontWeight: 'bold',
+                            }}
+                            className="absolute z-[60] bg-transparent outline-none border-2 border-blue-400 border-dashed resize-none min-w-[200px] min-h-[40px] overflow-hidden leading-tight p-1"
+                        />
+                    )}
+
+                    {/* Header */}
+                    {showHeader && (
+                        <div
+                            className="shrink-0 bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 dark:from-indigo-900 dark:via-violet-900 dark:to-purple-900 border-b border-indigo-400/30 dark:border-indigo-700/50 flex flex-col md:flex-row justify-between items-center w-full z-30 relative transition-all duration-500 px-3 md:px-6"
+                            style={{
+                                paddingTop: `${0.75 * headerScale}rem`,
+                                paddingBottom: `${0.75 * headerScale}rem`,
+                                gap: `${0.5 * headerScale}rem`,
+                                boxShadow: '0 4px 20px rgba(109,40,217,0.3), 0 1px 0 rgba(255,255,255,0.12)'
+                            }}
+                        >
+                            {/* Logo Area */}
+                            <div className="flex items-center w-full md:w-auto justify-between md:justify-start">
+                                {showLogo && (
+                                    <div className="flex items-center gap-2 md:gap-3">
+                                        <img src="/icons/icon-192x192.png" alt="DeshExam" style={{ height: `${2.25 * headerScale}rem` }} className="w-auto object-contain drop-shadow-sm rounded-full bg-white p-1" />
+                                        <div className="flex flex-col justify-center select-none">
+                                            <div className="flex items-center gap-1.5 font-black leading-tight tracking-tight drop-shadow-sm" style={{ fontSize: `${1.15 * headerScale}rem` }}>
+                                                {/* Saffron / Kesari */}
+                                                <span className="text-[#FF9F57] font-black tracking-tight drop-shadow-sm">
+                                                    DESH
+                                                </span>
+                                                {/* Light white-green for purple bg */}
+                                                <span className="text-white font-black tracking-tight drop-shadow-sm">
+                                                    EXAM
+                                                </span>
+                                            </div>
+                                            {/* Tagline — white tones for purple bg */}
+                                            <div className="flex items-center gap-1 font-extrabold tracking-widest uppercase mt-0.5" style={{ fontSize: `${0.55 * headerScale}rem` }}>
+                                                <span className="text-orange-300">Learn</span>
+                                                <span className="text-white/60 font-bold">•</span>
+                                                <span className="text-white/80">Practice</span>
+                                                <span className="text-white/60 font-bold">•</span>
+                                                <span className="text-emerald-300">Succeed</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Mobile Actions */}
+                                <div className="flex md:hidden items-center gap-2 shrink-0">
+
+                                    <button onClick={closePresentation} className="bg-white/90 dark:bg-gray-800 hover:bg-white dark:hover:bg-gray-700 rounded-full text-indigo-600 dark:text-indigo-400 shadow-sm border border-indigo-100 dark:border-gray-600 transition-colors flex items-center justify-center shrink-0" style={{ width: `${2.2 * headerScale}rem`, height: `${2.2 * headerScale}rem` }}>
+                                        <X style={{ width: `${1.2 * headerScale}rem`, height: `${1.2 * headerScale}rem` }} strokeWidth={2.5} />
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Title Area */}
+                            <div className={`flex-1 w-full md:px-6 flex flex-col justify-center ${headerTitleAlign === 'left' ? 'items-start text-left' :
+                                headerTitleAlign === 'right' ? 'items-end text-right' :
+                                    'items-center text-center'
+                                }`}>
+                                <h1 className="font-extrabold text-white dark:text-gray-100 tracking-tight line-clamp-1 md:line-clamp-none drop-shadow-sm" style={{ fontSize: `${1.1 * headerScale * headerTitleScale}rem` }}>{displayTitle}</h1>
+                                {displayTaxonomy && (
+                                    <div className="flex items-center flex-wrap gap-1 font-bold tracking-wider uppercase mt-1" style={{ fontSize: `${0.72 * headerScale * headerTitleScale}rem` }}>
+                                        {displayTaxonomy.split('•').map((part, i) => (
+                                            <span key={i} className="flex items-center gap-1">
+                                                {i > 0 && <span className="text-white/40 mx-0.5">•</span>}
+                                                <span className={
+                                                    i === 0 ? 'text-amber-300 drop-shadow-sm' :
+                                                        i === 1 ? 'text-cyan-300 drop-shadow-sm' :
+                                                            i === 2 ? 'text-lime-300 drop-shadow-sm' :
+                                                                'text-pink-300 drop-shadow-sm'
+                                                }>{part.trim()}</span>
+                                            </span>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Desktop Actions */}
+                            <div className="hidden md:flex items-center gap-3 justify-end shrink-0">
+                                {/* Score Badge Button */}
+                                <button
+                                    onClick={() => setIsScoreVisible(!isScoreVisible)}
+                                    className="flex items-center gap-1 shrink-0 hover:scale-105 transition-all"
+                                    title="Session Score"
+                                >
+                                    {/* Correct */}
+                                    <span className="flex items-center gap-1 bg-emerald-500/90 hover:bg-emerald-500 text-white px-2.5 py-1.5 rounded-l-full font-black text-xs shadow-md border border-emerald-400/50" style={{ fontSize: `${0.8 * headerScale}rem` }}>
+                                        <span className="text-emerald-100">✓</span>
+                                        <span>{sessionScore.correct}</span>
+                                    </span>
+                                    {/* Divider */}
+                                    <span className="bg-white/20 text-white/60 px-1 py-1.5 font-bold text-xs" style={{ fontSize: `${0.75 * headerScale}rem` }}>/</span>
+                                    {/* Wrong */}
+                                    <span className="flex items-center gap-1 bg-rose-500/90 hover:bg-rose-500 text-white px-2.5 py-1.5 rounded-r-full font-black text-xs shadow-md border border-rose-400/50" style={{ fontSize: `${0.8 * headerScale}rem` }}>
+                                        <span>{sessionScore.wrong}</span>
+                                        <span className="text-rose-100">✗</span>
+                                    </span>
+                                </button>
+
+
+                                <button onClick={closePresentation} className="bg-white/10 hover:bg-white/20 dark:bg-white/10 dark:hover:bg-white/20 rounded-full text-white shadow-sm border border-white/20 transition-all hover:scale-105 flex items-center justify-center shrink-0" style={{ width: `${2.75 * headerScale}rem`, height: `${2.75 * headerScale}rem` }} title="Close Presentation">
+                                    <X style={{ width: `${1.4 * headerScale}rem`, height: `${1.4 * headerScale}rem` }} strokeWidth={2.5} />
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Floating Draggable Clock Timer ("ঘড়ির মতো" Analog + Digital Watch Face with Light/Dark Theme Support) */}
+                    {isTimerEnabled && (() => {
+                        const sec = timerDisplay.secs;
+                        const min = Math.floor(sec / 60);
+                        const s = sec % 60;
+                        const secondDeg = (s * 6); // 6 deg per second (0 to 354)
+                        const minuteDeg = ((min % 60) * 6) + (s * 0.1); // 6 deg per minute + second offset
+
+                        // Theme-tailored colors
+                        const colors = isDarkMode ? {
+                            bezelBg: 'bg-gradient-to-br from-slate-800 via-slate-900 to-black',
+                            bezelBorder: 'border-slate-700/80',
+                            bezelShadow: 'shadow-[0_16px_36px_rgba(0,0,0,0.7),inset_0_1px_2px_rgba(255,255,255,0.15)]',
+                            ringGlow: 'ring-4 ring-cyan-500/20',
+                            crownBg: 'bg-gradient-to-b from-slate-600 via-slate-700 to-slate-800 border-slate-600',
+                            dialGrad1: '#0f172a',
+                            dialGrad2: '#020617',
+                            outerRing: '#334155',
+                            majorTick: '#f8fafc',
+                            minorTick: '#64748b',
+                            minuteHand: '#f1f5f9',
+                            secondHand: '#ff3b30',
+                            centerCap: '#ff3b30',
+                            digitalBg: 'bg-black/90 border-cyan-500/40 text-cyan-400 shadow-[0_0_12px_rgba(6,182,212,0.25)]',
+                        } : {
+                            bezelBg: 'bg-gradient-to-br from-slate-100 via-white to-slate-200',
+                            bezelBorder: 'border-slate-300',
+                            bezelShadow: 'shadow-[0_12px_28px_rgba(0,0,0,0.12),inset_0_2px_4px_rgba(255,255,255,0.9)]',
+                            ringGlow: 'ring-4 ring-blue-500/15',
+                            crownBg: 'bg-gradient-to-b from-slate-200 via-slate-400 to-slate-300 border-slate-400',
+                            dialGrad1: '#ffffff',
+                            dialGrad2: '#e2e8f0',
+                            outerRing: '#cbd5e1',
+                            majorTick: '#0f172a',
+                            minorTick: '#94a3b8',
+                            minuteHand: '#1e293b',
+                            secondHand: '#dc2626',
+                            centerCap: '#dc2626',
+                            digitalBg: 'bg-slate-900 border-slate-700 text-cyan-300 shadow-md',
+                        };
+
+                        return (
+                            <div
+                                style={{ transform: `translate(${timerPos.x}px, ${timerPos.y}px)` }}
+                                className={`absolute bottom-[80px] md:bottom-[90px] right-2 md:right-3 z-[70] select-none touch-none transition-all duration-300 ${isDraggingTimer
+                                    ? 'cursor-grabbing scale-105 drop-shadow-[0_20px_40px_rgba(59,130,246,0.35)]'
+                                    : 'cursor-grab hover:drop-shadow-[0_12px_30px_rgba(59,130,246,0.25)] hover:scale-105'
+                                    }`}
+                                onPointerDown={handleTimerPointerDown}
+                                onPointerMove={handleTimerPointerMove}
+                                onPointerUp={handleTimerPointerUp}
+                                onPointerCancel={handleTimerPointerUp}
+                                onDoubleClick={() => setTimerPos({ x: 0, y: 0 })}
+                                title="Clock Timer (Drag to move / Double-click to reset)"
+                            >
+                                {/* Watch Case & Crown */}
+                                <div className="relative flex flex-col items-center">
+                                    {/* Classic Stopwatch Top Crown / Button */}
+                                    <div className="flex items-center justify-center -mb-1 z-10 pointer-events-none">
+                                        <div className={`w-5 h-2 rounded-t-md border-t border-x shadow-sm ${colors.crownBg}`} />
+                                    </div>
+
+                                    {/* Circular Clock Face */}
+                                    <div className={`relative w-[88px] h-[88px] md:w-[96px] md:h-[96px] rounded-full p-1 border-[2.5px] backdrop-blur-xl ${colors.bezelBg} ${colors.bezelBorder} ${colors.bezelShadow} ${colors.ringGlow} transition-colors duration-500`}>
+                                        <svg className="w-full h-full pointer-events-none" viewBox="0 0 100 100">
+                                            <defs>
+                                                <radialGradient id="clockDialGrad" cx="50%" cy="50%" r="50%">
+                                                    <stop offset="60%" stopColor={colors.dialGrad1} />
+                                                    <stop offset="100%" stopColor={colors.dialGrad2} />
+                                                </radialGradient>
+                                            </defs>
+
+                                            {/* Dial Base with Radial Gradient */}
+                                            <circle cx="50" cy="50" r="46" fill="url(#clockDialGrad)" stroke={colors.outerRing} strokeWidth="1" />
+
+                                            {/* Countdown Mode Progress Arc (if countdown mode) */}
+                                            {timerMode === 'countdown' && timerDisplay.pct !== null && (
+                                                <circle
+                                                    cx="50"
+                                                    cy="50"
+                                                    r="43.5"
+                                                    fill="none"
+                                                    stroke={timerDisplay.pct > 0.5 ? '#22c55e' : timerDisplay.pct > 0.25 ? '#f59e0b' : '#ef4444'}
+                                                    strokeWidth="3.5"
+                                                    strokeDasharray={`${timerDisplay.pct * 273.3} 273.3`}
+                                                    strokeLinecap="round"
+                                                    transform="rotate(-90 50 50)"
+                                                    className="transition-all duration-1000"
+                                                />
+                                            )}
+
+                                            {/* 60 Minute/Second Dots */}
+                                            {[...Array(60)].map((_, i) => {
+                                                if (i % 5 === 0) return null; // handled by major ticks
+                                                const angle = i * 6;
+                                                return (
+                                                    <circle
+                                                        key={`dot-${i}`}
+                                                        cx="50"
+                                                        cy="8"
+                                                        r="0.75"
+                                                        fill={colors.minorTick}
+                                                        transform={`rotate(${angle} 50 50)`}
+                                                    />
+                                                );
+                                            })}
+
+                                            {/* 12 Hour / 5-Sec Dial Ticks */}
+                                            {[...Array(12)].map((_, i) => {
+                                                const angle = i * 30;
+                                                const isCardinal = i % 3 === 0;
+                                                return (
+                                                    <line
+                                                        key={`tick-${i}`}
+                                                        x1="50"
+                                                        y1={isCardinal ? "7" : "9"}
+                                                        x2="50"
+                                                        y2="14"
+                                                        stroke={isCardinal ? colors.majorTick : colors.minorTick}
+                                                        strokeWidth={isCardinal ? "2.5" : "1.5"}
+                                                        strokeLinecap="round"
+                                                        transform={`rotate(${angle} 50 50)`}
+                                                    />
+                                                );
+                                            })}
+
+                                            {/* Clock Numerals (12, 3, 9) */}
+                                            <text x="50" y="22" textAnchor="middle" fontSize="6.5" fontWeight="900" fontFamily="sans-serif" fill={colors.majorTick} opacity="0.85">12</text>
+                                            <text x="79" y="52.5" textAnchor="middle" fontSize="6.5" fontWeight="900" fontFamily="sans-serif" fill={colors.majorTick} opacity="0.85">3</text>
+                                            <text x="21" y="52.5" textAnchor="middle" fontSize="6.5" fontWeight="900" fontFamily="sans-serif" fill={colors.majorTick} opacity="0.85">9</text>
+
+                                            {/* Minute Hand */}
+                                            <line
+                                                x1="50"
+                                                y1="50"
+                                                x2="50"
+                                                y2="25"
+                                                stroke={colors.minuteHand}
+                                                strokeWidth="2.8"
+                                                strokeLinecap="round"
+                                                className="transition-transform duration-500 ease-out"
+                                                transform={`rotate(${minuteDeg} 50 50)`}
+                                            />
+
+                                            {/* Second Hand (Classic sweep/tick hand) */}
+                                            <g
+                                                className="transition-transform duration-300 ease-out"
+                                                transform={`rotate(${secondDeg} 50 50)`}
+                                            >
+                                                {/* Counterweight Tail */}
+                                                <line
+                                                    x1="50"
+                                                    y1="50"
+                                                    x2="50"
+                                                    y2="60"
+                                                    stroke={step >= 1 ? '#9ca3af' : colors.secondHand}
+                                                    strokeWidth="2.5"
+                                                    strokeLinecap="round"
+                                                />
+                                                {/* Long Second Hand Needle */}
+                                                <line
+                                                    x1="50"
+                                                    y1="50"
+                                                    x2="50"
+                                                    y2="13"
+                                                    stroke={step >= 1 ? '#9ca3af' : colors.secondHand}
+                                                    strokeWidth="1.6"
+                                                    strokeLinecap="round"
+                                                />
+                                                <circle cx="50" cy="13" r="1.8" fill={step >= 1 ? '#9ca3af' : colors.secondHand} />
+                                            </g>
+
+                                            {/* Center Pivot Jewel */}
+                                            <circle cx="50" cy="50" r="3.5" fill={step >= 1 ? '#6b7280' : colors.centerCap} stroke={isDarkMode ? '#0f172a' : '#ffffff'} strokeWidth="1.2" />
+                                        </svg>
+
+
+                                    </div>
+
+                                    {/* Digital Time Badge — below clock face */}
+                                    <div className={`mt-1 px-3 py-0.5 rounded-full font-mono text-[10px] md:text-[11px] font-black tracking-wider flex items-center gap-1 border pointer-events-none ${colors.digitalBg}`}>
+                                        {step === 0 && (
+                                            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse inline-block" />
+                                        )}
+                                        <span>
+                                            {String(min).padStart(2, '0')}:{String(s).padStart(2, '0')}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })()}
+
+                    {/* Hidden Audio Elements */}
+                    <audio ref={lofiAudioRef} src={selectedMusic} loop />
+                    <audio ref={popAudioRef} src="/audio/correct-pop.mp3" preload="auto" />
+                    <audio ref={wowAudioRef} src="/audio/wow.mp3" preload="auto" />
+                    <audio ref={winAudioRef} src="/audio/win.mp3" preload="auto" />
+
+                    {/* ── Grand Full-Page Celebration Across Entire Screen ── */}
+                    <AnimatePresence>
+                        {showCelebration && (
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: 0.5, ease: 'easeInOut' }}
+                                className="fixed inset-0 z-[999998] pointer-events-none select-none overflow-hidden flex items-center justify-center"
+                            >
+                                {/* Full Page Ambient Radiant Glow */}
+                                <div
+                                    className="absolute inset-0 opacity-40 dark:opacity-50 transition-opacity"
+                                    style={{
+                                        background: `radial-gradient(ellipse at center, ${currentPraise.glow} 0%, rgba(0,0,0,0) 70%)`
+                                    }}
+                                />
+
+                                {/* Floating Celebration Confetti Paper Pieces */}
+                                {CELEBRATION_PARTICLES.map((p, idx) => (
+                                    <motion.div
+                                        key={idx}
+                                        initial={{ opacity: 0, y: -40, rotate: p.rot - 180, scale: 0 }}
+                                        animate={{
+                                            opacity: [0, 1, 1, 0.9],
+                                            y: [-40, 30, 10, 20],
+                                            rotate: [p.rot - 180, p.rot + 60, p.rot - 30, p.rot],
+                                            scale: [0, 1.15, 0.95, 1]
+                                        }}
+                                        exit={{ opacity: 0, y: 80, scale: 0, transition: { duration: 0.5, ease: 'easeIn' } }}
+                                        transition={{
+                                            duration: 1.4,
+                                            delay: p.delay,
+                                            ease: [0.22, 1, 0.36, 1]
+                                        }}
+                                        style={{
+                                            position: 'absolute',
+                                            left: p.left,
+                                            top: p.top,
+                                            width: p.w,
+                                            height: p.h,
+                                            backgroundColor: p.color,
+                                            borderRadius: p.shape === 'circle' ? '50%' : p.shape === 'ribbon' ? '2px' : p.shape === 'square' ? '2px' : '3px',
+                                            boxShadow: `0 2px 8px ${p.color}88`,
+                                            transformOrigin: 'center center',
+                                        }}
+                                    />
+                                ))}
+
+                                {/* Grand Floating Central Praise Badge - Transparent Glass Card with rounded-[0.5rem] */}
+                                <motion.div
+                                    initial={{ scale: 0.5, opacity: 0, y: 80 }}
+                                    animate={{ scale: 1, opacity: 1, y: 0 }}
+                                    exit={{ scale: 0.75, opacity: 0, y: -40, transition: { duration: 0.35, ease: 'easeIn' } }}
+                                    transition={{ type: 'spring', stiffness: 220, damping: 22, mass: 0.9 }}
+                                    className="relative z-10 flex flex-col items-center justify-center max-w-[92vw] sm:max-w-xl md:max-w-2xl px-4"
+                                >
+                                    <div className="relative bg-white/50 dark:bg-black/50 backdrop-blur-xl px-6 sm:px-10 md:px-12 py-6 sm:py-7 md:py-8 rounded-[0.5rem] flex flex-col items-center text-center gap-3.5 border-2 border-white/60 dark:border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.2)]">
+                                        {/* Top animated emoji flair */}
+                                        <div className="flex items-center gap-3 sm:gap-5">
+                                            <motion.span
+                                                animate={{ y: [0, -8, 0] }}
+                                                transition={{ repeat: Infinity, duration: 1.4, ease: 'easeInOut' }}
+                                                className="text-4xl sm:text-5xl md:text-6xl inline-block drop-shadow-md"
+                                            >{currentPraise.emojiLeft}</motion.span>
+                                            <motion.span
+                                                animate={{ scale: [1, 1.25, 1], rotate: [0, 15, -15, 0] }}
+                                                transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}
+                                                className="text-3xl sm:text-4xl md:text-5xl inline-block drop-shadow-md"
+                                            >✨</motion.span>
+                                            <motion.span
+                                                animate={{ y: [0, -8, 0] }}
+                                                transition={{ repeat: Infinity, duration: 1.4, ease: 'easeInOut', delay: 0.2 }}
+                                                className="text-4xl sm:text-5xl md:text-6xl inline-block drop-shadow-md"
+                                            >{currentPraise.emojiRight}</motion.span>
+                                        </div>
+
+                                        {/* Dynamic Appreciation Title */}
+                                        <h2 className={`text-2xl sm:text-3xl md:text-5xl font-black tracking-wide bg-gradient-to-r ${currentPraise.textGradient} bg-clip-text text-transparent drop-shadow-[0_2px_4px_rgba(255,255,255,0.5)] dark:drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] uppercase leading-tight`}>
+                                            {uiLang === 'bn' ? currentPraise.titleBn : currentPraise.titleEn}
+                                        </h2>
+
+                                        {/* Subtitle Praise */}
+                                        <p className="text-xs sm:text-sm md:text-base font-bold text-slate-800 dark:text-slate-100 tracking-wide max-w-md drop-shadow-sm">
+                                            {uiLang === 'bn' ? currentPraise.subtitleBn : currentPraise.subtitleEn}
+                                        </p>
+
+                                        {/* Accuracy badge pill with 0.5rem radius */}
+                                        <div className="mt-1 px-4 py-1.5 rounded-[0.5rem] bg-emerald-50/80 dark:bg-emerald-500/20 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 font-black text-xs md:text-sm tracking-wider uppercase flex items-center gap-2 shadow-sm backdrop-blur-md">
+                                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+                                            {uiLang === 'bn' ? '১০০% নির্ভুল উত্তর' : '100% Accurate Answer'}
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+
+                    {/* Virtual Cursor Animation — only during auto-click */}
+                    {virtualCursor.visible && (
+                        <div
+                            className="fixed pointer-events-none z-[999999]"
+                            style={{
+                                left: `${virtualCursor.x}px`,
+                                top: `${virtualCursor.y}px`,
+                                transform: `translate(-4px, -4px) ${virtualCursor.isClicking ? 'scale(0.80)' : 'scale(1)'}`,
+                                transition: virtualCursor.isClicking
+                                    ? 'transform 0.08s ease-in'
+                                    : virtualCursor.visible
+                                        ? 'left 0.30s cubic-bezier(0.25,0.46,0.45,0.94), top 0.30s cubic-bezier(0.25,0.46,0.45,0.94), transform 0.12s ease-out'
+                                        : 'left 0s, top 0s, transform 0.12s ease-out',
+                                filter: virtualCursor.isClicking
+                                    ? 'drop-shadow(0 0 12px rgba(59,130,246,0.95)) drop-shadow(0 0 24px rgba(99,102,241,0.7))'
+                                    : 'drop-shadow(0 4px 14px rgba(0,0,0,0.5)) drop-shadow(0 0 8px rgba(59,130,246,0.45))'
+                            }}
+                        >
+                            {/* Outer glow halo — only during auto-click animation */}
+                            {virtualCursor.visible && (
+                                <div
+                                    className="absolute rounded-full"
+                                    style={{
+                                        width: virtualCursor.isClicking ? '52px' : '40px',
+                                        height: virtualCursor.isClicking ? '52px' : '40px',
+                                        top: '50%', left: '50%',
+                                        transform: 'translate(-50%, -50%)',
+                                        background: virtualCursor.isClicking
+                                            ? 'radial-gradient(circle, rgba(99,102,241,0.35) 0%, transparent 70%)'
+                                            : 'radial-gradient(circle, rgba(59,130,246,0.2) 0%, transparent 70%)',
+                                        transition: 'all 0.12s ease'
+                                    }}
+                                />
+                            )}
+                            <div className="relative">
+                                {/* Main cursor SVG */}
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="44" height="44"
+                                    viewBox="0 0 24 24"
+                                    style={{ display: 'block' }}
+                                >
+                                    {/* White stroke outline for contrast */}
+                                    <path
+                                        d="M4 0 L4 17 L8 13 L11.5 21 L13.5 20 L10 12 L15 12 Z"
+                                        fill="white"
+                                        stroke="white"
+                                        strokeWidth="1"
+                                        strokeLinejoin="round"
+                                    />
+                                    {/* Main blue cursor */}
+                                    <path
+                                        d="M4 0 L4 17 L8 13 L11.5 21 L13.5 20 L10 12 L15 12 Z"
+                                        fill={virtualCursor.isClicking ? '#4f46e5' : '#2563eb'}
+                                        stroke="#1e40af"
+                                        strokeWidth="0.6"
+                                        strokeLinejoin="round"
+                                    />
+                                </svg>
+
+                                {/* Click ripple rings — only during auto-click */}
+                                {virtualCursor.isClicking && (
+                                    <>
+                                        <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full border-2 border-indigo-400 animate-ping" />
+                                        <span
+                                            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-blue-400/30"
+                                            style={{ animation: 'ping 0.5s ease-out 0.15s 1 forwards' }}
+                                        />
+                                        <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-indigo-500/50 blur-[1px]" />
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Main Content Area */}
+                    <div ref={scrollContainerRef} className="flex-1 w-full relative flex flex-col items-center px-4 md:px-24 py-6 md:py-12 z-10 overflow-y-auto overflow-x-hidden custom-scrollbar gap-8">
+
+                        {/* Zoomable Content Wrapper */}
+                        <div
+                            className="w-full flex flex-col items-center flex-1 transition-transform duration-100 ease-out"
+                            style={isMagnified
+                                ? { transform: 'scale(1.7)', transformOrigin: `${magnifierPos.x}% ${magnifierPos.y}%` }
+                                : contentZoom !== 1
+                                    ? { transform: `scale(${contentZoom}) translate(${panOffset.x}px, ${panOffset.y}px)`, transformOrigin: 'center center' }
+                                    : {}
+                            }
+                            onWheel={handleContentWheel}
+                            onTouchMove={handleContentTouchMove}
+                            onTouchEnd={handleContentTouchEnd}
+                        >
+                            <AnimatePresence mode="wait">
+                                <motion.div
+                                    key={currentSlide}
+                                    initial={{ ...TRANSITION_VARIANTS[transitionType].initial }}
+                                    animate={{ opacity: 1, x: 0, y: 0, scale: 1, rotateY: 0 }}
+                                    exit={{ ...TRANSITION_VARIANTS[transitionType].exit }}
+                                    transition={{ duration: animSpeed, ease: 'easeOut' }}
+                                    className="w-full flex flex-col items-center flex-1"
+                                >
+
+                                    {/* Question */}
+                                    <div
+                                        className={`flex flex-col items-center justify-center gap-4 w-[94%] sm:w-full min-w-[300px] md:min-w-[600px] max-w-4xl xl:max-w-5xl min-h-[120px] md:min-h-[160px] mx-auto mt-1 md:mt-1 transition-all duration-300 relative z-10 rounded-t-2xl rounded-b-[0.5rem] border shadow-[0_8px_32px_rgba(0,0,0,0.10)] p-6 md:p-8 md:px-10 ${qBgColor !== 'transparent' ? `${qBgColor} border-gray-200/50 dark:border-gray-700/50` : 'bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-gray-100/80 dark:border-slate-700/40'}`}
+                                        style={{
+                                            '--q-size': (() => {
+                                                const hasStmts = q.statements && q.statements.length > 0;
+                                                const stmtLines = q.statements ? q.statements.length : 0;
+                                                const stmtLen = q.statements ? q.statements.join(' ').length : 0;
+                                                const tLen = (q.questionText?.length || 0) + stmtLen;
+                                                if (hasStmts) {
+                                                    if (stmtLines >= 4 || tLen > 150) return 'calc(var(--base-q-size) * 0.65)';
+                                                    if (stmtLines >= 2 || tLen > 100) return 'calc(var(--base-q-size) * 0.75)';
+                                                    return 'calc(var(--base-q-size) * 0.85)';
+                                                }
+                                                return tLen > 300 ? 'calc(var(--base-q-size) * 0.75)' : 'var(--base-q-size)';
+                                            })(),
+                                            '--q-color': qTextColor !== 'default' ? qTextColor : undefined,
+                                            borderTopColor: bgTheme === 'video' ? 'rgba(255,255,255,0.4)' : [
+                                                '#6366f1', '#3b82f6', '#10b981', '#f43f5e', '#f59e0b', '#a855f7'
+                                            ][currentSlide % 6],
+                                            borderTopWidth: '4px',
+                                            ...(qBgColor !== 'transparent' && bgTheme === 'dots' ? {
+                                                backgroundImage: `radial-gradient(${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'} 1.5px, transparent 1.5px)`,
+                                                backgroundSize: '16px 16px'
+                                            } : qBgColor !== 'transparent' && bgTheme === 'grid' ? {
+                                                backgroundImage: `linear-gradient(to right, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px)`,
+                                                backgroundSize: '16px 16px'
+                                            } : {
+                                                backgroundImage: 'none',
+                                                backgroundSize: 'auto'
+                                            })
+                                        } as unknown as React.CSSProperties}
+                                    >
+                                        {/* Question Number Badge */}
+                                        <div className="absolute -top-8 md:-top-10 left-1/2 -translate-x-1/2 flex items-center justify-center z-20">
+                                            <div className={`w-16 h-16 md:w-20 md:h-20 flex items-center justify-center rounded-full shadow-xl border-2 backdrop-blur-md font-black text-3xl md:text-5xl ${bgTheme === 'video' ? 'bg-black/50 border-white/30 text-white' : `${[
+                                                'from-indigo-600 to-violet-600 dark:from-indigo-500 dark:to-violet-500',
+                                                'from-blue-600 to-cyan-600 dark:from-blue-500 dark:to-cyan-500',
+                                                'from-emerald-600 to-teal-600 dark:from-emerald-500 dark:to-teal-500',
+                                                'from-rose-600 to-pink-600 dark:from-rose-500 dark:to-pink-500',
+                                                'from-amber-500 to-orange-500 dark:from-amber-400 dark:to-orange-500',
+                                                'from-fuchsia-600 to-purple-600 dark:from-fuchsia-500 dark:to-purple-500'
+                                            ][currentSlide % 6]} bg-gradient-to-tr border-white dark:border-slate-800 text-white`}`}>
+                                                {uiLang === 'bn' ? toBanglaNumber(currentSlide + 1) : currentSlide + 1}
+                                            </div>
+                                        </div>
+
+                                        {/* Top-Left Metallic Rivets / Screws (৩টি তারকাঁটা/স্ক্রু) */}
+                                        <div className="absolute top-2.5 md:top-3.5 left-4 md:left-8 flex items-center gap-2 md:gap-2.5 z-20 pointer-events-none select-none">
+                                            <MetallicScrew rotation={15} />
+                                            <MetallicScrew rotation={68} />
+                                            <MetallicScrew rotation={125} />
+                                        </div>
+
+                                        {/* Top-Right Metallic Rivets / Screws (৩টি তারকাঁটা/স্ক্রু) */}
+                                        <div className="absolute top-2.5 md:top-3.5 right-4 md:right-8 flex items-center gap-2 md:gap-2.5 z-20 pointer-events-none select-none">
+                                            <MetallicScrew rotation={35} />
+                                            <MetallicScrew rotation={95} />
+                                            <MetallicScrew rotation={155} />
+                                        </div>
+
+                                        {/* Subtle horizontal divider line */}
+                                        <div className="w-full border-t border-gray-200 dark:border-gray-700/60 mt-1 md:mt-2 mb-1"></div>
+
+                                        <div data-read-cursor-target="question" className={`prose dark:prose-invert max-w-none w-full prose-p:font-extrabold text-[length:var(--q-size)] leading-relaxed text-left font-extrabold [&_*]:!text-[length:var(--q-size)] [&_*]:!leading-relaxed [&_*]:!m-0 ${qTextColor !== 'default' ? 'text-[var(--q-color)] [&_*]:!text-[var(--q-color)] drop-shadow-sm [&_*]:!drop-shadow-sm' : (bgTheme === 'video' ? 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] [&_*]:!text-white [&_*]:!drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]' : 'text-slate-900 dark:text-white [&_*]:!text-slate-900 dark:[&_*]:!text-white')}`}>
+                                            <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
+                                                {q.questionText}
+                                            </ReactMarkdown>
+                                        </div>
+                                        {q.statements && q.statements.length > 0 && (
+                                            <div className="mt-2 flex flex-col gap-1 w-full pl-3 md:pl-6 border-l-4 border-indigo-200 dark:border-indigo-800/50">
+                                                {q.statements.map((stmt: string, sIdx: number) => (
+                                                    <div key={sIdx} className={`prose dark:prose-invert max-w-none w-full prose-p:font-bold text-[calc(var(--q-size)*0.85)] leading-[1] text-left font-bold [&_*]:!text-[calc(var(--q-size)*0.85)] [&_*]:!leading-[1] [&_*]:!m-0 ${qTextColor !== 'default' ? 'text-[var(--q-color)] [&_*]:!text-[var(--q-color)]' : (bgTheme === 'video' ? 'text-white/90 [&_*]:!text-white/90' : 'text-slate-700 dark:text-gray-300 [&_*]:!text-slate-700 dark:[&_*]:!text-gray-300')}`}>
+                                                        <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
+                                                            {stmt}
+                                                        </ReactMarkdown>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Options Area with Side Navigation */}
+                                    <div className="relative w-full max-w-[1200px] flex justify-center mt-6 md:mt-8 mb-4 mx-auto">
+                                        {/* Prev Arrow */}
+                                        {currentSlide > 0 && (
+                                            <div className="absolute left-[-10px] md:left-[-50px] lg:left-[-70px] top-1/2 -translate-y-1/2 z-[45] group hidden md:block">
+                                                <button
+                                                    onClick={prevStep}
+                                                    className="p-3 bg-white/70 hover:bg-white dark:bg-gray-800/70 dark:hover:bg-gray-800 text-indigo-600 dark:text-indigo-400 rounded-full shadow-lg backdrop-blur-sm border border-gray-200 dark:border-gray-600 transition-all hover:scale-110 active:scale-95"
+                                                >
+                                                    <ChevronLeft className="w-8 h-8" strokeWidth={2.5} />
+                                                </button>
+                                            </div>
+                                        )}
+
+                                        <motion.div
+                                            className={optionsLayout === 'grid' ? "grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 w-full max-w-6xl" : "flex flex-col gap-y-3 w-[90%] sm:w-fit min-w-[300px] md:min-w-[450px] lg:min-w-[500px] max-w-4xl mx-auto"}
+                                            initial="hidden"
+                                            animate="visible"
+                                            variants={{
+                                                hidden: {},
+                                                visible: { transition: { staggerChildren: animSpeed / 2 } }
+                                            }}
+                                        >
+                                            {parsedOptions.length > 0 && parsedOptions.map((opt: { key: string, text: string }, oIdx: number) => {
+                                                const isCorrect = q.correctAnswer && q.correctAnswer.toLowerCase().includes(opt.key);
+                                                const optLetter = getOptionLabel(opt.key, uiLang);
+
+                                                const showCorrect = step >= 1 && isCorrect;
+                                                const showWrong = step >= 1 && !isCorrect;
+                                                const isSelected = selectedOption === opt.key;
+
+                                                // Colors closely matching the image
+                                                const colorThemes = [
+                                                    { border: 'border-[#4285F4]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#4285F4]', letterText: 'text-white' }, // Blue
+                                                    { border: 'border-[#34A853]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#34A853]', letterText: 'text-white' }, // Green
+                                                    { border: 'border-[#F9AB00]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#F9AB00]', letterText: 'text-white' }, // Yellow/Orange
+                                                    { border: 'border-[#EA4335]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#EA4335]', letterText: 'text-white' }, // Red
+                                                    { border: 'border-[#9C27B0]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#9C27B0]', letterText: 'text-white' }, // Purple
+                                                ];
+
+                                                const theme = colorThemes[oIdx % colorThemes.length];
+
+                                                let containerClasses = `flex items-center gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 transition-all duration-200 shadow-[0_4px_12px_rgba(0,0,0,0.04)] relative z-10 select-none ${theme.bg} ${theme.border}`;
+                                                let letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 ${theme.letterBg} ${theme.letterText}`;
+
+                                                if (step === 0) {
+                                                    if (eliminatedOptions.includes(opt.key)) {
+                                                        containerClasses = `flex items-center gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 transition-all duration-200 opacity-40 grayscale border-gray-300 bg-gray-50 dark:bg-gray-800 relative z-10 cursor-not-allowed select-none`;
+                                                        letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 bg-gray-300 text-gray-500`;
+                                                    } else if (isSelected) {
+                                                        containerClasses = `flex items-center gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 transition-all duration-200 shadow-[0_8px_20px_rgba(66,133,244,0.15)] bg-[#e8f0fe] dark:bg-[#1e293b] border-[#4285F4] scale-[1.02] cursor-pointer ring-2 ring-[#4285F4]/30 relative z-10 select-none active:scale-[0.99]`;
+                                                        letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 bg-[#4285F4] text-white`;
+                                                    } else {
+                                                        containerClasses += ` hover:scale-[1.02] hover:shadow-md cursor-pointer hover:border-gray-300 active:scale-[0.99]`;
+                                                    }
+                                                } else {
+                                                    if (showCorrect) {
+                                                        containerClasses = `flex items-center gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 ring-4 ring-[#34A853]/30 bg-[#f0fdf4] dark:bg-[#064e3b] border-[#34A853] z-10 relative animate-pop-in select-none`;
+                                                        letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 bg-[#34A853] text-white`;
+                                                    } else if (showWrong && isSelected) {
+                                                        containerClasses = `flex items-center gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 transition-all duration-200 shadow-[0_8px_20px_rgba(234,67,53,0.15)] bg-[#fce8e6] dark:bg-[#7f1d1d] border-[#EA4335] scale-[1.02] relative z-10 select-none`;
+                                                        letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 bg-[#EA4335] text-white`;
+                                                    } else if (showWrong) {
+                                                        containerClasses = `flex items-center gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 transition-all duration-200 shadow-sm bg-yellow-50 dark:bg-yellow-950/50 border-yellow-400 dark:border-yellow-600 relative z-10 select-none`;
+                                                        letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 bg-yellow-300 dark:bg-yellow-700 text-yellow-800 dark:text-yellow-100`;
+                                                    }
+                                                }
+                                                return (
+                                                    <motion.div
+                                                        key={opt.key}
+                                                        variants={{
+                                                            hidden: { opacity: 0, y: 20 },
+                                                            visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100, damping: 14 } }
+                                                        }}
+                                                        className="flex flex-col gap-2 w-full relative"
+                                                    >
+                                                        <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none transition-opacity duration-300 ${step >= 1 ? 'opacity-100' : 'opacity-0'}`}>
+                                                            <Confetti active={isConfettiActive && isSelected && showCorrect} config={CONFETTI_CONFIG} />
+                                                        </div>
+                                                        <div
+                                                            id={`option-card-${opt.key}`}
+                                                            className={containerClasses}
+                                                            style={{
+                                                                ...(bgTheme === 'dots' ? {
+                                                                    backgroundImage: `radial-gradient(${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'} 1.5px, transparent 1.5px)`,
+                                                                    backgroundSize: '12px 12px'
+                                                                } : bgTheme === 'grid' ? {
+                                                                    backgroundImage: `linear-gradient(to right, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px)`,
+                                                                    backgroundSize: '12px 12px'
+                                                                } : {
+                                                                    backgroundImage: 'none',
+                                                                    backgroundSize: 'auto'
+                                                                })
+                                                            }}
+                                                            onContextMenu={(e) => {
+                                                                e.preventDefault();
+                                                                if (step === 0) {
+                                                                    setEliminatedOptions(prev =>
+                                                                        prev.includes(opt.key) ? prev.filter(k => k !== opt.key) : [...prev, opt.key]
+                                                                    );
+                                                                }
+                                                            }}
+                                                            onClick={() => {
+                                                                if (step === 0) {
+                                                                    if (eliminatedOptions.includes(opt.key)) return;
+                                                                    setSelectedOption(opt.key);
+                                                                    setStep(1);
+
+                                                                    // Trigger confetti and celebration if correct (Single Question Perform)
+                                                                    if (q.correctAnswer && q.correctAnswer.toLowerCase().trim().includes(opt.key)) {
+                                                                        const newConsecutive = consecutiveCorrect + 1;
+                                                                        setConsecutiveCorrect(newConsecutive);
+                                                                        setIsConfettiActive(true);
+
+                                                                        // Show celebration on every 10 consecutive correct answers
+                                                                        triggerCelebration(newConsecutive);
+
+                                                                        if (newConsecutive > 0 && newConsecutive % 5 === 0) {
+                                                                            // Play WOW sound every 5 consecutive correct answers
+                                                                            if (wowAudioRef.current) {
+                                                                                wowAudioRef.current.currentTime = 0;
+                                                                                wowAudioRef.current.play().catch(e => console.warn('Wow audio failed:', e));
+                                                                            }
+                                                                        } else {
+                                                                            if (!isCelebrationSoundEnabled && popAudioRef.current) {
+                                                                                popAudioRef.current.currentTime = 0;
+                                                                                popAudioRef.current.play().catch(e => console.warn('Pop audio failed:', e));
+                                                                            }
+                                                                        }
+                                                                        setTimeout(() => setIsConfettiActive(false), 2000);
+                                                                    } else {
+                                                                        // Reset on wrong answer
+                                                                        setConsecutiveCorrect(0);
+                                                                    }
+                                                                    // Feature 8: Track session score
+                                                                    if (q.correctAnswer) {
+                                                                        const isCorrect = q.correctAnswer.toLowerCase().trim().includes(opt.key);
+                                                                        updateSessionScore(currentSlide, isCorrect);
+                                                                    }
+                                                                }
+                                                            }}
+                                                        >
+                                                            <div className={letterClasses} style={{ fontSize: 'var(--opt-size)' }}>
+                                                                {optLetter}
+                                                            </div>
+                                                            <div className={`prose dark:prose-invert max-w-none text-slate-900 dark:text-white [&_*]:!text-slate-900 dark:[&_*]:!text-white [&>p]:m-0 [&>p]:text-[length:var(--opt-size)] [&>p]:font-semibold [&>p]:leading-snug flex-1 capitalize ${eliminatedOptions.includes(opt.key) && step === 0 ? 'line-through opacity-50' : ''}`}>
+                                                                <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
+                                                                    {opt.text}
+                                                                </ReactMarkdown>
+                                                            </div>
+
+                                                            {step >= 1 && showCorrect && (
+                                                                isSavingImage ? (
+                                                                    <div className="shrink-0 text-white bg-[#34A853] rounded-full p-1.5 shadow-sm relative z-20">
+                                                                        <Check className="w-7 h-7 stroke-[3]" />
+                                                                    </div>
+                                                                ) : (
+                                                                    <motion.div
+                                                                        initial={{ x: -200, opacity: 0, scale: 0.5 }}
+                                                                        animate={{ x: 0, opacity: 1, scale: 1 }}
+                                                                        transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
+                                                                        className="shrink-0 text-white bg-[#34A853] rounded-full p-1.5 shadow-sm relative z-20"
+                                                                    >
+                                                                        <Check className="w-7 h-7 stroke-[3]" />
+                                                                    </motion.div>
+                                                                )
+                                                            )}
+                                                            {step >= 1 && showWrong && isSelected && (
+                                                                isSavingImage ? (
+                                                                    <div className="shrink-0 text-white bg-[#EA4335] rounded-full p-1.5 shadow-sm relative z-20">
+                                                                        <X className="w-7 h-7 stroke-[3]" />
+                                                                    </div>
+                                                                ) : (
+                                                                    <motion.div
+                                                                        initial={{ x: -200, opacity: 0, scale: 0.5 }}
+                                                                        animate={{ x: 0, opacity: 1, scale: 1 }}
+                                                                        transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
+                                                                        className="shrink-0 text-white bg-[#EA4335] rounded-full p-1.5 shadow-sm relative z-20"
+                                                                    >
+                                                                        <X className="w-7 h-7 stroke-[3]" />
+                                                                    </motion.div>
+                                                                )
+                                                            )}
+                                                        </div>
+
+                                                        {/* Option Explanation */}
+                                                        {step >= 2 && isOptionExpEnabled && q.optionExplanations?.[opt.key] && (
+                                                            <div
+                                                                className="ml-4 mt-2 pl-4 pr-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-50/90 dark:bg-gray-800/90 rounded-xl border-l-4 border-l-[#4285F4] shadow-sm animate-in fade-in duration-500 prose dark:prose-invert max-w-none [&>p]:m-0 [&_*]:!text-[length:var(--exp-size)]"
+                                                                style={{ fontSize: 'var(--exp-size)' }}
+                                                            >
+                                                                <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
+                                                                    {q.optionExplanations[opt.key]}
+                                                                </ReactMarkdown>
+                                                            </div>
+                                                        )}
+                                                    </motion.div>
+                                                );
+                                            })}
+                                        </motion.div>
+
+                                        {/* Next Arrow */}
+                                        {currentSlide < questions.length - 1 && (
+                                            <div className="absolute right-[-10px] md:right-[-50px] lg:right-[-70px] top-1/2 -translate-y-1/2 z-[45] group hidden md:block">
+                                                <button
+                                                    onClick={nextStep}
+                                                    className="p-3 bg-white/70 hover:bg-white dark:bg-gray-800/70 dark:hover:bg-gray-800 text-indigo-600 dark:text-indigo-400 rounded-full shadow-lg backdrop-blur-sm border border-gray-200 dark:border-gray-600 transition-all hover:scale-110 active:scale-95"
+                                                >
+                                                    <ChevronRight className="w-8 h-8" strokeWidth={2.5} />
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Explanation */}
+                                    {step >= 2 && q.explanation && isExpEnabled && (
+                                        <div className="w-full max-w-5xl mt-4 animate-in fade-in slide-in-from-bottom-8 duration-700">
+                                            <div className="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-200 dark:border-gray-700 shadow-xl relative overflow-hidden transition-colors duration-500">
+                                                {/* Small colored accent line on the left */}
+                                                <div className="absolute left-0 top-0 bottom-0 w-2 bg-[#34A853]"></div>
+
+                                                <div className="text-[#34A853] font-bold text-xl mb-3 flex items-center gap-2 pl-4">
+                                                    <span className="text-2xl">💡</span>
+                                                    Explanation
+                                                </div>
+                                                <div
+                                                    className="prose prose-xl dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 pl-4 font-medium [&_*]:!text-[length:var(--exp-size)] [&_*]:!leading-relaxed"
+                                                    style={{ fontSize: 'var(--exp-size)' }}
+                                                >
+                                                    <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
+                                                        {q.explanation}
+                                                    </ReactMarkdown>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                </motion.div>
+                            </AnimatePresence>
+                        </div>
+                    </div>
+
+                    {/* Footer */}
+                    <div className="shrink-0 bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 dark:from-indigo-900 dark:via-violet-900 dark:to-purple-900 border-t border-indigo-400/30 dark:border-indigo-700/50 py-2 px-2 md:pl-12 md:pr-8 flex justify-between items-center w-full z-30 relative transition-colors duration-500 overflow-visible" style={{ boxShadow: '0 -4px 20px rgba(109,40,217,0.3), 0 -1px 0 rgba(255,255,255,0.12)' }}>
+                        <div className="hidden md:flex items-center text-indigo-200/80 dark:text-indigo-300/70 font-semibold text-sm md:text-lg whitespace-nowrap mr-2 md:mr-4">
+                            © DeshExam.app
+                        </div>
+
+                        <div className="flex items-center gap-2 md:gap-4 lg:gap-8 ml-auto w-full md:w-auto justify-center md:justify-end">
+                            <div className="flex items-center gap-2 md:gap-4">
+                                {/* Read Aloud Toggle Button (Footer) */}
+                                <button
+                                    onClick={() => {
+                                        if (isAutoPlayReadAloud || isSpeaking) {
+                                            setIsAutoPlayReadAloud(false);
+                                            window.speechSynthesis.cancel();
+                                            setIsSpeaking(false);
+                                        } else {
+                                            setIsAutoPlayReadAloud(true);
+                                            // If not on step 0, manually start reading so user gets immediate feedback
+                                            if (step !== 0) handleReadAloud(true);
+                                        }
+                                    }}
+                                    className={`p-2 md:p-3 rounded-full transition-all shrink-0 ${isAutoPlayReadAloud || isSpeaking ? 'bg-green-500 text-white ring-2 ring-green-300' : 'bg-green-500/80 hover:bg-green-500 text-white'}`}
+                                    title={isAutoPlayReadAloud || isSpeaking ? "Stop Auto Read (R)" : "Start Auto Read (R)"}
+                                >
+                                    {isAutoPlayReadAloud || isSpeaking ? <Pause className="w-5 h-5 md:w-6 md:h-6 fill-current" /> : <Play className="w-5 h-5 md:w-6 md:h-6 fill-current" />}
+                                </button>
+
+                                {/* Dark Mode Toggle Button */}
+                                <button
+                                    onClick={() => setIsDarkMode(!isDarkMode)}
+                                    className="p-2 md:p-3 rounded-full transition-all bg-blue-500/80 hover:bg-blue-500 text-white shrink-0"
+                                    title="Toggle Dark Mode (Shift+N)"
+                                >
+                                    {isDarkMode ? <Sun className="w-5 h-5 md:w-6 md:h-6" /> : <Moon className="w-5 h-5 md:w-6 md:h-6" />}
+                                </button>
+
+                                {/* Language Toggle Button */}
+                                <button
+                                    onClick={() => setUiLang(l => l === 'bn' ? 'en' : 'bn')}
+                                    className="p-2 md:p-3 rounded-full transition-all bg-indigo-500/80 hover:bg-indigo-500 text-white shrink-0 flex items-center justify-center relative"
+                                    title="Toggle Language (বাং/EN)"
+                                >
+                                    <Globe className="w-5 h-5 md:w-6 md:h-6 opacity-40" />
+                                    <span className="absolute text-[10px] md:text-xs font-black tracking-widest uppercase">
+                                        {uiLang === 'bn' ? 'বাং' : 'EN'}
+                                    </span>
+                                </button>
+                                {/* Fullscreen Toggle Button */}
+                                <button
+                                    onClick={toggleFullscreen}
+                                    className="p-2 md:p-3 rounded-full transition-all bg-teal-500/80 hover:bg-teal-500 text-white shrink-0"
+                                    title="Toggle Fullscreen (F11)"
+                                >
+                                    {isFullscreen ? <Minimize className="w-5 h-5 md:w-6 md:h-6" /> : <Maximize className="w-5 h-5 md:w-6 md:h-6" />}
+                                </button>
+
+                                {/* Print Button */}
+                                <button
+                                    onClick={() => window.print()}
+                                    className="hidden md:block p-2 md:p-3 rounded-full transition-all bg-slate-500/80 hover:bg-slate-500 text-white shrink-0"
+                                    title="Print Slides (Ctrl+P)"
+                                >
+                                    <Printer className="w-5 h-5 md:w-6 md:h-6" />
+                                </button>
+
+                                {/* Save as Image Button */}
+                                <button
+                                    onClick={handleSaveAsImage}
+                                    disabled={isSavingImage}
+                                    className={`hidden md:block p-2 md:p-3 rounded-full transition-all text-white shrink-0 ${isSavingImage
+                                        ? 'bg-pink-400/60 cursor-wait'
+                                        : 'bg-pink-500/80 hover:bg-pink-500'
+                                        }`}
+                                    title="Save Slide as Image"
+                                >
+                                    {isSavingImage
+                                        ? <span className="w-5 h-5 md:w-6 md:h-6 flex items-center justify-center"><svg className="animate-spin" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="white" strokeWidth="3" strokeDasharray="31.4" strokeDashoffset="10" /></svg></span>
+                                        : <ImageDown className="w-5 h-5 md:w-6 md:h-6" />
+                                    }
+                                </button>
+
+                                {/* Download PDF Button */}
+                                <button
+                                    onClick={downloadPdf}
+                                    disabled={isGeneratingPdf}
+                                    className={`hidden md:block p-2 md:p-3 rounded-full transition-all text-white shrink-0 ${isGeneratingPdf
+                                        ? 'bg-blue-400/60 cursor-wait'
+                                        : 'bg-blue-500/80 hover:bg-blue-500'
+                                        }`}
+                                    title="Download Presentation as PDF"
+                                >
+                                    {isGeneratingPdf
+                                        ? <span className="w-5 h-5 md:w-6 md:h-6 flex items-center justify-center"><svg className="animate-spin" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="white" strokeWidth="3" strokeDasharray="31.4" strokeDashoffset="10" /></svg></span>
+                                        : <FileDown className="w-5 h-5 md:w-6 md:h-6" />
+                                    }
+                                </button>
+
+
+                                {/* Spotlight Toggle Button */}
+                                <button
+                                    onClick={() => setIsSpotlightActive(!isSpotlightActive)}
+                                    className={`hidden sm:block p-2 md:p-3 rounded-full transition-all shrink-0 ${isSpotlightActive ? 'bg-amber-400 text-white ring-2 ring-amber-200' : 'bg-amber-500/80 hover:bg-amber-500 text-white'}`}
+                                    title="Toggle Spotlight (Shift+F)"
+                                >
+                                    <Focus className="w-5 h-5 md:w-6 md:h-6" />
+                                </button>
+
+                                {/* Whiteboard Toggle Button */}
+                                <button
+                                    onClick={() => setIsWhiteboardMode(!isWhiteboardMode)}
+                                    className={`hidden md:block p-2 md:p-3 rounded-full transition-all shrink-0 ${isWhiteboardMode ? 'bg-violet-400 text-white ring-2 ring-violet-200' : 'bg-violet-500/80 hover:bg-violet-500 text-white'}`}
+                                    title="Toggle Whiteboard Mode (Shift+W)"
+                                >
+                                    <Presentation className="w-5 h-5 md:w-6 md:h-6" />
+                                </button>
+
+                                {/* Pen Toggle Button */}
+                                <button
+                                    onClick={() => setIsPenActive(!isPenActive)}
+                                    className={`p-2 md:p-3 rounded-full transition-all shrink-0 ${isPenActive ? 'bg-rose-500 text-white ring-2 ring-rose-300' : 'bg-rose-500/80 hover:bg-rose-500 text-white'}`}
+                                    title="Toggle Pen Tool (Shift+D)"
+                                >
+                                    <Pen className="w-5 h-5 md:w-6 md:h-6" />
+                                </button>
+
+                                {/* Keyboard Shortcuts Toggle Button */}
+                                <div className="relative shrink-0 hidden md:block">
+                                    <button
+                                        onClick={() => setIsShortcutsOpen(!isShortcutsOpen)}
+                                        className={`p-2 md:p-3 rounded-full transition-all ${isShortcutsOpen ? 'bg-gray-400 text-white ring-2 ring-gray-200' : 'bg-gray-500/80 hover:bg-gray-500 text-white'}`}
+                                        title="Keyboard Shortcuts (Shift+?)"
+                                    >
+                                        <Keyboard className="w-5 h-5 md:w-6 md:h-6" />
+                                    </button>
+
+                                    {isShortcutsOpen && (
+                                        <div className="fixed bottom-[80px] left-1/2 -translate-x-1/2 md:absolute md:bottom-full md:left-auto md:right-0 md:translate-x-0 md:mb-4 bg-white dark:bg-gray-900 !bg-opacity-100 !opacity-100 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)] p-5 w-[90vw] sm:w-[400px] z-[70] animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[70vh] md:max-h-[60vh]">
+                                            <div className="flex justify-between items-center mb-4 pb-3 border-b border-gray-100 dark:border-gray-800 shrink-0">
+                                                <h3 className="font-bold text-gray-800 dark:text-gray-200 text-lg flex items-center gap-2">
+                                                    <Keyboard className="w-5 h-5 text-gray-500 dark:text-gray-400" /> Keyboard Shortcuts
+                                                </h3>
+                                                <button onClick={() => setIsShortcutsOpen(false)} className="p-1 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
+                                                    <X className="w-5 h-5" />
+                                                </button>
+                                            </div>
+                                            <div className="space-y-3 overflow-y-auto custom-scrollbar pr-2 pb-2 text-sm text-gray-700 dark:text-gray-300">
+                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Toggle Shortcuts</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Shift + ?</kbd></div>
+                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Next / Previous</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">← / →</kbd></div>
+                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Select Option A-E</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">A - E</kbd></div>
+                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Read Aloud</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Shift + R</kbd></div>
+                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Auto-Play Read Aloud</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Shift + A</kbd></div>
+                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Toggle Timer</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">T</kbd></div>
+                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Toggle Dark Mode</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Shift + N</kbd></div>
+                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Toggle Fullscreen</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">F11</kbd></div>
+                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Toggle Settings</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">S</kbd></div>
+                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Toggle Spotlight</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Shift + F</kbd></div>
+                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Whiteboard Mode</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Shift + W</kbd></div>
+                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Toggle Pen Tool</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Shift + D</kbd></div>
+                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Show Explanation</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Shift + X</kbd></div>
+                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Show Option Explanations</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Shift + O</kbd></div>
+                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Presentation Mode</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">M</kbd></div>
+                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Question Font Size</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Q / W</kbd></div>
+                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Options Font Size</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">O / P</kbd></div>
+                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Explanation Font Size</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">[ / ]</kbd></div>
+                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Options Layout</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">L / G</kbd></div>
+                                                <div className="flex justify-between items-center pb-2"><span className="font-medium">Clear Canvas</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Shift + C</kbd></div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Settings Dropdown */}
+                                <div className="relative shrink-0">
+                                    <button
+                                        onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+                                        className={`p-2 md:p-3 rounded-full transition-all duration-300 ${isSettingsOpen ? 'bg-indigo-600 text-white shadow-[0_0_20px_rgba(79,70,229,0.4)] scale-105' : 'bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 hover:bg-white dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 hover:scale-105 shadow-lg'}`}
+                                        title="Display Settings"
+                                    >
+                                        <Settings className={`w-5 h-5 md:w-6 md:h-6 transition-transform duration-500 ${isSettingsOpen ? 'rotate-90' : ''}`} />
+                                    </button>
+
+                                    {isSettingsOpen && (
+                                        <div className="fixed bottom-[90px] left-1/2 -translate-x-1/2 md:absolute md:bottom-full md:left-auto md:right-0 md:translate-x-0 md:mb-4 bg-white/95 dark:bg-gray-950/95 backdrop-blur-xl border border-gray-200 dark:border-gray-800 rounded-2xl shadow-2xl p-5 w-[92vw] sm:w-[350px] z-[70] animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[75vh] md:max-h-[65vh]">
+                                            <div className="flex justify-between items-center mb-2 pb-2 border-b border-gray-100 dark:border-gray-800/60 shrink-0">
+                                                <h3 className="font-bold text-gray-800 dark:text-gray-200 text-lg flex items-center gap-2">
+                                                    <Settings className="w-5 h-5 text-indigo-500" /> Settings
+
+                                                </h3>
+                                                <button onClick={() => setIsSettingsOpen(false)} className="p-1 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
+                                                    <X className="w-5 h-5" />
+                                                </button>
+                                            </div>
+
+                                            <div className="overflow-y-auto custom-scrollbar pr-2 pb-2">
+                                                <div className="mb-2 pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
+                                                        <span className="flex items-center gap-2"><MonitorPlay className="w-4 h-4 text-indigo-500" /> Presentation Mode</span>
+
+                                                    </div>
+                                                    <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl">
+                                                        <button
+                                                            onClick={() => setMode('test')}
+                                                            className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-colors ${mode === 'test' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
+                                                        >
+                                                            Test Mode
+                                                        </button>
+                                                        <button
+                                                            onClick={() => setMode('read')}
+                                                            className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-colors ${mode === 'read' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
+                                                        >
+                                                            Read Mode
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                <div className="mb-2 pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
+                                                        <span className="flex items-center gap-2"><Sparkles className="w-4 h-4 text-indigo-500" /> Celebration Settings</span>
+                                                    </div>
+                                                    <div className="space-y-3">
+                                                        <div className="flex items-center justify-between">
+                                                            <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Enable Celebration</span>
+                                                            <button onClick={() => setIsCelebrationEnabled(!isCelebrationEnabled)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${isCelebrationEnabled ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-gray-700'}`}>
+                                                                <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ${isCelebrationEnabled ? 'translate-x-5' : 'translate-x-1'}`} />
+                                                            </button>
+                                                        </div>
+                                                        {isCelebrationEnabled && (
+                                                            <>
+                                                                <div className="flex items-center justify-between mt-2 pl-4 md:pl-6">
+                                                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Celebration Sound</span>
+                                                                    <button onClick={() => setIsCelebrationSoundEnabled(!isCelebrationSoundEnabled)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${isCelebrationSoundEnabled ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-gray-700'}`}>
+                                                                        <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ${isCelebrationSoundEnabled ? 'translate-x-5' : 'translate-x-1'}`} />
+                                                                    </button>
+                                                                </div>
+                                                                <div className="flex items-center justify-between mt-2 pl-4 md:pl-6">
+                                                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Duration</span>
+                                                                    <select
+                                                                        value={celebrationDuration}
+                                                                        onChange={(e) => setCelebrationDuration(Number(e.target.value))}
+                                                                        className="text-xs font-medium bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-2 py-1 outline-none focus:border-indigo-500 dark:text-gray-200"
+                                                                    >
+                                                                        <option value={1}>1 Sec.</option>
+                                                                        <option value={2}>2 Sec.</option>
+                                                                        <option value={3}>3 Sec.</option>
+                                                                        <option value={4}>4 Sec.</option>
+                                                                        <option value={5}>5 Sec.</option>
+                                                                        <option value={6}>6 Sec.</option>
+                                                                        <option value={7}>7 Sec.</option>
+                                                                        <option value={8}>8 Sec.</option>
+                                                                        <option value={9}>9 Sec.</option>
+                                                                        <option value={10}>10 Sec.</option>
+                                                                        <option value={15}>15 Sec.</option>
+                                                                    </select>
+                                                                </div>
+                                                            </>
+                                                        )}
+                                                    </div>
+                                                </div>
+
+                                                <div className="mb-2 pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
+                                                        <span className="flex items-center gap-2"><ImageDown className="w-4 h-4 text-indigo-500" /> Export Settings</span>
+                                                    </div>
+                                                    <div className="space-y-3">
+                                                        <div className="flex items-center justify-between">
+                                                            <div className="flex flex-col">
+                                                                <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Download All Slides</span>
+                                                                <span className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">Save every slide at once</span>
+                                                            </div>
+                                                            <button onClick={() => setDownloadAllSlides(!downloadAllSlides)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${downloadAllSlides ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-gray-700'}`}>
+                                                                <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ${downloadAllSlides ? 'translate-x-5' : 'translate-x-1'}`} />
+                                                            </button>
+                                                        </div>
+                                                        <div className="flex items-center justify-between">
+                                                            <div className="flex flex-col">
+                                                                <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Save with Correct Option</span>
+                                                                <span className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">Show answer in the image</span>
+                                                            </div>
+                                                            <button onClick={() => setSaveWithCorrectOption(!saveWithCorrectOption)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${saveWithCorrectOption ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-gray-700'}`}>
+                                                                <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ${saveWithCorrectOption ? 'translate-x-5' : 'translate-x-1'}`} />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+
+
+                                                <div className="mb-2 pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
+                                                        <span className="flex items-center gap-2"><Printer className="w-4 h-4 text-indigo-500" /> Print Settings</span>
+                                                    </div>
+                                                    <div className="space-y-3">
+                                                        <div className="flex items-center justify-between">
+                                                            <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Include Correct Answers</span>
+                                                            <button onClick={() => setIsPrintWithAnswers(!isPrintWithAnswers)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${isPrintWithAnswers ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-gray-700'}`}>
+                                                                <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ${isPrintWithAnswers ? 'translate-x-5' : 'translate-x-1'}`} />
+                                                            </button>
+                                                        </div>
+                                                        <div className="flex items-center justify-between">
+                                                            <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Print as Continuous List</span>
+                                                            <button onClick={() => setIsPrintAsList(!isPrintAsList)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${isPrintAsList ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-gray-700'}`}>
+                                                                <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ${isPrintAsList ? 'translate-x-5' : 'translate-x-1'}`} />
+                                                            </button>
+                                                        </div>
+                                                        <div className="flex items-center justify-between">
+                                                            <div className="flex flex-col">
+                                                                <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Print Both Versions</span>
+                                                                <span className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">Test copy + Answer key</span>
+                                                            </div>
+                                                            <button onClick={() => setIsPrintBothVersions(!isPrintBothVersions)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${isPrintBothVersions ? 'bg-indigo-600' : 'bg-gray-200 dark:bg-gray-700'}`}>
+                                                                <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ${isPrintBothVersions ? 'translate-x-5' : 'translate-x-1'}`} />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+
+
+                                                <div className="mb-2 pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
+                                                        <span className="flex items-center gap-2"><LayoutGrid className="w-4 h-4 text-indigo-500" /> Options Layout</span>
+                                                    </div>
+                                                    <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl">
+                                                        <button
+                                                            onClick={() => setOptionsLayout('grid')}
+                                                            className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-colors ${optionsLayout === 'grid' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
+                                                        >
+                                                            Grid
+                                                        </button>
+                                                        <button
+                                                            onClick={() => setOptionsLayout('list')}
+                                                            className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-colors ${optionsLayout === 'list' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
+                                                        >
+                                                            List
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+
+
+                                                <div className="mb-2 pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
+                                                        <span className="flex items-center gap-2"><LayoutGrid className="w-4 h-4 text-indigo-500" /> Header Settings</span>
+                                                    </div>
+                                                    <div className="space-y-3">
+                                                        <div className="flex items-center justify-between">
+                                                            <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Show Header</span>
+                                                            <button onClick={() => setShowHeader(!showHeader)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${showHeader ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-gray-700'}`}>
+                                                                <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ${showHeader ? 'translate-x-5' : 'translate-x-1'}`} />
+                                                            </button>
+                                                        </div>
+                                                        {showHeader && (
+                                                            <>
+                                                                <div className="flex items-center justify-between">
+                                                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Show Logo</span>
+                                                                    <button onClick={() => setShowLogo(!showLogo)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${showLogo ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-gray-700'}`}>
+                                                                        <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ${showLogo ? 'translate-x-5' : 'translate-x-1'}`} />
+                                                                    </button>
+                                                                </div>
+                                                                <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400 min-w-[50px]">Scale</span>
+                                                                    <input
+                                                                        type="range" min="0.5" max="1.5" step="0.1"
+                                                                        value={headerScale} onChange={(e) => setHeaderScale(Number(e.target.value))}
+                                                                        className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                                                    />
+                                                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-8 text-right">{(headerScale * 100).toFixed(0)}%</span>
+                                                                </div>
+                                                                <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400 min-w-[50px]">Text Size</span>
+                                                                    <input
+                                                                        type="range" min="0.5" max="2.5" step="0.1"
+                                                                        value={headerTitleScale} onChange={(e) => setHeaderTitleScale(Number(e.target.value))}
+                                                                        className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                                                    />
+                                                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-8 text-right">{(headerTitleScale * 100).toFixed(0)}%</span>
+                                                                </div>
+                                                                <div className="flex flex-col gap-1.5 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Text Alignment</span>
+                                                                    <div className="flex items-center justify-between gap-2">
+                                                                        <button onClick={() => setHeaderTitleAlign('left')} className={`flex-1 py-1 rounded text-xs font-bold transition-colors ${headerTitleAlign === 'left' ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}`}>Left</button>
+                                                                        <button onClick={() => setHeaderTitleAlign('center')} className={`flex-1 py-1 rounded text-xs font-bold transition-colors ${headerTitleAlign === 'center' ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}`}>Center</button>
+                                                                        <button onClick={() => setHeaderTitleAlign('right')} className={`flex-1 py-1 rounded text-xs font-bold transition-colors ${headerTitleAlign === 'right' ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}`}>Right</button>
+                                                                    </div>
+                                                                </div>
+                                                            </>
+                                                        )}
+                                                    </div>
+                                                </div>
+
+
+
+                                                {/* Transition Type */}
+                                                <div className="mb-2 pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                                                        <span className="flex items-center gap-2"><Play className="w-4 h-4 text-indigo-500" /> {L.transition}</span>
+                                                    </div>
+                                                    <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl flex-wrap gap-1">
+                                                        {(['slide', 'zoom', 'flip', 'fade', 'bounce'] as const).map(t => (
+                                                            <button key={t} onClick={() => setTransitionType(t)} className={`flex-1 py-1 px-1 text-[10px] font-bold rounded-lg capitalize transition-colors ${transitionType === t ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>{t}</button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+
+
+                                                {/* Countdown Timer Settings */}
+                                                <div className="mb-2 pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                                                        <span className="flex items-center gap-2"><Clock className="w-4 h-4 text-indigo-500" /> {L.countdown}</span>
+                                                    </div>
+                                                    <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl mb-2">
+                                                        <button onClick={() => setTimerMode('stopwatch')} className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors ${timerMode === 'stopwatch' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400'}`}>Stopwatch</button>
+                                                        <button onClick={() => setTimerMode('countdown')} className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors ${timerMode === 'countdown' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400'}`}>Countdown</button>
+                                                    </div>
+                                                    {timerMode === 'countdown' && (
+                                                        <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                            <span className="text-xs font-bold text-gray-500 dark:text-gray-400 min-w-[40px]">Secs</span>
+                                                            <input type="range" min="10" max="300" step="5" value={countdownTotal} onChange={e => setCountdownTotal(Number(e.target.value))} className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500" />
+                                                            <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-10 text-right">{countdownTotal}s</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+
+
+
+                                                <div className="mb-2 pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
+                                                        <span className="flex items-center gap-2"><Play className="w-4 h-4 text-indigo-500" /> Animation Speed</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                        <input
+                                                            type="range"
+                                                            min="0.1"
+                                                            max="2.0"
+                                                            step="0.1"
+                                                            value={animSpeed}
+                                                            onChange={(e) => setAnimSpeed(Number(e.target.value))}
+                                                            className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                                        />
+                                                        <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-8 text-right">{animSpeed.toFixed(1)}s</span>
+                                                    </div>
+                                                </div>
+
+
+
+                                                <div className="mb-2 pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
+                                                        <span className="flex items-center gap-2"><LayoutGrid className="w-4 h-4 text-indigo-500" /> Background Theme</span>
+                                                    </div>
+                                                    <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl flex-wrap gap-1">
+                                                        <button onClick={() => setBgTheme('default')} className={`flex-1 min-w-[22%] py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'default' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Default</button>
+                                                        <button onClick={() => setBgTheme('mesh')} className={`flex-1 min-w-[22%] py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'mesh' ? 'bg-white dark:bg-gray-700 text-purple-600 dark:text-purple-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Mesh</button>
+                                                        <button onClick={() => setBgTheme('grid')} className={`flex-1 min-w-[22%] py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'grid' ? 'bg-white dark:bg-gray-700 text-emerald-600 dark:text-emerald-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Grid</button>
+                                                        <button onClick={() => setBgTheme('dots')} className={`flex-1 min-w-[22%] py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'dots' ? 'bg-white dark:bg-gray-700 text-orange-600 dark:text-orange-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Dots</button>
+                                                        <button onClick={() => setBgTheme('video')} className={`flex-1 min-w-[22%] py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'video' ? 'bg-white dark:bg-gray-700 text-rose-600 dark:text-rose-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Video</button>
+                                                        <button onClick={() => setBgTheme('midnight')} className={`flex-1 min-w-[22%] py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'midnight' ? 'bg-white dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Midnight</button>
+                                                        <button onClick={() => setBgTheme('aurora')} className={`flex-1 min-w-[22%] py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'aurora' ? 'bg-white dark:bg-gray-700 text-teal-600 dark:text-teal-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Aurora</button>
+                                                        <button onClick={() => setBgTheme('sunset')} className={`flex-1 min-w-[22%] py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'sunset' ? 'bg-white dark:bg-gray-700 text-pink-600 dark:text-pink-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Sunset</button>
+                                                    </div>
+                                                    {bgTheme === 'video' && (
+                                                        <div className="mt-2 space-y-2">
+                                                            <select
+                                                                value={selectedVideo}
+                                                                onChange={(e) => setSelectedVideo(e.target.value)}
+                                                                className="w-full text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 focus:outline-none focus:border-blue-500 text-gray-700 dark:text-gray-200 font-semibold"
+                                                            >
+                                                                {VIDEO_OPTIONS.map(opt => (
+                                                                    <option key={opt.id} value={opt.url}>{opt.name}</option>
+                                                                ))}
+                                                            </select>
+                                                            <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                                <Sun className="w-4 h-4 text-gray-400 shrink-0" />
+                                                                <input
+                                                                    type="range"
+                                                                    min="5"
+                                                                    max="100"
+                                                                    value={videoOpacity}
+                                                                    onChange={(e) => setVideoOpacity(Number(e.target.value))}
+                                                                    className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                                                />
+                                                                <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-8 text-right">{videoOpacity}%</span>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                    {bgTheme !== 'video' && (
+                                                        <div className="mt-2 flex items-center gap-3 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                            <Sun className="w-4 h-4 text-gray-400 shrink-0" />
+                                                            <input
+                                                                type="range"
+                                                                min="0"
+                                                                max="100"
+                                                                value={bgOpacity}
+                                                                onChange={(e) => setBgOpacity(Number(e.target.value))}
+                                                                className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                                            />
+                                                            <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-8 text-right">{bgOpacity}%</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+
+
+
+                                                <div className="mb-2 pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
+                                                        <span className="flex items-center gap-2"><Highlighter className="w-4 h-4 text-indigo-500" /> Question Styling</span>
+                                                    </div>
+                                                    <div className="space-y-3">
+                                                        {/* Background Color */}
+                                                        <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                            <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400 min-w-[50px] uppercase">Bg Color:</span>
+                                                            <div className="flex gap-1.5 flex-1 justify-end">
+                                                                <button onClick={() => setQBgColor('transparent')} className={`w-5 h-5 rounded-full border-2 ${qBgColor === 'transparent' ? 'border-blue-500' : 'border-transparent'} relative`} title="Transparent">
+                                                                    <div className="absolute inset-0 rounded-full bg-transparent overflow-hidden border border-gray-300">
+                                                                        <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200" style={{ backgroundImage: 'repeating-linear-gradient(45deg, #e5e7eb 25%, transparent 25%, transparent 75%, #e5e7eb 75%, #e5e7eb), repeating-linear-gradient(45deg, #e5e7eb 25%, transparent 25%, transparent 75%, #e5e7eb 75%, #e5e7eb)', backgroundPosition: '0 0, 3px 3px', backgroundSize: '6px 6px' }}></div>
+                                                                    </div>
+                                                                </button>
+                                                                <button onClick={() => setQBgColor('bg-white/90 dark:bg-gray-800/90')} className={`w-5 h-5 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 shadow-sm ring-2 ${qBgColor === 'bg-white/90 dark:bg-gray-800/90' ? 'ring-blue-500' : 'ring-transparent'}`} title="White/Dark"></button>
+                                                                <button onClick={() => setQBgColor('bg-blue-50/90 dark:bg-blue-900/50')} className={`w-5 h-5 rounded-full border border-blue-200 dark:border-blue-700 bg-blue-100 dark:bg-blue-900 shadow-sm ring-2 ${qBgColor === 'bg-blue-50/90 dark:bg-blue-900/50' ? 'ring-blue-500' : 'ring-transparent'}`} title="Blue"></button>
+                                                                <button onClick={() => setQBgColor('bg-indigo-50/90 dark:bg-indigo-900/50')} className={`w-5 h-5 rounded-full border border-indigo-200 dark:border-indigo-700 bg-indigo-100 dark:bg-indigo-900 shadow-sm ring-2 ${qBgColor === 'bg-indigo-50/90 dark:bg-indigo-900/50' ? 'ring-blue-500' : 'ring-transparent'}`} title="Indigo"></button>
+                                                                <button onClick={() => setQBgColor('bg-black/50 dark:bg-black/80')} className={`w-5 h-5 rounded-full border border-gray-700 dark:border-gray-600 bg-gray-900 shadow-sm ring-2 ${qBgColor === 'bg-black/50 dark:bg-black/80' ? 'ring-blue-500' : 'ring-transparent'}`} title="Black/Dark"></button>
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Text Color */}
+                                                        <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                            <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400 min-w-[50px] uppercase">Text Color:</span>
+                                                            <div className="flex gap-1.5 flex-1 justify-end">
+                                                                <button onClick={() => setQTextColor('default')} className={`w-5 h-5 rounded-full border border-gray-300 dark:border-gray-600 shadow-sm text-[9px] font-bold flex items-center justify-center bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300 ring-2 ${qTextColor === 'default' ? 'ring-blue-500' : 'ring-transparent'}`} title="Auto">A</button>
+                                                                <button onClick={() => setQTextColor('#000000')} className={`w-5 h-5 rounded-full border border-gray-800 shadow-sm bg-black ring-2 ${qTextColor === '#000000' ? 'ring-blue-500' : 'ring-transparent'}`} title="Black"></button>
+                                                                <button onClick={() => setQTextColor('#ffffff')} className={`w-5 h-5 rounded-full border border-gray-300 shadow-sm bg-white ring-2 ${qTextColor === '#ffffff' ? 'ring-blue-500' : 'ring-transparent'}`} title="White"></button>
+                                                                <button onClick={() => setQTextColor('#ef4444')} className={`w-5 h-5 rounded-full border border-red-500 shadow-sm bg-red-500 ring-2 ${qTextColor === '#ef4444' ? 'ring-blue-500' : 'ring-transparent'}`} title="Red"></button>
+                                                                <button onClick={() => setQTextColor('#3b82f6')} className={`w-5 h-5 rounded-full border border-blue-500 shadow-sm bg-blue-500 ring-2 ${qTextColor === '#3b82f6' ? 'ring-blue-500' : 'ring-transparent'}`} title="Blue"></button>
+                                                                <button onClick={() => setQTextColor('#f59e0b')} className={`w-5 h-5 rounded-full border border-amber-500 shadow-sm bg-amber-500 ring-2 ${qTextColor === '#f59e0b' ? 'ring-blue-500' : 'ring-transparent'}`} title="Yellow"></button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+
+
+                                                <div className="bg-gray-50/50 dark:bg-gray-900/40 border border-gray-200/60 dark:border-gray-800/60 rounded-2xl p-4 mb-4 shadow-sm backdrop-blur-sm flex flex-col gap-4">
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                                            <Clock className="w-4 h-4 text-indigo-500" />
+                                                            Question Timer
+
+                                                        </div>
+                                                        <button
+                                                            onClick={() => setIsTimerEnabled(!isTimerEnabled)}
+                                                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isTimerEnabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}
+                                                        >
+                                                            <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isTimerEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
+                                                        </button>
+                                                    </div>
+
+                                                    <div className="flex items-center justify-between mt-4">
+                                                        <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                                            <Clock className="w-4 h-4 text-indigo-500" /> Auto Change Question
+                                                        </div>
+                                                        <button onClick={() => setIsAutoChangeQuestion(!isAutoChangeQuestion)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${isAutoChangeQuestion ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-gray-700'}`}>
+                                                            <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ${isAutoChangeQuestion ? 'translate-x-5' : 'translate-x-1'}`} />
+                                                        </button>
+                                                    </div>
+                                                    {isAutoChangeQuestion && (
+                                                        <div className="flex items-center justify-between mt-2 pl-6">
+                                                            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Delay Time</span>
+                                                            <select
+                                                                value={autoChangeDelay}
+                                                                onChange={(e) => setAutoChangeDelay(Number(e.target.value))}
+                                                                className="text-xs font-medium bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-2 py-1 outline-none focus:border-indigo-500 dark:text-gray-200"
+                                                            >
+                                                                <option value={1}>1 Sec.</option>
+                                                                <option value={2}>2 Sec.</option>
+                                                                <option value={3}>3 Sec.</option>
+                                                                <option value={4}>4 Sec.</option>
+                                                                <option value={5}>5 Sec.</option>
+                                                                <option value={6}>6 Sec.</option>
+                                                                <option value={7}>7 Sec.</option>
+                                                                <option value={8}>8 Sec.</option>
+                                                                <option value={9}>9 Sec.</option>
+                                                                <option value={10}>10 Sec.</option>
+                                                                <option value={15}>15 Sec.</option>
+                                                            </select>
+                                                        </div>
+                                                    )}
+                                                </div>
+
+
+
+                                                <div className="flex items-center justify-between">
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                                        <Volume2 className="w-4 h-4 text-indigo-500" />
+                                                        Auto Play Read Aloud
+
+                                                    </div>
+                                                    <button
+                                                        onClick={() => setIsAutoPlayReadAloud(!isAutoPlayReadAloud)}
+                                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isAutoPlayReadAloud ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}
+                                                    >
+                                                        <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isAutoPlayReadAloud ? 'translate-x-6' : 'translate-x-1'}`} />
+                                                    </button>
+                                                </div>
+
+
+
+                                                <div className="flex flex-col gap-2">
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                                            <Music className="w-4 h-4 text-indigo-500" />
+                                                            Focus Mode (Music)
+                                                        </div>
+                                                        <button
+                                                            onClick={() => setIsLofiEnabled(!isLofiEnabled)}
+                                                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isLofiEnabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}
+                                                        >
+                                                            <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isLofiEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
+                                                        </button>
+                                                    </div>
+                                                    {isLofiEnabled && (
+                                                        <div className="pl-6 pr-2 flex flex-col gap-3">
+                                                            <select
+                                                                value={selectedMusic}
+                                                                onChange={(e) => {
+                                                                    setSelectedMusic(e.target.value);
+                                                                    // Restart audio if it's already playing
+                                                                    if (isLofiEnabled && lofiAudioRef.current) {
+                                                                        lofiAudioRef.current.src = e.target.value;
+                                                                        lofiAudioRef.current.play().catch(console.warn);
+                                                                    }
+                                                                }}
+                                                                className="w-full text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 focus:outline-none focus:border-blue-500 text-gray-700 dark:text-gray-200 font-semibold"
+                                                            >
+                                                                {MUSIC_OPTIONS.map(opt => (
+                                                                    <option key={opt.id} value={opt.url}>{opt.name}</option>
+                                                                ))}
+                                                            </select>
+                                                            <div className="flex items-center gap-3">
+                                                                <VolumeX className="w-4 h-4 text-gray-400" />
+                                                                <input
+                                                                    type="range"
+                                                                    min="0"
+                                                                    max="1"
+                                                                    step="0.05"
+                                                                    value={musicVolume}
+                                                                    onChange={(e) => setMusicVolume(parseFloat(e.target.value))}
+                                                                    className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                                                />
+                                                                <div className="flex items-center gap-1 min-w-[3.5rem]">
+                                                                    <Volume2 className="w-4 h-4 text-gray-400" />
+                                                                    <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">{Math.round(musicVolume * 100)}%</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+
+
+
+                                                <div className="flex items-center justify-between">
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                                        <Lightbulb className="w-4 h-4 text-indigo-500" /> Show Explanation
+
+                                                    </div>
+                                                    <button
+                                                        onClick={() => setIsExpEnabled(!isExpEnabled)}
+                                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isExpEnabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}
+                                                    >
+                                                        <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isExpEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
+                                                    </button>
+                                                </div>
+
+                                                <div className="flex items-center justify-between">
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                                        <MessageCircle className="w-4 h-4 text-indigo-500" /> Show Options Explanation
+
+                                                    </div>
+                                                    <button
+                                                        onClick={() => setIsOptionExpEnabled(!isOptionExpEnabled)}
+                                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isOptionExpEnabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}
+                                                    >
+                                                        <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isOptionExpEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
+                                                    </button>
+                                                </div>
+
+
+
+                                                <div className="mb-2 pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between">
+                                                        <span className="flex items-center gap-2"><Type className="w-4 h-4 text-indigo-500" /> Question Font Size</span>
+                                                        <span className="text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 rounded text-xs py-0.5">{Math.round(qFontScale * 100)}%</span>
+                                                    </div>
+                                                    <div className="flex items-center bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 w-full overflow-hidden shadow-inner">
+                                                        <button onClick={() => setQFontScale(s => Math.max(0.6, s - 0.1))} className="flex-1 py-2 flex justify-center items-center gap-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 font-bold border-r border-gray-200 dark:border-gray-700 transition-colors">
+                                                            A-
+                                                        </button>
+                                                        <button onClick={() => setQFontScale(s => Math.min(2.0, s + 0.1))} className="flex-1 py-2 flex justify-center items-center gap-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 font-bold transition-colors">
+                                                            A+
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                <div className="mb-2 pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between">
+                                                        <span className="flex items-center gap-2"><Type className="w-4 h-4 text-green-500" /> Options Font Size</span>
+                                                        <span className="text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/30 px-2 rounded text-xs py-0.5">{Math.round(optFontScale * 100)}%</span>
+                                                    </div>
+                                                    <div className="flex items-center bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 w-full overflow-hidden shadow-inner">
+                                                        <button onClick={() => setOptFontScale(s => Math.max(0.6, s - 0.1))} className="flex-1 py-2 flex justify-center items-center gap-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 font-bold border-r border-gray-200 dark:border-gray-700 transition-colors">
+                                                            A-
+                                                        </button>
+                                                        <button onClick={() => setOptFontScale(s => Math.min(2.0, s + 0.1))} className="flex-1 py-2 flex justify-center items-center gap-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 font-bold transition-colors">
+                                                            A+
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                <div className="mb-2 pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between">
+                                                        <span className="flex items-center gap-2"><Type className="w-4 h-4 text-purple-500" /> Explanation Font Size</span>
+                                                        <span className="text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/30 px-2 rounded text-xs py-0.5">{Math.round(expFontScale * 100)}%</span>
+                                                    </div>
+                                                    <div className="flex items-center bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 w-full overflow-hidden shadow-inner">
+                                                        <button onClick={() => setExpFontScale(s => Math.max(0.6, s - 0.1))} className="flex-1 py-2 flex justify-center items-center gap-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 font-bold border-r border-gray-200 dark:border-gray-700 transition-colors">
+                                                            A-
+                                                        </button>
+                                                        <button onClick={() => setExpFontScale(s => Math.min(2.0, s + 0.1))} className="flex-1 py-2 flex justify-center items-center gap-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 font-bold transition-colors">
+                                                            A+
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+
+
+                                                <div className="flex items-center justify-between">
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                                        <Focus className="w-4 h-4 text-yellow-500" />
+                                                        Spotlight Mode
+
+                                                    </div>
+                                                    <button
+                                                        onClick={() => setIsSpotlightActive(!isSpotlightActive)}
+                                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isSpotlightActive ? 'bg-yellow-500' : 'bg-gray-300 dark:bg-gray-700'}`}
+                                                    >
+                                                        <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isSpotlightActive ? 'translate-x-6' : 'translate-x-1'}`} />
+                                                    </button>
+                                                </div>
+
+
+
+                                                <div className="mb-2 pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 flex items-center justify-between">
+                                                        <span className="flex items-center gap-2"><Pen className="w-4 h-4 text-indigo-500" /> Presentation Tools</span>
+                                                        <div className="flex items-center gap-2">
+
+                                                            <button onClick={() => setIsPenActive(!isPenActive)} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${isPenActive ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}>
+                                                                <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${isPenActive ? 'translate-x-5' : 'translate-x-1'}`} />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    {isPenActive && (
+                                                        <div className="space-y-4 bg-gray-50 dark:bg-gray-800/80 p-3 rounded-xl border border-gray-100 dark:border-gray-700 shadow-inner mb-4">
+
+                                                            {/* Tool Selector */}
+                                                            <div className="flex gap-2 p-1.5 bg-gray-200/50 dark:bg-gray-700/50 rounded-lg flex-wrap">
+                                                                <button
+                                                                    onClick={() => setDrawingTool('pen')}
+                                                                    className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'pen' ? 'bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm border border-gray-200/50 dark:border-gray-500' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                                                                    title="Pen (Shift+P)"
+                                                                >
+                                                                    <Pen className="w-3.5 h-3.5" /> Pen
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => setDrawingTool('highlighter')}
+                                                                    className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'highlighter' ? 'bg-white dark:bg-gray-600 text-yellow-600 dark:text-yellow-400 shadow-sm border border-gray-200/50 dark:border-gray-500' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                                                                    title="Marker (Shift+M)"
+                                                                >
+                                                                    <Highlighter className="w-3.5 h-3.5" /> Marker
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => setDrawingTool('laser')}
+                                                                    className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'laser' ? 'bg-white dark:bg-gray-600 text-red-500 dark:text-red-400 shadow-sm border border-gray-200/50 dark:border-gray-500' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                                                                    title="Laser (Shift+L)"
+                                                                >
+                                                                    <MousePointer2 className="w-3.5 h-3.5" /> Laser
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => setDrawingTool('eraser')}
+                                                                    className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'eraser' ? 'bg-white dark:bg-gray-600 text-gray-800 dark:text-gray-200 shadow-sm border border-gray-200/50 dark:border-gray-500' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                                                                    title="Eraser (Shift+E)"
+                                                                >
+                                                                    <Eraser className="w-3.5 h-3.5" /> Eraser
+                                                                </button>
+                                                            </div>
+                                                            <div className="flex gap-2 p-1.5 bg-gray-200/50 dark:bg-gray-700/50 rounded-lg flex-wrap mt-2">
+                                                                <button
+                                                                    onClick={() => setDrawingTool('rectangle')}
+                                                                    className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'rectangle' ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm border border-gray-200/50 dark:border-gray-500' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                                                                    title="Rect (Shift+B)"
+                                                                >
+                                                                    <Square className="w-3.5 h-3.5" /> Rect
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => setDrawingTool('circle')}
+                                                                    className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'circle' ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm border border-gray-200/50 dark:border-gray-500' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                                                                    title="Circle (Shift+C)"
+                                                                >
+                                                                    <Circle className="w-3.5 h-3.5" /> Circle
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => setDrawingTool('arrow')}
+                                                                    className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'arrow' ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm border border-gray-200/50 dark:border-gray-500' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                                                                    title="Arrow (Shift+V)"
+                                                                >
+                                                                    <ArrowUpRight className="w-3.5 h-3.5" /> Arrow
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => setDrawingTool('text')}
+                                                                    className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'text' ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm border border-gray-200/50 dark:border-gray-500' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                                                                    title="Text (Shift+T)"
+                                                                >
+                                                                    <Type className="w-3.5 h-3.5" /> Text
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => setDrawingTool('magnifier')}
+                                                                    className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'magnifier' ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm border border-gray-200/50 dark:border-gray-500' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                                                                    title="Zoom (Shift+Z)"
+                                                                >
+                                                                    <ZoomIn className="w-3.5 h-3.5" /> Zoom
+                                                                </button>
+                                                            </div>
+
+                                                            <div className={drawingTool === 'laser' || drawingTool === 'text' || drawingTool === 'magnifier' ? 'opacity-50 pointer-events-none transition-opacity flex flex-col gap-4 mt-2' : 'transition-opacity flex flex-col gap-4 mt-2'}>
+                                                                <div>
+                                                                    <div className="flex justify-between text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">
+                                                                        <span>Color</span>
+                                                                    </div>
+                                                                    <div className="flex gap-2 items-center flex-wrap">
+                                                                        {['#ef4444', '#3b82f6', '#22c55e', '#facc15', '#000000', '#ffffff'].map(c => (
+                                                                            <button
+                                                                                key={c}
+                                                                                onClick={() => setPenColor(c)}
+                                                                                className={`w-5 h-5 rounded-full border-2 ${penColor === c ? 'border-gray-900 dark:border-white scale-110' : 'border-transparent hover:scale-110'} transition-all shadow-sm`}
+                                                                                style={{ backgroundColor: c }}
+                                                                            />
+                                                                        ))}
+                                                                        <input
+                                                                            type="color"
+                                                                            value={penColor}
+                                                                            onChange={e => setPenColor(e.target.value)}
+                                                                            className="w-6 h-6 ml-1 cursor-pointer border-0 rounded overflow-hidden bg-transparent"
+                                                                            title="Custom Color"
+                                                                        />
+                                                                    </div>
+                                                                </div>
+                                                                <div>
+                                                                    <div className="flex justify-between text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">
+                                                                        <span>Size</span>
+                                                                        <span className="text-blue-600 dark:text-blue-400 font-bold">{penSize}px</span>
+                                                                    </div>
+                                                                    <input type="range" min="2" max="24" value={penSize} onChange={(e) => setPenSize(Number(e.target.value))} className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600" />
+                                                                </div>
+                                                            </div>
+                                                            <button
+                                                                onClick={clearCanvas}
+                                                                className="w-full py-2 text-red-500 dark:text-red-400 bg-red-50 dark:bg-red-950/40 hover:bg-red-100 dark:hover:bg-red-900/40 rounded-lg border border-red-200/50 dark:border-red-900/50 transition-colors flex items-center justify-center gap-1.5 text-xs font-bold"
+                                                            >
+                                                                <Trash2 className="w-4 h-4" /> Clear Canvas
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </div>
+
+
+
+                                                <div>
+                                                    <div className="relative">
+                                                        {!canUsePremium && (
+                                                            <div className="absolute inset-0 z-10 bg-gray-50/40 dark:bg-gray-900/60 backdrop-blur-[1.5px] rounded-xl flex items-center justify-center mt-6">
+                                                                <a href="/pricing" className="bg-gradient-to-r from-amber-500 to-orange-600 text-white text-[10px] font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 hover:scale-105 transition-transform cursor-pointer">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
+                                                                    Premium Only
+                                                                </a>
+                                                            </div>
+                                                        )}
+                                                        <div className={`text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 flex items-center justify-between ${!canUsePremium ? 'opacity-50' : ''}`}>
+                                                            <span className="flex items-center gap-2"><Stamp className="w-4 h-4 text-indigo-500" /> Watermark</span>
+                                                            <button onClick={() => setWmVisible(!wmVisible)} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${wmVisible ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}>
+                                                                <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${wmVisible ? 'translate-x-5' : 'translate-x-1'}`} />
+                                                            </button>
+                                                        </div>
+                                                        {wmVisible && (
+                                                            <div className={`flex flex-col gap-3 bg-gray-50 dark:bg-gray-800/80 p-2.5 rounded-xl border border-gray-100 dark:border-gray-700 shadow-inner ${!canUsePremium ? 'opacity-50 pointer-events-none select-none' : ''}`}>
+                                                                <input
+                                                                    type="text"
+                                                                    value={wmText}
+                                                                    onChange={(e) => setWmText(e.target.value)}
+                                                                    placeholder="Watermark Text"
+                                                                    className="w-full text-sm bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-gray-700 dark:text-gray-200 font-semibold"
+                                                                />
+                                                                <div className="flex items-center gap-3">
+                                                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-16 whitespace-nowrap">Opacity</span>
+                                                                    <input
+                                                                        type="range" min="0" max="0.6" step="0.01"
+                                                                        value={wmOpacity} onChange={(e) => setWmOpacity(Number(e.target.value))}
+                                                                        className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                                                                    />
+                                                                    <span className="text-xs font-bold text-blue-600 dark:text-blue-400 w-10 text-right bg-blue-50 dark:bg-blue-900/30 px-1 py-0.5 rounded">{Math.round(wmOpacity * 100)}%</span>
+                                                                </div>
+                                                                <div className="flex items-center gap-3">
+                                                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-16 whitespace-nowrap">Size</span>
+                                                                    <input
+                                                                        type="range" min="10" max="100" step="1"
+                                                                        value={wmSize} onChange={(e) => setWmSize(Number(e.target.value))}
+                                                                        className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                                                                    />
+                                                                    <span className="text-xs font-bold text-blue-600 dark:text-blue-400 w-10 text-right bg-blue-50 dark:bg-blue-900/30 px-1 py-0.5 rounded">{wmSize}</span>
+                                                                </div>
+                                                                <div className="flex items-center gap-3">
+                                                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-16 whitespace-nowrap">Spacing</span>
+                                                                    <input
+                                                                        type="range" min="50" max="500" step="5"
+                                                                        value={wmSpacing} onChange={(e) => setWmSpacing(Number(e.target.value))}
+                                                                        className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                                                                    />
+                                                                    <span className="text-xs font-bold text-blue-600 dark:text-blue-400 w-10 text-right bg-blue-50 dark:bg-blue-900/30 px-1 py-0.5 rounded">{wmSpacing}</span>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
+                            </div>
+
+                            <div className="relative flex items-center justify-center shrink-0">
+                                <button
+                                    onClick={() => setIsNavigatorOpen(!isNavigatorOpen)}
+                                    className={`p-2 md:p-3 rounded-full transition-all shadow-sm shrink-0 ${isNavigatorOpen ? 'bg-indigo-600 text-white ring-2 ring-indigo-300' : 'bg-white/60 hover:bg-white text-indigo-600 dark:bg-gray-700/60 dark:hover:bg-gray-700 dark:text-gray-300'}`}
+                                    title="Slide Navigator"
+                                >
+                                    <LayoutGrid className="w-5 h-5 md:w-6 md:h-6" />
+                                </button>
+
+                                {isNavigatorOpen && (
+                                    <div className="absolute bottom-[calc(100%+12px)] right-0 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-2xl p-3.5 sm:p-4 w-[320px] sm:w-[350px] z-50 animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[440px]">
+                                        {/* Professional Balanced Header */}
+                                        <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800 shrink-0">
+                                            <div className="flex items-center gap-2.5">
+                                                <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                                                    <LayoutGrid className="w-4 h-4" />
+                                                </div>
+                                                <div>
+                                                    <h4 className="font-bold text-sm text-gray-800 dark:text-gray-100 leading-tight">
+                                                        {uiLang === 'bn' ? 'স্লাইড নেভিগেটর' : 'Slide Navigator'}
+                                                    </h4>
+                                                    <p className="text-[11px] text-gray-400 dark:text-gray-500 font-medium">
+                                                        {uiLang === 'bn' ? 'যেকোনো প্রশ্নে সরাসরি যান' : 'Jump to question'}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-1.5">
+                                                <span className="text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/80 px-2 py-0.5 rounded-full border border-blue-200/50 dark:border-blue-900/50">
+                                                    {uiLang === 'bn'
+                                                        ? `${toBanglaNumber(currentSlide + 1)} / ${toBanglaNumber(questions.length)}`
+                                                        : `${currentSlide + 1} / ${questions.length}`}
+                                                </span>
+                                                <button
+                                                    onClick={() => setIsNavigatorOpen(false)}
+                                                    className="w-7 h-7 flex items-center justify-center text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                                                    title="Close"
+                                                >
+                                                    <X className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        {/* Status Legend */}
+                                        <div className="flex items-center justify-between px-0.5 py-2.5 text-xs text-gray-600 dark:text-gray-400 font-medium shrink-0">
+                                            <span className="flex items-center gap-1.5">
+                                                <span className="w-2.5 h-2.5 rounded-full bg-blue-600 ring-2 ring-blue-300 dark:ring-blue-800" />
+                                                <span className="text-gray-800 dark:text-gray-200 font-semibold">{uiLang === 'bn' ? 'বর্তমান' : 'Current'}</span>
+                                            </span>
+                                            <span className="flex items-center gap-1.5">
+                                                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                                                <span>{uiLang === 'bn' ? 'উত্তর' : 'Done'} ({uiLang === 'bn' ? toBanglaNumber(answeredSlidesRef.current.size) : answeredSlidesRef.current.size})</span>
+                                            </span>
+                                            <span className="flex items-center gap-1.5">
+                                                <span className="w-2.5 h-2.5 rounded-full bg-gray-300 dark:bg-gray-600" />
+                                                <span>{uiLang === 'bn' ? 'বাকি' : 'Left'} ({uiLang === 'bn' ? toBanglaNumber(questions.length - answeredSlidesRef.current.size) : questions.length - answeredSlidesRef.current.size})</span>
+                                            </span>
+                                        </div>
+
+                                        {/* Grid of Slide Numbers */}
+                                        <div className="overflow-y-auto custom-scrollbar pr-1 pb-1 flex-1">
+                                            <div className="grid grid-cols-6 gap-2">
+                                                {questions.map((_, idx) => {
+                                                    const isCurrent = currentSlide === idx;
+                                                    const isAnswered = answeredSlidesRef.current.has(idx);
+
+                                                    let tileClasses = "h-10 w-full rounded-xl flex items-center justify-center text-xs sm:text-sm font-bold transition-all relative select-none cursor-pointer ";
+
+                                                    if (isCurrent) {
+                                                        tileClasses += "bg-blue-600 text-white font-extrabold shadow-md shadow-blue-500/35 ring-2 ring-blue-400 ring-offset-2 ring-offset-white dark:ring-offset-gray-900 scale-105 z-10";
+                                                    } else if (isAnswered) {
+                                                        tileClasses += "bg-emerald-500 hover:bg-emerald-600 text-white font-bold shadow-xs";
+                                                    } else {
+                                                        tileClasses += "bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-200 border border-gray-200/80 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400";
+                                                    }
+
+                                                    return (
+                                                        <button
+                                                            key={idx}
+                                                            ref={isCurrent ? activeSlideBtnRef : undefined}
+                                                            onClick={() => {
+                                                                setCurrentSlide(idx);
+                                                                setStep(mode === 'read' ? 2 : 0);
+                                                                setSelectedOption(null);
+                                                                setTimerSeconds(0);
+                                                                setIsNavigatorOpen(false);
+                                                            }}
+                                                            className={tileClasses}
+                                                            title={`Question ${idx + 1}`}
+                                                        >
+                                                            <span>{uiLang === 'bn' ? toBanglaNumber(idx + 1) : idx + 1}</span>
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+
+                                        {/* Footer Quick Jumps */}
+                                        <div className="flex items-center justify-between pt-2.5 mt-2.5 border-t border-gray-100 dark:border-gray-800 text-xs font-bold text-gray-500 dark:text-gray-400 shrink-0">
+                                            <button
+                                                onClick={() => {
+                                                    setCurrentSlide(0);
+                                                    setStep(mode === 'read' ? 2 : 0);
+                                                    setSelectedOption(null);
+                                                    setTimerSeconds(0);
+                                                    setIsNavigatorOpen(false);
+                                                }}
+                                                className="hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-1 transition-colors px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 active:scale-95"
+                                            >
+                                                <ChevronLeft className="w-3.5 h-3.5" />
+                                                <span>{uiLang === 'bn' ? 'প্রথম' : 'First'}</span>
+                                            </button>
+                                            <span className="text-[11px] font-extrabold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-2.5 py-0.5 rounded-full border border-blue-100 dark:border-blue-900/50">
+                                                {Math.round(((currentSlide + 1) / Math.max(questions.length, 1)) * 100)}%
+                                            </span>
+                                            <button
+                                                onClick={() => {
+                                                    setCurrentSlide(questions.length - 1);
+                                                    setStep(mode === 'read' ? 2 : 0);
+                                                    setSelectedOption(null);
+                                                    setTimerSeconds(0);
+                                                    setIsNavigatorOpen(false);
+                                                }}
+                                                className="hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-1 transition-colors px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 active:scale-95"
+                                            >
+                                                <span>{uiLang === 'bn' ? 'শেষ' : 'Last'}</span>
+                                                <ChevronRight className="w-3.5 h-3.5" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                        </div>
+                    </div>
+
+                    {/* Dynamic Responsive Font Styles */}
+                    <style dangerouslySetInnerHTML={{
+                        __html: `
+                        .responsive-fonts {
+                            --base-q-size: ${24 * qFontScale}px;
+                            --q-size: var(--base-q-size);
+                            --opt-size: ${16 * optFontScale}px;
+                            --exp-size: ${15 * expFontScale}px;
+                        }
+                        @media (min-width: 768px) {
+                            .responsive-fonts {
+                                --base-q-size: ${32 * qFontScale}px;
+                                --q-size: var(--base-q-size);
+                                --opt-size: ${20 * optFontScale}px;
+                                --exp-size: ${18 * expFontScale}px;
+                            }
+                        }
+                        @media (min-width: 1024px) {
+                            .responsive-fonts {
+                                --base-q-size: ${42 * qFontScale}px;
+                                --q-size: var(--base-q-size);
+                                --opt-size: ${30 * optFontScale}px;
+                                --exp-size: ${24 * expFontScale}px;
+                            }
+                        }
+                    ` }} />
+                    {/* Floating Presentation Tools (Right Edge) */}
+                    {isPenActive && (
+                        <div className="absolute right-4 bottom-8 z-[70] bg-slate-900/95 backdrop-blur-xl p-1 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.4)] border border-slate-700/50 flex flex-col gap-1 w-9 items-center animate-in slide-in-from-right-10 fade-in duration-300">
+
+                            <button onClick={() => setDrawingTool('laser')} className={`p-0.5 rounded-lg transition-all ${drawingTool === 'laser' ? 'bg-red-500/20 text-red-400 border border-red-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Laser (Shift+L)">
+                                <MousePointer2 className="w-4 h-4" />
+                            </button>
+                            <button onClick={() => setDrawingTool('pen')} className={`p-0.5 rounded-lg transition-all ${drawingTool === 'pen' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Pen (Shift+P)">
+                                <Pen className="w-4 h-4" />
+                            </button>
+                            <button onClick={() => setDrawingTool('highlighter')} className={`p-0.5 rounded-lg transition-all ${drawingTool === 'highlighter' ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Marker (Shift+M)">
+                                <Highlighter className="w-4 h-4" />
+                            </button>
+                            <button onClick={() => setDrawingTool('eraser')} className={`p-0.5 rounded-lg transition-all ${drawingTool === 'eraser' ? 'bg-slate-500/40 text-white border border-slate-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Eraser (Shift+E)">
+                                <Eraser className="w-4 h-4" />
+                            </button>
+
+                            <hr className="w-full border-slate-700/50 my-0.5" />
+
+                            <button onClick={() => setDrawingTool('rectangle')} className={`p-0.5 rounded-lg transition-all ${drawingTool === 'rectangle' ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Rectangle (Shift+B)">
+                                <Square className="w-4 h-4" />
+                            </button>
+                            <button onClick={() => setDrawingTool('circle')} className={`p-0.5 rounded-lg transition-all ${drawingTool === 'circle' ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Circle (Shift+C)">
+                                <Circle className="w-4 h-4" />
+                            </button>
+                            <button onClick={() => setDrawingTool('arrow')} className={`p-0.5 rounded-lg transition-all ${drawingTool === 'arrow' ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Arrow (Shift+V)">
+                                <ArrowUpRight className="w-4 h-4" />
+                            </button>
+                            <button onClick={() => setDrawingTool('text')} className={`p-0.5 rounded-lg transition-all ${drawingTool === 'text' ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Text (Shift+T)">
+                                <Type className="w-4 h-4" />
+                            </button>
+                            <button onClick={() => setDrawingTool('magnifier')} className={`p-0.5 rounded-lg transition-all ${drawingTool === 'magnifier' ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Zoom (Shift+Z)">
+                                <ZoomIn className="w-4 h-4" />
+                            </button>
+
+                            <hr className="w-full border-slate-700/50 my-0.5" />
+
+                            <button onClick={clearCanvas} className="p-0.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all" title="Clear Canvas (Shift+Del)">
+                                <Trash2 className="w-4 h-4" />
+                            </button>
+
+                            <hr className="w-full border-slate-700/50 my-0.5" />
+
+                            {/* Color Picker Group */}
+                            <div className={`relative group mt-0.5 mb-0.5 transition-opacity ${drawingTool === 'laser' || drawingTool === 'magnifier' ? 'opacity-30 pointer-events-none' : 'opacity-100'}`}>
+                                {/* The main color button */}
+                                <div className="w-5 h-5 mx-auto relative rounded-full overflow-hidden border border-slate-600 hover:border-slate-400 transition-all cursor-pointer shadow-sm" title="Choose Color">
+                                    <div className="absolute inset-0 pointer-events-none" style={{ backgroundColor: penColor }}></div>
+                                    <input
+                                        type="color"
+                                        value={penColor}
+                                        onChange={e => setPenColor(e.target.value)}
+                                        className="absolute inset-[-10px] w-[50px] h-[50px] cursor-pointer opacity-0"
+                                    />
+                                </div>
+                                {/* Flyout for quick colors */}
+                                <div className="absolute right-full top-1/2 -translate-y-1/2 mr-3 hidden group-hover:flex bg-slate-900/95 backdrop-blur-xl p-1.5 rounded-2xl border border-slate-700/50 shadow-xl gap-1.5 animate-in slide-in-from-right-2 fade-in duration-200">
+                                    {['#ef4444', '#3b82f6', '#22c55e', '#facc15', '#ffffff'].map(c => (
+                                        <button
+                                            key={c}
+                                            onClick={() => setPenColor(c)}
+                                            className={`w-5 h-5 rounded-full border-2 ${penColor === c ? 'border-white scale-110 shadow-lg' : 'border-transparent hover:scale-110'} transition-all`}
+                                            style={{ backgroundColor: c }}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                </div>
+
+                {/* Right Ad Banner (160x600) */}
+                <div className="hidden xl:flex w-[160px] h-[600px] shrink-0 flex-col items-center justify-between bg-gradient-to-b from-[#2a0845] via-[#6441A5] to-[#2a0845] rounded-xl overflow-hidden shadow-2xl border border-purple-400/20 relative z-10 p-3">
+                    {/* Floating Elements Background */}
+                    <div className="absolute top-[10%] right-[20%] w-16 h-16 rounded-full border border-purple-400/20 bg-purple-500/10 blur-[8px]"></div>
+                    <div className="absolute bottom-[20%] left-[-10%] w-20 h-20 rounded-full bg-pink-400/10 blur-[20px]"></div>
+
+                    {/* Top Icon */}
+                    <div className="flex items-center justify-center text-4xl w-full z-10 pt-4 drop-shadow-lg relative">
+                        <div className="absolute inset-0 bg-purple-400/20 blur-[15px] rounded-full"></div>
+                        🎯
+                    </div>
+
+                    {/* Text Section */}
+                    <div className="flex flex-col items-center w-full z-10 text-center mt-3">
+                        <h3 className="text-[18px] text-purple-100 mb-1 leading-tight font-medium">লক্ষ্য তোমার,</h3>
+                        <h3 className="text-[26px] text-white leading-tight font-extrabold">
+                            <span className="text-[#FFD700]">সফলতা</span>
+                        </h3>
+                        <h3 className="text-[26px] text-white leading-tight font-extrabold">আমাদের সাথে!</h3>
+                    </div>
+
+                    {/* Features List */}
+                    <div className="flex flex-col z-10 w-full space-y-2 mt-4 mb-2">
+                        <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-lg p-2.5">
+                            <div className="flex flex-col space-y-2">
+                                {[
+                                    'Daily Test',
+                                    'Unlimited',
+                                    'Analytics',
+                                    'AI Ranking',
+                                    'Report'
+                                ].map((feature, idx) => (
+                                    <div key={idx} className="flex items-center gap-1.5">
+                                        <Check className="w-5 h-5 text-[#00E676] shrink-0" />
+                                        <span className="text-gray-100 text-[16px] font-semibold tracking-wide leading-tight">{feature}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* CTA Button */}
+                    <div className="w-full z-10 pb-2">
+                        <button className="w-full flex items-center justify-center py-2.5 bg-gradient-to-r from-[#FF416C] to-[#FF4B2B] border border-red-400/50 rounded-lg shadow-[0_4px_10px_rgba(255,65,108,0.4)] hover:scale-105 transition-transform duration-300">
+                            <span className="text-white font-bold text-[18px] drop-shadow-md">Join Now</span>
+                        </button>
+                    </div>
+                </div>
+
+
+
+                {/* ── Session Score Overlay ── */}
+                <AnimatePresence>
+                    {isScoreVisible && (
+                        <motion.div
+                            key="score-overlay"
+                            initial={{ x: 80, opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            exit={{ x: 80, opacity: 0 }}
+                            className="fixed top-20 right-4 z-[60] bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-2xl p-4 w-52"
+                        >
+                            <div className="flex items-center justify-between mb-3">
+                                <h3 className="font-bold text-sm text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                                    <BarChart2 className="w-4 h-4 text-green-500" />
+                                    {L.sessionScore}
+                                </h3>
+                                <button onClick={() => setIsScoreVisible(false)} className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-full"><X className="w-3.5 h-3.5" /></button>
+                            </div>
+                            <div className="space-y-2">
+                                <div className="flex justify-between items-center text-xs">
+                                    <span className="flex items-center gap-1.5 font-semibold text-green-600 dark:text-green-400"><span className="w-2 h-2 rounded-full bg-green-500 inline-block"></span>{L.correct}</span>
+                                    <span className="font-black text-green-600 dark:text-green-400">{uiLang === 'bn' ? toBanglaNumber(sessionScore.correct) : sessionScore.correct}</span>
+                                </div>
+                                <div className="flex justify-between items-center text-xs">
+                                    <span className="flex items-center gap-1.5 font-semibold text-red-600 dark:text-red-400"><span className="w-2 h-2 rounded-full bg-red-500 inline-block"></span>{L.wrong}</span>
+                                    <span className="font-black text-red-600 dark:text-red-400">{uiLang === 'bn' ? toBanglaNumber(sessionScore.wrong) : sessionScore.wrong}</span>
+                                </div>
+                                <div className="flex justify-between items-center text-xs">
+                                    <span className="flex items-center gap-1.5 font-semibold text-gray-400"><span className="w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600 inline-block"></span>{L.unanswered}</span>
+                                    <span className="font-black text-gray-500">{uiLang === 'bn' ? toBanglaNumber(questions.length - sessionScore.correct - sessionScore.wrong) : questions.length - sessionScore.correct - sessionScore.wrong}</span>
+                                </div>
+                            </div>
+                            {/* Progress bar */}
+                            <div className="mt-3 h-2 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden flex gap-0.5">
+                                <div className="bg-green-500 h-full rounded-full transition-all" style={{ width: `${(sessionScore.correct / questions.length) * 100}%` }} />
+                                <div className="bg-red-500 h-full rounded-full transition-all" style={{ width: `${(sessionScore.wrong / questions.length) * 100}%` }} />
+                            </div>
+                            <div className="mt-3 flex gap-2">
+                                <button
+                                    onClick={() => { const aid = `presentation_${classLine.substring(0, 40)}`; fetchLeaderboard(aid); setIsLeaderboardOpen(true); }}
+                                    className="flex-1 text-[10px] font-bold py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors flex items-center justify-center gap-1"
+                                >
+                                    <Trophy className="w-3 h-3" />{L.leaderboard}
+                                </button>
+                                <button
+                                    onClick={async () => { await saveFinalScore(); setIsFinalScoreOpen(true); }}
+                                    className="flex-1 text-[10px] font-bold py-1.5 rounded-lg bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/50 transition-colors"
+                                >
+                                    {L.finalScore}
+                                </button>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {/* ── Leaderboard Modal ── */}
+                <AnimatePresence>
+                    {isLeaderboardOpen && (
+                        <motion.div
+                            key="leaderboard"
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.9 }}
+                            className="fixed inset-0 z-[70] flex items-center justify-center p-4"
+                        >
+                            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsLeaderboardOpen(false)} />
+                            <div className="relative bg-white dark:bg-gray-900 rounded-3xl shadow-2xl p-6 w-full max-w-md border border-gray-200 dark:border-gray-700">
+                                <div className="flex items-center justify-between mb-5">
+                                    <h2 className="font-black text-lg text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                                        <Trophy className="w-5 h-5 text-amber-500" />
+                                        {L.topScorers}
+                                    </h2>
+                                    <button onClick={() => setIsLeaderboardOpen(false)} className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"><X className="w-5 h-5" /></button>
+                                </div>
+                                {leaderboardLoading ? (
+                                    <div className="flex items-center justify-center py-8"><div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" /></div>
+                                ) : leaderboardData.length === 0 ? (
+                                    <p className="text-center text-gray-500 dark:text-gray-400 py-8 text-sm">No scores yet. Be the first!</p>
+                                ) : (
+                                    <div className="space-y-2">
+                                        {leaderboardData.map((entry: any, idx: number) => (
+                                            <div key={idx} className={`flex items-center gap-3 p-3 rounded-xl border ${idx === 0 ? 'bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800' : 'bg-gray-50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-700/50'}`}>
+                                                <span className={`font-black text-lg w-7 text-center ${idx === 0 ? 'text-amber-500' : idx === 1 ? 'text-gray-400' : idx === 2 ? 'text-orange-400' : 'text-gray-400'}`}>{idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : idx + 1}</span>
+                                                <div className="flex-1">
+                                                    <p className="font-bold text-sm text-gray-800 dark:text-gray-200">{entry.userId === user?.uid ? userDisplayName + ' (You)' : (entry.displayName || 'Student')}</p>
+                                                    <p className="text-xs text-gray-500 dark:text-gray-400">{entry.scoreData?.correct || 0}/{entry.scoreData?.total || questions.length} correct</p>
+                                                </div>
+                                                <span className="font-black text-indigo-600 dark:text-indigo-400">{entry.scoreData?.score || 0}pts</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {/* ── Final Score Modal ── */}
+                <AnimatePresence>
+                    {isFinalScoreOpen && (
+                        <motion.div
+                            key="final-score"
+                            initial={{ opacity: 0, scale: 0.85 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.85 }}
+                            className="fixed inset-0 z-[70] flex items-center justify-center p-4"
+                        >
+                            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setIsFinalScoreOpen(false)} />
+                            <div className="relative bg-gradient-to-br from-white to-indigo-50 dark:from-gray-900 dark:to-indigo-950 rounded-3xl shadow-2xl p-8 w-full max-w-sm border border-indigo-100 dark:border-indigo-800/50 text-center">
+                                <div className="text-5xl mb-4">{sessionScore.correct / questions.length >= 0.8 ? '🎉' : sessionScore.correct / questions.length >= 0.5 ? '👍' : '💪'}</div>
+                                <h2 className="font-black text-2xl text-gray-900 dark:text-gray-100 mb-1">{L.finalScore}</h2>
+                                <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">{classLine}</p>
+                                <div className="flex justify-center gap-6 mb-6">
+                                    <div className="text-center"><p className="text-3xl font-black text-green-500">{uiLang === 'bn' ? toBanglaNumber(sessionScore.correct) : sessionScore.correct}</p><p className="text-xs font-semibold text-gray-500 mt-1">{L.correct}</p></div>
+                                    <div className="text-center"><p className="text-3xl font-black text-red-500">{uiLang === 'bn' ? toBanglaNumber(sessionScore.wrong) : sessionScore.wrong}</p><p className="text-xs font-semibold text-gray-500 mt-1">{L.wrong}</p></div>
+                                    <div className="text-center"><p className="text-3xl font-black text-gray-400">{uiLang === 'bn' ? toBanglaNumber(questions.length - sessionScore.correct - sessionScore.wrong) : questions.length - sessionScore.correct - sessionScore.wrong}</p><p className="text-xs font-semibold text-gray-500 mt-1">{L.unanswered}</p></div>
+                                </div>
+                                <div className="h-3 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden flex mb-4">
+                                    <div className="bg-green-500 h-full transition-all" style={{ width: `${(sessionScore.correct / questions.length) * 100}%` }} />
+                                    <div className="bg-red-500 h-full transition-all" style={{ width: `${(sessionScore.wrong / questions.length) * 100}%` }} />
+                                </div>
+                                <p className="font-black text-4xl text-indigo-600 dark:text-indigo-400 mb-6">{Math.round((sessionScore.correct / questions.length) * 100)}%</p>
+                                <button onClick={() => setIsFinalScoreOpen(false)} className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl font-bold shadow-lg hover:shadow-xl transition-all hover:scale-105">Close</button>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {/* ── Zoom/Pan Indicator ── */}
+                {contentZoom !== 1 && (
+                    <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[55] flex items-center gap-2 bg-black/70 text-white text-xs font-bold px-3 py-1.5 rounded-full">
+                        <ZoomIn className="w-3.5 h-3.5" />
+                        <span>{Math.round(contentZoom * 100)}%</span>
+                        <button onClick={() => { setContentZoom(1); setPanOffset({ x: 0, y: 0 }); }} className="ml-1 underline opacity-70 hover:opacity-100">{L.zoomReset}</button>
+                    </div>
+                )}
+
+                {/* Spotlight Overlay */}
+                {isSpotlightActive && (
+                    <div
+                        className="fixed inset-0 z-[9999] pointer-events-none transition-opacity duration-300"
+                        style={{
+                            background: `radial-gradient(circle at ${spotlightPos.x}px ${spotlightPos.y}px, transparent 60px, rgba(0,0,0,0.85) 150px)`
+                        }}
+                    />
+                )}
+            </div> {/* Close print:hidden container */}
+
+            {/* Print Only Container */}
+            <div className="print-only hidden print:block w-full bg-white text-black relative z-[999999]" style={{ WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}>
+                {questions.map((q, idx) => {
+                    const parsedOptions = (() => {
+                        if (!q.options) return [];
+                        try { return typeof q.options === 'string' ? JSON.parse(q.options) : q.options; } catch (e) { return []; }
+                    })();
+                    const opts = parsedOptions.length > 0 ? parsedOptions : (() => {
+                        const arr = [
+                            { key: 'a', text: q.options?.a || '' },
+                            { key: 'b', text: q.options?.b || '' },
+                            { key: 'c', text: q.options?.c || '' },
+                            { key: 'd', text: q.options?.d || '' }
+                        ];
+                        if (q.options?.e) arr.push({ key: 'e', text: q.options.e });
+                        return arr.filter((x: any) => x.text);
+                    })();
+
+                    const renderQuestion = (isAnswerKey: boolean) => {
+                        const showHighlight = isAnswerKey || (isPrintWithAnswers && !isPrintBothVersions);
+                        const keyPrefix = isAnswerKey ? `ak-${idx}` : `test-${idx}`;
+
+                        return (
+                            <div key={keyPrefix} className={`w-full ${isPrintAsList ? 'py-8' : 'h-[100vh]'} flex items-center justify-center select-none font-sans ${isPrintAsList ? '' : 'overflow-hidden'} transition-colors duration-500 ${isDarkMode ? 'dark bg-gray-900' : 'bg-[#f8fbff]'}`} style={{ pageBreakAfter: isPrintAsList ? 'auto' : 'always', pageBreakInside: 'avoid' }}>
+                                {/* Main Presentation Area Only (No side banners) */}
+                                <div className={`responsive-fonts relative w-full ${isPrintAsList ? '' : 'h-full'} ${getBgThemeClasses()} flex flex-col shadow-2xl ${isPrintAsList ? '' : 'overflow-hidden'} z-10 transition-colors duration-500`}>
+                                    {bgTheme !== 'video' && (
+                                        <div className={`absolute inset-0 z-0 pointer-events-none transition-opacity duration-300 ${getBgThemeOverlayClasses()}`} style={{ opacity: bgOpacity / 100 }} />
+                                    )}
+
+                                    <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+                                        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-200/30 blur-[100px]"></div>
+                                        <div className="absolute bottom-[-10%] right-[-5%] w-[50%] h-[50%] rounded-full bg-pink-200/30 blur-[100px]"></div>
+                                        <div className="absolute top-[20%] right-[10%] w-[30%] h-[30%] rounded-full bg-purple-200/30 blur-[80px]"></div>
+                                        <div className="absolute top-0 left-0 w-full h-full" style={{ backgroundImage: 'radial-gradient(rgba(99, 102, 241, 0.06) 2px, transparent 2px)', backgroundSize: '32px 32px', opacity: 0.8 }}></div>
+                                        {!isAnswerKey && (
+                                            <>
+                                                <div className="absolute top-[15%] right-[-5%] w-72 h-72 rounded-full border-[1px] border-indigo-200/40 opacity-60"></div>
+                                                <div className="absolute top-[18%] right-[-2%] w-56 h-56 rounded-full border-[1px] border-purple-200/40 opacity-60"></div>
+                                                <div className="absolute bottom-[20%] left-[5%] w-48 h-48 rounded-full border-[1px] border-pink-200/40 opacity-60"></div>
+                                            </>
+                                        )}
+                                    </div>
+
+                                    {wmVisible && wmText && (
+                                        <div
+                                            className="absolute inset-0 pointer-events-none z-0 overflow-hidden"
+                                            style={{
+                                                backgroundImage: getWatermarkSvg(wmSpacing, wmSize, wmOpacity, wmText, isDarkMode),
+                                                backgroundRepeat: 'repeat'
+                                            }}
+                                        />
+                                    )}
+
+                                    {/* Header */}
+                                    {showHeader && (
+                                        isPrintAsList ? (
+                                            <div
+                                                className={isAnswerKey
+                                                    ? "shrink-0 bg-gradient-to-r from-green-50 via-white to-indigo-50 border-b border-green-100/50 flex flex-row justify-between items-center w-full z-30 shadow-sm relative px-6 py-4 !print-color-adjust-exact"
+                                                    : "shrink-0 bg-gradient-to-r from-indigo-50 via-white to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 border-b border-indigo-100/50 dark:border-gray-700/50 flex flex-row justify-between items-center w-full z-30 shadow-sm relative px-6 py-4 !print-color-adjust-exact"}
+                                            >
+                                                <div className="flex items-center gap-3 w-1/3">
+                                                    {showLogo && <img src="/icons/icon-192x192.png" alt="DeshExam" className="h-10 w-auto object-contain drop-shadow-sm rounded-full bg-white p-1" />}
+                                                    <div className="flex flex-col justify-center">
+                                                        <span className="font-extrabold text-indigo-950 dark:text-gray-100 leading-tight text-lg">DESH EXAM</span>
+                                                        <span className="text-indigo-800/80 dark:text-gray-400 font-bold tracking-widest uppercase mt-0.5 text-[10px]">Learn • Practice • Succeed</span>
+                                                    </div>
+                                                </div>
+                                                <div className={`flex-1 w-full px-6 flex flex-col justify-center ${isPrintAsList || headerTitleAlign === 'left' ? 'items-start text-left' : headerTitleAlign === 'right' ? 'items-end text-right' : 'items-center text-center'}`}>
+                                                    <h1 className="font-extrabold text-indigo-950 dark:text-gray-100 tracking-tight text-lg">{displayTitle}</h1>
+                                                    {displayTaxonomy && (
+                                                        <div className="text-indigo-700 dark:text-gray-400 font-bold tracking-wider uppercase mt-1 text-xs">
+                                                            {displayTaxonomy}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="flex items-center justify-end shrink-0 w-1/3">
+                                                    <div className={isAnswerKey
+                                                        ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-full font-extrabold tracking-widest shadow-md flex items-center justify-center whitespace-nowrap px-6 py-2 text-sm !print-color-adjust-exact"
+                                                        : "bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-full font-extrabold tracking-widest shadow-md flex items-center justify-center whitespace-nowrap px-6 py-2 text-sm !print-color-adjust-exact"}
+                                                    >
+                                                        {isAnswerKey ? "ANSWER KEY" : "MOCK TEST"}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className={`shrink-0 w-full px-4 sm:px-6 md:px-8 py-3 md:py-4 flex items-center justify-between border-b relative z-30 transition-colors duration-300 shadow-sm ${bgTheme === 'video'
+                                                ? 'bg-black/40 border-white/10 backdrop-blur-md'
+                                                : isDarkMode
+                                                    ? 'bg-[#111827] border-gray-800'
+                                                    : 'bg-[#7c3aed] border-purple-600'
+                                                } !print-color-adjust-exact`}>
+
+                                                <div className="flex items-center gap-3 w-1/3">
+                                                    {showLogo && (
+                                                        <div className="relative">
+                                                            <div className="absolute inset-0 bg-white rounded-full blur-md opacity-20"></div>
+                                                            <img src="/icons/icon-192x192.png" alt="DeshExam" className="h-10 md:h-12 w-auto object-contain drop-shadow-lg relative z-10 rounded-full bg-white p-1" />
+                                                        </div>
+                                                    )}
+                                                    <div className="flex flex-col justify-center">
+                                                        <span className={`font-black leading-none text-lg md:text-xl ${bgTheme === 'video' ? 'text-white drop-shadow-md' : isDarkMode ? 'text-white' : 'text-white'}`}>DESH EXAM</span>
+                                                        <span className={`font-bold tracking-[0.2em] uppercase mt-1 text-[8px] md:text-[9px] ${bgTheme === 'video' ? 'text-white/80' : isDarkMode ? 'text-gray-400' : 'text-purple-200'}`}>Learn • Practice • Succeed</span>
+                                                    </div>
+                                                </div>
+                                                <div className={`flex-1 w-full px-2 flex flex-col justify-center items-center text-center`}>
+                                                    <h1 className={`font-extrabold tracking-tight text-base md:text-lg lg:text-xl line-clamp-1 ${bgTheme === 'video' ? 'text-white drop-shadow-md' : isDarkMode ? 'text-white' : 'text-white'}`}>{displayTitle}</h1>
+                                                    {displayTaxonomy && (
+                                                        <div className={`font-bold tracking-wider uppercase mt-1 text-[10px] md:text-xs ${bgTheme === 'video' ? 'text-white/90 drop-shadow-md' : isDarkMode ? 'text-gray-300' : 'text-purple-100/90'}`}>
+                                                            {displayTaxonomy}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="flex flex-row items-center justify-end gap-2 shrink-0 w-1/3">
+                                                </div>
+                                            </div>
+                                        )
+                                    )}
+
+                                    {/* Question & Options */}
+                                    <div className={`flex-1 w-full relative flex flex-col ${isPrintAsList ? 'px-12 py-10 z-10 items-start justify-start' : 'items-center justify-center gap-8 z-10'}`}>
+
+                                        {isPrintAsList ? (
+                                            <div
+                                                className={`w-full max-w-full rounded-3xl p-12 shadow-[0_20px_50px_rgba(0,0,0,0.1)] backdrop-blur-sm border transition-all duration-500 relative z-20 ${qBgColor} border-white/20 dark:border-gray-700/50`}
+                                                style={{
+                                                    boxShadow: isDarkMode ? '0 20px 40px -10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1)' : '0 20px 40px -10px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.5)',
+                                                    backgroundImage: `linear-gradient(to right, ${isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'} 1px, transparent 1px)`,
+                                                    backgroundSize: '24px 24px'
+                                                }}
+                                            >
+                                                <div className="flex items-start gap-4 mb-12 border-b border-gray-200/50 dark:border-gray-700/50 pb-10">
+                                                    <div className="flex items-center gap-4 shrink-0">
+                                                        <span className={`font-black text-[32px] bg-clip-text text-transparent bg-gradient-to-br drop-shadow-sm ${isAnswerKey ? 'from-green-600 to-emerald-600' : 'from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400'}`}>
+                                                            Q{idx + 1}.
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex-1 w-full relative pt-1">
+                                                        <div className={`prose max-w-none prose-p:font-black font-black text-[32px] leading-snug ${qTextColor !== 'default' ? 'text-[var(--q-color)]' : 'text-gray-900 dark:text-gray-100'} [&_*]:!text-[32px] [&_*]:!leading-snug [&>p]:m-0`} style={{ '--q-color': qTextColor !== 'default' ? qTextColor : undefined } as React.CSSProperties}>
+                                                            <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
+                                                                {q.questionText}
+                                                            </ReactMarkdown>
+                                                        </div>
+                                                        {q.statements && q.statements.length > 0 && (
+                                                            <div className="mt-6 flex flex-col gap-1.5 w-full pl-6 border-l-4 border-gray-300 dark:border-gray-600">
+                                                                {q.statements.map((stmt: string, sIdx: number) => (
+                                                                    <div key={sIdx} className="prose max-w-none prose-p:font-bold font-bold text-[26px] leading-[1] text-gray-700 dark:text-gray-300 [&_*]:!text-[26px] [&_*]:!leading-[1] [&>p]:m-0">
+                                                                        <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
+                                                                            {stmt}
+                                                                        </ReactMarkdown>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+
+                                                <div className={optionsLayout === 'grid' ? "grid grid-cols-2 gap-x-12 gap-y-10" : `flex flex-col gap-8 w-full`}>
+                                                    {opts.map((opt: any, oIdx: number) => {
+                                                        const optLetter = getOptionLabel(opt.key, uiLang);
+                                                        const colorThemes = [
+                                                            { border: 'border-[#4285F4]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#4285F4]/75', letterText: 'text-white' },
+                                                            { border: 'border-[#34A853]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#34A853]/75', letterText: 'text-white' },
+                                                            { border: 'border-[#F9AB00]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#F9AB00]/75', letterText: 'text-white' },
+                                                            { border: 'border-[#EA4335]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#EA4335]/75', letterText: 'text-white' },
+                                                            { border: 'border-[#9C27B0]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#9C27B0]/75', letterText: 'text-white' },
+                                                        ];
+                                                        const theme = colorThemes[oIdx % colorThemes.length];
+
+                                                        const isCorrect = q.correctAnswer && q.correctAnswer.toLowerCase().includes(opt.key);
+                                                        const printContainerClass = showHighlight && isCorrect
+                                                            ? `flex items-center gap-5 py-2 px-3 rounded-xl border-2 border-[#34A853] bg-[#f0fdf4] min-h-[50px] !print-color-adjust-exact`
+                                                            : `flex items-center gap-5 py-2 px-3 rounded-xl border-2 shadow-[0_4px_12px_rgba(0,0,0,0.04)] ${theme.bg} ${theme.border} min-h-[50px]`;
+                                                        const printLetterClass = showHighlight && isCorrect
+                                                            ? `shrink-0 w-14 h-14 flex items-center justify-center rounded-full text-2xl font-black bg-[#34A853] text-white !print-color-adjust-exact`
+                                                            : `shrink-0 w-14 h-14 flex items-center justify-center rounded-full text-2xl font-black ${theme.letterBg} ${theme.letterText}`;
+
+                                                        return (
+                                                            <div key={opt.key} className={printContainerClass}>
+                                                                <div className={printLetterClass}>
+                                                                    {optLetter}
+                                                                </div>
+                                                                <div className="prose dark:prose-invert max-w-none text-black dark:text-gray-100 font-bold text-[24px] flex items-center [&_*]:!text-[24px] [&_*]:!leading-tight [&_*]:!m-0">
+                                                                    <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
+                                                                        {opt.text}
+                                                                    </ReactMarkdown>
+                                                                </div>
+                                                                {showHighlight && isCorrect && (
+                                                                    <div className="shrink-0 text-white bg-[#34A853] rounded-full p-1.5 shadow-sm ml-auto !print-color-adjust-exact">
+                                                                        <Check className="w-7 h-7 stroke-[3]" />
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="w-full flex flex-col items-center flex-1 !print-color-adjust-exact mt-8">
+                                                <div
+                                                    className={`flex flex-col items-center justify-center gap-4 w-[94%] sm:w-full min-w-[300px] md:min-w-[600px] max-w-4xl xl:max-w-5xl min-h-[120px] md:min-h-[160px] mx-auto mt-1 md:mt-1 transition-all duration-300 relative z-10 rounded-t-2xl rounded-b-[0.5rem] border shadow-[0_8px_32px_rgba(0,0,0,0.10)] p-6 md:p-8 md:px-10 ${qBgColor !== 'transparent' ? `${qBgColor} border-gray-200/50 dark:border-gray-700/50` : 'bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-gray-100/80 dark:border-slate-700/40'} !print-color-adjust-exact`}
+                                                    style={{
+                                                        '--q-size': (() => {
+                                                            const hasStmts = q.statements && q.statements.length > 0;
+                                                            const stmtLines = q.statements ? q.statements.length : 0;
+                                                            const stmtLen = q.statements ? q.statements.join(' ').length : 0;
+                                                            const tLen = (q.questionText?.length || 0) + stmtLen;
+                                                            if (hasStmts) {
+                                                                if (stmtLines >= 4 || tLen > 150) return 'calc(var(--base-q-size) * 0.65)';
+                                                                if (stmtLines >= 2 || tLen > 100) return 'calc(var(--base-q-size) * 0.75)';
+                                                                return 'calc(var(--base-q-size) * 0.85)';
+                                                            }
+                                                            return tLen > 300 ? 'calc(var(--base-q-size) * 0.75)' : 'var(--base-q-size)';
+                                                        })(),
+                                                        '--q-color': qTextColor !== 'default' ? qTextColor : undefined,
+                                                        borderTopColor: bgTheme === 'video' ? 'rgba(255,255,255,0.4)' : [
+                                                            '#6366f1', '#3b82f6', '#10b981', '#f43f5e', '#f59e0b', '#a855f7'
+                                                        ][idx % 6],
+                                                        borderTopWidth: '4px',
+                                                        ...(qBgColor !== 'transparent' && bgTheme === 'dots' ? {
+                                                            backgroundImage: `radial-gradient(${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'} 1.5px, transparent 1.5px)`,
+                                                            backgroundSize: '16px 16px'
+                                                        } : qBgColor !== 'transparent' && bgTheme === 'grid' ? {
+                                                            backgroundImage: `linear-gradient(to right, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px)`,
+                                                            backgroundSize: '16px 16px'
+                                                        } : {
+                                                            backgroundImage: 'none',
+                                                            backgroundSize: 'auto'
+                                                        })
+                                                    } as unknown as React.CSSProperties}
+                                                >
+                                                    <div className="absolute -top-8 md:-top-10 left-1/2 -translate-x-1/2 flex items-center justify-center z-20 !print-color-adjust-exact">
+                                                        <div className={`w-16 h-16 md:w-20 md:h-20 flex items-center justify-center rounded-full shadow-xl border-2 backdrop-blur-md font-black text-3xl md:text-5xl ${bgTheme === 'video' ? 'bg-black/50 border-white/30 text-white' : `${[
+                                                            'from-indigo-600 to-violet-600 dark:from-indigo-500 dark:to-violet-500',
+                                                            'from-blue-600 to-cyan-600 dark:from-blue-500 dark:to-cyan-500',
+                                                            'from-emerald-600 to-teal-600 dark:from-emerald-500 dark:to-teal-500',
+                                                            'from-rose-600 to-pink-600 dark:from-rose-500 dark:to-pink-500',
+                                                            'from-amber-500 to-orange-500 dark:from-amber-400 dark:to-orange-500',
+                                                            'from-fuchsia-600 to-purple-600 dark:from-fuchsia-500 dark:to-purple-500'
+                                                        ][idx % 6]} bg-gradient-to-tr border-white dark:border-slate-800 text-white`}`}>
+                                                            {uiLang === 'bn' ? toBanglaNumber(idx + 1) : idx + 1}
+                                                        </div>
+                                                    </div>
+                                                    <div className="absolute top-2.5 md:top-3.5 left-4 md:left-8 flex items-center gap-2 md:gap-2.5 z-20 pointer-events-none select-none !print-color-adjust-exact">
+                                                        <MetallicScrew rotation={15} />
+                                                        <MetallicScrew rotation={68} />
+                                                        <MetallicScrew rotation={125} />
+                                                    </div>
+                                                    <div className="absolute top-2.5 md:top-3.5 right-4 md:right-8 flex items-center gap-2 md:gap-2.5 z-20 pointer-events-none select-none !print-color-adjust-exact">
+                                                        <MetallicScrew rotation={35} />
+                                                        <MetallicScrew rotation={95} />
+                                                        <MetallicScrew rotation={155} />
+                                                    </div>
+                                                    <div className={`prose dark:prose-invert max-w-none w-full prose-p:font-extrabold text-[length:var(--q-size)] leading-relaxed text-left font-extrabold [&_*]:!text-[length:var(--q-size)] [&_*]:!leading-relaxed [&_*]:!m-0 ${qTextColor !== 'default' ? 'text-[var(--q-color)] [&_*]:!text-[var(--q-color)] drop-shadow-sm [&_*]:!drop-shadow-sm' : (bgTheme === 'video' ? 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] [&_*]:!text-white [&_*]:!drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]' : 'text-slate-900 dark:text-white [&_*]:!text-slate-900 dark:[&_*]:!text-white')}`}>
+                                                        <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
+                                                            {q.questionText}
+                                                        </ReactMarkdown>
+                                                    </div>
+                                                    {q.statements && q.statements.length > 0 && (
+                                                        <div className="mt-4 mb-2 flex flex-col gap-1 w-full pl-4 md:pl-8 border-l-4 border-gray-300 dark:border-gray-600 self-start">
+                                                            {q.statements.map((stmt: string, sIdx: number) => (
+                                                                <div key={sIdx} className={`prose dark:prose-invert max-w-none w-full prose-p:font-bold text-[calc(var(--q-size)*0.85)] leading-[1] text-left font-bold [&_*]:!text-[calc(var(--q-size)*0.85)] [&_*]:!leading-[1] [&_*]:!m-0 ${qTextColor !== 'default' ? 'text-[var(--q-color)] [&_*]:!text-[var(--q-color)]' : 'text-slate-700 dark:text-gray-300 [&_*]:!text-slate-700 dark:[&_*]:!text-gray-300'}`}>
+                                                                    <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
+                                                                        {stmt}
+                                                                    </ReactMarkdown>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                <div className="relative w-full max-w-[1200px] flex justify-center mt-6 md:mt-8 mb-4 mx-auto !print-color-adjust-exact">
+                                                    <div className={optionsLayout === 'grid' ? "grid grid-cols-2 gap-x-6 gap-y-6 w-[94%] sm:w-full max-w-4xl xl:max-w-5xl mx-auto" : "flex flex-col gap-y-3 w-[94%] sm:w-full max-w-4xl xl:max-w-5xl mx-auto"}>
+                                                        {opts.map((opt: any, oIdx: number) => {
+                                                            const isCorrect = q.correctAnswer && q.correctAnswer.toLowerCase().includes(opt.key);
+                                                            const optLetter = getOptionLabel(opt.key, uiLang);
+                                                            const showCorrect = showHighlight && isCorrect;
+
+                                                            const colorThemes = [
+                                                                { border: 'border-[#4285F4]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#4285F4]', letterText: 'text-white' }, // Blue
+                                                                { border: 'border-[#34A853]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#34A853]', letterText: 'text-white' }, // Green
+                                                                { border: 'border-[#F9AB00]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#F9AB00]', letterText: 'text-white' }, // Yellow/Orange
+                                                                { border: 'border-[#EA4335]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#EA4335]', letterText: 'text-white' }, // Red
+                                                                { border: 'border-[#9C27B0]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#9C27B0]', letterText: 'text-white' }, // Purple
+                                                            ];
+                                                            const theme = colorThemes[oIdx % colorThemes.length];
+
+                                                            let containerClasses = `flex items-center gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 transition-all duration-200 shadow-[0_4px_12px_rgba(0,0,0,0.04)] relative z-10 select-none ${theme.bg} ${theme.border} !print-color-adjust-exact`;
+                                                            let letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 ${theme.letterBg} ${theme.letterText} !print-color-adjust-exact`;
+
+                                                            if (showCorrect) {
+                                                                containerClasses = `flex items-center gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 ring-4 ring-[#34A853]/30 bg-[#f0fdf4] dark:bg-[#064e3b] border-[#34A853] z-10 relative select-none !print-color-adjust-exact`;
+                                                                letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 bg-[#34A853] text-white !print-color-adjust-exact`;
+                                                            }
+
+                                                            return (
+                                                                <div key={opt.key} className="flex flex-col gap-2 w-full relative !print-color-adjust-exact">
+                                                                    <div
+                                                                        className={containerClasses}
+                                                                        style={{
+                                                                            ...(bgTheme === 'dots' ? {
+                                                                                backgroundImage: `radial-gradient(${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'} 1.5px, transparent 1.5px)`,
+                                                                                backgroundSize: '12px 12px'
+                                                                            } : bgTheme === 'grid' ? {
+                                                                                backgroundImage: `linear-gradient(to right, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px)`,
+                                                                                backgroundSize: '12px 12px'
+                                                                            } : {
+                                                                                backgroundImage: 'none',
+                                                                                backgroundSize: 'auto'
+                                                                            })
+                                                                        }}
+                                                                    >
+                                                                        <div className={letterClasses}>
+                                                                            {optLetter}
+                                                                        </div>
+                                                                        <div className="prose dark:prose-invert max-w-none w-full leading-snug flex-1 font-bold text-[length:calc(var(--q-size)*0.85)] [&_*]:!text-[length:calc(var(--q-size)*0.85)] [&_*]:!leading-snug [&_*]:!m-0 text-slate-800 dark:text-slate-100">
+                                                                            <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
+                                                                                {opt.text}
+                                                                            </ReactMarkdown>
+                                                                        </div>
+                                                                        {showCorrect && (
+                                                                            <div className="shrink-0 text-white bg-[#34A853] rounded-full p-1 shadow-sm ml-auto z-10 !print-color-adjust-exact">
+                                                                                <Check className="w-5 h-5 md:w-6 md:h-6 stroke-[3]" />
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {!isPrintAsList && (
+                                        <div className={`shrink-0 w-full px-4 sm:px-6 md:px-8 py-3 flex items-center justify-between relative z-30 transition-colors duration-300 ${bgTheme === 'video' ? 'bg-black/40 border-t border-white/10 backdrop-blur-md' : isDarkMode ? 'bg-[#111827] border-t border-gray-800' : 'bg-[#7c3aed] border-t border-purple-600'} !print-color-adjust-exact`}>
+                                            <div className="text-white/90 text-sm font-medium tracking-wide !print-color-adjust-exact">
+                                                © DeshExam.app
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        );
+                    };
+
+                    return (
+                        <React.Fragment key={idx}>
+                            {renderQuestion(false)}
+                            {isPrintBothVersions && renderQuestion(true)}
+                        </React.Fragment>
+                    );
+                })}
+            </div>
+        </>,
+        document.body
+    );
+}

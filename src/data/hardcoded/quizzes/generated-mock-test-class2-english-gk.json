@@ -1,0 +1,734 @@
+{
+  "id": "generated-mock-test-class2-english-gk",
+  "slug": "class-2-english-and-gk-mock-test",
+  "title": "Class 2 English and General Knowledge Mock Test",
+  "description": "This mock test is designed for Class 2 students based on their primary English and General Knowledge syllabus. It covers essential topics like sense organs, family relationships, months of the year, seasons, and basic vocabulary. It is highly beneficial for young learners building their foundational knowledge.",
+  "thumbnail": "https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?w=800&q=80",
+  "status": "Published",
+  "difficulty": "Easy",
+  "language": "English",
+  "questionType": "MCQ",
+  "questionCount": 30,
+  "questionIds": [],
+  "durationMin": 30,
+  "totalMarks": 30,
+  "passingMarks": 15,
+  "negativeMarking": 0,
+  "attemptsAllowed": 5420,
+  "accessType": "subscription",
+  "allowedSubscriptionPlans": [
+    "pass"
+  ],
+  "attemptCount": 3412,
+  "averageScore": 72,
+  "instructions": "* This exam contains a total of 30 MCQ questions.\n* Each correct answer carries 1 mark.\n* There is no negative marking.\n* Only one option is correct for each question.\n* The timer will start as soon as the exam begins.\n* Try to answer the maximum number of questions within the time limit.\n* You can change your answers before the final submission.\n* After submission, you can review the answer key with explanations.\n* Your progress will be saved even if you refresh the page during the exam.\n* Attempt honestly and use this test to evaluate your preparation.",
+  "examRules": "* No books or notes are allowed during the exam.\n* Use of mobile phones or other devices is strictly prohibited.\n* Select only one correct answer per question.\n* The exam will be auto-submitted when the time runs out.\n* You may retake this exam multiple times.\n* Click the Submit button to view your results.\n* Refresh the page if you face any technical issues.\n* Avoid any form of dishonest practice during the exam.",
+  "boardId": "WBBPE",
+  "classId": "Class 2",
+  "subjectId": "English",
+  "textbookId": "Amar Boi",
+  "chapterId": "Mixed Practice",
+  "topicId": "Vocabulary and Basic GK",
+  "competitiveExam": null,
+  "verificationBadges": [
+    "DeshExam Verified"
+  ],
+  "tags": [
+    "English",
+    "General Knowledge",
+    "Class 2"
+  ],
+  "createdAt": "2026-09-15T13:09:45Z",
+  "questions": [
+    {
+      "id": "q1",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "English",
+      "questionText": "The colour of yolk is -",
+      "options": {
+        "a": "green",
+        "b": "yellow",
+        "c": "blue",
+        "d": "black"
+      },
+      "correctAnswer": "b",
+      "explanation": "The yolk, which is the inner part of an egg, is characteristically yellow in color.",
+      "optionExplanations": {
+        "a": "Green is the primary color of most leaves and grass.",
+        "b": "Correct! The yolk is the yellow internal part of an egg.",
+        "c": "Blue is the color commonly associated with the clear daytime sky.",
+        "d": "Black is a very dark color associated with coal or the night sky."
+      }
+    },
+    {
+      "id": "q2",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Which one is a sense organ?",
+      "options": {
+        "a": "eye",
+        "b": "leg",
+        "c": "chest",
+        "d": "knee"
+      },
+      "correctAnswer": "a",
+      "explanation": "The eye is one of the five primary sense organs used for vision.",
+      "optionExplanations": {
+        "a": "Correct! The eye is a sense organ responsible for sight.",
+        "b": "A leg is a limb used for movement and supporting the body.",
+        "c": "The chest is the front part of the body enclosing the heart and lungs.",
+        "d": "The knee is the joint connecting the thigh and lower leg."
+      }
+    },
+    {
+      "id": "q3",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "English",
+      "questionText": "I _____ my hands.",
+      "options": {
+        "a": "run",
+        "b": "stand",
+        "c": "nod",
+        "d": "clap"
+      },
+      "correctAnswer": "d",
+      "explanation": "Clapping is an action specifically performed by striking the hands together.",
+      "optionExplanations": {
+        "a": "Running is an action performed using the legs and feet.",
+        "b": "Standing is a bodily posture maintained primarily by the legs.",
+        "c": "Nodding is an action performed by moving the head up and down.",
+        "d": "Correct! Clapping is the action of striking the hands together to make a sound."
+      }
+    },
+    {
+      "id": "q4",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Lily = white, then Sunflower = ?",
+      "options": {
+        "a": "yellow",
+        "b": "pink",
+        "c": "red",
+        "d": "violet"
+      },
+      "correctAnswer": "a",
+      "explanation": "Just as a typical lily is white, a typical sunflower is yellow.",
+      "optionExplanations": {
+        "a": "Correct! Sunflowers are famous for their bright yellow petals.",
+        "b": "Pink is a color often seen in roses or lotuses, but not sunflowers.",
+        "c": "Red is a color often associated with roses or hibiscus flowers.",
+        "d": "Violet is a dark purple color seen in violets or lavender."
+      }
+    },
+    {
+      "id": "q5",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "English",
+      "questionText": "I taste with my _____.",
+      "options": {
+        "a": "eyes",
+        "b": "ears",
+        "c": "tongue",
+        "d": "skin"
+      },
+      "correctAnswer": "c",
+      "explanation": "The tongue is the primary sense organ responsible for the sensation of taste.",
+      "optionExplanations": {
+        "a": "The eyes are sense organs used for seeing, not tasting.",
+        "b": "The ears are sense organs used for hearing sounds.",
+        "c": "Correct! The tongue contains taste buds used for tasting food.",
+        "d": "The skin is the sense organ responsible for feeling touch and temperature."
+      }
+    },
+    {
+      "id": "q6",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Medium",
+      "status": "Published",
+      "language": "English",
+      "questionText": "I can see an _____.",
+      "options": {
+        "a": "apple",
+        "b": "guava",
+        "c": "pineapple",
+        "d": "banana"
+      },
+      "correctAnswer": "a",
+      "explanation": "The article 'an' is used before words that begin with a vowel sound.",
+      "optionExplanations": {
+        "a": "Correct! The word 'apple' begins with a vowel sound, so it follows 'an'.",
+        "b": "The word 'guava' begins with a consonant sound and would follow 'a'.",
+        "c": "The word 'pineapple' begins with a consonant sound and would follow 'a'.",
+        "d": "The word 'banana' begins with a consonant sound and would follow 'a'."
+      }
+    },
+    {
+      "id": "q7",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Which one is a flower?",
+      "options": {
+        "a": "mango",
+        "b": "dahlia",
+        "c": "banana",
+        "d": "orange"
+      },
+      "correctAnswer": "b",
+      "explanation": "A dahlia is a common type of brightly colored flower.",
+      "optionExplanations": {
+        "a": "Mango is a sweet, tropical fruit, not a flower.",
+        "b": "Correct! Dahlia is a type of beautiful garden flower.",
+        "c": "Banana is an elongated, edible fruit, not a flower.",
+        "d": "Orange is a round, citrus fruit, not a flower."
+      }
+    },
+    {
+      "id": "q8",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Read the text: 'My father is a teacher. He teaches English. My mother is a housewife.'\nBased on the text, My father is a -",
+      "options": {
+        "a": "farmer",
+        "b": "lawyer",
+        "c": "teacher",
+        "d": "student"
+      },
+      "correctAnswer": "c",
+      "explanation": "The passage explicitly states that the narrator's father is a teacher.",
+      "optionExplanations": {
+        "a": "A farmer is someone who works in agriculture, which contradicts the text.",
+        "b": "A lawyer is someone who practices law, which contradicts the text.",
+        "c": "Correct! The text directly states 'My father is a teacher'.",
+        "d": "A student is someone who learns, whereas the father teaches."
+      }
+    },
+    {
+      "id": "q9",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Medium",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Read the text: 'My sister reads in class three. I am in class two.'\nBased on the text, My sister reads in class _____.",
+      "options": {
+        "a": "two",
+        "b": "four",
+        "c": "five",
+        "d": "none"
+      },
+      "correctAnswer": "d",
+      "explanation": "The text states the sister is in class three, which is not available in the given options.",
+      "optionExplanations": {
+        "a": "The text states the narrator is in class two, not the sister.",
+        "b": "The text does not mention anyone reading in class four.",
+        "c": "The text does not mention anyone reading in class five.",
+        "d": "Correct! Since 'class three' is not an option, 'none' is the right choice."
+      }
+    },
+    {
+      "id": "q10",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Read the text: 'My mother is a housewife. She takes good care of us.'\nBased on the text, My mother is a _____.",
+      "options": {
+        "a": "housewife",
+        "b": "teacher",
+        "c": "doctor",
+        "d": "none"
+      },
+      "correctAnswer": "a",
+      "explanation": "The passage explicitly identifies the narrator's mother as a housewife.",
+      "optionExplanations": {
+        "a": "Correct! The text directly states 'My mother is a housewife'.",
+        "b": "The text says the father is a teacher, not the mother.",
+        "c": "The text does not mention anyone being a doctor in this family.",
+        "d": "This is incorrect because the correct option 'housewife' is provided."
+      }
+    },
+    {
+      "id": "q11",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "English",
+      "questionText": "There are _____ months in a year.",
+      "options": {
+        "a": "9",
+        "b": "12",
+        "c": "10",
+        "d": "11"
+      },
+      "correctAnswer": "b",
+      "explanation": "A standard calendar year consists of exactly 12 months.",
+      "optionExplanations": {
+        "a": "A year consists of more than 9 months.",
+        "b": "Correct! There are 12 months in a standard Gregorian year.",
+        "c": "A year consists of more than 10 months.",
+        "d": "A year consists of more than 11 months."
+      }
+    },
+    {
+      "id": "q12",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Medium",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Which month has 28 or 29 days?",
+      "options": {
+        "a": "April",
+        "b": "February",
+        "c": "November",
+        "d": "January"
+      },
+      "correctAnswer": "b",
+      "explanation": "February is the only month that has 28 days in a common year and 29 days in a leap year.",
+      "optionExplanations": {
+        "a": "April is a month that always has exactly 30 days.",
+        "b": "Correct! February has 28 days, and 29 days during a leap year.",
+        "c": "November is a month that always has exactly 30 days.",
+        "d": "January is a month that always has exactly 31 days."
+      }
+    },
+    {
+      "id": "q13",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "English",
+      "questionText": "The 6th month of the year is _____.",
+      "options": {
+        "a": "January",
+        "b": "March",
+        "c": "June",
+        "d": "December"
+      },
+      "correctAnswer": "c",
+      "explanation": "Following the Gregorian calendar, June is the sixth month of the year.",
+      "optionExplanations": {
+        "a": "January is the first month of the year.",
+        "b": "March is the third month of the year.",
+        "c": "Correct! June is the sixth month of the year.",
+        "d": "December is the twelfth and final month of the year."
+      }
+    },
+    {
+      "id": "q14",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Medium",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Summer = April, May and June, then spring = ?",
+      "options": {
+        "a": "December and January",
+        "b": "February and March",
+        "c": "July and August",
+        "d": "September and October"
+      },
+      "correctAnswer": "b",
+      "explanation": "In the common Indian seasonal cycle, the spring season occurs just before summer, covering February and March.",
+      "optionExplanations": {
+        "a": "December and January are the months typically associated with winter.",
+        "b": "Correct! February and March mark the spring season before the summer begins.",
+        "c": "July and August are the months typically associated with the monsoon season.",
+        "d": "September and October mark the autumn season after the monsoon."
+      }
+    },
+    {
+      "id": "q15",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Medium",
+      "status": "Published",
+      "language": "English",
+      "questionText": "New leaf, blossoms = spring; very hot, dry pond = ?",
+      "options": {
+        "a": "monsoon",
+        "b": "early autumn",
+        "c": "summer",
+        "d": "winter"
+      },
+      "correctAnswer": "c",
+      "explanation": "Very hot weather and dry ponds are defining characteristics of the summer season.",
+      "optionExplanations": {
+        "a": "The monsoon brings heavy rainfall, so ponds would be full, not dry.",
+        "b": "Early autumn is characterized by clear skies and moderate temperatures.",
+        "c": "Correct! Summer brings intense heat that can dry up ponds.",
+        "d": "Winter is characterized by cold weather, not extreme heat."
+      }
+    },
+    {
+      "id": "q16",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "English",
+      "questionText": "What is the colour of cabbage?",
+      "options": {
+        "a": "green",
+        "b": "violet",
+        "c": "red",
+        "d": "brown"
+      },
+      "correctAnswer": "a",
+      "explanation": "A standard cabbage is a leafy vegetable that is light green in color.",
+      "optionExplanations": {
+        "a": "Correct! The most common type of cabbage is green.",
+        "b": "While violet/purple cabbages exist, green is the standard and most common answer for young learners.",
+        "c": "Cabbages are not typically naturally bright red.",
+        "d": "Brown is generally the color of root vegetables like potatoes or yams."
+      }
+    },
+    {
+      "id": "q17",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Camel has _____.",
+      "options": {
+        "a": "trunk",
+        "b": "stripes",
+        "c": "mane",
+        "d": "hump"
+      },
+      "correctAnswer": "d",
+      "explanation": "Camels are famous for having one or two distinctive humps on their backs to store fat.",
+      "optionExplanations": {
+        "a": "A trunk is a long, flexible nose feature characteristic of elephants.",
+        "b": "Stripes are a distinct coat pattern characteristic of zebras or tigers.",
+        "c": "A mane is the long hair growing on the neck of a lion or horse.",
+        "d": "Correct! A camel has a distinct hump on its back."
+      }
+    },
+    {
+      "id": "q18",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Birds eat with _____.",
+      "options": {
+        "a": "mouth",
+        "b": "beaks",
+        "c": "teeth",
+        "d": "tongue"
+      },
+      "correctAnswer": "b",
+      "explanation": "Birds use their hard, protruding beaks to catch food and eat.",
+      "optionExplanations": {
+        "a": "While animals have mouths, a bird's specific eating apparatus is its beak.",
+        "b": "Correct! Birds use their beaks to peck and consume their food.",
+        "c": "Birds do not have teeth; they swallow their food whole or break it with their beaks.",
+        "d": "While birds have tongues, they primarily pick up food using their beaks."
+      }
+    },
+    {
+      "id": "q19",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Medium",
+      "status": "Published",
+      "language": "English",
+      "questionText": "An insect has _____ legs.",
+      "options": {
+        "a": "six",
+        "b": "seven",
+        "c": "five",
+        "d": "four"
+      },
+      "correctAnswer": "a",
+      "explanation": "A defining biological characteristic of all insects is that they have exactly six legs.",
+      "optionExplanations": {
+        "a": "Correct! All insects naturally possess six legs (three pairs).",
+        "b": "No standard biological classification of insects has seven legs.",
+        "c": "Five is an uneven number, whereas insect legs come in three pairs.",
+        "d": "Animals with four legs are typically mammals or reptiles, not insects."
+      }
+    },
+    {
+      "id": "q20",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Medium",
+      "status": "Published",
+      "language": "English",
+      "questionText": "_____ insects can fly.",
+      "options": {
+        "a": "most",
+        "b": "all",
+        "c": "no",
+        "d": "only one"
+      },
+      "correctAnswer": "a",
+      "explanation": "While many insects like butterflies and bees can fly, some like ants and fleas cannot, meaning 'most' is the best answer.",
+      "optionExplanations": {
+        "a": "Correct! The majority of insect species have wings and can fly.",
+        "b": "This is incorrect because many insects like worker ants and fleas cannot fly.",
+        "c": "This is incorrect because countless insects are frequently seen flying.",
+        "d": "This is incorrect because millions of insect species possess the ability to fly."
+      }
+    },
+    {
+      "id": "q21",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Read the text: 'Bina and Mina are friends... Mina's father is a doctor. Bina's father is a farmer.'\nBased on the text, Bina's father is a _____.",
+      "options": {
+        "a": "doctor",
+        "b": "farmer",
+        "c": "lawyer",
+        "d": "teacher"
+      },
+      "correctAnswer": "b",
+      "explanation": "The text explicitly states the profession of Bina's father as a farmer.",
+      "optionExplanations": {
+        "a": "The text states that Mina's father is the doctor, not Bina's.",
+        "b": "Correct! The text directly states 'Bina's father is a farmer'.",
+        "c": "The profession of a lawyer is never mentioned in the text.",
+        "d": "The profession of a teacher is never mentioned in this text."
+      }
+    },
+    {
+      "id": "q22",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Medium",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Man + go = _____",
+      "options": {
+        "a": "penguin",
+        "b": "mango",
+        "c": "monkey",
+        "d": "captain"
+      },
+      "correctAnswer": "b",
+      "explanation": "Combining the word 'Man' and 'go' forms the word 'Mango'.",
+      "optionExplanations": {
+        "a": "A penguin is a flightless bird and has no relation to these syllables.",
+        "b": "Correct! Joining 'Man' and 'go' spells 'Mango', a delicious fruit.",
+        "c": "A monkey is an animal and does not match the joined syllables.",
+        "d": "A captain is a leader and has no relation to the word puzzle."
+      }
+    },
+    {
+      "id": "q23",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Raju is Arka's _____.",
+      "options": {
+        "a": "father",
+        "b": "friend",
+        "c": "brother",
+        "d": "nephew"
+      },
+      "correctAnswer": "b",
+      "explanation": "In standard primary textbook narratives, boys of similar names introduced together are usually depicted as friends.",
+      "optionExplanations": {
+        "a": "Father denotes a parental relationship, which is less common in this context.",
+        "b": "Correct! Raju and Arka are typical names used for school friends in stories.",
+        "c": "Brother implies they belong to the same family, requiring more context.",
+        "d": "Nephew describes a specific family relationship between an uncle and child."
+      }
+    },
+    {
+      "id": "q24",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Which one is in the classroom?",
+      "options": {
+        "a": "car",
+        "b": "apple",
+        "c": "bed",
+        "d": "blackboard"
+      },
+      "correctAnswer": "d",
+      "explanation": "A blackboard is a standard educational tool found inside a school classroom.",
+      "optionExplanations": {
+        "a": "A car is a vehicle used for transportation and is kept outside or in a garage.",
+        "b": "An apple is a fruit, which is typically found in a kitchen or dining area.",
+        "c": "A bed is furniture used for sleeping, usually located in a bedroom.",
+        "d": "Correct! A blackboard is a large board used by teachers in a classroom."
+      }
+    },
+    {
+      "id": "q25",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Medium",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Butterfly - fly = _____",
+      "options": {
+        "a": "butter",
+        "b": "house",
+        "c": "mutton",
+        "d": "none"
+      },
+      "correctAnswer": "a",
+      "explanation": "Removing the word 'fly' from the compound word 'Butterfly' leaves 'Butter'.",
+      "optionExplanations": {
+        "a": "Correct! Subtracting the letters 'fly' from 'Butterfly' results in 'Butter'.",
+        "b": "'House' is an entirely different word completely unrelated to the puzzle.",
+        "c": "'Mutton' refers to sheep meat and is unrelated to this word game.",
+        "d": "This is incorrect because the correct option 'butter' is provided."
+      }
+    },
+    {
+      "id": "q26",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "English",
+      "questionText": "Which animal is known as the king of the jungle?",
+      "options": {
+        "a": "Tiger",
+        "b": "Lion",
+        "c": "Elephant",
+        "d": "Bear"
+      },
+      "correctAnswer": "b",
+      "explanation": "The lion is traditionally referred to as the 'king of the jungle' in popular culture and stories.",
+      "optionExplanations": {
+        "a": "While fierce, tigers are not commonly called the king of the jungle.",
+        "b": "Correct! The lion is widely recognized by the title 'king of the jungle'.",
+        "c": "Elephants are the largest land animals but do not hold this specific title.",
+        "d": "Bears are large forest mammals and are not referred to as kings of the jungle."
+      }
+    },
+    {
+      "id": "q27",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "English",
+      "questionText": "I smell with my _____.",
+      "options": {
+        "a": "nose",
+        "b": "eyes",
+        "c": "ears",
+        "d": "hands"
+      },
+      "correctAnswer": "a",
+      "explanation": "The nose is the designated sense organ responsible for detecting odors and smells.",
+      "optionExplanations": {
+        "a": "Correct! The nose is used to breathe and smell various scents.",
+        "b": "Eyes are used exclusively for vision and cannot detect smells.",
+        "c": "Ears are used exclusively for hearing and cannot detect smells.",
+        "d": "Hands are used to touch and feel objects, not to smell them."
+      }
+    },
+    {
+      "id": "q28",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "English",
+      "questionText": "What comes after Sunday?",
+      "options": {
+        "a": "Tuesday",
+        "b": "Friday",
+        "c": "Monday",
+        "d": "Saturday"
+      },
+      "correctAnswer": "c",
+      "explanation": "In the standard sequence of the days of the week, Monday directly follows Sunday.",
+      "optionExplanations": {
+        "a": "Tuesday is the day that follows Monday, not Sunday.",
+        "b": "Friday is the day that comes near the end of the workweek.",
+        "c": "Correct! Monday is the very next day immediately following Sunday.",
+        "d": "Saturday is the day that comes immediately before Sunday."
+      }
+    },
+    {
+      "id": "q29",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "English",
+      "questionText": "A cow gives us _____.",
+      "options": {
+        "a": "wool",
+        "b": "milk",
+        "c": "eggs",
+        "d": "honey"
+      },
+      "correctAnswer": "b",
+      "explanation": "Cows are primarily raised by humans for their ability to produce milk.",
+      "optionExplanations": {
+        "a": "Wool is a textile fiber obtained primarily from sheep, not cows.",
+        "b": "Correct! Cows are common farm animals that provide us with milk.",
+        "c": "Eggs are typically laid by birds like chickens or ducks.",
+        "d": "Honey is a sweet substance produced by bees from flower nectar."
+      }
+    },
+    {
+      "id": "q30",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "English",
+      "questionText": "The color of the sky on a clear day is _____.",
+      "options": {
+        "a": "red",
+        "b": "green",
+        "c": "blue",
+        "d": "yellow"
+      },
+      "correctAnswer": "c",
+      "explanation": "During a clear, sunny day, the sky appears blue due to the scattering of sunlight.",
+      "optionExplanations": {
+        "a": "Red is a color often seen during a sunset, not the typical daytime sky.",
+        "b": "Green is the common color of grass and tree leaves, not the sky.",
+        "c": "Correct! The sky naturally appears blue during a clear day.",
+        "d": "Yellow is often used to depict the sun, but not the sky itself."
+      }
+    }
+  ]
+}

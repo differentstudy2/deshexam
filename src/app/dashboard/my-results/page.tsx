@@ -9,13 +9,15 @@ import {
   CardTitle,
   CardFooter,
 } from '@/components/ui/card';
-import { FileText, Loader2, Eye, BarChart, Book } from 'lucide-react';
+import { FileText, Loader2, Eye, BarChart, Book, RefreshCw } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { useEffect, useState, useMemo } from 'react';
 import { getSubmissionsByUserId } from '@/lib/firebase/firestore';
 import { ScoreCircle } from '@/components/feature/score-circle';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { useToast } from '@/hooks/use-toast';
+import { Badge } from '@/components/ui/badge';
 
 type Submission = {
   id: string;
@@ -26,28 +28,54 @@ type Submission = {
   submittedAt: any;
   testType: string;
   subject?: string;
+  board?: string;
+  class?: string;
+  exam?: string;
+  textbookId?: string;
+  chapterId?: string;
+  topicId?: string;
+  practiceSetId?: string;
 };
 
 export default function MyResultsPage() {
   const { user } = useAuth();
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
-    if (user) {
-      getSubmissionsByUserId(user.uid)
-        .then(setSubmissions)
-        .finally(() => setLoading(false));
-    } else if (!loading) {
+    if (!user) {
       setLoading(false);
+      return;
     }
-  }, [user, loading]);
+    
+    setLoading(true);
+    const unsubscribe = getSubmissionsByUserId(
+        user.uid, 
+        (userSubmissions) => {
+            setSubmissions(userSubmissions);
+            setLoading(false);
+        }, 
+        (error) => {
+            console.error("Error fetching submissions:", error);
+            toast({
+                variant: 'destructive',
+                title: 'Error loading results',
+                description: error.message,
+            });
+            setLoading(false);
+        }
+    );
+
+    return () => unsubscribe();
+    
+  }, [user, toast]);
 
   const aggregatedResults = useMemo(() => {
-    const resultsMap = new Map<string, { highestScore: number; bestSubmission: Submission; testTitle: string, subject?: string, testType: string }>();
+    const resultsMap = new Map<string, { highestScore: number; bestSubmission: Submission; testTitle: string, subject?: string, testType: string, board?: string, class?: string, exam?: string }>();
 
     submissions.forEach(sub => {
-      const score = Math.round((sub.score / sub.totalQuestions) * 100);
+      const score = sub.totalQuestions > 0 ? Math.round((sub.score / sub.totalQuestions) * 100) : 0;
       const existing = resultsMap.get(sub.testId);
 
       if (!existing || score > existing.highestScore) {
@@ -57,6 +85,9 @@ export default function MyResultsPage() {
           testTitle: sub.testTitle,
           subject: sub.subject,
           testType: sub.testType,
+          board: sub.board,
+          class: sub.class,
+          exam: sub.exam,
         });
       }
     });
@@ -66,10 +97,22 @@ export default function MyResultsPage() {
   const getUrlForResults = (submission: Submission) => {
     const typeSlug = (submission.testType || 'content').toLowerCase().replace(/\s+/g, '-');
     if (submission.testType === 'Practice Set') {
-        const test = (submission as any).test;
-        return `/textbook-solutions/practice-set/${submission.testId}/results?submissionId=${submission.id}`;
+        const test = (submission as any);
+        return `/textbook-solutions/practice-set/${test.practiceSetId}/results?submissionId=${submission.id}`;
     }
     return `/${typeSlug}/${submission.testId}/results?submissionId=${submission.id}`;
+  };
+
+  const getUrlForRetake = (submission: Submission) => {
+    const typeSlug = (submission.testType || 'content').toLowerCase().replace(/\s+/g, '-');
+    if (submission.testType === 'Practice Set') {
+        const test = (submission as any);
+        const topicSegment = test.topicId && test.topicId !== 'null' ? `/topic/${test.topicId}` : '/topic/null';
+        const chapterSegment = test.chapterId ? `/chapter/${test.chapterId}` : '/chapter/null';
+        const textbookSegment = test.textbookId ? `/textbook/${test.textbookId}` : '';
+        return `/textbook-solutions/practice-set/${test.practiceSetId}${textbookSegment}${chapterSegment}${topicSegment}`;
+    }
+    return `/${typeSlug}/${submission.testId}`;
   };
 
   if (loading) {
@@ -101,24 +144,35 @@ export default function MyResultsPage() {
             {aggregatedResults.map(result => (
                 <Card key={result.bestSubmission.id}>
                     <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                           <BarChart className="w-5 h-5 text-primary"/>
-                           {result.testTitle}
-                        </CardTitle>
-                        <CardDescription className="flex items-center gap-2">
-                           <Book className="w-4 h-4"/>
-                           {result.subject || 'General'}
-                        </CardDescription>
+                        <div className="flex justify-between items-start">
+                             <CardTitle className="flex items-start gap-2">
+                                <BarChart className="w-5 h-5 text-primary mt-1 flex-shrink-0"/>
+                                {result.testTitle}
+                             </CardTitle>
+                        </div>
+                         <div className="flex flex-wrap gap-1.5 pt-1">
+                            <Badge variant="secondary">{result.testType}</Badge>
+                            {result.subject && <Badge variant="outline">{result.subject}</Badge>}
+                            {result.board && <Badge variant="outline">{result.board}</Badge>}
+                            {result.class && <Badge variant="outline">{result.class}</Badge>}
+                             {result.exam && <Badge variant="outline">{result.exam}</Badge>}
+                        </div>
                     </CardHeader>
                     <CardContent className="flex flex-col items-center justify-center gap-4">
                         <ScoreCircle score={result.highestScore} size={80} strokeWidth={6} />
                         <p className="font-bold text-lg">Highest Score</p>
                     </CardContent>
-                    <CardFooter>
+                    <CardFooter className="flex flex-col gap-2">
                         <Button asChild className="w-full">
                             <Link href={getUrlForResults(result.bestSubmission)}>
                                 <Eye className="mr-2"/>
                                 Review Best Attempt
+                            </Link>
+                        </Button>
+                         <Button asChild variant="secondary" className="w-full">
+                            <Link href={getUrlForRetake(result.bestSubmission)}>
+                                <RefreshCw className="mr-2 h-4 w-4"/>
+                                Retake Attempt
                             </Link>
                         </Button>
                     </CardFooter>
