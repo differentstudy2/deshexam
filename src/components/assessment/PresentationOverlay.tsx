@@ -1104,8 +1104,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
         const { x, y } = getCoordinates(e);
         if (cursorRef.current) {
-            cursorRef.current.style.left = `${x}px`;
-            cursorRef.current.style.top = `${y}px`;
+            cursorRef.current.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`;
         }
 
         if (drawingTool === 'laser') {
@@ -1229,8 +1228,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         const { x, y } = getCoordinates(e);
 
         if (cursorRef.current) {
-            cursorRef.current.style.left = `${x}px`;
-            cursorRef.current.style.top = `${y}px`;
+            cursorRef.current.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`;
         }
 
         if (drawingTool === 'laser' || drawingTool === 'text') {
@@ -1493,54 +1491,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         handleReadAloudRef.current = handleReadAloud;
     });
 
-    useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-            const key = e.key.toLowerCase();
 
-            if (e.shiftKey) {
-                if (key === '?') {
-                    setIsShortcutsOpen(prev => !prev);
-                } else if (key === 'a') {
-                    setIsAutoPlayReadAloud(prev => !prev);
-                } else if (key === 'r') {
-                    handleReadAloudRef.current(true);
-                } else if (key === 'f') {
-                    setIsSpotlightActive(prev => !prev);
-                } else if (key === 'd') {
-                    setIsPenActive(prev => !prev);
-                } else if (key === 'w') {
-                    setIsWhiteboardMode(prev => !prev);
-                } else if (key === 'n') {
-                    setIsDarkMode(prev => !prev);
-                } else if (key === 'x') {
-                    setIsExpEnabled(prev => !prev);
-                } else if (key === 'o') {
-                    setIsOptionExpEnabled(prev => !prev);
-                } else if (['p', 'm', 'l', 'e', 'b', 'c', 'v', 't', 'z'].includes(key)) {
-                    setIsPenActive(true);
-                    if (key === 'p') setDrawingTool('pen');
-                    else if (key === 'm') setDrawingTool('highlighter');
-                    else if (key === 'l') setDrawingTool('laser');
-                    else if (key === 'e') setDrawingTool('eraser');
-                    else if (key === 'b') setDrawingTool('rectangle');
-                    else if (key === 'c') setDrawingTool('circle');
-                    else if (key === 'v') setDrawingTool('arrow');
-                    else if (key === 't') setDrawingTool('text');
-                    else if (key === 'z') setDrawingTool('magnifier');
-                }
-            } else {
-                if (key === 's') {
-                    setIsSettingsOpen(prev => !prev);
-                } else if (key === 't') {
-                    setIsTimerEnabled(prev => !prev);
-                }
-            }
-        };
-
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, []);
 
     const openPresentation = useCallback(() => {
         setIsOpen(true);
@@ -1726,7 +1677,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     return;
                 }
                 if (e.key === 'C' || e.key === 'c') {
-                    clearCanvas();
+                    setIsPenActive(true);
+                    setDrawingTool('circle');
                     return;
                 }
                 if (e.key === 'O' || e.key === 'o') {
@@ -1741,10 +1693,31 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     }
                     return;
                 }
+                const key = e.key.toLowerCase();
+                if (['p', 'm', 'l', 'e', 'b', 'v', 't', 'z'].includes(key)) {
+                    setIsPenActive(true);
+                    if (key === 'p') setDrawingTool('pen');
+                    else if (key === 'm') setDrawingTool('highlighter');
+                    else if (key === 'l') setDrawingTool('laser');
+                    else if (key === 'e') setDrawingTool('eraser');
+                    else if (key === 'b') setDrawingTool('rectangle');
+                    else if (key === 'v') setDrawingTool('arrow');
+                    else if (key === 't') setDrawingTool('text');
+                    else if (key === 'z') setDrawingTool('magnifier');
+                    return;
+                }
                 return; // Ignore other shift keys to prevent conflicts
             }
 
             // --- Special Action Keys ---
+            if (e.key === 's' || e.key === 'S') {
+                setIsSettingsOpen(prev => !prev);
+                return;
+            }
+            if (e.key === 't' || e.key === 'T') {
+                setIsTimerEnabled(prev => !prev);
+                return;
+            }
             if (e.key === 'Delete' || e.key === 'Backspace') {
                 clearCanvas();
                 return;
@@ -2118,16 +2091,16 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             ref={cursorRef}
                             className="absolute z-40 pointer-events-none flex items-center justify-center"
                             style={{
-                                left: -100,
-                                top: -100,
-                                transform: 'translate(-50%, -50%)',
-                                willChange: 'left, top',
+                                left: 0,
+                                top: 0,
+                                transform: 'translate3d(-100px, -100px, 0) translate(-50%, -50%)',
+                                willChange: 'transform',
                                 ...(drawingTool === 'laser' ? {
-                                    width: '16px',
-                                    height: '16px',
+                                    width: '8px',
+                                    height: '8px',
                                     backgroundColor: '#ef4444',
                                     borderRadius: '50%',
-                                    boxShadow: '0 0 15px 5px rgba(239,68,68,0.8)',
+                                    boxShadow: '0 0 8px 3px rgba(239, 68, 68, 0.7), 0 0 12px 6px rgba(239, 68, 68, 0.4)',
                                     border: '1px solid rgba(255,255,255,0.5)'
                                 } : drawingTool === 'highlighter' ? {
                                     width: `${penSize * 5}px`,
