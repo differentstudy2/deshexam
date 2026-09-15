@@ -17,7 +17,7 @@
   "passingMarks": 42,
   "negativeMarking": 0,
   "attemptsAllowed": 0,
-  "accessType": "premium",
+  "accessType": "both",
   "attemptCount": 15600,
   "averageScore": 72,
   "instructions": "* মোট ২০টি প্রশ্ন, সময় ১৫ মিনিট।\n* কোনো নেগেটিভ মার্কিং নেই।\n* Quiz শেষে সঠিক উত্তর দেখতে পাবেন।",
@@ -998,5 +998,9 @@
       "difficulty": "Easy",
       "status": "Published"
     }
-  ]
+  ],
+  "allowedSubscriptionPlans": [
+    "pass"
+  ],
+  "price": 15
 }

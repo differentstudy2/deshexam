@@ -15,7 +15,10 @@
   "passingMarks": 15,
   "negativeMarking": 0,
   "attemptsAllowed": 0,
-  "accessType": "free",
+  "accessType": "subscription",
+  "allowedSubscriptionPlans": [
+    "pass"
+  ],
   "attemptCount": 3412,
   "averageScore": 72,
   "instructions": "* This exam contains a total of 30 MCQ questions.\n* Each correct answer carries 1 mark.\n* There is no negative marking.\n* Only one option is correct for each question.\n* The timer will start as soon as the exam begins.\n* Try to answer the maximum number of questions within the time limit.\n* You can change your answers before the final submission.\n* After submission, you can review the answer key with explanations.\n* Your progress will be saved even if you refresh the page during the exam.\n* Attempt honestly and use this test to evaluate your preparation.",

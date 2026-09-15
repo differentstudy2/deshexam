@@ -14,7 +14,7 @@
   "passingMarks": 21,
   "negativeMarking": 0,
   "attemptsAllowed": 0,
-  "accessType": "premium",
+  "accessType": "both",
   "attemptCount": 4200,
   "averageScore": 75,
   "examRules": "",
@@ -518,5 +518,9 @@
   ],
   "boardId": "WBBSE",
   "classId": "Class 2",
-  "subjectId": "Bengali"
+  "subjectId": "Bengali",
+  "allowedSubscriptionPlans": [
+    "pass"
+  ],
+  "price": 15
 }
