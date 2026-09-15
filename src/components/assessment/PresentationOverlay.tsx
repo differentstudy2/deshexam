@@ -54,9 +54,9 @@ const VIDEO_OPTIONS = [
 
 const CONFETTI_CONFIG = {
     spread: 360,           // Spread in all directions
-    elementCount: 350,     // More paper pieces (rangin tukro)
-    duration: 5000,        // Last longer
-    startVelocity: 70,     // Shoot further to cover the page
+    elementCount: 120,     // Reduced to prevent stuttering
+    duration: 4000,        // Slightly shorter duration for smooth finish
+    startVelocity: 60,     // Adjusted for better spread with fewer elements
     colors: ['#34A853', '#FABB05', '#4285F4', '#EA4335', '#f43f5e', '#a78bfa', '#fb923c']
 };
 
@@ -463,11 +463,23 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     // ── Feature 7: Multi-language UI ──────────────────────────────────────────
     const [uiLang, setUiLang] = useState<UiLang>(() => {
         const lang = testLanguage?.toLowerCase() || '';
-        if (lang.includes('english') || lang.includes('en')) {
+        if (lang === 'english' || lang === 'en') {
             return 'en';
         }
         return 'bn';
     });
+    
+    useEffect(() => {
+        if (testLanguage) {
+            const lang = testLanguage.toLowerCase();
+            if (lang === 'english' || lang === 'en') {
+                setUiLang('en');
+            } else {
+                setUiLang('bn');
+            }
+        }
+    }, [testLanguage]);
+
     const L = UI_LABELS[uiLang];
 
     // ── Feature 1: Slide Transition ──────────────────────────────────────────
@@ -549,9 +561,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [showCelebration, setShowCelebration] = useState(false);
     const [isCelebrationEnabled, setIsCelebrationEnabled] = useState(true);
     const [isCelebrationSoundEnabled, setIsCelebrationSoundEnabled] = useState(true);
-    const [celebrationDuration, setCelebrationDuration] = useState(2);
+    const [celebrationDuration, setCelebrationDuration] = useState(5);
     const [isAutoChangeQuestion, setIsAutoChangeQuestion] = useState(true);
-    const [autoChangeDelay, setAutoChangeDelay] = useState(3);
+    const [autoChangeDelay, setAutoChangeDelay] = useState(5);
     const [currentPraise, setCurrentPraise] = useState(CELEBRATION_PRAISES[0]);
     const praiseIdxRef = useRef(0);
 
@@ -628,7 +640,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [bgOpacity, setBgOpacity] = useState(100);
     const [qBgColor, setQBgColor] = useState('bg-white dark:bg-gray-800');
     const [qTextColor, setQTextColor] = useState('default');
-    const [animSpeed, setAnimSpeed] = useState(0.8);
+    const [animSpeed, setAnimSpeed] = useState(0.1);
     const [isPrintWithAnswers, setIsPrintWithAnswers] = useState(true);
     const [isPrintAsList, setIsPrintAsList] = useState(false);
     const [isPrintBothVersions, setIsPrintBothVersions] = useState(false);
@@ -793,12 +805,12 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         // Step 1: glide to midpoint
         const midTimer = setTimeout(() => {
             setVirtualCursor(prev => ({ ...prev, x: midX, y: midY }));
-        }, 80);
+        }, 60);
 
         // Step 2: glide to target
         const glideTimer = setTimeout(() => {
             setVirtualCursor(prev => ({ ...prev, x: targetX, y: targetY }));
-        }, 480);
+        }, 300);
 
         const clickTimer = setTimeout(() => {
             setVirtualCursor(prev => ({ ...prev, isClicking: true }));
@@ -819,8 +831,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
             setTimeout(() => {
                 setVirtualCursor({ visible: false, x: 0, y: 0, isClicking: false });
                 if (onDone) onDone();
-            }, 800);
-        }, 1100);
+            }, 700);
+        }, 700);
 
         return () => {
             clearTimeout(midTimer);
@@ -1835,7 +1847,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const downloadPdf = async () => {
         if (!slideRef.current || isGeneratingPdf) return;
         setIsGeneratingPdf(true);
-        
+
         const originalSlide = currentSlide;
         const originalStep = step;
         const originalSelected = selectedOption;
@@ -1864,7 +1876,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
             for (let i = 0; i < questions.length; i++) {
                 setCurrentSlide(i);
-                
+
                 if (saveWithCorrectOption) {
                     const q = questions[i];
                     if (q && q.correctAnswer) {
@@ -1883,7 +1895,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                 const el = slideRef.current;
                 if (!el) continue;
-                
+
                 const scale = 2;
                 const dataUrl = await domtoimage.toPng(el, {
                     quality: 1,
@@ -2626,7 +2638,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 transition: virtualCursor.isClicking
                                     ? 'transform 0.08s ease-in'
                                     : virtualCursor.visible
-                                        ? 'left 0.38s cubic-bezier(0.25,0.46,0.45,0.94), top 0.38s cubic-bezier(0.25,0.46,0.45,0.94), transform 0.12s ease-out'
+                                        ? 'left 0.30s cubic-bezier(0.25,0.46,0.45,0.94), top 0.30s cubic-bezier(0.25,0.46,0.45,0.94), transform 0.12s ease-out'
                                         : 'left 0s, top 0s, transform 0.12s ease-out',
                                 filter: virtualCursor.isClicking
                                     ? 'drop-shadow(0 0 12px rgba(59,130,246,0.95)) drop-shadow(0 0 24px rgba(99,102,241,0.7))'
@@ -2874,7 +2886,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                         }}
                                                         className="flex flex-col gap-2 w-full relative"
                                                     >
-                                                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none">
+                                                        <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none transition-opacity duration-300 ${step >= 1 ? 'opacity-100' : 'opacity-0'}`}>
                                                             <Confetti active={isConfettiActive && isSelected && showCorrect} config={CONFETTI_CONFIG} />
                                                         </div>
                                                         <div
@@ -3067,10 +3079,13 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 {/* Language Toggle Button */}
                                 <button
                                     onClick={() => setUiLang(l => l === 'bn' ? 'en' : 'bn')}
-                                    className="p-2 md:p-3 rounded-full transition-all bg-indigo-500/80 hover:bg-indigo-500 text-white shrink-0"
+                                    className="p-2 md:p-3 rounded-full transition-all bg-indigo-500/80 hover:bg-indigo-500 text-white shrink-0 flex items-center justify-center relative"
                                     title="Toggle Language (বাং/EN)"
                                 >
-                                    <Globe className="w-5 h-5 md:w-6 md:h-6" />
+                                    <Globe className="w-5 h-5 md:w-6 md:h-6 opacity-40" />
+                                    <span className="absolute text-[10px] md:text-xs font-black tracking-widest uppercase">
+                                        {uiLang === 'bn' ? 'বাং' : 'EN'}
+                                    </span>
                                 </button>
                                 {/* Fullscreen Toggle Button */}
                                 <button
@@ -3266,11 +3281,17 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                                         onChange={(e) => setCelebrationDuration(Number(e.target.value))}
                                                                         className="text-xs font-medium bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-2 py-1 outline-none focus:border-indigo-500 dark:text-gray-200"
                                                                     >
-                                                                        <option value={1}>1 Second</option>
-                                                                        <option value={2}>2 Seconds</option>
-                                                                        <option value={3}>3 Seconds</option>
-                                                                        <option value={4}>4 Seconds</option>
-                                                                        <option value={5}>5 Seconds</option>
+                                                                        <option value={1}>1 Sec.</option>
+                                                                        <option value={2}>2 Sec.</option>
+                                                                        <option value={3}>3 Sec.</option>
+                                                                        <option value={4}>4 Sec.</option>
+                                                                        <option value={5}>5 Sec.</option>
+                                                                        <option value={6}>6 Sec.</option>
+                                                                        <option value={7}>7 Sec.</option>
+                                                                        <option value={8}>8 Sec.</option>
+                                                                        <option value={9}>9 Sec.</option>
+                                                                        <option value={10}>10 Sec.</option>
+                                                                        <option value={15}>15 Sec.</option>
                                                                     </select>
                                                                 </div>
                                                             </>
@@ -3590,11 +3611,17 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                                 onChange={(e) => setAutoChangeDelay(Number(e.target.value))}
                                                                 className="text-xs font-medium bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-2 py-1 outline-none focus:border-indigo-500 dark:text-gray-200"
                                                             >
-                                                                <option value={1}>1 Second</option>
-                                                                <option value={2}>2 Seconds</option>
-                                                                <option value={3}>3 Seconds</option>
-                                                                <option value={4}>4 Seconds</option>
-                                                                <option value={5}>5 Seconds</option>
+                                                                <option value={1}>1 Sec.</option>
+                                                                <option value={2}>2 Sec.</option>
+                                                                <option value={3}>3 Sec.</option>
+                                                                <option value={4}>4 Sec.</option>
+                                                                <option value={5}>5 Sec.</option>
+                                                                <option value={6}>6 Sec.</option>
+                                                                <option value={7}>7 Sec.</option>
+                                                                <option value={8}>8 Sec.</option>
+                                                                <option value={9}>9 Sec.</option>
+                                                                <option value={10}>10 Sec.</option>
+                                                                <option value={15}>15 Sec.</option>
                                                             </select>
                                                         </div>
                                                     )}
