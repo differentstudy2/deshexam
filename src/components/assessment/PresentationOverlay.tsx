@@ -1272,6 +1272,22 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         const pushPointFiltered = (px: number, py: number) => {
             const lastPt = currentStroke.current[currentStroke.current.length - 1];
             if (!lastPt || Math.hypot(px - lastPt.x, py - lastPt.y) >= 2) {
+                if (drawingTool === 'eraser' && lastPt) {
+                    const canvas = canvasRef.current;
+                    const ctx = canvas?.getContext('2d');
+                    if (ctx) {
+                        ctx.globalCompositeOperation = 'destination-out';
+                        ctx.beginPath();
+                        ctx.moveTo(lastPt.x, lastPt.y);
+                        ctx.lineTo(px, py);
+                        ctx.strokeStyle = 'rgba(0,0,0,1)';
+                        ctx.lineWidth = penSize * 5;
+                        ctx.lineCap = 'round';
+                        ctx.lineJoin = 'round';
+                        ctx.stroke();
+                        ctx.globalCompositeOperation = 'source-over';
+                    }
+                }
                 currentStroke.current.push({ x: px, y: py });
             }
         };
@@ -1290,23 +1306,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
             pushPointFiltered(x, y);
         }
 
-        if (drawingTool === 'eraser') {
-            const canvas = canvasRef.current;
-            const ctx = canvas?.getContext('2d');
-            if (ctx && currentStroke.current.length >= 2) {
-                const prev = currentStroke.current[currentStroke.current.length - 2];
-                ctx.globalCompositeOperation = 'destination-out';
-                ctx.beginPath();
-                ctx.moveTo(prev.x, prev.y);
-                ctx.lineTo(x, y);
-                ctx.strokeStyle = 'rgba(0,0,0,1)';
-                ctx.lineWidth = penSize * 5;
-                ctx.lineCap = 'round';
-                ctx.lineJoin = 'round';
-                ctx.stroke();
-                ctx.globalCompositeOperation = 'source-over';
-            }
-        } else {
+        if (drawingTool !== 'eraser') {
             redrawActiveStroke();
         }
     };
