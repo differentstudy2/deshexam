@@ -921,8 +921,10 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                         return (node as Element).tagName !== 'CANVAS';
                     },
                 });
+                const qText = questions[slideIdx]?.questionText?.replace(/[^a-zA-Z0-9\u0980-\u09FF\s]/g, '').trim().substring(0, 50) || `slide-${slideIdx + 1}`;
+                const suffix = saveWithCorrectOption ? 'with_answer' : 'question';
                 const link = document.createElement('a');
-                link.download = `deshexam-slide-${slideIdx + 1}.png`;
+                link.download = `${qText}_${suffix}.png`;
                 link.href = dataUrl;
                 link.click();
             } catch (e) {
@@ -2974,24 +2976,36 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                             </div>
 
                                                             {step >= 1 && showCorrect && (
-                                                                <motion.div
-                                                                    initial={{ x: -200, opacity: 0, scale: 0.5 }}
-                                                                    animate={{ x: 0, opacity: 1, scale: 1 }}
-                                                                    transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
-                                                                    className="shrink-0 text-white bg-[#34A853] rounded-full p-1.5 shadow-sm relative z-20"
-                                                                >
-                                                                    <Check className="w-7 h-7 stroke-[3]" />
-                                                                </motion.div>
+                                                                isSavingImage ? (
+                                                                    <div className="shrink-0 text-white bg-[#34A853] rounded-full p-1.5 shadow-sm relative z-20">
+                                                                        <Check className="w-7 h-7 stroke-[3]" />
+                                                                    </div>
+                                                                ) : (
+                                                                    <motion.div
+                                                                        initial={{ x: -200, opacity: 0, scale: 0.5 }}
+                                                                        animate={{ x: 0, opacity: 1, scale: 1 }}
+                                                                        transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
+                                                                        className="shrink-0 text-white bg-[#34A853] rounded-full p-1.5 shadow-sm relative z-20"
+                                                                    >
+                                                                        <Check className="w-7 h-7 stroke-[3]" />
+                                                                    </motion.div>
+                                                                )
                                                             )}
                                                             {step >= 1 && showWrong && isSelected && (
-                                                                <motion.div
-                                                                    initial={{ x: -200, opacity: 0, scale: 0.5 }}
-                                                                    animate={{ x: 0, opacity: 1, scale: 1 }}
-                                                                    transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
-                                                                    className="shrink-0 text-white bg-[#EA4335] rounded-full p-1.5 shadow-sm relative z-20"
-                                                                >
-                                                                    <X className="w-7 h-7 stroke-[3]" />
-                                                                </motion.div>
+                                                                isSavingImage ? (
+                                                                    <div className="shrink-0 text-white bg-[#EA4335] rounded-full p-1.5 shadow-sm relative z-20">
+                                                                        <X className="w-7 h-7 stroke-[3]" />
+                                                                    </div>
+                                                                ) : (
+                                                                    <motion.div
+                                                                        initial={{ x: -200, opacity: 0, scale: 0.5 }}
+                                                                        animate={{ x: 0, opacity: 1, scale: 1 }}
+                                                                        transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
+                                                                        className="shrink-0 text-white bg-[#EA4335] rounded-full p-1.5 shadow-sm relative z-20"
+                                                                    >
+                                                                        <X className="w-7 h-7 stroke-[3]" />
+                                                                    </motion.div>
+                                                                )
                                                             )}
                                                         </div>
 
