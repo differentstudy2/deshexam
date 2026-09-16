@@ -635,7 +635,7 @@ const StreamEngagementWidget = () => {
 
 const LeftStreamWidgets = ({ currentQuestion }: { currentQuestion?: any }) => {
     // Fake Chat Logic
-    const [chats, setChats] = useState<{id: number, name: string, msg: string}[]>(() => {
+    const [chats, setChats] = useState<{ id: number, name: string, msg: string }[]>(() => {
         const initialMessages = ['Sir eta bujhlam na', 'Ans hobe C!', 'Thank you sir!', 'Option A is correct', 'Next question please', 'B!', 'D hobe na?'];
         return Array.from({ length: 15 }).map((_, i) => ({
             id: Date.now() - i * 3000,
@@ -643,19 +643,19 @@ const LeftStreamWidgets = ({ currentQuestion }: { currentQuestion?: any }) => {
             msg: initialMessages[Math.floor(Math.random() * initialMessages.length)]
         }));
     });
-    
+
     useEffect(() => {
         const messages = ['Sir eta bujhlam na', 'Thank you sir!', 'Next question please', 'Eta onek shohoj!', 'Ektu shomoy den sir', 'Bujhte parlam na', 'Excellent class'];
         const interval = setInterval(() => {
             let newMsg = '';
-            
+
             // Contextual chat: 40% chance to guess an option from the current question
             if (currentQuestion?.options?.length > 0 && Math.random() < 0.4) {
                 const optIndex = Math.floor(Math.random() * currentQuestion.options.length);
                 const optText = currentQuestion.options[optIndex].replace(/<[^>]*>?/gm, '').trim(); // strip html
                 const optLabels = ['A', 'B', 'C', 'D'];
                 const label = optLabels[optIndex] || String(optIndex + 1);
-                
+
                 const guessFormats = [
                     optText,
                     `Option ${label}`,
@@ -669,7 +669,7 @@ const LeftStreamWidgets = ({ currentQuestion }: { currentQuestion?: any }) => {
                 newMsg = messages[Math.floor(Math.random() * messages.length)];
             }
 
-            setChats(prev => [{id: Date.now(), name: generateRandomName().split(' ')[0], msg: newMsg}, ...prev].slice(0, 15));
+            setChats(prev => [{ id: Date.now(), name: generateRandomName().split(' ')[0], msg: newMsg }, ...prev].slice(0, 15));
         }, 3000);
         return () => clearInterval(interval);
     }, [currentQuestion]);
@@ -718,7 +718,7 @@ const LeftStreamWidgets = ({ currentQuestion }: { currentQuestion?: any }) => {
                     </AnimatePresence>
                 </div>
             </div>
-            
+
             {/* 4. Subscribe CTA */}
             <div className="w-full bg-[#cc0000] hover:bg-[#b30000] dark:bg-[#FF0000] dark:hover:bg-[#cc0000] text-white rounded-md h-[48px] flex items-center justify-center gap-2 cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98] shadow-sm shrink-0 mb-1 mt-auto border border-red-700/50 animate-pulse hover:animate-none">
                 <Youtube className="w-6 h-6" />
@@ -5281,9 +5281,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     {/* Floating Quick Pen Tool (Left Edge, Bottom) */}
                     <div className="absolute left-3 md:left-5 bottom-4 md:bottom-8 z-[70] flex flex-col gap-2 items-center animate-in slide-in-from-left-10 fade-in duration-300">
                         {/* Preset Colors (Visible when Pen is active, expands upwards) */}
-                        <div className={`flex flex-col gap-2 p-1.5 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md rounded-full shadow-lg border border-gray-200 dark:border-gray-700 transition-all duration-300 origin-bottom ${
-                            (isPenActive && drawingTool === 'pen') ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-90 translate-y-4 pointer-events-none'
-                        }`}>
+                        <div className={`flex flex-col gap-2 p-1.5 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md rounded-full shadow-lg border border-gray-200 dark:border-gray-700 transition-all duration-300 origin-bottom ${(isPenActive && drawingTool === 'pen') ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-90 translate-y-4 pointer-events-none'
+                            }`}>
                             {[
                                 { color: '#ef4444', name: 'Red' },
                                 { color: '#3b82f6', name: 'Blue' },
@@ -5326,11 +5325,10 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     setIsPenActive(true);
                                 }
                             }}
-                            className={`p-3 rounded-full shadow-lg transition-all border-2 ${
-                                (isPenActive && drawingTool === 'pen')
+                            className={`p-3 rounded-full shadow-lg transition-all border-2 ${(isPenActive && drawingTool === 'pen')
                                     ? 'bg-blue-600 text-white border-blue-400 scale-110 shadow-[0_0_15px_rgba(37,99,235,0.5)]'
                                     : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-transparent hover:bg-gray-50 dark:hover:bg-gray-700'
-                            }`}
+                                }`}
                             title="Quick Pen Toggle"
                         >
                             <Pen className="w-5 h-5 md:w-6 md:h-6" />
@@ -5338,14 +5336,12 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     </div>
 
                     {/* Floating Presentation Tools (Right Edge, Top, Transparent) */}
-                    <div className="absolute right-4 top-4 md:top-8 z-[70] bg-transparent flex flex-col gap-1 w-9 items-center animate-in slide-in-from-right-10 fade-in duration-300">
+                    <div className="absolute right-4 top-18 md:top-20 z-[70] bg-transparent flex flex-col gap-1 w-9 items-center animate-in slide-in-from-right-10 fade-in duration-300">
 
                         <button onClick={() => { setDrawingTool('laser'); setIsPenActive(true); }} className={`p-0.5 rounded-lg transition-all ${(isPenActive && drawingTool === 'laser') ? 'bg-red-500/20 text-red-400 border border-red-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Laser (Shift+L)">
                             <MousePointer2 className="w-4 h-4" />
                         </button>
-                        <button onClick={() => { setDrawingTool('pen'); setIsPenActive(true); }} className={`p-0.5 rounded-lg transition-all ${(isPenActive && drawingTool === 'pen') ? 'bg-blue-500/20 text-blue-400 border border-blue-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Pen (Shift+P)">
-                            <Pen className="w-4 h-4" />
-                        </button>
+
                         <button onClick={() => { setDrawingTool('highlighter'); setIsPenActive(true); }} className={`p-0.5 rounded-lg transition-all ${(isPenActive && drawingTool === 'highlighter') ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Marker (Shift+M)">
                             <Highlighter className="w-4 h-4" />
                         </button>
