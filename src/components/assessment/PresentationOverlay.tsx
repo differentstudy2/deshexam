@@ -476,6 +476,84 @@ const SevenSegmentColon = () => {
     );
 };
 
+const FAKE_FIRST_NAMES = [
+    // Bengali/Muslim
+    'Rahim', 'Karim', 'Sajid', 'Anika', 'Nusrat', 'Hasan', 'Mehedi', 'Sakib', 'Tamim', 'Mashrafe', 'Mushi', 'Fahim', 'Tonmoy', 'Arif', 'Sumon', 'Rubel', 'Rifat', 'Jamil', 'Tanim', 'Riad', 'Shakil', 'Tariq', 'Farhan', 'Nadim', 'Imran', 'Kamrul', 'Tuhin', 'Pavel', 'Jahid', 'Sohel', 'Limon', 'Sadia', 'Nafisa', 'Lamia', 'Mithila',
+    // Hindu
+    'Amit', 'Rahul', 'Sourav', 'Pritam', 'Rakesh', 'Akash', 'Puja', 'Riya', 'Priti', 'Sneha', 'Joy', 'Anik', 'Sujon', 'Bipasha', 'Sreya', 'Bikash', 'Apu',
+    // English
+    'John', 'Michael', 'David', 'James', 'Robert', 'William', 'Sarah', 'Jessica', 'Emily', 'Emma', 'Olivia', 'Alex', 'Chris', 'Kevin'
+];
+const FAKE_LAST_NAMES = [
+    // Bengali/Muslim
+    'Rahman', 'Islam', 'Hossain', 'Hasan', 'Ali', 'Ahmed', 'Uddin', 'Khan', 'Chowdhury', 'Akter', 'Khatun', 'Begum', 'Sikder', 'Mondol',
+    // Hindu
+    'Das', 'Ghosh', 'Saha', 'Roy', 'Sen', 'Banerjee', 'Chatterjee', 'Mukherjee', 'Bose', 'Dutta', 'Sarkar', 'Biswas', 'Nath',
+    // English
+    'Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Taylor', 'Wilson', 'Anderson', 'Thomas'
+];
+
+const generateRandomName = () => {
+    const first = FAKE_FIRST_NAMES[Math.floor(Math.random() * FAKE_FIRST_NAMES.length)];
+    const last = FAKE_LAST_NAMES[Math.floor(Math.random() * FAKE_LAST_NAMES.length)];
+    return `${first} ${last}`;
+};
+
+const LiveSubscriberFeed = () => {
+    const [subs, setSubs] = useState<{id: number, name: string}[]>([]);
+
+    useEffect(() => {
+        // Initial populate
+        const initial = Array.from({length: 4}).map((_, i) => ({
+            id: Date.now() - i * 1000,
+            name: generateRandomName()
+        }));
+        setSubs(initial);
+
+        const interval = setInterval(() => {
+            const randomName = generateRandomName();
+            setSubs(prev => {
+                const newSub = { id: Date.now(), name: randomName };
+                return [newSub, ...prev].slice(0, 5);
+            });
+        }, Math.random() * 3000 + 4000); // 4-7 seconds
+
+        return () => clearInterval(interval);
+    }, []);
+
+    return (
+        <div className="w-full flex-1 min-h-[200px] flex flex-col bg-gray-900/80 rounded-xl overflow-hidden shadow-2xl border border-gray-700 relative p-2.5 shrink" style={{ maxHeight: '420px' }}>
+            <div className="flex items-center gap-2 mb-3 border-b border-gray-700 pb-2 shrink-0">
+                <div className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></div>
+                <h3 className="text-white font-bold text-[14px] uppercase tracking-wider">Live Activity</h3>
+            </div>
+            
+            <div className="flex flex-col gap-2 overflow-hidden flex-1 relative">
+                <AnimatePresence>
+                    {subs.map((sub) => (
+                        <motion.div 
+                            key={sub.id}
+                            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.9 }}
+                            transition={{ duration: 0.4 }}
+                            className="flex items-center gap-2.5 bg-white/5 border border-white/10 rounded-lg p-2 shadow-sm"
+                        >
+                            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shrink-0 shadow-inner">
+                                <span className="text-white text-[12px] font-bold">{sub.name.charAt(0)}</span>
+                            </div>
+                            <div className="flex flex-col flex-1 min-w-0">
+                                <span className="text-white text-[13px] font-bold truncate leading-tight">{sub.name}</span>
+                                <span className="text-green-400 text-[10px] font-semibold">Just Subscribed! 🎉</span>
+                            </div>
+                        </motion.div>
+                    ))}
+                </AnimatePresence>
+            </div>
+        </div>
+    );
+};
+
 export default function PresentationOverlay({ questions, classLine, chapterName, topicName, autoStart, onClose, isPremiumUser, testLanguage }: PresentationOverlayProps) {
     const { user, userProfile } = useAuth();
     const [fetchedIsAdmin, setFetchedIsAdmin] = useState(false);
@@ -2596,7 +2674,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 {/* Left Sidebar Column */}
                 <div className="hidden xl:flex w-[160px] h-full shrink-0 flex-col gap-3 z-10">
                     {/* Left Ad Banner */}
-                    <div className="w-full flex-1 min-h-[350px] flex flex-col items-center justify-between bg-gradient-to-b from-[#0a192f] via-[#0b2244] to-[#041128] rounded-xl overflow-hidden shadow-2xl border border-blue-400/20 relative p-2.5 shrink" style={{ maxHeight: '500px' }}>
+                    <div className="w-full flex-1 min-h-[200px] flex flex-col items-center justify-between bg-gradient-to-b from-[#0a192f] via-[#0b2244] to-[#041128] rounded-xl overflow-hidden shadow-2xl border border-blue-400/20 relative p-2.5 shrink" style={{ maxHeight: '420px' }}>
                         {/* Floating Elements Background */}
                     <div className="absolute top-[5%] left-[25%] w-16 h-16 rounded-full border border-blue-400/20 bg-blue-500/10 blur-[8px]"></div>
                     <div className="absolute bottom-[30%] right-[-5%] w-20 h-20 rounded-full bg-blue-400/10 blur-[20px]"></div>
@@ -2624,7 +2702,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     </div>
 
                     {/* Features List */}
-                    <div className="flex flex-col z-10 w-full space-y-2 mb-2">
+                    <div className="flex flex-col z-10 w-full space-y-2 mb-2 min-h-0 overflow-y-auto shrink custom-scrollbar">
                         <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-lg p-2.5">
                             <div className="flex flex-col space-y-1.5">
                                 {[
@@ -5179,54 +5257,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                         </div>
                     )}
 
-                    {/* Right Ad Banner */}
-                    <div className="w-full flex-1 min-h-[350px] flex flex-col items-center justify-between bg-gradient-to-b from-[#2a0845] via-[#6441A5] to-[#2a0845] rounded-xl overflow-hidden shadow-2xl border border-purple-400/20 relative p-2.5 shrink" style={{ maxHeight: '500px' }}>
-                        {/* Floating Elements Background */}
-                    <div className="absolute top-[10%] right-[20%] w-16 h-16 rounded-full border border-purple-400/20 bg-purple-500/10 blur-[8px]"></div>
-                    <div className="absolute bottom-[20%] left-[-10%] w-20 h-20 rounded-full bg-pink-400/10 blur-[20px]"></div>
-
-                    {/* Top Icon */}
-                    <div className="flex items-center justify-center text-4xl w-full z-10 pt-4 drop-shadow-lg relative">
-                        <div className="absolute inset-0 bg-purple-400/20 blur-[15px] rounded-full"></div>
-                        🎯
-                    </div>
-
-                    {/* Text Section */}
-                    <div className="flex flex-col items-center w-full z-10 text-center mt-3">
-                        <h3 className="text-[18px] text-purple-100 mb-1 leading-tight font-medium">লক্ষ্য তোমার,</h3>
-                        <h3 className="text-[26px] text-white leading-tight font-extrabold">
-                            <span className="text-[#FFD700]">সফলতা</span>
-                        </h3>
-                        <h3 className="text-[26px] text-white leading-tight font-extrabold">আমাদের সাথে!</h3>
-                    </div>
-
-                    {/* Features List */}
-                    <div className="flex flex-col z-10 w-full space-y-2 mt-4 mb-2">
-                        <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-lg p-2.5">
-                            <div className="flex flex-col space-y-2">
-                                {[
-                                    'Daily Test',
-                                    'Unlimited',
-                                    'Analytics',
-                                    'AI Ranking',
-                                    'Report'
-                                ].map((feature, idx) => (
-                                    <div key={idx} className="flex items-center gap-1.5">
-                                        <Check className="w-5 h-5 text-[#00E676] shrink-0" />
-                                        <span className="text-gray-100 text-[16px] font-semibold tracking-wide leading-tight">{feature}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* CTA Button */}
-                    <div className="w-full mt-auto z-10 pb-2">
-                        <button className="w-full flex items-center justify-center py-2.5 bg-gradient-to-r from-[#FF416C] to-[#FF4B2B] border border-red-400/50 rounded-lg shadow-[0_4px_10px_rgba(255,65,108,0.4)] hover:scale-105 transition-transform duration-300">
-                            <span className="text-white font-bold text-[18px] drop-shadow-md">Join Now</span>
-                        </button>
-                    </div>
-                </div>
+                    {/* Live Subscribers Feed */}
+                    <LiveSubscriberFeed />
                 
                 {/* ── Bottom Section: Future Right Content OR Webcam ── */}
                 {isWebcamActive ? (
