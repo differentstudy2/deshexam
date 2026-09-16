@@ -12,11 +12,13 @@ import {
     FileQuestion,
     ChevronDown,
     Star,
-    Square
+    Square,
+    Pause
 } from 'lucide-react';
 
 export default function ScreenRecorderPage() {
     const [isRecording, setIsRecording] = useState(false);
+    const [isPaused, setIsPaused] = useState(false);
     const [recordingQuality, setRecordingQuality] = useState<'standard' | 'high' | 'ultra' | '4k'>('high');
     const [recordingTime, setRecordingTime] = useState(0);
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -25,16 +27,16 @@ export default function ScreenRecorderPage() {
 
     // Timer logic
     useEffect(() => {
-        if (isRecording) {
+        if (isRecording && !isPaused) {
             timerRef.current = setInterval(() => setRecordingTime(t => t + 1), 1000);
         } else {
             if (timerRef.current) clearInterval(timerRef.current);
-            setRecordingTime(0);
+            if (!isRecording) setRecordingTime(0);
         }
         return () => {
             if (timerRef.current) clearInterval(timerRef.current);
         };
-    }, [isRecording]);
+    }, [isRecording, isPaused]);
 
     const formatTime = (seconds: number) => {
         const m = Math.floor(seconds / 60).toString().padStart(2, '0');
@@ -155,6 +157,7 @@ export default function ScreenRecorderPage() {
                 a.click();
                 window.URL.revokeObjectURL(url);
                 setIsRecording(false);
+                setIsPaused(false);
                 
                 // Cleanup tracks
                 finalStream.getTracks().forEach(track => track.stop());
@@ -162,11 +165,25 @@ export default function ScreenRecorderPage() {
                 if (micStream) micStream.getTracks().forEach(track => track.stop());
             };
 
-            mediaRecorder.start(1000); // collect 1s chunks
+            mediaRecorder.start(); // Do not use timeslice to allow properly formatted WebM headers
             setIsRecording(true);
+            setIsPaused(false);
         } catch (err) {
             console.error("Recording error: ", err);
             setIsRecording(false);
+            setIsPaused(false);
+        }
+    };
+
+    const togglePause = () => {
+        if (!mediaRecorderRef.current) return;
+        
+        if (isPaused) {
+            mediaRecorderRef.current.resume();
+            setIsPaused(false);
+        } else {
+            mediaRecorderRef.current.pause();
+            setIsPaused(true);
         }
     };
 
@@ -178,16 +195,25 @@ export default function ScreenRecorderPage() {
             {isRecording && (
                 <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[100] bg-gray-900 text-white rounded-full shadow-2xl px-6 py-3 flex items-center gap-6 animate-in slide-in-from-bottom-10 border border-gray-800">
                     <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.8)]"></div>
+                        <div className={`w-3 h-3 bg-red-500 rounded-full shadow-[0_0_8px_rgba(239,68,68,0.8)] ${isPaused ? '' : 'animate-pulse'}`}></div>
                         <span className="font-mono text-lg font-bold tracking-wider">{formatTime(recordingTime)}</span>
                     </div>
-                    <button 
-                        onClick={toggleRecording}
-                        className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full font-bold flex items-center gap-2 transition-colors"
-                    >
-                        <Square className="w-4 h-4 fill-white" />
-                        Stop Recording
-                    </button>
+                    <div className="flex items-center gap-3">
+                        <button 
+                            onClick={togglePause}
+                            className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-full font-bold flex items-center gap-2 transition-colors"
+                        >
+                            {isPaused ? <Play className="w-4 h-4 fill-white" /> : <Pause className="w-4 h-4 fill-white" />}
+                            {isPaused ? 'Resume' : 'Pause'}
+                        </button>
+                        <button 
+                            onClick={toggleRecording}
+                            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full font-bold flex items-center gap-2 transition-colors"
+                        >
+                            <Square className="w-4 h-4 fill-white" />
+                            Stop
+                        </button>
+                    </div>
                 </div>
             )}
 
