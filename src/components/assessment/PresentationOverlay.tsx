@@ -62,7 +62,7 @@ const CONFETTI_CONFIG = {
 };
 
 import 'katex/dist/katex.min.css';
-import { X, ChevronLeft, ChevronRight, Play, Pause, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize, LayoutGrid, Sun, Moon, Eraser, Square, Circle, ArrowUpRight, Type, Presentation, ZoomIn, Volume2, VolumeX, MonitorPlay, Lightbulb, MessageCircle, Stamp, Droplet, Music, AlignLeft, Keyboard, Printer, Trophy, Globe, BarChart2, Sparkles, ImageDown, FileDown, Video, Sliders, List, Key, Camera } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Play, Pause, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize, LayoutGrid, Sun, Moon, Eraser, Square, Circle, ArrowUpRight, Type, Presentation, ZoomIn, Volume2, VolumeX, MonitorPlay, Lightbulb, MessageCircle, Stamp, Droplet, Music, AlignLeft, Keyboard, Printer, Trophy, Globe, BarChart2, Sparkles, ImageDown, FileDown, Video, Sliders, List, Key, Camera, Youtube, Bell } from 'lucide-react';
 
 const bnOptionsMap: Record<string, string> = {
     a: 'ক',
@@ -499,12 +499,15 @@ const generateRandomName = () => {
     return `${first} ${last}`;
 };
 
+const AVATAR_COLORS = ['bg-blue-600', 'bg-green-600', 'bg-purple-600', 'bg-yellow-600', 'bg-pink-600', 'bg-indigo-600', 'bg-teal-600', 'bg-orange-600'];
+
 const LiveSubscriberFeed = () => {
     const [subs, setSubs] = useState<{id: number, name: string}[]>([]);
+    const [totalSubs, setTotalSubs] = useState(1240592); // Starting number
 
     useEffect(() => {
         // Initial populate
-        const initial = Array.from({length: 4}).map((_, i) => ({
+        const initial = Array.from({length: 3}).map((_, i) => ({
             id: Date.now() - i * 1000,
             name: generateRandomName()
         }));
@@ -514,40 +517,57 @@ const LiveSubscriberFeed = () => {
             const randomName = generateRandomName();
             setSubs(prev => {
                 const newSub = { id: Date.now(), name: randomName };
-                return [newSub, ...prev].slice(0, 5);
+                return [newSub, ...prev].slice(0, 5); // Keep last 5 for space since there's no big counter
             });
-        }, Math.random() * 3000 + 4000); // 4-7 seconds
+        }, Math.random() * 3000 + 3500); // 3.5-6.5 seconds
 
         return () => clearInterval(interval);
     }, []);
 
     return (
-        <div className="w-full flex-1 min-h-[200px] flex flex-col bg-gray-900/80 rounded-xl overflow-hidden shadow-2xl border border-gray-700 relative p-2.5 shrink" style={{ maxHeight: '420px' }}>
-            <div className="flex items-center gap-2 mb-3 border-b border-gray-700 pb-2 shrink-0">
-                <div className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></div>
-                <h3 className="text-white font-bold text-[14px] uppercase tracking-wider">Live Activity</h3>
+        <div className="w-full flex-1 min-h-[200px] flex flex-col bg-[#0F0F0F] rounded-lg overflow-hidden shadow-2xl border border-[#272727] relative p-3 shrink" style={{ maxHeight: '420px' }}>
+            
+            {/* YouTube Header */}
+            <div className="flex flex-col items-center justify-center border-b border-[#272727] pb-3 mb-3 shrink-0">
+                <div className="flex items-center gap-1.5">
+                    <div className="relative flex items-center justify-center w-5 h-5">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-20"></span>
+                        <Youtube className="w-5 h-5 text-[#FF0000] relative z-10" />
+                    </div>
+                    <h3 className="text-[#AAAAAA] font-semibold text-[11px] uppercase tracking-widest">Live Subscribers</h3>
+                </div>
             </div>
             
-            <div className="flex flex-col gap-2 overflow-hidden flex-1 relative">
+            {/* Feed */}
+            <div 
+                className="flex flex-col gap-2 overflow-hidden flex-1 relative"
+                style={{ maskImage: 'linear-gradient(to bottom, black 70%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to bottom, black 70%, transparent 100%)' }}
+            >
                 <AnimatePresence>
-                    {subs.map((sub) => (
-                        <motion.div 
-                            key={sub.id}
-                            initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.9 }}
-                            transition={{ duration: 0.4 }}
-                            className="flex items-center gap-2.5 bg-white/5 border border-white/10 rounded-lg p-2 shadow-sm"
-                        >
-                            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shrink-0 shadow-inner">
-                                <span className="text-white text-[12px] font-bold">{sub.name.charAt(0)}</span>
-                            </div>
-                            <div className="flex flex-col flex-1 min-w-0">
-                                <span className="text-white text-[13px] font-bold truncate leading-tight">{sub.name}</span>
-                                <span className="text-green-400 text-[10px] font-semibold">Just Subscribed! 🎉</span>
-                            </div>
-                        </motion.div>
-                    ))}
+                    {subs.map((sub) => {
+                        const avatarColor = AVATAR_COLORS[sub.name.charCodeAt(0) % AVATAR_COLORS.length];
+                        return (
+                            <motion.div 
+                                key={sub.id}
+                                initial={{ opacity: 0, x: -20, scale: 0.95 }}
+                                animate={{ opacity: 1, x: 0, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.9 }}
+                                transition={{ duration: 0.3, ease: 'easeOut' }}
+                                className="flex items-center gap-2 bg-[#272727]/50 hover:bg-[#3F3F3F] transition-colors rounded-xl p-2 shadow-sm group border border-[#3F3F3F]/50"
+                            >
+                                <div className={`w-7 h-7 rounded-full ${avatarColor} flex items-center justify-center shrink-0`}>
+                                    <span className="text-white text-[12px] font-bold">{sub.name.charAt(0)}</span>
+                                </div>
+                                <div className="flex flex-col flex-1 min-w-0 justify-center">
+                                    <span className="text-white text-[12px] font-medium truncate leading-tight group-hover:text-blue-400 transition-colors">{sub.name}</span>
+                                    <span className="text-[#AAAAAA] text-[10px] font-normal mt-0.5 truncate">Just subscribed!</span>
+                                </div>
+                                <div className="shrink-0 bg-[#FF0000] rounded-full p-1 shadow-[0_0_8px_rgba(255,0,0,0.5)]">
+                                    <Bell className="w-2.5 h-2.5 text-white" />
+                                </div>
+                            </motion.div>
+                        );
+                    })}
                 </AnimatePresence>
             </div>
         </div>
