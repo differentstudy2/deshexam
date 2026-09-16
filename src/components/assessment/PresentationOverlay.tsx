@@ -635,7 +635,14 @@ const StreamEngagementWidget = () => {
 
 const LeftStreamWidgets = () => {
     // Fake Chat Logic
-    const [chats, setChats] = useState<{id: number, name: string, msg: string}[]>([]);
+    const [chats, setChats] = useState<{id: number, name: string, msg: string}[]>(() => {
+        const initialMessages = ['Sir eta bujhlam na', 'Ans hobe C!', 'Thank you sir!', 'Option A is correct', 'Next question please', 'B!', 'D hobe na?'];
+        return Array.from({ length: 15 }).map((_, i) => ({
+            id: Date.now() - i * 3000,
+            name: generateRandomName().split(' ')[0],
+            msg: initialMessages[Math.floor(Math.random() * initialMessages.length)]
+        }));
+    });
     
     useEffect(() => {
         const messages = ['Sir eta bujhlam na', 'Ans hobe C!', 'Thank you sir!', 'Option A is correct', 'Next question please', 'B!', 'D hobe na?'];
@@ -675,14 +682,14 @@ const LeftStreamWidgets = () => {
             </div>
 
             {/* 3. Live Chat (Fake) */}
-            <div className="flex flex-col h-[220px] shrink-0 bg-white dark:bg-[#0F0F0F] rounded-lg p-1.5 border border-gray-200 dark:border-[#272727] shadow-sm overflow-hidden relative">
+            <div className="flex flex-col h-[240px] shrink-0 bg-white dark:bg-[#0F0F0F] rounded-lg p-1.5 border border-gray-200 dark:border-[#272727] shadow-sm overflow-hidden relative">
                 <span className="text-[10px] font-bold text-red-500 mb-1 border-b border-gray-200 dark:border-[#272727] pb-1 flex items-center gap-1 uppercase tracking-wider shrink-0">
                     <MessageCircle className="w-3 h-3" /> Live Chat
                 </span>
-                <div className="flex flex-col gap-1.5 flex-1 overflow-hidden relative justify-end pb-1" style={{ maskImage: 'linear-gradient(to bottom, transparent 0%, black 20%, black 100%)', WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 20%, black 100%)' }}>
+                <div className="flex flex-col gap-0.5 flex-1 overflow-hidden relative justify-end pb-1" style={{ maskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 100%)', WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 100%)' }}>
                     <AnimatePresence initial={false}>
                         {[...chats].reverse().map(chat => (
-                            <motion.div key={chat.id} layout initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} className="text-[10px] leading-snug shrink-0">
+                            <motion.div key={chat.id} layout initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} className="text-[9.5px] leading-tight shrink-0">
                                 <span className="font-bold text-blue-500 dark:text-blue-400 mr-1">{chat.name}:</span>
                                 <span className="text-gray-700 dark:text-gray-300 font-medium break-words">{chat.msg}</span>
                             </motion.div>
