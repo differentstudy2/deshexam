@@ -5301,8 +5301,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 }
                             }}
                             className={`p-3 rounded-full transition-all ${(isPenActive && drawingTool === 'pen')
-                                    ? 'bg-transparent text-blue-500 scale-110 drop-shadow-[0_0_8px_rgba(37,99,235,0.8)]'
-                                    : 'bg-transparent text-gray-400 dark:text-gray-500 hover:bg-gray-500/10'
+                                ? 'bg-transparent text-blue-500 scale-110 drop-shadow-[0_0_8px_rgba(37,99,235,0.8)]'
+                                : 'bg-transparent text-gray-400 dark:text-gray-500 hover:bg-gray-500/10'
                                 }`}
                             title="Quick Pen Toggle"
                         >
@@ -5471,19 +5471,19 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                         </div>
                     ) : (
                         <div className={`w-full aspect-square mt-auto relative group shrink-0 shadow-xl border border-indigo-200/50 dark:border-indigo-800/50 flex flex-col items-center justify-center bg-black overflow-hidden ${webcamShape === 'circle' ? 'rounded-full' : 'rounded-2xl'}`}>
-                            
+
                             {/* Realistic Video Avatar (Option 1 Demo) */}
-                            <video 
-                                src="https://www.w3schools.com/html/mov_bbb.mp4" /* 👈 Replace this URL with your own Avatar MP4 video */
-                                loop 
-                                muted 
+                            <video
+                                src="/avatar.mp4" /* 👈 Replace this URL with your own Avatar MP4 video */
+                                loop
+                                muted
                                 playsInline
                                 className="w-full h-full object-cover transition-opacity duration-300"
                                 style={{ opacity: isSpeaking ? 1 : 0.6 }}
                                 ref={(video) => {
                                     if (video) {
                                         if (isSpeaking) {
-                                            video.play().catch(() => {});
+                                            video.play().catch(() => { });
                                         } else {
                                             video.pause();
                                         }
