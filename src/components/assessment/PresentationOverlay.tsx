@@ -633,7 +633,7 @@ const StreamEngagementWidget = () => {
     );
 };
 
-const LeftStreamWidgets = () => {
+const LeftStreamWidgets = ({ currentQuestion }: { currentQuestion?: any }) => {
     // Fake Chat Logic
     const [chats, setChats] = useState<{id: number, name: string, msg: string}[]>(() => {
         const initialMessages = ['Sir eta bujhlam na', 'Ans hobe C!', 'Thank you sir!', 'Option A is correct', 'Next question please', 'B!', 'D hobe na?'];
@@ -645,16 +645,42 @@ const LeftStreamWidgets = () => {
     });
     
     useEffect(() => {
-        const messages = ['Sir eta bujhlam na', 'Ans hobe C!', 'Thank you sir!', 'Option A is correct', 'Next question please', 'B!', 'D hobe na?'];
+        const messages = ['Sir eta bujhlam na', 'Thank you sir!', 'Next question please', 'Eta onek shohoj!', 'Ektu shomoy den sir', 'Bujhte parlam na', 'Excellent class'];
         const interval = setInterval(() => {
-            const randomMsg = messages[Math.floor(Math.random() * messages.length)];
-            setChats(prev => [{id: Date.now(), name: generateRandomName().split(' ')[0], msg: randomMsg}, ...prev].slice(0, 15));
+            let newMsg = '';
+            
+            // Contextual chat: 40% chance to guess an option from the current question
+            if (currentQuestion?.options?.length > 0 && Math.random() < 0.4) {
+                const optIndex = Math.floor(Math.random() * currentQuestion.options.length);
+                const optText = currentQuestion.options[optIndex].replace(/<[^>]*>?/gm, '').trim(); // strip html
+                const optLabels = ['A', 'B', 'C', 'D'];
+                const label = optLabels[optIndex] || String(optIndex + 1);
+                
+                const guessFormats = [
+                    optText,
+                    `Option ${label}`,
+                    `Ans hobe ${label}`,
+                    `I think ${optText}`,
+                    `${label} hobe ki?`,
+                    `Definitely ${label}`
+                ];
+                newMsg = guessFormats[Math.floor(Math.random() * guessFormats.length)];
+            } else {
+                newMsg = messages[Math.floor(Math.random() * messages.length)];
+            }
+
+            setChats(prev => [{id: Date.now(), name: generateRandomName().split(' ')[0], msg: newMsg}, ...prev].slice(0, 15));
         }, 3000);
         return () => clearInterval(interval);
-    }, []);
+    }, [currentQuestion]);
 
     return (
         <div className="flex flex-col gap-1.5 w-full h-full overflow-hidden shrink-0">
+            {/* Placeholder for future widget (Fills remaining empty space at the top) */}
+            <div className="flex-1 w-full min-h-[50px] border border-dashed border-gray-300 dark:border-gray-700 rounded-lg flex items-center justify-center shrink">
+                <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500">Empty Space</span>
+            </div>
+
             {/* 1. Leaderboard */}
             <div className="flex flex-col bg-white dark:bg-[#0F0F0F] rounded-lg p-1.5 px-2 border border-gray-200 dark:border-[#272727] shadow-sm shrink-0">
                 <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400 mb-1 border-b border-gray-200 dark:border-[#272727] pb-1 uppercase tracking-wider flex items-center justify-between">
@@ -675,12 +701,6 @@ const LeftStreamWidgets = () => {
                     <span className="text-[10px] font-semibold text-gray-800 dark:text-gray-200 leading-tight">English - 4:00 PM</span>
                 </div>
             </div>
-
-            {/* Placeholder for future widget (Fills remaining empty space) */}
-            <div className="flex-1 w-full min-h-[50px] border border-dashed border-gray-300 dark:border-gray-700 rounded-lg flex items-center justify-center shrink">
-                <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500">Empty Space</span>
-            </div>
-
             {/* 3. Live Chat (Fake) */}
             <div className="flex flex-col h-[240px] shrink-0 bg-white dark:bg-[#0F0F0F] rounded-lg p-1.5 border border-gray-200 dark:border-[#272727] shadow-sm overflow-hidden relative">
                 <span className="text-[10px] font-bold text-red-500 mb-1 border-b border-gray-200 dark:border-[#272727] pb-1 flex items-center gap-1 uppercase tracking-wider shrink-0">
@@ -699,9 +719,9 @@ const LeftStreamWidgets = () => {
             </div>
             
             {/* 4. Subscribe CTA */}
-            <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-1.5 border border-red-200 dark:border-red-800/30 flex items-center justify-center gap-1 cursor-pointer hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors shrink-0 shadow-sm animate-pulse mb-1">
-                <Youtube className="w-4 h-4 text-red-600 shrink-0" />
-                <span className="text-[11px] font-bold text-red-600 dark:text-red-400">Subscribe & Like!</span>
+            <div className="w-full bg-[#cc0000] hover:bg-[#b30000] dark:bg-[#FF0000] dark:hover:bg-[#cc0000] text-white rounded-md h-[42px] flex items-center justify-center gap-2 cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98] shadow-sm shrink-0 mb-1 mt-auto border border-red-700/50">
+                <Youtube className="w-5 h-5" />
+                <span className="text-[13px] font-bold tracking-wide uppercase">Subscribe</span>
             </div>
         </div>
     );
@@ -2827,7 +2847,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 {/* Left Sidebar Column */}
                 <div className="hidden xl:flex w-[160px] h-full shrink-0 flex-col gap-1 z-10">
                     {/* Stream Widgets */}
-                    <LeftStreamWidgets />
+                    <LeftStreamWidgets currentQuestion={q} />
                     {/* ── Analog Clock (Moved here) ── */}
                     {isTimerEnabled ? (() => {
                         const sec = timerDisplay.secs;
