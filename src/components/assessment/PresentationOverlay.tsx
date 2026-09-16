@@ -546,7 +546,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     
     // --- Screen Recording State ---
     const [isRecording, setIsRecording] = useState(false);
-    const [recordingQuality, setRecordingQuality] = useState<'standard' | 'high' | 'ultra' | '4k'>('high');
+    const [isRecordingPaused, setIsRecordingPaused] = useState(false);
+    const [recordingQuality, setRecordingQuality] = useState<'standard' | 'high' | 'ultra' | '4k'>('4k');
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const recordedChunksRef = useRef<BlobPart[]>([]);
 
@@ -558,6 +559,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
             }
             return;
         }
+
+        setIsRecordingPaused(false);
 
         // Start recording
         try {
@@ -660,6 +663,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 a.click();
                 window.URL.revokeObjectURL(url);
                 setIsRecording(false);
+                setIsRecordingPaused(false);
                 
                 // Stop all tracks to remove the recording icon from browser tab
                 displayStream.getTracks().forEach(track => track.stop());
@@ -679,6 +683,19 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         } catch (error) {
             console.error("Error starting screen recording:", error);
             setIsRecording(false);
+            setIsRecordingPaused(false);
+        }
+    };
+
+    const toggleRecordingPause = () => {
+        if (!mediaRecorderRef.current) return;
+        
+        if (isRecordingPaused) {
+            mediaRecorderRef.current.resume();
+            setIsRecordingPaused(false);
+        } else {
+            mediaRecorderRef.current.pause();
+            setIsRecordingPaused(true);
         }
     };
     const [downloadAllSlides, setDownloadAllSlides] = useState(false);
@@ -3301,6 +3318,19 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     }
                                 </button>
 
+                                {/* Screen Record Pause Button */}
+                                {isRecording && (
+                                    <button
+                                        onClick={toggleRecordingPause}
+                                        className={`hidden md:block p-2 md:p-3 rounded-full transition-all shrink-0 ${isRecordingPaused
+                                            ? 'bg-yellow-500 text-white shadow-md ring-2 ring-yellow-300'
+                                            : 'hover:bg-white/10 text-white/80 hover:text-white'
+                                            }`}
+                                        title={isRecordingPaused ? "Resume Recording" : "Pause Recording"}
+                                    >
+                                        {isRecordingPaused ? <Play className="w-5 h-5 md:w-6 md:h-6 fill-current" /> : <Pause className="w-5 h-5 md:w-6 md:h-6 fill-current" />}
+                                    </button>
+                                )}
 
                                 {/* Screen Record Button */}
                                 <button
