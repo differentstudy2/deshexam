@@ -2596,7 +2596,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 {/* Left Sidebar Column */}
                 <div className="hidden xl:flex w-[160px] h-full shrink-0 flex-col gap-3 z-10">
                     {/* Left Ad Banner */}
-                    <div className="w-full flex flex-col items-center justify-between bg-gradient-to-b from-[#0a192f] via-[#0b2244] to-[#041128] rounded-xl overflow-hidden shadow-2xl border border-blue-400/20 relative p-2.5 shrink-0" style={{ height: '500px' }}>
+                    <div className="w-full flex-1 min-h-[350px] flex flex-col items-center justify-between bg-gradient-to-b from-[#0a192f] via-[#0b2244] to-[#041128] rounded-xl overflow-hidden shadow-2xl border border-blue-400/20 relative p-2.5 shrink" style={{ maxHeight: '500px' }}>
                         {/* Floating Elements Background */}
                     <div className="absolute top-[5%] left-[25%] w-16 h-16 rounded-full border border-blue-400/20 bg-blue-500/10 blur-[8px]"></div>
                     <div className="absolute bottom-[30%] right-[-5%] w-20 h-20 rounded-full bg-blue-400/10 blur-[20px]"></div>
@@ -5158,9 +5158,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     {isTimerEnabled && (
                         <div 
                             className="w-full bg-[#0c0c0c] border-2 border-[#222] rounded-xl shadow-[inset_0_0_15px_rgba(0,0,0,1),0_5px_15px_rgba(0,0,0,0.6)] flex flex-col items-center justify-center shrink-0"
-                            style={{ height: `calc(3.75rem * ${headerScale} + 1px)` }}
+                            style={{ height: `calc(4.5rem * ${headerScale})` }}
                         >
-                            <div className="flex items-center justify-center text-[22px] gap-0">
+                            <div className="flex items-center justify-center text-[32px] gap-0">
                                 {(() => {
                                     const sec = timerDisplay.secs;
                                     const h = Math.floor(sec / 3600);
@@ -5180,7 +5180,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     )}
 
                     {/* Right Ad Banner */}
-                    <div className="w-full flex flex-col items-center justify-between bg-gradient-to-b from-[#2a0845] via-[#6441A5] to-[#2a0845] rounded-xl overflow-hidden shadow-2xl border border-purple-400/20 relative p-2.5 shrink-0" style={{ height: '500px' }}>
+                    <div className="w-full flex-1 min-h-[350px] flex flex-col items-center justify-between bg-gradient-to-b from-[#2a0845] via-[#6441A5] to-[#2a0845] rounded-xl overflow-hidden shadow-2xl border border-purple-400/20 relative p-2.5 shrink" style={{ maxHeight: '500px' }}>
                         {/* Floating Elements Background */}
                     <div className="absolute top-[10%] right-[20%] w-16 h-16 rounded-full border border-purple-400/20 bg-purple-500/10 blur-[8px]"></div>
                     <div className="absolute bottom-[20%] left-[-10%] w-20 h-20 rounded-full bg-pink-400/10 blur-[20px]"></div>
