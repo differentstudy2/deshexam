@@ -675,9 +675,12 @@ const LeftStreamWidgets = ({ currentQuestion }: { currentQuestion?: any }) => {
     }, [currentQuestion]);
 
     return (
-        <div className="flex flex-col gap-1.5 w-full h-full overflow-hidden shrink-0">
-            {/* Reserved Empty Space for OBS Camera/Overlay (Pushes other widgets down) */}
-            <div className="flex-1 w-full min-h-[100px] shrink pointer-events-none"></div>
+        <div className="flex-1 flex flex-col gap-1.5 w-full h-full overflow-hidden shrink-0">
+            {/* Reserved Empty Space for OBS Camera/Overlay (Matches Right Sidebar Timer Height) */}
+            <div className="w-full h-[4.5rem] border border-dashed border-gray-300 dark:border-gray-700 rounded-lg flex flex-col items-center justify-center shrink-0 opacity-60">
+                <span className="text-xl mb-1">🎥</span>
+                <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500">Camera Zone</span>
+            </div>
 
             {/* 1. Leaderboard */}
             <div className="flex flex-col bg-white dark:bg-[#0F0F0F] rounded-lg p-1.5 px-2 border border-gray-200 dark:border-[#272727] shadow-sm shrink-0">
