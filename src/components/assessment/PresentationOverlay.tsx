@@ -62,7 +62,7 @@ const CONFETTI_CONFIG = {
 };
 
 import 'katex/dist/katex.min.css';
-import { X, ChevronLeft, ChevronRight, Play, Pause, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize, LayoutGrid, Sun, Moon, Eraser, Square, Circle, ArrowUpRight, Type, Presentation, ZoomIn, Volume2, VolumeX, MonitorPlay, Lightbulb, MessageCircle, Stamp, Droplet, Music, AlignLeft, Keyboard, Printer, Trophy, Globe, BarChart2, Sparkles, ImageDown, FileDown, Video, Sliders, List, Key } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Play, Pause, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize, LayoutGrid, Sun, Moon, Eraser, Square, Circle, ArrowUpRight, Type, Presentation, ZoomIn, Volume2, VolumeX, MonitorPlay, Lightbulb, MessageCircle, Stamp, Droplet, Music, AlignLeft, Keyboard, Printer, Trophy, Globe, BarChart2, Sparkles, ImageDown, FileDown, Video, Sliders, List, Key, Camera } from 'lucide-react';
 
 const bnOptionsMap: Record<string, string> = {
     a: 'ক',
@@ -617,6 +617,50 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [isRecordingPaused, setIsRecordingPaused] = useState(false);
     const [recordingQuality, setRecordingQuality] = useState<'standard' | 'high' | 'ultra' | '4k'>('4k');
     
+    // --- Webcam PIP State ---
+    const [isWebcamActive, setIsWebcamActive] = useState(false);
+    const webcamVideoRef = useRef<HTMLVideoElement>(null);
+    const webcamStreamRef = useRef<MediaStream | null>(null);
+
+    const toggleWebcam = async () => {
+        if (isWebcamActive) {
+            // Stop webcam
+            if (webcamStreamRef.current) {
+                webcamStreamRef.current.getTracks().forEach(track => track.stop());
+                webcamStreamRef.current = null;
+            }
+            if (webcamVideoRef.current) {
+                webcamVideoRef.current.srcObject = null;
+            }
+            setIsWebcamActive(false);
+        } else {
+            // Start webcam
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                webcamStreamRef.current = stream;
+                setIsWebcamActive(true);
+            } catch (err) {
+                console.error("Error accessing webcam:", err);
+                alert("Could not access the camera. Please check permissions.");
+            }
+        }
+    };
+
+    useEffect(() => {
+        if (isWebcamActive && webcamVideoRef.current && webcamStreamRef.current) {
+            webcamVideoRef.current.srcObject = webcamStreamRef.current;
+        }
+    }, [isWebcamActive]);
+
+    useEffect(() => {
+        // Cleanup webcam on unmount
+        return () => {
+            if (webcamStreamRef.current) {
+                webcamStreamRef.current.getTracks().forEach(track => track.stop());
+            }
+        };
+    }, []);
+
     // --- Advanced Audio Settings State ---
     const [showAudioSettings, setShowAudioSettings] = useState(false);
     const [useCompressor, setUseCompressor] = useState(true);
@@ -3798,6 +3842,18 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 >
                                     {isRecording ? <Square className="w-5 h-5 md:w-6 md:h-6 fill-current" /> : <Video className="w-5 h-5 md:w-6 md:h-6" />}
                                 </button>
+
+                                {/* Toggle Webcam Button */}
+                                <button
+                                    onClick={toggleWebcam}
+                                    className={`hidden md:block p-2 md:p-3 rounded-full transition-all shrink-0 ${isWebcamActive
+                                        ? 'bg-blue-500 text-white shadow-md ring-2 ring-blue-300'
+                                        : 'hover:bg-white/10 text-white/80 hover:text-white'
+                                        }`}
+                                    title={isWebcamActive ? "Stop Webcam" : "Start Webcam"}
+                                >
+                                    <Camera className="w-5 h-5 md:w-6 md:h-6" />
+                                </button>
                                 
                                 {/* TTS Read Aloud Button */}
                                 <button
@@ -6146,6 +6202,40 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     </div>
                 </div>
             )}
+
+            {/* Webcam PIP Overlay */}
+            <AnimatePresence>
+                {isWebcamActive && (
+                    <motion.div
+                        key="webcam-pip"
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                        drag
+                        dragMomentum={false}
+                        className="fixed bottom-24 right-8 z-[150] overflow-hidden rounded-full shadow-2xl border-4 border-indigo-500/50 bg-black/50 backdrop-blur-sm group cursor-move"
+                        style={{ width: '200px', height: '200px' }}
+                    >
+                        <video
+                            ref={webcamVideoRef}
+                            autoPlay
+                            playsInline
+                            muted
+                            className="w-full h-full object-cover rounded-full"
+                        />
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-full pointer-events-none">
+                            <span className="text-white text-xs font-semibold bg-black/60 px-2 py-1 rounded-full">Drag to move</span>
+                        </div>
+                        <button 
+                            onClick={(e) => { e.stopPropagation(); toggleWebcam(); }}
+                            className="absolute top-6 right-8 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                            title="Close Webcam"
+                        >
+                            <X className="w-4 h-4" />
+                        </button>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </>,
         document.body
     );
