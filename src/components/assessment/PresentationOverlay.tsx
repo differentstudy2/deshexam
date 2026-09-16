@@ -676,10 +676,8 @@ const LeftStreamWidgets = ({ currentQuestion }: { currentQuestion?: any }) => {
 
     return (
         <div className="flex flex-col gap-1.5 w-full h-full overflow-hidden shrink-0">
-            {/* Placeholder for future widget (Fills remaining empty space at the top) */}
-            <div className="flex-1 w-full min-h-[50px] border border-dashed border-gray-300 dark:border-gray-700 rounded-lg flex items-center justify-center shrink">
-                <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500">Empty Space</span>
-            </div>
+            {/* Reserved Empty Space for OBS Camera/Overlay (Pushes other widgets down) */}
+            <div className="flex-1 w-full min-h-[100px] shrink pointer-events-none"></div>
 
             {/* 1. Leaderboard */}
             <div className="flex flex-col bg-white dark:bg-[#0F0F0F] rounded-lg p-1.5 px-2 border border-gray-200 dark:border-[#272727] shadow-sm shrink-0">
@@ -719,9 +717,9 @@ const LeftStreamWidgets = ({ currentQuestion }: { currentQuestion?: any }) => {
             </div>
             
             {/* 4. Subscribe CTA */}
-            <div className="w-full bg-[#cc0000] hover:bg-[#b30000] dark:bg-[#FF0000] dark:hover:bg-[#cc0000] text-white rounded-md h-[42px] flex items-center justify-center gap-2 cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98] shadow-sm shrink-0 mb-1 mt-auto border border-red-700/50">
-                <Youtube className="w-5 h-5" />
-                <span className="text-[13px] font-bold tracking-wide uppercase">Subscribe</span>
+            <div className="w-full bg-[#cc0000] hover:bg-[#b30000] dark:bg-[#FF0000] dark:hover:bg-[#cc0000] text-white rounded-md h-[48px] flex items-center justify-center gap-2 cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98] shadow-sm shrink-0 mb-1 mt-auto border border-red-700/50 animate-pulse hover:animate-none">
+                <Youtube className="w-6 h-6" />
+                <span className="text-[14px] font-bold tracking-wide uppercase">Subscribe</span>
             </div>
         </div>
     );
