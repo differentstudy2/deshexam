@@ -525,16 +525,16 @@ const LiveSubscriberFeed = () => {
     }, []);
 
     return (
-        <div className="w-full flex-1 min-h-[200px] flex flex-col bg-[#0F0F0F] rounded-lg overflow-hidden shadow-2xl border border-[#272727] relative p-3 shrink" style={{ maxHeight: '420px' }}>
+        <div className="w-full flex-1 min-h-[200px] flex flex-col bg-white dark:bg-[#0F0F0F] rounded-lg overflow-hidden shadow-2xl border border-gray-200 dark:border-[#272727] relative p-3 shrink transition-colors" style={{ maxHeight: '420px' }}>
             
             {/* YouTube Header */}
-            <div className="flex flex-col items-center justify-center border-b border-[#272727] pb-3 mb-3 shrink-0">
+            <div className="flex flex-col items-center justify-center border-b border-gray-200 dark:border-[#272727] pb-3 mb-3 shrink-0 transition-colors">
                 <div className="flex items-center gap-1.5">
                     <div className="relative flex items-center justify-center w-5 h-5">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-20"></span>
                         <Youtube className="w-5 h-5 text-[#FF0000] relative z-10" />
                     </div>
-                    <h3 className="text-[#AAAAAA] font-semibold text-[11px] uppercase tracking-widest">Live Subscribers</h3>
+                    <h3 className="text-gray-500 dark:text-[#AAAAAA] font-semibold text-[11px] uppercase tracking-widest transition-colors">Live Subscribers</h3>
                 </div>
             </div>
             
@@ -553,14 +553,14 @@ const LiveSubscriberFeed = () => {
                                 animate={{ opacity: 1, x: 0, scale: 1 }}
                                 exit={{ opacity: 0, scale: 0.9 }}
                                 transition={{ duration: 0.3, ease: 'easeOut' }}
-                                className="flex items-center gap-2 bg-[#272727]/50 hover:bg-[#3F3F3F] transition-colors rounded-xl p-2 shadow-sm group border border-[#3F3F3F]/50"
+                                className="flex items-center gap-2 bg-gray-50 dark:bg-[#1A1A1A] hover:bg-gray-100 dark:hover:bg-[#272727] transition-colors rounded-xl p-2 group cursor-default"
                             >
                                 <div className={`w-7 h-7 rounded-full ${avatarColor} flex items-center justify-center shrink-0`}>
                                     <span className="text-white text-[12px] font-bold">{sub.name.charAt(0)}</span>
                                 </div>
                                 <div className="flex flex-col flex-1 min-w-0 justify-center">
-                                    <span className="text-white text-[12px] font-medium truncate leading-tight group-hover:text-blue-400 transition-colors">{sub.name}</span>
-                                    <span className="text-[#AAAAAA] text-[10px] font-normal mt-0.5 truncate">Just subscribed!</span>
+                                    <span className="text-gray-900 dark:text-white text-[12px] font-medium truncate leading-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{sub.name}</span>
+                                    <span className="text-gray-500 dark:text-[#AAAAAA] text-[10px] font-normal mt-0.5 truncate transition-colors">Just subscribed!</span>
                                 </div>
                                 <div className="shrink-0 bg-[#FF0000] rounded-full p-1 shadow-[0_0_8px_rgba(255,0,0,0.5)]">
                                     <Bell className="w-2.5 h-2.5 text-white" />
