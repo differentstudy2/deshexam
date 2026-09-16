@@ -619,6 +619,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     
     // --- Webcam PIP State ---
     const [isWebcamActive, setIsWebcamActive] = useState(false);
+    const [webcamShape, setWebcamShape] = useState<'circle' | 'square'>('circle');
     const webcamVideoRef = useRef<HTMLVideoElement>(null);
     const webcamStreamRef = useRef<MediaStream | null>(null);
 
@@ -2592,9 +2593,11 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     }
                 `}</style>
 
-                {/* Left Ad Banner (160x600) */}
-                <div className="hidden xl:flex w-[160px] h-[600px] shrink-0 flex-col items-center justify-between bg-gradient-to-b from-[#0a192f] via-[#0b2244] to-[#041128] rounded-xl overflow-hidden shadow-2xl border border-blue-400/20 relative z-10 p-3">
-                    {/* Floating Elements Background */}
+                {/* Left Sidebar Column */}
+                <div className="hidden xl:flex w-[160px] h-full shrink-0 flex-col gap-3 z-10">
+                    {/* Left Ad Banner */}
+                    <div className="w-full flex flex-col items-center justify-between bg-gradient-to-b from-[#0a192f] via-[#0b2244] to-[#041128] rounded-xl overflow-hidden shadow-2xl border border-blue-400/20 relative p-2.5 shrink-0" style={{ height: '500px' }}>
+                        {/* Floating Elements Background */}
                     <div className="absolute top-[5%] left-[25%] w-16 h-16 rounded-full border border-blue-400/20 bg-blue-500/10 blur-[8px]"></div>
                     <div className="absolute bottom-[30%] right-[-5%] w-20 h-20 rounded-full bg-blue-400/10 blur-[20px]"></div>
 
@@ -2656,6 +2659,187 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                         </button>
                     </div>
                 </div>
+                {/* ── Analog Clock (Moved here) ── */}
+                {isTimerEnabled ? (() => {
+                    const sec = timerDisplay.secs;
+                    const min = Math.floor(sec / 60);
+                    const s = sec % 60;
+                    const secondDeg = (s * 6); // 6 deg per second (0 to 354)
+                    const minuteDeg = ((min % 60) * 6) + (s * 0.1); // 6 deg per minute + second offset
+
+                    // Theme-tailored colors
+                    const colors = isDarkMode ? {
+                        bezelBg: 'bg-gradient-to-br from-slate-800 via-slate-900 to-black',
+                        bezelBorder: 'border-slate-700/80',
+                        bezelShadow: 'shadow-[0_16px_36px_rgba(0,0,0,0.7),inset_0_1px_2px_rgba(255,255,255,0.15)]',
+                        ringGlow: 'ring-4 ring-cyan-500/20',
+                        crownBg: 'bg-gradient-to-b from-slate-600 via-slate-700 to-slate-800 border-slate-600',
+                        dialGrad1: '#0f172a',
+                        dialGrad2: '#020617',
+                        outerRing: '#334155',
+                        majorTick: '#f8fafc',
+                        minorTick: '#64748b',
+                        minuteHand: '#f1f5f9',
+                        secondHand: '#ff3b30',
+                        centerCap: '#ff3b30',
+                        digitalBg: 'bg-black/90 border-cyan-500/40 text-cyan-400 shadow-[0_0_12px_rgba(6,182,212,0.25)]',
+                    } : {
+                        bezelBg: 'bg-gradient-to-br from-slate-100 via-white to-slate-200',
+                        bezelBorder: 'border-slate-300',
+                        bezelShadow: 'shadow-[0_12px_28px_rgba(0,0,0,0.12),inset_0_2px_4px_rgba(255,255,255,0.9)]',
+                        ringGlow: 'ring-4 ring-blue-500/15',
+                        crownBg: 'bg-gradient-to-b from-slate-200 via-slate-400 to-slate-300 border-slate-400',
+                        dialGrad1: '#ffffff',
+                        dialGrad2: '#e2e8f0',
+                        outerRing: '#cbd5e1',
+                        majorTick: '#0f172a',
+                        minorTick: '#94a3b8',
+                        minuteHand: '#1e293b',
+                        secondHand: '#dc2626',
+                        centerCap: '#dc2626',
+                        digitalBg: 'bg-slate-900 border-slate-700 text-cyan-300 shadow-md',
+                    };
+
+                    return (
+                        <div className="w-full mt-auto flex flex-col items-center justify-center shrink-0 mb-4 select-none">
+                            {/* Watch Case & Crown */}
+                            <div className="relative flex flex-col items-center group transition-all duration-300 hover:scale-105 hover:drop-shadow-[0_12px_30px_rgba(59,130,246,0.25)]">
+                                {/* Classic Stopwatch Top Crown / Button */}
+                                <div className="flex items-center justify-center -mb-1 z-10 pointer-events-none">
+                                    <div className={`w-5 h-2 rounded-t-md border-t border-x shadow-sm ${colors.crownBg}`} />
+                                </div>
+
+                                {/* Circular Clock Face */}
+                                <div className={`relative w-[130px] h-[130px] rounded-full p-1 border-[2.5px] backdrop-blur-xl ${colors.bezelBg} ${colors.bezelBorder} ${colors.bezelShadow} ${colors.ringGlow} transition-colors duration-500`}>
+                                    <svg className="w-full h-full pointer-events-none" viewBox="0 0 100 100">
+                                        <defs>
+                                            <radialGradient id="clockDialGrad" cx="50%" cy="50%" r="50%">
+                                                <stop offset="60%" stopColor={colors.dialGrad1} />
+                                                <stop offset="100%" stopColor={colors.dialGrad2} />
+                                            </radialGradient>
+                                        </defs>
+
+                                        {/* Dial Base with Radial Gradient */}
+                                        <circle cx="50" cy="50" r="46" fill="url(#clockDialGrad)" stroke={colors.outerRing} strokeWidth="1" />
+
+                                        {/* Countdown Mode Progress Arc (if countdown mode) */}
+                                        {timerMode === 'countdown' && timerDisplay.pct !== null && (
+                                            <circle
+                                                cx="50"
+                                                cy="50"
+                                                r="43.5"
+                                                fill="none"
+                                                stroke={timerDisplay.pct > 0.5 ? '#22c55e' : timerDisplay.pct > 0.25 ? '#f59e0b' : '#ef4444'}
+                                                strokeWidth="3.5"
+                                                strokeDasharray={`${timerDisplay.pct * 273.3} 273.3`}
+                                                strokeLinecap="round"
+                                                transform="rotate(-90 50 50)"
+                                                className="transition-all duration-1000"
+                                            />
+                                        )}
+
+                                        {/* 60 Minute/Second Dots */}
+                                        {[...Array(60)].map((_, i) => {
+                                            if (i % 5 === 0) return null; // handled by major ticks
+                                            const angle = i * 6;
+                                            return (
+                                                <circle
+                                                    key={`dot-${i}`}
+                                                    cx="50"
+                                                    cy="8"
+                                                    r="0.75"
+                                                    fill={colors.minorTick}
+                                                    transform={`rotate(${angle} 50 50)`}
+                                                />
+                                            );
+                                        })}
+
+                                        {/* 12 Hour / 5-Sec Dial Ticks */}
+                                        {[...Array(12)].map((_, i) => {
+                                            const angle = i * 30;
+                                            const isCardinal = i % 3 === 0;
+                                            return (
+                                                <line
+                                                    key={`tick-${i}`}
+                                                    x1="50"
+                                                    y1={isCardinal ? "7" : "9"}
+                                                    x2="50"
+                                                    y2="14"
+                                                    stroke={isCardinal ? colors.majorTick : colors.minorTick}
+                                                    strokeWidth={isCardinal ? "2.5" : "1.5"}
+                                                    strokeLinecap="round"
+                                                    transform={`rotate(${angle} 50 50)`}
+                                                />
+                                            );
+                                        })}
+
+                                        {/* Clock Numerals (12, 3, 9) */}
+                                        <text x="50" y="22" textAnchor="middle" fontSize="6.5" fontWeight="900" fontFamily="sans-serif" fill={colors.majorTick} opacity="0.85">12</text>
+                                        <text x="79" y="52.5" textAnchor="middle" fontSize="6.5" fontWeight="900" fontFamily="sans-serif" fill={colors.majorTick} opacity="0.85">3</text>
+                                        <text x="21" y="52.5" textAnchor="middle" fontSize="6.5" fontWeight="900" fontFamily="sans-serif" fill={colors.majorTick} opacity="0.85">9</text>
+
+                                        {/* Minute Hand */}
+                                        <line
+                                            x1="50"
+                                            y1="50"
+                                            x2="50"
+                                            y2="25"
+                                            stroke={colors.minuteHand}
+                                            strokeWidth="2.8"
+                                            strokeLinecap="round"
+                                            className="transition-transform duration-500 ease-out"
+                                            transform={`rotate(${minuteDeg} 50 50)`}
+                                        />
+
+                                        {/* Second Hand (Classic sweep/tick hand) */}
+                                        <g
+                                            className="transition-transform duration-300 ease-out"
+                                            transform={`rotate(${secondDeg} 50 50)`}
+                                        >
+                                            {/* Counterweight Tail */}
+                                            <line
+                                                x1="50"
+                                                y1="50"
+                                                x2="50"
+                                                y2="60"
+                                                stroke={step >= 1 ? '#9ca3af' : colors.secondHand}
+                                                strokeWidth="2.5"
+                                                strokeLinecap="round"
+                                            />
+                                            {/* Long Second Hand Needle */}
+                                            <line
+                                                x1="50"
+                                                y1="50"
+                                                x2="50"
+                                                y2="13"
+                                                stroke={step >= 1 ? '#9ca3af' : colors.secondHand}
+                                                strokeWidth="1.6"
+                                                strokeLinecap="round"
+                                            />
+                                            <circle cx="50" cy="13" r="1.8" fill={step >= 1 ? '#9ca3af' : colors.secondHand} />
+                                        </g>
+
+                                        {/* Center Pivot Jewel */}
+                                        <circle cx="50" cy="50" r="3.5" fill={step >= 1 ? '#6b7280' : colors.centerCap} stroke={isDarkMode ? '#0f172a' : '#ffffff'} strokeWidth="1.2" />
+                                    </svg>
+                                </div>
+
+                                {/* Digital Time Badge — below clock face */}
+                                <div className={`mt-2 px-3 py-1 rounded-full font-mono text-[12px] font-black tracking-wider flex items-center gap-1 border pointer-events-none ${colors.digitalBg}`}>
+                                    {step === 0 && (
+                                        <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse inline-block" />
+                                    )}
+                                    <span>
+                                        {String(min).padStart(2, '0')}:{String(s).padStart(2, '0')}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                })() : (
+                    <div className="w-full flex-1 min-h-0 bg-white/5 border border-white/10 rounded-xl hidden"></div>
+                )}
+            </div>
 
                 {/* Main Presentation Area */}
                 <div
@@ -2667,27 +2851,6 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                         }
                     }}
                 >
-                    {/* Railway Station Style Digital Timer */}
-                    {isTimerEnabled && (
-                        <div className="absolute top-12 right-0 md:top-16 md:right-0 z-[60] bg-[#0c0c0c] border-2 border-[#222] rounded-lg px-1.5 py-1 md:px-2 md:py-1.5 shadow-[inset_0_0_15px_rgba(0,0,0,1),0_5px_15px_rgba(0,0,0,0.6)] pointer-events-none flex flex-col items-center justify-center">
-                            <div className="flex items-center justify-center text-[18px] md:text-[24px] gap-0">
-                                {(() => {
-                                    const timeLeft = Math.max(0, (questions.length * countdownTotal) - totalExamTimeElapsed);
-                                    const h = Math.floor(timeLeft / 3600);
-                                    const m = Math.floor((timeLeft % 3600) / 60);
-                                    const s = timeLeft % 60;
-
-                                    const timeStr = h > 0
-                                        ? `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
-                                        : `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-
-                                    return timeStr.split('').map((char, i) =>
-                                        char === ':' ? <SevenSegmentColon key={i} /> : <SevenSegmentDigit key={i} digit={char} />
-                                    );
-                                })()}
-                            </div>
-                        </div>
-                    )}
 
                     {/* Background Pattern Overlay */}
                     {bgTheme !== 'video' && (
@@ -2956,198 +3119,6 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                         </div>
                     )}
 
-                    {/* Floating Draggable Clock Timer ("ঘড়ির মতো" Analog + Digital Watch Face with Light/Dark Theme Support) */}
-                    {isTimerEnabled && (() => {
-                        const sec = timerDisplay.secs;
-                        const min = Math.floor(sec / 60);
-                        const s = sec % 60;
-                        const secondDeg = (s * 6); // 6 deg per second (0 to 354)
-                        const minuteDeg = ((min % 60) * 6) + (s * 0.1); // 6 deg per minute + second offset
-
-                        // Theme-tailored colors
-                        const colors = isDarkMode ? {
-                            bezelBg: 'bg-gradient-to-br from-slate-800 via-slate-900 to-black',
-                            bezelBorder: 'border-slate-700/80',
-                            bezelShadow: 'shadow-[0_16px_36px_rgba(0,0,0,0.7),inset_0_1px_2px_rgba(255,255,255,0.15)]',
-                            ringGlow: 'ring-4 ring-cyan-500/20',
-                            crownBg: 'bg-gradient-to-b from-slate-600 via-slate-700 to-slate-800 border-slate-600',
-                            dialGrad1: '#0f172a',
-                            dialGrad2: '#020617',
-                            outerRing: '#334155',
-                            majorTick: '#f8fafc',
-                            minorTick: '#64748b',
-                            minuteHand: '#f1f5f9',
-                            secondHand: '#ff3b30',
-                            centerCap: '#ff3b30',
-                            digitalBg: 'bg-black/90 border-cyan-500/40 text-cyan-400 shadow-[0_0_12px_rgba(6,182,212,0.25)]',
-                        } : {
-                            bezelBg: 'bg-gradient-to-br from-slate-100 via-white to-slate-200',
-                            bezelBorder: 'border-slate-300',
-                            bezelShadow: 'shadow-[0_12px_28px_rgba(0,0,0,0.12),inset_0_2px_4px_rgba(255,255,255,0.9)]',
-                            ringGlow: 'ring-4 ring-blue-500/15',
-                            crownBg: 'bg-gradient-to-b from-slate-200 via-slate-400 to-slate-300 border-slate-400',
-                            dialGrad1: '#ffffff',
-                            dialGrad2: '#e2e8f0',
-                            outerRing: '#cbd5e1',
-                            majorTick: '#0f172a',
-                            minorTick: '#94a3b8',
-                            minuteHand: '#1e293b',
-                            secondHand: '#dc2626',
-                            centerCap: '#dc2626',
-                            digitalBg: 'bg-slate-900 border-slate-700 text-cyan-300 shadow-md',
-                        };
-
-                        return (
-                            <div
-                                style={{ transform: `translate(${timerPos.x}px, ${timerPos.y}px)` }}
-                                className={`absolute bottom-[80px] md:bottom-[90px] right-2 md:right-3 z-[70] select-none touch-none transition-all duration-300 ${isDraggingTimer
-                                    ? 'cursor-grabbing scale-105 drop-shadow-[0_20px_40px_rgba(59,130,246,0.35)]'
-                                    : 'cursor-grab hover:drop-shadow-[0_12px_30px_rgba(59,130,246,0.25)] hover:scale-105'
-                                    }`}
-                                onPointerDown={handleTimerPointerDown}
-                                onPointerMove={handleTimerPointerMove}
-                                onPointerUp={handleTimerPointerUp}
-                                onPointerCancel={handleTimerPointerUp}
-                                onDoubleClick={() => setTimerPos({ x: 0, y: 0 })}
-                                title="Clock Timer (Drag to move / Double-click to reset)"
-                            >
-                                {/* Watch Case & Crown */}
-                                <div className="relative flex flex-col items-center">
-                                    {/* Classic Stopwatch Top Crown / Button */}
-                                    <div className="flex items-center justify-center -mb-1 z-10 pointer-events-none">
-                                        <div className={`w-5 h-2 rounded-t-md border-t border-x shadow-sm ${colors.crownBg}`} />
-                                    </div>
-
-                                    {/* Circular Clock Face */}
-                                    <div className={`relative w-[88px] h-[88px] md:w-[96px] md:h-[96px] rounded-full p-1 border-[2.5px] backdrop-blur-xl ${colors.bezelBg} ${colors.bezelBorder} ${colors.bezelShadow} ${colors.ringGlow} transition-colors duration-500`}>
-                                        <svg className="w-full h-full pointer-events-none" viewBox="0 0 100 100">
-                                            <defs>
-                                                <radialGradient id="clockDialGrad" cx="50%" cy="50%" r="50%">
-                                                    <stop offset="60%" stopColor={colors.dialGrad1} />
-                                                    <stop offset="100%" stopColor={colors.dialGrad2} />
-                                                </radialGradient>
-                                            </defs>
-
-                                            {/* Dial Base with Radial Gradient */}
-                                            <circle cx="50" cy="50" r="46" fill="url(#clockDialGrad)" stroke={colors.outerRing} strokeWidth="1" />
-
-                                            {/* Countdown Mode Progress Arc (if countdown mode) */}
-                                            {timerMode === 'countdown' && timerDisplay.pct !== null && (
-                                                <circle
-                                                    cx="50"
-                                                    cy="50"
-                                                    r="43.5"
-                                                    fill="none"
-                                                    stroke={timerDisplay.pct > 0.5 ? '#22c55e' : timerDisplay.pct > 0.25 ? '#f59e0b' : '#ef4444'}
-                                                    strokeWidth="3.5"
-                                                    strokeDasharray={`${timerDisplay.pct * 273.3} 273.3`}
-                                                    strokeLinecap="round"
-                                                    transform="rotate(-90 50 50)"
-                                                    className="transition-all duration-1000"
-                                                />
-                                            )}
-
-                                            {/* 60 Minute/Second Dots */}
-                                            {[...Array(60)].map((_, i) => {
-                                                if (i % 5 === 0) return null; // handled by major ticks
-                                                const angle = i * 6;
-                                                return (
-                                                    <circle
-                                                        key={`dot-${i}`}
-                                                        cx="50"
-                                                        cy="8"
-                                                        r="0.75"
-                                                        fill={colors.minorTick}
-                                                        transform={`rotate(${angle} 50 50)`}
-                                                    />
-                                                );
-                                            })}
-
-                                            {/* 12 Hour / 5-Sec Dial Ticks */}
-                                            {[...Array(12)].map((_, i) => {
-                                                const angle = i * 30;
-                                                const isCardinal = i % 3 === 0;
-                                                return (
-                                                    <line
-                                                        key={`tick-${i}`}
-                                                        x1="50"
-                                                        y1={isCardinal ? "7" : "9"}
-                                                        x2="50"
-                                                        y2="14"
-                                                        stroke={isCardinal ? colors.majorTick : colors.minorTick}
-                                                        strokeWidth={isCardinal ? "2.5" : "1.5"}
-                                                        strokeLinecap="round"
-                                                        transform={`rotate(${angle} 50 50)`}
-                                                    />
-                                                );
-                                            })}
-
-                                            {/* Clock Numerals (12, 3, 9) */}
-                                            <text x="50" y="22" textAnchor="middle" fontSize="6.5" fontWeight="900" fontFamily="sans-serif" fill={colors.majorTick} opacity="0.85">12</text>
-                                            <text x="79" y="52.5" textAnchor="middle" fontSize="6.5" fontWeight="900" fontFamily="sans-serif" fill={colors.majorTick} opacity="0.85">3</text>
-                                            <text x="21" y="52.5" textAnchor="middle" fontSize="6.5" fontWeight="900" fontFamily="sans-serif" fill={colors.majorTick} opacity="0.85">9</text>
-
-                                            {/* Minute Hand */}
-                                            <line
-                                                x1="50"
-                                                y1="50"
-                                                x2="50"
-                                                y2="25"
-                                                stroke={colors.minuteHand}
-                                                strokeWidth="2.8"
-                                                strokeLinecap="round"
-                                                className="transition-transform duration-500 ease-out"
-                                                transform={`rotate(${minuteDeg} 50 50)`}
-                                            />
-
-                                            {/* Second Hand (Classic sweep/tick hand) */}
-                                            <g
-                                                className="transition-transform duration-300 ease-out"
-                                                transform={`rotate(${secondDeg} 50 50)`}
-                                            >
-                                                {/* Counterweight Tail */}
-                                                <line
-                                                    x1="50"
-                                                    y1="50"
-                                                    x2="50"
-                                                    y2="60"
-                                                    stroke={step >= 1 ? '#9ca3af' : colors.secondHand}
-                                                    strokeWidth="2.5"
-                                                    strokeLinecap="round"
-                                                />
-                                                {/* Long Second Hand Needle */}
-                                                <line
-                                                    x1="50"
-                                                    y1="50"
-                                                    x2="50"
-                                                    y2="13"
-                                                    stroke={step >= 1 ? '#9ca3af' : colors.secondHand}
-                                                    strokeWidth="1.6"
-                                                    strokeLinecap="round"
-                                                />
-                                                <circle cx="50" cy="13" r="1.8" fill={step >= 1 ? '#9ca3af' : colors.secondHand} />
-                                            </g>
-
-                                            {/* Center Pivot Jewel */}
-                                            <circle cx="50" cy="50" r="3.5" fill={step >= 1 ? '#6b7280' : colors.centerCap} stroke={isDarkMode ? '#0f172a' : '#ffffff'} strokeWidth="1.2" />
-                                        </svg>
-
-
-                                    </div>
-
-                                    {/* Digital Time Badge — below clock face */}
-                                    <div className={`mt-1 px-3 py-0.5 rounded-full font-mono text-[10px] md:text-[11px] font-black tracking-wider flex items-center gap-1 border pointer-events-none ${colors.digitalBg}`}>
-                                        {step === 0 && (
-                                            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse inline-block" />
-                                        )}
-                                        <span>
-                                            {String(min).padStart(2, '0')}:{String(s).padStart(2, '0')}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    })()}
 
                     {/* Hidden Audio Elements */}
                     <audio ref={lofiAudioRef} src={selectedMusic} loop />
@@ -3719,6 +3690,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             </AnimatePresence>
                         </div>
                     </div>
+
 
                     {/* Footer */}
                     <div className="shrink-0 bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 dark:from-indigo-900 dark:via-violet-900 dark:to-purple-900 border-t border-indigo-400/30 dark:border-indigo-700/50 py-2 px-2 md:pl-12 md:pr-8 flex justify-between items-center w-full z-30 relative transition-colors duration-500 overflow-visible" style={{ boxShadow: '0 -4px 20px rgba(109,40,217,0.3), 0 -1px 0 rgba(255,255,255,0.12)' }}>
@@ -5180,9 +5152,36 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                 </div>
 
-                {/* Right Ad Banner (160x600) */}
-                <div className="hidden xl:flex w-[160px] h-[600px] shrink-0 flex-col items-center justify-between bg-gradient-to-b from-[#2a0845] via-[#6441A5] to-[#2a0845] rounded-xl overflow-hidden shadow-2xl border border-purple-400/20 relative z-10 p-3">
-                    {/* Floating Elements Background */}
+                {/* Right Sidebar Column */}
+                <div className="hidden xl:flex w-[160px] h-full shrink-0 flex-col gap-3 z-10">
+                    {/* Railway Station Style Digital Timer (Moved here) */}
+                    {isTimerEnabled && (
+                        <div 
+                            className="w-full bg-[#0c0c0c] border-2 border-[#222] rounded-xl shadow-[inset_0_0_15px_rgba(0,0,0,1),0_5px_15px_rgba(0,0,0,0.6)] flex flex-col items-center justify-center shrink-0"
+                            style={{ height: `calc(3.75rem * ${headerScale} + 1px)` }}
+                        >
+                            <div className="flex items-center justify-center text-[22px] gap-0">
+                                {(() => {
+                                    const sec = timerDisplay.secs;
+                                    const h = Math.floor(sec / 3600);
+                                    const m = Math.floor((sec % 3600) / 60);
+                                    const s = sec % 60;
+
+                                    const timeStr = h > 0
+                                        ? `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
+                                        : `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+
+                                    return timeStr.split('').map((char, i) =>
+                                        char === ':' ? <SevenSegmentColon key={i} /> : <SevenSegmentDigit key={i} digit={char} />
+                                    );
+                                })()}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Right Ad Banner */}
+                    <div className="w-full flex flex-col items-center justify-between bg-gradient-to-b from-[#2a0845] via-[#6441A5] to-[#2a0845] rounded-xl overflow-hidden shadow-2xl border border-purple-400/20 relative p-2.5 shrink-0" style={{ height: '500px' }}>
+                        {/* Floating Elements Background */}
                     <div className="absolute top-[10%] right-[20%] w-16 h-16 rounded-full border border-purple-400/20 bg-purple-500/10 blur-[8px]"></div>
                     <div className="absolute bottom-[20%] left-[-10%] w-20 h-20 rounded-full bg-pink-400/10 blur-[20px]"></div>
 
@@ -5222,12 +5221,49 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     </div>
 
                     {/* CTA Button */}
-                    <div className="w-full z-10 pb-2">
+                    <div className="w-full mt-auto z-10 pb-2">
                         <button className="w-full flex items-center justify-center py-2.5 bg-gradient-to-r from-[#FF416C] to-[#FF4B2B] border border-red-400/50 rounded-lg shadow-[0_4px_10px_rgba(255,65,108,0.4)] hover:scale-105 transition-transform duration-300">
                             <span className="text-white font-bold text-[18px] drop-shadow-md">Join Now</span>
                         </button>
                     </div>
                 </div>
+                
+                {/* ── Bottom Section: Future Right Content OR Webcam ── */}
+                {isWebcamActive ? (
+                    <div className="w-full aspect-square mt-auto relative group shrink-0">
+                        <div className={`w-full h-full overflow-hidden shadow-2xl border-2 border-indigo-400/50 bg-black/50 transition-all duration-300 ${webcamShape === 'circle' ? 'rounded-full' : 'rounded-2xl'}`}>
+                            <video
+                                ref={webcamVideoRef}
+                                autoPlay
+                                playsInline
+                                muted
+                                className="w-full h-full object-cover pointer-events-none"
+                            />
+                        </div>
+                        <div className={`absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center pointer-events-auto ${webcamShape === 'circle' ? 'rounded-full' : 'rounded-2xl'}`}>
+                            <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm p-1.5 rounded-full shadow-lg">
+                                <button 
+                                    onClick={(e) => { e.stopPropagation(); setWebcamShape(s => s === 'circle' ? 'square' : 'circle'); }}
+                                    className="text-white p-1.5 rounded-full hover:bg-white/20 transition-colors"
+                                    title="Toggle Shape"
+                                >
+                                    {webcamShape === 'circle' ? <Square className="w-4 h-4" /> : <Circle className="w-4 h-4" />}
+                                </button>
+                                <div className="w-[1px] h-6 bg-white/20 mx-1"></div>
+                                <button 
+                                    onClick={(e) => { e.stopPropagation(); toggleWebcam(); }}
+                                    className="bg-red-500 text-white p-1.5 rounded-full hover:bg-red-600 shadow-md"
+                                    title="Close Webcam"
+                                >
+                                    <X className="w-4 h-4" />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="w-full flex-1 min-h-0 bg-white/5 border border-white/10 rounded-xl hidden"></div>
+                )}
+            </div>
 
 
 
@@ -6202,40 +6238,6 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     </div>
                 </div>
             )}
-
-            {/* Webcam PIP Overlay */}
-            <AnimatePresence>
-                {isWebcamActive && (
-                    <motion.div
-                        key="webcam-pip"
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.8 }}
-                        drag
-                        dragMomentum={false}
-                        className="fixed bottom-24 right-8 z-[150] overflow-hidden rounded-full shadow-2xl border-4 border-indigo-500/50 bg-black/50 backdrop-blur-sm group cursor-move"
-                        style={{ width: '200px', height: '200px' }}
-                    >
-                        <video
-                            ref={webcamVideoRef}
-                            autoPlay
-                            playsInline
-                            muted
-                            className="w-full h-full object-cover rounded-full"
-                        />
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-full pointer-events-none">
-                            <span className="text-white text-xs font-semibold bg-black/60 px-2 py-1 rounded-full">Drag to move</span>
-                        </div>
-                        <button 
-                            onClick={(e) => { e.stopPropagation(); toggleWebcam(); }}
-                            className="absolute top-6 right-8 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
-                            title="Close Webcam"
-                        >
-                            <X className="w-4 h-4" />
-                        </button>
-                    </motion.div>
-                )}
-            </AnimatePresence>
         </>,
         document.body
     );
