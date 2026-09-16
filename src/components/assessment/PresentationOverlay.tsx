@@ -1233,17 +1233,24 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
     // Spotlight State
     const [isSpotlightActive, setIsSpotlightActive] = useState(false);
-    const [spotlightPos, setSpotlightPos] = useState({ x: 0, y: 0 });
+    const [isCursorHighlightActive, setIsCursorHighlightActive] = useState(false);
+    const cursorHighlightRef = useRef<HTMLDivElement>(null);
+    const spotlightRef = useRef<HTMLDivElement>(null);
 
-    // Spotlight mouse tracking
+    // Spotlight and Cursor Highlight mouse tracking
     useEffect(() => {
-        if (!isSpotlightActive) return;
+        if (!isSpotlightActive && !isCursorHighlightActive) return;
         const handleMouseMove = (e: MouseEvent) => {
-            setSpotlightPos({ x: e.clientX, y: e.clientY });
+            if (isCursorHighlightActive && cursorHighlightRef.current) {
+                cursorHighlightRef.current.style.transform = `translate3d(${e.clientX - 20}px, ${e.clientY - 20}px, 0)`;
+            }
+            if (isSpotlightActive && spotlightRef.current) {
+                spotlightRef.current.style.background = `radial-gradient(circle at ${e.clientX}px ${e.clientY}px, transparent 60px, rgba(0,0,0,0.85) 150px)`;
+            }
         };
-        window.addEventListener('mousemove', handleMouseMove);
+        window.addEventListener('mousemove', handleMouseMove, { passive: true });
         return () => window.removeEventListener('mousemove', handleMouseMove);
-    }, [isSpotlightActive]);
+    }, [isSpotlightActive, isCursorHighlightActive]);
 
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const activeCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -3440,6 +3447,15 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     <Sliders className="w-5 h-5 md:w-6 md:h-6" />
                                 </button>
 
+                                {/* Cursor Highlight Toggle Button */}
+                                <button
+                                    onClick={() => setIsCursorHighlightActive(!isCursorHighlightActive)}
+                                    className={`hidden sm:block p-2 md:p-3 rounded-full transition-all shrink-0 ${isCursorHighlightActive ? 'bg-yellow-500/80 text-white shadow-sm' : 'hover:bg-white/10 text-white/80 hover:text-white'}`}
+                                    title="Toggle Cursor Highlight"
+                                >
+                                    <MousePointer2 className="w-5 h-5 md:w-6 md:h-6" />
+                                </button>
+
                                 {/* Spotlight Toggle Button */}
                                 <button
                                     onClick={() => setIsSpotlightActive(!isSpotlightActive)}
@@ -4224,6 +4240,21 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                 <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
                                                     <div className="flex items-center justify-between">
                                                         <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                                            <MousePointer2 className="w-4 h-4 text-yellow-500" />
+                                                            Cursor Highlight
+                                                        </div>
+                                                        <button
+                                                            onClick={() => setIsCursorHighlightActive(!isCursorHighlightActive)}
+                                                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isCursorHighlightActive ? 'bg-yellow-500' : 'bg-gray-300 dark:bg-gray-700'}`}
+                                                        >
+                                                            <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isCursorHighlightActive ? 'translate-x-6' : 'translate-x-1'}`} />
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
                                                             <Focus className="w-4 h-4 text-yellow-500" />
                                                             Spotlight Mode
                                                         </div>
@@ -4845,12 +4876,32 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     </div>
                 )}
 
+                {/* Cursor Highlight Overlay */}
+                {isCursorHighlightActive && (
+                    <div
+                        ref={cursorHighlightRef}
+                        className="fixed z-[9998] pointer-events-none rounded-full transition-opacity duration-150"
+                        style={{
+                            left: '0px',
+                            top: '0px',
+                            width: '40px',
+                            height: '40px',
+                            backgroundColor: 'rgba(250, 204, 21, 0.4)',
+                            border: '2px solid rgba(250, 204, 21, 0.8)',
+                            boxShadow: '0 0 15px rgba(250, 204, 21, 0.5)',
+                            transform: 'translate3d(-999px, -999px, 0)',
+                            willChange: 'transform'
+                        }}
+                    />
+                )}
+
                 {/* Spotlight Overlay */}
                 {isSpotlightActive && (
                     <div
+                        ref={spotlightRef}
                         className="fixed inset-0 z-[9999] pointer-events-none transition-opacity duration-300"
                         style={{
-                            background: `radial-gradient(circle at ${spotlightPos.x}px ${spotlightPos.y}px, transparent 60px, rgba(0,0,0,0.85) 150px)`
+                            background: `radial-gradient(circle at -999px -999px, transparent 60px, rgba(0,0,0,0.85) 150px)`
                         }}
                     />
                 )}
