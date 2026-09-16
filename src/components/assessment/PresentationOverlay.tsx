@@ -62,7 +62,7 @@ const CONFETTI_CONFIG = {
 };
 
 import 'katex/dist/katex.min.css';
-import { X, ChevronLeft, ChevronRight, Play, Pause, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize, LayoutGrid, Sun, Moon, Eraser, Square, Circle, ArrowUpRight, Type, Presentation, ZoomIn, Volume2, VolumeX, MonitorPlay, Lightbulb, MessageCircle, Stamp, Droplet, Music, AlignLeft, Keyboard, Printer, Trophy, Globe, BarChart2, Sparkles, ImageDown, FileDown, Video, Sliders, List, Key, Camera, Youtube, Bell } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Play, Pause, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize, LayoutGrid, Sun, Moon, Eraser, Square, Circle, ArrowUpRight, Type, Presentation, ZoomIn, Volume2, VolumeX, MonitorPlay, Lightbulb, MessageCircle, Stamp, Droplet, Music, AlignLeft, Keyboard, Printer, Trophy, Globe, BarChart2, Sparkles, ImageDown, FileDown, Video, Sliders, List, Key, Camera, Youtube, Bell, Eye, ThumbsUp } from 'lucide-react';
 
 const bnOptionsMap: Record<string, string> = {
     a: 'ক',
@@ -374,7 +374,7 @@ const clearWordHighlight = () => {
 
 const highlightWordInElement = (elId: string | 'question', globalCharIdx: number, segStartChar: number): DOMRect | null => {
     if (!('highlights' in CSS)) return null;
-    
+
     let el: HTMLElement | null = null;
     if (elId === 'question') {
         el = document.querySelector('[data-read-cursor-target="question"]') as HTMLElement | null;
@@ -386,7 +386,7 @@ const highlightWordInElement = (elId: string | 'question', globalCharIdx: number
     clearWordHighlight();
 
     const localIdx = globalCharIdx - segStartChar;
-    
+
     const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
     let currentNode: Node | null;
     let currentOffset = 0;
@@ -409,15 +409,15 @@ const highlightWordInElement = (elId: string | 'question', globalCharIdx: number
         while (endOffset < text.length && !/\s/.test(text[endOffset])) {
             endOffset++;
         }
-        
+
         try {
             const range = new Range();
             range.setStart(targetNode, targetOffset);
             range.setEnd(targetNode, endOffset);
-            
+
             const highlight = new (window as any).Highlight(range);
             (CSS as any).highlights.set("tts-word-highlight", highlight);
-            
+
             return range.getBoundingClientRect();
         } catch (e) {
             console.error("Highlight API error:", e);
@@ -496,7 +496,7 @@ const generateRandomName = () => {
     const category = categories[Math.floor(Math.random() * categories.length)];
     const firstList = FAKE_NAMES_DB[category].first;
     const lastList = FAKE_NAMES_DB[category].last;
-    
+
     const first = firstList[Math.floor(Math.random() * firstList.length)];
     const last = lastList[Math.floor(Math.random() * lastList.length)];
     return `${first} ${last}`;
@@ -505,12 +505,12 @@ const generateRandomName = () => {
 const AVATAR_COLORS = ['bg-blue-600', 'bg-green-600', 'bg-purple-600', 'bg-yellow-600', 'bg-pink-600', 'bg-indigo-600', 'bg-teal-600', 'bg-orange-600'];
 
 const LiveSubscriberFeed = () => {
-    const [subs, setSubs] = useState<{id: number, name: string}[]>([]);
+    const [subs, setSubs] = useState<{ id: number, name: string }[]>([]);
     const [totalSubs, setTotalSubs] = useState(1240592); // Starting number
 
     useEffect(() => {
         // Initial populate
-        const initial = Array.from({length: 3}).map((_, i) => ({
+        const initial = Array.from({ length: 3 }).map((_, i) => ({
             id: Date.now() - i * 1000,
             name: generateRandomName()
         }));
@@ -522,14 +522,14 @@ const LiveSubscriberFeed = () => {
                 const newSub = { id: Date.now(), name: randomName };
                 return [newSub, ...prev].slice(0, 5); // Keep last 5 for space since there's no big counter
             });
-        }, 30000); // 30 seconds
+        }, 15000); // 15 seconds
 
         return () => clearInterval(interval);
     }, []);
 
     return (
         <div className="w-full h-[340px] shrink-0 flex flex-col bg-white dark:bg-[#0F0F0F] rounded-lg overflow-hidden shadow-2xl border border-gray-200 dark:border-[#272727] relative p-3 transition-colors">
-            
+
             {/* YouTube Header */}
             <div className="flex flex-col items-center justify-center border-b border-gray-200 dark:border-[#272727] pb-3 mb-3 shrink-0 transition-colors">
                 <div className="flex items-center gap-1.5">
@@ -540,17 +540,17 @@ const LiveSubscriberFeed = () => {
                     <h3 className="text-gray-500 dark:text-[#AAAAAA] font-semibold text-[11px] uppercase tracking-widest transition-colors">Live Subscribers</h3>
                 </div>
             </div>
-            
+
             {/* Feed */}
-            <div 
-                className="flex flex-col gap-2 overflow-hidden flex-1 relative"
+            <div
+                className="flex flex-col gap-1 overflow-hidden flex-1 relative"
                 style={{ maskImage: 'linear-gradient(to bottom, black 70%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to bottom, black 70%, transparent 100%)' }}
             >
                 <AnimatePresence>
                     {subs.map((sub) => {
                         const avatarColor = AVATAR_COLORS[sub.name.charCodeAt(0) % AVATAR_COLORS.length];
                         return (
-                            <motion.div 
+                            <motion.div
                                 key={sub.id}
                                 initial={{ opacity: 0, x: -20, scale: 0.95 }}
                                 animate={{ opacity: 1, x: 0, scale: 1 }}
@@ -572,6 +572,62 @@ const LiveSubscriberFeed = () => {
                         );
                     })}
                 </AnimatePresence>
+            </div>
+        </div>
+    );
+};
+
+const StreamEngagementWidget = () => {
+    const [viewers, setViewers] = useState(2450);
+    const [superChat, setSuperChat] = useState({ name: 'Rahul Ghosh', amount: '৳ 500', message: 'Great stream! Keep it up.' });
+
+    // Viewers logic
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setViewers(prev => Math.max(0, prev + Math.floor(Math.random() * 21) - 10)); // fluctuate +/- 10
+        }, 3000);
+        return () => clearInterval(interval);
+    }, []);
+
+    // Super chat logic
+    useEffect(() => {
+        const messages = [
+            { amount: '৳ 500', message: 'Great stream! Keep it up.' },
+            { amount: '৳ 200', message: 'Love this content!' },
+            { amount: '৳ 1000', message: 'Best channel ever.' },
+            { amount: '৳ 100', message: 'Hello from Dhaka!' },
+            { amount: '৳ 300', message: 'Very helpful, thanks!' }
+        ];
+        const interval = setInterval(() => {
+            const randomMsg = messages[Math.floor(Math.random() * messages.length)];
+            setSuperChat({
+                name: generateRandomName(),
+                ...randomMsg
+            });
+        }, 45000); // 45 seconds
+        return () => clearInterval(interval);
+    }, []);
+
+    return (
+        <div className="flex flex-col gap-1.5 w-full mt-1 shrink-0">
+            {/* 1. Viewers */}
+            <div className="flex items-center justify-between bg-white dark:bg-[#0F0F0F] rounded-lg p-1.5 px-2 border border-gray-200 dark:border-[#272727] shadow-sm transition-colors">
+                <div className="flex items-center gap-1.5 text-red-500">
+                    <Eye className="w-4 h-4" />
+                    <span className="text-[12px] font-bold tabular-nums">{viewers.toLocaleString()}</span>
+                </div>
+                <div className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">
+                    Watching Now
+                </div>
+            </div>
+
+            {/* 2. Super Chat */}
+            <div className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 dark:from-green-500/20 dark:to-emerald-500/20 rounded-lg p-1.5 px-2 border border-emerald-500/20 dark:border-green-500/20 flex flex-col gap-0.5 shadow-sm">
+                <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold text-gray-900 dark:text-white truncate pr-2">{superChat.name}</span>
+                    <span className="text-[10px] font-extrabold text-emerald-600 dark:text-green-400 bg-emerald-500/10 dark:bg-green-500/10 px-1.5 py-0.5 rounded shrink-0">{superChat.amount}</span>
+                </div>
+                <span className="text-[10px] text-gray-600 dark:text-gray-300 italic truncate">"{superChat.message}"</span>
             </div>
         </div>
     );
@@ -630,7 +686,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         }
         return 'bn';
     });
-    
+
     useEffect(() => {
         if (testLanguage) {
             const lang = testLanguage.toLowerCase();
@@ -709,15 +765,15 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const dingAudioRef = useRef<HTMLAudioElement>(null);
     const wrongAudioRef = useRef<HTMLAudioElement>(null);
     const bubbleAudioRef = useRef<HTMLAudioElement>(null);
-    
+
     const slideRef = useRef<HTMLDivElement>(null);
     const [isSavingImage, setIsSavingImage] = useState(false);
-    
+
     // --- Screen Recording State ---
     const [isRecording, setIsRecording] = useState(false);
     const [isRecordingPaused, setIsRecordingPaused] = useState(false);
     const [recordingQuality, setRecordingQuality] = useState<'standard' | 'high' | 'ultra' | '4k'>('4k');
-    
+
     // --- Webcam PIP State ---
     const [isWebcamActive, setIsWebcamActive] = useState(false);
     const [webcamShape, setWebcamShape] = useState<'circle' | 'square'>('circle');
@@ -769,7 +825,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [lowCutFreq, setLowCutFreq] = useState(150); // 0 to 300 Hz
     const [trebleBoost, setTrebleBoost] = useState(5); // 0 to 10
     const [noiseGateThreshold, setNoiseGateThreshold] = useState(0.02); // 0 to 0.1
-    
+
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const recordedChunksRef = useRef<BlobPart[]>([]);
 
@@ -802,7 +858,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
             // 1. Get Screen & Tab/System Audio
             const displayStream = await navigator.mediaDevices.getDisplayMedia({
-                video: { 
+                video: {
                     displaySurface: 'browser',
                     frameRate: { ideal: frameRate },
                     width: { ideal: width },
@@ -816,13 +872,13 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
             // 2. Get Microphone Audio
             let micStream: MediaStream | null = null;
             try {
-                micStream = await navigator.mediaDevices.getUserMedia({ 
+                micStream = await navigator.mediaDevices.getUserMedia({
                     audio: {
                         noiseSuppression: true,
                         echoCancellation: true,
                         autoGainControl: true
-                    }, 
-                    video: false 
+                    },
+                    video: false
                 });
             } catch (err) {
                 console.warn("Microphone not available or permission denied.", err);
@@ -830,7 +886,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
             // 3. Mix Audio Tracks using AudioContext
             let finalStream = displayStream;
-            
+
             const hasDisplayAudio = displayStream.getAudioTracks().length > 0;
             const hasMicAudio = micStream && micStream.getAudioTracks().length > 0;
 
@@ -854,7 +910,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             const scriptNode = audioCtx.createScriptProcessor(4096, 1, 1);
                             const gateGain = audioCtx.createGain();
                             let isOpen = true; // State to track if gate is open
-                            
+
                             scriptNode.onaudioprocess = (e) => {
                                 const inputData = e.inputBuffer.getChannelData(0);
                                 let sum = 0;
@@ -862,7 +918,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     sum += inputData[i] * inputData[i];
                                 }
                                 const rms = Math.sqrt(sum / inputData.length);
-                                
+
                                 // Hysteresis logic to prevent chopping/chattering
                                 if (!isOpen && rms > noiseGateThreshold) {
                                     isOpen = true;
@@ -873,7 +929,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     gateGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.4);
                                 }
                             };
-                            
+
                             micSource.connect(scriptNode);
                             scriptNode.connect(audioCtx.destination);
                             currentNode.connect(gateGain);
@@ -915,7 +971,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     }
 
                     const mixedTracks = dest.stream.getAudioTracks();
-                    
+
                     finalStream = new MediaStream([
                         displayStream.getVideoTracks()[0],
                         ...(mixedTracks.length > 0 ? mixedTracks : [])
@@ -957,7 +1013,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 window.URL.revokeObjectURL(url);
                 setIsRecording(false);
                 setIsRecordingPaused(false);
-                
+
                 // Stop all tracks to remove the recording icon from browser tab
                 displayStream.getTracks().forEach(track => track.stop());
                 if (micStream) micStream.getTracks().forEach(track => track.stop());
@@ -982,7 +1038,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
     const toggleRecordingPause = () => {
         if (!mediaRecorderRef.current) return;
-        
+
         if (isRecordingPaused) {
             mediaRecorderRef.current.resume();
             setIsRecordingPaused(false);
@@ -1116,7 +1172,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [ttsWordHighlightColor, setTtsWordHighlightColor] = useState('#facc15'); // yellow
     const [ttsWordHighlightStyle, setTtsWordHighlightStyle] = useState<'bg' | 'underline' | 'glow'>('bg');
     const [ttsWordHighlightRadius, setTtsWordHighlightRadius] = useState(4); // px
-    
+
     const [ttsProvider, setTtsProvider] = useState<any>(() => {
         if (typeof window !== 'undefined') return localStorage.getItem('ttsProvider') || 'browser';
         return 'browser';
@@ -1169,7 +1225,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         };
 
         loadVoices();
-        
+
         if ('speechSynthesis' in window) {
             if (window.speechSynthesis.onvoiceschanged !== undefined) {
                 window.speechSynthesis.onvoiceschanged = loadVoices;
@@ -1677,7 +1733,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const getCoordinates = (e: any, updateCache = false) => {
         const canvas = canvasRef.current;
         if (!canvas) return { x: 0, y: 0 };
-        
+
         let rect = cachedCanvasRect.current;
         if (!rect || updateCache) {
             rect = canvas.getBoundingClientRect();
@@ -2090,7 +2146,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     if (validCloudVoices && !validCloudVoices.some(v => v.id === finalVoiceURI)) {
                         finalVoiceURI = validCloudVoices[0].id;
                     }
-                    
+
                     const audioDataUrl = await fetchCloudTTS(ttsProvider, text, finalVoiceURI, ttsRate);
 
                     if (currentSlideLocal !== currentSlide) return;
@@ -2098,12 +2154,12 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     const audio = new Audio(audioDataUrl);
                     cloudAudioRef.current = audio;
                     let interval: any;
-                    
+
                     audio.onloadedmetadata = () => {
                         setIsSpeaking(true);
                         setIsCloudTTSLoading(false);
                         const totalChars = isCorrectAnswer ? text.length : segments[segments.length - 1].endChar;
-                        
+
                         interval = setInterval(() => {
                             if (!cloudAudioRef.current || cloudAudioRef.current.paused || cloudAudioRef.current.ended) {
                                 clearInterval(interval);
@@ -2120,12 +2176,12 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             }
                         }, 100);
                     };
-                    
+
                     audio.onended = () => {
                         if (interval) clearInterval(interval);
                         onEndCallback();
                     };
-                    
+
                     audio.play().catch(e => {
                         setIsCloudTTSLoading(false);
                         console.error("Audio play error", e);
@@ -2695,252 +2751,252 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 `}</style>
 
                 {/* Left Sidebar Column */}
-                <div className="hidden xl:flex w-[160px] h-full shrink-0 flex-col gap-3 z-10">
+                <div className="hidden xl:flex w-[160px] h-full shrink-0 flex-col gap-1 z-10">
                     {/* Left Ad Banner */}
                     <div className="w-full flex-1 min-h-[200px] flex flex-col items-center justify-between bg-gradient-to-b from-[#0a192f] via-[#0b2244] to-[#041128] rounded-xl overflow-hidden shadow-2xl border border-blue-400/20 relative p-2.5 shrink" style={{ maxHeight: '420px' }}>
                         {/* Floating Elements Background */}
-                    <div className="absolute top-[5%] left-[25%] w-16 h-16 rounded-full border border-blue-400/20 bg-blue-500/10 blur-[8px]"></div>
-                    <div className="absolute bottom-[30%] right-[-5%] w-20 h-20 rounded-full bg-blue-400/10 blur-[20px]"></div>
+                        <div className="absolute top-[5%] left-[25%] w-16 h-16 rounded-full border border-blue-400/20 bg-blue-500/10 blur-[8px]"></div>
+                        <div className="absolute bottom-[30%] right-[-5%] w-20 h-20 rounded-full bg-blue-400/10 blur-[20px]"></div>
 
-                    {/* Top Logo */}
-                    <div className="flex flex-col items-center w-full z-10 pt-2">
-                        <div className="bg-white/10 px-3 py-2 rounded-lg shadow-lg border border-white/10 backdrop-blur-sm mb-3">
-                            <h2 className="text-[20px] font-extrabold text-white tracking-wide drop-shadow-md">
-                                <span className="text-blue-400">Desh</span>Exam
-                            </h2>
+                        {/* Top Logo */}
+                        <div className="flex flex-col items-center w-full z-10 pt-2">
+                            <div className="bg-white/10 px-3 py-2 rounded-lg shadow-lg border border-white/10 backdrop-blur-sm mb-3">
+                                <h2 className="text-[20px] font-extrabold text-white tracking-wide drop-shadow-md">
+                                    <span className="text-blue-400">Desh</span>Exam
+                                </h2>
+                            </div>
+                            <div className="text-center">
+                                <h3 className="text-[18px] text-blue-100 mb-1 leading-tight font-medium">সঠিক প্রস্তুতি</h3>
+                                <h3 className="text-[26px] text-white leading-tight font-extrabold">
+                                    <span className="text-[#FFD700]">সফলতার</span>
+                                </h3>
+                                <h3 className="text-[26px] text-white leading-tight font-extrabold">চাবিকাঠি!</h3>
+                            </div>
                         </div>
-                        <div className="text-center">
-                            <h3 className="text-[18px] text-blue-100 mb-1 leading-tight font-medium">সঠিক প্রস্তুতি</h3>
-                            <h3 className="text-[26px] text-white leading-tight font-extrabold">
-                                <span className="text-[#FFD700]">সফলতার</span>
-                            </h3>
-                            <h3 className="text-[26px] text-white leading-tight font-extrabold">চাবিকাঠি!</h3>
+
+                        {/* Middle Trophy */}
+                        <div className="flex items-center justify-center text-4xl w-full z-10 drop-shadow-2xl my-2 relative">
+                            <div className="absolute inset-0 bg-blue-400/20 blur-[15px] rounded-full"></div>
+                            🏆
+                        </div>
+
+                        {/* Features List */}
+                        <div className="flex flex-col z-10 w-full space-y-2 mb-2 min-h-0 overflow-y-auto shrink custom-scrollbar">
+                            <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-lg p-2.5">
+                                <div className="flex flex-col space-y-1.5">
+                                    {[
+                                        'Mock Test',
+                                        'Topic Test',
+                                        'Live Exam',
+                                        'PYQ',
+                                        'AI Report',
+                                        'Merit List'
+                                    ].map((feature, idx) => (
+                                        <div key={idx} className="flex items-center gap-1.5">
+                                            <Check className="w-4 h-4 text-[#FFB800] shrink-0" />
+                                            <span className="text-gray-100 text-[14px] font-semibold tracking-wide leading-tight">{feature}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Discount Badge */}
+                        <div className="w-full z-10 flex justify-center mb-2">
+                            <div className="bg-red-500/90 text-white text-[11px] font-bold px-3 py-1 rounded-full animate-pulse border border-red-400 shadow-[0_0_10px_rgba(239,68,68,0.5)]">
+                                ⭐ GET 50% OFF ⭐
+                            </div>
+                        </div>
+
+                        {/* CTA Button */}
+                        <div className="w-full z-10 pb-2">
+                            <button className="w-full flex flex-col items-center justify-center py-2 bg-gradient-to-b from-[#2178ff] to-[#0a4bb8] border border-blue-400/50 rounded-lg shadow-[0_4px_10px_rgba(10,75,184,0.4)] hover:scale-105 transition-transform duration-300">
+                                <span className="text-white font-bold text-[16px] drop-shadow-md leading-none mb-1">Subscribe</span>
+                                <span className="text-white font-bold text-[16px] drop-shadow-md leading-none">Today</span>
+                            </button>
                         </div>
                     </div>
+                    {/* ── Analog Clock (Moved here) ── */}
+                    {isTimerEnabled ? (() => {
+                        const sec = timerDisplay.secs;
+                        const min = Math.floor(sec / 60);
+                        const s = sec % 60;
+                        const secondDeg = (s * 6); // 6 deg per second (0 to 354)
+                        const minuteDeg = ((min % 60) * 6) + (s * 0.1); // 6 deg per minute + second offset
 
-                    {/* Middle Trophy */}
-                    <div className="flex items-center justify-center text-4xl w-full z-10 drop-shadow-2xl my-2 relative">
-                        <div className="absolute inset-0 bg-blue-400/20 blur-[15px] rounded-full"></div>
-                        🏆
-                    </div>
+                        // Theme-tailored colors
+                        const colors = isDarkMode ? {
+                            bezelBg: 'bg-gradient-to-br from-slate-800 via-slate-900 to-black',
+                            bezelBorder: 'border-slate-700/80',
+                            bezelShadow: 'shadow-[0_16px_36px_rgba(0,0,0,0.7),inset_0_1px_2px_rgba(255,255,255,0.15)]',
+                            ringGlow: 'ring-4 ring-cyan-500/20',
+                            crownBg: 'bg-gradient-to-b from-slate-600 via-slate-700 to-slate-800 border-slate-600',
+                            dialGrad1: '#0f172a',
+                            dialGrad2: '#020617',
+                            outerRing: '#334155',
+                            majorTick: '#f8fafc',
+                            minorTick: '#64748b',
+                            minuteHand: '#f1f5f9',
+                            secondHand: '#ff3b30',
+                            centerCap: '#ff3b30',
+                            digitalBg: 'bg-black/90 border-cyan-500/40 text-cyan-400 shadow-[0_0_12px_rgba(6,182,212,0.25)]',
+                        } : {
+                            bezelBg: 'bg-gradient-to-br from-slate-100 via-white to-slate-200',
+                            bezelBorder: 'border-slate-300',
+                            bezelShadow: 'shadow-[0_12px_28px_rgba(0,0,0,0.12),inset_0_2px_4px_rgba(255,255,255,0.9)]',
+                            ringGlow: 'ring-4 ring-blue-500/15',
+                            crownBg: 'bg-gradient-to-b from-slate-200 via-slate-400 to-slate-300 border-slate-400',
+                            dialGrad1: '#ffffff',
+                            dialGrad2: '#e2e8f0',
+                            outerRing: '#cbd5e1',
+                            majorTick: '#0f172a',
+                            minorTick: '#94a3b8',
+                            minuteHand: '#1e293b',
+                            secondHand: '#dc2626',
+                            centerCap: '#dc2626',
+                            digitalBg: 'bg-slate-900 border-slate-700 text-cyan-300 shadow-md',
+                        };
 
-                    {/* Features List */}
-                    <div className="flex flex-col z-10 w-full space-y-2 mb-2 min-h-0 overflow-y-auto shrink custom-scrollbar">
-                        <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-lg p-2.5">
-                            <div className="flex flex-col space-y-1.5">
-                                {[
-                                    'Mock Test',
-                                    'Topic Test',
-                                    'Live Exam',
-                                    'PYQ',
-                                    'AI Report',
-                                    'Merit List'
-                                ].map((feature, idx) => (
-                                    <div key={idx} className="flex items-center gap-1.5">
-                                        <Check className="w-4 h-4 text-[#FFB800] shrink-0" />
-                                        <span className="text-gray-100 text-[14px] font-semibold tracking-wide leading-tight">{feature}</span>
+                        return (
+                            <div className="w-full mt-auto flex flex-col items-center justify-center shrink-0 mb-4 select-none">
+                                {/* Watch Case & Crown */}
+                                <div className="relative flex flex-col items-center group transition-all duration-300 hover:scale-105 hover:drop-shadow-[0_12px_30px_rgba(59,130,246,0.25)]">
+                                    {/* Classic Stopwatch Top Crown / Button */}
+                                    <div className="flex items-center justify-center -mb-1 z-10 pointer-events-none">
+                                        <div className={`w-5 h-2 rounded-t-md border-t border-x shadow-sm ${colors.crownBg}`} />
                                     </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
 
-                    {/* Discount Badge */}
-                    <div className="w-full z-10 flex justify-center mb-2">
-                        <div className="bg-red-500/90 text-white text-[11px] font-bold px-3 py-1 rounded-full animate-pulse border border-red-400 shadow-[0_0_10px_rgba(239,68,68,0.5)]">
-                            ⭐ GET 50% OFF ⭐
-                        </div>
-                    </div>
+                                    {/* Circular Clock Face */}
+                                    <div className={`relative w-[130px] h-[130px] rounded-full p-1 border-[2.5px] backdrop-blur-xl ${colors.bezelBg} ${colors.bezelBorder} ${colors.bezelShadow} ${colors.ringGlow} transition-colors duration-500`}>
+                                        <svg className="w-full h-full pointer-events-none" viewBox="0 0 100 100">
+                                            <defs>
+                                                <radialGradient id="clockDialGrad" cx="50%" cy="50%" r="50%">
+                                                    <stop offset="60%" stopColor={colors.dialGrad1} />
+                                                    <stop offset="100%" stopColor={colors.dialGrad2} />
+                                                </radialGradient>
+                                            </defs>
 
-                    {/* CTA Button */}
-                    <div className="w-full z-10 pb-2">
-                        <button className="w-full flex flex-col items-center justify-center py-2 bg-gradient-to-b from-[#2178ff] to-[#0a4bb8] border border-blue-400/50 rounded-lg shadow-[0_4px_10px_rgba(10,75,184,0.4)] hover:scale-105 transition-transform duration-300">
-                            <span className="text-white font-bold text-[16px] drop-shadow-md leading-none mb-1">Subscribe</span>
-                            <span className="text-white font-bold text-[16px] drop-shadow-md leading-none">Today</span>
-                        </button>
-                    </div>
-                </div>
-                {/* ── Analog Clock (Moved here) ── */}
-                {isTimerEnabled ? (() => {
-                    const sec = timerDisplay.secs;
-                    const min = Math.floor(sec / 60);
-                    const s = sec % 60;
-                    const secondDeg = (s * 6); // 6 deg per second (0 to 354)
-                    const minuteDeg = ((min % 60) * 6) + (s * 0.1); // 6 deg per minute + second offset
+                                            {/* Dial Base with Radial Gradient */}
+                                            <circle cx="50" cy="50" r="46" fill="url(#clockDialGrad)" stroke={colors.outerRing} strokeWidth="1" />
 
-                    // Theme-tailored colors
-                    const colors = isDarkMode ? {
-                        bezelBg: 'bg-gradient-to-br from-slate-800 via-slate-900 to-black',
-                        bezelBorder: 'border-slate-700/80',
-                        bezelShadow: 'shadow-[0_16px_36px_rgba(0,0,0,0.7),inset_0_1px_2px_rgba(255,255,255,0.15)]',
-                        ringGlow: 'ring-4 ring-cyan-500/20',
-                        crownBg: 'bg-gradient-to-b from-slate-600 via-slate-700 to-slate-800 border-slate-600',
-                        dialGrad1: '#0f172a',
-                        dialGrad2: '#020617',
-                        outerRing: '#334155',
-                        majorTick: '#f8fafc',
-                        minorTick: '#64748b',
-                        minuteHand: '#f1f5f9',
-                        secondHand: '#ff3b30',
-                        centerCap: '#ff3b30',
-                        digitalBg: 'bg-black/90 border-cyan-500/40 text-cyan-400 shadow-[0_0_12px_rgba(6,182,212,0.25)]',
-                    } : {
-                        bezelBg: 'bg-gradient-to-br from-slate-100 via-white to-slate-200',
-                        bezelBorder: 'border-slate-300',
-                        bezelShadow: 'shadow-[0_12px_28px_rgba(0,0,0,0.12),inset_0_2px_4px_rgba(255,255,255,0.9)]',
-                        ringGlow: 'ring-4 ring-blue-500/15',
-                        crownBg: 'bg-gradient-to-b from-slate-200 via-slate-400 to-slate-300 border-slate-400',
-                        dialGrad1: '#ffffff',
-                        dialGrad2: '#e2e8f0',
-                        outerRing: '#cbd5e1',
-                        majorTick: '#0f172a',
-                        minorTick: '#94a3b8',
-                        minuteHand: '#1e293b',
-                        secondHand: '#dc2626',
-                        centerCap: '#dc2626',
-                        digitalBg: 'bg-slate-900 border-slate-700 text-cyan-300 shadow-md',
-                    };
-
-                    return (
-                        <div className="w-full mt-auto flex flex-col items-center justify-center shrink-0 mb-4 select-none">
-                            {/* Watch Case & Crown */}
-                            <div className="relative flex flex-col items-center group transition-all duration-300 hover:scale-105 hover:drop-shadow-[0_12px_30px_rgba(59,130,246,0.25)]">
-                                {/* Classic Stopwatch Top Crown / Button */}
-                                <div className="flex items-center justify-center -mb-1 z-10 pointer-events-none">
-                                    <div className={`w-5 h-2 rounded-t-md border-t border-x shadow-sm ${colors.crownBg}`} />
-                                </div>
-
-                                {/* Circular Clock Face */}
-                                <div className={`relative w-[130px] h-[130px] rounded-full p-1 border-[2.5px] backdrop-blur-xl ${colors.bezelBg} ${colors.bezelBorder} ${colors.bezelShadow} ${colors.ringGlow} transition-colors duration-500`}>
-                                    <svg className="w-full h-full pointer-events-none" viewBox="0 0 100 100">
-                                        <defs>
-                                            <radialGradient id="clockDialGrad" cx="50%" cy="50%" r="50%">
-                                                <stop offset="60%" stopColor={colors.dialGrad1} />
-                                                <stop offset="100%" stopColor={colors.dialGrad2} />
-                                            </radialGradient>
-                                        </defs>
-
-                                        {/* Dial Base with Radial Gradient */}
-                                        <circle cx="50" cy="50" r="46" fill="url(#clockDialGrad)" stroke={colors.outerRing} strokeWidth="1" />
-
-                                        {/* Countdown Mode Progress Arc (if countdown mode) */}
-                                        {timerMode === 'countdown' && timerDisplay.pct !== null && (
-                                            <circle
-                                                cx="50"
-                                                cy="50"
-                                                r="43.5"
-                                                fill="none"
-                                                stroke={timerDisplay.pct > 0.5 ? '#22c55e' : timerDisplay.pct > 0.25 ? '#f59e0b' : '#ef4444'}
-                                                strokeWidth="3.5"
-                                                strokeDasharray={`${timerDisplay.pct * 273.3} 273.3`}
-                                                strokeLinecap="round"
-                                                transform="rotate(-90 50 50)"
-                                                className="transition-all duration-1000"
-                                            />
-                                        )}
-
-                                        {/* 60 Minute/Second Dots */}
-                                        {[...Array(60)].map((_, i) => {
-                                            if (i % 5 === 0) return null; // handled by major ticks
-                                            const angle = i * 6;
-                                            return (
+                                            {/* Countdown Mode Progress Arc (if countdown mode) */}
+                                            {timerMode === 'countdown' && timerDisplay.pct !== null && (
                                                 <circle
-                                                    key={`dot-${i}`}
                                                     cx="50"
-                                                    cy="8"
-                                                    r="0.75"
-                                                    fill={colors.minorTick}
-                                                    transform={`rotate(${angle} 50 50)`}
-                                                />
-                                            );
-                                        })}
-
-                                        {/* 12 Hour / 5-Sec Dial Ticks */}
-                                        {[...Array(12)].map((_, i) => {
-                                            const angle = i * 30;
-                                            const isCardinal = i % 3 === 0;
-                                            return (
-                                                <line
-                                                    key={`tick-${i}`}
-                                                    x1="50"
-                                                    y1={isCardinal ? "7" : "9"}
-                                                    x2="50"
-                                                    y2="14"
-                                                    stroke={isCardinal ? colors.majorTick : colors.minorTick}
-                                                    strokeWidth={isCardinal ? "2.5" : "1.5"}
+                                                    cy="50"
+                                                    r="43.5"
+                                                    fill="none"
+                                                    stroke={timerDisplay.pct > 0.5 ? '#22c55e' : timerDisplay.pct > 0.25 ? '#f59e0b' : '#ef4444'}
+                                                    strokeWidth="3.5"
+                                                    strokeDasharray={`${timerDisplay.pct * 273.3} 273.3`}
                                                     strokeLinecap="round"
-                                                    transform={`rotate(${angle} 50 50)`}
+                                                    transform="rotate(-90 50 50)"
+                                                    className="transition-all duration-1000"
                                                 />
-                                            );
-                                        })}
+                                            )}
 
-                                        {/* Clock Numerals (12, 3, 9) */}
-                                        <text x="50" y="22" textAnchor="middle" fontSize="6.5" fontWeight="900" fontFamily="sans-serif" fill={colors.majorTick} opacity="0.85">12</text>
-                                        <text x="79" y="52.5" textAnchor="middle" fontSize="6.5" fontWeight="900" fontFamily="sans-serif" fill={colors.majorTick} opacity="0.85">3</text>
-                                        <text x="21" y="52.5" textAnchor="middle" fontSize="6.5" fontWeight="900" fontFamily="sans-serif" fill={colors.majorTick} opacity="0.85">9</text>
+                                            {/* 60 Minute/Second Dots */}
+                                            {[...Array(60)].map((_, i) => {
+                                                if (i % 5 === 0) return null; // handled by major ticks
+                                                const angle = i * 6;
+                                                return (
+                                                    <circle
+                                                        key={`dot-${i}`}
+                                                        cx="50"
+                                                        cy="8"
+                                                        r="0.75"
+                                                        fill={colors.minorTick}
+                                                        transform={`rotate(${angle} 50 50)`}
+                                                    />
+                                                );
+                                            })}
 
-                                        {/* Minute Hand */}
-                                        <line
-                                            x1="50"
-                                            y1="50"
-                                            x2="50"
-                                            y2="25"
-                                            stroke={colors.minuteHand}
-                                            strokeWidth="2.8"
-                                            strokeLinecap="round"
-                                            className="transition-transform duration-500 ease-out"
-                                            transform={`rotate(${minuteDeg} 50 50)`}
-                                        />
+                                            {/* 12 Hour / 5-Sec Dial Ticks */}
+                                            {[...Array(12)].map((_, i) => {
+                                                const angle = i * 30;
+                                                const isCardinal = i % 3 === 0;
+                                                return (
+                                                    <line
+                                                        key={`tick-${i}`}
+                                                        x1="50"
+                                                        y1={isCardinal ? "7" : "9"}
+                                                        x2="50"
+                                                        y2="14"
+                                                        stroke={isCardinal ? colors.majorTick : colors.minorTick}
+                                                        strokeWidth={isCardinal ? "2.5" : "1.5"}
+                                                        strokeLinecap="round"
+                                                        transform={`rotate(${angle} 50 50)`}
+                                                    />
+                                                );
+                                            })}
 
-                                        {/* Second Hand (Classic sweep/tick hand) */}
-                                        <g
-                                            className="transition-transform duration-300 ease-out"
-                                            transform={`rotate(${secondDeg} 50 50)`}
-                                        >
-                                            {/* Counterweight Tail */}
+                                            {/* Clock Numerals (12, 3, 9) */}
+                                            <text x="50" y="22" textAnchor="middle" fontSize="6.5" fontWeight="900" fontFamily="sans-serif" fill={colors.majorTick} opacity="0.85">12</text>
+                                            <text x="79" y="52.5" textAnchor="middle" fontSize="6.5" fontWeight="900" fontFamily="sans-serif" fill={colors.majorTick} opacity="0.85">3</text>
+                                            <text x="21" y="52.5" textAnchor="middle" fontSize="6.5" fontWeight="900" fontFamily="sans-serif" fill={colors.majorTick} opacity="0.85">9</text>
+
+                                            {/* Minute Hand */}
                                             <line
                                                 x1="50"
                                                 y1="50"
                                                 x2="50"
-                                                y2="60"
-                                                stroke={step >= 1 ? '#9ca3af' : colors.secondHand}
-                                                strokeWidth="2.5"
+                                                y2="25"
+                                                stroke={colors.minuteHand}
+                                                strokeWidth="2.8"
                                                 strokeLinecap="round"
+                                                className="transition-transform duration-500 ease-out"
+                                                transform={`rotate(${minuteDeg} 50 50)`}
                                             />
-                                            {/* Long Second Hand Needle */}
-                                            <line
-                                                x1="50"
-                                                y1="50"
-                                                x2="50"
-                                                y2="13"
-                                                stroke={step >= 1 ? '#9ca3af' : colors.secondHand}
-                                                strokeWidth="1.6"
-                                                strokeLinecap="round"
-                                            />
-                                            <circle cx="50" cy="13" r="1.8" fill={step >= 1 ? '#9ca3af' : colors.secondHand} />
-                                        </g>
 
-                                        {/* Center Pivot Jewel */}
-                                        <circle cx="50" cy="50" r="3.5" fill={step >= 1 ? '#6b7280' : colors.centerCap} stroke={isDarkMode ? '#0f172a' : '#ffffff'} strokeWidth="1.2" />
-                                    </svg>
-                                </div>
+                                            {/* Second Hand (Classic sweep/tick hand) */}
+                                            <g
+                                                className="transition-transform duration-300 ease-out"
+                                                transform={`rotate(${secondDeg} 50 50)`}
+                                            >
+                                                {/* Counterweight Tail */}
+                                                <line
+                                                    x1="50"
+                                                    y1="50"
+                                                    x2="50"
+                                                    y2="60"
+                                                    stroke={step >= 1 ? '#9ca3af' : colors.secondHand}
+                                                    strokeWidth="2.5"
+                                                    strokeLinecap="round"
+                                                />
+                                                {/* Long Second Hand Needle */}
+                                                <line
+                                                    x1="50"
+                                                    y1="50"
+                                                    x2="50"
+                                                    y2="13"
+                                                    stroke={step >= 1 ? '#9ca3af' : colors.secondHand}
+                                                    strokeWidth="1.6"
+                                                    strokeLinecap="round"
+                                                />
+                                                <circle cx="50" cy="13" r="1.8" fill={step >= 1 ? '#9ca3af' : colors.secondHand} />
+                                            </g>
 
-                                {/* Digital Time Badge — below clock face */}
-                                <div className={`mt-2 px-3 py-1 rounded-full font-mono text-[12px] font-black tracking-wider flex items-center gap-1 border pointer-events-none ${colors.digitalBg}`}>
-                                    {step === 0 && (
-                                        <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse inline-block" />
-                                    )}
-                                    <span>
-                                        {String(min).padStart(2, '0')}:{String(s).padStart(2, '0')}
-                                    </span>
+                                            {/* Center Pivot Jewel */}
+                                            <circle cx="50" cy="50" r="3.5" fill={step >= 1 ? '#6b7280' : colors.centerCap} stroke={isDarkMode ? '#0f172a' : '#ffffff'} strokeWidth="1.2" />
+                                        </svg>
+                                    </div>
+
+                                    {/* Digital Time Badge — below clock face */}
+                                    <div className={`mt-2 px-3 py-1 rounded-full font-mono text-[12px] font-black tracking-wider flex items-center gap-1 border pointer-events-none ${colors.digitalBg}`}>
+                                        {step === 0 && (
+                                            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse inline-block" />
+                                        )}
+                                        <span>
+                                            {String(min).padStart(2, '0')}:{String(s).padStart(2, '0')}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    );
-                })() : (
-                    <div className="w-full flex-1 min-h-0 bg-white/5 border border-white/10 rounded-xl hidden"></div>
-                )}
-            </div>
+                        );
+                    })() : (
+                        <div className="w-full flex-1 min-h-0 bg-white/5 border border-white/10 rounded-xl hidden"></div>
+                    )}
+                </div>
 
                 {/* Main Presentation Area */}
                 <div
@@ -3600,7 +3656,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     } else {
                                                         animClass = ' transform scale-100 z-10 shadow-sm ';
                                                     }
-                                                    
+
                                                     if (ttsHighlightStyle === 'bg') {
                                                         containerClasses += ' bg-blue-50/80 dark:bg-blue-900/40 backdrop-blur-sm ring-2 ring-blue-400/50 dark:ring-blue-500/50 transition-all duration-300 ' + animClass;
                                                     } else {
@@ -3927,7 +3983,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 >
                                     <Camera className="w-5 h-5 md:w-6 md:h-6" />
                                 </button>
-                                
+
                                 {/* TTS Read Aloud Button */}
                                 <button
                                     onClick={() => handleReadAloud()}
@@ -3999,36 +4055,36 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                         <>
                                             <div className="fixed inset-0 z-[60]" onClick={() => setIsShortcutsOpen(false)}></div>
                                             <div className="fixed bottom-[80px] left-1/2 -translate-x-1/2 md:absolute md:bottom-full md:left-auto md:right-0 md:translate-x-0 md:mb-4 bg-white dark:bg-gray-900 !bg-opacity-100 !opacity-100 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)] p-5 w-[90vw] sm:w-[400px] z-[70] animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[70vh] md:max-h-[60vh]">
-                                            <div className="flex justify-between items-center mb-4 pb-3 border-b border-gray-100 dark:border-gray-800 shrink-0">
-                                                <h3 className="font-bold text-gray-800 dark:text-gray-200 text-lg flex items-center gap-2">
-                                                    <Keyboard className="w-5 h-5 text-gray-500 dark:text-gray-400" /> Keyboard Shortcuts
-                                                </h3>
-                                                <button onClick={() => setIsShortcutsOpen(false)} className="p-1 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
-                                                    <X className="w-5 h-5" />
-                                                </button>
-                                            </div>
-                                            <div className="space-y-3 overflow-y-auto overscroll-contain custom-scrollbar pr-2 pb-2 text-sm text-gray-700 dark:text-gray-300">
-                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Toggle Shortcuts</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Shift + ?</kbd></div>
-                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Next / Previous</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">← / →</kbd></div>
-                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Select Option A-E</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">A - E</kbd></div>
-                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Read Aloud</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Shift + R</kbd></div>
-                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Auto-Play Read Aloud</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Shift + A</kbd></div>
-                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Toggle Timer</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">T</kbd></div>
-                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Toggle Dark Mode</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Shift + N</kbd></div>
-                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Toggle Fullscreen</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">F11</kbd></div>
-                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Toggle Settings</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">S</kbd></div>
-                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Toggle Spotlight</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Shift + F</kbd></div>
-                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Whiteboard Mode</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Shift + W</kbd></div>
-                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Toggle Pen Tool</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Shift + D</kbd></div>
-                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Show Explanation</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Shift + X</kbd></div>
-                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Show Option Explanations</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Shift + O</kbd></div>
-                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Presentation Mode</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">M</kbd></div>
-                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Question Font Size</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Q / W</kbd></div>
-                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Options Font Size</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">O / P</kbd></div>
-                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Explanation Font Size</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">[ / ]</kbd></div>
-                                                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Options Layout</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">L / G</kbd></div>
-                                                <div className="flex justify-between items-center pb-2"><span className="font-medium">Clear Canvas</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Shift + C</kbd></div>
-                                            </div>
+                                                <div className="flex justify-between items-center mb-4 pb-3 border-b border-gray-100 dark:border-gray-800 shrink-0">
+                                                    <h3 className="font-bold text-gray-800 dark:text-gray-200 text-lg flex items-center gap-2">
+                                                        <Keyboard className="w-5 h-5 text-gray-500 dark:text-gray-400" /> Keyboard Shortcuts
+                                                    </h3>
+                                                    <button onClick={() => setIsShortcutsOpen(false)} className="p-1 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
+                                                        <X className="w-5 h-5" />
+                                                    </button>
+                                                </div>
+                                                <div className="space-y-3 overflow-y-auto overscroll-contain custom-scrollbar pr-2 pb-2 text-sm text-gray-700 dark:text-gray-300">
+                                                    <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Toggle Shortcuts</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Shift + ?</kbd></div>
+                                                    <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Next / Previous</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">← / →</kbd></div>
+                                                    <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Select Option A-E</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">A - E</kbd></div>
+                                                    <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Read Aloud</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Shift + R</kbd></div>
+                                                    <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Auto-Play Read Aloud</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Shift + A</kbd></div>
+                                                    <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Toggle Timer</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">T</kbd></div>
+                                                    <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Toggle Dark Mode</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Shift + N</kbd></div>
+                                                    <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Toggle Fullscreen</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">F11</kbd></div>
+                                                    <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Toggle Settings</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">S</kbd></div>
+                                                    <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Toggle Spotlight</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Shift + F</kbd></div>
+                                                    <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Whiteboard Mode</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Shift + W</kbd></div>
+                                                    <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Toggle Pen Tool</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Shift + D</kbd></div>
+                                                    <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Show Explanation</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Shift + X</kbd></div>
+                                                    <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Show Option Explanations</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Shift + O</kbd></div>
+                                                    <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Presentation Mode</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">M</kbd></div>
+                                                    <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Question Font Size</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Q / W</kbd></div>
+                                                    <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Options Font Size</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">O / P</kbd></div>
+                                                    <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Explanation Font Size</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">[ / ]</kbd></div>
+                                                    <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Options Layout</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">L / G</kbd></div>
+                                                    <div className="flex justify-between items-center pb-2"><span className="font-medium">Clear Canvas</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Shift + C</kbd></div>
+                                                </div>
                                             </div>
                                         </>
                                     )}
@@ -4048,965 +4104,965 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                         <>
                                             <div className="fixed inset-0 z-[60]" onClick={() => setIsSettingsOpen(false)}></div>
                                             <div className="fixed bottom-[90px] left-1/2 -translate-x-1/2 md:absolute md:bottom-full md:left-auto md:right-0 md:translate-x-0 md:mb-4 bg-white/95 dark:bg-gray-950/95 backdrop-blur-xl border border-gray-200 dark:border-gray-800 rounded-2xl shadow-2xl p-3 md:p-4 w-[92vw] sm:w-[350px] z-[70] animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[75vh] md:max-h-[65vh]">
-                                            <div className="flex justify-between items-center mb-2 pb-2 border-b border-gray-100 dark:border-gray-800/60 shrink-0">
-                                                <h3 className="font-bold text-gray-800 dark:text-gray-200 text-lg flex items-center gap-2">
-                                                    <Settings className="w-5 h-5 text-indigo-500" /> Settings
+                                                <div className="flex justify-between items-center mb-2 pb-2 border-b border-gray-100 dark:border-gray-800/60 shrink-0">
+                                                    <h3 className="font-bold text-gray-800 dark:text-gray-200 text-lg flex items-center gap-2">
+                                                        <Settings className="w-5 h-5 text-indigo-500" /> Settings
 
-                                                </h3>
-                                                <button onClick={() => setIsSettingsOpen(false)} className="p-1 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
-                                                    <X className="w-5 h-5" />
-                                                </button>
-                                            </div>
-
-                                            <div className="overflow-y-auto overscroll-contain custom-scrollbar pr-2 pb-2 flex-1 min-h-0 space-y-3">
-                                                <div className="pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0">
-                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
-                                                        <span className="flex items-center gap-2"><MonitorPlay className="w-4 h-4 text-indigo-500" /> Presentation Mode</span>
-
-                                                    </div>
-                                                    <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl">
-                                                        <button
-                                                            onClick={() => setMode('test')}
-                                                            className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-colors ${mode === 'test' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
-                                                        >
-                                                            Test Mode
-                                                        </button>
-                                                        <button
-                                                            onClick={() => setMode('read')}
-                                                            className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-colors ${mode === 'read' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
-                                                        >
-                                                            Read Mode
-                                                        </button>
-                                                    </div>
-                                                </div>
-
-                                                <div className="pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0">
-                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
-                                                        <span className="flex items-center gap-2"><Sparkles className="w-4 h-4 text-indigo-500" /> Celebration Settings</span>
-                                                    </div>
-                                                    <div className="space-y-3">
-                                                        <div className="flex items-center justify-between">
-                                                            <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Enable Celebration</span>
-                                                            <button onClick={() => setIsCelebrationEnabled(!isCelebrationEnabled)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${isCelebrationEnabled ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-gray-700'}`}>
-                                                                <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ${isCelebrationEnabled ? 'translate-x-5' : 'translate-x-1'}`} />
-                                                            </button>
-                                                        </div>
-                                                        {isCelebrationEnabled && (
-                                                            <>
-                                                                <div className="flex items-center justify-between mt-2 pl-4 md:pl-6">
-                                                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Celebration Sound</span>
-                                                                    <button onClick={() => setIsCelebrationSoundEnabled(!isCelebrationSoundEnabled)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${isCelebrationSoundEnabled ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-gray-700'}`}>
-                                                                        <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ${isCelebrationSoundEnabled ? 'translate-x-5' : 'translate-x-1'}`} />
-                                                                    </button>
-                                                                </div>
-                                                                <div className="flex items-center justify-between mt-2 pl-4 md:pl-6">
-                                                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Duration</span>
-                                                                    <select
-                                                                        value={celebrationDuration}
-                                                                        onChange={(e) => setCelebrationDuration(Number(e.target.value))}
-                                                                        className="text-xs font-medium bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-2 py-1 outline-none focus:border-indigo-500 dark:text-gray-200"
-                                                                    >
-                                                                        <option value={1}>1 Sec.</option>
-                                                                        <option value={2}>2 Sec.</option>
-                                                                        <option value={3}>3 Sec.</option>
-                                                                        <option value={4}>4 Sec.</option>
-                                                                        <option value={5}>5 Sec.</option>
-                                                                        <option value={6}>6 Sec.</option>
-                                                                        <option value={7}>7 Sec.</option>
-                                                                        <option value={8}>8 Sec.</option>
-                                                                        <option value={9}>9 Sec.</option>
-                                                                        <option value={10}>10 Sec.</option>
-                                                                        <option value={15}>15 Sec.</option>
-                                                                    </select>
-                                                                </div>
-                                                            </>
-                                                        )}
-                                                    </div>
-                                                </div>
-
-                                                <div className="pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0">
-                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
-                                                        <span className="flex items-center gap-2"><Video className="w-4 h-4 text-indigo-500" /> Recording Quality</span>
-                                                    </div>
-                                                    <div className="space-y-3">
-                                                        <div className="flex items-center justify-between">
-                                                            <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Resolution & FPS</span>
-                                                            <select
-                                                                value={recordingQuality}
-                                                                onChange={(e) => setRecordingQuality(e.target.value as any)}
-                                                                className="text-xs font-medium bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-2 py-1 outline-none focus:border-indigo-500 dark:text-gray-200"
-                                                            >
-                                                                <option value="standard">Standard (720p / 30fps)</option>
-                                                                <option value="high">High (1080p / 60fps)</option>
-                                                                <option value="ultra">Ultra (1440p / 60fps)</option>
-                                                                <option value="4k">4K (2160p / 60fps)</option>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div className="pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0">
-                                                    <button 
-                                                        onClick={() => setShowAudioSettings(!showAudioSettings)} 
-                                                        className="w-full text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center focus:outline-none"
-                                                    >
-                                                        <span className="flex items-center gap-2"><Sliders className="w-4 h-4 text-pink-500" /> Advanced Audio</span>
-                                                        <span className={`text-gray-400 transform transition-transform ${showAudioSettings ? '-rotate-90' : 'rotate-180'}`}><ChevronLeft className="w-4 h-4" /></span>
+                                                    </h3>
+                                                    <button onClick={() => setIsSettingsOpen(false)} className="p-1 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
+                                                        <X className="w-5 h-5" />
                                                     </button>
-                                                    {showAudioSettings && (
-                                                    <div className="space-y-4 px-2 mt-3">
-                                                        {/* Auto Volume Leveler */}
-                                                        <div className="flex items-center justify-between">
-                                                            <div className="flex flex-col">
-                                                                <span className="text-xs font-bold text-gray-700 dark:text-gray-300">Auto Volume Leveler</span>
-                                                                <span className="text-[10px] text-gray-500 dark:text-gray-400">Balances loud and soft sounds</span>
-                                                            </div>
-                                                            <button onClick={() => setUseCompressor(!useCompressor)} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${useCompressor ? 'bg-pink-500' : 'bg-gray-200 dark:bg-gray-700'}`}>
-                                                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-md transition-transform duration-300 ${useCompressor ? 'translate-x-5' : 'translate-x-1'}`} />
-                                                            </button>
-                                                        </div>
-
-                                                        {/* Low-Cut Filter */}
-                                                        <div className="flex flex-col gap-1">
-                                                            <div className="flex justify-between items-center">
-                                                                <div className="flex flex-col">
-                                                                    <span className="text-xs font-bold text-gray-700 dark:text-gray-300">Low-Cut Filter (AC/Fan)</span>
-                                                                    <span className="text-[10px] text-gray-500 dark:text-gray-400">Removes low rumble noise</span>
-                                                                </div>
-                                                                <span className="text-xs font-bold text-pink-500">{lowCutFreq} Hz</span>
-                                                            </div>
-                                                            <input
-                                                                type="range" min="0" max="300" step="10"
-                                                                value={lowCutFreq} onChange={(e) => setLowCutFreq(Number(e.target.value))}
-                                                                className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-pink-500"
-                                                            />
-                                                        </div>
-
-                                                        {/* Treble Boost */}
-                                                        <div className="flex flex-col gap-1">
-                                                            <div className="flex justify-between items-center">
-                                                                <div className="flex flex-col">
-                                                                    <span className="text-xs font-bold text-gray-700 dark:text-gray-300">Treble Boost (Crispness)</span>
-                                                                    <span className="text-[10px] text-gray-500 dark:text-gray-400">Adds presence to voice</span>
-                                                                </div>
-                                                                <span className="text-xs font-bold text-pink-500">{trebleBoost} dB</span>
-                                                            </div>
-                                                            <input
-                                                                type="range" min="0" max="15" step="1"
-                                                                value={trebleBoost} onChange={(e) => setTrebleBoost(Number(e.target.value))}
-                                                                className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-pink-500"
-                                                            />
-                                                        </div>
-
-                                                        {/* Noise Gate */}
-                                                        <div className="flex flex-col gap-1">
-                                                            <div className="flex justify-between items-center">
-                                                                <div className="flex flex-col">
-                                                                    <span className="text-xs font-bold text-gray-700 dark:text-gray-300">Noise Gate Threshold</span>
-                                                                    <span className="text-[10px] text-gray-500 dark:text-gray-400">Mutes mic when silent</span>
-                                                                </div>
-                                                                <span className="text-xs font-bold text-pink-500">{Math.round(noiseGateThreshold * 100)}%</span>
-                                                            </div>
-                                                            <input
-                                                                type="range" min="0" max="0.1" step="0.005"
-                                                                value={noiseGateThreshold} onChange={(e) => setNoiseGateThreshold(Number(e.target.value))}
-                                                                className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-pink-500"
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    )}
                                                 </div>
 
-                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
-                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
-                                                        <span className="flex items-center gap-2"><ImageDown className="w-4 h-4 text-indigo-500" /> Export Settings</span>
+                                                <div className="overflow-y-auto overscroll-contain custom-scrollbar pr-2 pb-2 flex-1 min-h-0 space-y-3">
+                                                    <div className="pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0">
+                                                        <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
+                                                            <span className="flex items-center gap-2"><MonitorPlay className="w-4 h-4 text-indigo-500" /> Presentation Mode</span>
+
+                                                        </div>
+                                                        <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl">
+                                                            <button
+                                                                onClick={() => setMode('test')}
+                                                                className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-colors ${mode === 'test' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
+                                                            >
+                                                                Test Mode
+                                                            </button>
+                                                            <button
+                                                                onClick={() => setMode('read')}
+                                                                className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-colors ${mode === 'read' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
+                                                            >
+                                                                Read Mode
+                                                            </button>
+                                                        </div>
                                                     </div>
-                                                    <div className="space-y-3">
-                                                        <div className="flex items-center justify-between">
-                                                            <div className="flex flex-col">
-                                                                <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Download All Slides</span>
-                                                                <span className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">Save every slide at once</span>
+
+                                                    <div className="pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0">
+                                                        <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
+                                                            <span className="flex items-center gap-2"><Sparkles className="w-4 h-4 text-indigo-500" /> Celebration Settings</span>
+                                                        </div>
+                                                        <div className="space-y-3">
+                                                            <div className="flex items-center justify-between">
+                                                                <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Enable Celebration</span>
+                                                                <button onClick={() => setIsCelebrationEnabled(!isCelebrationEnabled)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${isCelebrationEnabled ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-gray-700'}`}>
+                                                                    <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ${isCelebrationEnabled ? 'translate-x-5' : 'translate-x-1'}`} />
+                                                                </button>
                                                             </div>
-                                                            <button onClick={() => setDownloadAllSlides(!downloadAllSlides)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${downloadAllSlides ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-gray-700'}`}>
-                                                                <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ${downloadAllSlides ? 'translate-x-5' : 'translate-x-1'}`} />
-                                                            </button>
+                                                            {isCelebrationEnabled && (
+                                                                <>
+                                                                    <div className="flex items-center justify-between mt-2 pl-4 md:pl-6">
+                                                                        <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Celebration Sound</span>
+                                                                        <button onClick={() => setIsCelebrationSoundEnabled(!isCelebrationSoundEnabled)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${isCelebrationSoundEnabled ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-gray-700'}`}>
+                                                                            <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ${isCelebrationSoundEnabled ? 'translate-x-5' : 'translate-x-1'}`} />
+                                                                        </button>
+                                                                    </div>
+                                                                    <div className="flex items-center justify-between mt-2 pl-4 md:pl-6">
+                                                                        <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Duration</span>
+                                                                        <select
+                                                                            value={celebrationDuration}
+                                                                            onChange={(e) => setCelebrationDuration(Number(e.target.value))}
+                                                                            className="text-xs font-medium bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-2 py-1 outline-none focus:border-indigo-500 dark:text-gray-200"
+                                                                        >
+                                                                            <option value={1}>1 Sec.</option>
+                                                                            <option value={2}>2 Sec.</option>
+                                                                            <option value={3}>3 Sec.</option>
+                                                                            <option value={4}>4 Sec.</option>
+                                                                            <option value={5}>5 Sec.</option>
+                                                                            <option value={6}>6 Sec.</option>
+                                                                            <option value={7}>7 Sec.</option>
+                                                                            <option value={8}>8 Sec.</option>
+                                                                            <option value={9}>9 Sec.</option>
+                                                                            <option value={10}>10 Sec.</option>
+                                                                            <option value={15}>15 Sec.</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </>
+                                                            )}
                                                         </div>
-                                                        <div className="flex items-center justify-between">
-                                                            <div className="flex flex-col">
-                                                                <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Save with Correct Option</span>
-                                                                <span className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">Show answer in the image</span>
+                                                    </div>
+
+                                                    <div className="pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0">
+                                                        <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
+                                                            <span className="flex items-center gap-2"><Video className="w-4 h-4 text-indigo-500" /> Recording Quality</span>
+                                                        </div>
+                                                        <div className="space-y-3">
+                                                            <div className="flex items-center justify-between">
+                                                                <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Resolution & FPS</span>
+                                                                <select
+                                                                    value={recordingQuality}
+                                                                    onChange={(e) => setRecordingQuality(e.target.value as any)}
+                                                                    className="text-xs font-medium bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-2 py-1 outline-none focus:border-indigo-500 dark:text-gray-200"
+                                                                >
+                                                                    <option value="standard">Standard (720p / 30fps)</option>
+                                                                    <option value="high">High (1080p / 60fps)</option>
+                                                                    <option value="ultra">Ultra (1440p / 60fps)</option>
+                                                                    <option value="4k">4K (2160p / 60fps)</option>
+                                                                </select>
                                                             </div>
-                                                            <button onClick={() => setSaveWithCorrectOption(!saveWithCorrectOption)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${saveWithCorrectOption ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-gray-700'}`}>
-                                                                <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ${saveWithCorrectOption ? 'translate-x-5' : 'translate-x-1'}`} />
-                                                            </button>
                                                         </div>
                                                     </div>
-                                                </div>
 
-
-
-                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
-                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
-                                                        <span className="flex items-center gap-2"><Printer className="w-4 h-4 text-indigo-500" /> Print Settings</span>
-                                                    </div>
-                                                    <div className="space-y-3">
-                                                        <div className="flex items-center justify-between">
-                                                            <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Include Correct Answers</span>
-                                                            <button onClick={() => setIsPrintWithAnswers(!isPrintWithAnswers)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${isPrintWithAnswers ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-gray-700'}`}>
-                                                                <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ${isPrintWithAnswers ? 'translate-x-5' : 'translate-x-1'}`} />
-                                                            </button>
-                                                        </div>
-                                                        <div className="flex items-center justify-between">
-                                                            <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Print as Continuous List</span>
-                                                            <button onClick={() => setIsPrintAsList(!isPrintAsList)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${isPrintAsList ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-gray-700'}`}>
-                                                                <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ${isPrintAsList ? 'translate-x-5' : 'translate-x-1'}`} />
-                                                            </button>
-                                                        </div>
-                                                        <div className="flex items-center justify-between">
-                                                            <div className="flex flex-col">
-                                                                <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Print Both Versions</span>
-                                                                <span className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">Test copy + Answer key</span>
-                                                            </div>
-                                                            <button onClick={() => setIsPrintBothVersions(!isPrintBothVersions)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${isPrintBothVersions ? 'bg-indigo-600' : 'bg-gray-200 dark:bg-gray-700'}`}>
-                                                                <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ${isPrintBothVersions ? 'translate-x-5' : 'translate-x-1'}`} />
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-
-
-                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
-                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
-                                                        <span className="flex items-center gap-2"><LayoutGrid className="w-4 h-4 text-indigo-500" /> Options Layout</span>
-                                                    </div>
-                                                    <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl">
+                                                    <div className="pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0">
                                                         <button
-                                                            onClick={() => setOptionsLayout('grid')}
-                                                            className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-colors ${optionsLayout === 'grid' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
+                                                            onClick={() => setShowAudioSettings(!showAudioSettings)}
+                                                            className="w-full text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center focus:outline-none"
                                                         >
-                                                            Grid
+                                                            <span className="flex items-center gap-2"><Sliders className="w-4 h-4 text-pink-500" /> Advanced Audio</span>
+                                                            <span className={`text-gray-400 transform transition-transform ${showAudioSettings ? '-rotate-90' : 'rotate-180'}`}><ChevronLeft className="w-4 h-4" /></span>
                                                         </button>
-                                                        <button
-                                                            onClick={() => setOptionsLayout('list')}
-                                                            className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-colors ${optionsLayout === 'list' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
-                                                        >
-                                                            List
-                                                        </button>
-                                                    </div>
-                                                </div>
-
-
-
-                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
-                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
-                                                        <span className="flex items-center gap-2"><LayoutGrid className="w-4 h-4 text-indigo-500" /> Header Settings</span>
-                                                    </div>
-                                                    <div className="space-y-3">
-                                                        <div className="flex items-center justify-between">
-                                                            <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Show Header</span>
-                                                            <button onClick={() => setShowHeader(!showHeader)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${showHeader ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-gray-700'}`}>
-                                                                <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ${showHeader ? 'translate-x-5' : 'translate-x-1'}`} />
-                                                            </button>
-                                                        </div>
-                                                        {showHeader && (
-                                                            <>
+                                                        {showAudioSettings && (
+                                                            <div className="space-y-4 px-2 mt-3">
+                                                                {/* Auto Volume Leveler */}
                                                                 <div className="flex items-center justify-between">
-                                                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Show Logo</span>
-                                                                    <button onClick={() => setShowLogo(!showLogo)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${showLogo ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-gray-700'}`}>
-                                                                        <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ${showLogo ? 'translate-x-5' : 'translate-x-1'}`} />
+                                                                    <div className="flex flex-col">
+                                                                        <span className="text-xs font-bold text-gray-700 dark:text-gray-300">Auto Volume Leveler</span>
+                                                                        <span className="text-[10px] text-gray-500 dark:text-gray-400">Balances loud and soft sounds</span>
+                                                                    </div>
+                                                                    <button onClick={() => setUseCompressor(!useCompressor)} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${useCompressor ? 'bg-pink-500' : 'bg-gray-200 dark:bg-gray-700'}`}>
+                                                                        <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-md transition-transform duration-300 ${useCompressor ? 'translate-x-5' : 'translate-x-1'}`} />
                                                                     </button>
                                                                 </div>
-                                                                <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
-                                                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400 min-w-[50px]">Scale</span>
-                                                                    <input
-                                                                        type="range" min="0.5" max="1.5" step="0.1"
-                                                                        value={headerScale} onChange={(e) => setHeaderScale(Number(e.target.value))}
-                                                                        className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
-                                                                    />
-                                                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-8 text-right">{(headerScale * 100).toFixed(0)}%</span>
-                                                                </div>
-                                                                <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
-                                                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400 min-w-[50px]">Text Size</span>
-                                                                    <input
-                                                                        type="range" min="0.5" max="2.5" step="0.1"
-                                                                        value={headerTitleScale} onChange={(e) => setHeaderTitleScale(Number(e.target.value))}
-                                                                        className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
-                                                                    />
-                                                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-8 text-right">{(headerTitleScale * 100).toFixed(0)}%</span>
-                                                                </div>
-                                                                <div className="flex flex-col gap-1.5 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
-                                                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Text Alignment</span>
-                                                                    <div className="flex items-center justify-between gap-2">
-                                                                        <button onClick={() => setHeaderTitleAlign('left')} className={`flex-1 py-1 rounded text-xs font-bold transition-colors ${headerTitleAlign === 'left' ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}`}>Left</button>
-                                                                        <button onClick={() => setHeaderTitleAlign('center')} className={`flex-1 py-1 rounded text-xs font-bold transition-colors ${headerTitleAlign === 'center' ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}`}>Center</button>
-                                                                        <button onClick={() => setHeaderTitleAlign('right')} className={`flex-1 py-1 rounded text-xs font-bold transition-colors ${headerTitleAlign === 'right' ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}`}>Right</button>
+
+                                                                {/* Low-Cut Filter */}
+                                                                <div className="flex flex-col gap-1">
+                                                                    <div className="flex justify-between items-center">
+                                                                        <div className="flex flex-col">
+                                                                            <span className="text-xs font-bold text-gray-700 dark:text-gray-300">Low-Cut Filter (AC/Fan)</span>
+                                                                            <span className="text-[10px] text-gray-500 dark:text-gray-400">Removes low rumble noise</span>
+                                                                        </div>
+                                                                        <span className="text-xs font-bold text-pink-500">{lowCutFreq} Hz</span>
                                                                     </div>
+                                                                    <input
+                                                                        type="range" min="0" max="300" step="10"
+                                                                        value={lowCutFreq} onChange={(e) => setLowCutFreq(Number(e.target.value))}
+                                                                        className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-pink-500"
+                                                                    />
                                                                 </div>
-                                                            </>
+
+                                                                {/* Treble Boost */}
+                                                                <div className="flex flex-col gap-1">
+                                                                    <div className="flex justify-between items-center">
+                                                                        <div className="flex flex-col">
+                                                                            <span className="text-xs font-bold text-gray-700 dark:text-gray-300">Treble Boost (Crispness)</span>
+                                                                            <span className="text-[10px] text-gray-500 dark:text-gray-400">Adds presence to voice</span>
+                                                                        </div>
+                                                                        <span className="text-xs font-bold text-pink-500">{trebleBoost} dB</span>
+                                                                    </div>
+                                                                    <input
+                                                                        type="range" min="0" max="15" step="1"
+                                                                        value={trebleBoost} onChange={(e) => setTrebleBoost(Number(e.target.value))}
+                                                                        className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-pink-500"
+                                                                    />
+                                                                </div>
+
+                                                                {/* Noise Gate */}
+                                                                <div className="flex flex-col gap-1">
+                                                                    <div className="flex justify-between items-center">
+                                                                        <div className="flex flex-col">
+                                                                            <span className="text-xs font-bold text-gray-700 dark:text-gray-300">Noise Gate Threshold</span>
+                                                                            <span className="text-[10px] text-gray-500 dark:text-gray-400">Mutes mic when silent</span>
+                                                                        </div>
+                                                                        <span className="text-xs font-bold text-pink-500">{Math.round(noiseGateThreshold * 100)}%</span>
+                                                                    </div>
+                                                                    <input
+                                                                        type="range" min="0" max="0.1" step="0.005"
+                                                                        value={noiseGateThreshold} onChange={(e) => setNoiseGateThreshold(Number(e.target.value))}
+                                                                        className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-pink-500"
+                                                                    />
+                                                                </div>
+                                                            </div>
                                                         )}
                                                     </div>
-                                                </div>
 
-
-
-                                                {/* Transition Type */}
-                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
-                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
-                                                        <span className="flex items-center gap-2"><Play className="w-4 h-4 text-indigo-500" /> {L.transition}</span>
-                                                    </div>
-                                                    <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl flex-wrap gap-1">
-                                                        {(['slide', 'zoom', 'flip', 'fade', 'bounce'] as const).map(t => (
-                                                            <button key={t} onClick={() => setTransitionType(t)} className={`flex-1 py-1 px-1 text-[10px] font-bold rounded-lg capitalize transition-colors ${transitionType === t ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>{t}</button>
-                                                        ))}
-                                                    </div>
-                                                </div>
-
-
-                                                {/* Countdown Timer Settings */}
-                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
-                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
-                                                        <span className="flex items-center gap-2"><Clock className="w-4 h-4 text-indigo-500" /> {L.countdown}</span>
-                                                    </div>
-                                                    <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl mb-2">
-                                                        <button onClick={() => setTimerMode('stopwatch')} className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors ${timerMode === 'stopwatch' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400'}`}>Stopwatch</button>
-                                                        <button onClick={() => setTimerMode('countdown')} className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors ${timerMode === 'countdown' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400'}`}>Countdown</button>
-                                                    </div>
-                                                    {timerMode === 'countdown' && (
-                                                        <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
-                                                            <span className="text-xs font-bold text-gray-500 dark:text-gray-400 min-w-[40px]">Secs</span>
-                                                            <input type="range" min="10" max="300" step="5" value={countdownTotal} onChange={e => setCountdownTotal(Number(e.target.value))} className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500" />
-                                                            <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-10 text-right">{countdownTotal}s</span>
+                                                    <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                        <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
+                                                            <span className="flex items-center gap-2"><ImageDown className="w-4 h-4 text-indigo-500" /> Export Settings</span>
                                                         </div>
-                                                    )}
-                                                </div>
-
-
-
-                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
-                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
-                                                        <span className="flex items-center gap-2"><Play className="w-4 h-4 text-indigo-500" /> Animation Speed</span>
-                                                    </div>
-                                                    <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
-                                                        <input
-                                                            type="range"
-                                                            min="0.1"
-                                                            max="2.0"
-                                                            step="0.1"
-                                                            value={animSpeed}
-                                                            onChange={(e) => setAnimSpeed(Number(e.target.value))}
-                                                            className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
-                                                        />
-                                                        <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-8 text-right">{animSpeed.toFixed(1)}s</span>
-                                                    </div>
-                                                </div>
-
-
-
-                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
-                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
-                                                        <span className="flex items-center gap-2"><LayoutGrid className="w-4 h-4 text-indigo-500" /> Background Theme</span>
-                                                    </div>
-                                                    <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl flex-wrap gap-1">
-                                                        <button onClick={() => setBgTheme('default')} className={`flex-1 min-w-[22%] py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'default' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Default</button>
-                                                        <button onClick={() => setBgTheme('mesh')} className={`flex-1 min-w-[22%] py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'mesh' ? 'bg-white dark:bg-gray-700 text-purple-600 dark:text-purple-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Mesh</button>
-                                                        <button onClick={() => setBgTheme('grid')} className={`flex-1 min-w-[22%] py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'grid' ? 'bg-white dark:bg-gray-700 text-emerald-600 dark:text-emerald-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Grid</button>
-                                                        <button onClick={() => setBgTheme('dots')} className={`flex-1 min-w-[22%] py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'dots' ? 'bg-white dark:bg-gray-700 text-orange-600 dark:text-orange-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Dots</button>
-                                                        <button onClick={() => setBgTheme('video')} className={`flex-1 min-w-[22%] py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'video' ? 'bg-white dark:bg-gray-700 text-rose-600 dark:text-rose-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Video</button>
-                                                        <button onClick={() => setBgTheme('midnight')} className={`flex-1 min-w-[22%] py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'midnight' ? 'bg-white dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Midnight</button>
-                                                        <button onClick={() => setBgTheme('aurora')} className={`flex-1 min-w-[22%] py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'aurora' ? 'bg-white dark:bg-gray-700 text-teal-600 dark:text-teal-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Aurora</button>
-                                                        <button onClick={() => setBgTheme('sunset')} className={`flex-1 min-w-[22%] py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'sunset' ? 'bg-white dark:bg-gray-700 text-pink-600 dark:text-pink-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Sunset</button>
-                                                    </div>
-                                                    {bgTheme === 'video' && (
-                                                        <div className="mt-2 space-y-2">
-                                                            <select
-                                                                value={selectedVideo}
-                                                                onChange={(e) => setSelectedVideo(e.target.value)}
-                                                                className="w-full text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 focus:outline-none focus:border-blue-500 text-gray-700 dark:text-gray-200 font-semibold"
-                                                            >
-                                                                {VIDEO_OPTIONS.map(opt => (
-                                                                    <option key={opt.id} value={opt.url}>{opt.name}</option>
-                                                                ))}
-                                                            </select>
-                                                            <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
-                                                                <Sun className="w-4 h-4 text-gray-400 shrink-0" />
-                                                                <input
-                                                                    type="range"
-                                                                    min="5"
-                                                                    max="100"
-                                                                    value={videoOpacity}
-                                                                    onChange={(e) => setVideoOpacity(Number(e.target.value))}
-                                                                    className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
-                                                                />
-                                                                <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-8 text-right">{videoOpacity}%</span>
+                                                        <div className="space-y-3">
+                                                            <div className="flex items-center justify-between">
+                                                                <div className="flex flex-col">
+                                                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Download All Slides</span>
+                                                                    <span className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">Save every slide at once</span>
+                                                                </div>
+                                                                <button onClick={() => setDownloadAllSlides(!downloadAllSlides)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${downloadAllSlides ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-gray-700'}`}>
+                                                                    <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ${downloadAllSlides ? 'translate-x-5' : 'translate-x-1'}`} />
+                                                                </button>
+                                                            </div>
+                                                            <div className="flex items-center justify-between">
+                                                                <div className="flex flex-col">
+                                                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Save with Correct Option</span>
+                                                                    <span className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">Show answer in the image</span>
+                                                                </div>
+                                                                <button onClick={() => setSaveWithCorrectOption(!saveWithCorrectOption)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${saveWithCorrectOption ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-gray-700'}`}>
+                                                                    <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ${saveWithCorrectOption ? 'translate-x-5' : 'translate-x-1'}`} />
+                                                                </button>
                                                             </div>
                                                         </div>
-                                                    )}
-                                                    {bgTheme !== 'video' && (
-                                                        <div className="mt-2 flex items-center gap-3 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
-                                                            <Sun className="w-4 h-4 text-gray-400 shrink-0" />
+                                                    </div>
+
+
+
+                                                    <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                        <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
+                                                            <span className="flex items-center gap-2"><Printer className="w-4 h-4 text-indigo-500" /> Print Settings</span>
+                                                        </div>
+                                                        <div className="space-y-3">
+                                                            <div className="flex items-center justify-between">
+                                                                <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Include Correct Answers</span>
+                                                                <button onClick={() => setIsPrintWithAnswers(!isPrintWithAnswers)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${isPrintWithAnswers ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-gray-700'}`}>
+                                                                    <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ${isPrintWithAnswers ? 'translate-x-5' : 'translate-x-1'}`} />
+                                                                </button>
+                                                            </div>
+                                                            <div className="flex items-center justify-between">
+                                                                <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Print as Continuous List</span>
+                                                                <button onClick={() => setIsPrintAsList(!isPrintAsList)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${isPrintAsList ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-gray-700'}`}>
+                                                                    <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ${isPrintAsList ? 'translate-x-5' : 'translate-x-1'}`} />
+                                                                </button>
+                                                            </div>
+                                                            <div className="flex items-center justify-between">
+                                                                <div className="flex flex-col">
+                                                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Print Both Versions</span>
+                                                                    <span className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">Test copy + Answer key</span>
+                                                                </div>
+                                                                <button onClick={() => setIsPrintBothVersions(!isPrintBothVersions)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${isPrintBothVersions ? 'bg-indigo-600' : 'bg-gray-200 dark:bg-gray-700'}`}>
+                                                                    <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ${isPrintBothVersions ? 'translate-x-5' : 'translate-x-1'}`} />
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+
+
+                                                    <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                        <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
+                                                            <span className="flex items-center gap-2"><LayoutGrid className="w-4 h-4 text-indigo-500" /> Options Layout</span>
+                                                        </div>
+                                                        <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl">
+                                                            <button
+                                                                onClick={() => setOptionsLayout('grid')}
+                                                                className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-colors ${optionsLayout === 'grid' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
+                                                            >
+                                                                Grid
+                                                            </button>
+                                                            <button
+                                                                onClick={() => setOptionsLayout('list')}
+                                                                className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-colors ${optionsLayout === 'list' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
+                                                            >
+                                                                List
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+
+
+                                                    <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                        <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
+                                                            <span className="flex items-center gap-2"><LayoutGrid className="w-4 h-4 text-indigo-500" /> Header Settings</span>
+                                                        </div>
+                                                        <div className="space-y-3">
+                                                            <div className="flex items-center justify-between">
+                                                                <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Show Header</span>
+                                                                <button onClick={() => setShowHeader(!showHeader)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${showHeader ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-gray-700'}`}>
+                                                                    <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ${showHeader ? 'translate-x-5' : 'translate-x-1'}`} />
+                                                                </button>
+                                                            </div>
+                                                            {showHeader && (
+                                                                <>
+                                                                    <div className="flex items-center justify-between">
+                                                                        <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Show Logo</span>
+                                                                        <button onClick={() => setShowLogo(!showLogo)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${showLogo ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-gray-700'}`}>
+                                                                            <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ${showLogo ? 'translate-x-5' : 'translate-x-1'}`} />
+                                                                        </button>
+                                                                    </div>
+                                                                    <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                                        <span className="text-xs font-bold text-gray-500 dark:text-gray-400 min-w-[50px]">Scale</span>
+                                                                        <input
+                                                                            type="range" min="0.5" max="1.5" step="0.1"
+                                                                            value={headerScale} onChange={(e) => setHeaderScale(Number(e.target.value))}
+                                                                            className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                                                        />
+                                                                        <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-8 text-right">{(headerScale * 100).toFixed(0)}%</span>
+                                                                    </div>
+                                                                    <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                                        <span className="text-xs font-bold text-gray-500 dark:text-gray-400 min-w-[50px]">Text Size</span>
+                                                                        <input
+                                                                            type="range" min="0.5" max="2.5" step="0.1"
+                                                                            value={headerTitleScale} onChange={(e) => setHeaderTitleScale(Number(e.target.value))}
+                                                                            className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                                                        />
+                                                                        <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-8 text-right">{(headerTitleScale * 100).toFixed(0)}%</span>
+                                                                    </div>
+                                                                    <div className="flex flex-col gap-1.5 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                                        <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Text Alignment</span>
+                                                                        <div className="flex items-center justify-between gap-2">
+                                                                            <button onClick={() => setHeaderTitleAlign('left')} className={`flex-1 py-1 rounded text-xs font-bold transition-colors ${headerTitleAlign === 'left' ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}`}>Left</button>
+                                                                            <button onClick={() => setHeaderTitleAlign('center')} className={`flex-1 py-1 rounded text-xs font-bold transition-colors ${headerTitleAlign === 'center' ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}`}>Center</button>
+                                                                            <button onClick={() => setHeaderTitleAlign('right')} className={`flex-1 py-1 rounded text-xs font-bold transition-colors ${headerTitleAlign === 'right' ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}`}>Right</button>
+                                                                        </div>
+                                                                    </div>
+                                                                </>
+                                                            )}
+                                                        </div>
+                                                    </div>
+
+
+
+                                                    {/* Transition Type */}
+                                                    <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                        <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                                                            <span className="flex items-center gap-2"><Play className="w-4 h-4 text-indigo-500" /> {L.transition}</span>
+                                                        </div>
+                                                        <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl flex-wrap gap-1">
+                                                            {(['slide', 'zoom', 'flip', 'fade', 'bounce'] as const).map(t => (
+                                                                <button key={t} onClick={() => setTransitionType(t)} className={`flex-1 py-1 px-1 text-[10px] font-bold rounded-lg capitalize transition-colors ${transitionType === t ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>{t}</button>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+
+
+                                                    {/* Countdown Timer Settings */}
+                                                    <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                        <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                                                            <span className="flex items-center gap-2"><Clock className="w-4 h-4 text-indigo-500" /> {L.countdown}</span>
+                                                        </div>
+                                                        <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl mb-2">
+                                                            <button onClick={() => setTimerMode('stopwatch')} className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors ${timerMode === 'stopwatch' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400'}`}>Stopwatch</button>
+                                                            <button onClick={() => setTimerMode('countdown')} className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors ${timerMode === 'countdown' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400'}`}>Countdown</button>
+                                                        </div>
+                                                        {timerMode === 'countdown' && (
+                                                            <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                                <span className="text-xs font-bold text-gray-500 dark:text-gray-400 min-w-[40px]">Secs</span>
+                                                                <input type="range" min="10" max="300" step="5" value={countdownTotal} onChange={e => setCountdownTotal(Number(e.target.value))} className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500" />
+                                                                <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-10 text-right">{countdownTotal}s</span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+
+
+
+                                                    <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                        <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
+                                                            <span className="flex items-center gap-2"><Play className="w-4 h-4 text-indigo-500" /> Animation Speed</span>
+                                                        </div>
+                                                        <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
                                                             <input
                                                                 type="range"
-                                                                min="0"
-                                                                max="100"
-                                                                value={bgOpacity}
-                                                                onChange={(e) => setBgOpacity(Number(e.target.value))}
+                                                                min="0.1"
+                                                                max="2.0"
+                                                                step="0.1"
+                                                                value={animSpeed}
+                                                                onChange={(e) => setAnimSpeed(Number(e.target.value))}
                                                                 className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
                                                             />
-                                                            <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-8 text-right">{bgOpacity}%</span>
-                                                        </div>
-                                                    )}
-                                                </div>
-
-
-
-                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
-                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
-                                                        <span className="flex items-center gap-2"><Highlighter className="w-4 h-4 text-indigo-500" /> Question Styling</span>
-                                                    </div>
-                                                    <div className="space-y-3">
-                                                        {/* Background Color */}
-                                                        <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
-                                                            <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400 min-w-[50px] uppercase">Bg Color:</span>
-                                                            <div className="flex gap-1.5 flex-1 justify-end">
-                                                                <button onClick={() => setQBgColor('transparent')} className={`w-5 h-5 rounded-full border-2 ${qBgColor === 'transparent' ? 'border-blue-500' : 'border-transparent'} relative`} title="Transparent">
-                                                                    <div className="absolute inset-0 rounded-full bg-transparent overflow-hidden border border-gray-300">
-                                                                        <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200" style={{ backgroundImage: 'repeating-linear-gradient(45deg, #e5e7eb 25%, transparent 25%, transparent 75%, #e5e7eb 75%, #e5e7eb), repeating-linear-gradient(45deg, #e5e7eb 25%, transparent 25%, transparent 75%, #e5e7eb 75%, #e5e7eb)', backgroundPosition: '0 0, 3px 3px', backgroundSize: '6px 6px' }}></div>
-                                                                    </div>
-                                                                </button>
-                                                                <button onClick={() => setQBgColor('bg-white/90 dark:bg-gray-800/90')} className={`w-5 h-5 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 shadow-sm ring-2 ${qBgColor === 'bg-white/90 dark:bg-gray-800/90' ? 'ring-blue-500' : 'ring-transparent'}`} title="White/Dark"></button>
-                                                                <button onClick={() => setQBgColor('bg-blue-50/90 dark:bg-blue-900/50')} className={`w-5 h-5 rounded-full border border-blue-200 dark:border-blue-700 bg-blue-100 dark:bg-blue-900 shadow-sm ring-2 ${qBgColor === 'bg-blue-50/90 dark:bg-blue-900/50' ? 'ring-blue-500' : 'ring-transparent'}`} title="Blue"></button>
-                                                                <button onClick={() => setQBgColor('bg-indigo-50/90 dark:bg-indigo-900/50')} className={`w-5 h-5 rounded-full border border-indigo-200 dark:border-indigo-700 bg-indigo-100 dark:bg-indigo-900 shadow-sm ring-2 ${qBgColor === 'bg-indigo-50/90 dark:bg-indigo-900/50' ? 'ring-blue-500' : 'ring-transparent'}`} title="Indigo"></button>
-                                                                <button onClick={() => setQBgColor('bg-black/50 dark:bg-black/80')} className={`w-5 h-5 rounded-full border border-gray-700 dark:border-gray-600 bg-gray-900 shadow-sm ring-2 ${qBgColor === 'bg-black/50 dark:bg-black/80' ? 'ring-blue-500' : 'ring-transparent'}`} title="Black/Dark"></button>
-                                                                <input
-                                                                    type="color"
-                                                                    value={qBgColor.startsWith('#') ? qBgColor : '#ffffff'}
-                                                                    onChange={e => setQBgColor(e.target.value)}
-                                                                    className="w-5 h-5 ml-1 cursor-pointer border-0 rounded overflow-hidden bg-transparent"
-                                                                    title="Custom Color"
-                                                                />
-                                                            </div>
-                                                        </div>
-
-                                                        {/* Text Color */}
-                                                        <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
-                                                            <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400 min-w-[50px] uppercase">Text Color:</span>
-                                                            <div className="flex gap-1.5 flex-1 justify-end">
-                                                                <button onClick={() => setQTextColor('default')} className={`w-5 h-5 rounded-full border border-gray-300 dark:border-gray-600 shadow-sm text-[9px] font-bold flex items-center justify-center bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300 ring-2 ${qTextColor === 'default' ? 'ring-blue-500' : 'ring-transparent'}`} title="Auto">A</button>
-                                                                <button onClick={() => setQTextColor('#000000')} className={`w-5 h-5 rounded-full border border-gray-800 shadow-sm bg-black ring-2 ${qTextColor === '#000000' ? 'ring-blue-500' : 'ring-transparent'}`} title="Black"></button>
-                                                                <button onClick={() => setQTextColor('#ffffff')} className={`w-5 h-5 rounded-full border border-gray-300 shadow-sm bg-white ring-2 ${qTextColor === '#ffffff' ? 'ring-blue-500' : 'ring-transparent'}`} title="White"></button>
-                                                                <button onClick={() => setQTextColor('#ef4444')} className={`w-5 h-5 rounded-full border border-red-500 shadow-sm bg-red-500 ring-2 ${qTextColor === '#ef4444' ? 'ring-blue-500' : 'ring-transparent'}`} title="Red"></button>
-                                                                <button onClick={() => setQTextColor('#3b82f6')} className={`w-5 h-5 rounded-full border border-blue-500 shadow-sm bg-blue-500 ring-2 ${qTextColor === '#3b82f6' ? 'ring-blue-500' : 'ring-transparent'}`} title="Blue"></button>
-                                                                <button onClick={() => setQTextColor('#f59e0b')} className={`w-5 h-5 rounded-full border border-amber-500 shadow-sm bg-amber-500 ring-2 ${qTextColor === '#f59e0b' ? 'ring-blue-500' : 'ring-transparent'}`} title="Yellow"></button>
-                                                                <input
-                                                                    type="color"
-                                                                    value={qTextColor.startsWith('#') ? qTextColor : '#000000'}
-                                                                    onChange={e => setQTextColor(e.target.value)}
-                                                                />
-                                                            </div>
+                                                            <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-8 text-right">{animSpeed.toFixed(1)}s</span>
                                                         </div>
                                                     </div>
-                                                </div>
 
-                                                {/* Options Styling */}
-                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
-                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
-                                                        <span className="flex items-center gap-2"><List className="w-4 h-4 text-indigo-500" /> Options Styling</span>
-                                                    </div>
-                                                    <div className="space-y-3">
-                                                        {/* Background Color */}
-                                                        <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
-                                                            <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400 min-w-[50px] uppercase">Bg Color:</span>
-                                                            <div className="flex gap-1.5 flex-1 justify-end items-center">
-                                                                <button onClick={() => setOptBgColor('default')} className={`w-5 h-5 rounded-full border border-gray-300 dark:border-gray-600 shadow-sm text-[9px] font-bold flex items-center justify-center bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300 ring-2 ${optBgColor === 'default' ? 'ring-blue-500' : 'ring-transparent'}`} title="Auto">A</button>
-                                                                <button onClick={() => setOptBgColor('bg-white dark:bg-gray-800')} className={`w-5 h-5 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 shadow-sm ring-2 ${optBgColor === 'bg-white dark:bg-gray-800' ? 'ring-blue-500' : 'ring-transparent'}`} title="White/Dark"></button>
-                                                                <button onClick={() => setOptBgColor('bg-blue-50/90 dark:bg-blue-900/50')} className={`w-5 h-5 rounded-full border border-blue-200 dark:border-blue-700 bg-blue-100 dark:bg-blue-900 shadow-sm ring-2 ${optBgColor === 'bg-blue-50/90 dark:bg-blue-900/50' ? 'ring-blue-500' : 'ring-transparent'}`} title="Blue"></button>
-                                                                <button onClick={() => setOptBgColor('bg-indigo-50/90 dark:bg-indigo-900/50')} className={`w-5 h-5 rounded-full border border-indigo-200 dark:border-indigo-700 bg-indigo-100 dark:bg-indigo-900 shadow-sm ring-2 ${optBgColor === 'bg-indigo-50/90 dark:bg-indigo-900/50' ? 'ring-blue-500' : 'ring-transparent'}`} title="Indigo"></button>
-                                                                <button onClick={() => setOptBgColor('bg-black/50 dark:bg-black/80')} className={`w-5 h-5 rounded-full border border-gray-700 dark:border-gray-600 bg-gray-900 shadow-sm ring-2 ${optBgColor === 'bg-black/50 dark:bg-black/80' ? 'ring-blue-500' : 'ring-transparent'}`} title="Black/Dark"></button>
-                                                                <input
-                                                                    type="color"
-                                                                    value={optBgColor.startsWith('#') ? optBgColor : '#ffffff'}
-                                                                    onChange={e => setOptBgColor(e.target.value)}
-                                                                    className="w-5 h-5 ml-1 cursor-pointer border-0 rounded overflow-hidden bg-transparent"
-                                                                    title="Custom Color"
-                                                                />
-                                                            </div>
+
+
+                                                    <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                        <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
+                                                            <span className="flex items-center gap-2"><LayoutGrid className="w-4 h-4 text-indigo-500" /> Background Theme</span>
                                                         </div>
-
-                                                        {/* Text Color */}
-                                                        <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
-                                                            <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400 min-w-[50px] uppercase">Text Color:</span>
-                                                            <div className="flex gap-1.5 flex-1 justify-end items-center">
-                                                                <button onClick={() => setOptTextColor('default')} className={`w-5 h-5 rounded-full border border-gray-300 dark:border-gray-600 shadow-sm text-[9px] font-bold flex items-center justify-center bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300 ring-2 ${optTextColor === 'default' ? 'ring-blue-500' : 'ring-transparent'}`} title="Auto">A</button>
-                                                                <button onClick={() => setOptTextColor('#000000')} className={`w-5 h-5 rounded-full border border-gray-800 shadow-sm bg-black ring-2 ${optTextColor === '#000000' ? 'ring-blue-500' : 'ring-transparent'}`} title="Black"></button>
-                                                                <button onClick={() => setOptTextColor('#ffffff')} className={`w-5 h-5 rounded-full border border-gray-300 shadow-sm bg-white ring-2 ${optTextColor === '#ffffff' ? 'ring-blue-500' : 'ring-transparent'}`} title="White"></button>
-                                                                <button onClick={() => setOptTextColor('#ef4444')} className={`w-5 h-5 rounded-full border border-red-500 shadow-sm bg-red-500 ring-2 ${optTextColor === '#ef4444' ? 'ring-blue-500' : 'ring-transparent'}`} title="Red"></button>
-                                                                <button onClick={() => setOptTextColor('#3b82f6')} className={`w-5 h-5 rounded-full border border-blue-500 shadow-sm bg-blue-500 ring-2 ${optTextColor === '#3b82f6' ? 'ring-blue-500' : 'ring-transparent'}`} title="Blue"></button>
-                                                                <button onClick={() => setOptTextColor('#f59e0b')} className={`w-5 h-5 rounded-full border border-amber-500 shadow-sm bg-amber-500 ring-2 ${optTextColor === '#f59e0b' ? 'ring-blue-500' : 'ring-transparent'}`} title="Yellow"></button>
-                                                                <input
-                                                                    type="color"
-                                                                    value={optTextColor.startsWith('#') ? optTextColor : '#000000'}
-                                                                    onChange={e => setOptTextColor(e.target.value)}
-                                                                    className="w-5 h-5 ml-1 cursor-pointer border-0 rounded overflow-hidden bg-transparent"
-                                                                    title="Custom Color"
-                                                                />
-                                                            </div>
+                                                        <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl flex-wrap gap-1">
+                                                            <button onClick={() => setBgTheme('default')} className={`flex-1 min-w-[22%] py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'default' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Default</button>
+                                                            <button onClick={() => setBgTheme('mesh')} className={`flex-1 min-w-[22%] py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'mesh' ? 'bg-white dark:bg-gray-700 text-purple-600 dark:text-purple-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Mesh</button>
+                                                            <button onClick={() => setBgTheme('grid')} className={`flex-1 min-w-[22%] py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'grid' ? 'bg-white dark:bg-gray-700 text-emerald-600 dark:text-emerald-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Grid</button>
+                                                            <button onClick={() => setBgTheme('dots')} className={`flex-1 min-w-[22%] py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'dots' ? 'bg-white dark:bg-gray-700 text-orange-600 dark:text-orange-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Dots</button>
+                                                            <button onClick={() => setBgTheme('video')} className={`flex-1 min-w-[22%] py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'video' ? 'bg-white dark:bg-gray-700 text-rose-600 dark:text-rose-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Video</button>
+                                                            <button onClick={() => setBgTheme('midnight')} className={`flex-1 min-w-[22%] py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'midnight' ? 'bg-white dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Midnight</button>
+                                                            <button onClick={() => setBgTheme('aurora')} className={`flex-1 min-w-[22%] py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'aurora' ? 'bg-white dark:bg-gray-700 text-teal-600 dark:text-teal-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Aurora</button>
+                                                            <button onClick={() => setBgTheme('sunset')} className={`flex-1 min-w-[22%] py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === 'sunset' ? 'bg-white dark:bg-gray-700 text-pink-600 dark:text-pink-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Sunset</button>
                                                         </div>
-                                                    </div>
-                                                </div>
-
-
-
-                                                <div className="bg-gray-50/50 dark:bg-gray-900/40 border border-gray-200/60 dark:border-gray-800/60 rounded-xl p-3 mb-2 shadow-sm backdrop-blur-sm flex flex-col gap-3">
-                                                    <div className="flex items-center justify-between">
-                                                        <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                                                            <Clock className="w-4 h-4 text-indigo-500" />
-                                                            Question Timer
-
-                                                        </div>
-                                                        <button
-                                                            onClick={() => setIsTimerEnabled(!isTimerEnabled)}
-                                                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isTimerEnabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}
-                                                        >
-                                                            <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isTimerEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
-                                                        </button>
-                                                    </div>
-
-                                                    <div className="flex items-center justify-between">
-                                                        <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                                                            <Clock className="w-4 h-4 text-indigo-500" /> Auto Change Question
-                                                        </div>
-                                                        <button onClick={() => setIsAutoChangeQuestion(!isAutoChangeQuestion)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${isAutoChangeQuestion ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-gray-700'}`}>
-                                                            <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ${isAutoChangeQuestion ? 'translate-x-5' : 'translate-x-1'}`} />
-                                                        </button>
-                                                    </div>
-                                                    {isAutoChangeQuestion && (
-                                                        <div className="flex items-center justify-between mt-2 pl-6">
-                                                            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Delay Time</span>
-                                                            <select
-                                                                value={autoChangeDelay}
-                                                                onChange={(e) => setAutoChangeDelay(Number(e.target.value))}
-                                                                className="text-xs font-medium bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-2 py-1 outline-none focus:border-indigo-500 dark:text-gray-200"
-                                                            >
-                                                                <option value={1}>1 Sec.</option>
-                                                                <option value={2}>2 Sec.</option>
-                                                                <option value={3}>3 Sec.</option>
-                                                                <option value={4}>4 Sec.</option>
-                                                                <option value={5}>5 Sec.</option>
-                                                                <option value={6}>6 Sec.</option>
-                                                                <option value={7}>7 Sec.</option>
-                                                                <option value={8}>8 Sec.</option>
-                                                                <option value={9}>9 Sec.</option>
-                                                                <option value={10}>10 Sec.</option>
-                                                                <option value={15}>15 Sec.</option>
-                                                            </select>
-                                                        </div>
-                                                    )}
-                                                </div>
-
-
-
-                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
-                                                    <div className="flex items-center justify-between mb-2">
-                                                        <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                                                            <Volume2 className="w-4 h-4 text-indigo-500" />
-                                                            Auto Play Read Aloud
-                                                        </div>
-                                                        <button
-                                                            onClick={() => setIsAutoPlayReadAloud(!isAutoPlayReadAloud)}
-                                                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isAutoPlayReadAloud ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}
-                                                        >
-                                                            <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isAutoPlayReadAloud ? 'translate-x-6' : 'translate-x-1'}`} />
-                                                        </button>
-                                                    </div>
-
-                                                    <div className="flex flex-col gap-2 mb-2">
-                                                        <div className="flex items-center justify-between">
-                                                            <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                                                                <Music className="w-4 h-4 text-indigo-500" />
-                                                                Focus Mode (Music)
-                                                            </div>
-                                                            <button
-                                                                onClick={() => setIsLofiEnabled(!isLofiEnabled)}
-                                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isLofiEnabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}
-                                                            >
-                                                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isLofiEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
-                                                            </button>
-                                                        </div>
-                                                        {isLofiEnabled && (
-                                                            <div className="pl-6 pr-2 flex flex-col gap-3 mt-1">
+                                                        {bgTheme === 'video' && (
+                                                            <div className="mt-2 space-y-2">
                                                                 <select
-                                                                    value={selectedMusic}
-                                                                    onChange={(e) => {
-                                                                        setSelectedMusic(e.target.value);
-                                                                        // Restart audio if it's already playing
-                                                                        if (isLofiEnabled && lofiAudioRef.current) {
-                                                                            lofiAudioRef.current.src = e.target.value;
-                                                                            lofiAudioRef.current.play().catch(console.warn);
-                                                                        }
-                                                                    }}
+                                                                    value={selectedVideo}
+                                                                    onChange={(e) => setSelectedVideo(e.target.value)}
                                                                     className="w-full text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 focus:outline-none focus:border-blue-500 text-gray-700 dark:text-gray-200 font-semibold"
                                                                 >
-                                                                    {MUSIC_OPTIONS.map(opt => (
+                                                                    {VIDEO_OPTIONS.map(opt => (
                                                                         <option key={opt.id} value={opt.url}>{opt.name}</option>
                                                                     ))}
                                                                 </select>
-                                                                <div className="flex items-center gap-3">
-                                                                    <VolumeX className="w-4 h-4 text-gray-400" />
+                                                                <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                                    <Sun className="w-4 h-4 text-gray-400 shrink-0" />
                                                                     <input
                                                                         type="range"
-                                                                        min="0"
-                                                                        max="1"
-                                                                        step="0.05"
-                                                                        value={musicVolume}
-                                                                        onChange={(e) => setMusicVolume(parseFloat(e.target.value))}
+                                                                        min="5"
+                                                                        max="100"
+                                                                        value={videoOpacity}
+                                                                        onChange={(e) => setVideoOpacity(Number(e.target.value))}
                                                                         className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
                                                                     />
-                                                                    <div className="flex items-center gap-1 min-w-[3.5rem]">
-                                                                        <Volume2 className="w-4 h-4 text-gray-400" />
-                                                                        <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">{Math.round(musicVolume * 100)}%</span>
-                                                                    </div>
+                                                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-8 text-right">{videoOpacity}%</span>
                                                                 </div>
+                                                            </div>
+                                                        )}
+                                                        {bgTheme !== 'video' && (
+                                                            <div className="mt-2 flex items-center gap-3 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                                <Sun className="w-4 h-4 text-gray-400 shrink-0" />
+                                                                <input
+                                                                    type="range"
+                                                                    min="0"
+                                                                    max="100"
+                                                                    value={bgOpacity}
+                                                                    onChange={(e) => setBgOpacity(Number(e.target.value))}
+                                                                    className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                                                />
+                                                                <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-8 text-right">{bgOpacity}%</span>
+                                                            </div>
+                                                        )}
+                                                    </div>
 
-                                                                {/* Auto-Ducking Toggle */}
-                                                                <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100 dark:border-gray-800/60">
-                                                                    <div>
-                                                                        <div className="text-xs font-bold text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
-                                                                            <span>🎙️</span> Auto-Ducking
+
+
+                                                    <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                        <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
+                                                            <span className="flex items-center gap-2"><Highlighter className="w-4 h-4 text-indigo-500" /> Question Styling</span>
+                                                        </div>
+                                                        <div className="space-y-3">
+                                                            {/* Background Color */}
+                                                            <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                                <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400 min-w-[50px] uppercase">Bg Color:</span>
+                                                                <div className="flex gap-1.5 flex-1 justify-end">
+                                                                    <button onClick={() => setQBgColor('transparent')} className={`w-5 h-5 rounded-full border-2 ${qBgColor === 'transparent' ? 'border-blue-500' : 'border-transparent'} relative`} title="Transparent">
+                                                                        <div className="absolute inset-0 rounded-full bg-transparent overflow-hidden border border-gray-300">
+                                                                            <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200" style={{ backgroundImage: 'repeating-linear-gradient(45deg, #e5e7eb 25%, transparent 25%, transparent 75%, #e5e7eb 75%, #e5e7eb), repeating-linear-gradient(45deg, #e5e7eb 25%, transparent 25%, transparent 75%, #e5e7eb 75%, #e5e7eb)', backgroundPosition: '0 0, 3px 3px', backgroundSize: '6px 6px' }}></div>
                                                                         </div>
-                                                                        <div className="text-[10px] text-gray-400 mt-0.5">Music fades when TTS speaks</div>
-                                                                    </div>
-                                                                    <button
-                                                                        onClick={() => setMusicAutoDucking(!musicAutoDucking)}
-                                                                        className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${musicAutoDucking ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}
+                                                                    </button>
+                                                                    <button onClick={() => setQBgColor('bg-white/90 dark:bg-gray-800/90')} className={`w-5 h-5 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 shadow-sm ring-2 ${qBgColor === 'bg-white/90 dark:bg-gray-800/90' ? 'ring-blue-500' : 'ring-transparent'}`} title="White/Dark"></button>
+                                                                    <button onClick={() => setQBgColor('bg-blue-50/90 dark:bg-blue-900/50')} className={`w-5 h-5 rounded-full border border-blue-200 dark:border-blue-700 bg-blue-100 dark:bg-blue-900 shadow-sm ring-2 ${qBgColor === 'bg-blue-50/90 dark:bg-blue-900/50' ? 'ring-blue-500' : 'ring-transparent'}`} title="Blue"></button>
+                                                                    <button onClick={() => setQBgColor('bg-indigo-50/90 dark:bg-indigo-900/50')} className={`w-5 h-5 rounded-full border border-indigo-200 dark:border-indigo-700 bg-indigo-100 dark:bg-indigo-900 shadow-sm ring-2 ${qBgColor === 'bg-indigo-50/90 dark:bg-indigo-900/50' ? 'ring-blue-500' : 'ring-transparent'}`} title="Indigo"></button>
+                                                                    <button onClick={() => setQBgColor('bg-black/50 dark:bg-black/80')} className={`w-5 h-5 rounded-full border border-gray-700 dark:border-gray-600 bg-gray-900 shadow-sm ring-2 ${qBgColor === 'bg-black/50 dark:bg-black/80' ? 'ring-blue-500' : 'ring-transparent'}`} title="Black/Dark"></button>
+                                                                    <input
+                                                                        type="color"
+                                                                        value={qBgColor.startsWith('#') ? qBgColor : '#ffffff'}
+                                                                        onChange={e => setQBgColor(e.target.value)}
+                                                                        className="w-5 h-5 ml-1 cursor-pointer border-0 rounded overflow-hidden bg-transparent"
+                                                                        title="Custom Color"
+                                                                    />
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Text Color */}
+                                                            <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                                <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400 min-w-[50px] uppercase">Text Color:</span>
+                                                                <div className="flex gap-1.5 flex-1 justify-end">
+                                                                    <button onClick={() => setQTextColor('default')} className={`w-5 h-5 rounded-full border border-gray-300 dark:border-gray-600 shadow-sm text-[9px] font-bold flex items-center justify-center bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300 ring-2 ${qTextColor === 'default' ? 'ring-blue-500' : 'ring-transparent'}`} title="Auto">A</button>
+                                                                    <button onClick={() => setQTextColor('#000000')} className={`w-5 h-5 rounded-full border border-gray-800 shadow-sm bg-black ring-2 ${qTextColor === '#000000' ? 'ring-blue-500' : 'ring-transparent'}`} title="Black"></button>
+                                                                    <button onClick={() => setQTextColor('#ffffff')} className={`w-5 h-5 rounded-full border border-gray-300 shadow-sm bg-white ring-2 ${qTextColor === '#ffffff' ? 'ring-blue-500' : 'ring-transparent'}`} title="White"></button>
+                                                                    <button onClick={() => setQTextColor('#ef4444')} className={`w-5 h-5 rounded-full border border-red-500 shadow-sm bg-red-500 ring-2 ${qTextColor === '#ef4444' ? 'ring-blue-500' : 'ring-transparent'}`} title="Red"></button>
+                                                                    <button onClick={() => setQTextColor('#3b82f6')} className={`w-5 h-5 rounded-full border border-blue-500 shadow-sm bg-blue-500 ring-2 ${qTextColor === '#3b82f6' ? 'ring-blue-500' : 'ring-transparent'}`} title="Blue"></button>
+                                                                    <button onClick={() => setQTextColor('#f59e0b')} className={`w-5 h-5 rounded-full border border-amber-500 shadow-sm bg-amber-500 ring-2 ${qTextColor === '#f59e0b' ? 'ring-blue-500' : 'ring-transparent'}`} title="Yellow"></button>
+                                                                    <input
+                                                                        type="color"
+                                                                        value={qTextColor.startsWith('#') ? qTextColor : '#000000'}
+                                                                        onChange={e => setQTextColor(e.target.value)}
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Options Styling */}
+                                                    <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                        <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
+                                                            <span className="flex items-center gap-2"><List className="w-4 h-4 text-indigo-500" /> Options Styling</span>
+                                                        </div>
+                                                        <div className="space-y-3">
+                                                            {/* Background Color */}
+                                                            <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                                <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400 min-w-[50px] uppercase">Bg Color:</span>
+                                                                <div className="flex gap-1.5 flex-1 justify-end items-center">
+                                                                    <button onClick={() => setOptBgColor('default')} className={`w-5 h-5 rounded-full border border-gray-300 dark:border-gray-600 shadow-sm text-[9px] font-bold flex items-center justify-center bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300 ring-2 ${optBgColor === 'default' ? 'ring-blue-500' : 'ring-transparent'}`} title="Auto">A</button>
+                                                                    <button onClick={() => setOptBgColor('bg-white dark:bg-gray-800')} className={`w-5 h-5 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 shadow-sm ring-2 ${optBgColor === 'bg-white dark:bg-gray-800' ? 'ring-blue-500' : 'ring-transparent'}`} title="White/Dark"></button>
+                                                                    <button onClick={() => setOptBgColor('bg-blue-50/90 dark:bg-blue-900/50')} className={`w-5 h-5 rounded-full border border-blue-200 dark:border-blue-700 bg-blue-100 dark:bg-blue-900 shadow-sm ring-2 ${optBgColor === 'bg-blue-50/90 dark:bg-blue-900/50' ? 'ring-blue-500' : 'ring-transparent'}`} title="Blue"></button>
+                                                                    <button onClick={() => setOptBgColor('bg-indigo-50/90 dark:bg-indigo-900/50')} className={`w-5 h-5 rounded-full border border-indigo-200 dark:border-indigo-700 bg-indigo-100 dark:bg-indigo-900 shadow-sm ring-2 ${optBgColor === 'bg-indigo-50/90 dark:bg-indigo-900/50' ? 'ring-blue-500' : 'ring-transparent'}`} title="Indigo"></button>
+                                                                    <button onClick={() => setOptBgColor('bg-black/50 dark:bg-black/80')} className={`w-5 h-5 rounded-full border border-gray-700 dark:border-gray-600 bg-gray-900 shadow-sm ring-2 ${optBgColor === 'bg-black/50 dark:bg-black/80' ? 'ring-blue-500' : 'ring-transparent'}`} title="Black/Dark"></button>
+                                                                    <input
+                                                                        type="color"
+                                                                        value={optBgColor.startsWith('#') ? optBgColor : '#ffffff'}
+                                                                        onChange={e => setOptBgColor(e.target.value)}
+                                                                        className="w-5 h-5 ml-1 cursor-pointer border-0 rounded overflow-hidden bg-transparent"
+                                                                        title="Custom Color"
+                                                                    />
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Text Color */}
+                                                            <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                                <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400 min-w-[50px] uppercase">Text Color:</span>
+                                                                <div className="flex gap-1.5 flex-1 justify-end items-center">
+                                                                    <button onClick={() => setOptTextColor('default')} className={`w-5 h-5 rounded-full border border-gray-300 dark:border-gray-600 shadow-sm text-[9px] font-bold flex items-center justify-center bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300 ring-2 ${optTextColor === 'default' ? 'ring-blue-500' : 'ring-transparent'}`} title="Auto">A</button>
+                                                                    <button onClick={() => setOptTextColor('#000000')} className={`w-5 h-5 rounded-full border border-gray-800 shadow-sm bg-black ring-2 ${optTextColor === '#000000' ? 'ring-blue-500' : 'ring-transparent'}`} title="Black"></button>
+                                                                    <button onClick={() => setOptTextColor('#ffffff')} className={`w-5 h-5 rounded-full border border-gray-300 shadow-sm bg-white ring-2 ${optTextColor === '#ffffff' ? 'ring-blue-500' : 'ring-transparent'}`} title="White"></button>
+                                                                    <button onClick={() => setOptTextColor('#ef4444')} className={`w-5 h-5 rounded-full border border-red-500 shadow-sm bg-red-500 ring-2 ${optTextColor === '#ef4444' ? 'ring-blue-500' : 'ring-transparent'}`} title="Red"></button>
+                                                                    <button onClick={() => setOptTextColor('#3b82f6')} className={`w-5 h-5 rounded-full border border-blue-500 shadow-sm bg-blue-500 ring-2 ${optTextColor === '#3b82f6' ? 'ring-blue-500' : 'ring-transparent'}`} title="Blue"></button>
+                                                                    <button onClick={() => setOptTextColor('#f59e0b')} className={`w-5 h-5 rounded-full border border-amber-500 shadow-sm bg-amber-500 ring-2 ${optTextColor === '#f59e0b' ? 'ring-blue-500' : 'ring-transparent'}`} title="Yellow"></button>
+                                                                    <input
+                                                                        type="color"
+                                                                        value={optTextColor.startsWith('#') ? optTextColor : '#000000'}
+                                                                        onChange={e => setOptTextColor(e.target.value)}
+                                                                        className="w-5 h-5 ml-1 cursor-pointer border-0 rounded overflow-hidden bg-transparent"
+                                                                        title="Custom Color"
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+
+
+                                                    <div className="bg-gray-50/50 dark:bg-gray-900/40 border border-gray-200/60 dark:border-gray-800/60 rounded-xl p-3 mb-2 shadow-sm backdrop-blur-sm flex flex-col gap-3">
+                                                        <div className="flex items-center justify-between">
+                                                            <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                                                <Clock className="w-4 h-4 text-indigo-500" />
+                                                                Question Timer
+
+                                                            </div>
+                                                            <button
+                                                                onClick={() => setIsTimerEnabled(!isTimerEnabled)}
+                                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isTimerEnabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}
+                                                            >
+                                                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isTimerEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
+                                                            </button>
+                                                        </div>
+
+                                                        <div className="flex items-center justify-between">
+                                                            <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                                                <Clock className="w-4 h-4 text-indigo-500" /> Auto Change Question
+                                                            </div>
+                                                            <button onClick={() => setIsAutoChangeQuestion(!isAutoChangeQuestion)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${isAutoChangeQuestion ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-gray-700'}`}>
+                                                                <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ${isAutoChangeQuestion ? 'translate-x-5' : 'translate-x-1'}`} />
+                                                            </button>
+                                                        </div>
+                                                        {isAutoChangeQuestion && (
+                                                            <div className="flex items-center justify-between mt-2 pl-6">
+                                                                <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Delay Time</span>
+                                                                <select
+                                                                    value={autoChangeDelay}
+                                                                    onChange={(e) => setAutoChangeDelay(Number(e.target.value))}
+                                                                    className="text-xs font-medium bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-2 py-1 outline-none focus:border-indigo-500 dark:text-gray-200"
+                                                                >
+                                                                    <option value={1}>1 Sec.</option>
+                                                                    <option value={2}>2 Sec.</option>
+                                                                    <option value={3}>3 Sec.</option>
+                                                                    <option value={4}>4 Sec.</option>
+                                                                    <option value={5}>5 Sec.</option>
+                                                                    <option value={6}>6 Sec.</option>
+                                                                    <option value={7}>7 Sec.</option>
+                                                                    <option value={8}>8 Sec.</option>
+                                                                    <option value={9}>9 Sec.</option>
+                                                                    <option value={10}>10 Sec.</option>
+                                                                    <option value={15}>15 Sec.</option>
+                                                                </select>
+                                                            </div>
+                                                        )}
+                                                    </div>
+
+
+
+                                                    <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                        <div className="flex items-center justify-between mb-2">
+                                                            <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                                                <Volume2 className="w-4 h-4 text-indigo-500" />
+                                                                Auto Play Read Aloud
+                                                            </div>
+                                                            <button
+                                                                onClick={() => setIsAutoPlayReadAloud(!isAutoPlayReadAloud)}
+                                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isAutoPlayReadAloud ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}
+                                                            >
+                                                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isAutoPlayReadAloud ? 'translate-x-6' : 'translate-x-1'}`} />
+                                                            </button>
+                                                        </div>
+
+                                                        <div className="flex flex-col gap-2 mb-2">
+                                                            <div className="flex items-center justify-between">
+                                                                <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                                                    <Music className="w-4 h-4 text-indigo-500" />
+                                                                    Focus Mode (Music)
+                                                                </div>
+                                                                <button
+                                                                    onClick={() => setIsLofiEnabled(!isLofiEnabled)}
+                                                                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isLofiEnabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}
+                                                                >
+                                                                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isLofiEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
+                                                                </button>
+                                                            </div>
+                                                            {isLofiEnabled && (
+                                                                <div className="pl-6 pr-2 flex flex-col gap-3 mt-1">
+                                                                    <select
+                                                                        value={selectedMusic}
+                                                                        onChange={(e) => {
+                                                                            setSelectedMusic(e.target.value);
+                                                                            // Restart audio if it's already playing
+                                                                            if (isLofiEnabled && lofiAudioRef.current) {
+                                                                                lofiAudioRef.current.src = e.target.value;
+                                                                                lofiAudioRef.current.play().catch(console.warn);
+                                                                            }
+                                                                        }}
+                                                                        className="w-full text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 focus:outline-none focus:border-blue-500 text-gray-700 dark:text-gray-200 font-semibold"
                                                                     >
-                                                                        <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${musicAutoDucking ? 'translate-x-[18px]' : 'translate-x-1'}`} />
+                                                                        {MUSIC_OPTIONS.map(opt => (
+                                                                            <option key={opt.id} value={opt.url}>{opt.name}</option>
+                                                                        ))}
+                                                                    </select>
+                                                                    <div className="flex items-center gap-3">
+                                                                        <VolumeX className="w-4 h-4 text-gray-400" />
+                                                                        <input
+                                                                            type="range"
+                                                                            min="0"
+                                                                            max="1"
+                                                                            step="0.05"
+                                                                            value={musicVolume}
+                                                                            onChange={(e) => setMusicVolume(parseFloat(e.target.value))}
+                                                                            className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                                                        />
+                                                                        <div className="flex items-center gap-1 min-w-[3.5rem]">
+                                                                            <Volume2 className="w-4 h-4 text-gray-400" />
+                                                                            <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">{Math.round(musicVolume * 100)}%</span>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    {/* Auto-Ducking Toggle */}
+                                                                    <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100 dark:border-gray-800/60">
+                                                                        <div>
+                                                                            <div className="text-xs font-bold text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
+                                                                                <span>🎙️</span> Auto-Ducking
+                                                                            </div>
+                                                                            <div className="text-[10px] text-gray-400 mt-0.5">Music fades when TTS speaks</div>
+                                                                        </div>
+                                                                        <button
+                                                                            onClick={() => setMusicAutoDucking(!musicAutoDucking)}
+                                                                            className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${musicAutoDucking ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}
+                                                                        >
+                                                                            <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${musicAutoDucking ? 'translate-x-[18px]' : 'translate-x-1'}`} />
+                                                                        </button>
+                                                                    </div>
+
+                                                                    {/* Duck Ratio Sliders */}
+                                                                    {musicAutoDucking && (
+                                                                        <div className="flex flex-col gap-2 mt-2">
+                                                                            <div className="flex items-center gap-3">
+                                                                                <span className="text-[10px] text-gray-400 whitespace-nowrap min-w-[3rem]">Idle at</span>
+                                                                                <input
+                                                                                    type="range"
+                                                                                    min="0"
+                                                                                    max="1"
+                                                                                    step="0.01"
+                                                                                    value={musicIdleRatio}
+                                                                                    onChange={(e) => setMusicIdleRatio(parseFloat(e.target.value))}
+                                                                                    className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-green-500"
+                                                                                />
+                                                                                <span className="text-[10px] font-bold text-green-500 min-w-[2.5rem] text-right">{Math.round(musicIdleRatio * 100)}%</span>
+                                                                            </div>
+                                                                            <div className="flex items-center gap-3">
+                                                                                <span className="text-[10px] text-gray-400 whitespace-nowrap min-w-[3rem]">Duck to</span>
+                                                                                <input
+                                                                                    type="range"
+                                                                                    min="0"
+                                                                                    max="0.5"
+                                                                                    step="0.01"
+                                                                                    value={musicDuckRatio}
+                                                                                    onChange={(e) => setMusicDuckRatio(parseFloat(e.target.value))}
+                                                                                    className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                                                                />
+                                                                                <span className="text-[10px] font-bold text-blue-500 min-w-[2.5rem] text-right">{Math.round(musicDuckRatio * 100)}%</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                        </div>
+
+                                                        <div className="flex items-center justify-between mb-2">
+                                                            <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                                                <Lightbulb className="w-4 h-4 text-indigo-500" /> Show Explanation
+                                                            </div>
+                                                            <button
+                                                                onClick={() => setIsExpEnabled(!isExpEnabled)}
+                                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isExpEnabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}
+                                                            >
+                                                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isExpEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
+                                                            </button>
+                                                        </div>
+
+                                                        <div className="flex items-center justify-between">
+                                                            <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                                                <MessageCircle className="w-4 h-4 text-indigo-500" /> Show Options Explanation
+                                                            </div>
+                                                            <button
+                                                                onClick={() => setIsOptionExpEnabled(!isOptionExpEnabled)}
+                                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isOptionExpEnabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}
+                                                            >
+                                                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isOptionExpEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+
+
+                                                    <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                        <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between">
+                                                            <span className="flex items-center gap-2"><Type className="w-4 h-4 text-indigo-500" /> Question Font Size</span>
+                                                            <span className="text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 rounded text-xs py-0.5">{Math.round(qFontScale * 100)}%</span>
+                                                        </div>
+                                                        <div className="flex items-center bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 w-full overflow-hidden shadow-inner">
+                                                            <button onClick={() => setQFontScale(s => Math.max(0.6, s - 0.1))} className="flex-1 py-2 flex justify-center items-center gap-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 font-bold border-r border-gray-200 dark:border-gray-700 transition-colors">
+                                                                A-
+                                                            </button>
+                                                            <button onClick={() => setQFontScale(s => Math.min(2.0, s + 0.1))} className="flex-1 py-2 flex justify-center items-center gap-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 font-bold transition-colors">
+                                                                A+
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                        <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between">
+                                                            <span className="flex items-center gap-2"><Type className="w-4 h-4 text-green-500" /> Options Font Size</span>
+                                                            <span className="text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/30 px-2 rounded text-xs py-0.5">{Math.round(optFontScale * 100)}%</span>
+                                                        </div>
+                                                        <div className="flex items-center bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 w-full overflow-hidden shadow-inner">
+                                                            <button onClick={() => setOptFontScale(s => Math.max(0.6, s - 0.1))} className="flex-1 py-2 flex justify-center items-center gap-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 font-bold border-r border-gray-200 dark:border-gray-700 transition-colors">
+                                                                A-
+                                                            </button>
+                                                            <button onClick={() => setOptFontScale(s => Math.min(2.0, s + 0.1))} className="flex-1 py-2 flex justify-center items-center gap-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 font-bold transition-colors">
+                                                                A+
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                        <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between">
+                                                            <span className="flex items-center gap-2"><Type className="w-4 h-4 text-purple-500" /> Explanation Font Size</span>
+                                                            <span className="text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/30 px-2 rounded text-xs py-0.5">{Math.round(expFontScale * 100)}%</span>
+                                                        </div>
+                                                        <div className="flex items-center bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 w-full overflow-hidden shadow-inner">
+                                                            <button onClick={() => setExpFontScale(s => Math.max(0.6, s - 0.1))} className="flex-1 py-2 flex justify-center items-center gap-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 font-bold border-r border-gray-200 dark:border-gray-700 transition-colors">
+                                                                A-
+                                                            </button>
+                                                            <button onClick={() => setExpFontScale(s => Math.min(2.0, s + 0.1))} className="flex-1 py-2 flex justify-center items-center gap-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 font-bold transition-colors">
+                                                                A+
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+
+
+                                                    <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                        <div className="flex items-center justify-between">
+                                                            <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                                                <MousePointer2 className="w-4 h-4 text-yellow-500" />
+                                                                Cursor Highlight
+                                                            </div>
+                                                            <button
+                                                                onClick={() => setIsCursorHighlightActive(!isCursorHighlightActive)}
+                                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isCursorHighlightActive ? 'bg-yellow-500' : 'bg-gray-300 dark:bg-gray-700'}`}
+                                                            >
+                                                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isCursorHighlightActive ? 'translate-x-6' : 'translate-x-1'}`} />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                        <div className="flex items-center justify-between">
+                                                            <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                                                <Focus className="w-4 h-4 text-yellow-500" />
+                                                                Spotlight Mode
+                                                            </div>
+                                                            <button
+                                                                onClick={() => setIsSpotlightActive(!isSpotlightActive)}
+                                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isSpotlightActive ? 'bg-yellow-500' : 'bg-gray-300 dark:bg-gray-700'}`}
+                                                            >
+                                                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isSpotlightActive ? 'translate-x-6' : 'translate-x-1'}`} />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+
+                                                    <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                        <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 flex items-center justify-between">
+                                                            <span className="flex items-center gap-2"><Pen className="w-4 h-4 text-indigo-500" /> Presentation Tools</span>
+                                                            <div className="flex items-center gap-2">
+
+                                                                <button onClick={() => setIsPenActive(!isPenActive)} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${isPenActive ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}>
+                                                                    <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${isPenActive ? 'translate-x-5' : 'translate-x-1'}`} />
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                        {isPenActive && (
+                                                            <div className="space-y-4 bg-gray-50 dark:bg-gray-800/80 p-3 rounded-xl border border-gray-100 dark:border-gray-700 shadow-inner mb-4">
+
+                                                                {/* Tool Selector */}
+                                                                <div className="flex gap-2 p-1.5 bg-gray-200/50 dark:bg-gray-700/50 rounded-lg flex-wrap">
+                                                                    <button
+                                                                        onClick={() => setDrawingTool('pen')}
+                                                                        className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'pen' ? 'bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm border border-gray-200/50 dark:border-gray-500' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                                                                        title="Pen (Shift+P)"
+                                                                    >
+                                                                        <Pen className="w-3.5 h-3.5" /> Pen
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => setDrawingTool('highlighter')}
+                                                                        className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'highlighter' ? 'bg-white dark:bg-gray-600 text-yellow-600 dark:text-yellow-400 shadow-sm border border-gray-200/50 dark:border-gray-500' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                                                                        title="Marker (Shift+M)"
+                                                                    >
+                                                                        <Highlighter className="w-3.5 h-3.5" /> Marker
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => setDrawingTool('laser')}
+                                                                        className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'laser' ? 'bg-white dark:bg-gray-600 text-red-500 dark:text-red-400 shadow-sm border border-gray-200/50 dark:border-gray-500' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                                                                        title="Laser (Shift+L)"
+                                                                    >
+                                                                        <MousePointer2 className="w-3.5 h-3.5" /> Laser
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => setDrawingTool('eraser')}
+                                                                        className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'eraser' ? 'bg-white dark:bg-gray-600 text-gray-800 dark:text-gray-200 shadow-sm border border-gray-200/50 dark:border-gray-500' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                                                                        title="Eraser (Shift+E)"
+                                                                    >
+                                                                        <Eraser className="w-3.5 h-3.5" /> Eraser
+                                                                    </button>
+                                                                </div>
+                                                                <div className="flex gap-2 p-1.5 bg-gray-200/50 dark:bg-gray-700/50 rounded-lg flex-wrap mt-2">
+                                                                    <button
+                                                                        onClick={() => setDrawingTool('rectangle')}
+                                                                        className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'rectangle' ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm border border-gray-200/50 dark:border-gray-500' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                                                                        title="Rect (Shift+B)"
+                                                                    >
+                                                                        <Square className="w-3.5 h-3.5" /> Rect
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => setDrawingTool('circle')}
+                                                                        className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'circle' ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm border border-gray-200/50 dark:border-gray-500' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                                                                        title="Circle (Shift+C)"
+                                                                    >
+                                                                        <Circle className="w-3.5 h-3.5" /> Circle
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => setDrawingTool('arrow')}
+                                                                        className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'arrow' ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm border border-gray-200/50 dark:border-gray-500' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                                                                        title="Arrow (Shift+V)"
+                                                                    >
+                                                                        <ArrowUpRight className="w-3.5 h-3.5" /> Arrow
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => setDrawingTool('text')}
+                                                                        className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'text' ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm border border-gray-200/50 dark:border-gray-500' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                                                                        title="Text (Shift+T)"
+                                                                    >
+                                                                        <Type className="w-3.5 h-3.5" /> Text
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => setDrawingTool('magnifier')}
+                                                                        className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'magnifier' ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm border border-gray-200/50 dark:border-gray-500' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                                                                        title="Zoom (Shift+Z)"
+                                                                    >
+                                                                        <ZoomIn className="w-3.5 h-3.5" /> Zoom
                                                                     </button>
                                                                 </div>
 
-                                                                {/* Duck Ratio Sliders */}
-                                                                {musicAutoDucking && (
-                                                                    <div className="flex flex-col gap-2 mt-2">
-                                                                        <div className="flex items-center gap-3">
-                                                                            <span className="text-[10px] text-gray-400 whitespace-nowrap min-w-[3rem]">Idle at</span>
-                                                                            <input
-                                                                                type="range"
-                                                                                min="0"
-                                                                                max="1"
-                                                                                step="0.01"
-                                                                                value={musicIdleRatio}
-                                                                                onChange={(e) => setMusicIdleRatio(parseFloat(e.target.value))}
-                                                                                className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-green-500"
-                                                                            />
-                                                                            <span className="text-[10px] font-bold text-green-500 min-w-[2.5rem] text-right">{Math.round(musicIdleRatio * 100)}%</span>
+                                                                <div className={drawingTool === 'laser' || drawingTool === 'text' || drawingTool === 'magnifier' ? 'opacity-50 pointer-events-none transition-opacity flex flex-col gap-4 mt-2' : 'transition-opacity flex flex-col gap-4 mt-2'}>
+                                                                    <div>
+                                                                        <div className="flex justify-between text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">
+                                                                            <span>Color</span>
                                                                         </div>
-                                                                        <div className="flex items-center gap-3">
-                                                                            <span className="text-[10px] text-gray-400 whitespace-nowrap min-w-[3rem]">Duck to</span>
+                                                                        <div className="flex gap-2 items-center flex-wrap">
+                                                                            {['#ef4444', '#3b82f6', '#22c55e', '#facc15', '#000000', '#ffffff'].map(c => (
+                                                                                <button
+                                                                                    key={c}
+                                                                                    onClick={() => setPenColor(c)}
+                                                                                    className={`w-5 h-5 rounded-full border-2 ${penColor === c ? 'border-gray-900 dark:border-white scale-110' : 'border-transparent hover:scale-110'} transition-all shadow-sm`}
+                                                                                    style={{ backgroundColor: c }}
+                                                                                />
+                                                                            ))}
                                                                             <input
-                                                                                type="range"
-                                                                                min="0"
-                                                                                max="0.5"
-                                                                                step="0.01"
-                                                                                value={musicDuckRatio}
-                                                                                onChange={(e) => setMusicDuckRatio(parseFloat(e.target.value))}
-                                                                                className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                                                                type="color"
+                                                                                value={penColor}
+                                                                                onChange={e => setPenColor(e.target.value)}
+                                                                                className="w-6 h-6 ml-1 cursor-pointer border-0 rounded overflow-hidden bg-transparent"
+                                                                                title="Custom Color"
                                                                             />
-                                                                            <span className="text-[10px] font-bold text-blue-500 min-w-[2.5rem] text-right">{Math.round(musicDuckRatio * 100)}%</span>
                                                                         </div>
                                                                     </div>
-                                                                )}
+                                                                    <div>
+                                                                        <div className="flex justify-between text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">
+                                                                            <span>Size</span>
+                                                                            <span className="text-blue-600 dark:text-blue-400 font-bold">{penSize}px</span>
+                                                                        </div>
+                                                                        <input type="range" min="2" max="24" value={penSize} onChange={(e) => setPenSize(Number(e.target.value))} className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600" />
+                                                                    </div>
+                                                                </div>
+                                                                <button
+                                                                    onClick={clearCanvas}
+                                                                    className="w-full py-2 text-red-500 dark:text-red-400 bg-red-50 dark:bg-red-950/40 hover:bg-red-100 dark:hover:bg-red-900/40 rounded-lg border border-red-200/50 dark:border-red-900/50 transition-colors flex items-center justify-center gap-1.5 text-xs font-bold"
+                                                                >
+                                                                    <Trash2 className="w-4 h-4" /> Clear Canvas
+                                                                </button>
                                                             </div>
                                                         )}
                                                     </div>
 
-                                                    <div className="flex items-center justify-between mb-2">
-                                                        <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                                                            <Lightbulb className="w-4 h-4 text-indigo-500" /> Show Explanation
-                                                        </div>
-                                                        <button
-                                                            onClick={() => setIsExpEnabled(!isExpEnabled)}
-                                                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isExpEnabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}
-                                                        >
-                                                            <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isExpEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
-                                                        </button>
-                                                    </div>
-
-                                                    <div className="flex items-center justify-between">
-                                                        <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                                                            <MessageCircle className="w-4 h-4 text-indigo-500" /> Show Options Explanation
-                                                        </div>
-                                                        <button
-                                                            onClick={() => setIsOptionExpEnabled(!isOptionExpEnabled)}
-                                                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isOptionExpEnabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}
-                                                        >
-                                                            <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isOptionExpEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
-                                                        </button>
-                                                    </div>
-                                                </div>
 
 
-
-                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
-                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between">
-                                                        <span className="flex items-center gap-2"><Type className="w-4 h-4 text-indigo-500" /> Question Font Size</span>
-                                                        <span className="text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 rounded text-xs py-0.5">{Math.round(qFontScale * 100)}%</span>
-                                                    </div>
-                                                    <div className="flex items-center bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 w-full overflow-hidden shadow-inner">
-                                                        <button onClick={() => setQFontScale(s => Math.max(0.6, s - 0.1))} className="flex-1 py-2 flex justify-center items-center gap-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 font-bold border-r border-gray-200 dark:border-gray-700 transition-colors">
-                                                            A-
-                                                        </button>
-                                                        <button onClick={() => setQFontScale(s => Math.min(2.0, s + 0.1))} className="flex-1 py-2 flex justify-center items-center gap-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 font-bold transition-colors">
-                                                            A+
-                                                        </button>
-                                                    </div>
-                                                </div>
-
-                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
-                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between">
-                                                        <span className="flex items-center gap-2"><Type className="w-4 h-4 text-green-500" /> Options Font Size</span>
-                                                        <span className="text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/30 px-2 rounded text-xs py-0.5">{Math.round(optFontScale * 100)}%</span>
-                                                    </div>
-                                                    <div className="flex items-center bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 w-full overflow-hidden shadow-inner">
-                                                        <button onClick={() => setOptFontScale(s => Math.max(0.6, s - 0.1))} className="flex-1 py-2 flex justify-center items-center gap-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 font-bold border-r border-gray-200 dark:border-gray-700 transition-colors">
-                                                            A-
-                                                        </button>
-                                                        <button onClick={() => setOptFontScale(s => Math.min(2.0, s + 0.1))} className="flex-1 py-2 flex justify-center items-center gap-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 font-bold transition-colors">
-                                                            A+
-                                                        </button>
-                                                    </div>
-                                                </div>
-
-                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
-                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between">
-                                                        <span className="flex items-center gap-2"><Type className="w-4 h-4 text-purple-500" /> Explanation Font Size</span>
-                                                        <span className="text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/30 px-2 rounded text-xs py-0.5">{Math.round(expFontScale * 100)}%</span>
-                                                    </div>
-                                                    <div className="flex items-center bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 w-full overflow-hidden shadow-inner">
-                                                        <button onClick={() => setExpFontScale(s => Math.max(0.6, s - 0.1))} className="flex-1 py-2 flex justify-center items-center gap-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 font-bold border-r border-gray-200 dark:border-gray-700 transition-colors">
-                                                            A-
-                                                        </button>
-                                                        <button onClick={() => setExpFontScale(s => Math.min(2.0, s + 0.1))} className="flex-1 py-2 flex justify-center items-center gap-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 font-bold transition-colors">
-                                                            A+
-                                                        </button>
-                                                    </div>
-                                                </div>
-
-
-
-                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
-                                                    <div className="flex items-center justify-between">
-                                                        <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                                                            <MousePointer2 className="w-4 h-4 text-yellow-500" />
-                                                            Cursor Highlight
-                                                        </div>
-                                                        <button
-                                                            onClick={() => setIsCursorHighlightActive(!isCursorHighlightActive)}
-                                                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isCursorHighlightActive ? 'bg-yellow-500' : 'bg-gray-300 dark:bg-gray-700'}`}
-                                                        >
-                                                            <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isCursorHighlightActive ? 'translate-x-6' : 'translate-x-1'}`} />
-                                                        </button>
-                                                    </div>
-                                                </div>
-
-                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
-                                                    <div className="flex items-center justify-between">
-                                                        <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                                                            <Focus className="w-4 h-4 text-yellow-500" />
-                                                            Spotlight Mode
-                                                        </div>
-                                                        <button
-                                                            onClick={() => setIsSpotlightActive(!isSpotlightActive)}
-                                                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isSpotlightActive ? 'bg-yellow-500' : 'bg-gray-300 dark:bg-gray-700'}`}
-                                                        >
-                                                            <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isSpotlightActive ? 'translate-x-6' : 'translate-x-1'}`} />
-                                                        </button>
-                                                    </div>
-                                                </div>
-
-
-                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
-                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 flex items-center justify-between">
-                                                        <span className="flex items-center gap-2"><Pen className="w-4 h-4 text-indigo-500" /> Presentation Tools</span>
-                                                        <div className="flex items-center gap-2">
-
-                                                            <button onClick={() => setIsPenActive(!isPenActive)} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${isPenActive ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}>
-                                                                <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${isPenActive ? 'translate-x-5' : 'translate-x-1'}`} />
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                    {isPenActive && (
-                                                        <div className="space-y-4 bg-gray-50 dark:bg-gray-800/80 p-3 rounded-xl border border-gray-100 dark:border-gray-700 shadow-inner mb-4">
-
-                                                            {/* Tool Selector */}
-                                                            <div className="flex gap-2 p-1.5 bg-gray-200/50 dark:bg-gray-700/50 rounded-lg flex-wrap">
-                                                                <button
-                                                                    onClick={() => setDrawingTool('pen')}
-                                                                    className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'pen' ? 'bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm border border-gray-200/50 dark:border-gray-500' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
-                                                                    title="Pen (Shift+P)"
-                                                                >
-                                                                    <Pen className="w-3.5 h-3.5" /> Pen
-                                                                </button>
-                                                                <button
-                                                                    onClick={() => setDrawingTool('highlighter')}
-                                                                    className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'highlighter' ? 'bg-white dark:bg-gray-600 text-yellow-600 dark:text-yellow-400 shadow-sm border border-gray-200/50 dark:border-gray-500' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
-                                                                    title="Marker (Shift+M)"
-                                                                >
-                                                                    <Highlighter className="w-3.5 h-3.5" /> Marker
-                                                                </button>
-                                                                <button
-                                                                    onClick={() => setDrawingTool('laser')}
-                                                                    className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'laser' ? 'bg-white dark:bg-gray-600 text-red-500 dark:text-red-400 shadow-sm border border-gray-200/50 dark:border-gray-500' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
-                                                                    title="Laser (Shift+L)"
-                                                                >
-                                                                    <MousePointer2 className="w-3.5 h-3.5" /> Laser
-                                                                </button>
-                                                                <button
-                                                                    onClick={() => setDrawingTool('eraser')}
-                                                                    className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'eraser' ? 'bg-white dark:bg-gray-600 text-gray-800 dark:text-gray-200 shadow-sm border border-gray-200/50 dark:border-gray-500' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
-                                                                    title="Eraser (Shift+E)"
-                                                                >
-                                                                    <Eraser className="w-3.5 h-3.5" /> Eraser
+                                                    <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                        <div className="relative">
+                                                            {!canUsePremium && (
+                                                                <div className="absolute inset-0 z-10 bg-gray-50/40 dark:bg-gray-900/60 backdrop-blur-[1.5px] rounded-xl flex items-center justify-center mt-6">
+                                                                    <a href="/pricing" className="bg-gradient-to-r from-amber-500 to-orange-600 text-white text-[10px] font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 hover:scale-105 transition-transform cursor-pointer">
+                                                                        <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
+                                                                        Premium Only
+                                                                    </a>
+                                                                </div>
+                                                            )}
+                                                            <div className={`text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 flex items-center justify-between ${!canUsePremium ? 'opacity-50' : ''}`}>
+                                                                <span className="flex items-center gap-2"><Stamp className="w-4 h-4 text-indigo-500" /> Watermark</span>
+                                                                <button onClick={() => setWmVisible(!wmVisible)} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${wmVisible ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}>
+                                                                    <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${wmVisible ? 'translate-x-5' : 'translate-x-1'}`} />
                                                                 </button>
                                                             </div>
-                                                            <div className="flex gap-2 p-1.5 bg-gray-200/50 dark:bg-gray-700/50 rounded-lg flex-wrap mt-2">
-                                                                <button
-                                                                    onClick={() => setDrawingTool('rectangle')}
-                                                                    className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'rectangle' ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm border border-gray-200/50 dark:border-gray-500' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
-                                                                    title="Rect (Shift+B)"
-                                                                >
-                                                                    <Square className="w-3.5 h-3.5" /> Rect
-                                                                </button>
-                                                                <button
-                                                                    onClick={() => setDrawingTool('circle')}
-                                                                    className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'circle' ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm border border-gray-200/50 dark:border-gray-500' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
-                                                                    title="Circle (Shift+C)"
-                                                                >
-                                                                    <Circle className="w-3.5 h-3.5" /> Circle
-                                                                </button>
-                                                                <button
-                                                                    onClick={() => setDrawingTool('arrow')}
-                                                                    className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'arrow' ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm border border-gray-200/50 dark:border-gray-500' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
-                                                                    title="Arrow (Shift+V)"
-                                                                >
-                                                                    <ArrowUpRight className="w-3.5 h-3.5" /> Arrow
-                                                                </button>
-                                                                <button
-                                                                    onClick={() => setDrawingTool('text')}
-                                                                    className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'text' ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm border border-gray-200/50 dark:border-gray-500' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
-                                                                    title="Text (Shift+T)"
-                                                                >
-                                                                    <Type className="w-3.5 h-3.5" /> Text
-                                                                </button>
-                                                                <button
-                                                                    onClick={() => setDrawingTool('magnifier')}
-                                                                    className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-bold transition-all ${drawingTool === 'magnifier' ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm border border-gray-200/50 dark:border-gray-500' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
-                                                                    title="Zoom (Shift+Z)"
-                                                                >
-                                                                    <ZoomIn className="w-3.5 h-3.5" /> Zoom
-                                                                </button>
-                                                            </div>
-
-                                                            <div className={drawingTool === 'laser' || drawingTool === 'text' || drawingTool === 'magnifier' ? 'opacity-50 pointer-events-none transition-opacity flex flex-col gap-4 mt-2' : 'transition-opacity flex flex-col gap-4 mt-2'}>
-                                                                <div>
-                                                                    <div className="flex justify-between text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">
-                                                                        <span>Color</span>
-                                                                    </div>
-                                                                    <div className="flex gap-2 items-center flex-wrap">
-                                                                        {['#ef4444', '#3b82f6', '#22c55e', '#facc15', '#000000', '#ffffff'].map(c => (
-                                                                            <button
-                                                                                key={c}
-                                                                                onClick={() => setPenColor(c)}
-                                                                                className={`w-5 h-5 rounded-full border-2 ${penColor === c ? 'border-gray-900 dark:border-white scale-110' : 'border-transparent hover:scale-110'} transition-all shadow-sm`}
-                                                                                style={{ backgroundColor: c }}
-                                                                            />
-                                                                        ))}
+                                                            {wmVisible && (
+                                                                <div className={`flex flex-col gap-3 bg-gray-50 dark:bg-gray-800/80 p-2.5 rounded-xl border border-gray-100 dark:border-gray-700 shadow-inner ${!canUsePremium ? 'opacity-50 pointer-events-none select-none' : ''}`}>
+                                                                    <input
+                                                                        type="text"
+                                                                        value={wmText}
+                                                                        onChange={(e) => setWmText(e.target.value)}
+                                                                        placeholder="Watermark Text"
+                                                                        className="w-full text-sm bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-gray-700 dark:text-gray-200 font-semibold"
+                                                                    />
+                                                                    <div className="flex items-center gap-3">
+                                                                        <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-16 whitespace-nowrap">Opacity</span>
                                                                         <input
-                                                                            type="color"
-                                                                            value={penColor}
-                                                                            onChange={e => setPenColor(e.target.value)}
-                                                                            className="w-6 h-6 ml-1 cursor-pointer border-0 rounded overflow-hidden bg-transparent"
-                                                                            title="Custom Color"
+                                                                            type="range" min="0" max="0.6" step="0.01"
+                                                                            value={wmOpacity} onChange={(e) => setWmOpacity(Number(e.target.value))}
+                                                                            className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
                                                                         />
+                                                                        <span className="text-xs font-bold text-blue-600 dark:text-blue-400 w-10 text-right bg-blue-50 dark:bg-blue-900/30 px-1 py-0.5 rounded">{Math.round(wmOpacity * 100)}%</span>
+                                                                    </div>
+                                                                    <div className="flex items-center gap-3">
+                                                                        <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-16 whitespace-nowrap">Size</span>
+                                                                        <input
+                                                                            type="range" min="10" max="100" step="1"
+                                                                            value={wmSize} onChange={(e) => setWmSize(Number(e.target.value))}
+                                                                            className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                                                                        />
+                                                                        <span className="text-xs font-bold text-blue-600 dark:text-blue-400 w-10 text-right bg-blue-50 dark:bg-blue-900/30 px-1 py-0.5 rounded">{wmSize}</span>
+                                                                    </div>
+                                                                    <div className="flex items-center gap-3">
+                                                                        <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-16 whitespace-nowrap">Spacing</span>
+                                                                        <input
+                                                                            type="range" min="50" max="500" step="5"
+                                                                            value={wmSpacing} onChange={(e) => setWmSpacing(Number(e.target.value))}
+                                                                            className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                                                                        />
+                                                                        <span className="text-xs font-bold text-blue-600 dark:text-blue-400 w-10 text-right bg-blue-50 dark:bg-blue-900/30 px-1 py-0.5 rounded">{wmSpacing}</span>
                                                                     </div>
                                                                 </div>
-                                                                <div>
-                                                                    <div className="flex justify-between text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">
-                                                                        <span>Size</span>
-                                                                        <span className="text-blue-600 dark:text-blue-400 font-bold">{penSize}px</span>
-                                                                    </div>
-                                                                    <input type="range" min="2" max="24" value={penSize} onChange={(e) => setPenSize(Number(e.target.value))} className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600" />
-                                                                </div>
-                                                            </div>
-                                                            <button
-                                                                onClick={clearCanvas}
-                                                                className="w-full py-2 text-red-500 dark:text-red-400 bg-red-50 dark:bg-red-950/40 hover:bg-red-100 dark:hover:bg-red-900/40 rounded-lg border border-red-200/50 dark:border-red-900/50 transition-colors flex items-center justify-center gap-1.5 text-xs font-bold"
-                                                            >
-                                                                <Trash2 className="w-4 h-4" /> Clear Canvas
-                                                            </button>
+                                                            )}
                                                         </div>
-                                                    )}
-                                                </div>
-
-
-
-                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
-                                                    <div className="relative">
-                                                        {!canUsePremium && (
-                                                            <div className="absolute inset-0 z-10 bg-gray-50/40 dark:bg-gray-900/60 backdrop-blur-[1.5px] rounded-xl flex items-center justify-center mt-6">
-                                                                <a href="/pricing" className="bg-gradient-to-r from-amber-500 to-orange-600 text-white text-[10px] font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 hover:scale-105 transition-transform cursor-pointer">
-                                                                    <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
-                                                                    Premium Only
-                                                                </a>
-                                                            </div>
-                                                        )}
-                                                        <div className={`text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 flex items-center justify-between ${!canUsePremium ? 'opacity-50' : ''}`}>
-                                                            <span className="flex items-center gap-2"><Stamp className="w-4 h-4 text-indigo-500" /> Watermark</span>
-                                                            <button onClick={() => setWmVisible(!wmVisible)} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${wmVisible ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}>
-                                                                <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${wmVisible ? 'translate-x-5' : 'translate-x-1'}`} />
-                                                            </button>
-                                                        </div>
-                                                        {wmVisible && (
-                                                            <div className={`flex flex-col gap-3 bg-gray-50 dark:bg-gray-800/80 p-2.5 rounded-xl border border-gray-100 dark:border-gray-700 shadow-inner ${!canUsePremium ? 'opacity-50 pointer-events-none select-none' : ''}`}>
-                                                                <input
-                                                                    type="text"
-                                                                    value={wmText}
-                                                                    onChange={(e) => setWmText(e.target.value)}
-                                                                    placeholder="Watermark Text"
-                                                                    className="w-full text-sm bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-gray-700 dark:text-gray-200 font-semibold"
-                                                                />
-                                                                <div className="flex items-center gap-3">
-                                                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-16 whitespace-nowrap">Opacity</span>
-                                                                    <input
-                                                                        type="range" min="0" max="0.6" step="0.01"
-                                                                        value={wmOpacity} onChange={(e) => setWmOpacity(Number(e.target.value))}
-                                                                        className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
-                                                                    />
-                                                                    <span className="text-xs font-bold text-blue-600 dark:text-blue-400 w-10 text-right bg-blue-50 dark:bg-blue-900/30 px-1 py-0.5 rounded">{Math.round(wmOpacity * 100)}%</span>
-                                                                </div>
-                                                                <div className="flex items-center gap-3">
-                                                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-16 whitespace-nowrap">Size</span>
-                                                                    <input
-                                                                        type="range" min="10" max="100" step="1"
-                                                                        value={wmSize} onChange={(e) => setWmSize(Number(e.target.value))}
-                                                                        className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
-                                                                    />
-                                                                    <span className="text-xs font-bold text-blue-600 dark:text-blue-400 w-10 text-right bg-blue-50 dark:bg-blue-900/30 px-1 py-0.5 rounded">{wmSize}</span>
-                                                                </div>
-                                                                <div className="flex items-center gap-3">
-                                                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400 w-16 whitespace-nowrap">Spacing</span>
-                                                                    <input
-                                                                        type="range" min="50" max="500" step="5"
-                                                                        value={wmSpacing} onChange={(e) => setWmSpacing(Number(e.target.value))}
-                                                                        className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
-                                                                    />
-                                                                    <span className="text-xs font-bold text-blue-600 dark:text-blue-400 w-10 text-right bg-blue-50 dark:bg-blue-900/30 px-1 py-0.5 rounded">{wmSpacing}</span>
-                                                                </div>
-                                                            </div>
-                                                        )}
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
                                         </>
                                     )}
                                 </div>
@@ -5254,10 +5310,10 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 </div>
 
                 {/* Right Sidebar Column */}
-                <div className="hidden xl:flex w-[160px] h-full shrink-0 flex-col gap-3 z-10">
+                <div className="hidden xl:flex w-[160px] h-full shrink-0 flex-col gap-1 z-10">
                     {/* Railway Station Style Digital Timer (Moved here) */}
                     {isTimerEnabled && (
-                        <div 
+                        <div
                             className="w-full bg-[#0c0c0c] border-2 border-[#222] rounded-xl shadow-[inset_0_0_15px_rgba(0,0,0,1),0_5px_15px_rgba(0,0,0,0.6)] flex flex-col items-center justify-center shrink-0"
                             style={{ height: `calc(4.5rem * ${headerScale})` }}
                         >
@@ -5282,43 +5338,46 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                     {/* Live Subscribers Feed */}
                     <LiveSubscriberFeed />
-                
-                {/* ── Bottom Section: Future Right Content OR Webcam ── */}
-                {isWebcamActive ? (
-                    <div className="w-full aspect-square mt-auto relative group shrink-0">
-                        <div className={`w-full h-full overflow-hidden shadow-2xl border-2 border-indigo-400/50 bg-black/50 transition-all duration-300 ${webcamShape === 'circle' ? 'rounded-full' : 'rounded-2xl'}`}>
-                            <video
-                                ref={webcamVideoRef}
-                                autoPlay
-                                playsInline
-                                muted
-                                className="w-full h-full object-cover pointer-events-none"
-                            />
-                        </div>
-                        <div className={`absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center pointer-events-auto ${webcamShape === 'circle' ? 'rounded-full' : 'rounded-2xl'}`}>
-                            <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm p-1.5 rounded-full shadow-lg">
-                                <button 
-                                    onClick={(e) => { e.stopPropagation(); setWebcamShape(s => s === 'circle' ? 'square' : 'circle'); }}
-                                    className="text-white p-1.5 rounded-full hover:bg-white/20 transition-colors"
-                                    title="Toggle Shape"
-                                >
-                                    {webcamShape === 'circle' ? <Square className="w-4 h-4" /> : <Circle className="w-4 h-4" />}
-                                </button>
-                                <div className="w-[1px] h-6 bg-white/20 mx-1"></div>
-                                <button 
-                                    onClick={(e) => { e.stopPropagation(); toggleWebcam(); }}
-                                    className="bg-red-500 text-white p-1.5 rounded-full hover:bg-red-600 shadow-md"
-                                    title="Close Webcam"
-                                >
-                                    <X className="w-4 h-4" />
-                                </button>
+
+                    {/* Stream Engagement Widgets */}
+                    <StreamEngagementWidget />
+
+                    {/* ── Bottom Section: Future Right Content OR Webcam ── */}
+                    {isWebcamActive ? (
+                        <div className="w-full aspect-square mt-auto relative group shrink-0">
+                            <div className={`w-full h-full overflow-hidden shadow-2xl border-2 border-indigo-400/50 bg-black/50 transition-all duration-300 ${webcamShape === 'circle' ? 'rounded-full' : 'rounded-2xl'}`}>
+                                <video
+                                    ref={webcamVideoRef}
+                                    autoPlay
+                                    playsInline
+                                    muted
+                                    className="w-full h-full object-cover pointer-events-none"
+                                />
+                            </div>
+                            <div className={`absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center pointer-events-auto ${webcamShape === 'circle' ? 'rounded-full' : 'rounded-2xl'}`}>
+                                <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm p-1.5 rounded-full shadow-lg">
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); setWebcamShape(s => s === 'circle' ? 'square' : 'circle'); }}
+                                        className="text-white p-1.5 rounded-full hover:bg-white/20 transition-colors"
+                                        title="Toggle Shape"
+                                    >
+                                        {webcamShape === 'circle' ? <Square className="w-4 h-4" /> : <Circle className="w-4 h-4" />}
+                                    </button>
+                                    <div className="w-[1px] h-6 bg-white/20 mx-1"></div>
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); toggleWebcam(); }}
+                                        className="bg-red-500 text-white p-1.5 rounded-full hover:bg-red-600 shadow-md"
+                                        title="Close Webcam"
+                                    >
+                                        <X className="w-4 h-4" />
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                ) : (
-                    <div className="w-full flex-1 min-h-0 bg-white/5 border border-white/10 rounded-xl hidden"></div>
-                )}
-            </div>
+                    ) : (
+                        <div className="w-full flex-1 min-h-0 bg-white/5 border border-white/10 rounded-xl hidden"></div>
+                    )}
+                </div>
 
 
 
@@ -5858,7 +5917,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             <Sliders className="w-5 h-5 text-blue-400" />
                             Audio Settings
                         </h3>
-                        <button 
+                        <button
                             onClick={() => setShowAudioSettings(false)}
                             className="text-gray-400 hover:text-white transition-colors bg-gray-800 hover:bg-gray-700 rounded-full p-1.5"
                         >
@@ -5873,7 +5932,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 <div className="text-sm font-bold text-white">Auto Volume Leveler</div>
                                 <div className="text-[10px] text-gray-400">Balances loud and soft sounds</div>
                             </div>
-                            <button 
+                            <button
                                 onClick={() => setUseCompressor(!useCompressor)}
                                 className={`w-12 h-6 rounded-full transition-colors relative ${useCompressor ? 'bg-blue-500' : 'bg-gray-600'}`}
                             >
@@ -5889,8 +5948,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 </div>
                                 <span className="font-mono text-xs font-bold text-blue-400">{lowCutFreq} Hz</span>
                             </div>
-                            <input 
-                                type="range" min="0" max="300" step="5" 
+                            <input
+                                type="range" min="0" max="300" step="5"
                                 value={lowCutFreq} onChange={(e) => setLowCutFreq(Number(e.target.value))}
                                 className="w-full accent-blue-500 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
                             />
@@ -5905,8 +5964,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 </div>
                                 <span className="font-mono text-xs font-bold text-blue-400">{trebleBoost} dB</span>
                             </div>
-                            <input 
-                                type="range" min="0" max="10" step="1" 
+                            <input
+                                type="range" min="0" max="10" step="1"
                                 value={trebleBoost} onChange={(e) => setTrebleBoost(Number(e.target.value))}
                                 className="w-full accent-blue-500 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
                             />
@@ -5920,20 +5979,20 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 </div>
                                 <span className="font-mono text-xs font-bold text-blue-400">{(noiseGateThreshold * 100).toFixed(0)}%</span>
                             </div>
-                            <input 
-                                type="range" min="0" max="0.1" step="0.01" 
+                            <input
+                                type="range" min="0" max="0.1" step="0.01"
                                 value={noiseGateThreshold} onChange={(e) => setNoiseGateThreshold(Number(e.target.value))}
                                 className="w-full accent-blue-500 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
                             />
                         </div>
 
                         <div className="w-full h-px bg-gray-800 my-1 shrink-0"></div>
-                        
+
                         <h4 className="text-sm font-bold text-white flex items-center gap-2 shrink-0">
                             <Volume2 className="w-4 h-4 text-pink-400" />
                             Text-To-Speech (TTS)
                         </h4>
-                        
+
                         {/* Auto Play Read Aloud */}
                         <div className="flex items-center justify-between mt-1">
                             <div>
@@ -5942,13 +6001,11 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             </div>
                             <button
                                 onClick={() => setIsAutoPlayReadAloud(!isAutoPlayReadAloud)}
-                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                                    isAutoPlayReadAloud ? 'bg-pink-500' : 'bg-gray-600'
-                                }`}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${isAutoPlayReadAloud ? 'bg-pink-500' : 'bg-gray-600'
+                                    }`}
                             >
-                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                                    isAutoPlayReadAloud ? 'translate-x-6' : 'translate-x-1'
-                                }`} />
+                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isAutoPlayReadAloud ? 'translate-x-6' : 'translate-x-1'
+                                    }`} />
                             </button>
                         </div>
 
@@ -6074,7 +6131,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 <div className="text-[10px] text-gray-400">Word highlight color</div>
                             </div>
                             <div className="flex items-center gap-1.5">
-                                {['#facc15','#f87171','#34d399','#60a5fa','#a78bfa','#fb923c'].map(color => (
+                                {['#facc15', '#f87171', '#34d399', '#60a5fa', '#a78bfa', '#fb923c'].map(color => (
                                     <button key={color} onClick={() => setTtsWordHighlightColor(color)}
                                         className={`w-4 h-4 rounded-full border-2 transition-all ${ttsWordHighlightColor === color ? 'border-white scale-125' : 'border-transparent'}`}
                                         style={{ backgroundColor: color }}
@@ -6284,8 +6341,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 </div>
                                 <span className="font-mono text-sm font-bold text-pink-400">{ttsRate}x</span>
                             </div>
-                            <input 
-                                type="range" min="0.5" max="2" step="0.1" 
+                            <input
+                                type="range" min="0.5" max="2" step="0.1"
                                 value={ttsRate} onChange={(e) => setTtsRate(parseFloat(e.target.value))}
                                 className="w-full accent-pink-500 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
                             />
