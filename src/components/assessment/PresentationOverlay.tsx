@@ -5470,23 +5470,36 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             </div>
                         </div>
                     ) : (
-                        <div className={`w-full aspect-square mt-auto relative group shrink-0 shadow-xl border border-indigo-200/50 dark:border-indigo-800/50 flex flex-col items-center justify-center bg-gradient-to-br from-indigo-50 dark:from-indigo-950/40 to-blue-50 dark:to-blue-900/20 ${webcamShape === 'circle' ? 'rounded-full' : 'rounded-2xl'}`}>
-                            <div className="relative w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28">
-                                {/* Bot Head */}
-                                <div className={`absolute inset-0 bg-gradient-to-b from-indigo-500 to-blue-600 flex flex-col items-center justify-center shadow-[inset_0_-4px_12px_rgba(0,0,0,0.2),0_8px_16px_rgba(0,0,0,0.1)] ${webcamShape === 'circle' ? 'rounded-full' : 'rounded-[2rem]'}`}>
-                                    {/* Eyes */}
-                                    <div className="flex gap-4 mb-2 mt-2">
-                                        <div className="w-2 h-4 sm:w-2.5 sm:h-5 bg-white/95 rounded-full shadow-sm"></div>
-                                        <div className="w-2 h-4 sm:w-2.5 sm:h-5 bg-white/95 rounded-full shadow-sm"></div>
-                                    </div>
-                                    {/* Mouth */}
-                                    <div className="w-6 sm:w-8 bg-white rounded-full transition-all duration-75 shadow-sm" style={{ 
-                                        height: isSpeaking ? '18px' : '4px',
-                                        animation: isSpeaking ? 'pulse 0.3s ease-in-out infinite alternate' : 'none',
-                                        transformOrigin: 'center'
-                                    }}></div>
+                        <div className={`w-full aspect-square mt-auto relative group shrink-0 shadow-xl border border-indigo-200/50 dark:border-indigo-800/50 flex flex-col items-center justify-center bg-black overflow-hidden ${webcamShape === 'circle' ? 'rounded-full' : 'rounded-2xl'}`}>
+                            
+                            {/* Realistic Video Avatar (Option 1 Demo) */}
+                            <video 
+                                src="https://www.w3schools.com/html/mov_bbb.mp4" /* 👈 Replace this URL with your own Avatar MP4 video */
+                                loop 
+                                muted 
+                                playsInline
+                                className="w-full h-full object-cover transition-opacity duration-300"
+                                style={{ opacity: isSpeaking ? 1 : 0.6 }}
+                                ref={(video) => {
+                                    if (video) {
+                                        if (isSpeaking) {
+                                            video.play().catch(() => {});
+                                        } else {
+                                            video.pause();
+                                        }
+                                    }
+                                }}
+                            />
+
+                            {/* Optional: Add an audio waveform indicator when speaking */}
+                            {isSpeaking && (
+                                <div className="absolute bottom-4 flex gap-1 items-center">
+                                    <div className="w-1 h-3 bg-white rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                                    <div className="w-1 h-5 bg-white rounded-full animate-bounce" style={{ animationDelay: '100ms' }}></div>
+                                    <div className="w-1 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '200ms' }}></div>
                                 </div>
-                            </div>
+                            )}
+
                             {/* Overlay to switch on webcam */}
                             <div className={`absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center pointer-events-auto cursor-pointer ${webcamShape === 'circle' ? 'rounded-full' : 'rounded-2xl'}`} onClick={(e) => { e.stopPropagation(); toggleWebcam(); }}>
                                 <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-lg text-white">
