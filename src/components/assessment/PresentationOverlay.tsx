@@ -1725,7 +1725,13 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     }, [textInput, penColor, penSize]);
 
     const handleCanvasWheel = (e: React.WheelEvent<HTMLCanvasElement>) => {
-        if (scrollContainerRef.current) {
+        if (isPenActive) {
+            e.stopPropagation();
+            setPenSize(prev => {
+                const newSize = prev + (e.deltaY > 0 ? -2 : 2);
+                return Math.max(2, Math.min(48, newSize));
+            });
+        } else if (scrollContainerRef.current) {
             scrollContainerRef.current.scrollTop += e.deltaY;
         }
     };
@@ -5272,8 +5278,35 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             }
                         }
                     ` }} />
-                    {/* Floating Quick Pen Tool (Left Edge) */}
-                    <div className="absolute left-3 md:left-5 top-[15%] md:top-[20%] z-[70] flex flex-col gap-2 items-center animate-in slide-in-from-left-10 fade-in duration-300">
+                    {/* Floating Quick Pen Tool (Left Edge, Bottom) */}
+                    <div className="absolute left-3 md:left-5 bottom-4 md:bottom-8 z-[70] flex flex-col gap-2 items-center animate-in slide-in-from-left-10 fade-in duration-300">
+                        {/* Preset Colors (Visible when Pen is active, expands upwards) */}
+                        <div className={`flex flex-col gap-2 p-1.5 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md rounded-full shadow-lg border border-gray-200 dark:border-gray-700 transition-all duration-300 origin-bottom ${
+                            (isPenActive && drawingTool === 'pen') ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-90 translate-y-4 pointer-events-none'
+                        }`}>
+                            {[
+                                { color: '#ef4444', name: 'Red' },
+                                { color: '#3b82f6', name: 'Blue' },
+                                { color: '#22c55e', name: 'Green' },
+                                { color: '#facc15', name: 'Yellow' },
+                                { color: '#000000', name: 'Black' },
+                                { color: '#ffffff', name: 'White' }
+                            ].map((preset) => (
+                                <button
+                                    key={preset.color}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setPenColor(preset.color);
+                                        setDrawingTool('pen');
+                                        setIsPenActive(true);
+                                    }}
+                                    className={`w-6 h-6 md:w-7 md:h-7 rounded-full transition-all border-2 shadow-sm ${penColor === preset.color ? 'border-blue-500 scale-125 ring-2 ring-blue-500/30' : 'border-gray-300 dark:border-gray-600 hover:scale-110'}`}
+                                    style={{ backgroundColor: preset.color }}
+                                    title={preset.name}
+                                />
+                            ))}
+                        </div>
+
                         {/* Clear Markings Button (Above Pen) */}
                         <button
                             onClick={clearCanvas}
@@ -5302,37 +5335,10 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                         >
                             <Pen className="w-5 h-5 md:w-6 md:h-6" />
                         </button>
-
-                        {/* Preset Colors (Visible when Pen is active) */}
-                        <div className={`flex flex-col gap-2 p-1.5 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md rounded-full shadow-lg border border-gray-200 dark:border-gray-700 transition-all duration-300 origin-top ${
-                            (isPenActive && drawingTool === 'pen') ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-90 -translate-y-4 pointer-events-none'
-                        }`}>
-                            {[
-                                { color: '#ef4444', name: 'Red' },
-                                { color: '#3b82f6', name: 'Blue' },
-                                { color: '#22c55e', name: 'Green' },
-                                { color: '#facc15', name: 'Yellow' },
-                                { color: '#000000', name: 'Black' },
-                                { color: '#ffffff', name: 'White' }
-                            ].map((preset) => (
-                                <button
-                                    key={preset.color}
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        setPenColor(preset.color);
-                                        setDrawingTool('pen');
-                                        setIsPenActive(true);
-                                    }}
-                                    className={`w-6 h-6 md:w-7 md:h-7 rounded-full transition-all border-2 shadow-sm ${penColor === preset.color ? 'border-blue-500 scale-125 ring-2 ring-blue-500/30' : 'border-gray-300 dark:border-gray-600 hover:scale-110'}`}
-                                    style={{ backgroundColor: preset.color }}
-                                    title={preset.name}
-                                />
-                            ))}
-                        </div>
                     </div>
 
-                    {/* Floating Presentation Tools (Right Edge) */}
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 z-[70] bg-slate-900/95 backdrop-blur-xl p-1 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.4)] border border-slate-700/50 flex flex-col gap-1 w-9 items-center animate-in slide-in-from-right-10 fade-in duration-300">
+                    {/* Floating Presentation Tools (Right Edge, Top, Transparent) */}
+                    <div className="absolute right-4 top-4 md:top-8 z-[70] bg-transparent flex flex-col gap-1 w-9 items-center animate-in slide-in-from-right-10 fade-in duration-300">
 
                         <button onClick={() => { setDrawingTool('laser'); setIsPenActive(true); }} className={`p-0.5 rounded-lg transition-all ${(isPenActive && drawingTool === 'laser') ? 'bg-red-500/20 text-red-400 border border-red-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Laser (Shift+L)">
                             <MousePointer2 className="w-4 h-4" />
