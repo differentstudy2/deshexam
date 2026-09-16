@@ -61,7 +61,7 @@ const CONFETTI_CONFIG = {
 };
 
 import 'katex/dist/katex.min.css';
-import { X, ChevronLeft, ChevronRight, Play, Pause, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize, LayoutGrid, Sun, Moon, Eraser, Square, Circle, ArrowUpRight, Type, Presentation, ZoomIn, Volume2, VolumeX, MonitorPlay, Lightbulb, MessageCircle, Stamp, Droplet, Music, AlignLeft, Keyboard, Printer, Trophy, Globe, BarChart2, Sparkles, ImageDown, FileDown, Video, Sliders } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Play, Pause, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize, LayoutGrid, Sun, Moon, Eraser, Square, Circle, ArrowUpRight, Type, Presentation, ZoomIn, Volume2, VolumeX, MonitorPlay, Lightbulb, MessageCircle, Stamp, Droplet, Music, AlignLeft, Keyboard, Printer, Trophy, Globe, BarChart2, Sparkles, ImageDown, FileDown, Video, Sliders, List } from 'lucide-react';
 
 const bnOptionsMap: Record<string, string> = {
     a: 'ক',
@@ -874,6 +874,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [bgOpacity, setBgOpacity] = useState(100);
     const [qBgColor, setQBgColor] = useState('bg-white dark:bg-gray-800');
     const [qTextColor, setQTextColor] = useState('default');
+    const [optBgColor, setOptBgColor] = useState('default');
+    const [optTextColor, setOptTextColor] = useState('default');
     const [animSpeed, setAnimSpeed] = useState(0.1);
     const [isPrintWithAnswers, setIsPrintWithAnswers] = useState(true);
     const [isPrintAsList, setIsPrintAsList] = useState(false);
@@ -3101,7 +3103,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                                                 const theme = colorThemes[oIdx % colorThemes.length];
 
-                                                let containerClasses = `flex items-center gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 transition-all duration-200 shadow-[0_4px_12px_rgba(0,0,0,0.04)] relative z-10 select-none ${theme.bg} ${theme.border}`;
+                                                const bgClass = optBgColor === 'default' ? theme.bg : (optBgColor.startsWith('#') ? '' : optBgColor);
+                                                let containerClasses = `flex items-center gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 transition-all duration-200 shadow-[0_4px_12px_rgba(0,0,0,0.04)] relative z-10 select-none ${bgClass} ${theme.border}`;
                                                 let letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 ${theme.letterBg} ${theme.letterText}`;
 
                                                 if (step === 0) {
@@ -3142,6 +3145,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                             id={`option-card-${opt.key}`}
                                                             className={containerClasses}
                                                             style={{
+                                                                backgroundColor: (optBgColor !== 'default' && optBgColor.startsWith('#')) ? optBgColor : undefined,
                                                                 ...(bgTheme === 'dots' ? {
                                                                     backgroundImage: `radial-gradient(${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'} 1.5px, transparent 1.5px)`,
                                                                     backgroundSize: '12px 12px'
@@ -3204,7 +3208,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                             <div className={letterClasses} style={{ fontSize: 'var(--opt-size)' }}>
                                                                 {optLetter}
                                                             </div>
-                                                            <div className={`prose dark:prose-invert max-w-none text-slate-900 dark:text-white [&_*]:!text-slate-900 dark:[&_*]:!text-white [&>p]:m-0 [&>p]:text-[length:var(--opt-size)] [&>p]:font-semibold [&>p]:leading-snug flex-1 capitalize ${eliminatedOptions.includes(opt.key) && step === 0 ? 'line-through opacity-50' : ''}`}>
+                                                            <div className={`prose dark:prose-invert max-w-none ${optTextColor !== 'default' ? 'text-[var(--opt-color)] [&_*]:!text-[var(--opt-color)]' : 'text-slate-900 dark:text-white [&_*]:!text-slate-900 dark:[&_*]:!text-white'} [&>p]:m-0 [&>p]:text-[length:var(--opt-size)] [&>p]:font-semibold [&>p]:leading-snug flex-1 capitalize ${eliminatedOptions.includes(opt.key) && step === 0 ? 'line-through opacity-50' : ''}`} style={{ '--opt-color': optTextColor !== 'default' ? optTextColor : undefined } as React.CSSProperties}>
                                                                 <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
                                                                     {opt.text}
                                                                 </ReactMarkdown>
@@ -3974,6 +3978,51 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                                     type="color"
                                                                     value={qTextColor.startsWith('#') ? qTextColor : '#000000'}
                                                                     onChange={e => setQTextColor(e.target.value)}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* Options Styling */}
+                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
+                                                        <span className="flex items-center gap-2"><List className="w-4 h-4 text-indigo-500" /> Options Styling</span>
+                                                    </div>
+                                                    <div className="space-y-3">
+                                                        {/* Background Color */}
+                                                        <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                            <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400 min-w-[50px] uppercase">Bg Color:</span>
+                                                            <div className="flex gap-1.5 flex-1 justify-end items-center">
+                                                                <button onClick={() => setOptBgColor('default')} className={`w-5 h-5 rounded-full border border-gray-300 dark:border-gray-600 shadow-sm text-[9px] font-bold flex items-center justify-center bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300 ring-2 ${optBgColor === 'default' ? 'ring-blue-500' : 'ring-transparent'}`} title="Auto">A</button>
+                                                                <button onClick={() => setOptBgColor('bg-white dark:bg-gray-800')} className={`w-5 h-5 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 shadow-sm ring-2 ${optBgColor === 'bg-white dark:bg-gray-800' ? 'ring-blue-500' : 'ring-transparent'}`} title="White/Dark"></button>
+                                                                <button onClick={() => setOptBgColor('bg-blue-50/90 dark:bg-blue-900/50')} className={`w-5 h-5 rounded-full border border-blue-200 dark:border-blue-700 bg-blue-100 dark:bg-blue-900 shadow-sm ring-2 ${optBgColor === 'bg-blue-50/90 dark:bg-blue-900/50' ? 'ring-blue-500' : 'ring-transparent'}`} title="Blue"></button>
+                                                                <button onClick={() => setOptBgColor('bg-indigo-50/90 dark:bg-indigo-900/50')} className={`w-5 h-5 rounded-full border border-indigo-200 dark:border-indigo-700 bg-indigo-100 dark:bg-indigo-900 shadow-sm ring-2 ${optBgColor === 'bg-indigo-50/90 dark:bg-indigo-900/50' ? 'ring-blue-500' : 'ring-transparent'}`} title="Indigo"></button>
+                                                                <button onClick={() => setOptBgColor('bg-black/50 dark:bg-black/80')} className={`w-5 h-5 rounded-full border border-gray-700 dark:border-gray-600 bg-gray-900 shadow-sm ring-2 ${optBgColor === 'bg-black/50 dark:bg-black/80' ? 'ring-blue-500' : 'ring-transparent'}`} title="Black/Dark"></button>
+                                                                <input
+                                                                    type="color"
+                                                                    value={optBgColor.startsWith('#') ? optBgColor : '#ffffff'}
+                                                                    onChange={e => setOptBgColor(e.target.value)}
+                                                                    className="w-5 h-5 ml-1 cursor-pointer border-0 rounded overflow-hidden bg-transparent"
+                                                                    title="Custom Color"
+                                                                />
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Text Color */}
+                                                        <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                            <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400 min-w-[50px] uppercase">Text Color:</span>
+                                                            <div className="flex gap-1.5 flex-1 justify-end items-center">
+                                                                <button onClick={() => setOptTextColor('default')} className={`w-5 h-5 rounded-full border border-gray-300 dark:border-gray-600 shadow-sm text-[9px] font-bold flex items-center justify-center bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300 ring-2 ${optTextColor === 'default' ? 'ring-blue-500' : 'ring-transparent'}`} title="Auto">A</button>
+                                                                <button onClick={() => setOptTextColor('#000000')} className={`w-5 h-5 rounded-full border border-gray-800 shadow-sm bg-black ring-2 ${optTextColor === '#000000' ? 'ring-blue-500' : 'ring-transparent'}`} title="Black"></button>
+                                                                <button onClick={() => setOptTextColor('#ffffff')} className={`w-5 h-5 rounded-full border border-gray-300 shadow-sm bg-white ring-2 ${optTextColor === '#ffffff' ? 'ring-blue-500' : 'ring-transparent'}`} title="White"></button>
+                                                                <button onClick={() => setOptTextColor('#ef4444')} className={`w-5 h-5 rounded-full border border-red-500 shadow-sm bg-red-500 ring-2 ${optTextColor === '#ef4444' ? 'ring-blue-500' : 'ring-transparent'}`} title="Red"></button>
+                                                                <button onClick={() => setOptTextColor('#3b82f6')} className={`w-5 h-5 rounded-full border border-blue-500 shadow-sm bg-blue-500 ring-2 ${optTextColor === '#3b82f6' ? 'ring-blue-500' : 'ring-transparent'}`} title="Blue"></button>
+                                                                <button onClick={() => setOptTextColor('#f59e0b')} className={`w-5 h-5 rounded-full border border-amber-500 shadow-sm bg-amber-500 ring-2 ${optTextColor === '#f59e0b' ? 'ring-blue-500' : 'ring-transparent'}`} title="Yellow"></button>
+                                                                <input
+                                                                    type="color"
+                                                                    value={optTextColor.startsWith('#') ? optTextColor : '#000000'}
+                                                                    onChange={e => setOptTextColor(e.target.value)}
                                                                     className="w-5 h-5 ml-1 cursor-pointer border-0 rounded overflow-hidden bg-transparent"
                                                                     title="Custom Color"
                                                                 />
@@ -4981,17 +5030,17 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                         const isCorrect = q.correctAnswer && q.correctAnswer.toLowerCase().includes(opt.key);
                                                         const printContainerClass = showHighlight && isCorrect
                                                             ? `flex items-center gap-5 py-2 px-3 rounded-xl border-2 border-[#34A853] bg-[#f0fdf4] min-h-[50px] !print-color-adjust-exact`
-                                                            : `flex items-center gap-5 py-2 px-3 rounded-xl border-2 shadow-[0_4px_12px_rgba(0,0,0,0.04)] ${theme.bg} ${theme.border} min-h-[50px]`;
+                                                            : `flex items-center gap-5 py-2 px-3 rounded-xl border-2 shadow-[0_4px_12px_rgba(0,0,0,0.04)] ${optBgColor === 'default' ? theme.bg : (optBgColor.startsWith('#') ? '' : optBgColor)} ${theme.border} min-h-[50px]`;
                                                         const printLetterClass = showHighlight && isCorrect
                                                             ? `shrink-0 w-14 h-14 flex items-center justify-center rounded-full text-2xl font-black bg-[#34A853] text-white !print-color-adjust-exact`
                                                             : `shrink-0 w-14 h-14 flex items-center justify-center rounded-full text-2xl font-black ${theme.letterBg} ${theme.letterText}`;
 
                                                         return (
-                                                            <div key={opt.key} className={printContainerClass}>
+                                                            <div key={opt.key} className={printContainerClass} style={{ backgroundColor: (optBgColor !== 'default' && optBgColor.startsWith('#')) ? optBgColor : undefined }}>
                                                                 <div className={printLetterClass}>
                                                                     {optLetter}
                                                                 </div>
-                                                                <div className="prose dark:prose-invert max-w-none text-black dark:text-gray-100 font-bold text-[24px] flex items-center [&_*]:!text-[24px] [&_*]:!leading-tight [&_*]:!m-0">
+                                                                <div className={`prose dark:prose-invert max-w-none font-bold text-[24px] flex items-center [&_*]:!text-[24px] [&_*]:!leading-tight [&_*]:!m-0 ${optTextColor !== 'default' ? 'text-[var(--opt-color)] [&_*]:!text-[var(--opt-color)]' : 'text-black dark:text-gray-100'}`} style={{ '--opt-color': optTextColor !== 'default' ? optTextColor : undefined } as React.CSSProperties}>
                                                                     <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
                                                                         {opt.text}
                                                                     </ReactMarkdown>
@@ -5097,7 +5146,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                             ];
                                                             const theme = colorThemes[oIdx % colorThemes.length];
 
-                                                            let containerClasses = `flex items-center gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 transition-all duration-200 shadow-[0_4px_12px_rgba(0,0,0,0.04)] relative z-10 select-none ${theme.bg} ${theme.border} !print-color-adjust-exact`;
+                                                            const bgClass = optBgColor === 'default' ? theme.bg : (optBgColor.startsWith('#') ? '' : optBgColor);
+                                                            let containerClasses = `flex items-center gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 transition-all duration-200 shadow-[0_4px_12px_rgba(0,0,0,0.04)] relative z-10 select-none ${bgClass} ${theme.border} !print-color-adjust-exact`;
                                                             let letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 ${theme.letterBg} ${theme.letterText} !print-color-adjust-exact`;
 
                                                             if (showCorrect) {
@@ -5110,6 +5160,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                                     <div
                                                                         className={containerClasses}
                                                                         style={{
+                                                                            backgroundColor: (optBgColor !== 'default' && optBgColor.startsWith('#')) ? optBgColor : undefined,
                                                                             ...(bgTheme === 'dots' ? {
                                                                                 backgroundImage: `radial-gradient(${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'} 1.5px, transparent 1.5px)`,
                                                                                 backgroundSize: '12px 12px'
@@ -5125,7 +5176,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                                         <div className={letterClasses}>
                                                                             {optLetter}
                                                                         </div>
-                                                                        <div className="prose dark:prose-invert max-w-none w-full leading-snug flex-1 font-bold text-[length:calc(var(--q-size)*0.85)] [&_*]:!text-[length:calc(var(--q-size)*0.85)] [&_*]:!leading-snug [&_*]:!m-0 text-slate-800 dark:text-slate-100">
+                                                                        <div className={`prose dark:prose-invert max-w-none w-full leading-snug flex-1 font-bold text-[length:calc(var(--q-size)*0.85)] [&_*]:!text-[length:calc(var(--q-size)*0.85)] [&_*]:!leading-snug [&_*]:!m-0 ${optTextColor !== 'default' ? 'text-[var(--opt-color)] [&_*]:!text-[var(--opt-color)]' : 'text-slate-800 dark:text-slate-100'}`} style={{ '--opt-color': optTextColor !== 'default' ? optTextColor : undefined } as React.CSSProperties}>
                                                                             <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
                                                                                 {opt.text}
                                                                             </ReactMarkdown>
