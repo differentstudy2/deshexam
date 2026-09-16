@@ -519,13 +519,13 @@ const LiveSubscriberFeed = () => {
                 const newSub = { id: Date.now(), name: randomName };
                 return [newSub, ...prev].slice(0, 5); // Keep last 5 for space since there's no big counter
             });
-        }, Math.random() * 3000 + 3500); // 3.5-6.5 seconds
+        }, 30000); // 30 seconds
 
         return () => clearInterval(interval);
     }, []);
 
     return (
-        <div className="w-full flex-1 min-h-[200px] flex flex-col bg-white dark:bg-[#0F0F0F] rounded-lg overflow-hidden shadow-2xl border border-gray-200 dark:border-[#272727] relative p-3 shrink transition-colors" style={{ maxHeight: '420px' }}>
+        <div className="w-full h-[340px] shrink-0 flex flex-col bg-white dark:bg-[#0F0F0F] rounded-lg overflow-hidden shadow-2xl border border-gray-200 dark:border-[#272727] relative p-3 transition-colors">
             
             {/* YouTube Header */}
             <div className="flex flex-col items-center justify-center border-b border-gray-200 dark:border-[#272727] pb-3 mb-3 shrink-0 transition-colors">
