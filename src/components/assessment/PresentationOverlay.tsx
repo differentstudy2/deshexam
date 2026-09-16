@@ -886,71 +886,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [ttsRate, setTtsRate] = useState(1);
     const [isTTSPlaying, setIsTTSPlaying] = useState(false);
     const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([]);
-
-    useEffect(() => {
-        const loadVoices = () => {
-            const voices = window.speechSynthesis.getVoices();
-            setAvailableVoices(voices);
-            if (!ttsVoiceURI && voices.length > 0) {
-                const bnVoice = voices.find(v => v.lang.includes('bn') || v.lang.includes('bd'));
-                setTtsVoiceURI(bnVoice ? bnVoice.voiceURI : voices[0].voiceURI);
-            }
-        };
-        loadVoices();
-        if (window.speechSynthesis.onvoiceschanged !== undefined) {
-            window.speechSynthesis.onvoiceschanged = loadVoices;
-        }
-    }, [ttsVoiceURI]);
-
-    const stopTTS = () => {
-        window.speechSynthesis.cancel();
-        setIsTTSPlaying(false);
-    };
-
-    const playTTS = (text: string) => {
-        stopTTS();
-        if (!text) return;
-        const utterance = new SpeechSynthesisUtterance(text);
-        if (ttsVoiceURI) {
-            const selectedVoice = availableVoices.find(v => v.voiceURI === ttsVoiceURI);
-            if (selectedVoice) utterance.voice = selectedVoice;
-        }
-        utterance.rate = ttsRate;
-        utterance.onend = () => setIsTTSPlaying(false);
-        utterance.onerror = () => setIsTTSPlaying(false);
-        setIsTTSPlaying(true);
-        window.speechSynthesis.speak(utterance);
-    };
-
-    useEffect(() => {
-        stopTTS();
-    }, [currentSlide]);
-
-    useEffect(() => {
-        return () => stopTTS();
-    }, []);
     
-    const handleReadCurrentQuestion = () => {
-        if (isTTSPlaying) {
-            stopTTS();
-            return;
-        }
-        const q = questions[currentSlide];
-        if (!q) return;
-        let textToRead = q.question || '';
-        const parsedOptions = (() => {
-            if (!q.options) return [];
-            try { return typeof q.options === 'string' ? JSON.parse(q.options) : q.options; } catch (e) { return []; }
-        })();
-        if (parsedOptions.length > 0) {
-            textToRead += '. Options are: ';
-            parsedOptions.forEach((opt: any) => {
-                textToRead += `${opt.text}, `;
-            });
-        }
-        const cleanText = textToRead.replace(/[*_#`]/g, '').replace(/<[^>]*>?/gm, '');
-        playTTS(cleanText);
-    };
+
 
     const taxonomyString = [chapterName, topicName].filter(Boolean).join(' | ');
     let displayTitle = classLine;
@@ -1777,6 +1714,12 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
         const utterance = new SpeechSynthesisUtterance(textToRead);
         utterance.lang = uiLang === 'bn' ? 'bn-BD' : 'en-US';
+        
+        if (ttsVoiceURI) {
+            const selectedVoice = availableVoices.find(v => v.voiceURI === ttsVoiceURI);
+            if (selectedVoice) utterance.voice = selectedVoice;
+        }
+        utterance.rate = ttsRate;
 
         utterance.onboundary = (event: SpeechSynthesisEvent) => {
             const charIdx = event.charIndex;
@@ -1803,6 +1746,12 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     // Step 1: বলো সঠিক উত্তর কী
                     const correctUtterance = new SpeechSynthesisUtterance(correctText);
                     correctUtterance.lang = isBangla ? 'bn-BD' : 'en-US';
+                    
+                    if (ttsVoiceURI) {
+                        const selectedVoice = availableVoices.find(v => v.voiceURI === ttsVoiceURI);
+                        if (selectedVoice) correctUtterance.voice = selectedVoice;
+                    }
+                    correctUtterance.rate = ttsRate;
 
                     correctUtterance.onend = () => {
                         // Step 2: তারপর click animation করো
@@ -3121,7 +3070,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                         {/* Subtle horizontal divider line */}
                                         <div className="w-full border-t border-gray-200 dark:border-gray-700/60 mt-1 md:mt-2 mb-1"></div>
 
-                                        <div data-read-cursor-target="question" className={`prose dark:prose-invert max-w-none w-full prose-p:font-extrabold text-[length:var(--q-size)] leading-relaxed text-left font-extrabold [&_*]:!text-[length:var(--q-size)] [&_*]:!leading-relaxed [&_*]:!m-0 ${qTextColor !== 'default' ? 'text-[var(--q-color)] [&_*]:!text-[var(--q-color)] drop-shadow-sm [&_*]:!drop-shadow-sm' : (bgTheme === 'video' ? 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] [&_*]:!text-white [&_*]:!drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]' : 'text-slate-900 dark:text-white [&_*]:!text-slate-900 dark:[&_*]:!text-white')}`}>
+                                        <div data-read-cursor-target="question" className={`prose dark:prose-invert max-w-none w-full prose-p:font-extrabold text-[length:var(--q-size)] leading-relaxed text-left font-extrabold [&_*]:!text-[length:var(--q-size)] [&_*]:!leading-relaxed [&_*]:!m-0 ${qTextColor !== 'default' ? 'text-[var(--q-color)] [&_*]:!text-[var(--q-color)] drop-shadow-sm [&_*]:!drop-shadow-sm' : (bgTheme === 'video' ? 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] [&_*]:!text-white [&_*]:!drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]' : 'text-slate-900 dark:text-white [&_*]:!text-slate-900 dark:[&_*]:!text-white')} p-2 -m-2 transition-all duration-300`}>
                                             <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
                                                 {q.questionText}
                                             </ReactMarkdown>
@@ -3207,6 +3156,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                         letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 bg-yellow-300 dark:bg-yellow-700 text-yellow-800 dark:text-yellow-100`;
                                                     }
                                                 }
+
+
                                                 return (
                                                     <motion.div
                                                         key={opt.key}
@@ -3508,8 +3459,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 
                                 {/* TTS Read Aloud Button */}
                                 <button
-                                    onClick={handleReadCurrentQuestion}
-                                    className={`hidden sm:block p-2 md:p-3 rounded-full transition-all shrink-0 ${isTTSPlaying ? 'bg-pink-500 text-white shadow-md animate-pulse ring-2 ring-pink-300' : 'hover:bg-white/10 text-white/80 hover:text-white'}`}
+                                    onClick={() => handleReadAloud()}
+                                    className={`hidden sm:block p-2 md:p-3 rounded-full transition-all shrink-0 ${isSpeaking ? 'bg-pink-500 text-white shadow-md animate-pulse ring-2 ring-pink-300' : 'hover:bg-white/10 text-white/80 hover:text-white'}`}
                                     title="Read Question Aloud (TTS)"
                                 >
                                     <Volume2 className="w-5 h-5 md:w-6 md:h-6" />
@@ -3518,7 +3469,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 {/* Audio Settings Button */}
                                 <button
                                     onClick={() => setShowAudioSettings(!showAudioSettings)}
-                                    className={`hidden md:block p-2 md:p-3 rounded-full transition-all shrink-0 ${showAudioSettings
+                                    className={`p-2 md:p-3 rounded-full transition-all shrink-0 ${showAudioSettings
                                         ? 'bg-blue-500 text-white shadow-md ring-2 ring-blue-300'
                                         : 'hover:bg-white/10 text-white/80 hover:text-white'
                                         }`}
@@ -4347,47 +4298,6 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     </div>
                                                 </div>
 
-
-
-                                                {/* Text-To-Speech Settings */}
-                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
-                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
-                                                        <Volume2 className="w-4 h-4 text-pink-500" />
-                                                        Text-To-Speech (TTS)
-                                                    </div>
-                                                    
-                                                    <div className="flex flex-col gap-2">
-                                                        <div className="flex justify-between items-center bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
-                                                            <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase">Voice:</span>
-                                                            <select
-                                                                className="bg-transparent text-xs font-semibold text-gray-700 dark:text-gray-300 outline-none max-w-[150px] truncate"
-                                                                value={ttsVoiceURI}
-                                                                onChange={(e) => setTtsVoiceURI(e.target.value)}
-                                                            >
-                                                                {availableVoices.map(voice => (
-                                                                    <option key={voice.voiceURI} value={voice.voiceURI}>
-                                                                        {voice.name} ({voice.lang})
-                                                                    </option>
-                                                                ))}
-                                                            </select>
-                                                        </div>
-
-                                                        <div className="flex flex-col gap-1 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
-                                                            <div className="flex justify-between items-center w-full">
-                                                                <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase">Speed: {ttsRate}x</span>
-                                                            </div>
-                                                            <input
-                                                                type="range"
-                                                                min="0.5"
-                                                                max="2"
-                                                                step="0.1"
-                                                                value={ttsRate}
-                                                                onChange={(e) => setTtsRate(parseFloat(e.target.value))}
-                                                                className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                </div>
 
                                                 <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
                                                     <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 flex items-center justify-between">
@@ -5390,7 +5300,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
             {/* Audio Settings Panel */}
             {showAudioSettings && (
-                <div className="fixed bottom-24 right-4 md:right-8 bg-gray-900 border border-gray-700 rounded-2xl p-6 shadow-2xl z-50 w-80 md:w-96 animate-in slide-in-from-bottom-4">
+                <div className="fixed bottom-24 right-4 md:right-8 bg-gray-900 border border-gray-700 rounded-2xl p-6 shadow-2xl z-[100000] w-80 md:w-96 animate-in slide-in-from-bottom-4">
                     <button 
                         onClick={() => setShowAudioSettings(false)}
                         className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
@@ -5434,6 +5344,21 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             />
                         </div>
 
+                        {/* Auto Play Read Aloud */}
+                        <div className="flex items-center justify-between mb-4">
+                            <span className="text-sm font-semibold text-gray-300">Auto Play Read Aloud</span>
+                            <button
+                                onClick={() => setIsAutoPlayReadAloud(!isAutoPlayReadAloud)}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                                    isAutoPlayReadAloud ? 'bg-pink-500' : 'bg-gray-600'
+                                }`}
+                            >
+                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                    isAutoPlayReadAloud ? 'translate-x-6' : 'translate-x-1'
+                                }`} />
+                            </button>
+                        </div>
+
                         {/* Treble Boost */}
                         <div>
                             <div className="flex justify-between items-center mb-2">
@@ -5463,6 +5388,47 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 type="range" min="0" max="0.1" step="0.01" 
                                 value={noiseGateThreshold} onChange={(e) => setNoiseGateThreshold(Number(e.target.value))}
                                 className="w-full accent-blue-500 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                            />
+                        </div>
+
+                        <div className="w-full h-px bg-gray-800 my-1"></div>
+                        
+                        <h4 className="text-sm font-bold text-white flex items-center gap-2 -mb-2">
+                            <Volume2 className="w-4 h-4 text-pink-400" />
+                            Text-To-Speech (TTS)
+                        </h4>
+                        {/* TTS Voice */}
+                        <div>
+                            <div className="flex justify-between items-center mb-2">
+                                <div>
+                                    <div className="font-bold text-white">Voice</div>
+                                </div>
+                            </div>
+                            <select
+                                className="w-full bg-gray-800 text-sm font-semibold text-gray-200 border border-gray-700 rounded-lg px-2 py-2 focus:outline-none focus:border-pink-500"
+                                value={ttsVoiceURI}
+                                onChange={(e) => setTtsVoiceURI(e.target.value)}
+                            >
+                                {availableVoices.map(voice => (
+                                    <option key={voice.voiceURI} value={voice.voiceURI}>
+                                        {voice.name} ({voice.lang})
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* TTS Speed */}
+                        <div>
+                            <div className="flex justify-between items-center mb-2">
+                                <div>
+                                    <div className="font-bold text-white">Reading Speed</div>
+                                </div>
+                                <span className="font-mono text-sm font-bold text-pink-400">{ttsRate}x</span>
+                            </div>
+                            <input 
+                                type="range" min="0.5" max="2" step="0.1" 
+                                value={ttsRate} onChange={(e) => setTtsRate(parseFloat(e.target.value))}
+                                className="w-full accent-pink-500 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
                             />
                         </div>
                     </div>
