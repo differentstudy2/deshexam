@@ -633,6 +633,73 @@ const StreamEngagementWidget = () => {
     );
 };
 
+const LeftStreamWidgets = () => {
+    // Fake Chat Logic
+    const [chats, setChats] = useState<{id: number, name: string, msg: string}[]>([]);
+    
+    useEffect(() => {
+        const messages = ['Sir eta bujhlam na', 'Ans hobe C!', 'Thank you sir!', 'Option A is correct', 'Next question please', 'B!', 'D hobe na?'];
+        const interval = setInterval(() => {
+            const randomMsg = messages[Math.floor(Math.random() * messages.length)];
+            setChats(prev => [{id: Date.now(), name: generateRandomName().split(' ')[0], msg: randomMsg}, ...prev].slice(0, 15));
+        }, 3000);
+        return () => clearInterval(interval);
+    }, []);
+
+    return (
+        <div className="flex flex-col gap-1.5 w-full h-full overflow-hidden shrink-0">
+            {/* 1. Leaderboard */}
+            <div className="flex flex-col bg-white dark:bg-[#0F0F0F] rounded-lg p-1.5 px-2 border border-gray-200 dark:border-[#272727] shadow-sm shrink-0">
+                <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400 mb-1 border-b border-gray-200 dark:border-[#272727] pb-1 uppercase tracking-wider flex items-center justify-between">
+                    Top Scorers <Trophy className="w-3 h-3 text-yellow-500" />
+                </span>
+                <div className="flex flex-col gap-0.5">
+                    <div className="flex justify-between items-center"><span className="text-[11px] font-bold text-yellow-600 dark:text-yellow-400 truncate pr-1">🥇 Rahul</span><span className="text-[10px] font-semibold text-gray-800 dark:text-gray-200 tabular-nums">98%</span></div>
+                    <div className="flex justify-between items-center"><span className="text-[11px] font-bold text-gray-500 dark:text-gray-400 truncate pr-1">🥈 Akash</span><span className="text-[10px] font-semibold text-gray-800 dark:text-gray-200 tabular-nums">95%</span></div>
+                    <div className="flex justify-between items-center"><span className="text-[11px] font-bold text-orange-700 dark:text-orange-400 truncate pr-1">🥉 Puja</span><span className="text-[10px] font-semibold text-gray-800 dark:text-gray-200 tabular-nums">92%</span></div>
+                </div>
+            </div>
+
+            {/* 3. Upcoming Schedule */}
+            <div className="flex items-center gap-1.5 bg-blue-50 dark:bg-blue-900/20 rounded-lg p-1.5 border border-blue-200 dark:border-blue-800/30 shrink-0 shadow-sm">
+                <Clock className="w-4 h-4 text-blue-500 shrink-0" />
+                <div className="flex flex-col">
+                    <span className="text-[9px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Up Next</span>
+                    <span className="text-[10px] font-semibold text-gray-800 dark:text-gray-200 leading-tight">English - 4:00 PM</span>
+                </div>
+            </div>
+
+            {/* Placeholder for future widget (Fills remaining empty space) */}
+            <div className="flex-1 w-full min-h-[50px] border border-dashed border-gray-300 dark:border-gray-700 rounded-lg flex items-center justify-center shrink">
+                <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500">Empty Space</span>
+            </div>
+
+            {/* 3. Live Chat (Fake) */}
+            <div className="flex flex-col h-[220px] shrink-0 bg-white dark:bg-[#0F0F0F] rounded-lg p-1.5 border border-gray-200 dark:border-[#272727] shadow-sm overflow-hidden relative">
+                <span className="text-[10px] font-bold text-red-500 mb-1 border-b border-gray-200 dark:border-[#272727] pb-1 flex items-center gap-1 uppercase tracking-wider shrink-0">
+                    <MessageCircle className="w-3 h-3" /> Live Chat
+                </span>
+                <div className="flex flex-col gap-1.5 flex-1 overflow-hidden relative justify-end pb-1" style={{ maskImage: 'linear-gradient(to bottom, transparent 0%, black 20%, black 100%)', WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 20%, black 100%)' }}>
+                    <AnimatePresence initial={false}>
+                        {[...chats].reverse().map(chat => (
+                            <motion.div key={chat.id} layout initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} className="text-[10px] leading-snug shrink-0">
+                                <span className="font-bold text-blue-500 dark:text-blue-400 mr-1">{chat.name}:</span>
+                                <span className="text-gray-700 dark:text-gray-300 font-medium break-words">{chat.msg}</span>
+                            </motion.div>
+                        ))}
+                    </AnimatePresence>
+                </div>
+            </div>
+            
+            {/* 4. Subscribe CTA */}
+            <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-1.5 border border-red-200 dark:border-red-800/30 flex items-center justify-center gap-1 cursor-pointer hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors shrink-0 shadow-sm animate-pulse mb-1">
+                <Youtube className="w-4 h-4 text-red-600 shrink-0" />
+                <span className="text-[11px] font-bold text-red-600 dark:text-red-400">Subscribe & Like!</span>
+            </div>
+        </div>
+    );
+};
+
 export default function PresentationOverlay({ questions, classLine, chapterName, topicName, autoStart, onClose, isPremiumUser, testLanguage }: PresentationOverlayProps) {
     const { user, userProfile } = useAuth();
     const [fetchedIsAdmin, setFetchedIsAdmin] = useState(false);
@@ -2752,70 +2819,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                 {/* Left Sidebar Column */}
                 <div className="hidden xl:flex w-[160px] h-full shrink-0 flex-col gap-1 z-10">
-                    {/* Left Ad Banner */}
-                    <div className="w-full flex-1 min-h-[200px] flex flex-col items-center justify-between bg-gradient-to-b from-[#0a192f] via-[#0b2244] to-[#041128] rounded-xl overflow-hidden shadow-2xl border border-blue-400/20 relative p-2.5 shrink" style={{ maxHeight: '420px' }}>
-                        {/* Floating Elements Background */}
-                        <div className="absolute top-[5%] left-[25%] w-16 h-16 rounded-full border border-blue-400/20 bg-blue-500/10 blur-[8px]"></div>
-                        <div className="absolute bottom-[30%] right-[-5%] w-20 h-20 rounded-full bg-blue-400/10 blur-[20px]"></div>
-
-                        {/* Top Logo */}
-                        <div className="flex flex-col items-center w-full z-10 pt-2">
-                            <div className="bg-white/10 px-3 py-2 rounded-lg shadow-lg border border-white/10 backdrop-blur-sm mb-3">
-                                <h2 className="text-[20px] font-extrabold text-white tracking-wide drop-shadow-md">
-                                    <span className="text-blue-400">Desh</span>Exam
-                                </h2>
-                            </div>
-                            <div className="text-center">
-                                <h3 className="text-[18px] text-blue-100 mb-1 leading-tight font-medium">সঠিক প্রস্তুতি</h3>
-                                <h3 className="text-[26px] text-white leading-tight font-extrabold">
-                                    <span className="text-[#FFD700]">সফলতার</span>
-                                </h3>
-                                <h3 className="text-[26px] text-white leading-tight font-extrabold">চাবিকাঠি!</h3>
-                            </div>
-                        </div>
-
-                        {/* Middle Trophy */}
-                        <div className="flex items-center justify-center text-4xl w-full z-10 drop-shadow-2xl my-2 relative">
-                            <div className="absolute inset-0 bg-blue-400/20 blur-[15px] rounded-full"></div>
-                            🏆
-                        </div>
-
-                        {/* Features List */}
-                        <div className="flex flex-col z-10 w-full space-y-2 mb-2 min-h-0 overflow-y-auto shrink custom-scrollbar">
-                            <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-lg p-2.5">
-                                <div className="flex flex-col space-y-1.5">
-                                    {[
-                                        'Mock Test',
-                                        'Topic Test',
-                                        'Live Exam',
-                                        'PYQ',
-                                        'AI Report',
-                                        'Merit List'
-                                    ].map((feature, idx) => (
-                                        <div key={idx} className="flex items-center gap-1.5">
-                                            <Check className="w-4 h-4 text-[#FFB800] shrink-0" />
-                                            <span className="text-gray-100 text-[14px] font-semibold tracking-wide leading-tight">{feature}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Discount Badge */}
-                        <div className="w-full z-10 flex justify-center mb-2">
-                            <div className="bg-red-500/90 text-white text-[11px] font-bold px-3 py-1 rounded-full animate-pulse border border-red-400 shadow-[0_0_10px_rgba(239,68,68,0.5)]">
-                                ⭐ GET 50% OFF ⭐
-                            </div>
-                        </div>
-
-                        {/* CTA Button */}
-                        <div className="w-full z-10 pb-2">
-                            <button className="w-full flex flex-col items-center justify-center py-2 bg-gradient-to-b from-[#2178ff] to-[#0a4bb8] border border-blue-400/50 rounded-lg shadow-[0_4px_10px_rgba(10,75,184,0.4)] hover:scale-105 transition-transform duration-300">
-                                <span className="text-white font-bold text-[16px] drop-shadow-md leading-none mb-1">Subscribe</span>
-                                <span className="text-white font-bold text-[16px] drop-shadow-md leading-none">Today</span>
-                            </button>
-                        </div>
-                    </div>
+                    {/* Stream Widgets */}
+                    <LeftStreamWidgets />
                     {/* ── Analog Clock (Moved here) ── */}
                     {isTimerEnabled ? (() => {
                         const sec = timerDisplay.secs;
