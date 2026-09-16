@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
+import { CLOUD_VOICES, fetchCloudTTS, TTSProvider } from '../../utils/cloudTTS';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
@@ -61,7 +62,7 @@ const CONFETTI_CONFIG = {
 };
 
 import 'katex/dist/katex.min.css';
-import { X, ChevronLeft, ChevronRight, Play, Pause, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize, LayoutGrid, Sun, Moon, Eraser, Square, Circle, ArrowUpRight, Type, Presentation, ZoomIn, Volume2, VolumeX, MonitorPlay, Lightbulb, MessageCircle, Stamp, Droplet, Music, AlignLeft, Keyboard, Printer, Trophy, Globe, BarChart2, Sparkles, ImageDown, FileDown, Video, Sliders, List } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Play, Pause, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize, LayoutGrid, Sun, Moon, Eraser, Square, Circle, ArrowUpRight, Type, Presentation, ZoomIn, Volume2, VolumeX, MonitorPlay, Lightbulb, MessageCircle, Stamp, Droplet, Music, AlignLeft, Keyboard, Printer, Trophy, Globe, BarChart2, Sparkles, ImageDown, FileDown, Video, Sliders, List, Key } from 'lucide-react';
 
 const bnOptionsMap: Record<string, string> = {
     a: 'ক',
@@ -365,6 +366,66 @@ const MetallicScrew = ({ rotation = 0, className = '' }: { rotation?: number; cl
     </div>
 );
 
+const clearWordHighlight = () => {
+    if ('highlights' in CSS) {
+        (CSS as any).highlights.delete("tts-word-highlight");
+    }
+};
+
+const highlightWordInElement = (elId: string | 'question', globalCharIdx: number, segStartChar: number): DOMRect | null => {
+    if (!('highlights' in CSS)) return null;
+    
+    let el: HTMLElement | null = null;
+    if (elId === 'question') {
+        el = document.querySelector('[data-read-cursor-target="question"]') as HTMLElement | null;
+    } else {
+        el = document.getElementById(elId);
+    }
+    if (!el) return null;
+
+    clearWordHighlight();
+
+    const localIdx = globalCharIdx - segStartChar;
+    
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
+    let currentNode: Node | null;
+    let currentOffset = 0;
+    let targetNode: Node | null = null;
+    let targetOffset = 0;
+
+    while (currentNode = walker.nextNode()) {
+        const len = currentNode.nodeValue?.length || 0;
+        if (currentOffset + len > localIdx) {
+            targetNode = currentNode;
+            targetOffset = localIdx - currentOffset;
+            break;
+        }
+        currentOffset += len;
+    }
+
+    if (targetNode && targetNode.nodeValue) {
+        const text = targetNode.nodeValue;
+        let endOffset = targetOffset;
+        while (endOffset < text.length && !/\s/.test(text[endOffset])) {
+            endOffset++;
+        }
+        
+        try {
+            const range = new Range();
+            range.setStart(targetNode, targetOffset);
+            range.setEnd(targetNode, endOffset);
+            
+            const highlight = new (window as any).Highlight(range);
+            (CSS as any).highlights.set("tts-word-highlight", highlight);
+            
+            return range.getBoundingClientRect();
+        } catch (e) {
+            console.error("Highlight API error:", e);
+        }
+    }
+    return null;
+};
+
 interface PresentationOverlayProps {
     questions: any[];
     classLine: string;
@@ -541,6 +602,13 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const popAudioRef = useRef<HTMLAudioElement>(null);
     const wowAudioRef = useRef<HTMLAudioElement>(null);
     const winAudioRef = useRef<HTMLAudioElement>(null);
+    // YouTube SFX
+    const swooshAudioRef = useRef<HTMLAudioElement>(null);
+    const tickAudioRef = useRef<HTMLAudioElement>(null);
+    const dingAudioRef = useRef<HTMLAudioElement>(null);
+    const wrongAudioRef = useRef<HTMLAudioElement>(null);
+    const bubbleAudioRef = useRef<HTMLAudioElement>(null);
+    
     const slideRef = useRef<HTMLDivElement>(null);
     const [isSavingImage, setIsSavingImage] = useState(false);
     
@@ -865,8 +933,11 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [headerScale, setHeaderScale] = useState(0.9);
     const [headerTitleScale, setHeaderTitleScale] = useState(0.9);
     const [headerTitleAlign, setHeaderTitleAlign] = useState<'left' | 'center' | 'right'>('left');
-    const [selectedMusic, setSelectedMusic] = useState(MUSIC_OPTIONS[0].url);
-    const [musicVolume, setMusicVolume] = useState(0.5);
+    const [selectedMusic, setSelectedMusic] = useState(MUSIC_OPTIONS.find(m => m.id === 'tiptoe_still')?.url ?? MUSIC_OPTIONS[0].url);
+    const [musicVolume, setMusicVolume] = useState(0.1);
+    const [musicAutoDucking, setMusicAutoDucking] = useState(true);
+    const [musicDuckRatio, setMusicDuckRatio] = useState(0.1);  // volume ratio when TTS speaks
+    const [musicIdleRatio, setMusicIdleRatio] = useState(0.59); // volume ratio when not speaking
     const [consecutiveCorrect, setConsecutiveCorrect] = useState(0);
     const [bgTheme, setBgTheme] = useState<'default' | 'mesh' | 'grid' | 'dots' | 'video' | 'midnight' | 'aurora' | 'sunset'>('dots');
     const [selectedVideo, setSelectedVideo] = useState(VIDEO_OPTIONS[0].url);
@@ -886,22 +957,87 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [ttsRate, setTtsRate] = useState(1);
     const [isTTSPlaying, setIsTTSPlaying] = useState(false);
     const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([]);
+    const [activeTTSBlock, setActiveTTSBlock] = useState<string | null>(null);
+    const [ttsHighlightStyle, setTtsHighlightStyle] = useState<'bg' | 'text'>('text');
+    const [ttsAnimation, setTtsAnimation] = useState<'zoom' | 'pulse' | 'bounce' | 'pop' | 'glow' | 'none'>('zoom');
+    const [ttsVolume, setTtsVolume] = useState(1);      // 0 to 1
+    const [ttsPitch, setTtsPitch] = useState(1);        // 0.5 to 2
+    const [ttsDelay, setTtsDelay] = useState(0.5);      // seconds between segments
+    const [ttsReadParts, setTtsReadParts] = useState<'both' | 'question' | 'options'>('both');
+    const [ttsReadCorrectAnswer, setTtsReadCorrectAnswer] = useState(true);
+    const [ttsReadOptionLabels, setTtsReadOptionLabels] = useState(true);
+    // Word highlight appearance
+    const [ttsWordHighlightColor, setTtsWordHighlightColor] = useState('#facc15'); // yellow
+    const [ttsWordHighlightStyle, setTtsWordHighlightStyle] = useState<'bg' | 'underline' | 'glow'>('bg');
+    const [ttsWordHighlightRadius, setTtsWordHighlightRadius] = useState(4); // px
+    
+    const [ttsProvider, setTtsProvider] = useState<any>(() => {
+        if (typeof window !== 'undefined') return localStorage.getItem('ttsProvider') || 'browser';
+        return 'browser';
+    });
+    const [googleTtsApiKey, setGoogleTtsApiKey] = useState(() => {
+        if (typeof window !== 'undefined') return localStorage.getItem('googleTtsApiKey') || process.env.NEXT_PUBLIC_GOOGLE_TTS_API_KEY || '';
+        return process.env.NEXT_PUBLIC_GOOGLE_TTS_API_KEY || '';
+    });
+    const [azureTtsApiKey, setAzureTtsApiKey] = useState(() => {
+        if (typeof window !== 'undefined') return localStorage.getItem('azureTtsApiKey') || process.env.NEXT_PUBLIC_AZURE_TTS_API_KEY || '';
+        return process.env.NEXT_PUBLIC_AZURE_TTS_API_KEY || '';
+    });
+    const [azureRegion, setAzureRegion] = useState(() => {
+        if (typeof window !== 'undefined') return localStorage.getItem('azureRegion') || process.env.NEXT_PUBLIC_AZURE_REGION || 'eastus';
+        return process.env.NEXT_PUBLIC_AZURE_REGION || 'eastus';
+    });
+    const [elevenLabsApiKey, setElevenLabsApiKey] = useState(() => {
+        if (typeof window !== 'undefined') return localStorage.getItem('elevenLabsApiKey') || process.env.NEXT_PUBLIC_ELEVENLABS_API_KEY || '';
+        return process.env.NEXT_PUBLIC_ELEVENLABS_API_KEY || '';
+    });
+    const cloudAudioRef = useRef<HTMLAudioElement | null>(null);
+    const [isCloudTTSLoading, setIsCloudTTSLoading] = useState(false);
 
     useEffect(() => {
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('ttsProvider', ttsProvider);
+            localStorage.setItem('googleTtsApiKey', googleTtsApiKey);
+            localStorage.setItem('azureTtsApiKey', azureTtsApiKey);
+            localStorage.setItem('azureRegion', azureRegion);
+            localStorage.setItem('elevenLabsApiKey', elevenLabsApiKey);
+        }
+    }, [ttsProvider, googleTtsApiKey, azureTtsApiKey, azureRegion, elevenLabsApiKey]);
+
+    useEffect(() => {
+        let intervalId: any;
         const loadVoices = () => {
             if (!('speechSynthesis' in window)) return;
             const voices = window.speechSynthesis.getVoices();
-            setAvailableVoices(voices);
-            if (!ttsVoiceURI && voices.length > 0) {
-                const bnVoice = voices.find(v => v.lang.includes('bn') || v.lang.includes('bd'));
-                setTtsVoiceURI(bnVoice ? bnVoice.voiceURI : voices[0].voiceURI);
+            if (voices.length > 0) {
+                setAvailableVoices(voices);
+                setTtsVoiceURI(prev => {
+                    if (!prev) {
+                        const bnVoice = voices.find(v => v.lang.includes('bn') || v.lang.includes('bd'));
+                        return bnVoice ? bnVoice.voiceURI : 'bn-BD-network';
+                    }
+                    return prev;
+                });
+                if (intervalId) clearInterval(intervalId);
             }
         };
+
         loadVoices();
-        if (window.speechSynthesis.onvoiceschanged !== undefined) {
-            window.speechSynthesis.onvoiceschanged = loadVoices;
+        
+        if ('speechSynthesis' in window) {
+            if (window.speechSynthesis.onvoiceschanged !== undefined) {
+                window.speechSynthesis.onvoiceschanged = loadVoices;
+            }
+            intervalId = setInterval(() => {
+                if (window.speechSynthesis.getVoices().length > 0) {
+                    loadVoices();
+                }
+            }, 500);
         }
-    }, [ttsVoiceURI]);
+        return () => {
+            if (intervalId) clearInterval(intervalId);
+        };
+    }, []);
 
     const taxonomyString = [chapterName, topicName].filter(Boolean).join(' | ');
     let displayTitle = classLine;
@@ -944,11 +1080,55 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const isAutoPlayRef = useRef(isAutoPlayReadAloud);
     const stepRef = useRef(step);
 
+    // musicVolume slider: set idle or full volume depending on speaking state
     useEffect(() => {
-        if (lofiAudioRef.current) {
-            lofiAudioRef.current.volume = musicVolume;
+        if (!lofiAudioRef.current) return;
+        if (musicAutoDucking && isSpeaking) return; // don't override active duck
+        lofiAudioRef.current.volume = musicAutoDucking
+            ? musicVolume * musicIdleRatio
+            : musicVolume;
+    }, [musicVolume, musicIdleRatio, musicAutoDucking]);
+
+    // Music Auto-Ducking: smooth fade ONLY on TTS start/stop transitions
+    const duckingIntervalRef = useRef<any>(null);
+    const prevSpeakingRef = useRef(false);
+    useEffect(() => {
+        if (!lofiAudioRef.current || !isLofiEnabled || !musicAutoDucking) {
+            // if ducking disabled, just restore to musicVolume directly
+            if (lofiAudioRef.current && !musicAutoDucking && prevSpeakingRef.current) {
+                lofiAudioRef.current.volume = musicVolume;
+            }
+            prevSpeakingRef.current = isSpeaking;
+            return;
         }
-    }, [musicVolume]);
+
+        const wasSpeeaking = prevSpeakingRef.current;
+        prevSpeakingRef.current = isSpeaking;
+
+        // Only animate on actual transitions (false→true or true→false)
+        if (wasSpeeaking === isSpeaking) return;
+
+        if (duckingIntervalRef.current) clearInterval(duckingIntervalRef.current);
+
+        const targetVolume = isSpeaking
+            ? musicVolume * musicDuckRatio   // duck down when TTS speaks
+            : musicVolume * musicIdleRatio;  // idle level when silent
+
+        const STEP = 0.015;
+        const MS = 30;
+
+        duckingIntervalRef.current = setInterval(() => {
+            if (!lofiAudioRef.current) { clearInterval(duckingIntervalRef.current); return; }
+            const cur = lofiAudioRef.current.volume;
+            const diff = targetVolume - cur;
+            if (Math.abs(diff) <= STEP) {
+                lofiAudioRef.current.volume = Math.max(0, Math.min(1, targetVolume));
+                clearInterval(duckingIntervalRef.current);
+            } else {
+                lofiAudioRef.current.volume = Math.max(0, Math.min(1, cur + (diff > 0 ? STEP : -STEP)));
+            }
+        }, MS);
+    }, [isSpeaking, musicAutoDucking, isLofiEnabled]);
 
     useEffect(() => {
         isAutoPlayRef.current = isAutoPlayReadAloud;
@@ -1646,6 +1826,10 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     useEffect(() => {
         if ('speechSynthesis' in window) {
             window.speechSynthesis.cancel();
+            if (cloudAudioRef.current) {
+                cloudAudioRef.current.pause();
+                cloudAudioRef.current = null;
+            }
             setIsSpeaking(false);
 
             if (isOpen && isAutoPlayReadAloud) {
@@ -1662,7 +1846,13 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
         if (isSpeaking && !forcePlay) {
             window.speechSynthesis.cancel();
+            if (cloudAudioRef.current) {
+                cloudAudioRef.current.pause();
+                cloudAudioRef.current = null;
+            }
             setIsSpeaking(false);
+            setActiveTTSBlock(null);
+            clearWordHighlight();
             return;
         }
 
@@ -1672,35 +1862,53 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         // Clean up markdown before reading
         const cleanMarkdown = (text: string) => text.replace(/[*_#]/g, '').replace(/\[(.*?)\]\(.*?\)/g, '$1');
 
-        let textToRead = cleanMarkdown(q.questionText) + '. ';
+        // Build text based on ttsReadParts setting
+        let textToRead = '';
+        if (ttsReadParts === 'both' || ttsReadParts === 'question') {
+            textToRead = cleanMarkdown(q.questionText) + '. ';
+        }
 
         // Collect valid option keys once (used for both textToRead and cursor segments)
         const optionKeys = ['a', 'b', 'c', 'd', 'e'].filter(k => q.options && q.options[k as keyof typeof q.options]);
-        optionKeys.forEach((key) => {
-            const optText = q.options![key as keyof typeof q.options];
-            if (optText) {
-                const optLabel = getOptionLabel(key, uiLang);
-                textToRead += `${optLabel}: ${cleanMarkdown(optText)}. `;
-            }
-        });
+        if (ttsReadParts === 'both' || ttsReadParts === 'options') {
+            optionKeys.forEach((key) => {
+                const optText = q.options![key as keyof typeof q.options];
+                if (optText) {
+                    const optLabel = getOptionLabel(key, uiLang);
+                    textToRead += ttsReadOptionLabels
+                        ? `${optLabel}: ${cleanMarkdown(optText)}. `
+                        : `${cleanMarkdown(optText)}. `;
+                }
+            });
+        }
 
         const currentSlideLocal = currentSlide;
 
         // Build char-offset → DOM element segment map for reading cursor
+        // Segment lengths MUST exactly match the text added to textToRead above
         const qText = cleanMarkdown(q.questionText) + '. ';
         const segments: { startChar: number; endChar: number; elementId: string | 'question' }[] = [];
         let cursorPos = 0;
-        segments.push({ startChar: 0, endChar: qText.length, elementId: 'question' });
-        cursorPos = qText.length;
-        optionKeys.forEach((key) => {
-            const optText = q.options![key as keyof typeof q.options];
-            if (optText) {
-                const label = getOptionLabel(key, uiLang);
-                const segLen = `${label}: ${cleanMarkdown(optText)}. `.length;
-                segments.push({ startChar: cursorPos, endChar: cursorPos + segLen, elementId: `option-card-${key}` });
-                cursorPos += segLen;
-            }
-        });
+        if (ttsReadParts === 'both' || ttsReadParts === 'question') {
+            segments.push({ startChar: 0, endChar: qText.length, elementId: 'question' });
+            cursorPos = qText.length;
+        }
+        if (ttsReadParts === 'both' || ttsReadParts === 'options') {
+            optionKeys.forEach((key) => {
+                const optText = q.options![key as keyof typeof q.options];
+                if (optText) {
+                    const label = getOptionLabel(key, uiLang);
+                    // Use same format as textToRead to keep char offsets in sync
+                    const segText = ttsReadOptionLabels
+                        ? `${label}: ${cleanMarkdown(optText)}. `
+                        : `${cleanMarkdown(optText)}. `;
+                    const segLen = segText.length;
+                    segments.push({ startChar: cursorPos, endChar: cursorPos + segLen, elementId: `option-card-${key}` });
+                    cursorPos += segLen;
+                }
+            });
+        }
+
 
         // Wavy cursor animation helper: position synced with speech charIndex
         let wavePhase = 0;
@@ -1714,39 +1922,129 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
             if (!el) return;
 
             const rect = el.getBoundingClientRect();
-            wavePhase += 1;
+            // Normalize wave increment by ttsRate so cursor speed matches speech speed
+            wavePhase += (1 / Math.max(0.5, ttsRate));
 
             // Relative progress within this segment (0 → 1) matches speech position
             const segLen = Math.max(1, seg.endChar - seg.startChar);
             const relProgress = Math.min(1, (charIdx - seg.startChar) / segLen);
             const waveX = rect.left + 24 + relProgress * Math.max(0, rect.width - 48);
-            // Slight sinusoidal dip below the text
-            const waveY = rect.bottom + 8 + Math.sin(wavePhase * 1.4) * 4;
+            // Sinusoidal frequency also normalized so wave looks consistent at any speed
+            const waveY = rect.bottom + 8 + Math.sin(wavePhase * (1.4 / Math.max(0.5, ttsRate))) * 4;
 
             setVirtualCursor({ visible: true, x: waveX, y: waveY, isClicking: false });
         };
 
-        const utterance = new SpeechSynthesisUtterance(textToRead);
-        utterance.lang = uiLang === 'bn' ? 'bn-BD' : 'en-US';
-        
-        if (ttsVoiceURI) {
-            const selectedVoice = availableVoices.find(v => v.voiceURI === ttsVoiceURI);
-            if (selectedVoice) utterance.voice = selectedVoice;
-        }
-        utterance.rate = ttsRate;
+        const speakText = async (text: string, isCorrectAnswer: boolean, onEndCallback: () => void) => {
+            if (ttsProvider !== 'browser') {
+                setIsCloudTTSLoading(true);
+                try {
+                    let finalVoiceURI = ttsVoiceURI;
+                    const validCloudVoices = CLOUD_VOICES[ttsProvider as keyof typeof CLOUD_VOICES];
+                    if (validCloudVoices && !validCloudVoices.some(v => v.id === finalVoiceURI)) {
+                        finalVoiceURI = validCloudVoices[0].id;
+                    }
+                    
+                    const audioDataUrl = await fetchCloudTTS(ttsProvider, text, finalVoiceURI, ttsRate);
 
-        utterance.onboundary = (event: SpeechSynthesisEvent) => {
-            const charIdx = event.charIndex;
-            const seg = segments.find(s => charIdx >= s.startChar && charIdx < s.endChar);
-            if (seg) animateCursorToElement(seg.elementId, charIdx, seg);
+                    if (currentSlideLocal !== currentSlide) return;
+
+                    const audio = new Audio(audioDataUrl);
+                    cloudAudioRef.current = audio;
+                    let interval: any;
+                    
+                    audio.onloadedmetadata = () => {
+                        setIsSpeaking(true);
+                        setIsCloudTTSLoading(false);
+                        const totalChars = isCorrectAnswer ? text.length : segments[segments.length - 1].endChar;
+                        
+                        interval = setInterval(() => {
+                            if (!cloudAudioRef.current || cloudAudioRef.current.paused || cloudAudioRef.current.ended) {
+                                clearInterval(interval);
+                                return;
+                            }
+                            if (!isCorrectAnswer) {
+                                const progress = cloudAudioRef.current.currentTime / (cloudAudioRef.current.duration || 1);
+                                const currentTargetChar = Math.floor(progress * totalChars);
+                                const seg = segments.find(s => currentTargetChar >= s.startChar && currentTargetChar < s.endChar);
+                                if (seg) {
+                                    setActiveTTSBlock(seg.elementId);
+                                    animateCursorToElement(seg.elementId, currentTargetChar, seg);
+                                }
+                            }
+                        }, 100);
+                    };
+                    
+                    audio.onended = () => {
+                        if (interval) clearInterval(interval);
+                        onEndCallback();
+                    };
+                    
+                    audio.play().catch(e => {
+                        setIsCloudTTSLoading(false);
+                        console.error("Audio play error", e);
+                        onEndCallback();
+                    });
+                } catch (e) {
+                    console.error("Cloud TTS Error:", e);
+                    setIsCloudTTSLoading(false);
+                    alert("Cloud TTS failed: " + (e as Error).message + ". Switching to Browser Native.");
+                    setTtsProvider('browser');
+                    setIsSpeaking(false);
+                }
+            } else {
+                const utt = new SpeechSynthesisUtterance(text);
+                utt.lang = uiLang === 'bn' ? 'bn-BD' : 'en-US';
+                if (ttsVoiceURI) {
+                    if (ttsVoiceURI.endsWith('-network')) {
+                        utt.lang = ttsVoiceURI.replace('-network', '');
+                    } else {
+                        const selectedVoice = availableVoices.find(v => v.voiceURI === ttsVoiceURI);
+                        if (selectedVoice) utt.voice = selectedVoice;
+                    }
+                }
+                utt.rate = ttsRate;
+                utt.volume = ttsVolume;
+                utt.pitch = ttsPitch;
+
+                if (!isCorrectAnswer) {
+                    utt.onboundary = (event: SpeechSynthesisEvent) => {
+                        if (event.name !== 'word') return;
+                        const charIdx = event.charIndex;
+                        // Buffer of 2 chars: option segments only activate once charIdx is
+                        // clearly inside them — prevents the last question word-boundary
+                        // from prematurely highlighting the first option card.
+                        const seg = segments.find(s => {
+                            const buffer = s.elementId === 'question' ? 0 : 2;
+                            return charIdx >= s.startChar + buffer && charIdx < s.endChar;
+                        });
+                        if (seg) {
+                            setActiveTTSBlock(seg.elementId);
+                            const wordRect = highlightWordInElement(seg.elementId, charIdx, seg.startChar);
+                            if (wordRect) {
+                                wavePhase += 1;
+                                const waveX = wordRect.left + (wordRect.width / 2);
+                                const waveY = wordRect.bottom + 6 + Math.sin(wavePhase * 1.4) * 4;
+                                setVirtualCursor({ visible: true, x: waveX, y: waveY, isClicking: false });
+                            } else {
+                                animateCursorToElement(seg.elementId, charIdx, seg);
+                            }
+                        }
+                    };
+                }
+                utt.onstart = () => setIsSpeaking(true);
+                utt.onend = onEndCallback;
+                utt.onerror = () => setIsSpeaking(false);
+                window.speechSynthesis.speak(utt);
+            }
         };
 
-
-        utterance.onend = () => {
-            // Hide reading cursor when question+options reading is done
+        speakText(textToRead, false, () => {
+            setActiveTTSBlock(null);
+            clearWordHighlight();
             setVirtualCursor({ visible: false, x: 0, y: 0, isClicking: false });
 
-            if (isAutoPlayRef.current && stepRef.current === 0 && q.correctAnswer) {
+            if (isAutoPlayRef.current && stepRef.current === 0 && q.correctAnswer && ttsReadCorrectAnswer) {
                 const correctKey = q.correctAnswer.toLowerCase().trim();
                 const allOptKeys = ['a', 'b', 'c', 'd', 'e'].filter(k => q.options && q.options[k as keyof typeof q.options]);
                 const validKey = allOptKeys.find(k => correctKey.includes(k));
@@ -1757,18 +2055,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                         ? `সঠিক উত্তর: ${bnOptionsMap[validKey]}, ${correctOptText}`
                         : `Correct Answer is: ${validKey.toUpperCase()}, ${correctOptText}`;
 
-                    // Step 1: বলো সঠিক উত্তর কী
-                    const correctUtterance = new SpeechSynthesisUtterance(correctText);
-                    correctUtterance.lang = isBangla ? 'bn-BD' : 'en-US';
-                    
-                    if (ttsVoiceURI) {
-                        const selectedVoice = availableVoices.find(v => v.voiceURI === ttsVoiceURI);
-                        if (selectedVoice) correctUtterance.voice = selectedVoice;
-                    }
-                    correctUtterance.rate = ttsRate;
-
-                    correctUtterance.onend = () => {
-                        // Step 2: তারপর click animation করো
+                    speakText(correctText, true, () => {
                         triggerHumanClick(validKey, () => {
                             setIsSpeaking(false);
                             setTimeout(() => {
@@ -1785,23 +2072,14 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 }
                             }, 1500);
                         });
-                    };
-                    correctUtterance.onerror = () => setIsSpeaking(false);
-                    window.speechSynthesis.speak(correctUtterance);
+                    });
                 } else {
                     setIsSpeaking(false);
                 }
             } else {
                 setIsSpeaking(false);
             }
-        };
-        utterance.onerror = () => {
-            setIsSpeaking(false);
-            setVirtualCursor({ visible: false, x: 0, y: 0, isClicking: false });
-        };
-
-        window.speechSynthesis.speak(utterance);
-        setIsSpeaking(true);
+        });
     };
 
     const handleReadAloudRef = useRef(handleReadAloud);
@@ -2057,6 +2335,10 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 setMode(prev => prev === 'test' ? 'read' : 'test');
                 return;
             }
+            if (key === 'v') {
+                setIsLofiEnabled(prev => !prev);
+                return;
+            }
 
             // Undocumented but useful font & layout shortcuts
             if (key === 'q') { setQFontScale(s => Math.max(0.6, s - 0.1)); return; }
@@ -2240,6 +2522,15 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         <>
             <div className={`print:hidden fixed inset-0 w-full h-full z-[99999] flex items-center justify-between p-3 mb-3 gap-1 md:gap-1 xl:gap-1 select-none font-sans overflow-hidden transition-colors duration-500 ${isDarkMode ? 'dark bg-gray-900' : 'bg-[#f8fbff]'}`}>
                 <style>{`
+                    ::highlight(tts-word-highlight) {
+                        ${ttsWordHighlightStyle === 'bg' ? `background-color: ${ttsWordHighlightColor}88; color: inherit; border-radius: ${ttsWordHighlightRadius}px; text-shadow: 0 0 8px ${ttsWordHighlightColor}66;` : ''}
+                        ${ttsWordHighlightStyle === 'underline' ? `color: inherit; text-decoration: underline; text-decoration-color: ${ttsWordHighlightColor}; text-decoration-thickness: 3px; text-underline-offset: 2px;` : ''}
+                        ${ttsWordHighlightStyle === 'glow' ? `color: ${ttsWordHighlightColor}; text-shadow: 0 0 12px ${ttsWordHighlightColor}, 0 0 24px ${ttsWordHighlightColor}88; border-radius: ${ttsWordHighlightRadius}px;` : ''}
+                    }
+                    .dark ::highlight(tts-word-highlight) {
+                        ${ttsWordHighlightStyle === 'bg' ? `background-color: ${ttsWordHighlightColor}66;` : ''}
+                        ${ttsWordHighlightStyle === 'glow' ? `color: ${ttsWordHighlightColor}; text-shadow: 0 0 16px ${ttsWordHighlightColor};` : ''}
+                    }
                     @keyframes popIn {
                         0% { transform: scale(1); box-shadow: 0 0 0 rgba(52,168,83,0); }
                         50% { transform: scale(1.05); box-shadow: 0 0 40px rgba(52,168,83,0.6); }
@@ -2819,6 +3110,12 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     <audio ref={popAudioRef} src="/audio/correct-pop.mp3" preload="auto" />
                     <audio ref={wowAudioRef} src="/audio/wow.mp3" preload="auto" />
                     <audio ref={winAudioRef} src="/audio/win.mp3" preload="auto" />
+                    {/* YouTube SFX */}
+                    <audio ref={swooshAudioRef} src="/audio/SFX/swoosh-026.mp3" preload="auto" />
+                    <audio ref={tickAudioRef} src="/audio/SFX/Clock-Ticking-Sound-Effect.mp3" preload="auto" />
+                    <audio ref={dingAudioRef} src="/audio/SFX/ding-sound-effect_2.mp3" preload="auto" />
+                    <audio ref={wrongAudioRef} src="/audio/SFX/wrong-option.mp3" preload="auto" />
+                    <audio ref={bubbleAudioRef} src="/audio/SFX/Bubble-Pop.mp3" preload="auto" />
 
                     {/* ── Grand Full-Page Celebration Across Entire Screen ── */}
                     <AnimatePresence>
@@ -2929,7 +3226,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 transition: virtualCursor.isClicking
                                     ? 'transform 0.08s ease-in'
                                     : virtualCursor.visible
-                                        ? 'left 0.30s cubic-bezier(0.25,0.46,0.45,0.94), top 0.30s cubic-bezier(0.25,0.46,0.45,0.94), transform 0.12s ease-out'
+                                        ? `left ${(0.25 / ttsRate).toFixed(3)}s cubic-bezier(0.25,0.46,0.45,0.94), top ${(0.25 / ttsRate).toFixed(3)}s cubic-bezier(0.25,0.46,0.45,0.94), transform 0.12s ease-out`
                                         : 'left 0s, top 0s, transform 0.12s ease-out',
                                 filter: virtualCursor.isClicking
                                     ? 'drop-shadow(0 0 12px rgba(59,130,246,0.95)) drop-shadow(0 0 24px rgba(99,102,241,0.7))'
@@ -3084,7 +3381,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                         {/* Subtle horizontal divider line */}
                                         <div className="w-full border-t border-gray-200 dark:border-gray-700/60 mt-1 md:mt-2 mb-1"></div>
 
-                                        <div data-read-cursor-target="question" className={`prose dark:prose-invert max-w-none w-full prose-p:font-extrabold text-[length:var(--q-size)] leading-relaxed text-left font-extrabold [&_*]:!text-[length:var(--q-size)] [&_*]:!leading-relaxed [&_*]:!m-0 ${qTextColor !== 'default' ? 'text-[var(--q-color)] [&_*]:!text-[var(--q-color)] drop-shadow-sm [&_*]:!drop-shadow-sm' : (bgTheme === 'video' ? 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] [&_*]:!text-white [&_*]:!drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]' : 'text-slate-900 dark:text-white [&_*]:!text-slate-900 dark:[&_*]:!text-white')} p-2 -m-2 transition-all duration-300`}>
+                                        <div data-read-cursor-target="question" className={`prose dark:prose-invert max-w-none w-full prose-p:font-extrabold text-[length:var(--q-size)] leading-relaxed text-left font-extrabold [&_*]:!text-[length:var(--q-size)] [&_*]:!leading-relaxed [&_*]:!m-0 ${qTextColor !== 'default' ? 'text-[var(--q-color)] [&_*]:!text-[var(--q-color)] drop-shadow-sm [&_*]:!drop-shadow-sm' : (bgTheme === 'video' ? 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] [&_*]:!text-white [&_*]:!drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]' : 'text-slate-900 dark:text-white [&_*]:!text-slate-900 dark:[&_*]:!text-white')} ${activeTTSBlock === 'question' ? (ttsHighlightStyle === 'bg' ? 'p-2 -m-2 transition-all duration-500' : 'text-pink-600 dark:text-pink-400 [&_*]:!text-pink-600 dark:[&_*]:!text-pink-400 scale-[1.01] origin-left p-2 -m-2 transition-all duration-300 drop-shadow-md') : 'p-2 -m-2 transition-all duration-300'}`}>
                                             <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
                                                 {q.questionText}
                                             </ReactMarkdown>
@@ -3171,6 +3468,29 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     }
                                                 }
 
+                                                const isActiveTTS = activeTTSBlock === `option-card-${opt.key}`;
+                                                if (isActiveTTS) {
+                                                    let animClass = '';
+                                                    if (ttsAnimation === 'zoom') {
+                                                        animClass = ' transform scale-[1.06] z-20 shadow-[0_10px_30px_rgba(0,0,0,0.15)] ';
+                                                    } else if (ttsAnimation === 'pulse') {
+                                                        animClass = ' animate-pulse transform scale-[1.02] z-20 shadow-md ';
+                                                    } else if (ttsAnimation === 'bounce') {
+                                                        animClass = ' animate-bounce z-20 shadow-md ';
+                                                    } else if (ttsAnimation === 'pop') {
+                                                        animClass = ' animate-pop-in z-20 ';
+                                                    } else if (ttsAnimation === 'glow') {
+                                                        animClass = ' transform scale-[1.02] z-20 shadow-[0_0_30px_rgba(59,130,246,0.6)] dark:shadow-[0_0_30px_rgba(96,165,250,0.6)] ';
+                                                    } else {
+                                                        animClass = ' transform scale-100 z-10 shadow-sm ';
+                                                    }
+                                                    
+                                                    if (ttsHighlightStyle === 'bg') {
+                                                        containerClasses += ' bg-blue-50/80 dark:bg-blue-900/40 backdrop-blur-sm ring-2 ring-blue-400/50 dark:ring-blue-500/50 transition-all duration-300 ' + animClass;
+                                                    } else {
+                                                        containerClasses += ' ring-2 ring-pink-500/50 transition-all duration-300 text-pink-700 dark:text-pink-300 ' + animClass.replace('rgba(59,130,246,0.6)', 'rgba(236,72,153,0.6)').replace('rgba(96,165,250,0.6)', 'rgba(244,114,182,0.6)');
+                                                    }
+                                                }
 
                                                 return (
                                                     <motion.div
@@ -3234,11 +3554,19 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                                                 popAudioRef.current.currentTime = 0;
                                                                                 popAudioRef.current.play().catch(e => console.warn('Pop audio failed:', e));
                                                                             }
+                                                                            if (dingAudioRef.current) {
+                                                                                dingAudioRef.current.currentTime = 0;
+                                                                                dingAudioRef.current.play().catch(e => console.warn('Ding audio failed:', e));
+                                                                            }
                                                                         }
                                                                         setTimeout(() => setIsConfettiActive(false), 2000);
                                                                     } else {
-                                                                        // Reset on wrong answer
+                                                                        // Reset on wrong answer and play buzzer
                                                                         setConsecutiveCorrect(0);
+                                                                        if (wrongAudioRef.current) {
+                                                                            wrongAudioRef.current.currentTime = 0;
+                                                                            wrongAudioRef.current.play().catch(e => console.warn('Wrong audio failed:', e));
+                                                                        }
                                                                     }
                                                                     // Feature 8: Track session score
                                                                     if (q.correctAnswer) {
@@ -3590,7 +3918,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     {isSettingsOpen && (
                                         <>
                                             <div className="fixed inset-0 z-[60]" onClick={() => setIsSettingsOpen(false)}></div>
-                                            <div className="fixed bottom-[90px] left-1/2 -translate-x-1/2 md:absolute md:bottom-full md:left-auto md:right-0 md:translate-x-0 md:mb-4 bg-white/95 dark:bg-gray-950/95 backdrop-blur-xl border border-gray-200 dark:border-gray-800 rounded-2xl shadow-2xl p-5 w-[92vw] sm:w-[350px] z-[70] animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[75vh] md:max-h-[65vh]">
+                                            <div className="fixed bottom-[90px] left-1/2 -translate-x-1/2 md:absolute md:bottom-full md:left-auto md:right-0 md:translate-x-0 md:mb-4 bg-white/95 dark:bg-gray-950/95 backdrop-blur-xl border border-gray-200 dark:border-gray-800 rounded-2xl shadow-2xl p-3 md:p-4 w-[92vw] sm:w-[350px] z-[70] animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[75vh] md:max-h-[65vh]">
                                             <div className="flex justify-between items-center mb-2 pb-2 border-b border-gray-100 dark:border-gray-800/60 shrink-0">
                                                 <h3 className="font-bold text-gray-800 dark:text-gray-200 text-lg flex items-center gap-2">
                                                     <Settings className="w-5 h-5 text-indigo-500" /> Settings
@@ -3601,8 +3929,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                 </button>
                                             </div>
 
-                                            <div className="overflow-y-auto overscroll-contain custom-scrollbar pr-2 pb-2">
-                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                            <div className="overflow-y-auto overscroll-contain custom-scrollbar pr-2 pb-2 flex-1 min-h-0 space-y-3">
+                                                <div className="pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0">
                                                     <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
                                                         <span className="flex items-center gap-2"><MonitorPlay className="w-4 h-4 text-indigo-500" /> Presentation Mode</span>
 
@@ -3623,7 +3951,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     </div>
                                                 </div>
 
-                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                <div className="pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0">
                                                     <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
                                                         <span className="flex items-center gap-2"><Sparkles className="w-4 h-4 text-indigo-500" /> Celebration Settings</span>
                                                     </div>
@@ -3667,7 +3995,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     </div>
                                                 </div>
 
-                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                <div className="pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0">
                                                     <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
                                                         <span className="flex items-center gap-2"><Video className="w-4 h-4 text-indigo-500" /> Recording Quality</span>
                                                     </div>
@@ -3688,11 +4016,16 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     </div>
                                                 </div>
 
-                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
-                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
+                                                <div className="pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0">
+                                                    <button 
+                                                        onClick={() => setShowAudioSettings(!showAudioSettings)} 
+                                                        className="w-full text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center focus:outline-none"
+                                                    >
                                                         <span className="flex items-center gap-2"><Sliders className="w-4 h-4 text-pink-500" /> Advanced Audio</span>
-                                                    </div>
-                                                    <div className="space-y-4 px-2">
+                                                        <span className={`text-gray-400 transform transition-transform ${showAudioSettings ? '-rotate-90' : 'rotate-180'}`}><ChevronLeft className="w-4 h-4" /></span>
+                                                    </button>
+                                                    {showAudioSettings && (
+                                                    <div className="space-y-4 px-2 mt-3">
                                                         {/* Auto Volume Leveler */}
                                                         <div className="flex items-center justify-between">
                                                             <div className="flex flex-col">
@@ -3752,6 +4085,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                             />
                                                         </div>
                                                     </div>
+                                                    )}
                                                 </div>
 
                                                 <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
@@ -4204,6 +4538,54 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                                         <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">{Math.round(musicVolume * 100)}%</span>
                                                                     </div>
                                                                 </div>
+
+                                                                {/* Auto-Ducking Toggle */}
+                                                                <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100 dark:border-gray-800/60">
+                                                                    <div>
+                                                                        <div className="text-xs font-bold text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
+                                                                            <span>🎙️</span> Auto-Ducking
+                                                                        </div>
+                                                                        <div className="text-[10px] text-gray-400 mt-0.5">Music fades when TTS speaks</div>
+                                                                    </div>
+                                                                    <button
+                                                                        onClick={() => setMusicAutoDucking(!musicAutoDucking)}
+                                                                        className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${musicAutoDucking ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}
+                                                                    >
+                                                                        <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${musicAutoDucking ? 'translate-x-[18px]' : 'translate-x-1'}`} />
+                                                                    </button>
+                                                                </div>
+
+                                                                {/* Duck Ratio Sliders */}
+                                                                {musicAutoDucking && (
+                                                                    <div className="flex flex-col gap-2 mt-2">
+                                                                        <div className="flex items-center gap-3">
+                                                                            <span className="text-[10px] text-gray-400 whitespace-nowrap min-w-[3rem]">Idle at</span>
+                                                                            <input
+                                                                                type="range"
+                                                                                min="0"
+                                                                                max="1"
+                                                                                step="0.01"
+                                                                                value={musicIdleRatio}
+                                                                                onChange={(e) => setMusicIdleRatio(parseFloat(e.target.value))}
+                                                                                className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-green-500"
+                                                                            />
+                                                                            <span className="text-[10px] font-bold text-green-500 min-w-[2.5rem] text-right">{Math.round(musicIdleRatio * 100)}%</span>
+                                                                        </div>
+                                                                        <div className="flex items-center gap-3">
+                                                                            <span className="text-[10px] text-gray-400 whitespace-nowrap min-w-[3rem]">Duck to</span>
+                                                                            <input
+                                                                                type="range"
+                                                                                min="0"
+                                                                                max="0.5"
+                                                                                step="0.01"
+                                                                                value={musicDuckRatio}
+                                                                                onChange={(e) => setMusicDuckRatio(parseFloat(e.target.value))}
+                                                                                className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                                                            />
+                                                                            <span className="text-[10px] font-bold text-blue-500 min-w-[2.5rem] text-right">{Math.round(musicDuckRatio * 100)}%</span>
+                                                                        </div>
+                                                                    </div>
+                                                                )}
                                                             </div>
                                                         )}
                                                     </div>
@@ -4501,6 +4883,15 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 </div>
 
                             </div>
+
+                            {/* Music Toggle Button */}
+                            <button
+                                onClick={() => setIsLofiEnabled(!isLofiEnabled)}
+                                className={`hidden md:block p-2 md:p-3 rounded-full transition-all shrink-0 ${isLofiEnabled ? 'bg-indigo-500 text-white shadow-sm ring-2 ring-indigo-300' : 'hover:bg-white/10 text-white/80 hover:text-white'}`}
+                                title="Toggle Background Music (V)"
+                            >
+                                <Music className="w-5 h-5 md:w-6 md:h-6" />
+                            </button>
 
                             <div className="relative flex items-center justify-center shrink-0">
                                 <button
@@ -5314,25 +5705,26 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
             {/* Audio Settings Panel */}
             {showAudioSettings && (
-                <div className="fixed bottom-24 right-4 md:right-8 bg-gray-900 border border-gray-700 rounded-2xl p-6 shadow-2xl z-[100000] w-80 md:w-96 animate-in slide-in-from-bottom-4">
-                    <button 
-                        onClick={() => setShowAudioSettings(false)}
-                        className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
-                    >
-                        <X className="w-5 h-5" />
-                    </button>
-                    
-                    <h3 className="text-xl font-bold text-white flex items-center gap-2 mb-6">
-                        <Sliders className="w-5 h-5 text-blue-400" />
-                        Audio Settings
-                    </h3>
+                <div className="fixed bottom-24 right-4 md:right-8 bg-gray-900 border border-gray-700 rounded-2xl p-4 md:p-5 shadow-2xl z-[100000] w-[90vw] sm:w-80 md:w-96 animate-in slide-in-from-bottom-4 flex flex-col max-h-[75vh]">
+                    <div className="flex justify-between items-center mb-4 shrink-0">
+                        <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                            <Sliders className="w-5 h-5 text-blue-400" />
+                            Audio Settings
+                        </h3>
+                        <button 
+                            onClick={() => setShowAudioSettings(false)}
+                            className="text-gray-400 hover:text-white transition-colors bg-gray-800 hover:bg-gray-700 rounded-full p-1.5"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+                    </div>
 
-                    <div className="flex flex-col gap-6">
+                    <div className="flex flex-col gap-3 overflow-y-auto overscroll-contain [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-gray-500 pr-2 pb-2 flex-1 min-h-0">
                         {/* Compressor */}
                         <div className="flex items-start justify-between">
                             <div>
-                                <div className="font-bold text-white">Auto Volume Leveler</div>
-                                <div className="text-xs text-gray-400 mt-1">Balances loud and soft sounds</div>
+                                <div className="text-sm font-bold text-white">Auto Volume Leveler</div>
+                                <div className="text-[10px] text-gray-400">Balances loud and soft sounds</div>
                             </div>
                             <button 
                                 onClick={() => setUseCompressor(!useCompressor)}
@@ -5342,14 +5734,13 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             </button>
                         </div>
 
-                        {/* Low Cut */}
                         <div>
-                            <div className="flex justify-between items-center mb-2">
+                            <div className="flex justify-between items-center mb-1">
                                 <div>
-                                    <div className="font-bold text-white">Low-Cut Filter (AC/Fan)</div>
-                                    <div className="text-xs text-gray-400">Removes low rumble noise</div>
+                                    <div className="text-sm font-bold text-white">Low-Cut Filter (AC/Fan)</div>
+                                    <div className="text-[10px] text-gray-400">Removes low rumble noise</div>
                                 </div>
-                                <span className="font-mono text-sm font-bold text-blue-400">{lowCutFreq} Hz</span>
+                                <span className="font-mono text-xs font-bold text-blue-400">{lowCutFreq} Hz</span>
                             </div>
                             <input 
                                 type="range" min="0" max="300" step="5" 
@@ -5359,14 +5750,13 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                         </div>
 
 
-                        {/* Treble Boost */}
                         <div>
-                            <div className="flex justify-between items-center mb-2">
+                            <div className="flex justify-between items-center mb-1">
                                 <div>
-                                    <div className="font-bold text-white">Treble Boost (Crispness)</div>
-                                    <div className="text-xs text-gray-400">Adds presence to voice</div>
+                                    <div className="text-sm font-bold text-white">Treble Boost (Crispness)</div>
+                                    <div className="text-[10px] text-gray-400">Adds presence to voice</div>
                                 </div>
-                                <span className="font-mono text-sm font-bold text-blue-400">{trebleBoost} dB</span>
+                                <span className="font-mono text-xs font-bold text-blue-400">{trebleBoost} dB</span>
                             </div>
                             <input 
                                 type="range" min="0" max="10" step="1" 
@@ -5375,14 +5765,13 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             />
                         </div>
 
-                        {/* Noise Gate */}
                         <div>
-                            <div className="flex justify-between items-center mb-2">
+                            <div className="flex justify-between items-center mb-1">
                                 <div>
-                                    <div className="font-bold text-white">Noise Gate Threshold</div>
-                                    <div className="text-xs text-gray-400">Mutes mic when silent</div>
+                                    <div className="text-sm font-bold text-white">Noise Gate Threshold</div>
+                                    <div className="text-[10px] text-gray-400">Mutes mic when silent</div>
                                 </div>
-                                <span className="font-mono text-sm font-bold text-blue-400">{(noiseGateThreshold * 100).toFixed(0)}%</span>
+                                <span className="font-mono text-xs font-bold text-blue-400">{(noiseGateThreshold * 100).toFixed(0)}%</span>
                             </div>
                             <input 
                                 type="range" min="0" max="0.1" step="0.01" 
@@ -5391,15 +5780,15 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             />
                         </div>
 
-                        <div className="w-full h-px bg-gray-800 my-1"></div>
+                        <div className="w-full h-px bg-gray-800 my-1 shrink-0"></div>
                         
-                        <h4 className="text-sm font-bold text-white flex items-center gap-2 -mb-2">
+                        <h4 className="text-sm font-bold text-white flex items-center gap-2 shrink-0">
                             <Volume2 className="w-4 h-4 text-pink-400" />
                             Text-To-Speech (TTS)
                         </h4>
                         
                         {/* Auto Play Read Aloud */}
-                        <div className="flex items-center justify-between mb-4 mt-2">
+                        <div className="flex items-center justify-between mt-1">
                             <div>
                                 <div className="font-bold text-white">Auto Play</div>
                                 <div className="text-xs text-gray-400 mt-1">Reads questions automatically</div>
@@ -5416,11 +5805,295 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             </button>
                         </div>
 
+                        {/* TTS Highlight Style */}
+                        <div className="flex items-center justify-between mt-1">
+                            <div>
+                                <div className="text-sm font-bold text-white">Highlight Style</div>
+                                <div className="text-[10px] text-gray-400">Background or Text</div>
+                            </div>
+                            <div className="flex bg-gray-700 rounded-lg p-1">
+                                <button
+                                    onClick={() => setTtsHighlightStyle('bg')}
+                                    className={`px-3 py-1 text-xs font-bold rounded-md ${ttsHighlightStyle === 'bg' ? 'bg-pink-500 text-white' : 'text-gray-300'}`}
+                                >
+                                    Block BG
+                                </button>
+                                <button
+                                    onClick={() => setTtsHighlightStyle('text')}
+                                    className={`px-3 py-1 text-xs font-bold rounded-md ${ttsHighlightStyle === 'text' ? 'bg-pink-500 text-white' : 'text-gray-300'}`}
+                                >
+                                    Text Only
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* TTS Animation Setting */}
+                        <div className="flex items-center justify-between mt-1">
+                            <div>
+                                <div className="text-sm font-bold text-white">Animation</div>
+                                <div className="text-[10px] text-gray-400">Option card animation</div>
+                            </div>
+                            <select
+                                value={ttsAnimation}
+                                onChange={(e) => setTtsAnimation(e.target.value as any)}
+                                className="bg-gray-700 text-white text-xs font-bold rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-pink-500"
+                            >
+                                <option value="zoom">Zoom In</option>
+                                <option value="pulse">Pulse</option>
+                                <option value="bounce">Bounce</option>
+                                <option value="pop">Pop In</option>
+                                <option value="glow">Neon Glow</option>
+                                <option value="none">None</option>
+                            </select>
+                        </div>
+
+                        {/* Read Parts */}
+                        <div className="flex items-center justify-between mt-1">
+                            <div>
+                                <div className="text-sm font-bold text-white">Read Parts</div>
+                                <div className="text-[10px] text-gray-400">What to read aloud</div>
+                            </div>
+                            <div className="flex bg-gray-700 rounded-lg p-1">
+                                <button
+                                    onClick={() => setTtsReadParts('question')}
+                                    className={`px-2 py-1 text-[10px] font-bold rounded-md ${ttsReadParts === 'question' ? 'bg-pink-500 text-white' : 'text-gray-300'}`}
+                                >
+                                    Q only
+                                </button>
+                                <button
+                                    onClick={() => setTtsReadParts('both')}
+                                    className={`px-2 py-1 text-[10px] font-bold rounded-md ${ttsReadParts === 'both' ? 'bg-pink-500 text-white' : 'text-gray-300'}`}
+                                >
+                                    Both
+                                </button>
+                                <button
+                                    onClick={() => setTtsReadParts('options')}
+                                    className={`px-2 py-1 text-[10px] font-bold rounded-md ${ttsReadParts === 'options' ? 'bg-pink-500 text-white' : 'text-gray-300'}`}
+                                >
+                                    Opts only
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Read Correct Answer */}
+                        <div className="flex items-center justify-between mt-1">
+                            <div>
+                                <div className="text-sm font-bold text-white">Read Correct Answer</div>
+                                <div className="text-[10px] text-gray-400">Reads correct answer after auto-play</div>
+                            </div>
+                            <button
+                                onClick={() => setTtsReadCorrectAnswer(!ttsReadCorrectAnswer)}
+                                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${ttsReadCorrectAnswer ? 'bg-pink-500' : 'bg-gray-600'}`}
+                            >
+                                <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${ttsReadCorrectAnswer ? 'translate-x-[18px]' : 'translate-x-1'}`} />
+                            </button>
+                        </div>
+
+                        {/* Read Option Labels (A/B/C/D) */}
+                        <div className="flex items-center justify-between mt-1">
+                            <div>
+                                <div className="text-sm font-bold text-white">Read Option Labels</div>
+                                <div className="text-[10px] text-gray-400">Read A / B / C / D before each option</div>
+                            </div>
+                            <button
+                                onClick={() => setTtsReadOptionLabels(!ttsReadOptionLabels)}
+                                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${ttsReadOptionLabels ? 'bg-pink-500' : 'bg-gray-600'}`}
+                            >
+                                <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${ttsReadOptionLabels ? 'translate-x-[18px]' : 'translate-x-1'}`} />
+                            </button>
+                        </div>
+
+                        {/* Word Highlight Section Divider */}
+                        <div className="w-full h-px bg-gray-700 my-1 shrink-0"></div>
+                        <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Word Highlight</div>
+
+                        {/* Highlight Style */}
+                        <div className="flex items-center justify-between mt-1">
+                            <div>
+                                <div className="text-sm font-bold text-white">Style</div>
+                                <div className="text-[10px] text-gray-400">BG / Underline / Glow</div>
+                            </div>
+                            <div className="flex bg-gray-700 rounded-lg p-1">
+                                <button onClick={() => setTtsWordHighlightStyle('bg')} className={`px-2 py-1 text-[10px] font-bold rounded-md ${ttsWordHighlightStyle === 'bg' ? 'bg-pink-500 text-white' : 'text-gray-300'}`}>BG</button>
+                                <button onClick={() => setTtsWordHighlightStyle('underline')} className={`px-2 py-1 text-[10px] font-bold rounded-md ${ttsWordHighlightStyle === 'underline' ? 'bg-pink-500 text-white' : 'text-gray-300'}`}>Line</button>
+                                <button onClick={() => setTtsWordHighlightStyle('glow')} className={`px-2 py-1 text-[10px] font-bold rounded-md ${ttsWordHighlightStyle === 'glow' ? 'bg-pink-500 text-white' : 'text-gray-300'}`}>Glow</button>
+                            </div>
+                        </div>
+
+                        {/* Highlight Color */}
+                        <div className="flex items-center justify-between mt-1">
+                            <div>
+                                <div className="text-sm font-bold text-white">Highlight Color</div>
+                                <div className="text-[10px] text-gray-400">Word highlight color</div>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                                {['#facc15','#f87171','#34d399','#60a5fa','#a78bfa','#fb923c'].map(color => (
+                                    <button key={color} onClick={() => setTtsWordHighlightColor(color)}
+                                        className={`w-4 h-4 rounded-full border-2 transition-all ${ttsWordHighlightColor === color ? 'border-white scale-125' : 'border-transparent'}`}
+                                        style={{ backgroundColor: color }}
+                                    />
+                                ))}
+                                <input type="color" value={ttsWordHighlightColor}
+                                    onChange={(e) => setTtsWordHighlightColor(e.target.value)}
+                                    className="w-5 h-5 rounded cursor-pointer bg-transparent border-0 p-0" title="Custom" />
+                            </div>
+                        </div>
+
+                        {/* Border Radius (only for bg/glow) */}
+                        {ttsWordHighlightStyle !== 'underline' && (
+                            <div>
+                                <div className="flex justify-between items-center mb-1">
+                                    <div>
+                                        <div className="text-sm font-bold text-white">Corner Radius</div>
+                                        <div className="text-[10px] text-gray-400">Highlight roundness</div>
+                                    </div>
+                                    <span className="font-mono text-xs font-bold text-pink-400">{ttsWordHighlightRadius}px</span>
+                                </div>
+                                <input type="range" min="0" max="20" step="1"
+                                    value={ttsWordHighlightRadius} onChange={(e) => setTtsWordHighlightRadius(Number(e.target.value))}
+                                    className="w-full accent-pink-500 h-1.5 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                                />
+                            </div>
+                        )}
+
+                        {/* Volume */}
+                        <div>
+                            <div className="flex justify-between items-center mb-1">
+                                <div>
+                                    <div className="text-sm font-bold text-white">TTS Volume</div>
+                                    <div className="text-[10px] text-gray-400">Voice output level</div>
+                                </div>
+                                <span className="font-mono text-xs font-bold text-pink-400">{Math.round(ttsVolume * 100)}%</span>
+                            </div>
+                            <input
+                                type="range" min="0" max="1" step="0.05"
+                                value={ttsVolume} onChange={(e) => setTtsVolume(Number(e.target.value))}
+                                className="w-full accent-pink-500 h-1.5 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                            />
+                        </div>
+
+                        {/* Pitch */}
+                        <div>
+                            <div className="flex justify-between items-center mb-1">
+                                <div>
+                                    <div className="text-sm font-bold text-white">Voice Pitch</div>
+                                    <div className="text-[10px] text-gray-400">Low = deep, High = sharp</div>
+                                </div>
+                                <span className="font-mono text-xs font-bold text-pink-400">{ttsPitch.toFixed(1)}x</span>
+                            </div>
+                            <input
+                                type="range" min="0.5" max="2" step="0.1"
+                                value={ttsPitch} onChange={(e) => setTtsPitch(Number(e.target.value))}
+                                className="w-full accent-pink-500 h-1.5 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                            />
+                        </div>
+
+                        {/* Delay Between Options */}
+                        <div>
+                            <div className="flex justify-between items-center mb-1">
+                                <div>
+                                    <div className="text-sm font-bold text-white">Option Delay</div>
+                                    <div className="text-[10px] text-gray-400">Pause between readings</div>
+                                </div>
+                                <span className="font-mono text-xs font-bold text-pink-400">{ttsDelay.toFixed(1)}s</span>
+                            </div>
+                            <input
+                                type="range" min="0" max="3" step="0.1"
+                                value={ttsDelay} onChange={(e) => setTtsDelay(Number(e.target.value))}
+                                className="w-full accent-pink-500 h-1.5 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                            />
+                        </div>
+
+                        {/* TTS Provider Selection */}
+                        <div className="mt-2">
+                            <div className="flex justify-between items-center mb-2">
+                                <div>
+                                    <div className="font-bold text-white">TTS Engine Provider</div>
+                                    <div className="text-xs text-gray-400 mt-1">Select voice engine (Cloud requires API key)</div>
+                                </div>
+                            </div>
+                            <select
+                                className="w-full bg-gray-800 text-sm font-semibold text-gray-200 border border-gray-700 rounded-lg px-2 py-2 focus:outline-none focus:border-pink-500 mb-3"
+                                value={ttsProvider}
+                                onChange={(e) => {
+                                    const newProvider = e.target.value as TTSProvider;
+                                    setTtsProvider(newProvider);
+                                    if (newProvider === 'browser') {
+                                        setTtsVoiceURI('bn-BD-network');
+                                    } else {
+                                        setTtsVoiceURI(CLOUD_VOICES[newProvider as keyof typeof CLOUD_VOICES]?.[0]?.id || '');
+                                    }
+                                }}
+                            >
+                                <option value="browser">Browser Native (Free, Word Sync)</option>
+                                <option value="google">Google Cloud TTS (Premium)</option>
+                                <option value="azure">Microsoft Azure TTS (Premium)</option>
+                                <option value="elevenlabs">ElevenLabs (Ultra Premium)</option>
+                            </select>
+
+                            {/* API Key Inputs (Dynamic) */}
+                            {ttsProvider === 'google' && (
+                                <div className="mb-3">
+                                    <div className="text-xs font-bold text-gray-300 mb-1 flex items-center gap-1">
+                                        <Key className="w-3 h-3" /> Google Cloud API Key
+                                    </div>
+                                    <input
+                                        type="password"
+                                        value={googleTtsApiKey}
+                                        onChange={(e) => setGoogleTtsApiKey(e.target.value)}
+                                        placeholder="AIzaSy..."
+                                        className="w-full bg-gray-900 text-xs text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-pink-500"
+                                    />
+                                </div>
+                            )}
+                            {ttsProvider === 'azure' && (
+                                <div className="mb-3 space-y-2">
+                                    <div>
+                                        <div className="text-xs font-bold text-gray-300 mb-1 flex items-center gap-1">
+                                            <Key className="w-3 h-3" /> Azure Subscription Key
+                                        </div>
+                                        <input
+                                            type="password"
+                                            value={azureTtsApiKey}
+                                            onChange={(e) => setAzureTtsApiKey(e.target.value)}
+                                            placeholder="Your Azure Key"
+                                            className="w-full bg-gray-900 text-xs text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-pink-500"
+                                        />
+                                    </div>
+                                    <div>
+                                        <div className="text-xs font-bold text-gray-300 mb-1 flex items-center gap-1">
+                                            Azure Region (e.g., eastus, centralindia)
+                                        </div>
+                                        <input
+                                            type="text"
+                                            value={azureRegion}
+                                            onChange={(e) => setAzureRegion(e.target.value)}
+                                            className="w-full bg-gray-900 text-xs text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-pink-500"
+                                        />
+                                    </div>
+                                </div>
+                            )}
+                            {ttsProvider === 'elevenlabs' && (
+                                <div className="mb-3">
+                                    <div className="text-xs font-bold text-gray-300 mb-1 flex items-center gap-1">
+                                        <Key className="w-3 h-3" /> ElevenLabs API Key
+                                    </div>
+                                    <input
+                                        type="password"
+                                        value={elevenLabsApiKey}
+                                        onChange={(e) => setElevenLabsApiKey(e.target.value)}
+                                        placeholder="sk_..."
+                                        className="w-full bg-gray-900 text-xs text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-pink-500"
+                                    />
+                                </div>
+                            )}
+                        </div>
+
                         {/* TTS Voice */}
                         <div>
                             <div className="flex justify-between items-center mb-2">
                                 <div>
-                                    <div className="font-bold text-white">Voice</div>
+                                    <div className="font-bold text-white">Voice Selection</div>
                                 </div>
                             </div>
                             <select
@@ -5428,11 +6101,31 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 value={ttsVoiceURI}
                                 onChange={(e) => setTtsVoiceURI(e.target.value)}
                             >
-                                {availableVoices.map(voice => (
-                                    <option key={voice.voiceURI} value={voice.voiceURI}>
-                                        {voice.name} ({voice.lang})
-                                    </option>
-                                ))}
+                                {ttsProvider === 'browser' ? (
+                                    <>
+                                        <optgroup label="Auto (Network Voices)">
+                                            <option value="bn-BD-network">Google বাংলা (Bangladesh) - Auto</option>
+                                            <option value="bn-IN-network">Google বাংলা (India) - Auto</option>
+                                            <option value="en-US-network">Google English (US) - Auto</option>
+                                            <option value="en-GB-network">Google English (UK) - Auto</option>
+                                        </optgroup>
+                                        <optgroup label="System Installed Voices">
+                                            {availableVoices.map(voice => (
+                                                <option key={voice.voiceURI} value={voice.voiceURI}>
+                                                    {voice.name} ({voice.lang})
+                                                </option>
+                                            ))}
+                                        </optgroup>
+                                    </>
+                                ) : (
+                                    <optgroup label={`${ttsProvider.toUpperCase()} Premium Voices`}>
+                                        {CLOUD_VOICES[ttsProvider as keyof typeof CLOUD_VOICES]?.map(voice => (
+                                            <option key={voice.id} value={voice.id}>
+                                                {voice.name}
+                                            </option>
+                                        ))}
+                                    </optgroup>
+                                )}
                             </select>
                         </div>
 
