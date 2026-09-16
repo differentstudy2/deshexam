@@ -61,7 +61,7 @@ const CONFETTI_CONFIG = {
 };
 
 import 'katex/dist/katex.min.css';
-import { X, ChevronLeft, ChevronRight, Play, Pause, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize, LayoutGrid, Sun, Moon, Eraser, Square, Circle, ArrowUpRight, Type, Presentation, ZoomIn, Volume2, VolumeX, MonitorPlay, Lightbulb, MessageCircle, Stamp, Droplet, Music, AlignLeft, Keyboard, Printer, Trophy, Globe, BarChart2, Sparkles, ImageDown, FileDown } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Play, Pause, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize, LayoutGrid, Sun, Moon, Eraser, Square, Circle, ArrowUpRight, Type, Presentation, ZoomIn, Volume2, VolumeX, MonitorPlay, Lightbulb, MessageCircle, Stamp, Droplet, Music, AlignLeft, Keyboard, Printer, Trophy, Globe, BarChart2, Sparkles, ImageDown, FileDown, Video } from 'lucide-react';
 
 const bnOptionsMap: Record<string, string> = {
     a: 'ক',
@@ -543,6 +543,144 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const winAudioRef = useRef<HTMLAudioElement>(null);
     const slideRef = useRef<HTMLDivElement>(null);
     const [isSavingImage, setIsSavingImage] = useState(false);
+    
+    // --- Screen Recording State ---
+    const [isRecording, setIsRecording] = useState(false);
+    const [recordingQuality, setRecordingQuality] = useState<'standard' | 'high' | 'ultra' | '4k'>('high');
+    const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+    const recordedChunksRef = useRef<BlobPart[]>([]);
+
+    const toggleRecording = async () => {
+        if (isRecording) {
+            // Stop recording
+            if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+                mediaRecorderRef.current.stop();
+            }
+            return;
+        }
+
+        // Start recording
+        try {
+            // Configure Quality Constraints
+            let frameRate = 60;
+            let width = 1920;
+            let height = 1080;
+            let bitsPerSecond = 8000000;
+
+            if (recordingQuality === 'standard') {
+                frameRate = 30; width = 1280; height = 720; bitsPerSecond = 2500000;
+            } else if (recordingQuality === 'ultra') {
+                width = 2560; height = 1440; bitsPerSecond = 12000000;
+            } else if (recordingQuality === '4k') {
+                width = 3840; height = 2160; bitsPerSecond = 20000000;
+            }
+
+            // 1. Get Screen & Tab/System Audio
+            const displayStream = await navigator.mediaDevices.getDisplayMedia({
+                video: { 
+                    displaySurface: 'browser',
+                    frameRate: { ideal: frameRate },
+                    width: { ideal: width },
+                    height: { ideal: height }
+                } as any,
+                audio: true,
+                // Allow the user to select the current tab (Chrome hides it by default)
+                selfBrowserSurface: 'include'
+            } as any);
+
+            // 2. Get Microphone Audio
+            let micStream: MediaStream | null = null;
+            try {
+                micStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+            } catch (err) {
+                console.warn("Microphone not available or permission denied.", err);
+            }
+
+            // 3. Mix Audio Tracks using AudioContext
+            let finalStream = displayStream;
+            
+            const hasDisplayAudio = displayStream.getAudioTracks().length > 0;
+            const hasMicAudio = micStream && micStream.getAudioTracks().length > 0;
+
+            if (hasDisplayAudio || hasMicAudio) {
+                const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+                if (AudioContextClass) {
+                    const audioCtx = new AudioContextClass();
+                    const dest = audioCtx.createMediaStreamDestination();
+
+                    if (hasDisplayAudio) {
+                        const displaySource = audioCtx.createMediaStreamSource(new MediaStream([displayStream.getAudioTracks()[0]]));
+                        displaySource.connect(dest);
+                    }
+
+                    if (hasMicAudio && micStream) {
+                        const micSource = audioCtx.createMediaStreamSource(micStream);
+                        micSource.connect(dest);
+                    }
+
+                    const mixedTracks = dest.stream.getAudioTracks();
+                    
+                    finalStream = new MediaStream([
+                        displayStream.getVideoTracks()[0],
+                        ...(mixedTracks.length > 0 ? mixedTracks : [])
+                    ]);
+                } else {
+                    console.warn("AudioContext not supported in this browser, falling back to basic display stream");
+                }
+            }
+
+            // Check supported mime types
+            let mimeType = 'video/webm;codecs=vp9,opus';
+            if (!MediaRecorder.isTypeSupported(mimeType)) {
+                mimeType = 'video/webm;codecs=vp8,opus';
+                if (!MediaRecorder.isTypeSupported(mimeType)) {
+                    mimeType = 'video/webm';
+                }
+            }
+
+            const mediaRecorder = new MediaRecorder(finalStream, { mimeType, videoBitsPerSecond: bitsPerSecond });
+            mediaRecorderRef.current = mediaRecorder;
+            recordedChunksRef.current = [];
+
+            mediaRecorder.ondataavailable = (e) => {
+                if (e.data.size > 0) {
+                    recordedChunksRef.current.push(e.data);
+                }
+            };
+
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(recordedChunksRef.current, { type: mimeType });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                document.body.appendChild(a);
+                a.style.display = 'none';
+                a.href = url;
+                const baseName = (chapterName || topicName || classLine || 'Test').replace(/\s+/g, '_').replace(/[<>:"/\\|?*]+/g, '');
+                a.download = `DeshExam_${baseName}_${recordingQuality.toUpperCase()}.webm`;
+                a.click();
+                window.URL.revokeObjectURL(url);
+                setIsRecording(false);
+                
+                // Stop all tracks to remove the recording icon from browser tab
+                displayStream.getTracks().forEach(track => track.stop());
+                if (micStream) micStream.getTracks().forEach(track => track.stop());
+                if (finalStream !== displayStream) finalStream.getTracks().forEach(track => track.stop());
+            };
+
+            // Detect if user clicks "Stop sharing" on the browser's native UI
+            displayStream.getVideoTracks()[0].onended = () => {
+                if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+                    mediaRecorderRef.current.stop();
+                }
+            };
+
+            mediaRecorder.start();
+            setIsRecording(true);
+        } catch (error) {
+            console.error("Error starting screen recording:", error);
+            setIsRecording(false);
+        }
+    };
     const [downloadAllSlides, setDownloadAllSlides] = useState(false);
     const [saveWithCorrectOption, setSaveWithCorrectOption] = useState(false);
 
@@ -3087,7 +3225,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                             if (step !== 0) handleReadAloud(true);
                                         }
                                     }}
-                                    className={`p-2 md:p-3 rounded-full transition-all shrink-0 ${isAutoPlayReadAloud || isSpeaking ? 'bg-green-500 text-white ring-2 ring-green-300' : 'bg-green-500/80 hover:bg-green-500 text-white'}`}
+                                    className={`p-2 md:p-3 rounded-full transition-all shrink-0 ${isAutoPlayReadAloud || isSpeaking ? 'bg-white/20 text-white shadow-sm' : 'hover:bg-white/10 text-white/80 hover:text-white'}`}
                                     title={isAutoPlayReadAloud || isSpeaking ? "Stop Auto Read (R)" : "Start Auto Read (R)"}
                                 >
                                     {isAutoPlayReadAloud || isSpeaking ? <Pause className="w-5 h-5 md:w-6 md:h-6 fill-current" /> : <Play className="w-5 h-5 md:w-6 md:h-6 fill-current" />}
@@ -3096,7 +3234,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 {/* Dark Mode Toggle Button */}
                                 <button
                                     onClick={() => setIsDarkMode(!isDarkMode)}
-                                    className="p-2 md:p-3 rounded-full transition-all bg-blue-500/80 hover:bg-blue-500 text-white shrink-0"
+                                    className="p-2 md:p-3 rounded-full transition-all hover:bg-white/10 text-white/80 hover:text-white shrink-0"
                                     title="Toggle Dark Mode (Shift+N)"
                                 >
                                     {isDarkMode ? <Sun className="w-5 h-5 md:w-6 md:h-6" /> : <Moon className="w-5 h-5 md:w-6 md:h-6" />}
@@ -3105,10 +3243,10 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 {/* Language Toggle Button */}
                                 <button
                                     onClick={() => setUiLang(l => l === 'bn' ? 'en' : 'bn')}
-                                    className="p-2 md:p-3 rounded-full transition-all bg-indigo-500/80 hover:bg-indigo-500 text-white shrink-0 flex items-center justify-center relative"
+                                    className="p-2 md:p-3 rounded-full transition-all hover:bg-white/10 text-white/80 hover:text-white shrink-0 flex items-center justify-center relative"
                                     title="Toggle Language (বাং/EN)"
                                 >
-                                    <Globe className="w-5 h-5 md:w-6 md:h-6 opacity-40" />
+                                    <Globe className="w-5 h-5 md:w-6 md:h-6 opacity-100" />
                                     <span className="absolute text-[10px] md:text-xs font-black tracking-widest uppercase">
                                         {uiLang === 'bn' ? 'বাং' : 'EN'}
                                     </span>
@@ -3116,7 +3254,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 {/* Fullscreen Toggle Button */}
                                 <button
                                     onClick={toggleFullscreen}
-                                    className="p-2 md:p-3 rounded-full transition-all bg-teal-500/80 hover:bg-teal-500 text-white shrink-0"
+                                    className="p-2 md:p-3 rounded-full transition-all hover:bg-white/10 text-white/80 hover:text-white shrink-0"
                                     title="Toggle Fullscreen (F11)"
                                 >
                                     {isFullscreen ? <Minimize className="w-5 h-5 md:w-6 md:h-6" /> : <Maximize className="w-5 h-5 md:w-6 md:h-6" />}
@@ -3125,7 +3263,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 {/* Print Button */}
                                 <button
                                     onClick={() => window.print()}
-                                    className="hidden md:block p-2 md:p-3 rounded-full transition-all bg-slate-500/80 hover:bg-slate-500 text-white shrink-0"
+                                    className="hidden md:block p-2 md:p-3 rounded-full transition-all hover:bg-white/10 text-white/80 hover:text-white shrink-0"
                                     title="Print Slides (Ctrl+P)"
                                 >
                                     <Printer className="w-5 h-5 md:w-6 md:h-6" />
@@ -3135,9 +3273,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 <button
                                     onClick={handleSaveAsImage}
                                     disabled={isSavingImage}
-                                    className={`hidden md:block p-2 md:p-3 rounded-full transition-all text-white shrink-0 ${isSavingImage
-                                        ? 'bg-pink-400/60 cursor-wait'
-                                        : 'bg-pink-500/80 hover:bg-pink-500'
+                                    className={`hidden md:block p-2 md:p-3 rounded-full transition-all shrink-0 ${isSavingImage
+                                        ? 'bg-white/30 text-white cursor-wait'
+                                        : 'hover:bg-white/10 text-white/80 hover:text-white'
                                         }`}
                                     title="Save Slide as Image"
                                 >
@@ -3151,9 +3289,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 <button
                                     onClick={downloadPdf}
                                     disabled={isGeneratingPdf}
-                                    className={`hidden md:block p-2 md:p-3 rounded-full transition-all text-white shrink-0 ${isGeneratingPdf
-                                        ? 'bg-blue-400/60 cursor-wait'
-                                        : 'bg-blue-500/80 hover:bg-blue-500'
+                                    className={`hidden md:block p-2 md:p-3 rounded-full transition-all shrink-0 ${isGeneratingPdf
+                                        ? 'bg-white/30 text-white cursor-wait'
+                                        : 'hover:bg-white/10 text-white/80 hover:text-white'
                                         }`}
                                     title="Download Presentation as PDF"
                                 >
@@ -3164,10 +3302,22 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 </button>
 
 
+                                {/* Screen Record Button */}
+                                <button
+                                    onClick={toggleRecording}
+                                    className={`hidden md:block p-2 md:p-3 rounded-full transition-all shrink-0 ${isRecording
+                                        ? 'bg-red-500 text-white shadow-md animate-pulse ring-2 ring-red-300'
+                                        : 'hover:bg-white/10 text-white/80 hover:text-white'
+                                        }`}
+                                    title={isRecording ? "Stop Recording" : "Start Recording"}
+                                >
+                                    {isRecording ? <Square className="w-5 h-5 md:w-6 md:h-6 fill-current" /> : <Video className="w-5 h-5 md:w-6 md:h-6" />}
+                                </button>
+
                                 {/* Spotlight Toggle Button */}
                                 <button
                                     onClick={() => setIsSpotlightActive(!isSpotlightActive)}
-                                    className={`hidden sm:block p-2 md:p-3 rounded-full transition-all shrink-0 ${isSpotlightActive ? 'bg-amber-400 text-white ring-2 ring-amber-200' : 'bg-amber-500/80 hover:bg-amber-500 text-white'}`}
+                                    className={`hidden sm:block p-2 md:p-3 rounded-full transition-all shrink-0 ${isSpotlightActive ? 'bg-white/20 text-white shadow-sm' : 'hover:bg-white/10 text-white/80 hover:text-white'}`}
                                     title="Toggle Spotlight (Shift+F)"
                                 >
                                     <Focus className="w-5 h-5 md:w-6 md:h-6" />
@@ -3176,7 +3326,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 {/* Whiteboard Toggle Button */}
                                 <button
                                     onClick={() => setIsWhiteboardMode(!isWhiteboardMode)}
-                                    className={`hidden md:block p-2 md:p-3 rounded-full transition-all shrink-0 ${isWhiteboardMode ? 'bg-violet-400 text-white ring-2 ring-violet-200' : 'bg-violet-500/80 hover:bg-violet-500 text-white'}`}
+                                    className={`hidden md:block p-2 md:p-3 rounded-full transition-all shrink-0 ${isWhiteboardMode ? 'bg-white/20 text-white shadow-sm' : 'hover:bg-white/10 text-white/80 hover:text-white'}`}
                                     title="Toggle Whiteboard Mode (Shift+W)"
                                 >
                                     <Presentation className="w-5 h-5 md:w-6 md:h-6" />
@@ -3185,7 +3335,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 {/* Pen Toggle Button */}
                                 <button
                                     onClick={() => setIsPenActive(!isPenActive)}
-                                    className={`p-2 md:p-3 rounded-full transition-all shrink-0 ${isPenActive ? 'bg-rose-500 text-white ring-2 ring-rose-300' : 'bg-rose-500/80 hover:bg-rose-500 text-white'}`}
+                                    className={`p-2 md:p-3 rounded-full transition-all shrink-0 ${isPenActive ? 'bg-white/20 text-white shadow-sm' : 'hover:bg-white/10 text-white/80 hover:text-white'}`}
                                     title="Toggle Pen Tool (Shift+D)"
                                 >
                                     <Pen className="w-5 h-5 md:w-6 md:h-6" />
@@ -3195,7 +3345,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 <div className="relative shrink-0 hidden md:block">
                                     <button
                                         onClick={() => setIsShortcutsOpen(!isShortcutsOpen)}
-                                        className={`p-2 md:p-3 rounded-full transition-all ${isShortcutsOpen ? 'bg-gray-400 text-white ring-2 ring-gray-200' : 'bg-gray-500/80 hover:bg-gray-500 text-white'}`}
+                                        className={`p-2 md:p-3 rounded-full transition-all ${isShortcutsOpen ? 'bg-white/20 text-white shadow-sm' : 'hover:bg-white/10 text-white/80 hover:text-white'}`}
                                         title="Keyboard Shortcuts (Shift+?)"
                                     >
                                         <Keyboard className="w-5 h-5 md:w-6 md:h-6" />
@@ -3241,7 +3391,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 <div className="relative shrink-0">
                                     <button
                                         onClick={() => setIsSettingsOpen(!isSettingsOpen)}
-                                        className={`p-2 md:p-3 rounded-full transition-all duration-300 ${isSettingsOpen ? 'bg-indigo-600 text-white shadow-[0_0_20px_rgba(79,70,229,0.4)] scale-105' : 'bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 hover:bg-white dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 hover:scale-105 shadow-lg'}`}
+                                        className={`p-2 md:p-3 rounded-full transition-all duration-300 ${isSettingsOpen ? 'bg-white/20 text-white shadow-md scale-105' : 'hover:bg-white/10 text-white/80 hover:text-white'}`}
                                         title="Display Settings"
                                     >
                                         <Settings className={`w-5 h-5 md:w-6 md:h-6 transition-transform duration-500 ${isSettingsOpen ? 'rotate-90' : ''}`} />
@@ -3322,6 +3472,27 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                                 </div>
                                                             </>
                                                         )}
+                                                    </div>
+                                                </div>
+
+                                                <div className="mb-2 pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
+                                                        <span className="flex items-center gap-2"><Video className="w-4 h-4 text-indigo-500" /> Recording Quality</span>
+                                                    </div>
+                                                    <div className="space-y-3">
+                                                        <div className="flex items-center justify-between">
+                                                            <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Resolution & FPS</span>
+                                                            <select
+                                                                value={recordingQuality}
+                                                                onChange={(e) => setRecordingQuality(e.target.value as any)}
+                                                                className="text-xs font-medium bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-2 py-1 outline-none focus:border-indigo-500 dark:text-gray-200"
+                                                            >
+                                                                <option value="standard">Standard (720p / 30fps)</option>
+                                                                <option value="high">High (1080p / 60fps)</option>
+                                                                <option value="ultra">Ultra (1440p / 60fps)</option>
+                                                                <option value="4k">4K (2160p / 60fps)</option>
+                                                            </select>
+                                                        </div>
                                                     </div>
                                                 </div>
 
@@ -4006,7 +4177,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             <div className="relative flex items-center justify-center shrink-0">
                                 <button
                                     onClick={() => setIsNavigatorOpen(!isNavigatorOpen)}
-                                    className={`p-2 md:p-3 rounded-full transition-all shadow-sm shrink-0 ${isNavigatorOpen ? 'bg-indigo-600 text-white ring-2 ring-indigo-300' : 'bg-white/60 hover:bg-white text-indigo-600 dark:bg-gray-700/60 dark:hover:bg-gray-700 dark:text-gray-300'}`}
+                                    className={`p-2 md:p-3 rounded-full transition-all shadow-sm shrink-0 ${isNavigatorOpen ? 'bg-white/20 text-white shadow-md' : 'hover:bg-white/10 text-white/80 hover:text-white'}`}
                                     title="Slide Navigator"
                                 >
                                     <LayoutGrid className="w-5 h-5 md:w-6 md:h-6" />
