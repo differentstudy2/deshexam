@@ -476,26 +476,29 @@ const SevenSegmentColon = () => {
     );
 };
 
-const FAKE_FIRST_NAMES = [
-    // Bengali/Muslim
-    'Rahim', 'Karim', 'Sajid', 'Anika', 'Nusrat', 'Hasan', 'Mehedi', 'Sakib', 'Tamim', 'Mashrafe', 'Mushi', 'Fahim', 'Tonmoy', 'Arif', 'Sumon', 'Rubel', 'Rifat', 'Jamil', 'Tanim', 'Riad', 'Shakil', 'Tariq', 'Farhan', 'Nadim', 'Imran', 'Kamrul', 'Tuhin', 'Pavel', 'Jahid', 'Sohel', 'Limon', 'Sadia', 'Nafisa', 'Lamia', 'Mithila',
-    // Hindu
-    'Amit', 'Rahul', 'Sourav', 'Pritam', 'Rakesh', 'Akash', 'Puja', 'Riya', 'Priti', 'Sneha', 'Joy', 'Anik', 'Sujon', 'Bipasha', 'Sreya', 'Bikash', 'Apu',
-    // English
-    'John', 'Michael', 'David', 'James', 'Robert', 'William', 'Sarah', 'Jessica', 'Emily', 'Emma', 'Olivia', 'Alex', 'Chris', 'Kevin'
-];
-const FAKE_LAST_NAMES = [
-    // Bengali/Muslim
-    'Rahman', 'Islam', 'Hossain', 'Hasan', 'Ali', 'Ahmed', 'Uddin', 'Khan', 'Chowdhury', 'Akter', 'Khatun', 'Begum', 'Sikder', 'Mondol',
-    // Hindu
-    'Das', 'Ghosh', 'Saha', 'Roy', 'Sen', 'Banerjee', 'Chatterjee', 'Mukherjee', 'Bose', 'Dutta', 'Sarkar', 'Biswas', 'Nath',
-    // English
-    'Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Taylor', 'Wilson', 'Anderson', 'Thomas'
-];
+const FAKE_NAMES_DB = {
+    muslim: {
+        first: ['Rahim', 'Karim', 'Sajid', 'Anika', 'Nusrat', 'Hasan', 'Mehedi', 'Sakib', 'Tamim', 'Mashrafe', 'Mushi', 'Fahim', 'Tonmoy', 'Arif', 'Sumon', 'Rubel', 'Rifat', 'Jamil', 'Tanim', 'Riad', 'Shakil', 'Tariq', 'Farhan', 'Nadim', 'Imran', 'Kamrul', 'Tuhin', 'Pavel', 'Jahid', 'Sohel', 'Limon', 'Sadia', 'Nafisa', 'Lamia', 'Mithila', 'Zayed', 'Omar', 'Ali', 'Zarif', 'Hamza', 'Musa', 'Naim', 'Faisal', 'Rafi', 'Rakib', 'Sifat', 'Nabil', 'Milon', 'Nayan', 'Zisan', 'Tarik'],
+        last: ['Rahman', 'Islam', 'Hossain', 'Hasan', 'Ali', 'Ahmed', 'Uddin', 'Khan', 'Chowdhury', 'Akter', 'Khatun', 'Begum', 'Sikder', 'Mondol', 'Sheikh', 'Bhuiyan', 'Majumder', 'Talukder', 'Mia', 'Kazi', 'Molla', 'Mirza', 'Khondoker', 'Hawlader', 'Sarkar', 'Biswas', 'Kabir', 'Mahmud', 'Tarafder', 'Khandaker', 'Mallick', 'Mridha', 'Faruqui', 'Habib', 'Shohel', 'Rashid', 'Zaman', 'Ferdous', 'Shikdar', 'Sardar']
+    },
+    hindu: {
+        first: ['Amit', 'Rahul', 'Sourav', 'Pritam', 'Rakesh', 'Akash', 'Puja', 'Riya', 'Priti', 'Sneha', 'Joy', 'Anik', 'Sujon', 'Bipasha', 'Sreya', 'Bikash', 'Apu', 'Bappi', 'Prosenjit', 'Mithun', 'Ranjit', 'Subrata', 'Tapas', 'Bapi', 'Polash', 'Anupam', 'Arup', 'Debashis', 'Shuvo', 'Oronno', 'Sanjib', 'Somnath', 'Gourab', 'Pallab', 'Biplob', 'Suman', 'Bishal', 'Utpal', 'Piyal', 'Arnab', 'Soumitra', 'Susmita', 'Ananya', 'Tumpa', 'Moumita', 'Aditi', 'Rupa', 'Tithi', 'Sruti', 'Oishee'],
+        last: ['Das', 'Ghosh', 'Saha', 'Roy', 'Sen', 'Banerjee', 'Chatterjee', 'Mukherjee', 'Bose', 'Dutta', 'Sarkar', 'Biswas', 'Nath', 'Paul', 'Debnath', 'Bhattacharya', 'Majumdar', 'Chakraborty', 'Ganguly', 'Karmakar', 'Nandi', 'Baidya', 'Bhowmick', 'Pramanik', 'Guha', 'Basu', 'Kundu', 'Shil', 'Sanyal', 'Mazumdar']
+    },
+    english: {
+        first: ['John', 'Michael', 'David', 'James', 'Robert', 'William', 'Sarah', 'Jessica', 'Emily', 'Emma', 'Olivia', 'Alex', 'Chris', 'Kevin', 'Daniel', 'Matthew', 'Anthony', 'Mark', 'Paul', 'Steven', 'Andrew', 'Kenneth', 'Joshua', 'Brian', 'George', 'Edward', 'Ronald', 'Timothy', 'Jason', 'Jeffrey', 'Ryan', 'Jacob', 'Gary', 'Nicholas', 'Eric', 'Jonathan', 'Stephen', 'Larry', 'Justin', 'Scott', 'Brandon', 'Benjamin', 'Samuel', 'Gregory', 'Frank', 'Alexander', 'Raymond', 'Patrick', 'Jack'],
+        last: ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Taylor', 'Wilson', 'Anderson', 'Thomas', 'Jackson', 'White', 'Harris', 'Martin', 'Thompson', 'Moore', 'Young', 'Allen', 'King', 'Wright', 'Scott', 'Torres', 'Nguyen', 'Hill', 'Flores', 'Green', 'Adams', 'Nelson']
+    }
+};
 
 const generateRandomName = () => {
-    const first = FAKE_FIRST_NAMES[Math.floor(Math.random() * FAKE_FIRST_NAMES.length)];
-    const last = FAKE_LAST_NAMES[Math.floor(Math.random() * FAKE_LAST_NAMES.length)];
+    const categories = Object.keys(FAKE_NAMES_DB) as Array<keyof typeof FAKE_NAMES_DB>;
+    const category = categories[Math.floor(Math.random() * categories.length)];
+    const firstList = FAKE_NAMES_DB[category].first;
+    const lastList = FAKE_NAMES_DB[category].last;
+    
+    const first = firstList[Math.floor(Math.random() * firstList.length)];
+    const last = lastList[Math.floor(Math.random() * lastList.length)];
     return `${first} ${last}`;
 };
 
