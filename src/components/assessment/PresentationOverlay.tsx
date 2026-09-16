@@ -886,8 +886,22 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [ttsRate, setTtsRate] = useState(1);
     const [isTTSPlaying, setIsTTSPlaying] = useState(false);
     const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([]);
-    
 
+    useEffect(() => {
+        const loadVoices = () => {
+            if (!('speechSynthesis' in window)) return;
+            const voices = window.speechSynthesis.getVoices();
+            setAvailableVoices(voices);
+            if (!ttsVoiceURI && voices.length > 0) {
+                const bnVoice = voices.find(v => v.lang.includes('bn') || v.lang.includes('bd'));
+                setTtsVoiceURI(bnVoice ? bnVoice.voiceURI : voices[0].voiceURI);
+            }
+        };
+        loadVoices();
+        if (window.speechSynthesis.onvoiceschanged !== undefined) {
+            window.speechSynthesis.onvoiceschanged = loadVoices;
+        }
+    }, [ttsVoiceURI]);
 
     const taxonomyString = [chapterName, topicName].filter(Boolean).join(' | ');
     let displayTitle = classLine;
@@ -5344,20 +5358,6 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             />
                         </div>
 
-                        {/* Auto Play Read Aloud */}
-                        <div className="flex items-center justify-between mb-4">
-                            <span className="text-sm font-semibold text-gray-300">Auto Play Read Aloud</span>
-                            <button
-                                onClick={() => setIsAutoPlayReadAloud(!isAutoPlayReadAloud)}
-                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                                    isAutoPlayReadAloud ? 'bg-pink-500' : 'bg-gray-600'
-                                }`}
-                            >
-                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                                    isAutoPlayReadAloud ? 'translate-x-6' : 'translate-x-1'
-                                }`} />
-                            </button>
-                        </div>
 
                         {/* Treble Boost */}
                         <div>
@@ -5397,6 +5397,25 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             <Volume2 className="w-4 h-4 text-pink-400" />
                             Text-To-Speech (TTS)
                         </h4>
+                        
+                        {/* Auto Play Read Aloud */}
+                        <div className="flex items-center justify-between mb-4 mt-2">
+                            <div>
+                                <div className="font-bold text-white">Auto Play</div>
+                                <div className="text-xs text-gray-400 mt-1">Reads questions automatically</div>
+                            </div>
+                            <button
+                                onClick={() => setIsAutoPlayReadAloud(!isAutoPlayReadAloud)}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                                    isAutoPlayReadAloud ? 'bg-pink-500' : 'bg-gray-600'
+                                }`}
+                            >
+                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                    isAutoPlayReadAloud ? 'translate-x-6' : 'translate-x-1'
+                                }`} />
+                            </button>
+                        </div>
+
                         {/* TTS Voice */}
                         <div>
                             <div className="flex justify-between items-center mb-2">
