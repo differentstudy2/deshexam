@@ -5278,34 +5278,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             }
                         }
                     ` }} />
-                    {/* Floating Quick Pen Tool (Left Edge, Bottom) */}
-                    <div className="absolute left-3 md:left-5 bottom-4 md:bottom-8 z-[70] flex flex-col gap-2 items-center animate-in slide-in-from-left-10 fade-in duration-300">
-                        {/* Preset Colors (Visible when Pen is active, expands upwards) */}
-                        <div className={`flex flex-col gap-2 p-1.5 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md rounded-full shadow-lg border border-gray-200 dark:border-gray-700 transition-all duration-300 origin-bottom ${(isPenActive && drawingTool === 'pen') ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-90 translate-y-4 pointer-events-none'
-                            }`}>
-                            {[
-                                { color: '#ef4444', name: 'Red' },
-                                { color: '#3b82f6', name: 'Blue' },
-                                { color: '#22c55e', name: 'Green' },
-                                { color: '#facc15', name: 'Yellow' },
-                                { color: '#000000', name: 'Black' },
-                                { color: '#ffffff', name: 'White' }
-                            ].map((preset) => (
-                                <button
-                                    key={preset.color}
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        setPenColor(preset.color);
-                                        setDrawingTool('pen');
-                                        setIsPenActive(true);
-                                    }}
-                                    className={`w-6 h-6 md:w-7 md:h-7 rounded-full transition-all border-2 shadow-sm ${penColor === preset.color ? 'border-blue-500 scale-125 ring-2 ring-blue-500/30' : 'border-gray-300 dark:border-gray-600 hover:scale-110'}`}
-                                    style={{ backgroundColor: preset.color }}
-                                    title={preset.name}
-                                />
-                            ))}
-                        </div>
-
+                    {/* Floating Quick Pen Tool (Left Edge) */}
+                    <div className="absolute left-3 md:left-5 top-[15%] md:top-[20%] z-[70] flex flex-col gap-2 items-center animate-in slide-in-from-left-10 fade-in duration-300">
                         {/* Clear Markings Button (Above Pen) */}
                         <button
                             onClick={clearCanvas}
@@ -5325,14 +5299,40 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     setIsPenActive(true);
                                 }
                             }}
-                            className={`p-3 rounded-full shadow-lg transition-all border-2 ${(isPenActive && drawingTool === 'pen')
-                                    ? 'bg-blue-600 text-white border-blue-400 scale-110 shadow-[0_0_15px_rgba(37,99,235,0.5)]'
-                                    : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-transparent hover:bg-gray-50 dark:hover:bg-gray-700'
+                            className={`p-3 rounded-full transition-all ${(isPenActive && drawingTool === 'pen')
+                                    ? 'bg-transparent text-blue-500 scale-110 drop-shadow-[0_0_8px_rgba(37,99,235,0.8)]'
+                                    : 'bg-transparent text-gray-400 dark:text-gray-500 hover:bg-gray-500/10'
                                 }`}
                             title="Quick Pen Toggle"
                         >
                             <Pen className="w-5 h-5 md:w-6 md:h-6" />
                         </button>
+
+                        {/* Preset Colors (Visible when Pen is active, expands downwards) */}
+                        <div className={`flex flex-col gap-2 p-1.5 bg-transparent transition-all duration-300 origin-top ${(isPenActive && drawingTool === 'pen') ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-90 -translate-y-4 pointer-events-none'
+                            }`}>
+                            {[
+                                { color: '#ef4444', name: 'Red' },
+                                { color: '#3b82f6', name: 'Blue' },
+                                { color: '#22c55e', name: 'Green' },
+                                { color: '#facc15', name: 'Yellow' },
+                                { color: '#000000', name: 'Black' },
+                                { color: '#ffffff', name: 'White' }
+                            ].map((preset) => (
+                                <button
+                                    key={preset.color}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setPenColor(preset.color);
+                                        setDrawingTool('pen');
+                                        setIsPenActive(true);
+                                    }}
+                                    className={`w-6 h-6 md:w-7 md:h-7 rounded-full transition-all shadow-sm ${penColor === preset.color ? 'scale-125 ring-2 ring-white/50' : 'hover:scale-110'}`}
+                                    style={{ backgroundColor: preset.color }}
+                                    title={preset.name}
+                                />
+                            ))}
+                        </div>
                     </div>
 
                     {/* Floating Presentation Tools (Right Edge, Top, Transparent) */}
