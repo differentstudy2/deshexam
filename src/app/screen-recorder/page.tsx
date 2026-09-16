@@ -13,13 +13,27 @@ import {
     ChevronDown,
     Star,
     Square,
-    Pause
+    Pause,
+    MicOff,
+    VolumeX,
+    Sliders,
+    Settings,
+    X,
+    Waves
 } from 'lucide-react';
 
 export default function ScreenRecorderPage() {
     const [isRecording, setIsRecording] = useState(false);
     const [isPaused, setIsPaused] = useState(false);
     const [recordingQuality, setRecordingQuality] = useState<'standard' | 'high' | 'ultra' | '4k'>('4k');
+    const [noiseCancellation, setNoiseCancellation] = useState(true);
+    
+    // Advanced Audio Settings State
+    const [showAudioSettings, setShowAudioSettings] = useState(false);
+    const [useCompressor, setUseCompressor] = useState(true);
+    const [lowCutFreq, setLowCutFreq] = useState(100); // 0 to 300 Hz
+    const [trebleBoost, setTrebleBoost] = useState(5); // 0 to 10
+    const [noiseGateThreshold, setNoiseGateThreshold] = useState(0.01); // 0 to 0.1
     const [recordingTime, setRecordingTime] = useState(0);
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const recordedChunksRef = useRef<BlobPart[]>([]);
@@ -81,7 +95,14 @@ export default function ScreenRecorderPage() {
             // 2. Get Microphone Audio
             let micStream: MediaStream | null = null;
             try {
-                micStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+                micStream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: {
+                        noiseSuppression: noiseCancellation,
+                        echoCancellation: noiseCancellation,
+                        autoGainControl: noiseCancellation
+                    }, 
+                    video: false 
+                });
             } catch (err) {
                 console.warn("Microphone not available or permission denied.", err);
             }
@@ -105,7 +126,71 @@ export default function ScreenRecorderPage() {
 
                     if (hasMicAudio && micStream) {
                         const micSource = audioCtx.createMediaStreamSource(micStream);
-                        micSource.connect(dest);
+                        let currentNode: AudioNode = micSource;
+
+                        // 1. Noise Gate
+                        if (noiseGateThreshold > 0) {
+                            const scriptNode = audioCtx.createScriptProcessor(4096, 1, 1);
+                            const gateGain = audioCtx.createGain();
+                            let isOpen = true; // State to track if gate is open
+                            
+                            scriptNode.onaudioprocess = (e) => {
+                                const inputData = e.inputBuffer.getChannelData(0);
+                                let sum = 0;
+                                for (let i = 0; i < inputData.length; i++) {
+                                    sum += inputData[i] * inputData[i];
+                                }
+                                const rms = Math.sqrt(sum / inputData.length);
+                                
+                                // Hysteresis logic to prevent chopping/chattering
+                                if (!isOpen && rms > noiseGateThreshold) {
+                                    isOpen = true;
+                                    gateGain.gain.setTargetAtTime(1, audioCtx.currentTime, 0.02);
+                                } else if (isOpen && rms < noiseGateThreshold * 0.4) {
+                                    // Voice must drop to 40% of the threshold to close the gate
+                                    isOpen = false;
+                                    gateGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.4);
+                                }
+                            };
+                            
+                            micSource.connect(scriptNode);
+                            scriptNode.connect(audioCtx.destination);
+                            currentNode.connect(gateGain);
+                            currentNode = gateGain;
+                        }
+
+                        // 2. Low-Cut Filter
+                        if (lowCutFreq > 0) {
+                            const lowCut = audioCtx.createBiquadFilter();
+                            lowCut.type = 'highpass';
+                            lowCut.frequency.value = lowCutFreq;
+                            currentNode.connect(lowCut);
+                            currentNode = lowCut;
+                        }
+
+                        // 3. Treble Boost
+                        if (trebleBoost > 0) {
+                            const treble = audioCtx.createBiquadFilter();
+                            treble.type = 'highshelf';
+                            treble.frequency.value = 3000;
+                            treble.gain.value = trebleBoost;
+                            currentNode.connect(treble);
+                            currentNode = treble;
+                        }
+
+                        // 4. Compressor
+                        if (useCompressor) {
+                            const compressor = audioCtx.createDynamicsCompressor();
+                            compressor.threshold.value = -24;
+                            compressor.knee.value = 30;
+                            compressor.ratio.value = 4;
+                            compressor.attack.value = 0.003;
+                            compressor.release.value = 0.25;
+                            currentNode.connect(compressor);
+                            currentNode = compressor;
+                        }
+
+                        currentNode.connect(dest);
                     }
 
                     const mixedTracks = dest.stream.getAudioTracks();
@@ -219,9 +304,9 @@ export default function ScreenRecorderPage() {
 
             {/* HERO SECTION */}
             <section className={`pt-24 pb-16 px-4 md:px-8 max-w-7xl mx-auto transition-opacity duration-500 ${isRecording ? 'opacity-30 pointer-events-none' : ''}`}>
-                <div className="flex flex-col lg:flex-row items-start justify-between gap-16">
+                <div className="flex flex-col lg:flex-row items-start justify-between gap-8 lg:gap-12 xl:gap-16">
                     {/* Left Column */}
-                    <div className="flex-1 animate-in slide-in-from-left-8 fade-in duration-700">
+                    <div className="w-full lg:w-3/5 animate-in slide-in-from-left-8 fade-in duration-700">
                         <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-gray-900 mb-6 leading-[1.1]">
                             Free online screen <br className="hidden md:block" /> recorder
                         </h1>
@@ -229,14 +314,14 @@ export default function ScreenRecorderPage() {
                             The fastest, easiest way to capture high-quality videos of your screen, camera, or both. No downloads necessary. Start recording instantly right inside your browser.
                         </p>
                         
-                        <div className="flex flex-col sm:flex-row items-center gap-4">
+                        <div className="flex flex-wrap lg:flex-nowrap items-center gap-3">
                             <button 
                                 onClick={toggleRecording}
-                                className="group relative px-8 py-4 bg-transparent border-2 border-pink-500 text-pink-600 font-bold rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 w-full sm:w-auto text-lg text-center inline-flex items-center justify-center gap-2"
+                                className="group relative h-14 px-8 bg-transparent border-2 border-pink-500 text-pink-600 font-bold rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 w-full sm:w-auto text-lg text-center inline-flex items-center justify-center gap-2 whitespace-nowrap"
                             >
                                 <span className="absolute inset-0 bg-pink-500 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
                                 <span className="relative z-10 group-hover:text-white transition-colors duration-300 flex items-center gap-2">
-                                    <MonitorPlay className="w-5 h-5" />
+                                    <MonitorPlay className="w-5 h-5 shrink-0" />
                                     Start Recorder
                                 </span>
                             </button>
@@ -244,14 +329,116 @@ export default function ScreenRecorderPage() {
                             <select
                                 value={recordingQuality}
                                 onChange={(e) => setRecordingQuality(e.target.value as any)}
-                                className="px-4 py-4 w-full sm:w-auto bg-gray-50 border-2 border-gray-200 text-gray-700 font-bold rounded-xl shadow-sm outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20 transition-all cursor-pointer"
+                                className="h-14 px-4 w-full sm:w-auto bg-gray-50 border-2 border-gray-200 text-gray-700 font-bold rounded-xl shadow-sm outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20 transition-all cursor-pointer whitespace-nowrap"
                             >
                                 <option value="standard">Standard (720p)</option>
                                 <option value="high">High (1080p)</option>
                                 <option value="ultra">Ultra (1440p)</option>
                                 <option value="4k">4K (2160p)</option>
                             </select>
+
+                            <button
+                                onClick={() => setNoiseCancellation(!noiseCancellation)}
+                                className={`h-14 px-5 w-full sm:w-auto border-2 font-bold rounded-xl shadow-sm outline-none transition-all flex items-center justify-center gap-2 whitespace-nowrap ${
+                                    noiseCancellation 
+                                    ? 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100' 
+                                    : 'bg-gray-50 border-gray-200 text-gray-500 hover:bg-gray-100'
+                                }`}
+                                title="Toggle Mic Noise Cancellation & Echo Reduction"
+                            >
+                                {noiseCancellation ? <Mic className="w-5 h-5 shrink-0" /> : <MicOff className="w-5 h-5 shrink-0" />}
+                                {noiseCancellation ? 'Clear Voice' : 'Raw Mic'}
+                            </button>
+
+                            <button
+                                onClick={() => setShowAudioSettings(true)}
+                                className="h-14 w-14 shrink-0 bg-gray-50 border-2 border-gray-200 text-gray-700 hover:bg-gray-100 rounded-xl shadow-sm outline-none transition-all flex items-center justify-center"
+                                title="Advanced Audio Settings"
+                            >
+                                <Sliders className="w-5 h-5" />
+                            </button>
                         </div>
+                        
+                        {/* Advanced Audio Settings Panel */}
+                        {showAudioSettings && (
+                            <div className="mt-6 bg-white border-2 border-gray-200 rounded-2xl p-6 shadow-xl animate-in slide-in-from-top-4 fade-in duration-300 relative">
+                                <button 
+                                    onClick={() => setShowAudioSettings(false)}
+                                    className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+                                >
+                                    <X className="w-5 h-5" />
+                                </button>
+                                
+                                <h3 className="text-xl font-extrabold text-gray-800 flex items-center gap-2 mb-6">
+                                    <Waves className="w-6 h-6 text-pink-500" />
+                                    Advanced Audio Processing
+                                </h3>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                    {/* Compressor */}
+                                    <div className="flex items-start justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                        <div>
+                                            <div className="font-bold text-gray-800">Auto Volume Leveler</div>
+                                            <div className="text-xs text-gray-500 mt-1">Balances loud and soft sounds</div>
+                                        </div>
+                                        <button 
+                                            onClick={() => setUseCompressor(!useCompressor)}
+                                            className={`w-12 h-6 rounded-full transition-colors relative ${useCompressor ? 'bg-pink-500' : 'bg-gray-300'}`}
+                                        >
+                                            <div className={`w-4 h-4 bg-white rounded-full absolute top-1 transition-transform ${useCompressor ? 'left-7' : 'left-1'}`}></div>
+                                        </button>
+                                    </div>
+
+                                    {/* Low Cut */}
+                                    <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                        <div className="flex justify-between items-center mb-2">
+                                            <div>
+                                                <div className="font-bold text-gray-800">Low-Cut Filter (AC/Fan)</div>
+                                                <div className="text-xs text-gray-500">Removes low rumble noise</div>
+                                            </div>
+                                            <span className="font-mono text-sm font-bold text-pink-600">{lowCutFreq} Hz</span>
+                                        </div>
+                                        <input 
+                                            type="range" min="0" max="300" step="5" 
+                                            value={lowCutFreq} onChange={(e) => setLowCutFreq(Number(e.target.value))}
+                                            className="w-full accent-pink-500 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                                        />
+                                    </div>
+
+                                    {/* Treble Boost */}
+                                    <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                        <div className="flex justify-between items-center mb-2">
+                                            <div>
+                                                <div className="font-bold text-gray-800">Treble Boost (Crispness)</div>
+                                                <div className="text-xs text-gray-500">Adds presence to voice</div>
+                                            </div>
+                                            <span className="font-mono text-sm font-bold text-pink-600">{trebleBoost} dB</span>
+                                        </div>
+                                        <input 
+                                            type="range" min="0" max="10" step="1" 
+                                            value={trebleBoost} onChange={(e) => setTrebleBoost(Number(e.target.value))}
+                                            className="w-full accent-pink-500 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                                        />
+                                    </div>
+
+                                    {/* Noise Gate */}
+                                    <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                        <div className="flex justify-between items-center mb-2">
+                                            <div>
+                                                <div className="font-bold text-gray-800">Noise Gate Threshold</div>
+                                                <div className="text-xs text-gray-500">Mutes mic when silent</div>
+                                            </div>
+                                            <span className="font-mono text-sm font-bold text-pink-600">{(noiseGateThreshold * 100).toFixed(0)}%</span>
+                                        </div>
+                                        <input 
+                                            type="range" min="0" max="0.1" step="0.01" 
+                                            value={noiseGateThreshold} onChange={(e) => setNoiseGateThreshold(Number(e.target.value))}
+                                            className="w-full accent-pink-500 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                         
                         <p className="text-xs text-gray-400 mt-6 uppercase tracking-wider font-semibold">
                             Supports Windows, Mac, Chrome, Edge, Linux
@@ -259,7 +446,7 @@ export default function ScreenRecorderPage() {
                     </div>
 
                     {/* Right Column */}
-                    <div className="flex-1 animate-in slide-in-from-right-8 fade-in duration-700 delay-150">
+                    <div className="w-full lg:w-2/5 animate-in slide-in-from-right-8 fade-in duration-700 delay-150">
                         <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-6">
                             Free desktop screen recorder & editor
                         </h2>

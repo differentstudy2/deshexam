@@ -61,7 +61,7 @@ const CONFETTI_CONFIG = {
 };
 
 import 'katex/dist/katex.min.css';
-import { X, ChevronLeft, ChevronRight, Play, Pause, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize, LayoutGrid, Sun, Moon, Eraser, Square, Circle, ArrowUpRight, Type, Presentation, ZoomIn, Volume2, VolumeX, MonitorPlay, Lightbulb, MessageCircle, Stamp, Droplet, Music, AlignLeft, Keyboard, Printer, Trophy, Globe, BarChart2, Sparkles, ImageDown, FileDown, Video } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Play, Pause, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize, LayoutGrid, Sun, Moon, Eraser, Square, Circle, ArrowUpRight, Type, Presentation, ZoomIn, Volume2, VolumeX, MonitorPlay, Lightbulb, MessageCircle, Stamp, Droplet, Music, AlignLeft, Keyboard, Printer, Trophy, Globe, BarChart2, Sparkles, ImageDown, FileDown, Video, Sliders } from 'lucide-react';
 
 const bnOptionsMap: Record<string, string> = {
     a: 'ক',
@@ -548,6 +548,14 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [isRecording, setIsRecording] = useState(false);
     const [isRecordingPaused, setIsRecordingPaused] = useState(false);
     const [recordingQuality, setRecordingQuality] = useState<'standard' | 'high' | 'ultra' | '4k'>('4k');
+    
+    // --- Advanced Audio Settings State ---
+    const [showAudioSettings, setShowAudioSettings] = useState(false);
+    const [useCompressor, setUseCompressor] = useState(true);
+    const [lowCutFreq, setLowCutFreq] = useState(150); // 0 to 300 Hz
+    const [trebleBoost, setTrebleBoost] = useState(5); // 0 to 10
+    const [noiseGateThreshold, setNoiseGateThreshold] = useState(0.02); // 0 to 0.1
+    
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const recordedChunksRef = useRef<BlobPart[]>([]);
 
@@ -594,7 +602,14 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
             // 2. Get Microphone Audio
             let micStream: MediaStream | null = null;
             try {
-                micStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+                micStream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: {
+                        noiseSuppression: true,
+                        echoCancellation: true,
+                        autoGainControl: true
+                    }, 
+                    video: false 
+                });
             } catch (err) {
                 console.warn("Microphone not available or permission denied.", err);
             }
@@ -618,7 +633,71 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                     if (hasMicAudio && micStream) {
                         const micSource = audioCtx.createMediaStreamSource(micStream);
-                        micSource.connect(dest);
+                        let currentNode: AudioNode = micSource;
+
+                        // 1. Noise Gate
+                        if (noiseGateThreshold > 0) {
+                            const scriptNode = audioCtx.createScriptProcessor(4096, 1, 1);
+                            const gateGain = audioCtx.createGain();
+                            let isOpen = true; // State to track if gate is open
+                            
+                            scriptNode.onaudioprocess = (e) => {
+                                const inputData = e.inputBuffer.getChannelData(0);
+                                let sum = 0;
+                                for (let i = 0; i < inputData.length; i++) {
+                                    sum += inputData[i] * inputData[i];
+                                }
+                                const rms = Math.sqrt(sum / inputData.length);
+                                
+                                // Hysteresis logic to prevent chopping/chattering
+                                if (!isOpen && rms > noiseGateThreshold) {
+                                    isOpen = true;
+                                    gateGain.gain.setTargetAtTime(1, audioCtx.currentTime, 0.02);
+                                } else if (isOpen && rms < noiseGateThreshold * 0.4) {
+                                    // Voice must drop to 40% of the threshold to close the gate
+                                    isOpen = false;
+                                    gateGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.4);
+                                }
+                            };
+                            
+                            micSource.connect(scriptNode);
+                            scriptNode.connect(audioCtx.destination);
+                            currentNode.connect(gateGain);
+                            currentNode = gateGain;
+                        }
+
+                        // 2. Low-Cut Filter
+                        if (lowCutFreq > 0) {
+                            const lowCut = audioCtx.createBiquadFilter();
+                            lowCut.type = 'highpass';
+                            lowCut.frequency.value = lowCutFreq;
+                            currentNode.connect(lowCut);
+                            currentNode = lowCut;
+                        }
+
+                        // 3. Treble Boost
+                        if (trebleBoost > 0) {
+                            const treble = audioCtx.createBiquadFilter();
+                            treble.type = 'highshelf';
+                            treble.frequency.value = 3000;
+                            treble.gain.value = trebleBoost;
+                            currentNode.connect(treble);
+                            currentNode = treble;
+                        }
+
+                        // 4. Compressor
+                        if (useCompressor) {
+                            const compressor = audioCtx.createDynamicsCompressor();
+                            compressor.threshold.value = -24;
+                            compressor.knee.value = 30;
+                            compressor.ratio.value = 4;
+                            compressor.attack.value = 0.003;
+                            compressor.release.value = 0.25;
+                            currentNode.connect(compressor);
+                            currentNode = compressor;
+                        }
+
+                        currentNode.connect(dest);
                     }
 
                     const mixedTracks = dest.stream.getAudioTracks();
@@ -3343,6 +3422,18 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 >
                                     {isRecording ? <Square className="w-5 h-5 md:w-6 md:h-6 fill-current" /> : <Video className="w-5 h-5 md:w-6 md:h-6" />}
                                 </button>
+                                
+                                {/* Audio Settings Button */}
+                                <button
+                                    onClick={() => setShowAudioSettings(!showAudioSettings)}
+                                    className={`hidden md:block p-2 md:p-3 rounded-full transition-all shrink-0 ${showAudioSettings
+                                        ? 'bg-blue-500 text-white shadow-md ring-2 ring-blue-300'
+                                        : 'hover:bg-white/10 text-white/80 hover:text-white'
+                                        }`}
+                                    title="Advanced Audio Settings"
+                                >
+                                    <Sliders className="w-5 h-5 md:w-6 md:h-6" />
+                                </button>
 
                                 {/* Spotlight Toggle Button */}
                                 <button
@@ -3382,7 +3473,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     </button>
 
                                     {isShortcutsOpen && (
-                                        <div className="fixed bottom-[80px] left-1/2 -translate-x-1/2 md:absolute md:bottom-full md:left-auto md:right-0 md:translate-x-0 md:mb-4 bg-white dark:bg-gray-900 !bg-opacity-100 !opacity-100 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)] p-5 w-[90vw] sm:w-[400px] z-[70] animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[70vh] md:max-h-[60vh]">
+                                        <>
+                                            <div className="fixed inset-0 z-[60]" onClick={() => setIsShortcutsOpen(false)}></div>
+                                            <div className="fixed bottom-[80px] left-1/2 -translate-x-1/2 md:absolute md:bottom-full md:left-auto md:right-0 md:translate-x-0 md:mb-4 bg-white dark:bg-gray-900 !bg-opacity-100 !opacity-100 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)] p-5 w-[90vw] sm:w-[400px] z-[70] animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[70vh] md:max-h-[60vh]">
                                             <div className="flex justify-between items-center mb-4 pb-3 border-b border-gray-100 dark:border-gray-800 shrink-0">
                                                 <h3 className="font-bold text-gray-800 dark:text-gray-200 text-lg flex items-center gap-2">
                                                     <Keyboard className="w-5 h-5 text-gray-500 dark:text-gray-400" /> Keyboard Shortcuts
@@ -3391,7 +3484,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     <X className="w-5 h-5" />
                                                 </button>
                                             </div>
-                                            <div className="space-y-3 overflow-y-auto custom-scrollbar pr-2 pb-2 text-sm text-gray-700 dark:text-gray-300">
+                                            <div className="space-y-3 overflow-y-auto overscroll-contain custom-scrollbar pr-2 pb-2 text-sm text-gray-700 dark:text-gray-300">
                                                 <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Toggle Shortcuts</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Shift + ?</kbd></div>
                                                 <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Next / Previous</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">← / →</kbd></div>
                                                 <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Select Option A-E</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">A - E</kbd></div>
@@ -3413,7 +3506,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                 <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2"><span className="font-medium">Options Layout</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">L / G</kbd></div>
                                                 <div className="flex justify-between items-center pb-2"><span className="font-medium">Clear Canvas</span><kbd className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-mono text-xs shadow-sm">Shift + C</kbd></div>
                                             </div>
-                                        </div>
+                                            </div>
+                                        </>
                                     )}
                                 </div>
 
@@ -3428,7 +3522,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     </button>
 
                                     {isSettingsOpen && (
-                                        <div className="fixed bottom-[90px] left-1/2 -translate-x-1/2 md:absolute md:bottom-full md:left-auto md:right-0 md:translate-x-0 md:mb-4 bg-white/95 dark:bg-gray-950/95 backdrop-blur-xl border border-gray-200 dark:border-gray-800 rounded-2xl shadow-2xl p-5 w-[92vw] sm:w-[350px] z-[70] animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[75vh] md:max-h-[65vh]">
+                                        <>
+                                            <div className="fixed inset-0 z-[60]" onClick={() => setIsSettingsOpen(false)}></div>
+                                            <div className="fixed bottom-[90px] left-1/2 -translate-x-1/2 md:absolute md:bottom-full md:left-auto md:right-0 md:translate-x-0 md:mb-4 bg-white/95 dark:bg-gray-950/95 backdrop-blur-xl border border-gray-200 dark:border-gray-800 rounded-2xl shadow-2xl p-5 w-[92vw] sm:w-[350px] z-[70] animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[75vh] md:max-h-[65vh]">
                                             <div className="flex justify-between items-center mb-2 pb-2 border-b border-gray-100 dark:border-gray-800/60 shrink-0">
                                                 <h3 className="font-bold text-gray-800 dark:text-gray-200 text-lg flex items-center gap-2">
                                                     <Settings className="w-5 h-5 text-indigo-500" /> Settings
@@ -3439,8 +3535,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                 </button>
                                             </div>
 
-                                            <div className="overflow-y-auto custom-scrollbar pr-2 pb-2">
-                                                <div className="mb-2 pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                            <div className="overflow-y-auto overscroll-contain custom-scrollbar pr-2 pb-2">
+                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
                                                     <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
                                                         <span className="flex items-center gap-2"><MonitorPlay className="w-4 h-4 text-indigo-500" /> Presentation Mode</span>
 
@@ -3461,7 +3557,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     </div>
                                                 </div>
 
-                                                <div className="mb-2 pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
                                                     <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
                                                         <span className="flex items-center gap-2"><Sparkles className="w-4 h-4 text-indigo-500" /> Celebration Settings</span>
                                                     </div>
@@ -3505,7 +3601,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     </div>
                                                 </div>
 
-                                                <div className="mb-2 pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
                                                     <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
                                                         <span className="flex items-center gap-2"><Video className="w-4 h-4 text-indigo-500" /> Recording Quality</span>
                                                     </div>
@@ -3526,7 +3622,73 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     </div>
                                                 </div>
 
-                                                <div className="mb-2 pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
+                                                        <span className="flex items-center gap-2"><Sliders className="w-4 h-4 text-pink-500" /> Advanced Audio</span>
+                                                    </div>
+                                                    <div className="space-y-4 px-2">
+                                                        {/* Auto Volume Leveler */}
+                                                        <div className="flex items-center justify-between">
+                                                            <div className="flex flex-col">
+                                                                <span className="text-xs font-bold text-gray-700 dark:text-gray-300">Auto Volume Leveler</span>
+                                                                <span className="text-[10px] text-gray-500 dark:text-gray-400">Balances loud and soft sounds</span>
+                                                            </div>
+                                                            <button onClick={() => setUseCompressor(!useCompressor)} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${useCompressor ? 'bg-pink-500' : 'bg-gray-200 dark:bg-gray-700'}`}>
+                                                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-md transition-transform duration-300 ${useCompressor ? 'translate-x-5' : 'translate-x-1'}`} />
+                                                            </button>
+                                                        </div>
+
+                                                        {/* Low-Cut Filter */}
+                                                        <div className="flex flex-col gap-1">
+                                                            <div className="flex justify-between items-center">
+                                                                <div className="flex flex-col">
+                                                                    <span className="text-xs font-bold text-gray-700 dark:text-gray-300">Low-Cut Filter (AC/Fan)</span>
+                                                                    <span className="text-[10px] text-gray-500 dark:text-gray-400">Removes low rumble noise</span>
+                                                                </div>
+                                                                <span className="text-xs font-bold text-pink-500">{lowCutFreq} Hz</span>
+                                                            </div>
+                                                            <input
+                                                                type="range" min="0" max="300" step="10"
+                                                                value={lowCutFreq} onChange={(e) => setLowCutFreq(Number(e.target.value))}
+                                                                className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-pink-500"
+                                                            />
+                                                        </div>
+
+                                                        {/* Treble Boost */}
+                                                        <div className="flex flex-col gap-1">
+                                                            <div className="flex justify-between items-center">
+                                                                <div className="flex flex-col">
+                                                                    <span className="text-xs font-bold text-gray-700 dark:text-gray-300">Treble Boost (Crispness)</span>
+                                                                    <span className="text-[10px] text-gray-500 dark:text-gray-400">Adds presence to voice</span>
+                                                                </div>
+                                                                <span className="text-xs font-bold text-pink-500">{trebleBoost} dB</span>
+                                                            </div>
+                                                            <input
+                                                                type="range" min="0" max="15" step="1"
+                                                                value={trebleBoost} onChange={(e) => setTrebleBoost(Number(e.target.value))}
+                                                                className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-pink-500"
+                                                            />
+                                                        </div>
+
+                                                        {/* Noise Gate */}
+                                                        <div className="flex flex-col gap-1">
+                                                            <div className="flex justify-between items-center">
+                                                                <div className="flex flex-col">
+                                                                    <span className="text-xs font-bold text-gray-700 dark:text-gray-300">Noise Gate Threshold</span>
+                                                                    <span className="text-[10px] text-gray-500 dark:text-gray-400">Mutes mic when silent</span>
+                                                                </div>
+                                                                <span className="text-xs font-bold text-pink-500">{Math.round(noiseGateThreshold * 100)}%</span>
+                                                            </div>
+                                                            <input
+                                                                type="range" min="0" max="0.1" step="0.005"
+                                                                value={noiseGateThreshold} onChange={(e) => setNoiseGateThreshold(Number(e.target.value))}
+                                                                className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-pink-500"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
                                                     <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
                                                         <span className="flex items-center gap-2"><ImageDown className="w-4 h-4 text-indigo-500" /> Export Settings</span>
                                                     </div>
@@ -3554,7 +3716,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
 
 
-                                                <div className="mb-2 pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
                                                     <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
                                                         <span className="flex items-center gap-2"><Printer className="w-4 h-4 text-indigo-500" /> Print Settings</span>
                                                     </div>
@@ -3585,7 +3747,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
 
 
-                                                <div className="mb-2 pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
                                                     <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
                                                         <span className="flex items-center gap-2"><LayoutGrid className="w-4 h-4 text-indigo-500" /> Options Layout</span>
                                                     </div>
@@ -3607,7 +3769,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
 
 
-                                                <div className="mb-2 pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
                                                     <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
                                                         <span className="flex items-center gap-2"><LayoutGrid className="w-4 h-4 text-indigo-500" /> Header Settings</span>
                                                     </div>
@@ -3660,7 +3822,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
 
                                                 {/* Transition Type */}
-                                                <div className="mb-2 pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
                                                     <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                                                         <span className="flex items-center gap-2"><Play className="w-4 h-4 text-indigo-500" /> {L.transition}</span>
                                                     </div>
@@ -3673,7 +3835,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
 
                                                 {/* Countdown Timer Settings */}
-                                                <div className="mb-2 pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
                                                     <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                                                         <span className="flex items-center gap-2"><Clock className="w-4 h-4 text-indigo-500" /> {L.countdown}</span>
                                                     </div>
@@ -3692,7 +3854,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
 
 
-                                                <div className="mb-2 pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
                                                     <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
                                                         <span className="flex items-center gap-2"><Play className="w-4 h-4 text-indigo-500" /> Animation Speed</span>
                                                     </div>
@@ -3712,7 +3874,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
 
 
-                                                <div className="mb-2 pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
                                                     <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
                                                         <span className="flex items-center gap-2"><LayoutGrid className="w-4 h-4 text-indigo-500" /> Background Theme</span>
                                                     </div>
@@ -3769,7 +3931,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
 
 
-                                                <div className="mb-2 pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
                                                     <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
                                                         <span className="flex items-center gap-2"><Highlighter className="w-4 h-4 text-indigo-500" /> Question Styling</span>
                                                     </div>
@@ -3856,104 +4018,99 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
 
 
-                                                <div className="flex items-center justify-between">
-                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                                                        <Volume2 className="w-4 h-4 text-indigo-500" />
-                                                        Auto Play Read Aloud
-
-                                                    </div>
-                                                    <button
-                                                        onClick={() => setIsAutoPlayReadAloud(!isAutoPlayReadAloud)}
-                                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isAutoPlayReadAloud ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}
-                                                    >
-                                                        <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isAutoPlayReadAloud ? 'translate-x-6' : 'translate-x-1'}`} />
-                                                    </button>
-                                                </div>
-
-
-
-                                                <div className="flex flex-col gap-2">
-                                                    <div className="flex items-center justify-between">
+                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                    <div className="flex items-center justify-between mb-2">
                                                         <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                                                            <Music className="w-4 h-4 text-indigo-500" />
-                                                            Focus Mode (Music)
+                                                            <Volume2 className="w-4 h-4 text-indigo-500" />
+                                                            Auto Play Read Aloud
                                                         </div>
                                                         <button
-                                                            onClick={() => setIsLofiEnabled(!isLofiEnabled)}
-                                                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isLofiEnabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}
+                                                            onClick={() => setIsAutoPlayReadAloud(!isAutoPlayReadAloud)}
+                                                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isAutoPlayReadAloud ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}
                                                         >
-                                                            <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isLofiEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
+                                                            <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isAutoPlayReadAloud ? 'translate-x-6' : 'translate-x-1'}`} />
                                                         </button>
                                                     </div>
-                                                    {isLofiEnabled && (
-                                                        <div className="pl-6 pr-2 flex flex-col gap-3">
-                                                            <select
-                                                                value={selectedMusic}
-                                                                onChange={(e) => {
-                                                                    setSelectedMusic(e.target.value);
-                                                                    // Restart audio if it's already playing
-                                                                    if (isLofiEnabled && lofiAudioRef.current) {
-                                                                        lofiAudioRef.current.src = e.target.value;
-                                                                        lofiAudioRef.current.play().catch(console.warn);
-                                                                    }
-                                                                }}
-                                                                className="w-full text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 focus:outline-none focus:border-blue-500 text-gray-700 dark:text-gray-200 font-semibold"
+
+                                                    <div className="flex flex-col gap-2 mb-2">
+                                                        <div className="flex items-center justify-between">
+                                                            <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                                                <Music className="w-4 h-4 text-indigo-500" />
+                                                                Focus Mode (Music)
+                                                            </div>
+                                                            <button
+                                                                onClick={() => setIsLofiEnabled(!isLofiEnabled)}
+                                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isLofiEnabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}
                                                             >
-                                                                {MUSIC_OPTIONS.map(opt => (
-                                                                    <option key={opt.id} value={opt.url}>{opt.name}</option>
-                                                                ))}
-                                                            </select>
-                                                            <div className="flex items-center gap-3">
-                                                                <VolumeX className="w-4 h-4 text-gray-400" />
-                                                                <input
-                                                                    type="range"
-                                                                    min="0"
-                                                                    max="1"
-                                                                    step="0.05"
-                                                                    value={musicVolume}
-                                                                    onChange={(e) => setMusicVolume(parseFloat(e.target.value))}
-                                                                    className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
-                                                                />
-                                                                <div className="flex items-center gap-1 min-w-[3.5rem]">
-                                                                    <Volume2 className="w-4 h-4 text-gray-400" />
-                                                                    <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">{Math.round(musicVolume * 100)}%</span>
+                                                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isLofiEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
+                                                            </button>
+                                                        </div>
+                                                        {isLofiEnabled && (
+                                                            <div className="pl-6 pr-2 flex flex-col gap-3 mt-1">
+                                                                <select
+                                                                    value={selectedMusic}
+                                                                    onChange={(e) => {
+                                                                        setSelectedMusic(e.target.value);
+                                                                        // Restart audio if it's already playing
+                                                                        if (isLofiEnabled && lofiAudioRef.current) {
+                                                                            lofiAudioRef.current.src = e.target.value;
+                                                                            lofiAudioRef.current.play().catch(console.warn);
+                                                                        }
+                                                                    }}
+                                                                    className="w-full text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 focus:outline-none focus:border-blue-500 text-gray-700 dark:text-gray-200 font-semibold"
+                                                                >
+                                                                    {MUSIC_OPTIONS.map(opt => (
+                                                                        <option key={opt.id} value={opt.url}>{opt.name}</option>
+                                                                    ))}
+                                                                </select>
+                                                                <div className="flex items-center gap-3">
+                                                                    <VolumeX className="w-4 h-4 text-gray-400" />
+                                                                    <input
+                                                                        type="range"
+                                                                        min="0"
+                                                                        max="1"
+                                                                        step="0.05"
+                                                                        value={musicVolume}
+                                                                        onChange={(e) => setMusicVolume(parseFloat(e.target.value))}
+                                                                        className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                                                    />
+                                                                    <div className="flex items-center gap-1 min-w-[3.5rem]">
+                                                                        <Volume2 className="w-4 h-4 text-gray-400" />
+                                                                        <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">{Math.round(musicVolume * 100)}%</span>
+                                                                    </div>
                                                                 </div>
                                                             </div>
+                                                        )}
+                                                    </div>
+
+                                                    <div className="flex items-center justify-between mb-2">
+                                                        <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                                            <Lightbulb className="w-4 h-4 text-indigo-500" /> Show Explanation
                                                         </div>
-                                                    )}
-                                                </div>
-
-
-
-                                                <div className="flex items-center justify-between">
-                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                                                        <Lightbulb className="w-4 h-4 text-indigo-500" /> Show Explanation
-
+                                                        <button
+                                                            onClick={() => setIsExpEnabled(!isExpEnabled)}
+                                                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isExpEnabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}
+                                                        >
+                                                            <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isExpEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
+                                                        </button>
                                                     </div>
-                                                    <button
-                                                        onClick={() => setIsExpEnabled(!isExpEnabled)}
-                                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isExpEnabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}
-                                                    >
-                                                        <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isExpEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
-                                                    </button>
-                                                </div>
 
-                                                <div className="flex items-center justify-between">
-                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                                                        <MessageCircle className="w-4 h-4 text-indigo-500" /> Show Options Explanation
-
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                                            <MessageCircle className="w-4 h-4 text-indigo-500" /> Show Options Explanation
+                                                        </div>
+                                                        <button
+                                                            onClick={() => setIsOptionExpEnabled(!isOptionExpEnabled)}
+                                                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isOptionExpEnabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}
+                                                        >
+                                                            <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isOptionExpEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
+                                                        </button>
                                                     </div>
-                                                    <button
-                                                        onClick={() => setIsOptionExpEnabled(!isOptionExpEnabled)}
-                                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isOptionExpEnabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}
-                                                    >
-                                                        <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isOptionExpEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
-                                                    </button>
                                                 </div>
 
 
 
-                                                <div className="mb-2 pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
                                                     <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between">
                                                         <span className="flex items-center gap-2"><Type className="w-4 h-4 text-indigo-500" /> Question Font Size</span>
                                                         <span className="text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 rounded text-xs py-0.5">{Math.round(qFontScale * 100)}%</span>
@@ -3968,7 +4125,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     </div>
                                                 </div>
 
-                                                <div className="mb-2 pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
                                                     <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between">
                                                         <span className="flex items-center gap-2"><Type className="w-4 h-4 text-green-500" /> Options Font Size</span>
                                                         <span className="text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/30 px-2 rounded text-xs py-0.5">{Math.round(optFontScale * 100)}%</span>
@@ -3983,7 +4140,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     </div>
                                                 </div>
 
-                                                <div className="mb-2 pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
                                                     <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between">
                                                         <span className="flex items-center gap-2"><Type className="w-4 h-4 text-purple-500" /> Explanation Font Size</span>
                                                         <span className="text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/30 px-2 rounded text-xs py-0.5">{Math.round(expFontScale * 100)}%</span>
@@ -4000,23 +4157,24 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
 
 
-                                                <div className="flex items-center justify-between">
-                                                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                                                        <Focus className="w-4 h-4 text-yellow-500" />
-                                                        Spotlight Mode
-
+                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                                            <Focus className="w-4 h-4 text-yellow-500" />
+                                                            Spotlight Mode
+                                                        </div>
+                                                        <button
+                                                            onClick={() => setIsSpotlightActive(!isSpotlightActive)}
+                                                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isSpotlightActive ? 'bg-yellow-500' : 'bg-gray-300 dark:bg-gray-700'}`}
+                                                        >
+                                                            <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isSpotlightActive ? 'translate-x-6' : 'translate-x-1'}`} />
+                                                        </button>
                                                     </div>
-                                                    <button
-                                                        onClick={() => setIsSpotlightActive(!isSpotlightActive)}
-                                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isSpotlightActive ? 'bg-yellow-500' : 'bg-gray-300 dark:bg-gray-700'}`}
-                                                    >
-                                                        <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isSpotlightActive ? 'translate-x-6' : 'translate-x-1'}`} />
-                                                    </button>
                                                 </div>
 
 
 
-                                                <div className="mb-2 pb-2 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
                                                     <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 flex items-center justify-between">
                                                         <span className="flex items-center gap-2"><Pen className="w-4 h-4 text-indigo-500" /> Presentation Tools</span>
                                                         <div className="flex items-center gap-2">
@@ -4141,7 +4299,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
 
 
-                                                <div>
+                                                <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
                                                     <div className="relative">
                                                         {!canUsePremium && (
                                                             <div className="absolute inset-0 z-10 bg-gray-50/40 dark:bg-gray-900/60 backdrop-blur-[1.5px] rounded-xl flex items-center justify-center mt-6">
@@ -4199,6 +4357,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                 </div>
                                             </div>
                                         </div>
+                                        </>
                                     )}
                                 </div>
 
@@ -4989,6 +5148,87 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     );
                 })}
             </div>
+
+            {/* Audio Settings Panel */}
+            {showAudioSettings && (
+                <div className="fixed bottom-24 right-4 md:right-8 bg-gray-900 border border-gray-700 rounded-2xl p-6 shadow-2xl z-50 w-80 md:w-96 animate-in slide-in-from-bottom-4">
+                    <button 
+                        onClick={() => setShowAudioSettings(false)}
+                        className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
+                    >
+                        <X className="w-5 h-5" />
+                    </button>
+                    
+                    <h3 className="text-xl font-bold text-white flex items-center gap-2 mb-6">
+                        <Sliders className="w-5 h-5 text-blue-400" />
+                        Audio Settings
+                    </h3>
+
+                    <div className="flex flex-col gap-6">
+                        {/* Compressor */}
+                        <div className="flex items-start justify-between">
+                            <div>
+                                <div className="font-bold text-white">Auto Volume Leveler</div>
+                                <div className="text-xs text-gray-400 mt-1">Balances loud and soft sounds</div>
+                            </div>
+                            <button 
+                                onClick={() => setUseCompressor(!useCompressor)}
+                                className={`w-12 h-6 rounded-full transition-colors relative ${useCompressor ? 'bg-blue-500' : 'bg-gray-600'}`}
+                            >
+                                <div className={`w-4 h-4 bg-white rounded-full absolute top-1 transition-transform ${useCompressor ? 'left-7' : 'left-1'}`}></div>
+                            </button>
+                        </div>
+
+                        {/* Low Cut */}
+                        <div>
+                            <div className="flex justify-between items-center mb-2">
+                                <div>
+                                    <div className="font-bold text-white">Low-Cut Filter (AC/Fan)</div>
+                                    <div className="text-xs text-gray-400">Removes low rumble noise</div>
+                                </div>
+                                <span className="font-mono text-sm font-bold text-blue-400">{lowCutFreq} Hz</span>
+                            </div>
+                            <input 
+                                type="range" min="0" max="300" step="5" 
+                                value={lowCutFreq} onChange={(e) => setLowCutFreq(Number(e.target.value))}
+                                className="w-full accent-blue-500 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                            />
+                        </div>
+
+                        {/* Treble Boost */}
+                        <div>
+                            <div className="flex justify-between items-center mb-2">
+                                <div>
+                                    <div className="font-bold text-white">Treble Boost (Crispness)</div>
+                                    <div className="text-xs text-gray-400">Adds presence to voice</div>
+                                </div>
+                                <span className="font-mono text-sm font-bold text-blue-400">{trebleBoost} dB</span>
+                            </div>
+                            <input 
+                                type="range" min="0" max="10" step="1" 
+                                value={trebleBoost} onChange={(e) => setTrebleBoost(Number(e.target.value))}
+                                className="w-full accent-blue-500 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                            />
+                        </div>
+
+                        {/* Noise Gate */}
+                        <div>
+                            <div className="flex justify-between items-center mb-2">
+                                <div>
+                                    <div className="font-bold text-white">Noise Gate Threshold</div>
+                                    <div className="text-xs text-gray-400">Mutes mic when silent</div>
+                                </div>
+                                <span className="font-mono text-sm font-bold text-blue-400">{(noiseGateThreshold * 100).toFixed(0)}%</span>
+                            </div>
+                            <input 
+                                type="range" min="0" max="0.1" step="0.01" 
+                                value={noiseGateThreshold} onChange={(e) => setNoiseGateThreshold(Number(e.target.value))}
+                                className="w-full accent-blue-500 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
         </>,
         document.body
     );
