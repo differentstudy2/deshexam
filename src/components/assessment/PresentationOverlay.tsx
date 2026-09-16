@@ -2978,8 +2978,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                                     {/* Question */}
                                     <div
-                                        className={`flex flex-col items-center justify-center gap-4 w-[94%] sm:w-full min-w-[300px] md:min-w-[600px] max-w-4xl xl:max-w-5xl min-h-[120px] md:min-h-[160px] mx-auto mt-1 md:mt-1 transition-all duration-300 relative z-10 rounded-t-2xl rounded-b-[0.5rem] border shadow-[0_8px_32px_rgba(0,0,0,0.10)] p-6 md:p-8 md:px-10 ${qBgColor !== 'transparent' ? `${qBgColor} border-gray-200/50 dark:border-gray-700/50` : 'bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-gray-100/80 dark:border-slate-700/40'}`}
+                                        className={`flex flex-col items-center justify-center gap-4 w-[94%] sm:w-full min-w-[300px] md:min-w-[600px] max-w-4xl xl:max-w-5xl min-h-[120px] md:min-h-[160px] mx-auto mt-1 md:mt-1 transition-all duration-300 relative z-10 rounded-t-2xl rounded-b-[0.5rem] border shadow-[0_8px_32px_rgba(0,0,0,0.10)] p-6 md:p-8 md:px-10 ${qBgColor !== 'transparent' ? `${qBgColor.startsWith('#') ? '' : qBgColor} border-gray-200/50 dark:border-gray-700/50` : 'bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-gray-100/80 dark:border-slate-700/40'}`}
                                         style={{
+                                            backgroundColor: qBgColor.startsWith('#') ? qBgColor : undefined,
                                             '--q-size': (() => {
                                                 const hasStmts = q.statements && q.statements.length > 0;
                                                 const stmtLines = q.statements ? q.statements.length : 0;
@@ -3949,6 +3950,13 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                                 <button onClick={() => setQBgColor('bg-blue-50/90 dark:bg-blue-900/50')} className={`w-5 h-5 rounded-full border border-blue-200 dark:border-blue-700 bg-blue-100 dark:bg-blue-900 shadow-sm ring-2 ${qBgColor === 'bg-blue-50/90 dark:bg-blue-900/50' ? 'ring-blue-500' : 'ring-transparent'}`} title="Blue"></button>
                                                                 <button onClick={() => setQBgColor('bg-indigo-50/90 dark:bg-indigo-900/50')} className={`w-5 h-5 rounded-full border border-indigo-200 dark:border-indigo-700 bg-indigo-100 dark:bg-indigo-900 shadow-sm ring-2 ${qBgColor === 'bg-indigo-50/90 dark:bg-indigo-900/50' ? 'ring-blue-500' : 'ring-transparent'}`} title="Indigo"></button>
                                                                 <button onClick={() => setQBgColor('bg-black/50 dark:bg-black/80')} className={`w-5 h-5 rounded-full border border-gray-700 dark:border-gray-600 bg-gray-900 shadow-sm ring-2 ${qBgColor === 'bg-black/50 dark:bg-black/80' ? 'ring-blue-500' : 'ring-transparent'}`} title="Black/Dark"></button>
+                                                                <input
+                                                                    type="color"
+                                                                    value={qBgColor.startsWith('#') ? qBgColor : '#ffffff'}
+                                                                    onChange={e => setQBgColor(e.target.value)}
+                                                                    className="w-5 h-5 ml-1 cursor-pointer border-0 rounded overflow-hidden bg-transparent"
+                                                                    title="Custom Color"
+                                                                />
                                                             </div>
                                                         </div>
 
@@ -3962,6 +3970,13 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                                 <button onClick={() => setQTextColor('#ef4444')} className={`w-5 h-5 rounded-full border border-red-500 shadow-sm bg-red-500 ring-2 ${qTextColor === '#ef4444' ? 'ring-blue-500' : 'ring-transparent'}`} title="Red"></button>
                                                                 <button onClick={() => setQTextColor('#3b82f6')} className={`w-5 h-5 rounded-full border border-blue-500 shadow-sm bg-blue-500 ring-2 ${qTextColor === '#3b82f6' ? 'ring-blue-500' : 'ring-transparent'}`} title="Blue"></button>
                                                                 <button onClick={() => setQTextColor('#f59e0b')} className={`w-5 h-5 rounded-full border border-amber-500 shadow-sm bg-amber-500 ring-2 ${qTextColor === '#f59e0b' ? 'ring-blue-500' : 'ring-transparent'}`} title="Yellow"></button>
+                                                                <input
+                                                                    type="color"
+                                                                    value={qTextColor.startsWith('#') ? qTextColor : '#000000'}
+                                                                    onChange={e => setQTextColor(e.target.value)}
+                                                                    className="w-5 h-5 ml-1 cursor-pointer border-0 rounded overflow-hidden bg-transparent"
+                                                                    title="Custom Color"
+                                                                />
                                                             </div>
                                                         </div>
                                                     </div>
@@ -3969,7 +3984,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
 
 
-                                                <div className="bg-gray-50/50 dark:bg-gray-900/40 border border-gray-200/60 dark:border-gray-800/60 rounded-2xl p-4 mb-4 shadow-sm backdrop-blur-sm flex flex-col gap-4">
+                                                <div className="bg-gray-50/50 dark:bg-gray-900/40 border border-gray-200/60 dark:border-gray-800/60 rounded-xl p-3 mb-2 shadow-sm backdrop-blur-sm flex flex-col gap-3">
                                                     <div className="flex items-center justify-between">
                                                         <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
                                                             <Clock className="w-4 h-4 text-indigo-500" />
@@ -3984,7 +3999,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                         </button>
                                                     </div>
 
-                                                    <div className="flex items-center justify-between mt-4">
+                                                    <div className="flex items-center justify-between">
                                                         <div className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
                                                             <Clock className="w-4 h-4 text-indigo-500" /> Auto Change Question
                                                         </div>
@@ -4917,8 +4932,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                                         {isPrintAsList ? (
                                             <div
-                                                className={`w-full max-w-full rounded-3xl p-12 shadow-[0_20px_50px_rgba(0,0,0,0.1)] backdrop-blur-sm border transition-all duration-500 relative z-20 ${qBgColor} border-white/20 dark:border-gray-700/50`}
+                                                className={`w-full max-w-full rounded-3xl p-12 shadow-[0_20px_50px_rgba(0,0,0,0.1)] backdrop-blur-sm border transition-all duration-500 relative z-20 ${qBgColor.startsWith('#') ? '' : qBgColor} border-white/20 dark:border-gray-700/50`}
                                                 style={{
+                                                    backgroundColor: qBgColor.startsWith('#') ? qBgColor : undefined,
                                                     boxShadow: isDarkMode ? '0 20px 40px -10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1)' : '0 20px 40px -10px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.5)',
                                                     backgroundImage: `linear-gradient(to right, ${isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'} 1px, transparent 1px)`,
                                                     backgroundSize: '24px 24px'
@@ -4993,8 +5009,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                         ) : (
                                             <div className="w-full flex flex-col items-center flex-1 !print-color-adjust-exact mt-8">
                                                 <div
-                                                    className={`flex flex-col items-center justify-center gap-4 w-[94%] sm:w-full min-w-[300px] md:min-w-[600px] max-w-4xl xl:max-w-5xl min-h-[120px] md:min-h-[160px] mx-auto mt-1 md:mt-1 transition-all duration-300 relative z-10 rounded-t-2xl rounded-b-[0.5rem] border shadow-[0_8px_32px_rgba(0,0,0,0.10)] p-6 md:p-8 md:px-10 ${qBgColor !== 'transparent' ? `${qBgColor} border-gray-200/50 dark:border-gray-700/50` : 'bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-gray-100/80 dark:border-slate-700/40'} !print-color-adjust-exact`}
+                                                    className={`flex flex-col items-center justify-center gap-4 w-[94%] sm:w-full min-w-[300px] md:min-w-[600px] max-w-4xl xl:max-w-5xl min-h-[120px] md:min-h-[160px] mx-auto mt-1 md:mt-1 transition-all duration-300 relative z-10 rounded-t-2xl rounded-b-[0.5rem] border shadow-[0_8px_32px_rgba(0,0,0,0.10)] p-6 md:p-8 md:px-10 ${qBgColor !== 'transparent' ? `${qBgColor.startsWith('#') ? '' : qBgColor} border-gray-200/50 dark:border-gray-700/50` : 'bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-gray-100/80 dark:border-slate-700/40'} !print-color-adjust-exact`}
                                                     style={{
+                                                        backgroundColor: qBgColor.startsWith('#') ? qBgColor : undefined,
                                                         '--q-size': (() => {
                                                             const hasStmts = q.statements && q.statements.length > 0;
                                                             const stmtLines = q.statements ? q.statements.length : 0;
