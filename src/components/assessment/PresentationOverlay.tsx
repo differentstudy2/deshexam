@@ -5272,6 +5272,65 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             }
                         }
                     ` }} />
+                    {/* Floating Quick Pen Tool (Left Edge) */}
+                    <div className="absolute left-3 md:left-5 top-[15%] md:top-[20%] z-[70] flex flex-col gap-2 items-center animate-in slide-in-from-left-10 fade-in duration-300">
+                        {/* Clear Markings Button (Above Pen) */}
+                        <button
+                            onClick={clearCanvas}
+                            className="p-2 mb-1 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition-colors bg-transparent rounded-full hover:bg-red-500/10"
+                            title="Clear All Markings"
+                        >
+                            <Eraser className="w-5 h-5 md:w-6 md:h-6" />
+                        </button>
+
+                        {/* Main Pen Toggle Button */}
+                        <button
+                            onClick={() => {
+                                if (isPenActive && drawingTool === 'pen') {
+                                    setIsPenActive(false);
+                                } else {
+                                    setDrawingTool('pen');
+                                    setIsPenActive(true);
+                                }
+                            }}
+                            className={`p-3 rounded-full shadow-lg transition-all border-2 ${
+                                (isPenActive && drawingTool === 'pen')
+                                    ? 'bg-blue-600 text-white border-blue-400 scale-110 shadow-[0_0_15px_rgba(37,99,235,0.5)]'
+                                    : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-transparent hover:bg-gray-50 dark:hover:bg-gray-700'
+                            }`}
+                            title="Quick Pen Toggle"
+                        >
+                            <Pen className="w-5 h-5 md:w-6 md:h-6" />
+                        </button>
+
+                        {/* Preset Colors (Visible when Pen is active) */}
+                        <div className={`flex flex-col gap-2 p-1.5 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md rounded-full shadow-lg border border-gray-200 dark:border-gray-700 transition-all duration-300 origin-top ${
+                            (isPenActive && drawingTool === 'pen') ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-90 -translate-y-4 pointer-events-none'
+                        }`}>
+                            {[
+                                { color: '#ef4444', name: 'Red' },
+                                { color: '#3b82f6', name: 'Blue' },
+                                { color: '#22c55e', name: 'Green' },
+                                { color: '#facc15', name: 'Yellow' },
+                                { color: '#000000', name: 'Black' },
+                                { color: '#ffffff', name: 'White' }
+                            ].map((preset) => (
+                                <button
+                                    key={preset.color}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setPenColor(preset.color);
+                                        setDrawingTool('pen');
+                                        setIsPenActive(true);
+                                    }}
+                                    className={`w-6 h-6 md:w-7 md:h-7 rounded-full transition-all border-2 shadow-sm ${penColor === preset.color ? 'border-blue-500 scale-125 ring-2 ring-blue-500/30' : 'border-gray-300 dark:border-gray-600 hover:scale-110'}`}
+                                    style={{ backgroundColor: preset.color }}
+                                    title={preset.name}
+                                />
+                            ))}
+                        </div>
+                    </div>
+
                     {/* Floating Presentation Tools (Right Edge) */}
                     <div className="absolute right-4 top-1/2 -translate-y-1/2 z-[70] bg-slate-900/95 backdrop-blur-xl p-1 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.4)] border border-slate-700/50 flex flex-col gap-1 w-9 items-center animate-in slide-in-from-right-10 fade-in duration-300">
 
