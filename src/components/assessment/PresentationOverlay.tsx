@@ -633,7 +633,7 @@ const StreamEngagementWidget = () => {
     );
 };
 
-const LeftStreamWidgets = ({ currentQuestion }: { currentQuestion?: any }) => {
+const LeftStreamWidgets = ({ currentQuestion, isSpeaking }: { currentQuestion?: any, isSpeaking?: boolean }) => {
     // Fake Chat Logic
     const [chats, setChats] = useState<{ id: number, name: string, msg: string }[]>(() => {
         const initialMessages = ['Sir eta bujhlam na', 'Ans hobe C!', 'Thank you sir!', 'Option A is correct', 'Next question please', 'B!', 'D hobe na?'];
@@ -2849,7 +2849,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 {/* Left Sidebar Column */}
                 <div className="hidden xl:flex w-[160px] h-full shrink-0 flex-col gap-1 z-10">
                     {/* Stream Widgets */}
-                    <LeftStreamWidgets currentQuestion={q} />
+                    <LeftStreamWidgets currentQuestion={q} isSpeaking={isSpeaking} />
                     {/* ── Analog Clock (Moved here) ── */}
                     {isTimerEnabled ? (() => {
                         const sec = timerDisplay.secs;
@@ -5470,7 +5470,31 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             </div>
                         </div>
                     ) : (
-                        <div className="w-full flex-1 min-h-0 bg-white/5 border border-white/10 rounded-xl hidden"></div>
+                        <div className={`w-full aspect-square mt-auto relative group shrink-0 shadow-xl border border-indigo-200/50 dark:border-indigo-800/50 flex flex-col items-center justify-center bg-gradient-to-br from-indigo-50 dark:from-indigo-950/40 to-blue-50 dark:to-blue-900/20 ${webcamShape === 'circle' ? 'rounded-full' : 'rounded-2xl'}`}>
+                            <div className="relative w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28">
+                                {/* Bot Head */}
+                                <div className={`absolute inset-0 bg-gradient-to-b from-indigo-500 to-blue-600 flex flex-col items-center justify-center shadow-[inset_0_-4px_12px_rgba(0,0,0,0.2),0_8px_16px_rgba(0,0,0,0.1)] ${webcamShape === 'circle' ? 'rounded-full' : 'rounded-[2rem]'}`}>
+                                    {/* Eyes */}
+                                    <div className="flex gap-4 mb-2 mt-2">
+                                        <div className="w-2 h-4 sm:w-2.5 sm:h-5 bg-white/95 rounded-full shadow-sm"></div>
+                                        <div className="w-2 h-4 sm:w-2.5 sm:h-5 bg-white/95 rounded-full shadow-sm"></div>
+                                    </div>
+                                    {/* Mouth */}
+                                    <div className="w-6 sm:w-8 bg-white rounded-full transition-all duration-75 shadow-sm" style={{ 
+                                        height: isSpeaking ? '18px' : '4px',
+                                        animation: isSpeaking ? 'pulse 0.3s ease-in-out infinite alternate' : 'none',
+                                        transformOrigin: 'center'
+                                    }}></div>
+                                </div>
+                            </div>
+                            {/* Overlay to switch on webcam */}
+                            <div className={`absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center pointer-events-auto cursor-pointer ${webcamShape === 'circle' ? 'rounded-full' : 'rounded-2xl'}`} onClick={(e) => { e.stopPropagation(); toggleWebcam(); }}>
+                                <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-lg text-white">
+                                    <Camera className="w-4 h-4" />
+                                    <span className="text-[10px] font-bold uppercase tracking-wider">Start Cam</span>
+                                </div>
+                            </div>
+                        </div>
                     )}
                 </div>
 
