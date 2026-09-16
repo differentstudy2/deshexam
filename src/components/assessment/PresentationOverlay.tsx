@@ -719,11 +719,6 @@ const LeftStreamWidgets = ({ currentQuestion }: { currentQuestion?: any }) => {
                 </div>
             </div>
 
-            {/* 4. Subscribe CTA */}
-            <div className="w-full bg-[#cc0000] hover:bg-[#b30000] dark:bg-[#FF0000] dark:hover:bg-[#cc0000] text-white rounded-md h-[48px] flex items-center justify-center gap-2 cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98] shadow-sm shrink-0 mb-1 mt-auto border border-red-700/50 animate-pulse hover:animate-none">
-                <Youtube className="w-6 h-6" />
-                <span className="text-[14px] font-bold tracking-wide uppercase">Subscribe</span>
-            </div>
         </div>
     );
 };
@@ -3035,6 +3030,12 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     })() : (
                         <div className="w-full flex-1 min-h-0 bg-white/5 border border-white/10 rounded-xl hidden"></div>
                     )}
+
+                    {/* Subscribe CTA (Moved to bottom) */}
+                    <div className="w-full bg-[#cc0000] hover:bg-[#b30000] dark:bg-[#FF0000] dark:hover:bg-[#cc0000] text-white rounded-md h-[48px] flex items-center justify-center gap-2 cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98] shadow-sm shrink-0 mb-1 border border-red-700/50 animate-pulse hover:animate-none">
+                        <Youtube className="w-6 h-6" />
+                        <span className="text-[14px] font-bold tracking-wide uppercase">Subscribe</span>
+                    </div>
                 </div>
 
                 {/* Main Presentation Area */}
@@ -5327,7 +5328,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                         setDrawingTool('pen');
                                         setIsPenActive(true);
                                     }}
-                                    className={`w-6 h-6 md:w-7 md:h-7 rounded-full transition-all shadow-sm ${penColor === preset.color ? 'scale-125 ring-2 ring-white/50' : 'hover:scale-110'}`}
+                                    className={`w-6 h-6 md:w-7 md:h-7 rounded-full transition-all shadow-sm ${penColor === preset.color ? 'scale-125 ring-2 ring-white/50 opacity-100' : 'hover:scale-110 opacity-10 hover:opacity-100'}`}
                                     style={{ backgroundColor: preset.color }}
                                     title={preset.name}
                                 />
