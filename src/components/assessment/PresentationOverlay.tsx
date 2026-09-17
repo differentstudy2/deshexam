@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
@@ -4370,10 +4370,917 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                         <Settings className={`w-5 h-5 md:w-6 md:h-6 transition-transform duration-500 ${isSettingsOpen ? 'rotate-90' : ''}`} />
                                     </button>
 
+                                </div>
+
+                            </div>
+
+                            {/* Music Toggle Button */}
+                            <button
+                                onClick={() => setIsLofiEnabled(!isLofiEnabled)}
+                                className={`hidden md:block p-2 md:p-3 rounded-full transition-all shrink-0 ${isLofiEnabled ? 'bg-indigo-500 text-white shadow-sm ring-2 ring-indigo-300' : 'hover:bg-white/10 text-white/80 hover:text-white'}`}
+                                title="Toggle Background Music (V)"
+                            >
+                                <Music className="w-5 h-5 md:w-6 md:h-6" />
+                            </button>
+
+                            <div className="relative flex items-center justify-center shrink-0">
+                                <button
+                                    onClick={() => setIsNavigatorOpen(!isNavigatorOpen)}
+                                    className={`p-2 md:p-3 rounded-full transition-all shadow-sm shrink-0 ${isNavigatorOpen ? 'bg-white/20 text-white shadow-md' : 'hover:bg-white/10 text-white/80 hover:text-white'}`}
+                                    title="Slide Navigator"
+                                >
+                                    <LayoutGrid className="w-5 h-5 md:w-6 md:h-6" />
+                                </button>
+
+                                {isNavigatorOpen && (
+                                    <div className="absolute bottom-[calc(100%+12px)] right-0 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-2xl p-3.5 sm:p-4 w-[320px] sm:w-[350px] z-50 animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[440px]">
+                                        {/* Professional Balanced Header */}
+                                        <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800 shrink-0">
+                                            <div className="flex items-center gap-2.5">
+                                                <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                                                    <LayoutGrid className="w-4 h-4" />
+                                                </div>
+                                                <div>
+                                                    <h4 className="font-bold text-sm text-gray-800 dark:text-gray-100 leading-tight">
+                                                        {uiLang === 'bn' ? 'স্লাইড নেভিগেটর' : 'Slide Navigator'}
+                                                    </h4>
+                                                    <p className="text-[11px] text-gray-400 dark:text-gray-500 font-medium">
+                                                        {uiLang === 'bn' ? 'যেকোনো প্রশ্নে সরাসরি যান' : 'Jump to question'}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-1.5">
+                                                <span className="text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/80 px-2 py-0.5 rounded-full border border-blue-200/50 dark:border-blue-900/50">
+                                                    {uiLang === 'bn'
+                                                        ? `${toBanglaNumber(currentSlide + 1)} / ${toBanglaNumber(questions.length)}`
+                                                        : `${currentSlide + 1} / ${questions.length}`}
+                                                </span>
+                                                <button
+                                                    onClick={() => setIsNavigatorOpen(false)}
+                                                    className="w-7 h-7 flex items-center justify-center text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                                                    title="Close"
+                                                >
+                                                    <X className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        {/* Status Legend */}
+                                        <div className="flex items-center justify-between px-0.5 py-2.5 text-xs text-gray-600 dark:text-gray-400 font-medium shrink-0">
+                                            <span className="flex items-center gap-1.5">
+                                                <span className="w-2.5 h-2.5 rounded-full bg-blue-600 ring-2 ring-blue-300 dark:ring-blue-800" />
+                                                <span className="text-gray-800 dark:text-gray-200 font-semibold">{uiLang === 'bn' ? 'বর্তমান' : 'Current'}</span>
+                                            </span>
+                                            <span className="flex items-center gap-1.5">
+                                                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                                                <span>{uiLang === 'bn' ? 'উত্তর' : 'Done'} ({uiLang === 'bn' ? toBanglaNumber(answeredSlidesRef.current.size) : answeredSlidesRef.current.size})</span>
+                                            </span>
+                                            <span className="flex items-center gap-1.5">
+                                                <span className="w-2.5 h-2.5 rounded-full bg-gray-300 dark:bg-gray-600" />
+                                                <span>{uiLang === 'bn' ? 'বাকি' : 'Left'} ({uiLang === 'bn' ? toBanglaNumber(questions.length - answeredSlidesRef.current.size) : questions.length - answeredSlidesRef.current.size})</span>
+                                            </span>
+                                        </div>
+
+                                        {/* Grid of Slide Numbers */}
+                                        <div className="overflow-y-auto custom-scrollbar pr-1 pb-1 flex-1">
+                                            <div className="grid grid-cols-6 gap-2">
+                                                {questions.map((_, idx) => {
+                                                    const isCurrent = currentSlide === idx;
+                                                    const isAnswered = answeredSlidesRef.current.has(idx);
+
+                                                    let tileClasses = "h-10 w-full rounded-xl flex items-center justify-center text-xs sm:text-sm font-bold transition-all relative select-none cursor-pointer ";
+
+                                                    if (isCurrent) {
+                                                        tileClasses += "bg-blue-600 text-white font-extrabold shadow-md shadow-blue-500/35 ring-2 ring-blue-400 ring-offset-2 ring-offset-white dark:ring-offset-gray-900 scale-105 z-10";
+                                                    } else if (isAnswered) {
+                                                        tileClasses += "bg-emerald-500 hover:bg-emerald-600 text-white font-bold shadow-xs";
+                                                    } else {
+                                                        tileClasses += "bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-200 border border-gray-200/80 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400";
+                                                    }
+
+                                                    return (
+                                                        <button
+                                                            key={idx}
+                                                            ref={isCurrent ? activeSlideBtnRef : undefined}
+                                                            onClick={() => {
+                                                                setCurrentSlide(idx);
+                                                                setStep(mode === 'read' ? 2 : 0);
+                                                                setSelectedOption(null);
+                                                                setTimerSeconds(0);
+                                                                setIsNavigatorOpen(false);
+                                                            }}
+                                                            className={tileClasses}
+                                                            title={`Question ${idx + 1}`}
+                                                        >
+                                                            <span>{uiLang === 'bn' ? toBanglaNumber(idx + 1) : idx + 1}</span>
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+
+                                        {/* Footer Quick Jumps */}
+                                        <div className="flex items-center justify-between pt-2.5 mt-2.5 border-t border-gray-100 dark:border-gray-800 text-xs font-bold text-gray-500 dark:text-gray-400 shrink-0">
+                                            <button
+                                                onClick={() => {
+                                                    setCurrentSlide(0);
+                                                    setStep(mode === 'read' ? 2 : 0);
+                                                    setSelectedOption(null);
+                                                    setTimerSeconds(0);
+                                                    setIsNavigatorOpen(false);
+                                                }}
+                                                className="hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-1 transition-colors px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 active:scale-95"
+                                            >
+                                                <ChevronLeft className="w-3.5 h-3.5" />
+                                                <span>{uiLang === 'bn' ? 'প্রথম' : 'First'}</span>
+                                            </button>
+                                            <span className="text-[11px] font-extrabold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-2.5 py-0.5 rounded-full border border-blue-100 dark:border-blue-900/50">
+                                                {Math.round(((currentSlide + 1) / Math.max(questions.length, 1)) * 100)}%
+                                            </span>
+                                            <button
+                                                onClick={() => {
+                                                    setCurrentSlide(questions.length - 1);
+                                                    setStep(mode === 'read' ? 2 : 0);
+                                                    setSelectedOption(null);
+                                                    setTimerSeconds(0);
+                                                    setIsNavigatorOpen(false);
+                                                }}
+                                                className="hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-1 transition-colors px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 active:scale-95"
+                                            >
+                                                <span>{uiLang === 'bn' ? 'শেষ' : 'Last'}</span>
+                                                <ChevronRight className="w-3.5 h-3.5" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                        </div>
+                    </div>
+
+                    {/* Mobile Bottom Tab Bar */}
+                    <div className="md:hidden shrink-0 w-full bg-[#2d3a5e] dark:bg-[#1a2240] border-t border-white/10 flex items-center justify-around px-2 py-2.5 shadow-[0_-8px_30px_rgba(0,0,0,0.15)] z-30">
+                        {/* 1. Theme */}
+                        <button className="p-2 text-white/80 active:text-white active:scale-95 transition-transform" onClick={() => setIsDarkMode(!isDarkMode)}>
+                            {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                        </button>
+                        {/* 2. Language */}
+                        <button className="p-2 text-white/80 active:text-white active:scale-95 transition-transform" onClick={() => setUiLang(l => l === 'bn' ? 'en' : 'bn')}>
+                            <Globe className="w-5 h-5" />
+                        </button>
+                        {/* 3. Audio / Read Aloud */}
+                        <button className={`p-2 active:scale-95 transition-transform ${isAutoPlayReadAloud || isSpeaking ? 'text-blue-400' : 'text-white/80 active:text-white'}`} onClick={() => {
+                            if (isAutoPlayReadAloud || isSpeaking) { setIsAutoPlayReadAloud(false); window.speechSynthesis.cancel(); setIsSpeaking(false); }
+                            else { setIsAutoPlayReadAloud(true); if (step !== 0) handleReadAloud(true); }
+                        }}>
+                            {isAutoPlayReadAloud || isSpeaking ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current" />}
+                        </button>
+                        {/* 4. Advance Settings */}
+                        <button className={`p-2 active:scale-95 transition-transform ${showAudioSettings ? 'text-blue-400' : 'text-white/80 active:text-white'}`} onClick={() => setShowAudioSettings(!showAudioSettings)}>
+                            <Sliders className="w-5 h-5" />
+                        </button>
+                        {/* 5. Fullscreen */}
+                        <button className="p-2 text-white/80 active:text-white active:scale-95 transition-transform" onClick={toggleFullscreen}>
+                            {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
+                        </button>
+                        {/* 6. Settings */}
+                        <button className={`p-2 active:scale-95 transition-transform ${isSettingsOpen ? 'text-blue-400' : 'text-white/80 active:text-white'}`} onClick={() => setIsSettingsOpen(!isSettingsOpen)}>
+                            <Settings className="w-5 h-5" />
+                        </button>
+                    </div>
+
+                    {/* Dynamic Responsive Font Styles */}
+                    <style dangerouslySetInnerHTML={{
+                        __html: `
+                        .responsive-fonts {
+                            --base-q-size: ${24 * qFontScale}px;
+                            --q-size: var(--base-q-size);
+                            --base-opt-size: ${16 * optFontScale}px;
+                            --opt-size: var(--base-opt-size);
+                            --exp-size: ${15 * expFontScale}px;
+                        }
+                        @media (min-width: 768px) {
+                            .responsive-fonts {
+                                --base-q-size: ${32 * qFontScale}px;
+                                --q-size: var(--base-q-size);
+                                --base-opt-size: ${20 * optFontScale}px;
+                                --opt-size: var(--base-opt-size);
+                                --exp-size: ${18 * expFontScale}px;
+                            }
+                        }
+                        @media (min-width: 1024px) {
+                            .responsive-fonts {
+                                --base-q-size: ${42 * qFontScale}px;
+                                --q-size: var(--base-q-size);
+                                --base-opt-size: ${30 * optFontScale}px;
+                                --opt-size: var(--base-opt-size);
+                                --exp-size: ${24 * expFontScale}px;
+                            }
+                        }
+                    ` }} />
+
+                    {/* Floating Quick Pen Tool (Left) */}
+                    <motion.div drag dragMomentum={false} className="absolute left-3 md:left-5 bottom-[75px] md:bottom-[90px] z-[70] flex flex-row gap-1 md:gap-2 items-center animate-in slide-in-from-left-10 fade-in duration-300 cursor-move bg-black/30 dark:bg-black/60 backdrop-blur-sm px-2 md:px-3 py-1.5 md:py-2 rounded-full border border-black/10 dark:border-white/10 shadow-sm">
+                        {/* Clear Markings Button */}
+                        <button
+                            onClick={clearCanvas}
+                            className="p-1.5 md:p-2 text-white/70 hover:text-red-400 transition-colors bg-transparent rounded-full hover:bg-white/10"
+                            title="Clear All Markings"
+                        >
+                            <Eraser className="w-4 h-4 md:w-5 md:h-5" />
+                        </button>
+
+                        {/* Main Pen Toggle Button */}
+                        <button
+                            onClick={() => {
+                                if (isPenActive && drawingTool === 'pen') {
+                                    setIsPenActive(false);
+                                } else {
+                                    setDrawingTool('pen');
+                                    setIsPenActive(true);
+                                }
+                            }}
+                            className={`p-1.5 md:p-2 rounded-full transition-all ${(isPenActive && drawingTool === 'pen')
+                                ? 'bg-blue-500 text-white scale-110 shadow-lg'
+                                : 'bg-transparent text-white/70 hover:bg-white/10 hover:text-white'
+                                }`}
+                            title="Quick Pen Toggle"
+                        >
+                            <Pen className="w-4 h-4 md:w-5 md:h-5" />
+                        </button>
+
+                        {/* Preset Colors (Visible when Pen is active, expands horizontally) */}
+                        <div className={`flex flex-row items-center gap-2 overflow-hidden transition-all duration-300 ${isPenActive && drawingTool === 'pen' ? 'w-auto opacity-100 pl-1' : 'w-0 opacity-0 pointer-events-none'}`}>
+                            {[
+                                { color: '#ef4444', name: 'Red' },
+                                { color: '#3b82f6', name: 'Blue' },
+                                { color: '#22c55e', name: 'Green' },
+                                { color: '#facc15', name: 'Yellow' },
+                                { color: '#ffffff', name: 'White' }
+                            ].map((preset) => (
+                                <button
+                                    key={preset.color}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setPenColor(preset.color);
+                                        setDrawingTool('pen');
+                                        setIsPenActive(true);
+                                    }}
+                                    className={`w-5 h-5 md:w-6 md:h-6 shrink-0 rounded-full transition-all shadow-sm ${penColor === preset.color ? 'scale-110 ring-2 ring-blue-300 opacity-100' : 'hover:scale-110 opacity-70 hover:opacity-100'}`}
+                                    style={{ backgroundColor: preset.color }}
+                                    title={preset.name}
+                                />
+                            ))}
+                        </div>
+                    </motion.div>
+                </div>
+
+                {/* Right Sidebar Column */}
+                <div className="hidden xl:flex w-[160px] h-full shrink-0 flex-col gap-1 z-10">
+                    {/* Railway Station Style Digital Timer (Moved here) */}
+                    {isTimerEnabled && (
+                        <div
+                            className="w-full bg-[#0c0c0c] border-2 border-[#222] rounded-xl shadow-[inset_0_0_15px_rgba(0,0,0,1),0_5px_15px_rgba(0,0,0,0.6)] flex flex-col items-center justify-center shrink-0"
+                            style={{ height: `calc(4.5rem * ${headerScale})` }}
+                        >
+                            <div className="flex items-center justify-center text-[32px] gap-0">
+                                {(() => {
+                                    const sec = timerDisplay.secs;
+                                    const h = Math.floor(sec / 3600);
+                                    const m = Math.floor((sec % 3600) / 60);
+                                    const s = sec % 60;
+
+                                    const timeStr = h > 0
+                                        ? `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
+                                        : `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+
+                                    return timeStr.split('').map((char, i) =>
+                                        char === ':' ? <SevenSegmentColon key={i} /> : <SevenSegmentDigit key={i} digit={char} />
+                                    );
+                                })()}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Live Subscribers Feed */}
+                    <LiveSubscriberFeed />
+
+                    {/* Stream Engagement Widgets */}
+                    <StreamEngagementWidget />
+
+                    {/* ── Bottom Section: Future Right Content OR Webcam ── */}
+                    {isWebcamActive ? (
+                        <div className="w-full aspect-square mt-auto relative group shrink-0">
+                            <div className={`w-full h-full overflow-hidden shadow-2xl border-2 border-indigo-400/50 bg-black/50 transition-all duration-300 ${webcamShape === 'circle' ? 'rounded-full' : 'rounded-2xl'}`}>
+                                <video
+                                    ref={webcamVideoRef}
+                                    autoPlay
+                                    playsInline
+                                    muted
+                                    className="w-full h-full object-cover pointer-events-none"
+                                />
+                            </div>
+                            <div className={`absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center pointer-events-auto ${webcamShape === 'circle' ? 'rounded-full' : 'rounded-2xl'}`}>
+                                <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm p-1.5 rounded-full shadow-lg">
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); setWebcamShape(s => s === 'circle' ? 'square' : 'circle'); }}
+                                        className="text-white p-1.5 rounded-full hover:bg-white/20 transition-colors"
+                                        title="Toggle Shape"
+                                    >
+                                        {webcamShape === 'circle' ? <Square className="w-4 h-4" /> : <Circle className="w-4 h-4" />}
+                                    </button>
+                                    <div className="w-[1px] h-6 bg-white/20 mx-1"></div>
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); toggleWebcam(); }}
+                                        className="bg-red-500 text-white p-1.5 rounded-full hover:bg-red-600 shadow-md"
+                                        title="Close Webcam"
+                                    >
+                                        <X className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className={`w-full aspect-square mt-auto relative group shrink-0 shadow-xl border border-indigo-200/50 dark:border-indigo-800/50 flex flex-col items-center justify-center bg-black overflow-hidden ${webcamShape === 'circle' ? 'rounded-full' : 'rounded-2xl'}`}>
+
+                            {/* Realistic Video Avatar (Option 1 Demo) */}
+                            <video
+                                src="/Teacher_speaking_to_camera.mp4"  /* 👈 Replace this URL with your own Avatar MP4 video */
+                                loop
+                                muted
+                                playsInline
+                                className="w-full h-full object-cover transition-opacity duration-300"
+                                style={{ opacity: isSpeaking ? 1 : 0.6 }}
+                                ref={(video) => {
+                                    if (video) {
+                                        if (isSpeaking) {
+                                            video.play().catch(() => { });
+                                        } else {
+                                            video.pause();
+                                        }
+                                    }
+                                }}
+                            />
+
+                            {/* Optional: Add an audio waveform indicator when speaking */}
+                            {isSpeaking && (
+                                <div className="absolute bottom-4 flex gap-1 items-center">
+                                    <div className="w-1 h-3 bg-white rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                                    <div className="w-1 h-5 bg-white rounded-full animate-bounce" style={{ animationDelay: '100ms' }}></div>
+                                    <div className="w-1 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '200ms' }}></div>
+                                </div>
+                            )}
+
+                            {/* Overlay to switch on webcam */}
+                            <div className={`absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center pointer-events-auto cursor-pointer ${webcamShape === 'circle' ? 'rounded-full' : 'rounded-2xl'}`} onClick={(e) => { e.stopPropagation(); toggleWebcam(); }}>
+                                <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-lg text-white">
+                                    <Camera className="w-4 h-4" />
+                                    <span className="text-[10px] font-bold uppercase tracking-wider">Start Cam</span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+
+
+                {/* ── Session Score Overlay ── */}
+                <AnimatePresence>
+                    {isScoreVisible && (
+                        <motion.div
+                            key="score-overlay"
+                            initial={{ x: 80, opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            exit={{ x: 80, opacity: 0 }}
+                            className="fixed top-20 right-4 z-[60] bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-2xl p-4 w-52"
+                        >
+                            <div className="flex items-center justify-between mb-3">
+                                <h3 className="font-bold text-sm text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                                    <BarChart2 className="w-4 h-4 text-green-500" />
+                                    {L.sessionScore}
+                                </h3>
+                                <button onClick={() => setIsScoreVisible(false)} className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-full"><X className="w-3.5 h-3.5" /></button>
+                            </div>
+                            <div className="space-y-2">
+                                <div className="flex justify-between items-center text-xs">
+                                    <span className="flex items-center gap-1.5 font-semibold text-green-600 dark:text-green-400"><span className="w-2 h-2 rounded-full bg-green-500 inline-block"></span>{L.correct}</span>
+                                    <span className="font-black text-green-600 dark:text-green-400">{uiLang === 'bn' ? toBanglaNumber(sessionScore.correct) : sessionScore.correct}</span>
+                                </div>
+                                <div className="flex justify-between items-center text-xs">
+                                    <span className="flex items-center gap-1.5 font-semibold text-red-600 dark:text-red-400"><span className="w-2 h-2 rounded-full bg-red-500 inline-block"></span>{L.wrong}</span>
+                                    <span className="font-black text-red-600 dark:text-red-400">{uiLang === 'bn' ? toBanglaNumber(sessionScore.wrong) : sessionScore.wrong}</span>
+                                </div>
+                                <div className="flex justify-between items-center text-xs">
+                                    <span className="flex items-center gap-1.5 font-semibold text-gray-400"><span className="w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600 inline-block"></span>{L.unanswered}</span>
+                                    <span className="font-black text-gray-500">{uiLang === 'bn' ? toBanglaNumber(questions.length - sessionScore.correct - sessionScore.wrong) : questions.length - sessionScore.correct - sessionScore.wrong}</span>
+                                </div>
+                            </div>
+                            {/* Progress bar */}
+                            <div className="mt-3 h-2 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden flex gap-0.5">
+                                <div className="bg-green-500 h-full rounded-full transition-all" style={{ width: `${(sessionScore.correct / questions.length) * 100}%` }} />
+                                <div className="bg-red-500 h-full rounded-full transition-all" style={{ width: `${(sessionScore.wrong / questions.length) * 100}%` }} />
+                            </div>
+                            <div className="mt-3 flex gap-2">
+                                <button
+                                    onClick={() => { const aid = `presentation_${classLine.substring(0, 40)}`; fetchLeaderboard(aid); setIsLeaderboardOpen(true); }}
+                                    className="flex-1 text-[10px] font-bold py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors flex items-center justify-center gap-1"
+                                >
+                                    <Trophy className="w-3 h-3" />{L.leaderboard}
+                                </button>
+                                <button
+                                    onClick={async () => { await saveFinalScore(); setIsFinalScoreOpen(true); }}
+                                    className="flex-1 text-[10px] font-bold py-1.5 rounded-lg bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/50 transition-colors"
+                                >
+                                    {L.finalScore}
+                                </button>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {/* ── Leaderboard Modal ── */}
+                <AnimatePresence>
+                    {isLeaderboardOpen && (
+                        <motion.div
+                            key="leaderboard"
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.9 }}
+                            className="fixed inset-0 z-[70] flex items-center justify-center p-4"
+                        >
+                            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsLeaderboardOpen(false)} />
+                            <div className="relative bg-white dark:bg-gray-900 rounded-3xl shadow-2xl p-6 w-full max-w-md border border-gray-200 dark:border-gray-700">
+                                <div className="flex items-center justify-between mb-5">
+                                    <h2 className="font-black text-lg text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                                        <Trophy className="w-5 h-5 text-amber-500" />
+                                        {L.topScorers}
+                                    </h2>
+                                    <button onClick={() => setIsLeaderboardOpen(false)} className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"><X className="w-5 h-5" /></button>
+                                </div>
+                                {leaderboardLoading ? (
+                                    <div className="flex items-center justify-center py-8"><div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" /></div>
+                                ) : leaderboardData.length === 0 ? (
+                                    <p className="text-center text-gray-500 dark:text-gray-400 py-8 text-sm">No scores yet. Be the first!</p>
+                                ) : (
+                                    <div className="space-y-2">
+                                        {leaderboardData.map((entry: any, idx: number) => (
+                                            <div key={idx} className={`flex items-center gap-3 p-3 rounded-xl border ${idx === 0 ? 'bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800' : 'bg-gray-50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-700/50'}`}>
+                                                <span className={`font-black text-lg w-7 text-center ${idx === 0 ? 'text-amber-500' : idx === 1 ? 'text-gray-400' : idx === 2 ? 'text-orange-400' : 'text-gray-400'}`}>{idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : idx + 1}</span>
+                                                <div className="flex-1">
+                                                    <p className="font-bold text-sm text-gray-800 dark:text-gray-200">{entry.userId === user?.uid ? userDisplayName + ' (You)' : (entry.displayName || 'Student')}</p>
+                                                    <p className="text-xs text-gray-500 dark:text-gray-400">{entry.scoreData?.correct || 0}/{entry.scoreData?.total || questions.length} correct</p>
+                                                </div>
+                                                <span className="font-black text-indigo-600 dark:text-indigo-400">{entry.scoreData?.score || 0}pts</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {/* ── Final Score Modal ── */}
+                <AnimatePresence>
+                    {isFinalScoreOpen && (
+                        <motion.div
+                            key="final-score"
+                            initial={{ opacity: 0, scale: 0.85 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.85 }}
+                            className="fixed inset-0 z-[70] flex items-center justify-center p-4"
+                        >
+                            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setIsFinalScoreOpen(false)} />
+                            <div className="relative bg-gradient-to-br from-white to-indigo-50 dark:from-gray-900 dark:to-indigo-950 rounded-3xl shadow-2xl p-8 w-full max-w-sm border border-indigo-100 dark:border-indigo-800/50 text-center">
+                                <div className="text-5xl mb-4">{sessionScore.correct / questions.length >= 0.8 ? '🎉' : sessionScore.correct / questions.length >= 0.5 ? '👍' : '💪'}</div>
+                                <h2 className="font-black text-2xl text-gray-900 dark:text-gray-100 mb-1">{L.finalScore}</h2>
+                                <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">{classLine}</p>
+                                <div className="flex justify-center gap-6 mb-6">
+                                    <div className="text-center"><p className="text-3xl font-black text-green-500">{uiLang === 'bn' ? toBanglaNumber(sessionScore.correct) : sessionScore.correct}</p><p className="text-xs font-semibold text-gray-500 mt-1">{L.correct}</p></div>
+                                    <div className="text-center"><p className="text-3xl font-black text-red-500">{uiLang === 'bn' ? toBanglaNumber(sessionScore.wrong) : sessionScore.wrong}</p><p className="text-xs font-semibold text-gray-500 mt-1">{L.wrong}</p></div>
+                                    <div className="text-center"><p className="text-3xl font-black text-gray-400">{uiLang === 'bn' ? toBanglaNumber(questions.length - sessionScore.correct - sessionScore.wrong) : questions.length - sessionScore.correct - sessionScore.wrong}</p><p className="text-xs font-semibold text-gray-500 mt-1">{L.unanswered}</p></div>
+                                </div>
+                                <div className="h-3 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden flex mb-4">
+                                    <div className="bg-green-500 h-full transition-all" style={{ width: `${(sessionScore.correct / questions.length) * 100}%` }} />
+                                    <div className="bg-red-500 h-full transition-all" style={{ width: `${(sessionScore.wrong / questions.length) * 100}%` }} />
+                                </div>
+                                <p className="font-black text-4xl text-indigo-600 dark:text-indigo-400 mb-6">{Math.round((sessionScore.correct / questions.length) * 100)}%</p>
+                                <button onClick={() => setIsFinalScoreOpen(false)} className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl font-bold shadow-lg hover:shadow-xl transition-all hover:scale-105">Close</button>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {/* ── Zoom/Pan Indicator ── */}
+                {contentZoom !== 1 && (
+                    <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[55] flex items-center gap-2 bg-black/70 text-white text-xs font-bold px-3 py-1.5 rounded-full">
+                        <ZoomIn className="w-3.5 h-3.5" />
+                        <span>{Math.round(contentZoom * 100)}%</span>
+                        <button onClick={() => { setContentZoom(1); setPanOffset({ x: 0, y: 0 }); }} className="ml-1 underline opacity-70 hover:opacity-100">{L.zoomReset}</button>
+                    </div>
+                )}
+
+                {/* Cursor Highlight Overlay */}
+                {isCursorHighlightActive && (
+                    <div
+                        ref={cursorHighlightRef}
+                        className="fixed z-[9998] pointer-events-none rounded-full transition-opacity duration-150"
+                        style={{
+                            left: '0px',
+                            top: '0px',
+                            width: '40px',
+                            height: '40px',
+                            backgroundColor: 'rgba(250, 204, 21, 0.4)',
+                            border: '2px solid rgba(250, 204, 21, 0.8)',
+                            boxShadow: '0 0 15px rgba(250, 204, 21, 0.5)',
+                            transform: 'translate3d(-999px, -999px, 0)',
+                            willChange: 'transform'
+                        }}
+                    />
+                )}
+
+                {/* Spotlight Overlay */}
+                {isSpotlightActive && (
+                    <div
+                        ref={spotlightRef}
+                        className="fixed inset-0 z-[9999] pointer-events-none transition-opacity duration-300"
+                        style={{
+                            background: `radial-gradient(circle at -999px -999px, transparent 60px, rgba(0,0,0,0.85) 150px)`
+                        }}
+                    />
+                )}
+            </div> {/* Close print:hidden container */}
+
+            {/* Print Only Container */}
+            <div className="print-only hidden print:block w-full bg-white text-black relative z-[999999]" style={{ WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}>
+                {questions.map((q, idx) => {
+                    const parsedOptions = (() => {
+                        if (!q.options) return [];
+                        try { return typeof q.options === 'string' ? JSON.parse(q.options) : q.options; } catch (e) { return []; }
+                    })();
+                    const opts = parsedOptions.length > 0 ? parsedOptions : (() => {
+                        const arr = [
+                            { key: 'a', text: q.options?.a || '' },
+                            { key: 'b', text: q.options?.b || '' },
+                            { key: 'c', text: q.options?.c || '' },
+                            { key: 'd', text: q.options?.d || '' }
+                        ];
+                        if (q.options?.e) arr.push({ key: 'e', text: q.options.e });
+                        return arr.filter((x: any) => x.text);
+                    })();
+
+                    const renderQuestion = (isAnswerKey: boolean) => {
+                        const showHighlight = isAnswerKey || (isPrintWithAnswers && !isPrintBothVersions);
+                        const keyPrefix = isAnswerKey ? `ak-${idx}` : `test-${idx}`;
+
+                        return (
+                            <div key={keyPrefix} className={`w-full ${isPrintAsList ? 'py-8' : 'h-[100vh]'} flex items-center justify-center select-none font-sans ${isPrintAsList ? '' : 'overflow-hidden'} transition-colors duration-500 ${isDarkMode ? 'dark bg-gray-900' : 'bg-[#f8fbff]'}`} style={{ pageBreakAfter: isPrintAsList ? 'auto' : 'always', pageBreakInside: 'avoid' }}>
+                                {/* Main Presentation Area Only (No side banners) */}
+                                <div className={`responsive-fonts relative w-full ${isPrintAsList ? '' : 'h-full'} ${getBgThemeClasses()} flex flex-col shadow-2xl ${isPrintAsList ? '' : 'overflow-hidden'} z-10 transition-colors duration-500`}>
+                                    {bgTheme !== 'video' && (
+                                        <div className={`absolute inset-0 z-0 pointer-events-none transition-opacity duration-300 ${getBgThemeOverlayClasses()}`} style={{ opacity: bgOpacity / 100 }} />
+                                    )}
+
+                                    <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+                                        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-200/30 blur-[100px]"></div>
+                                        <div className="absolute bottom-[-10%] right-[-5%] w-[50%] h-[50%] rounded-full bg-pink-200/30 blur-[100px]"></div>
+                                        <div className="absolute top-[20%] right-[10%] w-[30%] h-[30%] rounded-full bg-purple-200/30 blur-[80px]"></div>
+                                        <div className="absolute top-0 left-0 w-full h-full" style={{ backgroundImage: 'radial-gradient(rgba(99, 102, 241, 0.06) 2px, transparent 2px)', backgroundSize: '32px 32px', opacity: 0.8 }}></div>
+                                        {!isAnswerKey && (
+                                            <>
+                                                <div className="absolute top-[15%] right-[-5%] w-72 h-72 rounded-full border-[1px] border-indigo-200/40 opacity-60"></div>
+                                                <div className="absolute top-[18%] right-[-2%] w-56 h-56 rounded-full border-[1px] border-purple-200/40 opacity-60"></div>
+                                                <div className="absolute bottom-[20%] left-[5%] w-48 h-48 rounded-full border-[1px] border-pink-200/40 opacity-60"></div>
+                                            </>
+                                        )}
+                                    </div>
+
+                                    {wmVisible && wmText && (
+                                        <div
+                                            className="absolute inset-0 pointer-events-none z-0 overflow-hidden"
+                                            style={{
+                                                backgroundImage: getWatermarkSvg(wmSpacing, wmSize, wmOpacity, wmText, isDarkMode),
+                                                backgroundRepeat: 'repeat'
+                                            }}
+                                        />
+                                    )}
+
+                                    {/* Header */}
+                                    {showHeader && (
+                                        isPrintAsList ? (
+                                            <div
+                                                className={isAnswerKey
+                                                    ? "shrink-0 bg-gradient-to-r from-green-50 via-white to-indigo-50 border-b border-green-100/50 flex flex-row justify-between items-center w-full z-30 shadow-sm relative px-6 py-4 !print-color-adjust-exact"
+                                                    : "shrink-0 bg-gradient-to-r from-indigo-50 via-white to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 border-b border-indigo-100/50 dark:border-gray-700/50 flex flex-row justify-between items-center w-full z-30 shadow-sm relative px-6 py-4 !print-color-adjust-exact"}
+                                            >
+                                                <div className="flex items-center gap-3 w-1/3">
+                                                    {showLogo && <img src="/icons/icon-192x192.png" alt="DeshExam" className="h-10 w-auto object-contain drop-shadow-sm rounded-full bg-white p-1" />}
+                                                    <div className="flex flex-col justify-center">
+                                                        <span className="font-extrabold text-indigo-950 dark:text-gray-100 leading-tight text-lg">DESH EXAM</span>
+                                                        <span className="text-indigo-800/80 dark:text-gray-400 font-bold tracking-widest uppercase mt-0.5 text-[10px]">Learn • Practice • Succeed</span>
+                                                    </div>
+                                                </div>
+                                                <div className={`flex-1 w-full px-6 flex flex-col justify-center ${isPrintAsList || headerTitleAlign === 'left' ? 'items-start text-left' : headerTitleAlign === 'right' ? 'items-end text-right' : 'items-center text-center'}`}>
+                                                    <h1 className="font-extrabold text-indigo-950 dark:text-gray-100 tracking-tight text-lg">{displayTitle}</h1>
+                                                    {displayTaxonomy && (
+                                                        <div className="text-indigo-700 dark:text-gray-400 font-bold tracking-wider uppercase mt-1 text-xs">
+                                                            {displayTaxonomy}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="flex items-center justify-end shrink-0 w-1/3">
+                                                    <div className={isAnswerKey
+                                                        ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-full font-extrabold tracking-widest shadow-md flex items-center justify-center whitespace-nowrap px-6 py-2 text-sm !print-color-adjust-exact"
+                                                        : "bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-full font-extrabold tracking-widest shadow-md flex items-center justify-center whitespace-nowrap px-6 py-2 text-sm !print-color-adjust-exact"}
+                                                    >
+                                                        {isAnswerKey ? "ANSWER KEY" : "MOCK TEST"}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className={`shrink-0 w-full px-4 sm:px-6 md:px-8 py-3 md:py-4 flex items-center justify-between border-b relative z-30 transition-colors duration-300 shadow-sm ${bgTheme === 'video'
+                                                ? 'bg-black/40 border-white/10 backdrop-blur-md'
+                                                : isDarkMode
+                                                    ? 'bg-[#111827] border-gray-800'
+                                                    : 'bg-[#7c3aed] border-purple-600'
+                                                } !print-color-adjust-exact`}>
+
+                                                <div className="flex items-center gap-3 w-1/3">
+                                                    {showLogo && (
+                                                        <div className="relative">
+                                                            <div className="absolute inset-0 bg-white rounded-full blur-md opacity-20"></div>
+                                                            <img src="/icons/icon-192x192.png" alt="DeshExam" className="h-10 md:h-12 w-auto object-contain drop-shadow-lg relative z-10 rounded-full bg-white p-1" />
+                                                        </div>
+                                                    )}
+                                                    <div className="flex flex-col justify-center">
+                                                        <span className={`font-black leading-none text-lg md:text-xl ${bgTheme === 'video' ? 'text-white drop-shadow-md' : isDarkMode ? 'text-white' : 'text-white'}`}>DESH EXAM</span>
+                                                        <span className={`font-bold tracking-[0.2em] uppercase mt-1 text-[8px] md:text-[9px] ${bgTheme === 'video' ? 'text-white/80' : isDarkMode ? 'text-gray-400' : 'text-purple-200'}`}>Learn • Practice • Succeed</span>
+                                                    </div>
+                                                </div>
+                                                <div className={`flex-1 w-full px-2 flex flex-col justify-center items-center text-center`}>
+                                                    <h1 className={`font-extrabold tracking-tight text-base md:text-lg lg:text-xl line-clamp-1 ${bgTheme === 'video' ? 'text-white drop-shadow-md' : isDarkMode ? 'text-white' : 'text-white'}`}>{displayTitle}</h1>
+                                                    {displayTaxonomy && (
+                                                        <div className={`font-bold tracking-wider uppercase mt-1 text-[10px] md:text-xs ${bgTheme === 'video' ? 'text-white/90 drop-shadow-md' : isDarkMode ? 'text-gray-300' : 'text-purple-100/90'}`}>
+                                                            {displayTaxonomy}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="flex flex-row items-center justify-end gap-2 shrink-0 w-1/3">
+                                                </div>
+                                            </div>
+                                        )
+                                    )}
+
+                                    {/* Question & Options */}
+                                    <div className={`flex-1 w-full relative flex flex-col ${isPrintAsList ? 'px-12 py-10 z-10 items-start justify-start' : 'items-center justify-center gap-8 z-10'}`}>
+
+                                        {isPrintAsList ? (
+                                            <div
+                                                className={`w-full max-w-full rounded-3xl p-12 shadow-[0_20px_50px_rgba(0,0,0,0.1)] backdrop-blur-sm border transition-all duration-500 relative z-20 ${qBgColor.startsWith('#') ? '' : qBgColor} border-white/20 dark:border-gray-700/50`}
+                                                style={{
+                                                    backgroundColor: qBgColor.startsWith('#') ? qBgColor : undefined,
+                                                    boxShadow: isDarkMode ? '0 20px 40px -10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1)' : '0 20px 40px -10px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.5)',
+                                                    backgroundImage: `linear-gradient(to right, ${isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'} 1px, transparent 1px)`,
+                                                    backgroundSize: '24px 24px'
+                                                }}
+                                            >
+                                                <div className="flex items-start gap-4 mb-12 border-b border-gray-200/50 dark:border-gray-700/50 pb-10">
+                                                    <div className="flex items-center gap-4 shrink-0">
+                                                        <span className={`font-black text-[32px] bg-clip-text text-transparent bg-gradient-to-br drop-shadow-sm ${isAnswerKey ? 'from-green-600 to-emerald-600' : 'from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400'}`}>
+                                                            Q{idx + 1}.
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex-1 w-full relative pt-1">
+                                                        <div className={`prose max-w-none prose-p:font-black font-black text-[32px] leading-snug ${qTextColor !== 'default' ? 'text-[var(--q-color)]' : 'text-gray-900 dark:text-gray-100'} [&_*]:!text-[32px] [&_*]:!leading-snug [&>p]:m-0`} style={{ '--q-color': qTextColor !== 'default' ? qTextColor : undefined } as React.CSSProperties}>
+                                                            <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
+                                                                {q.questionText}
+                                                            </ReactMarkdown>
+                                                        </div>
+                                                        {q.statements && q.statements.length > 0 && (
+                                                            <div className="mt-6 flex flex-col gap-1.5 w-full pl-6 border-l-4 border-gray-300 dark:border-gray-600">
+                                                                {q.statements.map((stmt: string, sIdx: number) => (
+                                                                    <div key={sIdx} className="prose max-w-none prose-p:font-bold font-bold text-[26px] leading-[1] text-gray-700 dark:text-gray-300 [&_*]:!text-[26px] [&_*]:!leading-[1] [&>p]:m-0">
+                                                                        <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
+                                                                            {stmt}
+                                                                        </ReactMarkdown>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+
+                                                <div className={optionsLayout === 'grid' ? "grid grid-cols-2 gap-x-12 gap-y-10" : `flex flex-col gap-8 w-full`}>
+                                                    {opts.map((opt: any, oIdx: number) => {
+                                                        const optLetter = getOptionLabel(opt.key, uiLang);
+                                                        const colorThemes = [
+                                                            { border: 'border-[#4285F4]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#4285F4]/75', letterText: 'text-white' },
+                                                            { border: 'border-[#34A853]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#34A853]/75', letterText: 'text-white' },
+                                                            { border: 'border-[#F9AB00]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#F9AB00]/75', letterText: 'text-white' },
+                                                            { border: 'border-[#EA4335]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#EA4335]/75', letterText: 'text-white' },
+                                                            { border: 'border-[#9C27B0]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#9C27B0]/75', letterText: 'text-white' },
+                                                        ];
+                                                        const theme = colorThemes[oIdx % colorThemes.length];
+
+                                                        const isCorrect = q.correctAnswer && q.correctAnswer.toLowerCase().includes(opt.key);
+                                                        const printContainerClass = showHighlight && isCorrect
+                                                            ? `flex items-center gap-5 py-2 px-3 rounded-xl border-2 border-[#34A853] bg-[#f0fdf4] min-h-[50px] !print-color-adjust-exact`
+                                                            : `flex items-center gap-5 py-2 px-3 rounded-xl border-2 shadow-[0_4px_12px_rgba(0,0,0,0.04)] ${optBgColor === 'default' ? theme.bg : (optBgColor.startsWith('#') ? '' : optBgColor)} ${theme.border} min-h-[50px]`;
+                                                        const printLetterClass = showHighlight && isCorrect
+                                                            ? `shrink-0 w-14 h-14 flex items-center justify-center rounded-full text-2xl font-black bg-[#34A853] text-white !print-color-adjust-exact`
+                                                            : `shrink-0 w-14 h-14 flex items-center justify-center rounded-full text-2xl font-black ${theme.letterBg} ${theme.letterText}`;
+
+                                                        return (
+                                                            <div key={opt.key} className={printContainerClass} style={{ backgroundColor: (optBgColor !== 'default' && optBgColor.startsWith('#')) ? optBgColor : undefined }}>
+                                                                <div className={printLetterClass}>
+                                                                    {optLetter}
+                                                                </div>
+                                                                <div className={`prose dark:prose-invert max-w-none font-bold text-[24px] flex items-center [&_*]:!text-[24px] [&_*]:!leading-tight [&_*]:!m-0 ${optTextColor !== 'default' ? 'text-[var(--opt-color)] [&_*]:!text-[var(--opt-color)]' : 'text-black dark:text-gray-100'}`} style={{ '--opt-color': optTextColor !== 'default' ? optTextColor : undefined } as React.CSSProperties}>
+                                                                    <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
+                                                                        {opt.text}
+                                                                    </ReactMarkdown>
+                                                                </div>
+                                                                {showHighlight && isCorrect && (
+                                                                    <div className="shrink-0 text-white bg-[#34A853] rounded-full p-1.5 shadow-sm ml-auto !print-color-adjust-exact">
+                                                                        <Check className="w-7 h-7 stroke-[3]" />
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="w-full flex flex-col items-center flex-1 !print-color-adjust-exact mt-8">
+                                                <div
+                                                    className={`flex flex-col items-center justify-center gap-4 w-[94%] sm:w-full min-w-[300px] md:min-w-[600px] max-w-4xl xl:max-w-5xl min-h-[120px] md:min-h-[160px] md:max-h-[260px] mx-auto mt-1 md:mt-1 transition-all duration-300 relative z-10 rounded-t-2xl rounded-b-[0.5rem] border shadow-[0_8px_32px_rgba(0,0,0,0.10)] p-6 md:p-8 md:px-10 ${qBgColor !== 'transparent' ? `${qBgColor.startsWith('#') ? '' : qBgColor} border-gray-200/50 dark:border-gray-700/50` : 'bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-gray-100/80 dark:border-slate-700/40'} !print-color-adjust-exact`}
+                                                    style={{
+                                                        containerType: 'inline-size',
+                                                        backgroundColor: qBgColor.startsWith('#') ? qBgColor : undefined,
+                                                        '--q-size': (() => {
+                                                            const hasStmts = q.statements && q.statements.length > 0;
+                                                            const stmtLines = q.statements ? q.statements.length : 0;
+                                                            const stmtLen = q.statements ? q.statements.join(' ').length : 0;
+                                                            const tLen = (q.questionText?.length || 0) + stmtLen;
+                                                            const multiplier = tLen <= 45 ? 1.6 : 2.8;
+                                                            if (hasStmts) {
+                                                                return `min(calc(var(--base-q-size) * 0.85), calc((min(94vw, 1000px) - 120px) * ${multiplier} / ${Math.max(1, tLen)}))`;
+                                                            }
+                                                            return `min(var(--base-q-size), calc((min(94vw, 1000px) - 120px) * ${multiplier} / ${Math.max(1, tLen)}))`;
+                                                        })(),
+                                                        '--q-color': qTextColor !== 'default' ? qTextColor : undefined,
+                                                        borderTopColor: bgTheme === 'video' ? 'rgba(255,255,255,0.4)' : [
+                                                            '#6366f1', '#3b82f6', '#10b981', '#f43f5e', '#f59e0b', '#a855f7'
+                                                        ][idx % 6],
+                                                        borderTopWidth: '4px',
+                                                        ...(qBgColor !== 'transparent' && bgTheme === 'dots' ? {
+                                                            backgroundImage: `radial-gradient(${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'} 1.5px, transparent 1.5px)`,
+                                                            backgroundSize: '16px 16px'
+                                                        } : qBgColor !== 'transparent' && bgTheme === 'grid' ? {
+                                                            backgroundImage: `linear-gradient(to right, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px)`,
+                                                            backgroundSize: '16px 16px'
+                                                        } : {
+                                                            backgroundImage: 'none',
+                                                            backgroundSize: 'auto'
+                                                        })
+                                                    } as unknown as React.CSSProperties}
+                                                >
+                                                    <div className="absolute -top-8 md:-top-10 left-1/2 -translate-x-1/2 flex items-center justify-center z-20 !print-color-adjust-exact">
+                                                        <div className={`w-16 h-16 md:w-20 md:h-20 flex items-center justify-center rounded-full shadow-xl border-2 backdrop-blur-md font-black text-3xl md:text-5xl ${bgTheme === 'video' ? 'bg-black/50 border-white/30 text-white' : `${[
+                                                            'from-indigo-600 to-violet-600 dark:from-indigo-500 dark:to-violet-500',
+                                                            'from-blue-600 to-cyan-600 dark:from-blue-500 dark:to-cyan-500',
+                                                            'from-emerald-600 to-teal-600 dark:from-emerald-500 dark:to-teal-500',
+                                                            'from-rose-600 to-pink-600 dark:from-rose-500 dark:to-pink-500',
+                                                            'from-amber-500 to-orange-500 dark:from-amber-400 dark:to-orange-500',
+                                                            'from-fuchsia-600 to-purple-600 dark:from-fuchsia-500 dark:to-purple-500'
+                                                        ][idx % 6]} bg-gradient-to-tr border-white dark:border-slate-800 text-white`}`}>
+                                                            {uiLang === 'bn' ? toBanglaNumber(idx + 1) : idx + 1}
+                                                        </div>
+                                                    </div>
+                                                    <div className="absolute top-2.5 md:top-3.5 left-4 md:left-8 flex items-center gap-2 md:gap-2.5 z-20 pointer-events-none select-none !print-color-adjust-exact">
+                                                        <MetallicScrew rotation={15} />
+                                                        <MetallicScrew rotation={68} />
+                                                        <MetallicScrew rotation={125} />
+                                                    </div>
+                                                    <div className="absolute top-2.5 md:top-3.5 right-4 md:right-8 flex items-center gap-2 md:gap-2.5 z-20 pointer-events-none select-none !print-color-adjust-exact">
+                                                        <MetallicScrew rotation={35} />
+                                                        <MetallicScrew rotation={95} />
+                                                        <MetallicScrew rotation={155} />
+                                                    </div>
+                                                    <div className={`prose dark:prose-invert max-w-none w-full prose-p:font-extrabold text-[length:var(--q-size)] leading-relaxed text-left font-extrabold [&_*]:!text-[length:var(--q-size)] [&_*]:!leading-relaxed [&_*]:!m-0 ${qTextColor !== 'default' ? 'text-[var(--q-color)] [&_*]:!text-[var(--q-color)] drop-shadow-sm [&_*]:!drop-shadow-sm' : (bgTheme === 'video' ? 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] [&_*]:!text-white [&_*]:!drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]' : 'text-slate-900 dark:text-white [&_*]:!text-slate-900 dark:[&_*]:!text-white')}`}>
+                                                        <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
+                                                            {q.questionText}
+                                                        </ReactMarkdown>
+                                                    </div>
+                                                    {q.statements && q.statements.length > 0 && (
+                                                        <div className="mt-4 mb-2 flex flex-col gap-1 w-full pl-4 md:pl-8 border-l-4 border-gray-300 dark:border-gray-600 self-start">
+                                                            {q.statements.map((stmt: string, sIdx: number) => (
+                                                                <div key={sIdx} className={`prose dark:prose-invert max-w-none w-full prose-p:font-bold text-[calc(var(--q-size)*0.85)] leading-[1] text-left font-bold [&_*]:!text-[calc(var(--q-size)*0.85)] [&_*]:!leading-[1] [&_*]:!m-0 ${qTextColor !== 'default' ? 'text-[var(--q-color)] [&_*]:!text-[var(--q-color)]' : 'text-slate-700 dark:text-gray-300 [&_*]:!text-slate-700 dark:[&_*]:!text-gray-300'}`}>
+                                                                    <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
+                                                                        {stmt}
+                                                                    </ReactMarkdown>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                <div className="relative w-full max-w-[1200px] flex justify-center mt-6 md:mt-8 mb-4 mx-auto !print-color-adjust-exact">
+                                                    <div className={optionsLayout === 'grid' ? "grid grid-cols-2 gap-x-6 gap-y-6 w-[94%] sm:w-full max-w-4xl xl:max-w-5xl mx-auto" : "flex flex-col gap-y-3 w-[94%] sm:w-full max-w-4xl xl:max-w-5xl mx-auto"}>
+                                                        {(() => {
+                                                            const maxOptLen = opts.length > 0 ? Math.max(...opts.map((o: any) => o.text?.length || 0)) : 1;
+                                                            if ((step >= 2 && q.explanation && isExpEnabled) || isManualExpOpen) return null;
+                                                            return opts.map((opt: any, oIdx: number) => {
+                                                                const isCorrect = q.correctAnswer && q.correctAnswer.toLowerCase().includes(opt.key);
+                                                                const optLetter = getOptionLabel(opt.key, uiLang);
+                                                                const showCorrect = showHighlight && isCorrect;
+
+                                                                const colorThemes = [
+                                                                    { border: 'border-[#4285F4]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#4285F4]', letterText: 'text-white' }, // Blue
+                                                                    { border: 'border-[#34A853]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#34A853]', letterText: 'text-white' }, // Green
+                                                                    { border: 'border-[#F9AB00]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#F9AB00]', letterText: 'text-white' }, // Yellow/Orange
+                                                                    { border: 'border-[#EA4335]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#EA4335]', letterText: 'text-white' }, // Red
+                                                                    { border: 'border-[#9C27B0]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#9C27B0]', letterText: 'text-white' }, // Purple
+                                                                ];
+                                                                const theme = colorThemes[oIdx % colorThemes.length];
+
+                                                                const bgClass = optBgColor === 'default' ? theme.bg : (optBgColor.startsWith('#') ? '' : optBgColor);
+                                                                let containerClasses = `flex items-center gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 transition-all duration-200 shadow-[0_4px_12px_rgba(0,0,0,0.04)] relative z-10 select-none ${bgClass} ${theme.border} !print-color-adjust-exact`;
+                                                                let letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 ${theme.letterBg} ${theme.letterText} !print-color-adjust-exact`;
+
+                                                                if (showCorrect) {
+                                                                    containerClasses = `flex items-center gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 ring-4 ring-[#34A853]/30 bg-[#f0fdf4] dark:bg-[#064e3b] border-[#34A853] z-10 relative select-none !print-color-adjust-exact`;
+                                                                    letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 bg-[#34A853] text-white !print-color-adjust-exact`;
+                                                                }
+
+                                                                return (
+                                                                    <div key={opt.key} className="flex flex-col gap-2 w-full relative !print-color-adjust-exact">
+                                                                        <div
+                                                                            className={containerClasses}
+                                                                            style={{
+                                                                                containerType: 'inline-size',
+                                                                                backgroundColor: (optBgColor !== 'default' && optBgColor.startsWith('#')) ? optBgColor : undefined,
+                                                                                ...(bgTheme === 'dots' ? {
+                                                                                    backgroundImage: `radial-gradient(${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'} 1.5px, transparent 1.5px)`,
+                                                                                    backgroundSize: '12px 12px'
+                                                                                } : bgTheme === 'grid' ? {
+                                                                                    backgroundImage: `linear-gradient(to right, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px)`,
+                                                                                    backgroundSize: '12px 12px'
+                                                                                } : {
+                                                                                    backgroundImage: 'none',
+                                                                                    backgroundSize: 'auto'
+                                                                                })
+                                                                            }}
+                                                                        >
+                                                                            <div className={letterClasses}>
+                                                                                {optLetter}
+                                                                            </div>
+                                                                            <div className={`prose dark:prose-invert max-w-none w-full leading-snug flex-1 font-bold text-[length:min(calc(var(--q-size)*0.85),calc((min(45vw,500px)-100px)*1.2/${Math.max(1, maxOptLen)}))] [&_*]:!text-[length:min(calc(var(--q-size)*0.85),calc((min(45vw,500px)-100px)*1.2/${Math.max(1, maxOptLen)}))] [&_*]:!leading-snug [&_*]:!m-0 [&_*]:whitespace-nowrap [&_*]:overflow-hidden [&_*]:text-ellipsis ${optTextColor !== 'default' ? 'text-[var(--opt-color)] [&_*]:!text-[var(--opt-color)]' : 'text-slate-800 dark:text-slate-100'}`} style={{ '--opt-color': optTextColor !== 'default' ? optTextColor : undefined } as React.CSSProperties}>
+                                                                                <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
+                                                                                    {opt.text}
+                                                                                </ReactMarkdown>
+                                                                            </div>
+                                                                            {showCorrect && (
+                                                                                <div className="shrink-0 text-white bg-[#34A853] rounded-full p-1 shadow-sm ml-auto z-10 !print-color-adjust-exact">
+                                                                                    <Check className="w-5 h-5 md:w-6 md:h-6 stroke-[3]" />
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+                                                                );
+                                                            });
+                                                        })()}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {!isPrintAsList && (
+                                        <div className={`shrink-0 w-full px-4 sm:px-6 md:px-8 py-3 flex items-center justify-between relative z-30 transition-colors duration-300 ${bgTheme === 'video' ? 'bg-black/40 border-t border-white/10 backdrop-blur-md' : isDarkMode ? 'bg-[#111827] border-t border-gray-800' : 'bg-[#7c3aed] border-t border-purple-600'} !print-color-adjust-exact`}>
+                                            <div className="text-white/90 text-sm font-medium tracking-wide !print-color-adjust-exact">
+                                                © DeshExam.app
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        );
+                    };
+
+                    return (
+                        <React.Fragment key={idx}>
+                            {renderQuestion(false)}
+                            {isPrintBothVersions && renderQuestion(true)}
+                        </React.Fragment>
+                    );
+                })}
+            </div>
+
                                     {isSettingsOpen && (
                                         <>
                                             <div className="fixed inset-0 z-[60]" onClick={() => setIsSettingsOpen(false)}></div>
-                                            <div className="fixed bottom-[90px] left-1/2 -translate-x-1/2 md:absolute md:bottom-full md:left-auto md:right-0 md:translate-x-0 md:mb-4 bg-white/95 dark:bg-gray-950/95 backdrop-blur-xl border border-gray-200 dark:border-gray-800 rounded-2xl shadow-2xl p-3 md:p-4 w-[92vw] sm:w-[350px] z-[70] animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[75vh] md:max-h-[65vh]">
+                                            <div className="fixed bottom-[90px] left-1/2 -translate-x-1/2 md:fixed md:bottom-[70px] md:left-auto md:right-4 md:translate-x-0 md:mb-0 bg-white/95 dark:bg-gray-950/95 backdrop-blur-xl border border-gray-200 dark:border-gray-800 rounded-2xl shadow-2xl p-3 md:p-4 w-[92vw] sm:w-[350px] z-[70] animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[75vh] md:max-h-[65vh]">
                                                 <div className="flex justify-between items-center mb-2 pb-2 border-b border-gray-100 dark:border-gray-800/60 shrink-0">
                                                     <h3 className="font-bold text-gray-800 dark:text-gray-200 text-lg flex items-center gap-2">
                                                         <Settings className="w-5 h-5 text-indigo-500" /> Settings
@@ -5370,913 +6277,6 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                             </div>
                                         </>
                                     )}
-                                </div>
-
-                            </div>
-
-                            {/* Music Toggle Button */}
-                            <button
-                                onClick={() => setIsLofiEnabled(!isLofiEnabled)}
-                                className={`hidden md:block p-2 md:p-3 rounded-full transition-all shrink-0 ${isLofiEnabled ? 'bg-indigo-500 text-white shadow-sm ring-2 ring-indigo-300' : 'hover:bg-white/10 text-white/80 hover:text-white'}`}
-                                title="Toggle Background Music (V)"
-                            >
-                                <Music className="w-5 h-5 md:w-6 md:h-6" />
-                            </button>
-
-                            <div className="relative flex items-center justify-center shrink-0">
-                                <button
-                                    onClick={() => setIsNavigatorOpen(!isNavigatorOpen)}
-                                    className={`p-2 md:p-3 rounded-full transition-all shadow-sm shrink-0 ${isNavigatorOpen ? 'bg-white/20 text-white shadow-md' : 'hover:bg-white/10 text-white/80 hover:text-white'}`}
-                                    title="Slide Navigator"
-                                >
-                                    <LayoutGrid className="w-5 h-5 md:w-6 md:h-6" />
-                                </button>
-
-                                {isNavigatorOpen && (
-                                    <div className="absolute bottom-[calc(100%+12px)] right-0 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-2xl p-3.5 sm:p-4 w-[320px] sm:w-[350px] z-50 animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[440px]">
-                                        {/* Professional Balanced Header */}
-                                        <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800 shrink-0">
-                                            <div className="flex items-center gap-2.5">
-                                                <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
-                                                    <LayoutGrid className="w-4 h-4" />
-                                                </div>
-                                                <div>
-                                                    <h4 className="font-bold text-sm text-gray-800 dark:text-gray-100 leading-tight">
-                                                        {uiLang === 'bn' ? 'স্লাইড নেভিগেটর' : 'Slide Navigator'}
-                                                    </h4>
-                                                    <p className="text-[11px] text-gray-400 dark:text-gray-500 font-medium">
-                                                        {uiLang === 'bn' ? 'যেকোনো প্রশ্নে সরাসরি যান' : 'Jump to question'}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div className="flex items-center gap-1.5">
-                                                <span className="text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/80 px-2 py-0.5 rounded-full border border-blue-200/50 dark:border-blue-900/50">
-                                                    {uiLang === 'bn'
-                                                        ? `${toBanglaNumber(currentSlide + 1)} / ${toBanglaNumber(questions.length)}`
-                                                        : `${currentSlide + 1} / ${questions.length}`}
-                                                </span>
-                                                <button
-                                                    onClick={() => setIsNavigatorOpen(false)}
-                                                    className="w-7 h-7 flex items-center justify-center text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
-                                                    title="Close"
-                                                >
-                                                    <X className="w-4 h-4" />
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        {/* Status Legend */}
-                                        <div className="flex items-center justify-between px-0.5 py-2.5 text-xs text-gray-600 dark:text-gray-400 font-medium shrink-0">
-                                            <span className="flex items-center gap-1.5">
-                                                <span className="w-2.5 h-2.5 rounded-full bg-blue-600 ring-2 ring-blue-300 dark:ring-blue-800" />
-                                                <span className="text-gray-800 dark:text-gray-200 font-semibold">{uiLang === 'bn' ? 'বর্তমান' : 'Current'}</span>
-                                            </span>
-                                            <span className="flex items-center gap-1.5">
-                                                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                                                <span>{uiLang === 'bn' ? 'উত্তর' : 'Done'} ({uiLang === 'bn' ? toBanglaNumber(answeredSlidesRef.current.size) : answeredSlidesRef.current.size})</span>
-                                            </span>
-                                            <span className="flex items-center gap-1.5">
-                                                <span className="w-2.5 h-2.5 rounded-full bg-gray-300 dark:bg-gray-600" />
-                                                <span>{uiLang === 'bn' ? 'বাকি' : 'Left'} ({uiLang === 'bn' ? toBanglaNumber(questions.length - answeredSlidesRef.current.size) : questions.length - answeredSlidesRef.current.size})</span>
-                                            </span>
-                                        </div>
-
-                                        {/* Grid of Slide Numbers */}
-                                        <div className="overflow-y-auto custom-scrollbar pr-1 pb-1 flex-1">
-                                            <div className="grid grid-cols-6 gap-2">
-                                                {questions.map((_, idx) => {
-                                                    const isCurrent = currentSlide === idx;
-                                                    const isAnswered = answeredSlidesRef.current.has(idx);
-
-                                                    let tileClasses = "h-10 w-full rounded-xl flex items-center justify-center text-xs sm:text-sm font-bold transition-all relative select-none cursor-pointer ";
-
-                                                    if (isCurrent) {
-                                                        tileClasses += "bg-blue-600 text-white font-extrabold shadow-md shadow-blue-500/35 ring-2 ring-blue-400 ring-offset-2 ring-offset-white dark:ring-offset-gray-900 scale-105 z-10";
-                                                    } else if (isAnswered) {
-                                                        tileClasses += "bg-emerald-500 hover:bg-emerald-600 text-white font-bold shadow-xs";
-                                                    } else {
-                                                        tileClasses += "bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-200 border border-gray-200/80 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400";
-                                                    }
-
-                                                    return (
-                                                        <button
-                                                            key={idx}
-                                                            ref={isCurrent ? activeSlideBtnRef : undefined}
-                                                            onClick={() => {
-                                                                setCurrentSlide(idx);
-                                                                setStep(mode === 'read' ? 2 : 0);
-                                                                setSelectedOption(null);
-                                                                setTimerSeconds(0);
-                                                                setIsNavigatorOpen(false);
-                                                            }}
-                                                            className={tileClasses}
-                                                            title={`Question ${idx + 1}`}
-                                                        >
-                                                            <span>{uiLang === 'bn' ? toBanglaNumber(idx + 1) : idx + 1}</span>
-                                                        </button>
-                                                    );
-                                                })}
-                                            </div>
-                                        </div>
-
-                                        {/* Footer Quick Jumps */}
-                                        <div className="flex items-center justify-between pt-2.5 mt-2.5 border-t border-gray-100 dark:border-gray-800 text-xs font-bold text-gray-500 dark:text-gray-400 shrink-0">
-                                            <button
-                                                onClick={() => {
-                                                    setCurrentSlide(0);
-                                                    setStep(mode === 'read' ? 2 : 0);
-                                                    setSelectedOption(null);
-                                                    setTimerSeconds(0);
-                                                    setIsNavigatorOpen(false);
-                                                }}
-                                                className="hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-1 transition-colors px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 active:scale-95"
-                                            >
-                                                <ChevronLeft className="w-3.5 h-3.5" />
-                                                <span>{uiLang === 'bn' ? 'প্রথম' : 'First'}</span>
-                                            </button>
-                                            <span className="text-[11px] font-extrabold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-2.5 py-0.5 rounded-full border border-blue-100 dark:border-blue-900/50">
-                                                {Math.round(((currentSlide + 1) / Math.max(questions.length, 1)) * 100)}%
-                                            </span>
-                                            <button
-                                                onClick={() => {
-                                                    setCurrentSlide(questions.length - 1);
-                                                    setStep(mode === 'read' ? 2 : 0);
-                                                    setSelectedOption(null);
-                                                    setTimerSeconds(0);
-                                                    setIsNavigatorOpen(false);
-                                                }}
-                                                className="hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-1 transition-colors px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 active:scale-95"
-                                            >
-                                                <span>{uiLang === 'bn' ? 'শেষ' : 'Last'}</span>
-                                                <ChevronRight className="w-3.5 h-3.5" />
-                                            </button>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-
-                        </div>
-                    </div>
-
-                    {/* Mobile Bottom Tab Bar */}
-                    <div className="md:hidden shrink-0 w-full bg-[#2d3a5e] dark:bg-[#1a2240] border-t border-white/10 flex items-center justify-around px-2 py-2.5 shadow-[0_-8px_30px_rgba(0,0,0,0.15)] z-30">
-                        {/* 1. Theme */}
-                        <button className="p-2 text-white/80 active:text-white active:scale-95 transition-transform" onClick={() => setIsDarkMode(!isDarkMode)}>
-                            {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-                        </button>
-                        {/* 2. Language */}
-                        <button className="p-2 text-white/80 active:text-white active:scale-95 transition-transform" onClick={() => setUiLang(l => l === 'bn' ? 'en' : 'bn')}>
-                            <Globe className="w-5 h-5" />
-                        </button>
-                        {/* 3. Audio / Read Aloud */}
-                        <button className={`p-2 active:scale-95 transition-transform ${isAutoPlayReadAloud || isSpeaking ? 'text-blue-400' : 'text-white/80 active:text-white'}`} onClick={() => {
-                            if (isAutoPlayReadAloud || isSpeaking) { setIsAutoPlayReadAloud(false); window.speechSynthesis.cancel(); setIsSpeaking(false); }
-                            else { setIsAutoPlayReadAloud(true); if (step !== 0) handleReadAloud(true); }
-                        }}>
-                            {isAutoPlayReadAloud || isSpeaking ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current" />}
-                        </button>
-                        {/* 4. Advance Settings */}
-                        <button className={`p-2 active:scale-95 transition-transform ${showAudioSettings ? 'text-blue-400' : 'text-white/80 active:text-white'}`} onClick={() => setShowAudioSettings(!showAudioSettings)}>
-                            <Sliders className="w-5 h-5" />
-                        </button>
-                        {/* 5. Fullscreen */}
-                        <button className="p-2 text-white/80 active:text-white active:scale-95 transition-transform" onClick={toggleFullscreen}>
-                            {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
-                        </button>
-                        {/* 6. Settings */}
-                        <button className={`p-2 active:scale-95 transition-transform ${isSettingsOpen ? 'text-blue-400' : 'text-white/80 active:text-white'}`} onClick={() => setIsSettingsOpen(!isSettingsOpen)}>
-                            <Settings className="w-5 h-5" />
-                        </button>
-                    </div>
-
-                    {/* Dynamic Responsive Font Styles */}
-                    <style dangerouslySetInnerHTML={{
-                        __html: `
-                        .responsive-fonts {
-                            --base-q-size: ${24 * qFontScale}px;
-                            --q-size: var(--base-q-size);
-                            --base-opt-size: ${16 * optFontScale}px;
-                            --opt-size: var(--base-opt-size);
-                            --exp-size: ${15 * expFontScale}px;
-                        }
-                        @media (min-width: 768px) {
-                            .responsive-fonts {
-                                --base-q-size: ${32 * qFontScale}px;
-                                --q-size: var(--base-q-size);
-                                --base-opt-size: ${20 * optFontScale}px;
-                                --opt-size: var(--base-opt-size);
-                                --exp-size: ${18 * expFontScale}px;
-                            }
-                        }
-                        @media (min-width: 1024px) {
-                            .responsive-fonts {
-                                --base-q-size: ${42 * qFontScale}px;
-                                --q-size: var(--base-q-size);
-                                --base-opt-size: ${30 * optFontScale}px;
-                                --opt-size: var(--base-opt-size);
-                                --exp-size: ${24 * expFontScale}px;
-                            }
-                        }
-                    ` }} />
-
-                    {/* Floating Quick Pen Tool (Left) */}
-                    <motion.div drag dragMomentum={false} className="absolute left-3 md:left-5 bottom-[75px] md:bottom-[90px] z-[70] flex flex-row gap-1 md:gap-2 items-center animate-in slide-in-from-left-10 fade-in duration-300 cursor-move bg-black/30 dark:bg-black/60 backdrop-blur-sm px-2 md:px-3 py-1.5 md:py-2 rounded-full border border-black/10 dark:border-white/10 shadow-sm">
-                        {/* Clear Markings Button */}
-                        <button
-                            onClick={clearCanvas}
-                            className="p-1.5 md:p-2 text-white/70 hover:text-red-400 transition-colors bg-transparent rounded-full hover:bg-white/10"
-                            title="Clear All Markings"
-                        >
-                            <Eraser className="w-4 h-4 md:w-5 md:h-5" />
-                        </button>
-
-                        {/* Main Pen Toggle Button */}
-                        <button
-                            onClick={() => {
-                                if (isPenActive && drawingTool === 'pen') {
-                                    setIsPenActive(false);
-                                } else {
-                                    setDrawingTool('pen');
-                                    setIsPenActive(true);
-                                }
-                            }}
-                            className={`p-1.5 md:p-2 rounded-full transition-all ${(isPenActive && drawingTool === 'pen')
-                                ? 'bg-blue-500 text-white scale-110 shadow-lg'
-                                : 'bg-transparent text-white/70 hover:bg-white/10 hover:text-white'
-                                }`}
-                            title="Quick Pen Toggle"
-                        >
-                            <Pen className="w-4 h-4 md:w-5 md:h-5" />
-                        </button>
-
-                        {/* Preset Colors (Visible when Pen is active, expands horizontally) */}
-                        <div className={`flex flex-row items-center gap-2 overflow-hidden transition-all duration-300 ${isPenActive && drawingTool === 'pen' ? 'w-auto opacity-100 pl-1' : 'w-0 opacity-0 pointer-events-none'}`}>
-                            {[
-                                { color: '#ef4444', name: 'Red' },
-                                { color: '#3b82f6', name: 'Blue' },
-                                { color: '#22c55e', name: 'Green' },
-                                { color: '#facc15', name: 'Yellow' },
-                                { color: '#ffffff', name: 'White' }
-                            ].map((preset) => (
-                                <button
-                                    key={preset.color}
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        setPenColor(preset.color);
-                                        setDrawingTool('pen');
-                                        setIsPenActive(true);
-                                    }}
-                                    className={`w-5 h-5 md:w-6 md:h-6 shrink-0 rounded-full transition-all shadow-sm ${penColor === preset.color ? 'scale-110 ring-2 ring-blue-300 opacity-100' : 'hover:scale-110 opacity-70 hover:opacity-100'}`}
-                                    style={{ backgroundColor: preset.color }}
-                                    title={preset.name}
-                                />
-                            ))}
-                        </div>
-                    </motion.div>
-                </div>
-
-                {/* Right Sidebar Column */}
-                <div className="hidden xl:flex w-[160px] h-full shrink-0 flex-col gap-1 z-10">
-                    {/* Railway Station Style Digital Timer (Moved here) */}
-                    {isTimerEnabled && (
-                        <div
-                            className="w-full bg-[#0c0c0c] border-2 border-[#222] rounded-xl shadow-[inset_0_0_15px_rgba(0,0,0,1),0_5px_15px_rgba(0,0,0,0.6)] flex flex-col items-center justify-center shrink-0"
-                            style={{ height: `calc(4.5rem * ${headerScale})` }}
-                        >
-                            <div className="flex items-center justify-center text-[32px] gap-0">
-                                {(() => {
-                                    const sec = timerDisplay.secs;
-                                    const h = Math.floor(sec / 3600);
-                                    const m = Math.floor((sec % 3600) / 60);
-                                    const s = sec % 60;
-
-                                    const timeStr = h > 0
-                                        ? `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
-                                        : `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-
-                                    return timeStr.split('').map((char, i) =>
-                                        char === ':' ? <SevenSegmentColon key={i} /> : <SevenSegmentDigit key={i} digit={char} />
-                                    );
-                                })()}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Live Subscribers Feed */}
-                    <LiveSubscriberFeed />
-
-                    {/* Stream Engagement Widgets */}
-                    <StreamEngagementWidget />
-
-                    {/* ── Bottom Section: Future Right Content OR Webcam ── */}
-                    {isWebcamActive ? (
-                        <div className="w-full aspect-square mt-auto relative group shrink-0">
-                            <div className={`w-full h-full overflow-hidden shadow-2xl border-2 border-indigo-400/50 bg-black/50 transition-all duration-300 ${webcamShape === 'circle' ? 'rounded-full' : 'rounded-2xl'}`}>
-                                <video
-                                    ref={webcamVideoRef}
-                                    autoPlay
-                                    playsInline
-                                    muted
-                                    className="w-full h-full object-cover pointer-events-none"
-                                />
-                            </div>
-                            <div className={`absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center pointer-events-auto ${webcamShape === 'circle' ? 'rounded-full' : 'rounded-2xl'}`}>
-                                <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm p-1.5 rounded-full shadow-lg">
-                                    <button
-                                        onClick={(e) => { e.stopPropagation(); setWebcamShape(s => s === 'circle' ? 'square' : 'circle'); }}
-                                        className="text-white p-1.5 rounded-full hover:bg-white/20 transition-colors"
-                                        title="Toggle Shape"
-                                    >
-                                        {webcamShape === 'circle' ? <Square className="w-4 h-4" /> : <Circle className="w-4 h-4" />}
-                                    </button>
-                                    <div className="w-[1px] h-6 bg-white/20 mx-1"></div>
-                                    <button
-                                        onClick={(e) => { e.stopPropagation(); toggleWebcam(); }}
-                                        className="bg-red-500 text-white p-1.5 rounded-full hover:bg-red-600 shadow-md"
-                                        title="Close Webcam"
-                                    >
-                                        <X className="w-4 h-4" />
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    ) : (
-                        <div className={`w-full aspect-square mt-auto relative group shrink-0 shadow-xl border border-indigo-200/50 dark:border-indigo-800/50 flex flex-col items-center justify-center bg-black overflow-hidden ${webcamShape === 'circle' ? 'rounded-full' : 'rounded-2xl'}`}>
-
-                            {/* Realistic Video Avatar (Option 1 Demo) */}
-                            <video
-                                src="/Teacher_speaking_to_camera.mp4"  /* 👈 Replace this URL with your own Avatar MP4 video */
-                                loop
-                                muted
-                                playsInline
-                                className="w-full h-full object-cover transition-opacity duration-300"
-                                style={{ opacity: isSpeaking ? 1 : 0.6 }}
-                                ref={(video) => {
-                                    if (video) {
-                                        if (isSpeaking) {
-                                            video.play().catch(() => { });
-                                        } else {
-                                            video.pause();
-                                        }
-                                    }
-                                }}
-                            />
-
-                            {/* Optional: Add an audio waveform indicator when speaking */}
-                            {isSpeaking && (
-                                <div className="absolute bottom-4 flex gap-1 items-center">
-                                    <div className="w-1 h-3 bg-white rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                                    <div className="w-1 h-5 bg-white rounded-full animate-bounce" style={{ animationDelay: '100ms' }}></div>
-                                    <div className="w-1 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '200ms' }}></div>
-                                </div>
-                            )}
-
-                            {/* Overlay to switch on webcam */}
-                            <div className={`absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center pointer-events-auto cursor-pointer ${webcamShape === 'circle' ? 'rounded-full' : 'rounded-2xl'}`} onClick={(e) => { e.stopPropagation(); toggleWebcam(); }}>
-                                <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-lg text-white">
-                                    <Camera className="w-4 h-4" />
-                                    <span className="text-[10px] font-bold uppercase tracking-wider">Start Cam</span>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </div>
-
-
-
-                {/* ── Session Score Overlay ── */}
-                <AnimatePresence>
-                    {isScoreVisible && (
-                        <motion.div
-                            key="score-overlay"
-                            initial={{ x: 80, opacity: 0 }}
-                            animate={{ x: 0, opacity: 1 }}
-                            exit={{ x: 80, opacity: 0 }}
-                            className="fixed top-20 right-4 z-[60] bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-2xl p-4 w-52"
-                        >
-                            <div className="flex items-center justify-between mb-3">
-                                <h3 className="font-bold text-sm text-gray-800 dark:text-gray-200 flex items-center gap-2">
-                                    <BarChart2 className="w-4 h-4 text-green-500" />
-                                    {L.sessionScore}
-                                </h3>
-                                <button onClick={() => setIsScoreVisible(false)} className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-full"><X className="w-3.5 h-3.5" /></button>
-                            </div>
-                            <div className="space-y-2">
-                                <div className="flex justify-between items-center text-xs">
-                                    <span className="flex items-center gap-1.5 font-semibold text-green-600 dark:text-green-400"><span className="w-2 h-2 rounded-full bg-green-500 inline-block"></span>{L.correct}</span>
-                                    <span className="font-black text-green-600 dark:text-green-400">{uiLang === 'bn' ? toBanglaNumber(sessionScore.correct) : sessionScore.correct}</span>
-                                </div>
-                                <div className="flex justify-between items-center text-xs">
-                                    <span className="flex items-center gap-1.5 font-semibold text-red-600 dark:text-red-400"><span className="w-2 h-2 rounded-full bg-red-500 inline-block"></span>{L.wrong}</span>
-                                    <span className="font-black text-red-600 dark:text-red-400">{uiLang === 'bn' ? toBanglaNumber(sessionScore.wrong) : sessionScore.wrong}</span>
-                                </div>
-                                <div className="flex justify-between items-center text-xs">
-                                    <span className="flex items-center gap-1.5 font-semibold text-gray-400"><span className="w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600 inline-block"></span>{L.unanswered}</span>
-                                    <span className="font-black text-gray-500">{uiLang === 'bn' ? toBanglaNumber(questions.length - sessionScore.correct - sessionScore.wrong) : questions.length - sessionScore.correct - sessionScore.wrong}</span>
-                                </div>
-                            </div>
-                            {/* Progress bar */}
-                            <div className="mt-3 h-2 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden flex gap-0.5">
-                                <div className="bg-green-500 h-full rounded-full transition-all" style={{ width: `${(sessionScore.correct / questions.length) * 100}%` }} />
-                                <div className="bg-red-500 h-full rounded-full transition-all" style={{ width: `${(sessionScore.wrong / questions.length) * 100}%` }} />
-                            </div>
-                            <div className="mt-3 flex gap-2">
-                                <button
-                                    onClick={() => { const aid = `presentation_${classLine.substring(0, 40)}`; fetchLeaderboard(aid); setIsLeaderboardOpen(true); }}
-                                    className="flex-1 text-[10px] font-bold py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors flex items-center justify-center gap-1"
-                                >
-                                    <Trophy className="w-3 h-3" />{L.leaderboard}
-                                </button>
-                                <button
-                                    onClick={async () => { await saveFinalScore(); setIsFinalScoreOpen(true); }}
-                                    className="flex-1 text-[10px] font-bold py-1.5 rounded-lg bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/50 transition-colors"
-                                >
-                                    {L.finalScore}
-                                </button>
-                            </div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-
-                {/* ── Leaderboard Modal ── */}
-                <AnimatePresence>
-                    {isLeaderboardOpen && (
-                        <motion.div
-                            key="leaderboard"
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.9 }}
-                            className="fixed inset-0 z-[70] flex items-center justify-center p-4"
-                        >
-                            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsLeaderboardOpen(false)} />
-                            <div className="relative bg-white dark:bg-gray-900 rounded-3xl shadow-2xl p-6 w-full max-w-md border border-gray-200 dark:border-gray-700">
-                                <div className="flex items-center justify-between mb-5">
-                                    <h2 className="font-black text-lg text-gray-900 dark:text-gray-100 flex items-center gap-2">
-                                        <Trophy className="w-5 h-5 text-amber-500" />
-                                        {L.topScorers}
-                                    </h2>
-                                    <button onClick={() => setIsLeaderboardOpen(false)} className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"><X className="w-5 h-5" /></button>
-                                </div>
-                                {leaderboardLoading ? (
-                                    <div className="flex items-center justify-center py-8"><div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" /></div>
-                                ) : leaderboardData.length === 0 ? (
-                                    <p className="text-center text-gray-500 dark:text-gray-400 py-8 text-sm">No scores yet. Be the first!</p>
-                                ) : (
-                                    <div className="space-y-2">
-                                        {leaderboardData.map((entry: any, idx: number) => (
-                                            <div key={idx} className={`flex items-center gap-3 p-3 rounded-xl border ${idx === 0 ? 'bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800' : 'bg-gray-50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-700/50'}`}>
-                                                <span className={`font-black text-lg w-7 text-center ${idx === 0 ? 'text-amber-500' : idx === 1 ? 'text-gray-400' : idx === 2 ? 'text-orange-400' : 'text-gray-400'}`}>{idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : idx + 1}</span>
-                                                <div className="flex-1">
-                                                    <p className="font-bold text-sm text-gray-800 dark:text-gray-200">{entry.userId === user?.uid ? userDisplayName + ' (You)' : (entry.displayName || 'Student')}</p>
-                                                    <p className="text-xs text-gray-500 dark:text-gray-400">{entry.scoreData?.correct || 0}/{entry.scoreData?.total || questions.length} correct</p>
-                                                </div>
-                                                <span className="font-black text-indigo-600 dark:text-indigo-400">{entry.scoreData?.score || 0}pts</span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-
-                {/* ── Final Score Modal ── */}
-                <AnimatePresence>
-                    {isFinalScoreOpen && (
-                        <motion.div
-                            key="final-score"
-                            initial={{ opacity: 0, scale: 0.85 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.85 }}
-                            className="fixed inset-0 z-[70] flex items-center justify-center p-4"
-                        >
-                            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setIsFinalScoreOpen(false)} />
-                            <div className="relative bg-gradient-to-br from-white to-indigo-50 dark:from-gray-900 dark:to-indigo-950 rounded-3xl shadow-2xl p-8 w-full max-w-sm border border-indigo-100 dark:border-indigo-800/50 text-center">
-                                <div className="text-5xl mb-4">{sessionScore.correct / questions.length >= 0.8 ? '🎉' : sessionScore.correct / questions.length >= 0.5 ? '👍' : '💪'}</div>
-                                <h2 className="font-black text-2xl text-gray-900 dark:text-gray-100 mb-1">{L.finalScore}</h2>
-                                <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">{classLine}</p>
-                                <div className="flex justify-center gap-6 mb-6">
-                                    <div className="text-center"><p className="text-3xl font-black text-green-500">{uiLang === 'bn' ? toBanglaNumber(sessionScore.correct) : sessionScore.correct}</p><p className="text-xs font-semibold text-gray-500 mt-1">{L.correct}</p></div>
-                                    <div className="text-center"><p className="text-3xl font-black text-red-500">{uiLang === 'bn' ? toBanglaNumber(sessionScore.wrong) : sessionScore.wrong}</p><p className="text-xs font-semibold text-gray-500 mt-1">{L.wrong}</p></div>
-                                    <div className="text-center"><p className="text-3xl font-black text-gray-400">{uiLang === 'bn' ? toBanglaNumber(questions.length - sessionScore.correct - sessionScore.wrong) : questions.length - sessionScore.correct - sessionScore.wrong}</p><p className="text-xs font-semibold text-gray-500 mt-1">{L.unanswered}</p></div>
-                                </div>
-                                <div className="h-3 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden flex mb-4">
-                                    <div className="bg-green-500 h-full transition-all" style={{ width: `${(sessionScore.correct / questions.length) * 100}%` }} />
-                                    <div className="bg-red-500 h-full transition-all" style={{ width: `${(sessionScore.wrong / questions.length) * 100}%` }} />
-                                </div>
-                                <p className="font-black text-4xl text-indigo-600 dark:text-indigo-400 mb-6">{Math.round((sessionScore.correct / questions.length) * 100)}%</p>
-                                <button onClick={() => setIsFinalScoreOpen(false)} className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl font-bold shadow-lg hover:shadow-xl transition-all hover:scale-105">Close</button>
-                            </div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-
-                {/* ── Zoom/Pan Indicator ── */}
-                {contentZoom !== 1 && (
-                    <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[55] flex items-center gap-2 bg-black/70 text-white text-xs font-bold px-3 py-1.5 rounded-full">
-                        <ZoomIn className="w-3.5 h-3.5" />
-                        <span>{Math.round(contentZoom * 100)}%</span>
-                        <button onClick={() => { setContentZoom(1); setPanOffset({ x: 0, y: 0 }); }} className="ml-1 underline opacity-70 hover:opacity-100">{L.zoomReset}</button>
-                    </div>
-                )}
-
-                {/* Cursor Highlight Overlay */}
-                {isCursorHighlightActive && (
-                    <div
-                        ref={cursorHighlightRef}
-                        className="fixed z-[9998] pointer-events-none rounded-full transition-opacity duration-150"
-                        style={{
-                            left: '0px',
-                            top: '0px',
-                            width: '40px',
-                            height: '40px',
-                            backgroundColor: 'rgba(250, 204, 21, 0.4)',
-                            border: '2px solid rgba(250, 204, 21, 0.8)',
-                            boxShadow: '0 0 15px rgba(250, 204, 21, 0.5)',
-                            transform: 'translate3d(-999px, -999px, 0)',
-                            willChange: 'transform'
-                        }}
-                    />
-                )}
-
-                {/* Spotlight Overlay */}
-                {isSpotlightActive && (
-                    <div
-                        ref={spotlightRef}
-                        className="fixed inset-0 z-[9999] pointer-events-none transition-opacity duration-300"
-                        style={{
-                            background: `radial-gradient(circle at -999px -999px, transparent 60px, rgba(0,0,0,0.85) 150px)`
-                        }}
-                    />
-                )}
-            </div> {/* Close print:hidden container */}
-
-            {/* Print Only Container */}
-            <div className="print-only hidden print:block w-full bg-white text-black relative z-[999999]" style={{ WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}>
-                {questions.map((q, idx) => {
-                    const parsedOptions = (() => {
-                        if (!q.options) return [];
-                        try { return typeof q.options === 'string' ? JSON.parse(q.options) : q.options; } catch (e) { return []; }
-                    })();
-                    const opts = parsedOptions.length > 0 ? parsedOptions : (() => {
-                        const arr = [
-                            { key: 'a', text: q.options?.a || '' },
-                            { key: 'b', text: q.options?.b || '' },
-                            { key: 'c', text: q.options?.c || '' },
-                            { key: 'd', text: q.options?.d || '' }
-                        ];
-                        if (q.options?.e) arr.push({ key: 'e', text: q.options.e });
-                        return arr.filter((x: any) => x.text);
-                    })();
-
-                    const renderQuestion = (isAnswerKey: boolean) => {
-                        const showHighlight = isAnswerKey || (isPrintWithAnswers && !isPrintBothVersions);
-                        const keyPrefix = isAnswerKey ? `ak-${idx}` : `test-${idx}`;
-
-                        return (
-                            <div key={keyPrefix} className={`w-full ${isPrintAsList ? 'py-8' : 'h-[100vh]'} flex items-center justify-center select-none font-sans ${isPrintAsList ? '' : 'overflow-hidden'} transition-colors duration-500 ${isDarkMode ? 'dark bg-gray-900' : 'bg-[#f8fbff]'}`} style={{ pageBreakAfter: isPrintAsList ? 'auto' : 'always', pageBreakInside: 'avoid' }}>
-                                {/* Main Presentation Area Only (No side banners) */}
-                                <div className={`responsive-fonts relative w-full ${isPrintAsList ? '' : 'h-full'} ${getBgThemeClasses()} flex flex-col shadow-2xl ${isPrintAsList ? '' : 'overflow-hidden'} z-10 transition-colors duration-500`}>
-                                    {bgTheme !== 'video' && (
-                                        <div className={`absolute inset-0 z-0 pointer-events-none transition-opacity duration-300 ${getBgThemeOverlayClasses()}`} style={{ opacity: bgOpacity / 100 }} />
-                                    )}
-
-                                    <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-                                        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-200/30 blur-[100px]"></div>
-                                        <div className="absolute bottom-[-10%] right-[-5%] w-[50%] h-[50%] rounded-full bg-pink-200/30 blur-[100px]"></div>
-                                        <div className="absolute top-[20%] right-[10%] w-[30%] h-[30%] rounded-full bg-purple-200/30 blur-[80px]"></div>
-                                        <div className="absolute top-0 left-0 w-full h-full" style={{ backgroundImage: 'radial-gradient(rgba(99, 102, 241, 0.06) 2px, transparent 2px)', backgroundSize: '32px 32px', opacity: 0.8 }}></div>
-                                        {!isAnswerKey && (
-                                            <>
-                                                <div className="absolute top-[15%] right-[-5%] w-72 h-72 rounded-full border-[1px] border-indigo-200/40 opacity-60"></div>
-                                                <div className="absolute top-[18%] right-[-2%] w-56 h-56 rounded-full border-[1px] border-purple-200/40 opacity-60"></div>
-                                                <div className="absolute bottom-[20%] left-[5%] w-48 h-48 rounded-full border-[1px] border-pink-200/40 opacity-60"></div>
-                                            </>
-                                        )}
-                                    </div>
-
-                                    {wmVisible && wmText && (
-                                        <div
-                                            className="absolute inset-0 pointer-events-none z-0 overflow-hidden"
-                                            style={{
-                                                backgroundImage: getWatermarkSvg(wmSpacing, wmSize, wmOpacity, wmText, isDarkMode),
-                                                backgroundRepeat: 'repeat'
-                                            }}
-                                        />
-                                    )}
-
-                                    {/* Header */}
-                                    {showHeader && (
-                                        isPrintAsList ? (
-                                            <div
-                                                className={isAnswerKey
-                                                    ? "shrink-0 bg-gradient-to-r from-green-50 via-white to-indigo-50 border-b border-green-100/50 flex flex-row justify-between items-center w-full z-30 shadow-sm relative px-6 py-4 !print-color-adjust-exact"
-                                                    : "shrink-0 bg-gradient-to-r from-indigo-50 via-white to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 border-b border-indigo-100/50 dark:border-gray-700/50 flex flex-row justify-between items-center w-full z-30 shadow-sm relative px-6 py-4 !print-color-adjust-exact"}
-                                            >
-                                                <div className="flex items-center gap-3 w-1/3">
-                                                    {showLogo && <img src="/icons/icon-192x192.png" alt="DeshExam" className="h-10 w-auto object-contain drop-shadow-sm rounded-full bg-white p-1" />}
-                                                    <div className="flex flex-col justify-center">
-                                                        <span className="font-extrabold text-indigo-950 dark:text-gray-100 leading-tight text-lg">DESH EXAM</span>
-                                                        <span className="text-indigo-800/80 dark:text-gray-400 font-bold tracking-widest uppercase mt-0.5 text-[10px]">Learn • Practice • Succeed</span>
-                                                    </div>
-                                                </div>
-                                                <div className={`flex-1 w-full px-6 flex flex-col justify-center ${isPrintAsList || headerTitleAlign === 'left' ? 'items-start text-left' : headerTitleAlign === 'right' ? 'items-end text-right' : 'items-center text-center'}`}>
-                                                    <h1 className="font-extrabold text-indigo-950 dark:text-gray-100 tracking-tight text-lg">{displayTitle}</h1>
-                                                    {displayTaxonomy && (
-                                                        <div className="text-indigo-700 dark:text-gray-400 font-bold tracking-wider uppercase mt-1 text-xs">
-                                                            {displayTaxonomy}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                                <div className="flex items-center justify-end shrink-0 w-1/3">
-                                                    <div className={isAnswerKey
-                                                        ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-full font-extrabold tracking-widest shadow-md flex items-center justify-center whitespace-nowrap px-6 py-2 text-sm !print-color-adjust-exact"
-                                                        : "bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-full font-extrabold tracking-widest shadow-md flex items-center justify-center whitespace-nowrap px-6 py-2 text-sm !print-color-adjust-exact"}
-                                                    >
-                                                        {isAnswerKey ? "ANSWER KEY" : "MOCK TEST"}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <div className={`shrink-0 w-full px-4 sm:px-6 md:px-8 py-3 md:py-4 flex items-center justify-between border-b relative z-30 transition-colors duration-300 shadow-sm ${bgTheme === 'video'
-                                                ? 'bg-black/40 border-white/10 backdrop-blur-md'
-                                                : isDarkMode
-                                                    ? 'bg-[#111827] border-gray-800'
-                                                    : 'bg-[#7c3aed] border-purple-600'
-                                                } !print-color-adjust-exact`}>
-
-                                                <div className="flex items-center gap-3 w-1/3">
-                                                    {showLogo && (
-                                                        <div className="relative">
-                                                            <div className="absolute inset-0 bg-white rounded-full blur-md opacity-20"></div>
-                                                            <img src="/icons/icon-192x192.png" alt="DeshExam" className="h-10 md:h-12 w-auto object-contain drop-shadow-lg relative z-10 rounded-full bg-white p-1" />
-                                                        </div>
-                                                    )}
-                                                    <div className="flex flex-col justify-center">
-                                                        <span className={`font-black leading-none text-lg md:text-xl ${bgTheme === 'video' ? 'text-white drop-shadow-md' : isDarkMode ? 'text-white' : 'text-white'}`}>DESH EXAM</span>
-                                                        <span className={`font-bold tracking-[0.2em] uppercase mt-1 text-[8px] md:text-[9px] ${bgTheme === 'video' ? 'text-white/80' : isDarkMode ? 'text-gray-400' : 'text-purple-200'}`}>Learn • Practice • Succeed</span>
-                                                    </div>
-                                                </div>
-                                                <div className={`flex-1 w-full px-2 flex flex-col justify-center items-center text-center`}>
-                                                    <h1 className={`font-extrabold tracking-tight text-base md:text-lg lg:text-xl line-clamp-1 ${bgTheme === 'video' ? 'text-white drop-shadow-md' : isDarkMode ? 'text-white' : 'text-white'}`}>{displayTitle}</h1>
-                                                    {displayTaxonomy && (
-                                                        <div className={`font-bold tracking-wider uppercase mt-1 text-[10px] md:text-xs ${bgTheme === 'video' ? 'text-white/90 drop-shadow-md' : isDarkMode ? 'text-gray-300' : 'text-purple-100/90'}`}>
-                                                            {displayTaxonomy}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                                <div className="flex flex-row items-center justify-end gap-2 shrink-0 w-1/3">
-                                                </div>
-                                            </div>
-                                        )
-                                    )}
-
-                                    {/* Question & Options */}
-                                    <div className={`flex-1 w-full relative flex flex-col ${isPrintAsList ? 'px-12 py-10 z-10 items-start justify-start' : 'items-center justify-center gap-8 z-10'}`}>
-
-                                        {isPrintAsList ? (
-                                            <div
-                                                className={`w-full max-w-full rounded-3xl p-12 shadow-[0_20px_50px_rgba(0,0,0,0.1)] backdrop-blur-sm border transition-all duration-500 relative z-20 ${qBgColor.startsWith('#') ? '' : qBgColor} border-white/20 dark:border-gray-700/50`}
-                                                style={{
-                                                    backgroundColor: qBgColor.startsWith('#') ? qBgColor : undefined,
-                                                    boxShadow: isDarkMode ? '0 20px 40px -10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1)' : '0 20px 40px -10px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.5)',
-                                                    backgroundImage: `linear-gradient(to right, ${isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'} 1px, transparent 1px)`,
-                                                    backgroundSize: '24px 24px'
-                                                }}
-                                            >
-                                                <div className="flex items-start gap-4 mb-12 border-b border-gray-200/50 dark:border-gray-700/50 pb-10">
-                                                    <div className="flex items-center gap-4 shrink-0">
-                                                        <span className={`font-black text-[32px] bg-clip-text text-transparent bg-gradient-to-br drop-shadow-sm ${isAnswerKey ? 'from-green-600 to-emerald-600' : 'from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400'}`}>
-                                                            Q{idx + 1}.
-                                                        </span>
-                                                    </div>
-                                                    <div className="flex-1 w-full relative pt-1">
-                                                        <div className={`prose max-w-none prose-p:font-black font-black text-[32px] leading-snug ${qTextColor !== 'default' ? 'text-[var(--q-color)]' : 'text-gray-900 dark:text-gray-100'} [&_*]:!text-[32px] [&_*]:!leading-snug [&>p]:m-0`} style={{ '--q-color': qTextColor !== 'default' ? qTextColor : undefined } as React.CSSProperties}>
-                                                            <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
-                                                                {q.questionText}
-                                                            </ReactMarkdown>
-                                                        </div>
-                                                        {q.statements && q.statements.length > 0 && (
-                                                            <div className="mt-6 flex flex-col gap-1.5 w-full pl-6 border-l-4 border-gray-300 dark:border-gray-600">
-                                                                {q.statements.map((stmt: string, sIdx: number) => (
-                                                                    <div key={sIdx} className="prose max-w-none prose-p:font-bold font-bold text-[26px] leading-[1] text-gray-700 dark:text-gray-300 [&_*]:!text-[26px] [&_*]:!leading-[1] [&>p]:m-0">
-                                                                        <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
-                                                                            {stmt}
-                                                                        </ReactMarkdown>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                </div>
-
-                                                <div className={optionsLayout === 'grid' ? "grid grid-cols-2 gap-x-12 gap-y-10" : `flex flex-col gap-8 w-full`}>
-                                                    {opts.map((opt: any, oIdx: number) => {
-                                                        const optLetter = getOptionLabel(opt.key, uiLang);
-                                                        const colorThemes = [
-                                                            { border: 'border-[#4285F4]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#4285F4]/75', letterText: 'text-white' },
-                                                            { border: 'border-[#34A853]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#34A853]/75', letterText: 'text-white' },
-                                                            { border: 'border-[#F9AB00]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#F9AB00]/75', letterText: 'text-white' },
-                                                            { border: 'border-[#EA4335]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#EA4335]/75', letterText: 'text-white' },
-                                                            { border: 'border-[#9C27B0]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#9C27B0]/75', letterText: 'text-white' },
-                                                        ];
-                                                        const theme = colorThemes[oIdx % colorThemes.length];
-
-                                                        const isCorrect = q.correctAnswer && q.correctAnswer.toLowerCase().includes(opt.key);
-                                                        const printContainerClass = showHighlight && isCorrect
-                                                            ? `flex items-center gap-5 py-2 px-3 rounded-xl border-2 border-[#34A853] bg-[#f0fdf4] min-h-[50px] !print-color-adjust-exact`
-                                                            : `flex items-center gap-5 py-2 px-3 rounded-xl border-2 shadow-[0_4px_12px_rgba(0,0,0,0.04)] ${optBgColor === 'default' ? theme.bg : (optBgColor.startsWith('#') ? '' : optBgColor)} ${theme.border} min-h-[50px]`;
-                                                        const printLetterClass = showHighlight && isCorrect
-                                                            ? `shrink-0 w-14 h-14 flex items-center justify-center rounded-full text-2xl font-black bg-[#34A853] text-white !print-color-adjust-exact`
-                                                            : `shrink-0 w-14 h-14 flex items-center justify-center rounded-full text-2xl font-black ${theme.letterBg} ${theme.letterText}`;
-
-                                                        return (
-                                                            <div key={opt.key} className={printContainerClass} style={{ backgroundColor: (optBgColor !== 'default' && optBgColor.startsWith('#')) ? optBgColor : undefined }}>
-                                                                <div className={printLetterClass}>
-                                                                    {optLetter}
-                                                                </div>
-                                                                <div className={`prose dark:prose-invert max-w-none font-bold text-[24px] flex items-center [&_*]:!text-[24px] [&_*]:!leading-tight [&_*]:!m-0 ${optTextColor !== 'default' ? 'text-[var(--opt-color)] [&_*]:!text-[var(--opt-color)]' : 'text-black dark:text-gray-100'}`} style={{ '--opt-color': optTextColor !== 'default' ? optTextColor : undefined } as React.CSSProperties}>
-                                                                    <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
-                                                                        {opt.text}
-                                                                    </ReactMarkdown>
-                                                                </div>
-                                                                {showHighlight && isCorrect && (
-                                                                    <div className="shrink-0 text-white bg-[#34A853] rounded-full p-1.5 shadow-sm ml-auto !print-color-adjust-exact">
-                                                                        <Check className="w-7 h-7 stroke-[3]" />
-                                                                    </div>
-                                                                )}
-                                                            </div>
-                                                        );
-                                                    })}
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <div className="w-full flex flex-col items-center flex-1 !print-color-adjust-exact mt-8">
-                                                <div
-                                                    className={`flex flex-col items-center justify-center gap-4 w-[94%] sm:w-full min-w-[300px] md:min-w-[600px] max-w-4xl xl:max-w-5xl min-h-[120px] md:min-h-[160px] md:max-h-[260px] mx-auto mt-1 md:mt-1 transition-all duration-300 relative z-10 rounded-t-2xl rounded-b-[0.5rem] border shadow-[0_8px_32px_rgba(0,0,0,0.10)] p-6 md:p-8 md:px-10 ${qBgColor !== 'transparent' ? `${qBgColor.startsWith('#') ? '' : qBgColor} border-gray-200/50 dark:border-gray-700/50` : 'bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-gray-100/80 dark:border-slate-700/40'} !print-color-adjust-exact`}
-                                                    style={{
-                                                        containerType: 'inline-size',
-                                                        backgroundColor: qBgColor.startsWith('#') ? qBgColor : undefined,
-                                                        '--q-size': (() => {
-                                                            const hasStmts = q.statements && q.statements.length > 0;
-                                                            const stmtLines = q.statements ? q.statements.length : 0;
-                                                            const stmtLen = q.statements ? q.statements.join(' ').length : 0;
-                                                            const tLen = (q.questionText?.length || 0) + stmtLen;
-                                                            const multiplier = tLen <= 45 ? 1.6 : 2.8;
-                                                            if (hasStmts) {
-                                                                return `min(calc(var(--base-q-size) * 0.85), calc((min(94vw, 1000px) - 120px) * ${multiplier} / ${Math.max(1, tLen)}))`;
-                                                            }
-                                                            return `min(var(--base-q-size), calc((min(94vw, 1000px) - 120px) * ${multiplier} / ${Math.max(1, tLen)}))`;
-                                                        })(),
-                                                        '--q-color': qTextColor !== 'default' ? qTextColor : undefined,
-                                                        borderTopColor: bgTheme === 'video' ? 'rgba(255,255,255,0.4)' : [
-                                                            '#6366f1', '#3b82f6', '#10b981', '#f43f5e', '#f59e0b', '#a855f7'
-                                                        ][idx % 6],
-                                                        borderTopWidth: '4px',
-                                                        ...(qBgColor !== 'transparent' && bgTheme === 'dots' ? {
-                                                            backgroundImage: `radial-gradient(${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'} 1.5px, transparent 1.5px)`,
-                                                            backgroundSize: '16px 16px'
-                                                        } : qBgColor !== 'transparent' && bgTheme === 'grid' ? {
-                                                            backgroundImage: `linear-gradient(to right, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px)`,
-                                                            backgroundSize: '16px 16px'
-                                                        } : {
-                                                            backgroundImage: 'none',
-                                                            backgroundSize: 'auto'
-                                                        })
-                                                    } as unknown as React.CSSProperties}
-                                                >
-                                                    <div className="absolute -top-8 md:-top-10 left-1/2 -translate-x-1/2 flex items-center justify-center z-20 !print-color-adjust-exact">
-                                                        <div className={`w-16 h-16 md:w-20 md:h-20 flex items-center justify-center rounded-full shadow-xl border-2 backdrop-blur-md font-black text-3xl md:text-5xl ${bgTheme === 'video' ? 'bg-black/50 border-white/30 text-white' : `${[
-                                                            'from-indigo-600 to-violet-600 dark:from-indigo-500 dark:to-violet-500',
-                                                            'from-blue-600 to-cyan-600 dark:from-blue-500 dark:to-cyan-500',
-                                                            'from-emerald-600 to-teal-600 dark:from-emerald-500 dark:to-teal-500',
-                                                            'from-rose-600 to-pink-600 dark:from-rose-500 dark:to-pink-500',
-                                                            'from-amber-500 to-orange-500 dark:from-amber-400 dark:to-orange-500',
-                                                            'from-fuchsia-600 to-purple-600 dark:from-fuchsia-500 dark:to-purple-500'
-                                                        ][idx % 6]} bg-gradient-to-tr border-white dark:border-slate-800 text-white`}`}>
-                                                            {uiLang === 'bn' ? toBanglaNumber(idx + 1) : idx + 1}
-                                                        </div>
-                                                    </div>
-                                                    <div className="absolute top-2.5 md:top-3.5 left-4 md:left-8 flex items-center gap-2 md:gap-2.5 z-20 pointer-events-none select-none !print-color-adjust-exact">
-                                                        <MetallicScrew rotation={15} />
-                                                        <MetallicScrew rotation={68} />
-                                                        <MetallicScrew rotation={125} />
-                                                    </div>
-                                                    <div className="absolute top-2.5 md:top-3.5 right-4 md:right-8 flex items-center gap-2 md:gap-2.5 z-20 pointer-events-none select-none !print-color-adjust-exact">
-                                                        <MetallicScrew rotation={35} />
-                                                        <MetallicScrew rotation={95} />
-                                                        <MetallicScrew rotation={155} />
-                                                    </div>
-                                                    <div className={`prose dark:prose-invert max-w-none w-full prose-p:font-extrabold text-[length:var(--q-size)] leading-relaxed text-left font-extrabold [&_*]:!text-[length:var(--q-size)] [&_*]:!leading-relaxed [&_*]:!m-0 ${qTextColor !== 'default' ? 'text-[var(--q-color)] [&_*]:!text-[var(--q-color)] drop-shadow-sm [&_*]:!drop-shadow-sm' : (bgTheme === 'video' ? 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] [&_*]:!text-white [&_*]:!drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]' : 'text-slate-900 dark:text-white [&_*]:!text-slate-900 dark:[&_*]:!text-white')}`}>
-                                                        <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
-                                                            {q.questionText}
-                                                        </ReactMarkdown>
-                                                    </div>
-                                                    {q.statements && q.statements.length > 0 && (
-                                                        <div className="mt-4 mb-2 flex flex-col gap-1 w-full pl-4 md:pl-8 border-l-4 border-gray-300 dark:border-gray-600 self-start">
-                                                            {q.statements.map((stmt: string, sIdx: number) => (
-                                                                <div key={sIdx} className={`prose dark:prose-invert max-w-none w-full prose-p:font-bold text-[calc(var(--q-size)*0.85)] leading-[1] text-left font-bold [&_*]:!text-[calc(var(--q-size)*0.85)] [&_*]:!leading-[1] [&_*]:!m-0 ${qTextColor !== 'default' ? 'text-[var(--q-color)] [&_*]:!text-[var(--q-color)]' : 'text-slate-700 dark:text-gray-300 [&_*]:!text-slate-700 dark:[&_*]:!text-gray-300'}`}>
-                                                                    <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
-                                                                        {stmt}
-                                                                    </ReactMarkdown>
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    )}
-                                                </div>
-
-                                                <div className="relative w-full max-w-[1200px] flex justify-center mt-6 md:mt-8 mb-4 mx-auto !print-color-adjust-exact">
-                                                    <div className={optionsLayout === 'grid' ? "grid grid-cols-2 gap-x-6 gap-y-6 w-[94%] sm:w-full max-w-4xl xl:max-w-5xl mx-auto" : "flex flex-col gap-y-3 w-[94%] sm:w-full max-w-4xl xl:max-w-5xl mx-auto"}>
-                                                        {(() => {
-                                                            const maxOptLen = opts.length > 0 ? Math.max(...opts.map((o: any) => o.text?.length || 0)) : 1;
-                                                            if ((step >= 2 && q.explanation && isExpEnabled) || isManualExpOpen) return null;
-                                                            return opts.map((opt: any, oIdx: number) => {
-                                                                const isCorrect = q.correctAnswer && q.correctAnswer.toLowerCase().includes(opt.key);
-                                                                const optLetter = getOptionLabel(opt.key, uiLang);
-                                                                const showCorrect = showHighlight && isCorrect;
-
-                                                                const colorThemes = [
-                                                                    { border: 'border-[#4285F4]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#4285F4]', letterText: 'text-white' }, // Blue
-                                                                    { border: 'border-[#34A853]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#34A853]', letterText: 'text-white' }, // Green
-                                                                    { border: 'border-[#F9AB00]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#F9AB00]', letterText: 'text-white' }, // Yellow/Orange
-                                                                    { border: 'border-[#EA4335]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#EA4335]', letterText: 'text-white' }, // Red
-                                                                    { border: 'border-[#9C27B0]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#9C27B0]', letterText: 'text-white' }, // Purple
-                                                                ];
-                                                                const theme = colorThemes[oIdx % colorThemes.length];
-
-                                                                const bgClass = optBgColor === 'default' ? theme.bg : (optBgColor.startsWith('#') ? '' : optBgColor);
-                                                                let containerClasses = `flex items-center gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 transition-all duration-200 shadow-[0_4px_12px_rgba(0,0,0,0.04)] relative z-10 select-none ${bgClass} ${theme.border} !print-color-adjust-exact`;
-                                                                let letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 ${theme.letterBg} ${theme.letterText} !print-color-adjust-exact`;
-
-                                                                if (showCorrect) {
-                                                                    containerClasses = `flex items-center gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 ring-4 ring-[#34A853]/30 bg-[#f0fdf4] dark:bg-[#064e3b] border-[#34A853] z-10 relative select-none !print-color-adjust-exact`;
-                                                                    letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 bg-[#34A853] text-white !print-color-adjust-exact`;
-                                                                }
-
-                                                                return (
-                                                                    <div key={opt.key} className="flex flex-col gap-2 w-full relative !print-color-adjust-exact">
-                                                                        <div
-                                                                            className={containerClasses}
-                                                                            style={{
-                                                                                containerType: 'inline-size',
-                                                                                backgroundColor: (optBgColor !== 'default' && optBgColor.startsWith('#')) ? optBgColor : undefined,
-                                                                                ...(bgTheme === 'dots' ? {
-                                                                                    backgroundImage: `radial-gradient(${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'} 1.5px, transparent 1.5px)`,
-                                                                                    backgroundSize: '12px 12px'
-                                                                                } : bgTheme === 'grid' ? {
-                                                                                    backgroundImage: `linear-gradient(to right, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px)`,
-                                                                                    backgroundSize: '12px 12px'
-                                                                                } : {
-                                                                                    backgroundImage: 'none',
-                                                                                    backgroundSize: 'auto'
-                                                                                })
-                                                                            }}
-                                                                        >
-                                                                            <div className={letterClasses}>
-                                                                                {optLetter}
-                                                                            </div>
-                                                                            <div className={`prose dark:prose-invert max-w-none w-full leading-snug flex-1 font-bold text-[length:min(calc(var(--q-size)*0.85),calc((min(45vw,500px)-100px)*1.2/${Math.max(1, maxOptLen)}))] [&_*]:!text-[length:min(calc(var(--q-size)*0.85),calc((min(45vw,500px)-100px)*1.2/${Math.max(1, maxOptLen)}))] [&_*]:!leading-snug [&_*]:!m-0 [&_*]:whitespace-nowrap [&_*]:overflow-hidden [&_*]:text-ellipsis ${optTextColor !== 'default' ? 'text-[var(--opt-color)] [&_*]:!text-[var(--opt-color)]' : 'text-slate-800 dark:text-slate-100'}`} style={{ '--opt-color': optTextColor !== 'default' ? optTextColor : undefined } as React.CSSProperties}>
-                                                                                <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
-                                                                                    {opt.text}
-                                                                                </ReactMarkdown>
-                                                                            </div>
-                                                                            {showCorrect && (
-                                                                                <div className="shrink-0 text-white bg-[#34A853] rounded-full p-1 shadow-sm ml-auto z-10 !print-color-adjust-exact">
-                                                                                    <Check className="w-5 h-5 md:w-6 md:h-6 stroke-[3]" />
-                                                                                </div>
-                                                                            )}
-                                                                        </div>
-                                                                    </div>
-                                                                );
-                                                            });
-                                                        })()}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {!isPrintAsList && (
-                                        <div className={`shrink-0 w-full px-4 sm:px-6 md:px-8 py-3 flex items-center justify-between relative z-30 transition-colors duration-300 ${bgTheme === 'video' ? 'bg-black/40 border-t border-white/10 backdrop-blur-md' : isDarkMode ? 'bg-[#111827] border-t border-gray-800' : 'bg-[#7c3aed] border-t border-purple-600'} !print-color-adjust-exact`}>
-                                            <div className="text-white/90 text-sm font-medium tracking-wide !print-color-adjust-exact">
-                                                © DeshExam.app
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        );
-                    };
-
-                    return (
-                        <React.Fragment key={idx}>
-                            {renderQuestion(false)}
-                            {isPrintBothVersions && renderQuestion(true)}
-                        </React.Fragment>
-                    );
-                })}
-            </div>
-
             {/* Audio Settings Panel */}
             {showAudioSettings && (
                 <div className="fixed bottom-24 right-4 md:right-8 bg-gray-900 border border-gray-700 rounded-2xl p-4 md:p-5 shadow-2xl z-[100000] w-[90vw] sm:w-80 md:w-96 animate-in slide-in-from-bottom-4 flex flex-col max-h-[75vh]">
