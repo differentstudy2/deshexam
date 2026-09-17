@@ -4024,14 +4024,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     <Camera className="w-5 h-5 md:w-6 md:h-6" />
                                 </button>
 
-                                {/* TTS Read Aloud Button */}
-                                <button
-                                    onClick={() => handleReadAloud()}
-                                    className={`hidden sm:block p-2 md:p-3 rounded-full transition-all shrink-0 ${isSpeaking ? 'bg-pink-500 text-white shadow-md animate-pulse ring-2 ring-pink-300' : 'hover:bg-white/10 text-white/80 hover:text-white'}`}
-                                    title="Read Question Aloud (TTS)"
-                                >
-                                    <Volume2 className="w-5 h-5 md:w-6 md:h-6" />
-                                </button>
+
 
                                 {/* Audio Settings Button */}
                                 <button
@@ -5474,7 +5467,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                             {/* Realistic Video Avatar (Option 1 Demo) */}
                             <video
-                                src="/avatar.mp4" /* 👈 Replace this URL with your own Avatar MP4 video */
+                                src="/Teacher_speaking_to_camera.mp4"  /* 👈 Replace this URL with your own Avatar MP4 video */
                                 loop
                                 muted
                                 playsInline
