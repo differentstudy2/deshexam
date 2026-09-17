@@ -2907,7 +2907,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
     return createPortal(
         <>
-            <div style={{ fontFamily }} className={`print:hidden fixed inset-0 w-full h-full z-[99999] flex items-center justify-between p-3 mb-3 gap-1 md:gap-1 xl:gap-1 select-none font-sans overflow-hidden transition-colors duration-500 ${isDarkMode ? 'dark bg-gray-900' : 'bg-[#f8fbff]'}`}>
+            <div style={{ fontFamily }} className={`print:hidden fixed inset-0 w-full h-full z-[99999] flex flex-col md:flex-row items-center justify-between p-0 md:p-3 mb-0 md:mb-3 gap-0 md:gap-1 xl:gap-1 select-none font-sans overflow-hidden transition-colors duration-500 ${isDarkMode ? 'dark bg-gray-900' : 'bg-[#f8fbff]'}`}>
                 <style>{`
                     ::highlight(tts-word-highlight) {
                         ${ttsWordHighlightStyle === 'bg' ? `background-color: ${ttsWordHighlightColor}88; color: inherit; border-radius: ${ttsWordHighlightRadius}px; text-shadow: 0 0 8px ${ttsWordHighlightColor}66;` : ''}
@@ -3308,12 +3308,12 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     {showHeader && (
                         <div
                             className="shrink-0 bg-gradient-to-r from-[#008b18] via-[#3b82f6] to-[#030c06] dark:from-[#008b18]/90 dark:via-[#3b82f6]/90 dark:to-[#030c06]/90 border-b border-blue-400/30 dark:border-blue-700/50 w-full z-30 relative transition-all duration-500"
-                            style={{ boxShadow: '0 4px 20px rgba(109,40,217,0.3), 0 1px 0 rgba(255,255,255,0.12)' }}
+                            style={{ boxShadow: '0 8px 30px rgba(0,0,0,0.2), 0 2px 4px rgba(0,0,0,0.1)' }}
                         >
                             {/* Mobile Header Row */}
-                            <div className="flex md:hidden items-center justify-between px-3 py-2 gap-2">
+                            <div className="flex md:hidden items-center justify-between px-0 py-0 gap-2">
                                 {/* Left: Logo + Title */}
-                                <div className="flex items-center gap-2 min-w-0 flex-1">
+                                <div className="flex items-center gap-2 min-w-0 flex-1 px-2">
                                     {showLogo && (
                                         <img src="/icons/icon-192x192.png" alt="DeshExam" className="w-9 h-9 shrink-0 object-contain drop-shadow-sm rounded-full bg-white p-0.5" />
                                     )}
@@ -3623,17 +3623,18 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                                     {/* Mobile Unified White Card Wrapper */}
                                     <div className="md:hidden w-full px-4 pt-4 pb-3 flex flex-col gap-3">
-                                        <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-md overflow-hidden">
+                                        {/* Question Card */}
+                                        <div className="relative bg-white dark:bg-slate-800 rounded-t-[1rem] rounded-b-[0.3rem] shadow-md border border-gray-100 dark:border-slate-700 overflow-visible border-t-4 border-t-blue-500 mt-3">
                                             {/* Mobile Question Number Pill */}
-                                            <div className="flex justify-center pt-4 pb-2">
-                                                <div className="bg-blue-500 dark:bg-blue-600 text-white px-5 py-1 rounded-full text-sm font-bold shadow-sm">
-                                                    {uiLang === 'bn' ? 'প্রশ্ন' : 'Question'} {uiLang === 'bn' ? toBanglaNumber(currentSlide + 1) : String(currentSlide + 1).padStart(2, '0')}
+                                            <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-20">
+                                                <div className="bg-blue-500 dark:bg-blue-600 text-white px-5 py-0.5 rounded-full text-[13px] font-bold shadow-sm whitespace-nowrap">
+                                                    {uiLang === 'bn' ? 'প্রশ্ন' : 'Question'} {uiLang === 'bn' ? toBanglaNumber(currentSlide + 1).padStart(2, '০') : String(currentSlide + 1).padStart(2, '0')}
                                                 </div>
                                             </div>
 
                                             {/* Mobile Question Text */}
-                                            <div className="px-5 pb-4">
-                                                <div data-read-cursor-target="question" className={`prose dark:prose-invert max-w-none w-full prose-p:font-extrabold text-[length:var(--q-size)] leading-relaxed text-center font-extrabold [&_*]:!text-[length:var(--q-size)] [&_*]:!leading-relaxed [&_*]:!m-0 ${qTextColor !== 'default' ? 'text-[var(--q-color)] [&_*]:!text-[var(--q-color)]' : (bgTheme === 'video' ? 'text-white [&_*]:!text-white' : 'text-slate-900 dark:text-white [&_*]:!text-slate-900 dark:[&_*]:!text-white')} ${activeTTSBlock === 'question' ? 'scale-[1.01] origin-left transition-all duration-300' : 'transition-all duration-300'}`} style={{ '--q-color': qTextColor !== 'default' ? qTextColor : undefined } as React.CSSProperties}>
+                                            <div className="px-5 pb-4 pt-6">
+                                                <div data-read-cursor-target="question" className={`prose dark:prose-invert max-w-none w-full prose-p:font-extrabold text-[length:var(--q-size)] leading-relaxed text-center font-extrabold [&_*]:!text-[length:var(--q-size)] [&_*]:!leading-relaxed [&_*]:!m-0 ${qTextColor !== 'default' ? 'text-[var(--q-color)] [&_*]:!text-[var(--q-color)]' : (bgTheme === 'video' ? 'text-white [&_*]:!text-white' : 'text-slate-900 dark:text-white [&_*]:!text-slate-900 dark:[&_*]:!text-white')} ${activeTTSBlock === 'question' ? 'scale-[1.01] origin-center transition-all duration-300' : 'transition-all duration-300'}`} style={{ '--q-color': qTextColor !== 'default' ? qTextColor : undefined } as React.CSSProperties}>
                                                     <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
                                                         {q.questionText}
                                                     </ReactMarkdown>
@@ -3648,492 +3649,474 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     </div>
                                                 )}
                                             </div>
+                                        </div>
 
-                                            {/* Mobile Options */}
-                                            {!((step >= 2 && q.explanation && isExpEnabled) || isManualExpOpen) && parsedOptions.length > 0 && (
-                                                <div className="flex flex-col gap-0 border-t border-gray-100 dark:border-slate-700">
-                                                    {parsedOptions.map((opt: { key: string, text: string }, oIdx: number) => {
-                                                        const isCorrect = q.correctAnswer && q.correctAnswer.toLowerCase().includes(opt.key);
-                                                        const optLetter = getOptionLabel(opt.key, uiLang);
-                                                        const showCorrect = step >= 1 && isCorrect;
-                                                        const showWrong = step >= 1 && !isCorrect;
-                                                        const isSelected = selectedOption === opt.key;
-                                                        const isEliminated = eliminatedOptions.includes(opt.key);
+                                        {/* Mobile Options */}
+                                        {!((step >= 2 && q.explanation && isExpEnabled) || isManualExpOpen) && parsedOptions.length > 0 && (
+                                            <div className="flex flex-col gap-2.5">
+                                                {parsedOptions.map((opt: { key: string, text: string }, oIdx: number) => {
+                                                    const isCorrect = q.correctAnswer && q.correctAnswer.toLowerCase().includes(opt.key);
+                                                    const optLetter = getOptionLabel(opt.key, uiLang);
+                                                    const showCorrect = step >= 1 && isCorrect;
+                                                    const showWrong = step >= 1 && !isCorrect;
+                                                    const isSelected = selectedOption === opt.key;
+                                                    const isEliminated = eliminatedOptions.includes(opt.key);
 
-                                                        const mobileColors = [
-                                                            { bg: 'bg-[#4285F4]', selectedBg: 'bg-blue-50 dark:bg-blue-950', selectedBorder: 'border-[#4285F4]' },
-                                                            { bg: 'bg-[#34A853]', selectedBg: 'bg-green-50 dark:bg-green-950', selectedBorder: 'border-[#34A853]' },
-                                                            { bg: 'bg-[#F9AB00]', selectedBg: 'bg-yellow-50 dark:bg-yellow-950', selectedBorder: 'border-[#F9AB00]' },
-                                                            { bg: 'bg-[#EA4335]', selectedBg: 'bg-red-50 dark:bg-red-950', selectedBorder: 'border-[#EA4335]' },
-                                                        ];
-                                                        const mc = mobileColors[oIdx % mobileColors.length];
+                                                    const mobileColors = [
+                                                        { bg: 'bg-[#4285F4]', selectedBg: 'bg-blue-50 dark:bg-blue-950', selectedBorder: 'border-[#4285F4]' },
+                                                        { bg: 'bg-[#34A853]', selectedBg: 'bg-green-50 dark:bg-green-950', selectedBorder: 'border-[#34A853]' },
+                                                        { bg: 'bg-[#F9AB00]', selectedBg: 'bg-yellow-50 dark:bg-yellow-950', selectedBorder: 'border-[#F9AB00]' },
+                                                        { bg: 'bg-[#EA4335]', selectedBg: 'bg-red-50 dark:bg-red-950', selectedBorder: 'border-[#EA4335]' },
+                                                    ];
+                                                    const mc = mobileColors[oIdx % mobileColors.length];
 
-                                                        let rowBg = 'bg-white dark:bg-slate-800';
-                                                        let rowBorder = 'border-t border-gray-100 dark:border-slate-700';
-                                                        let textOpacity = '';
-                                                        if (isEliminated && step === 0) { textOpacity = 'opacity-40 grayscale'; }
-                                                        else if (isSelected && step === 0) { rowBg = mc.selectedBg; rowBorder = `border-t border-l-4 ${mc.selectedBorder}`; }
-                                                        else if (showCorrect) { rowBg = 'bg-green-50 dark:bg-green-950'; rowBorder = 'border-t border-l-4 border-[#34A853]'; }
-                                                        else if (showWrong && isSelected) { rowBg = 'bg-red-50 dark:bg-red-950'; rowBorder = 'border-t border-l-4 border-[#EA4335]'; }
+                                                    let rowBg = 'bg-white dark:bg-slate-800';
+                                                    let rowBorder = 'border border-gray-100 dark:border-slate-700';
+                                                    let textOpacity = '';
+                                                    if (isEliminated && step === 0) { textOpacity = 'opacity-40 grayscale'; }
+                                                    else if (isSelected && step === 0) { rowBg = mc.selectedBg; rowBorder = `border border-l-4 ${mc.selectedBorder}`; }
+                                                    else if (showCorrect) { rowBg = 'bg-green-50 dark:bg-green-950'; rowBorder = 'border border-l-4 border-[#34A853]'; }
+                                                    else if (showWrong && isSelected) { rowBg = 'bg-red-50 dark:bg-red-950'; rowBorder = 'border border-l-4 border-[#EA4335]'; }
 
-                                                        return (
-                                                            <div
-                                                                key={oIdx}
-                                                                className={`flex items-center gap-3 px-4 py-3.5 cursor-pointer active:scale-[0.99] select-none transition-all duration-150 ${rowBg} ${rowBorder} ${textOpacity}`}
-                                                                onClick={() => {
-                                                                    if (step === 0 && !isEliminated) {
-                                                                        setSelectedOption(opt.key);
-                                                                        setStep(1);
-                                                                        if (q.correctAnswer) {
-                                                                            const isCor = q.correctAnswer.toLowerCase().trim().includes(opt.key);
-                                                                            updateSessionScore(currentSlide, isCor);
-                                                                            if (isCor) {
-                                                                                const newConsecutive = consecutiveCorrect + 1;
-                                                                                setConsecutiveCorrect(newConsecutive);
-                                                                                setIsConfettiActive(true);
-                                                                                triggerCelebration(newConsecutive);
-                                                                                setTimeout(() => setIsConfettiActive(false), 2000);
-                                                                                if (popAudioRef.current) { popAudioRef.current.currentTime = 0; popAudioRef.current.play().catch(() => {}); }
-                                                                            } else {
-                                                                                setConsecutiveCorrect(0);
-                                                                                if (wrongAudioRef.current) { wrongAudioRef.current.currentTime = 0; wrongAudioRef.current.play().catch(() => {}); }
-                                                                            }
+                                                    return (
+                                                        <div
+                                                            key={oIdx}
+                                                            className={`flex items-center gap-3 px-4 py-3.5 rounded-2xl shadow-sm cursor-pointer active:scale-[0.99] select-none transition-all duration-150 ${rowBg} ${rowBorder} ${textOpacity}`}
+                                                            onClick={() => {
+                                                                if (step === 0 && !isEliminated) {
+                                                                    setSelectedOption(opt.key);
+                                                                    setStep(1);
+                                                                    if (q.correctAnswer) {
+                                                                        const isCor = q.correctAnswer.toLowerCase().trim().includes(opt.key);
+                                                                        updateSessionScore(currentSlide, isCor);
+                                                                        if (isCor) {
+                                                                            const newConsecutive = consecutiveCorrect + 1;
+                                                                            setConsecutiveCorrect(newConsecutive);
+                                                                            setIsConfettiActive(true);
+                                                                            triggerCelebration(newConsecutive);
+                                                                            setTimeout(() => setIsConfettiActive(false), 2000);
+                                                                            if (winAudioRef.current) { winAudioRef.current.currentTime = 0; winAudioRef.current.play().catch(() => { }); }
+                                                                        } else {
+                                                                            setConsecutiveCorrect(0);
+                                                                            if (wrongAudioRef.current) { wrongAudioRef.current.currentTime = 0; wrongAudioRef.current.play().catch(() => { }); }
                                                                         }
                                                                     }
-                                                                }}
-                                                            >
-                                                                <div className={`shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-white font-black text-base ${mc.bg} ${(showCorrect) ? 'bg-[#34A853]' : (showWrong && isSelected) ? 'bg-[#EA4335]' : ''}`}>
-                                                                    {optLetter}
-                                                                </div>
-                                                                <div className="flex-1 text-slate-800 dark:text-white font-semibold text-base leading-snug">
-                                                                    <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>{opt.text}</ReactMarkdown>
-                                                                </div>
-                                                                {isSelected && step === 0 && <Check className="w-5 h-5 text-blue-500 shrink-0" strokeWidth={3} />}
-                                                                {step >= 1 && showCorrect && <Check className="w-5 h-5 text-[#34A853] shrink-0" strokeWidth={3} />}
-                                                                {step >= 1 && showWrong && isSelected && <X className="w-5 h-5 text-[#EA4335] shrink-0" strokeWidth={3} />}
+                                                                }
+                                                            }}
+                                                        >
+                                                            <div className={`shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-white font-black text-base ${mc.bg} ${(showCorrect) ? 'bg-[#34A853]' : (showWrong && isSelected) ? 'bg-[#EA4335]' : ''}`}>
+                                                                {optLetter}
                                                             </div>
-                                                        );
-                                                    })}
-                                                </div>
-                                            )}
+                                                            <div className="flex-1 text-slate-800 dark:text-white font-bold text-[17px] leading-snug">
+                                                                <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>{opt.text}</ReactMarkdown>
+                                                            </div>
+                                                            {isSelected && step === 0 && <Check className="w-6 h-6 text-blue-500 shrink-0 animate-pop-in" strokeWidth={3} />}
+                                                            {step >= 1 && showCorrect && <Check className="w-7 h-7 text-[#34A853] shrink-0 animate-pop-in drop-shadow-md" strokeWidth={3.5} />}
+                                                            {step >= 1 && showWrong && isSelected && <X className="w-6 h-6 text-[#EA4335] shrink-0 animate-pop-in" strokeWidth={3.5} />}
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        )}
 
-                                            {/* Mobile Explanation */}
-                                            {((step >= 2 && q.explanation && isExpEnabled) || isManualExpOpen) && q.explanation && (
-                                                <div className="border-t border-blue-100 dark:border-blue-900 bg-blue-50 dark:bg-blue-950/50 px-5 py-4">
-                                                    <div className="flex items-center gap-2 mb-2">
-                                                        <div className="bg-blue-500 text-white px-3 py-0.5 rounded-full text-xs font-bold">Explanation</div>
-                                                    </div>
-                                                    <div className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 text-sm font-medium">
-                                                        <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>{q.explanation}</ReactMarkdown>
-                                                    </div>
+                                        {/* Mobile Explanation */}
+                                        {((step >= 2 && q.explanation && isExpEnabled) || isManualExpOpen) && q.explanation && (
+                                            <div className="bg-blue-50 dark:bg-blue-950/50 rounded-2xl border border-blue-100 dark:border-blue-900 px-5 py-4 shadow-sm">
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    <div className="bg-blue-500 text-white px-3 py-0.5 rounded-full text-xs font-bold">Explanation</div>
                                                 </div>
-                                            )}
-                                        </div>
+                                                <div className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 text-[15px] leading-relaxed font-semibold">
+                                                    <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>{q.explanation}</ReactMarkdown>
+                                                </div>
+                                            </div>
+                                        )}
 
-                                        {/* Mobile Navigation Row */}
-                                        <div className="flex items-center justify-between gap-3 px-1 pb-2">
-                                            <button
-                                                onClick={prevStep}
-                                                disabled={currentSlide === 0}
-                                                className="flex-1 flex items-center justify-center gap-1.5 py-3 rounded-2xl bg-white dark:bg-slate-800 shadow-sm border border-gray-200 dark:border-slate-700 text-slate-700 dark:text-white font-bold text-sm disabled:opacity-40 active:scale-95 transition-all"
-                                            >
-                                                <ChevronLeft className="w-4 h-4" /> {uiLang === 'bn' ? 'আগে' : 'Prev'}
-                                            </button>
-                                            <span className="text-slate-500 dark:text-slate-400 font-bold text-xs">{currentSlide + 1}/{questions.length}</span>
-                                            <button
-                                                onClick={nextStep}
-                                                disabled={currentSlide >= questions.length - 1}
-                                                className="flex-1 flex items-center justify-center gap-1.5 py-3 rounded-2xl bg-blue-600 text-white shadow-sm font-bold text-sm disabled:opacity-40 active:scale-95 transition-all"
-                                            >
-                                                {uiLang === 'bn' ? 'পরে' : 'Next'} <ChevronRight className="w-4 h-4" />
-                                            </button>
-                                        </div>
                                     </div>
 
                                     {/* Desktop Layout — hidden on mobile */}
                                     <div className="hidden md:contents">
 
-                                    {/* Question */}
-                                    <div
-                                        className={`flex flex-col items-center justify-center gap-4 w-[94%] sm:w-full min-w-[300px] md:min-w-[600px] max-w-4xl xl:max-w-5xl min-h-[120px] md:min-h-[160px] md:max-h-[260px] mx-auto mt-6 md:mt-1 transition-all duration-300 relative z-10 rounded-[2rem] md:rounded-t-2xl md:rounded-b-[0.5rem] border shadow-sm md:shadow-[0_8px_32px_rgba(0,0,0,0.10)] p-5 md:p-8 md:px-10 ${qBgColor !== 'transparent' ? `md:${qBgColor.startsWith('#') ? '' : qBgColor} bg-white dark:bg-slate-800 md:border-gray-200/50 dark:border-gray-700/50` : 'bg-white dark:bg-slate-800 md:bg-white/90 md:dark:bg-slate-900/90 md:backdrop-blur-md border-gray-200 dark:border-slate-700 md:border-gray-100/80 md:dark:border-slate-700/40'}`}
-                                        style={{
-                                            containerType: 'inline-size',
-                                            backgroundColor: qBgColor.startsWith('#') ? qBgColor : undefined,
-                                            '--q-size': (() => {
-                                                const hasStmts = q.statements && q.statements.length > 0;
-                                                const stmtLines = q.statements ? q.statements.length : 0;
-                                                const stmtLen = q.statements ? q.statements.join(' ').length : 0;
-                                                const tLen = (q.questionText?.length || 0) + stmtLen;
-                                                const multiplier = tLen <= 45 ? 1.6 : 2.8;
-                                                if (hasStmts) {
-                                                    return `min(calc(var(--base-q-size) * 0.85), calc((min(94vw, 1000px) - 120px) * ${multiplier} / ${Math.max(1, tLen)}))`;
-                                                }
-                                                return `min(var(--base-q-size), calc((min(94vw, 1000px) - 120px) * ${multiplier} / ${Math.max(1, tLen)}))`;
-                                            })(),
-                                            '--q-color': qTextColor !== 'default' ? qTextColor : undefined,
-                                            borderTopColor: bgTheme === 'video' ? 'rgba(255,255,255,0.4)' : [
-                                                '#6366f1', '#3b82f6', '#10b981', '#f43f5e', '#f59e0b', '#a855f7'
-                                            ][currentSlide % 6],
-                                            borderTopWidth: '4px',
-                                            ...(qBgColor !== 'transparent' && bgTheme === 'dots' ? {
-                                                backgroundImage: `radial-gradient(${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'} 1.5px, transparent 1.5px)`,
-                                                backgroundSize: '16px 16px'
-                                            } : qBgColor !== 'transparent' && bgTheme === 'grid' ? {
-                                                backgroundImage: `linear-gradient(to right, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px)`,
-                                                backgroundSize: '16px 16px'
-                                            } : {
-                                                backgroundImage: 'none',
-                                                backgroundSize: 'auto'
-                                            })
-                                        } as unknown as React.CSSProperties}
-                                    >
-                                        {/* Desktop Question Number Badge */}
-                                        <div className="hidden md:flex absolute -top-10 left-1/2 -translate-x-1/2 items-center justify-center z-20">
-                                            <div className={`w-20 h-20 flex items-center justify-center rounded-full shadow-xl border-2 backdrop-blur-md font-black text-5xl ${bgTheme === 'video' ? 'bg-black/50 border-white/30 text-white' : `${[
-                                                'from-indigo-600 to-violet-600 dark:from-indigo-500 dark:to-violet-500',
-                                                'from-blue-600 to-cyan-600 dark:from-blue-500 dark:to-cyan-500',
-                                                'from-emerald-600 to-teal-600 dark:from-emerald-500 dark:to-teal-500',
-                                                'from-rose-600 to-pink-600 dark:from-rose-500 dark:to-pink-500',
-                                                'from-amber-500 to-orange-500 dark:from-amber-400 dark:to-orange-500',
-                                                'from-fuchsia-600 to-purple-600 dark:from-fuchsia-500 dark:to-purple-500'
-                                            ][currentSlide % 6]} bg-gradient-to-tr border-white dark:border-slate-800 text-white`}`}>
-                                                {uiLang === 'bn' ? toBanglaNumber(currentSlide + 1) : currentSlide + 1}
+                                        {/* Question */}
+                                        <div
+                                            className={`flex flex-col items-center justify-center gap-4 w-[94%] sm:w-full min-w-[300px] md:min-w-[600px] max-w-4xl xl:max-w-5xl min-h-[120px] md:min-h-[160px] md:max-h-[260px] mx-auto mt-6 md:mt-1 transition-all duration-300 relative z-10 rounded-[2rem] md:rounded-t-2xl md:rounded-b-[0.5rem] border shadow-sm md:shadow-[0_8px_32px_rgba(0,0,0,0.10)] p-5 md:p-8 md:px-10 ${qBgColor !== 'transparent' ? `md:${qBgColor.startsWith('#') ? '' : qBgColor} bg-white dark:bg-slate-800 md:border-gray-200/50 dark:border-gray-700/50` : 'bg-white dark:bg-slate-800 md:bg-white/90 md:dark:bg-slate-900/90 md:backdrop-blur-md border-gray-200 dark:border-slate-700 md:border-gray-100/80 md:dark:border-slate-700/40'}`}
+                                            style={{
+                                                containerType: 'inline-size',
+                                                backgroundColor: qBgColor.startsWith('#') ? qBgColor : undefined,
+                                                '--q-size': (() => {
+                                                    const hasStmts = q.statements && q.statements.length > 0;
+                                                    const stmtLines = q.statements ? q.statements.length : 0;
+                                                    const stmtLen = q.statements ? q.statements.join(' ').length : 0;
+                                                    const tLen = (q.questionText?.length || 0) + stmtLen;
+                                                    const multiplier = tLen <= 45 ? 1.6 : 2.8;
+                                                    if (hasStmts) {
+                                                        return `min(calc(var(--base-q-size) * 0.85), calc((min(94vw, 1000px) - 120px) * ${multiplier} / ${Math.max(1, tLen)}))`;
+                                                    }
+                                                    return `min(var(--base-q-size), calc((min(94vw, 1000px) - 120px) * ${multiplier} / ${Math.max(1, tLen)}))`;
+                                                })(),
+                                                '--q-color': qTextColor !== 'default' ? qTextColor : undefined,
+                                                borderTopColor: bgTheme === 'video' ? 'rgba(255,255,255,0.4)' : [
+                                                    '#6366f1', '#3b82f6', '#10b981', '#f43f5e', '#f59e0b', '#a855f7'
+                                                ][currentSlide % 6],
+                                                borderTopWidth: '4px',
+                                                ...(qBgColor !== 'transparent' && bgTheme === 'dots' ? {
+                                                    backgroundImage: `radial-gradient(${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'} 1.5px, transparent 1.5px)`,
+                                                    backgroundSize: '16px 16px'
+                                                } : qBgColor !== 'transparent' && bgTheme === 'grid' ? {
+                                                    backgroundImage: `linear-gradient(to right, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px)`,
+                                                    backgroundSize: '16px 16px'
+                                                } : {
+                                                    backgroundImage: 'none',
+                                                    backgroundSize: 'auto'
+                                                })
+                                            } as unknown as React.CSSProperties}
+                                        >
+                                            {/* Desktop Question Number Badge */}
+                                            <div className="hidden md:flex absolute -top-10 left-1/2 -translate-x-1/2 items-center justify-center z-20">
+                                                <div className={`w-20 h-20 flex items-center justify-center rounded-full shadow-xl border-2 backdrop-blur-md font-black text-5xl ${bgTheme === 'video' ? 'bg-black/50 border-white/30 text-white' : `${[
+                                                    'from-indigo-600 to-violet-600 dark:from-indigo-500 dark:to-violet-500',
+                                                    'from-blue-600 to-cyan-600 dark:from-blue-500 dark:to-cyan-500',
+                                                    'from-emerald-600 to-teal-600 dark:from-emerald-500 dark:to-teal-500',
+                                                    'from-rose-600 to-pink-600 dark:from-rose-500 dark:to-pink-500',
+                                                    'from-amber-500 to-orange-500 dark:from-amber-400 dark:to-orange-500',
+                                                    'from-fuchsia-600 to-purple-600 dark:from-fuchsia-500 dark:to-purple-500'
+                                                ][currentSlide % 6]} bg-gradient-to-tr border-white dark:border-slate-800 text-white`}`}>
+                                                    {uiLang === 'bn' ? toBanglaNumber(currentSlide + 1) : currentSlide + 1}
+                                                </div>
                                             </div>
-                                        </div>
 
-                                        {/* Mobile Question Number Pill */}
-                                        <div className="md:hidden absolute -top-4 left-1/2 -translate-x-1/2 z-20">
-                                            <div className="bg-blue-500 dark:bg-blue-600 text-white px-4 py-0.5 rounded-full text-[13px] font-bold shadow-md whitespace-nowrap">
-                                                {uiLang === 'bn' ? 'প্রশ্ন' : 'Question'} {uiLang === 'bn' ? toBanglaNumber(currentSlide + 1).padStart(2, '০') : String(currentSlide + 1).padStart(2, '0')}
+                                            {/* Mobile Question Number Pill */}
+                                            <div className="md:hidden absolute -top-4 left-1/2 -translate-x-1/2 z-20">
+                                                <div className="bg-blue-500 dark:bg-blue-600 text-white px-4 py-0.5 rounded-full text-[13px] font-bold shadow-md whitespace-nowrap">
+                                                    {uiLang === 'bn' ? 'প্রশ্ন' : 'Question'} {uiLang === 'bn' ? toBanglaNumber(currentSlide + 1).padStart(2, '০') : String(currentSlide + 1).padStart(2, '0')}
+                                                </div>
                                             </div>
+
+                                            {/* Top-Left Metallic Rivets / Screws (৩টি তারকাঁটা/স্ক্রু) */}
+                                            <div className="absolute top-2.5 md:top-3.5 left-4 md:left-8 flex items-center gap-2 md:gap-2.5 z-20 pointer-events-none select-none">
+                                                <MetallicScrew rotation={15} />
+                                                <MetallicScrew rotation={68} />
+                                                <MetallicScrew rotation={125} />
+                                            </div>
+
+                                            {/* Top-Right Metallic Rivets / Screws (৩টি তারকাঁটা/স্ক্রু) */}
+                                            <div className="absolute top-2.5 md:top-3.5 right-4 md:right-8 flex items-center gap-2 md:gap-2.5 z-20 pointer-events-none select-none">
+                                                <MetallicScrew rotation={35} />
+                                                <MetallicScrew rotation={95} />
+                                                <MetallicScrew rotation={155} />
+                                            </div>
+
+                                            {/* Subtle horizontal divider line */}
+                                            <div className="w-full border-t border-gray-200 dark:border-gray-700/60 mt-1 md:mt-2 mb-1"></div>
+
+                                            <div data-read-cursor-target="question" className={`prose dark:prose-invert max-w-none w-full prose-p:font-extrabold text-[length:var(--q-size)] leading-relaxed text-left font-extrabold [&_*]:!text-[length:var(--q-size)] [&_*]:!leading-relaxed [&_*]:!m-0 ${qTextColor !== 'default' ? 'text-[var(--q-color)] [&_*]:!text-[var(--q-color)] drop-shadow-sm [&_*]:!drop-shadow-sm' : (bgTheme === 'video' ? 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] [&_*]:!text-white [&_*]:!drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]' : 'text-slate-900 dark:text-white [&_*]:!text-slate-900 dark:[&_*]:!text-white')} ${activeTTSBlock === 'question' ? (ttsHighlightStyle === 'bg' ? 'p-2 -m-2 transition-all duration-500' : 'text-pink-600 dark:text-pink-400 [&_*]:!text-pink-600 dark:[&_*]:!text-pink-400 scale-[1.01] origin-left p-2 -m-2 transition-all duration-300 drop-shadow-md') : 'p-2 -m-2 transition-all duration-300'}`}>
+                                                <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
+                                                    {q.questionText}
+                                                </ReactMarkdown>
+                                            </div>
+                                            {q.statements && q.statements.length > 0 && (
+                                                <div className="mt-2 flex flex-col gap-1 w-full pl-3 md:pl-6 border-l-4 border-indigo-200 dark:border-indigo-800/50">
+                                                    {q.statements.map((stmt: string, sIdx: number) => (
+                                                        <div key={sIdx} className={`prose dark:prose-invert max-w-none w-full prose-p:font-bold text-[calc(var(--q-size)*0.85)] leading-[1] text-left font-bold [&_*]:!text-[calc(var(--q-size)*0.85)] [&_*]:!leading-[1] [&_*]:!m-0 ${qTextColor !== 'default' ? 'text-[var(--q-color)] [&_*]:!text-[var(--q-color)]' : (bgTheme === 'video' ? 'text-white/90 [&_*]:!text-white/90' : 'text-slate-700 dark:text-gray-300 [&_*]:!text-slate-700 dark:[&_*]:!text-gray-300')}`}>
+                                                            <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
+                                                                {stmt}
+                                                            </ReactMarkdown>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
                                         </div>
 
-                                        {/* Top-Left Metallic Rivets / Screws (৩টি তারকাঁটা/স্ক্রু) */}
-                                        <div className="absolute top-2.5 md:top-3.5 left-4 md:left-8 flex items-center gap-2 md:gap-2.5 z-20 pointer-events-none select-none">
-                                            <MetallicScrew rotation={15} />
-                                            <MetallicScrew rotation={68} />
-                                            <MetallicScrew rotation={125} />
+                                        {/* Options Area with Side Navigation */}
+                                        <div className="relative w-full max-w-[1200px] flex justify-center mt-4 md:mt-4 mb-1 mx-auto">
+                                            {/* Exp Toggle */}
+                                            {q.explanation && (
+                                                <div className="absolute left-[-10px] md:left-[-50px] lg:left-[-70px] top-[-60px] md:top-[-80px] z-[45] group hidden md:flex flex-col gap-4 items-center">
+                                                    <button
+                                                        onClick={() => setIsManualExpOpen(!isManualExpOpen)}
+                                                        className={`p-3 rounded-full shadow-lg backdrop-blur-sm border transition-all hover:scale-110 active:scale-95 ${isManualExpOpen ? 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-600 dark:text-yellow-400 border-yellow-300 dark:border-yellow-600' : 'bg-white/70 hover:bg-white dark:bg-gray-800/70 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-600'}`}
+                                                        title="Toggle Explanation"
+                                                    >
+                                                        <Lightbulb className="w-8 h-8 md:w-6 md:h-6" strokeWidth={2.5} />
+                                                    </button>
+                                                </div>
+                                            )}
+                                            {/* Prev Arrow */}
+                                            {currentSlide > 0 && (
+                                                <div className="absolute left-[-10px] md:left-[-50px] lg:left-[-70px] top-1/2 -translate-y-1/2 z-[45] group hidden md:block">
+                                                    <button
+                                                        onClick={prevStep}
+                                                        className="p-3 bg-white/70 hover:bg-white dark:bg-gray-800/70 dark:hover:bg-gray-800 text-indigo-600 dark:text-indigo-400 rounded-full shadow-lg backdrop-blur-sm border border-gray-200 dark:border-gray-600 transition-all hover:scale-110 active:scale-95"
+                                                    >
+                                                        <ChevronLeft className="w-8 h-8" strokeWidth={2.5} />
+                                                    </button>
+                                                </div>
+                                            )}
+
+                                            <motion.div
+                                                className={optionsLayout === 'grid' ? "grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 w-full max-w-6xl" : "flex flex-col gap-y-3 w-[90%] sm:w-fit min-w-[300px] md:min-w-[450px] lg:min-w-[500px] max-w-4xl mx-auto"}
+                                                initial="hidden"
+                                                animate="visible"
+                                                variants={{
+                                                    hidden: {},
+                                                    visible: { transition: { staggerChildren: animSpeed / 2 } }
+                                                }}
+                                            >
+                                                {!((step >= 2 && q.explanation && isExpEnabled) || isManualExpOpen) && parsedOptions.length > 0 && parsedOptions.map((opt: { key: string, text: string }, oIdx: number) => {
+                                                    const isCorrect = q.correctAnswer && q.correctAnswer.toLowerCase().includes(opt.key);
+                                                    const optLetter = getOptionLabel(opt.key, uiLang);
+
+                                                    const showCorrect = step >= 1 && isCorrect;
+                                                    const showWrong = step >= 1 && !isCorrect;
+                                                    const isSelected = selectedOption === opt.key;
+
+                                                    // Colors closely matching the image
+                                                    const colorThemes = [
+                                                        { border: 'border-[#4285F4]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#4285F4]', letterText: 'text-white' }, // Blue
+                                                        { border: 'border-[#34A853]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#34A853]', letterText: 'text-white' }, // Green
+                                                        { border: 'border-[#F9AB00]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#F9AB00]', letterText: 'text-white' }, // Yellow/Orange
+                                                        { border: 'border-[#EA4335]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#EA4335]', letterText: 'text-white' }, // Red
+                                                        { border: 'border-[#9C27B0]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#9C27B0]', letterText: 'text-white' }, // Purple
+                                                    ];
+
+                                                    const theme = colorThemes[oIdx % colorThemes.length];
+
+                                                    const bgClass = optBgColor === 'default' ? theme.bg : (optBgColor.startsWith('#') ? '' : optBgColor);
+                                                    let containerClasses = `flex items-center justify-between gap-2 sm:gap-3 md:gap-4 py-1.5 sm:py-2 md:py-2 px-3 sm:px-4 md:px-5 rounded-xl border-2 transition-all duration-200 shadow-sm md:shadow-[0_4px_12px_rgba(0,0,0,0.04)] relative z-10 select-none ${bgClass} border-gray-200 dark:border-gray-700 md:${theme.border}`;
+                                                    let letterClasses = `shrink-0 w-8 h-8 sm:w-10 sm:h-10 md:w-11 md:h-11 text-base md:text-lg flex items-center justify-center rounded-full font-black transition-colors duration-300 ${theme.letterBg} ${theme.letterText}`;
+
+                                                    if (step === 0) {
+                                                        if (eliminatedOptions.includes(opt.key)) {
+                                                            containerClasses = `flex items-center justify-between gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 transition-all duration-200 opacity-40 grayscale border-gray-300 bg-gray-50 dark:bg-gray-800 relative z-10 cursor-not-allowed select-none`;
+                                                            letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 bg-gray-300 text-gray-500`;
+                                                        } else if (isSelected) {
+                                                            containerClasses = `flex items-center justify-between gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 transition-all duration-200 shadow-[0_8px_20px_rgba(66,133,244,0.15)] bg-[#e8f0fe] dark:bg-[#1e293b] border-[#4285F4] scale-[1.02] cursor-pointer ring-2 ring-[#4285F4]/30 relative z-10 select-none active:scale-[0.99]`;
+                                                            letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 bg-[#4285F4] text-white`;
+                                                        } else {
+                                                            containerClasses += ` hover:scale-[1.02] hover:shadow-md cursor-pointer hover:border-gray-300 active:scale-[0.99]`;
+                                                        }
+                                                    } else {
+                                                        if (showCorrect) {
+                                                            containerClasses = `flex items-center gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 ring-4 ring-[#34A853]/30 bg-[#f0fdf4] dark:bg-[#064e3b] border-[#34A853] z-10 relative animate-pop-in select-none`;
+                                                            letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 bg-[#34A853] text-white`;
+                                                        } else if (showWrong && isSelected) {
+                                                            containerClasses = `flex items-center gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 transition-all duration-200 shadow-[0_8px_20px_rgba(234,67,53,0.15)] bg-[#fce8e6] dark:bg-[#7f1d1d] border-[#EA4335] scale-[1.02] relative z-10 select-none`;
+                                                            letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 bg-[#EA4335] text-white`;
+                                                        } else if (showWrong) {
+                                                            containerClasses = `flex items-center gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 transition-all duration-200 shadow-sm bg-yellow-50 dark:bg-yellow-950/50 border-yellow-400 dark:border-yellow-600 relative z-10 select-none`;
+                                                            letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 bg-yellow-300 dark:bg-yellow-700 text-yellow-800 dark:text-yellow-100`;
+                                                        }
+                                                    }
+
+                                                    const isActiveTTS = activeTTSBlock === `option-card-${opt.key}`;
+                                                    if (isActiveTTS) {
+                                                        let animClass = '';
+                                                        if (ttsAnimation === 'zoom') {
+                                                            animClass = ' transform scale-[1.06] z-20 shadow-[0_10px_30px_rgba(0,0,0,0.15)] ';
+                                                        } else if (ttsAnimation === 'pulse') {
+                                                            animClass = ' animate-pulse transform scale-[1.02] z-20 shadow-md ';
+                                                        } else if (ttsAnimation === 'bounce') {
+                                                            animClass = ' animate-bounce z-20 shadow-md ';
+                                                        } else if (ttsAnimation === 'pop') {
+                                                            animClass = ' animate-pop-in z-20 ';
+                                                        } else if (ttsAnimation === 'glow') {
+                                                            animClass = ' transform scale-[1.02] z-20 shadow-[0_0_30px_rgba(59,130,246,0.6)] dark:shadow-[0_0_30px_rgba(96,165,250,0.6)] ';
+                                                        } else {
+                                                            animClass = ' transform scale-100 z-10 shadow-sm ';
+                                                        }
+
+                                                        if (ttsHighlightStyle === 'bg') {
+                                                            containerClasses += ' bg-blue-50/80 dark:bg-blue-900/40 backdrop-blur-sm ring-2 ring-blue-400/50 dark:ring-blue-500/50 transition-all duration-300 ' + animClass;
+                                                        } else {
+                                                            containerClasses += ' ring-2 ring-pink-500/50 transition-all duration-300 text-pink-700 dark:text-pink-300 ' + animClass.replace('rgba(59,130,246,0.6)', 'rgba(236,72,153,0.6)').replace('rgba(96,165,250,0.6)', 'rgba(244,114,182,0.6)');
+                                                        }
+                                                    }
+
+                                                    return (
+                                                        <motion.div
+                                                            key={opt.key}
+                                                            variants={{
+                                                                hidden: { opacity: 0, y: 20 },
+                                                                visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100, damping: 14 } }
+                                                            }}
+                                                            className="flex flex-col gap-2 w-full relative"
+                                                        >
+                                                            <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none transition-opacity duration-300 ${step >= 1 ? 'opacity-100' : 'opacity-0'}`}>
+                                                                <Confetti active={isConfettiActive && isSelected && showCorrect} config={CONFETTI_CONFIG} />
+                                                            </div>
+                                                            <div
+                                                                id={`option-card-${opt.key}`}
+                                                                className={containerClasses}
+                                                                style={{
+                                                                    containerType: 'inline-size',
+                                                                    backgroundColor: (optBgColor !== 'default' && optBgColor.startsWith('#')) ? optBgColor : undefined,
+                                                                    ...(bgTheme === 'dots' ? {
+                                                                        backgroundImage: `radial-gradient(${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'} 1.5px, transparent 1.5px)`,
+                                                                        backgroundSize: '12px 12px'
+                                                                    } : bgTheme === 'grid' ? {
+                                                                        backgroundImage: `linear-gradient(to right, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px)`,
+                                                                        backgroundSize: '12px 12px'
+                                                                    } : {
+                                                                        backgroundImage: 'none',
+                                                                        backgroundSize: 'auto'
+                                                                    })
+                                                                }}
+                                                                onContextMenu={(e) => {
+                                                                    e.preventDefault();
+                                                                    if (step === 0) {
+                                                                        setEliminatedOptions(prev =>
+                                                                            prev.includes(opt.key) ? prev.filter(k => k !== opt.key) : [...prev, opt.key]
+                                                                        );
+                                                                    }
+                                                                }}
+                                                                onClick={() => {
+                                                                    if (step === 0) {
+                                                                        if (eliminatedOptions.includes(opt.key)) return;
+                                                                        setSelectedOption(opt.key);
+                                                                        setStep(1);
+
+                                                                        // Trigger confetti and celebration if correct (Single Question Perform)
+                                                                        if (q.correctAnswer && q.correctAnswer.toLowerCase().trim().includes(opt.key)) {
+                                                                            const newConsecutive = consecutiveCorrect + 1;
+                                                                            setConsecutiveCorrect(newConsecutive);
+                                                                            setIsConfettiActive(true);
+
+                                                                            // Show celebration on every 10 consecutive correct answers
+                                                                            triggerCelebration(newConsecutive);
+
+                                                                            if (newConsecutive > 0 && newConsecutive % 5 === 0) {
+                                                                                // Play WOW sound every 5 consecutive correct answers
+                                                                                if (wowAudioRef.current) {
+                                                                                    wowAudioRef.current.currentTime = 0;
+                                                                                    wowAudioRef.current.play().catch(e => console.warn('Wow audio failed:', e));
+                                                                                }
+                                                                            } else {
+                                                                                if (!isCelebrationSoundEnabled && popAudioRef.current) {
+                                                                                    popAudioRef.current.currentTime = 0;
+                                                                                    popAudioRef.current.play().catch(e => console.warn('Pop audio failed:', e));
+                                                                                }
+                                                                                if (dingAudioRef.current) {
+                                                                                    dingAudioRef.current.currentTime = 0;
+                                                                                    dingAudioRef.current.play().catch(e => console.warn('Ding audio failed:', e));
+                                                                                }
+                                                                            }
+                                                                            setTimeout(() => setIsConfettiActive(false), 2000);
+                                                                        } else {
+                                                                            // Reset on wrong answer and play buzzer
+                                                                            setConsecutiveCorrect(0);
+                                                                            if (wrongAudioRef.current) {
+                                                                                wrongAudioRef.current.currentTime = 0;
+                                                                                wrongAudioRef.current.play().catch(e => console.warn('Wrong audio failed:', e));
+                                                                            }
+                                                                        }
+                                                                        // Feature 8: Track session score
+                                                                        if (q.correctAnswer) {
+                                                                            const isCorrect = q.correctAnswer.toLowerCase().trim().includes(opt.key);
+                                                                            updateSessionScore(currentSlide, isCorrect);
+                                                                        }
+                                                                    }
+                                                                }}
+                                                            >
+                                                                <div className={letterClasses} style={{ fontSize: 'var(--opt-size)' }}>
+                                                                    {optLetter}
+                                                                </div>
+                                                                <div className={`prose dark:prose-invert max-w-none ${optTextColor !== 'default' ? 'text-[var(--opt-color)] [&_*]:!text-[var(--opt-color)]' : 'text-slate-900 dark:text-white [&_*]:!text-slate-900 dark:[&_*]:!text-white'} [&>p]:m-0 [&>p]:text-[length:var(--opt-size)] [&>p]:font-semibold [&>p]:leading-snug [&>p]:whitespace-nowrap [&>p]:overflow-hidden [&>p]:text-ellipsis flex-1 capitalize ${eliminatedOptions.includes(opt.key) && step === 0 ? 'line-through opacity-50' : ''}`} style={{
+                                                                    '--opt-color': optTextColor !== 'default' ? optTextColor : undefined,
+                                                                    '--opt-size': (() => {
+                                                                        const maxOptLen = parsedOptions.length > 0 ? Math.max(...parsedOptions.map((o: any) => o.text?.length || 0)) : 1;
+                                                                        const isGrid = optionsLayout === 'grid';
+                                                                        const cardWidth = isGrid ? 'min(45vw, 500px)' : 'min(94vw, 1000px)';
+                                                                        return `min(var(--base-opt-size), calc((${cardWidth} - 100px) * 1.2 / ${Math.max(1, maxOptLen)}))`;
+                                                                    })()
+                                                                } as React.CSSProperties}>
+                                                                    <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
+                                                                        {opt.text}
+                                                                    </ReactMarkdown>
+                                                                </div>
+
+                                                                {step >= 1 && showCorrect && (
+                                                                    isSavingImage ? (
+                                                                        <div className="shrink-0 text-white bg-[#34A853] rounded-full p-1.5 shadow-sm relative z-20">
+                                                                            <Check className="w-7 h-7 stroke-[3]" />
+                                                                        </div>
+                                                                    ) : (
+                                                                        <motion.div
+                                                                            initial={{ x: -200, opacity: 0, scale: 0.5 }}
+                                                                            animate={{ x: 0, opacity: 1, scale: 1 }}
+                                                                            transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
+                                                                            className="shrink-0 text-white bg-[#34A853] rounded-full p-1.5 shadow-sm relative z-20"
+                                                                        >
+                                                                            <Check className="w-7 h-7 stroke-[3]" />
+                                                                        </motion.div>
+                                                                    )
+                                                                )}
+                                                                {step >= 1 && showWrong && isSelected && (
+                                                                    isSavingImage ? (
+                                                                        <div className="shrink-0 text-white bg-[#EA4335] rounded-full p-1.5 shadow-sm relative z-20">
+                                                                            <X className="w-7 h-7 stroke-[3]" />
+                                                                        </div>
+                                                                    ) : (
+                                                                        <motion.div
+                                                                            initial={{ x: -200, opacity: 0, scale: 0.5 }}
+                                                                            animate={{ x: 0, opacity: 1, scale: 1 }}
+                                                                            transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
+                                                                            className="shrink-0 text-white bg-[#EA4335] rounded-full p-1.5 shadow-sm relative z-20"
+                                                                        >
+                                                                            <X className="w-7 h-7 stroke-[3]" />
+                                                                        </motion.div>
+                                                                    )
+                                                                )}
+                                                            </div>
+
+                                                            {/* Option Explanation */}
+                                                            {step >= 2 && isOptionExpEnabled && q.optionExplanations?.[opt.key] && (
+                                                                <div
+                                                                    className="ml-4 mt-2 pl-4 pr-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-50/90 dark:bg-gray-800/90 rounded-xl border-l-4 border-l-[#4285F4] shadow-sm animate-in fade-in duration-500 prose dark:prose-invert max-w-none [&>p]:m-0 [&_*]:!text-[length:var(--exp-size)]"
+                                                                    style={{ fontSize: 'var(--exp-size)' }}
+                                                                >
+                                                                    <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
+                                                                        {q.optionExplanations[opt.key]}
+                                                                    </ReactMarkdown>
+                                                                </div>
+                                                            )}
+                                                        </motion.div>
+                                                    );
+                                                })}
+                                            </motion.div>
+
+                                            {/* Next Arrow */}
+                                            {currentSlide < questions.length - 1 && (
+                                                <div className="absolute right-[-10px] md:right-[-50px] lg:right-[-70px] top-1/2 -translate-y-1/2 z-[45] group hidden md:block">
+                                                    <button
+                                                        onClick={nextStep}
+                                                        className="p-3 bg-white/70 hover:bg-white dark:bg-gray-800/70 dark:hover:bg-gray-800 text-indigo-600 dark:text-indigo-400 rounded-full shadow-lg backdrop-blur-sm border border-gray-200 dark:border-gray-600 transition-all hover:scale-110 active:scale-95"
+                                                    >
+                                                        <ChevronRight className="w-8 h-8" strokeWidth={2.5} />
+                                                    </button>
+                                                </div>
+                                            )}
                                         </div>
 
-                                        {/* Top-Right Metallic Rivets / Screws (৩টি তারকাঁটা/স্ক্রু) */}
-                                        <div className="absolute top-2.5 md:top-3.5 right-4 md:right-8 flex items-center gap-2 md:gap-2.5 z-20 pointer-events-none select-none">
-                                            <MetallicScrew rotation={35} />
-                                            <MetallicScrew rotation={95} />
-                                            <MetallicScrew rotation={155} />
-                                        </div>
+                                        {/* Explanation */}
+                                        {((step >= 2 && q.explanation && isExpEnabled) || isManualExpOpen) && q.explanation && (
+                                            <div className="w-full max-w-5xl mt-6 animate-in fade-in slide-in-from-bottom-8 duration-700 !print-color-adjust-exact">
+                                                <div className="bg-white dark:bg-gray-800 p-6 pt-10 md:p-8 md:pt-10 rounded-t-2xl rounded-b-[0.5rem] border-2 border-t-4 border-blue-600/30 border-t-blue-600 dark:border-blue-500/40 dark:border-t-blue-500 shadow-xl relative overflow-visible transition-colors duration-500">
 
-                                        {/* Subtle horizontal divider line */}
-                                        <div className="w-full border-t border-gray-200 dark:border-gray-700/60 mt-1 md:mt-2 mb-1"></div>
+                                                    {/* Top Center Badge */}
+                                                    <div className="absolute -top-7 left-1/2 -translate-x-1/2 bg-gradient-to-r from-blue-500 to-sky-500 text-white px-8 py-2 rounded-full font-bold text-lg md:text-xl shadow-[0_4px_12px_rgba(59,130,246,0.3)] flex items-center gap-2 border-[4px] border-indigo-300 dark:border-indigo-700 z-10 whitespace-nowrap !print-color-adjust-exact">
+                                                        Explanation
+                                                    </div>
 
-                                        <div data-read-cursor-target="question" className={`prose dark:prose-invert max-w-none w-full prose-p:font-extrabold text-[length:var(--q-size)] leading-relaxed text-left font-extrabold [&_*]:!text-[length:var(--q-size)] [&_*]:!leading-relaxed [&_*]:!m-0 ${qTextColor !== 'default' ? 'text-[var(--q-color)] [&_*]:!text-[var(--q-color)] drop-shadow-sm [&_*]:!drop-shadow-sm' : (bgTheme === 'video' ? 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] [&_*]:!text-white [&_*]:!drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]' : 'text-slate-900 dark:text-white [&_*]:!text-slate-900 dark:[&_*]:!text-white')} ${activeTTSBlock === 'question' ? (ttsHighlightStyle === 'bg' ? 'p-2 -m-2 transition-all duration-500' : 'text-pink-600 dark:text-pink-400 [&_*]:!text-pink-600 dark:[&_*]:!text-pink-400 scale-[1.01] origin-left p-2 -m-2 transition-all duration-300 drop-shadow-md') : 'p-2 -m-2 transition-all duration-300'}`}>
-                                            <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
-                                                {q.questionText}
-                                            </ReactMarkdown>
-                                        </div>
-                                        {q.statements && q.statements.length > 0 && (
-                                            <div className="mt-2 flex flex-col gap-1 w-full pl-3 md:pl-6 border-l-4 border-indigo-200 dark:border-indigo-800/50">
-                                                {q.statements.map((stmt: string, sIdx: number) => (
-                                                    <div key={sIdx} className={`prose dark:prose-invert max-w-none w-full prose-p:font-bold text-[calc(var(--q-size)*0.85)] leading-[1] text-left font-bold [&_*]:!text-[calc(var(--q-size)*0.85)] [&_*]:!leading-[1] [&_*]:!m-0 ${qTextColor !== 'default' ? 'text-[var(--q-color)] [&_*]:!text-[var(--q-color)]' : (bgTheme === 'video' ? 'text-white/90 [&_*]:!text-white/90' : 'text-slate-700 dark:text-gray-300 [&_*]:!text-slate-700 dark:[&_*]:!text-gray-300')}`}>
+                                                    <div
+                                                        className="prose prose-xl dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 font-medium [&_*]:!text-[length:var(--exp-size)] [&_*]:!leading-relaxed"
+                                                        style={{ fontSize: 'var(--exp-size)' }}
+                                                    >
                                                         <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
-                                                            {stmt}
+                                                            {q.explanation}
                                                         </ReactMarkdown>
                                                     </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* Options Area with Side Navigation */}
-                                    <div className="relative w-full max-w-[1200px] flex justify-center mt-4 md:mt-4 mb-1 mx-auto">
-                                        {/* Exp Toggle */}
-                                        {q.explanation && (
-                                            <div className="absolute left-[-10px] md:left-[-50px] lg:left-[-70px] top-[-60px] md:top-[-80px] z-[45] group hidden md:flex flex-col gap-4 items-center">
-                                                <button
-                                                    onClick={() => setIsManualExpOpen(!isManualExpOpen)}
-                                                    className={`p-3 rounded-full shadow-lg backdrop-blur-sm border transition-all hover:scale-110 active:scale-95 ${isManualExpOpen ? 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-600 dark:text-yellow-400 border-yellow-300 dark:border-yellow-600' : 'bg-white/70 hover:bg-white dark:bg-gray-800/70 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-600'}`}
-                                                    title="Toggle Explanation"
-                                                >
-                                                    <Lightbulb className="w-8 h-8 md:w-6 md:h-6" strokeWidth={2.5} />
-                                                </button>
-                                            </div>
-                                        )}
-                                        {/* Prev Arrow */}
-                                        {currentSlide > 0 && (
-                                            <div className="absolute left-[-10px] md:left-[-50px] lg:left-[-70px] top-1/2 -translate-y-1/2 z-[45] group hidden md:block">
-                                                <button
-                                                    onClick={prevStep}
-                                                    className="p-3 bg-white/70 hover:bg-white dark:bg-gray-800/70 dark:hover:bg-gray-800 text-indigo-600 dark:text-indigo-400 rounded-full shadow-lg backdrop-blur-sm border border-gray-200 dark:border-gray-600 transition-all hover:scale-110 active:scale-95"
-                                                >
-                                                    <ChevronLeft className="w-8 h-8" strokeWidth={2.5} />
-                                                </button>
-                                            </div>
-                                        )}
-
-                                        <motion.div
-                                            className={optionsLayout === 'grid' ? "grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 w-full max-w-6xl" : "flex flex-col gap-y-3 w-[90%] sm:w-fit min-w-[300px] md:min-w-[450px] lg:min-w-[500px] max-w-4xl mx-auto"}
-                                            initial="hidden"
-                                            animate="visible"
-                                            variants={{
-                                                hidden: {},
-                                                visible: { transition: { staggerChildren: animSpeed / 2 } }
-                                            }}
-                                        >
-                                            {!((step >= 2 && q.explanation && isExpEnabled) || isManualExpOpen) && parsedOptions.length > 0 && parsedOptions.map((opt: { key: string, text: string }, oIdx: number) => {
-                                                const isCorrect = q.correctAnswer && q.correctAnswer.toLowerCase().includes(opt.key);
-                                                const optLetter = getOptionLabel(opt.key, uiLang);
-
-                                                const showCorrect = step >= 1 && isCorrect;
-                                                const showWrong = step >= 1 && !isCorrect;
-                                                const isSelected = selectedOption === opt.key;
-
-                                                // Colors closely matching the image
-                                                const colorThemes = [
-                                                    { border: 'border-[#4285F4]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#4285F4]', letterText: 'text-white' }, // Blue
-                                                    { border: 'border-[#34A853]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#34A853]', letterText: 'text-white' }, // Green
-                                                    { border: 'border-[#F9AB00]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#F9AB00]', letterText: 'text-white' }, // Yellow/Orange
-                                                    { border: 'border-[#EA4335]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#EA4335]', letterText: 'text-white' }, // Red
-                                                    { border: 'border-[#9C27B0]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#9C27B0]', letterText: 'text-white' }, // Purple
-                                                ];
-
-                                                const theme = colorThemes[oIdx % colorThemes.length];
-
-                                                const bgClass = optBgColor === 'default' ? theme.bg : (optBgColor.startsWith('#') ? '' : optBgColor);
-                                                let containerClasses = `flex items-center justify-between gap-2 sm:gap-3 md:gap-4 py-1.5 sm:py-2 md:py-2 px-3 sm:px-4 md:px-5 rounded-xl border-2 transition-all duration-200 shadow-sm md:shadow-[0_4px_12px_rgba(0,0,0,0.04)] relative z-10 select-none ${bgClass} border-gray-200 dark:border-gray-700 md:${theme.border}`;
-                                                let letterClasses = `shrink-0 w-8 h-8 sm:w-10 sm:h-10 md:w-11 md:h-11 text-base md:text-lg flex items-center justify-center rounded-full font-black transition-colors duration-300 ${theme.letterBg} ${theme.letterText}`;
-
-                                                if (step === 0) {
-                                                    if (eliminatedOptions.includes(opt.key)) {
-                                                        containerClasses = `flex items-center justify-between gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 transition-all duration-200 opacity-40 grayscale border-gray-300 bg-gray-50 dark:bg-gray-800 relative z-10 cursor-not-allowed select-none`;
-                                                        letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 bg-gray-300 text-gray-500`;
-                                                    } else if (isSelected) {
-                                                        containerClasses = `flex items-center justify-between gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 transition-all duration-200 shadow-[0_8px_20px_rgba(66,133,244,0.15)] bg-[#e8f0fe] dark:bg-[#1e293b] border-[#4285F4] scale-[1.02] cursor-pointer ring-2 ring-[#4285F4]/30 relative z-10 select-none active:scale-[0.99]`;
-                                                        letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 bg-[#4285F4] text-white`;
-                                                    } else {
-                                                        containerClasses += ` hover:scale-[1.02] hover:shadow-md cursor-pointer hover:border-gray-300 active:scale-[0.99]`;
-                                                    }
-                                                } else {
-                                                    if (showCorrect) {
-                                                        containerClasses = `flex items-center gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 ring-4 ring-[#34A853]/30 bg-[#f0fdf4] dark:bg-[#064e3b] border-[#34A853] z-10 relative animate-pop-in select-none`;
-                                                        letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 bg-[#34A853] text-white`;
-                                                    } else if (showWrong && isSelected) {
-                                                        containerClasses = `flex items-center gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 transition-all duration-200 shadow-[0_8px_20px_rgba(234,67,53,0.15)] bg-[#fce8e6] dark:bg-[#7f1d1d] border-[#EA4335] scale-[1.02] relative z-10 select-none`;
-                                                        letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 bg-[#EA4335] text-white`;
-                                                    } else if (showWrong) {
-                                                        containerClasses = `flex items-center gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 transition-all duration-200 shadow-sm bg-yellow-50 dark:bg-yellow-950/50 border-yellow-400 dark:border-yellow-600 relative z-10 select-none`;
-                                                        letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 bg-yellow-300 dark:bg-yellow-700 text-yellow-800 dark:text-yellow-100`;
-                                                    }
-                                                }
-
-                                                const isActiveTTS = activeTTSBlock === `option-card-${opt.key}`;
-                                                if (isActiveTTS) {
-                                                    let animClass = '';
-                                                    if (ttsAnimation === 'zoom') {
-                                                        animClass = ' transform scale-[1.06] z-20 shadow-[0_10px_30px_rgba(0,0,0,0.15)] ';
-                                                    } else if (ttsAnimation === 'pulse') {
-                                                        animClass = ' animate-pulse transform scale-[1.02] z-20 shadow-md ';
-                                                    } else if (ttsAnimation === 'bounce') {
-                                                        animClass = ' animate-bounce z-20 shadow-md ';
-                                                    } else if (ttsAnimation === 'pop') {
-                                                        animClass = ' animate-pop-in z-20 ';
-                                                    } else if (ttsAnimation === 'glow') {
-                                                        animClass = ' transform scale-[1.02] z-20 shadow-[0_0_30px_rgba(59,130,246,0.6)] dark:shadow-[0_0_30px_rgba(96,165,250,0.6)] ';
-                                                    } else {
-                                                        animClass = ' transform scale-100 z-10 shadow-sm ';
-                                                    }
-
-                                                    if (ttsHighlightStyle === 'bg') {
-                                                        containerClasses += ' bg-blue-50/80 dark:bg-blue-900/40 backdrop-blur-sm ring-2 ring-blue-400/50 dark:ring-blue-500/50 transition-all duration-300 ' + animClass;
-                                                    } else {
-                                                        containerClasses += ' ring-2 ring-pink-500/50 transition-all duration-300 text-pink-700 dark:text-pink-300 ' + animClass.replace('rgba(59,130,246,0.6)', 'rgba(236,72,153,0.6)').replace('rgba(96,165,250,0.6)', 'rgba(244,114,182,0.6)');
-                                                    }
-                                                }
-
-                                                return (
-                                                    <motion.div
-                                                        key={opt.key}
-                                                        variants={{
-                                                            hidden: { opacity: 0, y: 20 },
-                                                            visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100, damping: 14 } }
-                                                        }}
-                                                        className="flex flex-col gap-2 w-full relative"
-                                                    >
-                                                        <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none transition-opacity duration-300 ${step >= 1 ? 'opacity-100' : 'opacity-0'}`}>
-                                                            <Confetti active={isConfettiActive && isSelected && showCorrect} config={CONFETTI_CONFIG} />
-                                                        </div>
-                                                        <div
-                                                            id={`option-card-${opt.key}`}
-                                                            className={containerClasses}
-                                                            style={{
-                                                                containerType: 'inline-size',
-                                                                backgroundColor: (optBgColor !== 'default' && optBgColor.startsWith('#')) ? optBgColor : undefined,
-                                                                ...(bgTheme === 'dots' ? {
-                                                                    backgroundImage: `radial-gradient(${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'} 1.5px, transparent 1.5px)`,
-                                                                    backgroundSize: '12px 12px'
-                                                                } : bgTheme === 'grid' ? {
-                                                                    backgroundImage: `linear-gradient(to right, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px)`,
-                                                                    backgroundSize: '12px 12px'
-                                                                } : {
-                                                                    backgroundImage: 'none',
-                                                                    backgroundSize: 'auto'
-                                                                })
-                                                            }}
-                                                            onContextMenu={(e) => {
-                                                                e.preventDefault();
-                                                                if (step === 0) {
-                                                                    setEliminatedOptions(prev =>
-                                                                        prev.includes(opt.key) ? prev.filter(k => k !== opt.key) : [...prev, opt.key]
-                                                                    );
-                                                                }
-                                                            }}
-                                                            onClick={() => {
-                                                                if (step === 0) {
-                                                                    if (eliminatedOptions.includes(opt.key)) return;
-                                                                    setSelectedOption(opt.key);
-                                                                    setStep(1);
-
-                                                                    // Trigger confetti and celebration if correct (Single Question Perform)
-                                                                    if (q.correctAnswer && q.correctAnswer.toLowerCase().trim().includes(opt.key)) {
-                                                                        const newConsecutive = consecutiveCorrect + 1;
-                                                                        setConsecutiveCorrect(newConsecutive);
-                                                                        setIsConfettiActive(true);
-
-                                                                        // Show celebration on every 10 consecutive correct answers
-                                                                        triggerCelebration(newConsecutive);
-
-                                                                        if (newConsecutive > 0 && newConsecutive % 5 === 0) {
-                                                                            // Play WOW sound every 5 consecutive correct answers
-                                                                            if (wowAudioRef.current) {
-                                                                                wowAudioRef.current.currentTime = 0;
-                                                                                wowAudioRef.current.play().catch(e => console.warn('Wow audio failed:', e));
-                                                                            }
-                                                                        } else {
-                                                                            if (!isCelebrationSoundEnabled && popAudioRef.current) {
-                                                                                popAudioRef.current.currentTime = 0;
-                                                                                popAudioRef.current.play().catch(e => console.warn('Pop audio failed:', e));
-                                                                            }
-                                                                            if (dingAudioRef.current) {
-                                                                                dingAudioRef.current.currentTime = 0;
-                                                                                dingAudioRef.current.play().catch(e => console.warn('Ding audio failed:', e));
-                                                                            }
-                                                                        }
-                                                                        setTimeout(() => setIsConfettiActive(false), 2000);
-                                                                    } else {
-                                                                        // Reset on wrong answer and play buzzer
-                                                                        setConsecutiveCorrect(0);
-                                                                        if (wrongAudioRef.current) {
-                                                                            wrongAudioRef.current.currentTime = 0;
-                                                                            wrongAudioRef.current.play().catch(e => console.warn('Wrong audio failed:', e));
-                                                                        }
-                                                                    }
-                                                                    // Feature 8: Track session score
-                                                                    if (q.correctAnswer) {
-                                                                        const isCorrect = q.correctAnswer.toLowerCase().trim().includes(opt.key);
-                                                                        updateSessionScore(currentSlide, isCorrect);
-                                                                    }
-                                                                }
-                                                            }}
-                                                        >
-                                                            <div className={letterClasses} style={{ fontSize: 'var(--opt-size)' }}>
-                                                                {optLetter}
-                                                            </div>
-                                                            <div className={`prose dark:prose-invert max-w-none ${optTextColor !== 'default' ? 'text-[var(--opt-color)] [&_*]:!text-[var(--opt-color)]' : 'text-slate-900 dark:text-white [&_*]:!text-slate-900 dark:[&_*]:!text-white'} [&>p]:m-0 [&>p]:text-[length:var(--opt-size)] [&>p]:font-semibold [&>p]:leading-snug [&>p]:whitespace-nowrap [&>p]:overflow-hidden [&>p]:text-ellipsis flex-1 capitalize ${eliminatedOptions.includes(opt.key) && step === 0 ? 'line-through opacity-50' : ''}`} style={{
-                                                                '--opt-color': optTextColor !== 'default' ? optTextColor : undefined,
-                                                                '--opt-size': (() => {
-                                                                    const maxOptLen = parsedOptions.length > 0 ? Math.max(...parsedOptions.map((o: any) => o.text?.length || 0)) : 1;
-                                                                    const isGrid = optionsLayout === 'grid';
-                                                                    const cardWidth = isGrid ? 'min(45vw, 500px)' : 'min(94vw, 1000px)';
-                                                                    return `min(var(--base-opt-size), calc((${cardWidth} - 100px) * 1.2 / ${Math.max(1, maxOptLen)}))`;
-                                                                })()
-                                                            } as React.CSSProperties}>
-                                                                <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
-                                                                    {opt.text}
-                                                                </ReactMarkdown>
-                                                            </div>
-
-                                                            {step >= 1 && showCorrect && (
-                                                                isSavingImage ? (
-                                                                    <div className="shrink-0 text-white bg-[#34A853] rounded-full p-1.5 shadow-sm relative z-20">
-                                                                        <Check className="w-7 h-7 stroke-[3]" />
-                                                                    </div>
-                                                                ) : (
-                                                                    <motion.div
-                                                                        initial={{ x: -200, opacity: 0, scale: 0.5 }}
-                                                                        animate={{ x: 0, opacity: 1, scale: 1 }}
-                                                                        transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
-                                                                        className="shrink-0 text-white bg-[#34A853] rounded-full p-1.5 shadow-sm relative z-20"
-                                                                    >
-                                                                        <Check className="w-7 h-7 stroke-[3]" />
-                                                                    </motion.div>
-                                                                )
-                                                            )}
-                                                            {step >= 1 && showWrong && isSelected && (
-                                                                isSavingImage ? (
-                                                                    <div className="shrink-0 text-white bg-[#EA4335] rounded-full p-1.5 shadow-sm relative z-20">
-                                                                        <X className="w-7 h-7 stroke-[3]" />
-                                                                    </div>
-                                                                ) : (
-                                                                    <motion.div
-                                                                        initial={{ x: -200, opacity: 0, scale: 0.5 }}
-                                                                        animate={{ x: 0, opacity: 1, scale: 1 }}
-                                                                        transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
-                                                                        className="shrink-0 text-white bg-[#EA4335] rounded-full p-1.5 shadow-sm relative z-20"
-                                                                    >
-                                                                        <X className="w-7 h-7 stroke-[3]" />
-                                                                    </motion.div>
-                                                                )
-                                                            )}
-                                                        </div>
-
-                                                        {/* Option Explanation */}
-                                                        {step >= 2 && isOptionExpEnabled && q.optionExplanations?.[opt.key] && (
-                                                            <div
-                                                                className="ml-4 mt-2 pl-4 pr-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-50/90 dark:bg-gray-800/90 rounded-xl border-l-4 border-l-[#4285F4] shadow-sm animate-in fade-in duration-500 prose dark:prose-invert max-w-none [&>p]:m-0 [&_*]:!text-[length:var(--exp-size)]"
-                                                                style={{ fontSize: 'var(--exp-size)' }}
-                                                            >
-                                                                <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
-                                                                    {q.optionExplanations[opt.key]}
-                                                                </ReactMarkdown>
-                                                            </div>
-                                                        )}
-                                                    </motion.div>
-                                                );
-                                            })}
-                                        </motion.div>
-
-                                        {/* Next Arrow */}
-                                        {currentSlide < questions.length - 1 && (
-                                            <div className="absolute right-[-10px] md:right-[-50px] lg:right-[-70px] top-1/2 -translate-y-1/2 z-[45] group hidden md:block">
-                                                <button
-                                                    onClick={nextStep}
-                                                    className="p-3 bg-white/70 hover:bg-white dark:bg-gray-800/70 dark:hover:bg-gray-800 text-indigo-600 dark:text-indigo-400 rounded-full shadow-lg backdrop-blur-sm border border-gray-200 dark:border-gray-600 transition-all hover:scale-110 active:scale-95"
-                                                >
-                                                    <ChevronRight className="w-8 h-8" strokeWidth={2.5} />
-                                                </button>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* Explanation */}
-                                    {((step >= 2 && q.explanation && isExpEnabled) || isManualExpOpen) && q.explanation && (
-                                        <div className="w-full max-w-5xl mt-6 animate-in fade-in slide-in-from-bottom-8 duration-700 !print-color-adjust-exact">
-                                            <div className="bg-white dark:bg-gray-800 p-6 pt-10 md:p-8 md:pt-10 rounded-t-2xl rounded-b-[0.5rem] border-2 border-t-4 border-blue-600/30 border-t-blue-600 dark:border-blue-500/40 dark:border-t-blue-500 shadow-xl relative overflow-visible transition-colors duration-500">
-
-                                                {/* Top Center Badge */}
-                                                <div className="absolute -top-7 left-1/2 -translate-x-1/2 bg-gradient-to-r from-blue-500 to-sky-500 text-white px-8 py-2 rounded-full font-bold text-lg md:text-xl shadow-[0_4px_12px_rgba(59,130,246,0.3)] flex items-center gap-2 border-[4px] border-indigo-300 dark:border-indigo-700 z-10 whitespace-nowrap !print-color-adjust-exact">
-                                                    Explanation
-                                                </div>
-
-                                                <div
-                                                    className="prose prose-xl dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 font-medium [&_*]:!text-[length:var(--exp-size)] [&_*]:!leading-relaxed"
-                                                    style={{ fontSize: 'var(--exp-size)' }}
-                                                >
-                                                    <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
-                                                        {q.explanation}
-                                                    </ReactMarkdown>
                                                 </div>
                                             </div>
-                                        </div>
-                                    )}
+                                        )}
 
                                     </div>{/* END: Desktop Layout hidden on mobile */}
 
@@ -5536,35 +5519,34 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     </div>
 
                     {/* Mobile Bottom Tab Bar */}
-                    <div className="md:hidden shrink-0 w-full bg-[#2d3a5e] dark:bg-[#1a2240] border-t border-white/10 flex items-center justify-around px-2 py-1.5 shadow-[0_-4px_20px_rgba(0,0,0,0.4)] z-30">
+                    <div className="md:hidden shrink-0 w-full bg-[#2d3a5e] dark:bg-[#1a2240] border-t border-white/10 flex items-center justify-around px-2 py-2.5 shadow-[0_-8px_30px_rgba(0,0,0,0.15)] z-30">
                         {/* 1. Theme */}
-                        <button className="flex flex-col items-center justify-center gap-0.5 flex-1 py-1.5 text-white/80 active:text-white" onClick={() => setIsDarkMode(!isDarkMode)}>
-                            {isDarkMode ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
-                            <span className="text-[10px] font-semibold">Theme</span>
+                        <button className="p-2 text-white/80 active:text-white active:scale-95 transition-transform" onClick={() => setIsDarkMode(!isDarkMode)}>
+                            {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
                         </button>
                         {/* 2. Language */}
-                        <button className="flex flex-col items-center justify-center gap-0.5 flex-1 py-1.5 text-white/80 active:text-white" onClick={() => setUiLang(l => l === 'bn' ? 'en' : 'bn')}>
-                            <Globe className="w-6 h-6" />
-                            <span className="text-[10px] font-semibold">Language</span>
+                        <button className="p-2 text-white/80 active:text-white active:scale-95 transition-transform" onClick={() => setUiLang(l => l === 'bn' ? 'en' : 'bn')}>
+                            <Globe className="w-5 h-5" />
                         </button>
-                        {/* 3. Fullscreen */}
-                        <button className="flex flex-col items-center justify-center gap-0.5 flex-1 py-1.5 text-white/80 active:text-white" onClick={toggleFullscreen}>
-                            {isFullscreen ? <Minimize className="w-6 h-6" /> : <Maximize className="w-6 h-6" />}
-                            <span className="text-[10px] font-semibold">Fullscreen</span>
+                        {/* 3. Pen Tool (New directly in footer) */}
+                        <button className={`p-2 active:scale-95 transition-transform ${isPenActive ? 'text-blue-400' : 'text-white/80 active:text-white'}`} onClick={() => setIsPenActive(!isPenActive)}>
+                            <Pen className="w-5 h-5" />
                         </button>
-                        {/* 4. Settings */}
-                        <button className="flex flex-col items-center justify-center gap-0.5 flex-1 py-1.5 text-white/80 active:text-white" onClick={() => setIsSettingsOpen(!isSettingsOpen)}>
-                            <Settings className="w-6 h-6" />
-                            <span className="text-[10px] font-semibold">Settings</span>
+                        {/* 4. Fullscreen */}
+                        <button className="p-2 text-white/80 active:text-white active:scale-95 transition-transform" onClick={toggleFullscreen}>
+                            {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
                         </button>
-                        {/* 5. More — opens a small popup with extra tools */}
-                        <div className="relative flex-1">
+                        {/* 5. Settings */}
+                        <button className="p-2 text-white/80 active:text-white active:scale-95 transition-transform" onClick={() => setIsSettingsOpen(!isSettingsOpen)}>
+                            <Settings className="w-5 h-5" />
+                        </button>
+                        {/* 6. More */}
+                        <div className="relative">
                             <button
-                                className="flex flex-col items-center justify-center gap-0.5 w-full py-1.5 text-white/80 active:text-white"
+                                className="p-2 text-white/80 active:text-white active:scale-95 transition-transform"
                                 onClick={() => setIsShortcutsOpen(!isShortcutsOpen)}
                             >
-                                <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
-                                <span className="text-[10px] font-semibold">More</span>
+                                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2" /><circle cx="12" cy="12" r="2" /><circle cx="19" cy="12" r="2" /></svg>
                             </button>
                             {isShortcutsOpen && (
                                 <>
