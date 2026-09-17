@@ -834,6 +834,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [isPenActive, setIsPenActive] = useState(false);
     const [penColor, setPenColor] = useState('#ef4444');
     const [penSize, setPenSize] = useState(2);
+    const [isManualExpOpen, setIsManualExpOpen] = useState(false);
 
     // Drawing Tool State
     const [drawingTool, setDrawingTool] = useState<'pen' | 'highlighter' | 'laser' | 'eraser' | 'rectangle' | 'circle' | 'arrow' | 'text' | 'magnifier'>('pen');
@@ -1535,6 +1536,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     useEffect(() => {
         setContentZoom(1);
         setPanOffset({ x: 0, y: 0 });
+        setIsManualExpOpen(false);
     }, [currentSlide]);
 
     useEffect(() => {
@@ -3700,17 +3702,26 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                                     {/* Options Area with Side Navigation */}
                                     <div className="relative w-full max-w-[1200px] flex justify-center mt-6 md:mt-8 mb-4 mx-auto">
-                                        {/* Prev Arrow */}
-                                        {currentSlide > 0 && (
-                                            <div className="absolute left-[-10px] md:left-[-50px] lg:left-[-70px] top-1/2 -translate-y-1/2 z-[45] group hidden md:block">
+                                        {/* Prev Arrow & Exp Toggle */}
+                                        <div className="absolute left-[-10px] md:left-[-50px] lg:left-[-70px] top-1/2 -translate-y-1/2 z-[45] group hidden md:flex flex-col gap-4 items-center">
+                                            {q.explanation && (
+                                                <button
+                                                    onClick={() => setIsManualExpOpen(!isManualExpOpen)}
+                                                    className={`p-3 rounded-full shadow-lg backdrop-blur-sm border transition-all hover:scale-110 active:scale-95 ${isManualExpOpen ? 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-600 dark:text-yellow-400 border-yellow-300 dark:border-yellow-600' : 'bg-white/70 hover:bg-white dark:bg-gray-800/70 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-600'}`}
+                                                    title="Toggle Explanation"
+                                                >
+                                                    <Lightbulb className="w-8 h-8 md:w-6 md:h-6" strokeWidth={2.5} />
+                                                </button>
+                                            )}
+                                            {currentSlide > 0 && (
                                                 <button
                                                     onClick={prevStep}
                                                     className="p-3 bg-white/70 hover:bg-white dark:bg-gray-800/70 dark:hover:bg-gray-800 text-indigo-600 dark:text-indigo-400 rounded-full shadow-lg backdrop-blur-sm border border-gray-200 dark:border-gray-600 transition-all hover:scale-110 active:scale-95"
                                                 >
                                                     <ChevronLeft className="w-8 h-8" strokeWidth={2.5} />
                                                 </button>
-                                            </div>
-                                        )}
+                                            )}
+                                        </div>
 
                                         <motion.div
                                             className={optionsLayout === 'grid' ? "grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 w-full max-w-6xl" : "flex flex-col gap-y-3 w-[90%] sm:w-fit min-w-[300px] md:min-w-[450px] lg:min-w-[500px] max-w-4xl mx-auto"}
@@ -3721,7 +3732,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                 visible: { transition: { staggerChildren: animSpeed / 2 } }
                                             }}
                                         >
-                                            {parsedOptions.length > 0 && parsedOptions.map((opt: { key: string, text: string }, oIdx: number) => {
+                                            {!((step >= 2 && q.explanation && isExpEnabled) || isManualExpOpen) && parsedOptions.length > 0 && parsedOptions.map((opt: { key: string, text: string }, oIdx: number) => {
                                                 const isCorrect = q.correctAnswer && q.correctAnswer.toLowerCase().includes(opt.key);
                                                 const optLetter = getOptionLabel(opt.key, uiLang);
 
@@ -3957,7 +3968,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     </div>
 
                                     {/* Explanation */}
-                                    {step >= 2 && q.explanation && isExpEnabled && (
+                                    {((step >= 2 && q.explanation && isExpEnabled) || isManualExpOpen) && q.explanation && (
                                         <div className="w-full max-w-5xl mt-6 animate-in fade-in slide-in-from-bottom-8 duration-700 !print-color-adjust-exact">
                                             <div className="bg-white dark:bg-gray-800 p-6 pt-10 md:p-8 md:pt-10 rounded-t-2xl rounded-b-[0.5rem] border-2 border-t-4 border-[#34A853]/30 border-t-[#34A853] dark:border-[#34A853]/40 dark:border-t-[#34A853] shadow-xl relative overflow-visible transition-colors duration-500">
                                                 
@@ -6084,6 +6095,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     <div className={optionsLayout === 'grid' ? "grid grid-cols-2 gap-x-6 gap-y-6 w-[94%] sm:w-full max-w-4xl xl:max-w-5xl mx-auto" : "flex flex-col gap-y-3 w-[94%] sm:w-full max-w-4xl xl:max-w-5xl mx-auto"}>
                                                         {(() => {
                                                             const maxOptLen = opts.length > 0 ? Math.max(...opts.map((o: any) => o.text?.length || 0)) : 1;
+                                                            if ((step >= 2 && q.explanation && isExpEnabled) || isManualExpOpen) return null;
                                                             return opts.map((opt: any, oIdx: number) => {
                                                                 const isCorrect = q.correctAnswer && q.correctAnswer.toLowerCase().includes(opt.key);
                                                                 const optLetter = getOptionLabel(opt.key, uiLang);
