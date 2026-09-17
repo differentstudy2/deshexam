@@ -3681,7 +3681,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     return (
                                                         <div
                                                             key={oIdx}
-                                                            className={`flex items-center gap-3 px-4 py-3.5 rounded-2xl shadow-sm cursor-pointer active:scale-[0.99] select-none transition-all duration-150 ${rowBg} ${rowBorder} ${textOpacity}`}
+                                                            className={`flex items-center gap-3 px-4 py-2 rounded-2xl shadow-sm cursor-pointer active:scale-[0.99] select-none transition-all duration-150 ${rowBg} ${rowBorder} ${textOpacity}`}
                                                             onClick={() => {
                                                                 if (step === 0 && !isEliminated) {
                                                                     setSelectedOption(opt.key);
@@ -5601,17 +5601,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                         }
                     ` }} />
 
-                    {/* Floating Quick Pen Tool (Left Edge) */}
-                    <motion.div drag dragMomentum={false} className="absolute left-3 md:left-5 top-18 md:top-20 z-[70] flex flex-row gap-1 items-center animate-in slide-in-from-left-10 fade-in duration-300 cursor-move bg-transparent p-1 rounded-full">
-                        {/* Clear Markings Button (Left) */}
-                        <button
-                            onClick={clearCanvas}
-                            className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition-colors bg-transparent rounded-full hover:bg-red-500/10"
-                            title="Clear All Markings"
-                        >
-                            <Eraser className="w-4 h-4 md:w-5 md:h-5" />
-                        </button>
-
+                    {/* Floating Quick Pen Tool (Bottom) */}
+                    <motion.div drag dragMomentum={false} className="absolute left-1/2 -translate-x-1/2 bottom-[75px] md:bottom-[90px] z-[70] flex flex-row gap-1 md:gap-2 items-center animate-in slide-in-from-bottom-10 fade-in duration-300 cursor-move bg-[#2d3a5e]/90 dark:bg-[#1a2240]/90 backdrop-blur-md px-2 md:px-3 py-1.5 md:py-2 rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.3)] border border-white/10">
                         {/* Main Pen Toggle Button */}
                         <button
                             onClick={() => {
@@ -5622,24 +5613,31 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     setIsPenActive(true);
                                 }
                             }}
-                            className={`p-1.5 rounded-full transition-all ${(isPenActive && drawingTool === 'pen')
-                                ? 'bg-transparent text-blue-500 scale-110 drop-shadow-[0_0_8px_rgba(37,99,235,0.8)]'
-                                : 'bg-transparent text-gray-400 dark:text-gray-500 hover:bg-gray-500/10'
+                            className={`p-1.5 md:p-2 rounded-full transition-all ${(isPenActive && drawingTool === 'pen')
+                                ? 'bg-blue-500 text-white scale-110 shadow-lg'
+                                : 'bg-transparent text-white/70 hover:bg-white/10 hover:text-white'
                                 }`}
                             title="Quick Pen Toggle"
                         >
                             <Pen className="w-4 h-4 md:w-5 md:h-5" />
                         </button>
 
+                        {/* Clear Markings Button */}
+                        <button
+                            onClick={clearCanvas}
+                            className="p-1.5 md:p-2 text-white/70 hover:text-red-400 transition-colors bg-transparent rounded-full hover:bg-white/10"
+                            title="Clear All Markings"
+                        >
+                            <Eraser className="w-4 h-4 md:w-5 md:h-5" />
+                        </button>
+
                         {/* Preset Colors (Visible when Pen is active, expands horizontally) */}
-                        <div className={`flex flex-row gap-2 p-1 bg-transparent transition-all duration-300 origin-left ${(isPenActive && drawingTool === 'pen') ? 'opacity-100 scale-100 translate-x-0' : 'opacity-0 scale-90 -translate-x-4 pointer-events-none'
-                            }`}>
+                        <div className={`flex flex-row items-center gap-2 overflow-hidden transition-all duration-300 ${isPenActive && drawingTool === 'pen' ? 'w-auto opacity-100 pl-1' : 'w-0 opacity-0 pointer-events-none'}`}>
                             {[
                                 { color: '#ef4444', name: 'Red' },
                                 { color: '#3b82f6', name: 'Blue' },
                                 { color: '#22c55e', name: 'Green' },
                                 { color: '#facc15', name: 'Yellow' },
-                                { color: '#000000', name: 'Black' },
                                 { color: '#ffffff', name: 'White' }
                             ].map((preset) => (
                                 <button
@@ -5650,7 +5648,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                         setDrawingTool('pen');
                                         setIsPenActive(true);
                                     }}
-                                    className={`w-6 h-6 md:w-7 md:h-7 rounded-full transition-all shadow-sm ${penColor === preset.color ? 'scale-125 ring-2 ring-white/50 opacity-100' : 'hover:scale-110 opacity-10 hover:opacity-100'}`}
+                                    className={`w-5 h-5 md:w-6 md:h-6 shrink-0 rounded-full transition-all shadow-sm ${penColor === preset.color ? 'scale-110 ring-2 ring-blue-300 opacity-100' : 'hover:scale-110 opacity-70 hover:opacity-100'}`}
                                     style={{ backgroundColor: preset.color }}
                                     title={preset.name}
                                 />
