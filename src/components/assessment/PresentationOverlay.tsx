@@ -3631,14 +3631,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                         <div 
                                             className={`relative rounded-t-[1rem] rounded-b-[0.3rem] shadow-md overflow-visible border-t-4 border-t-blue-500 mt-3 transition-colors duration-300 ${bgTheme === 'video' ? 'bg-black/40 border border-white/10 backdrop-blur-md' : isDarkMode ? 'bg-slate-800 border border-slate-700' : 'bg-white border border-gray-100'}`}
                                             style={{
-                                                backgroundColor: qBgColor !== 'transparent' ? (qBgColor === 'default' ? undefined : qBgColor) : undefined,
-                                                ...(bgTheme === 'dots' ? {
-                                                    backgroundImage: `radial-gradient(${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'} 1.5px, transparent 1.5px)`,
-                                                    backgroundSize: '12px 12px'
-                                                } : bgTheme === 'grid' ? {
-                                                    backgroundImage: `linear-gradient(to right, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px)`,
-                                                    backgroundSize: '12px 12px'
-                                                } : {})
+                                                backgroundColor: qBgColor !== 'transparent' ? (qBgColor === 'default' ? undefined : qBgColor) : undefined
                                             }}
                                         >
                                             {/* Mobile Question Number Pill */}
@@ -3700,14 +3693,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                             key={oIdx}
                                                             className={`relative flex items-center gap-3 px-4 py-2 rounded-2xl shadow-sm cursor-pointer active:scale-[0.99] select-none transition-all duration-150 ${rowBg} ${rowBorder} ${textOpacity}`}
                                                             style={{
-                                                                backgroundColor: (optBgColor !== 'default' && optBgColor.startsWith('#')) ? optBgColor : undefined,
-                                                                ...(bgTheme === 'dots' ? {
-                                                                    backgroundImage: `radial-gradient(${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'} 1.5px, transparent 1.5px)`,
-                                                                    backgroundSize: '12px 12px'
-                                                                } : bgTheme === 'grid' ? {
-                                                                    backgroundImage: `linear-gradient(to right, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px)`,
-                                                                    backgroundSize: '12px 12px'
-                                                                } : {})
+                                                                backgroundColor: (optBgColor !== 'default' && optBgColor.startsWith('#')) ? optBgColor : undefined
                                                             }}
                                                             onClick={() => {
                                                                 if (step === 0 && !isEliminated) {
