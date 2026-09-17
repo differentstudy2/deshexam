@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
@@ -5528,47 +5528,25 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                         <button className="p-2 text-white/80 active:text-white active:scale-95 transition-transform" onClick={() => setUiLang(l => l === 'bn' ? 'en' : 'bn')}>
                             <Globe className="w-5 h-5" />
                         </button>
-                        {/* 3. Pen Tool (New directly in footer) */}
-                        <button className={`p-2 active:scale-95 transition-transform ${isPenActive ? 'text-blue-400' : 'text-white/80 active:text-white'}`} onClick={() => setIsPenActive(!isPenActive)}>
-                            <Pen className="w-5 h-5" />
+                        {/* 3. Audio / Read Aloud */}
+                        <button className={`p-2 active:scale-95 transition-transform ${isAutoPlayReadAloud || isSpeaking ? 'text-blue-400' : 'text-white/80 active:text-white'}`} onClick={() => {
+                            if (isAutoPlayReadAloud || isSpeaking) { setIsAutoPlayReadAloud(false); window.speechSynthesis.cancel(); setIsSpeaking(false); }
+                            else { setIsAutoPlayReadAloud(true); if (step !== 0) handleReadAloud(true); }
+                        }}>
+                            {isAutoPlayReadAloud || isSpeaking ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current" />}
                         </button>
-                        {/* 4. Fullscreen */}
+                        {/* 4. Advance Settings */}
+                        <button className={`p-2 active:scale-95 transition-transform ${showAudioSettings ? 'text-blue-400' : 'text-white/80 active:text-white'}`} onClick={() => setShowAudioSettings(!showAudioSettings)}>
+                            <Sliders className="w-5 h-5" />
+                        </button>
+                        {/* 5. Fullscreen */}
                         <button className="p-2 text-white/80 active:text-white active:scale-95 transition-transform" onClick={toggleFullscreen}>
                             {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
                         </button>
-                        {/* 5. Settings */}
-                        <button className="p-2 text-white/80 active:text-white active:scale-95 transition-transform" onClick={() => setIsSettingsOpen(!isSettingsOpen)}>
+                        {/* 6. Settings */}
+                        <button className={`p-2 active:scale-95 transition-transform ${isSettingsOpen ? 'text-blue-400' : 'text-white/80 active:text-white'}`} onClick={() => setIsSettingsOpen(!isSettingsOpen)}>
                             <Settings className="w-5 h-5" />
                         </button>
-                        {/* 6. More */}
-                        <div className="relative">
-                            <button
-                                className="p-2 text-white/80 active:text-white active:scale-95 transition-transform"
-                                onClick={() => setIsShortcutsOpen(!isShortcutsOpen)}
-                            >
-                                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2" /><circle cx="12" cy="12" r="2" /><circle cx="19" cy="12" r="2" /></svg>
-                            </button>
-                            {isShortcutsOpen && (
-                                <>
-                                    <div className="fixed inset-0 z-[60]" onClick={() => setIsShortcutsOpen(false)}></div>
-                                    <div className="absolute bottom-full right-0 mb-2 bg-[#2d3a5e] dark:bg-[#1a2240] border border-white/20 rounded-2xl shadow-2xl p-3 z-[70] flex flex-col gap-1 min-w-[150px]">
-                                        <button className="flex items-center gap-3 px-3 py-2.5 text-white/90 hover:bg-white/10 rounded-xl text-sm font-semibold" onClick={() => { setIsPenActive(!isPenActive); setIsShortcutsOpen(false); }}>
-                                            <Pen className="w-5 h-5" /> Pen Tool
-                                        </button>
-                                        <button className="flex items-center gap-3 px-3 py-2.5 text-white/90 hover:bg-white/10 rounded-xl text-sm font-semibold" onClick={() => {
-                                            if (isAutoPlayReadAloud || isSpeaking) { setIsAutoPlayReadAloud(false); window.speechSynthesis.cancel(); setIsSpeaking(false); }
-                                            else { setIsAutoPlayReadAloud(true); if (step !== 0) handleReadAloud(true); }
-                                            setIsShortcutsOpen(false);
-                                        }}>
-                                            {isAutoPlayReadAloud || isSpeaking ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current" />} Audio
-                                        </button>
-                                        <button className="flex items-center gap-3 px-3 py-2.5 text-white/90 hover:bg-white/10 rounded-xl text-sm font-semibold" onClick={() => { setShowAudioSettings(!showAudioSettings); setIsShortcutsOpen(false); }}>
-                                            <Sliders className="w-5 h-5" /> Advance
-                                        </button>
-                                    </div>
-                                </>
-                            )}
-                        </div>
                     </div>
 
                     {/* Dynamic Responsive Font Styles */}
