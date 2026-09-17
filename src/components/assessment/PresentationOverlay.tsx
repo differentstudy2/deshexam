@@ -3599,7 +3599,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     )}
 
                     {/* Main Content Area */}
-                    <div ref={scrollContainerRef} className="flex-1 w-full relative flex flex-col items-center px-0 md:px-24 py-0 md:py-12 z-10 overflow-y-auto overflow-x-hidden custom-scrollbar md:gap-8 bg-[#EEF4FD] dark:bg-slate-900 md:bg-transparent">
+                    <div ref={scrollContainerRef} className="flex-1 w-full relative flex flex-col items-center px-0 md:px-24 py-0 md:py-12 z-10 overflow-y-auto overflow-x-hidden custom-scrollbar md:gap-8 bg-transparent">
 
                         {/* Zoomable Content Wrapper */}
                         <div
@@ -3684,7 +3684,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     return (
                                                         <div
                                                             key={oIdx}
-                                                            className={`flex items-center gap-3 px-4 py-2 rounded-2xl shadow-sm cursor-pointer active:scale-[0.99] select-none transition-all duration-150 ${rowBg} ${rowBorder} ${textOpacity}`}
+                                                            className={`relative flex items-center gap-3 px-4 py-2 rounded-2xl shadow-sm cursor-pointer active:scale-[0.99] select-none transition-all duration-150 ${rowBg} ${rowBorder} ${textOpacity}`}
                                                             onClick={() => {
                                                                 if (step === 0 && !isEliminated) {
                                                                     setSelectedOption(opt.key);
@@ -3730,6 +3730,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                                 }
                                                             }}
                                                         >
+                                                            <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none transition-opacity duration-300 ${step >= 1 ? 'opacity-100' : 'opacity-0'}`}>
+                                                                <Confetti active={isConfettiActive && isSelected && showCorrect} config={CONFETTI_CONFIG} />
+                                                            </div>
                                                             <div className={`shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-white font-black text-base ${mc.bg} ${(showCorrect) ? 'bg-[#34A853]' : (showWrong && isSelected) ? 'bg-[#EA4335]' : ''}`}>
                                                                 {optLetter}
                                                             </div>
