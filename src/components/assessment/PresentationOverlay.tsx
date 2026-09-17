@@ -3600,7 +3600,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     )}
 
                     {/* Main Content Area */}
-                    <div ref={scrollContainerRef} className="responsive-fonts flex-1 w-full relative flex flex-col items-center px-0 md:px-24 py-0 md:py-12 z-10 overflow-y-auto overflow-x-hidden custom-scrollbar md:gap-8 bg-transparent">
+                    <div ref={scrollContainerRef} className="flex-1 w-full relative flex flex-col items-center px-0 md:px-24 py-0 md:py-12 z-10 overflow-y-auto overflow-x-hidden custom-scrollbar md:gap-8 bg-transparent">
 
                         {/* Zoomable Content Wrapper */}
                         <div
@@ -3632,16 +3632,6 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                             className={`relative rounded-t-[1rem] rounded-b-[0.3rem] shadow-md overflow-visible border-t-4 border-t-blue-500 mt-3 transition-colors duration-300 ${bgTheme === 'video' ? 'bg-black/40 border border-white/10 backdrop-blur-md' : isDarkMode ? 'bg-slate-800 border border-slate-700' : 'bg-white border border-gray-100'}`}
                                             style={{
                                                 backgroundColor: qBgColor !== 'transparent' ? (qBgColor === 'default' ? undefined : qBgColor) : undefined,
-                                                '--q-size': (() => {
-                                                    const hasStmts = q.statements && q.statements.length > 0;
-                                                    const stmtLen = q.statements ? q.statements.join(' ').length : 0;
-                                                    const tLen = (q.questionText?.length || 0) + stmtLen;
-                                                    const multiplier = tLen <= 45 ? 1.6 : 2.8;
-                                                    if (hasStmts) {
-                                                        return `min(calc(var(--base-q-size) * 0.85), calc((100vw - 64px) * ${multiplier} / ${Math.max(1, tLen)}))`;
-                                                    }
-                                                    return `min(var(--base-q-size), calc((100vw - 64px) * ${multiplier} / ${Math.max(1, tLen)}))`;
-                                                })(),
                                                 ...(bgTheme === 'dots' ? {
                                                     backgroundImage: `radial-gradient(${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'} 1.5px, transparent 1.5px)`,
                                                     backgroundSize: '12px 12px'
@@ -3649,7 +3639,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     backgroundImage: `linear-gradient(to right, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px)`,
                                                     backgroundSize: '12px 12px'
                                                 } : {})
-                                            } as React.CSSProperties}
+                                            }}
                                         >
                                             {/* Mobile Question Number Pill */}
                                             <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-20">
@@ -3770,7 +3760,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                             <div className={`shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-white font-black text-base ${mc.bg} ${(showCorrect) ? 'bg-[#34A853]' : (showWrong && isSelected) ? 'bg-[#EA4335]' : ''}`}>
                                                                 {optLetter}
                                                             </div>
-                                                            <div className={`prose dark:prose-invert max-w-none flex-1 font-bold text-[length:var(--opt-size,17px)] leading-snug [&_*]:!text-[length:var(--opt-size,17px)] [&_*]:!leading-snug [&_*]:!m-0 ${optTextColor !== 'default' ? 'text-[var(--opt-color)] [&_*]:!text-[var(--opt-color)]' : 'text-slate-800 dark:text-white [&_*]:!text-slate-800 dark:[&_*]:!text-white'}`} style={{ '--opt-color': optTextColor !== 'default' ? optTextColor : undefined } as React.CSSProperties}>
+                                                            <div className={`prose dark:prose-invert max-w-none flex-1 font-bold text-[17px] leading-snug [&_*]:!text-[17px] [&_*]:!leading-snug [&_*]:!m-0 ${optTextColor !== 'default' ? 'text-[var(--opt-color)] [&_*]:!text-[var(--opt-color)]' : 'text-slate-800 dark:text-white [&_*]:!text-slate-800 dark:[&_*]:!text-white'}`} style={{ '--opt-color': optTextColor !== 'default' ? optTextColor : undefined } as React.CSSProperties}>
                                                                 <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>{opt.text}</ReactMarkdown>
                                                             </div>
                                                             
