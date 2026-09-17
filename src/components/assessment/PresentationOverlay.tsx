@@ -3973,10 +3973,10 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     {/* Explanation */}
                                     {((step >= 2 && q.explanation && isExpEnabled) || isManualExpOpen) && q.explanation && (
                                         <div className="w-full max-w-5xl mt-6 animate-in fade-in slide-in-from-bottom-8 duration-700 !print-color-adjust-exact">
-                                            <div className="bg-white dark:bg-gray-800 p-6 pt-10 md:p-8 md:pt-10 rounded-t-2xl rounded-b-[0.5rem] border-2 border-t-4 border-blue-500/30 border-t-blue-500 dark:border-blue-500/40 dark:border-t-blue-500 shadow-xl relative overflow-visible transition-colors duration-500">
+                                            <div className="bg-white dark:bg-gray-800 p-6 pt-10 md:p-8 md:pt-10 rounded-t-2xl rounded-b-[0.5rem] border-2 border-t-4 border-blue-600/30 border-t-blue-600 dark:border-blue-500/40 dark:border-t-blue-500 shadow-xl relative overflow-visible transition-colors duration-500">
 
                                                 {/* Top Center Badge */}
-                                                <div className="absolute -top-7 left-1/2 -translate-x-1/2 bg-gradient-to-r from-blue-500 to-sky-500 text-white px-8 py-2 rounded-full font-bold text-lg md:text-xl shadow-[0_4px_12px_rgba(59,130,246,0.3)] flex items-center gap-2 border-[4px] border-white dark:border-gray-800 z-10 whitespace-nowrap !print-color-adjust-exact">
+                                                <div className="absolute -top-7 left-1/2 -translate-x-1/2 bg-gradient-to-r from-blue-500 to-sky-500 text-white px-8 py-2 rounded-full font-bold text-lg md:text-xl shadow-[0_4px_12px_rgba(59,130,246,0.3)] flex items-center gap-2 border-[4px] border-indigo-300 dark:border-indigo-700 z-10 whitespace-nowrap !print-color-adjust-exact">
                                                     Explanation
                                                 </div>
 
