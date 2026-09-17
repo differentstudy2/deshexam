@@ -4612,7 +4612,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     </div>
 
                     {/* Mobile Bottom Tab Bar */}
-                    <div className="md:hidden shrink-0 w-full bg-[#2d3a5e] dark:bg-[#1a2240] border-t border-white/10 flex items-center justify-around px-2 py-2.5 shadow-[0_-8px_30px_rgba(0,0,0,0.15)] z-30">
+                    <div className="md:hidden shrink-0 w-full bg-[#155ab2] dark:bg-[#0f4082] border-t border-white/10 flex items-center justify-around pl-2 pr-[4.5rem] py-2.5 shadow-[0_-8px_30px_rgba(0,0,0,0.15)] z-30 relative">
                         {/* 1. Theme */}
                         <button className="p-2 text-white/80 active:text-white active:scale-95 transition-transform" onClick={() => setIsDarkMode(!isDarkMode)}>
                             {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
@@ -4622,24 +4622,31 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             <Globe className="w-5 h-5" />
                         </button>
                         {/* 3. Audio / Read Aloud */}
-                        <button className={`p-2 active:scale-95 transition-transform ${isAutoPlayReadAloud || isSpeaking ? 'text-blue-400' : 'text-white/80 active:text-white'}`} onClick={() => {
+                        <button className={`p-2 active:scale-95 transition-transform ${isAutoPlayReadAloud || isSpeaking ? 'text-blue-300' : 'text-white/80 active:text-white'}`} onClick={() => {
                             if (isAutoPlayReadAloud || isSpeaking) { setIsAutoPlayReadAloud(false); window.speechSynthesis.cancel(); setIsSpeaking(false); }
                             else { setIsAutoPlayReadAloud(true); if (step !== 0) handleReadAloud(true); }
                         }}>
                             {isAutoPlayReadAloud || isSpeaking ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current" />}
                         </button>
                         {/* 4. Advance Settings */}
-                        <button className={`p-2 active:scale-95 transition-transform ${showAudioSettings ? 'text-blue-400' : 'text-white/80 active:text-white'}`} onClick={() => setShowAudioSettings(!showAudioSettings)}>
+                        <button className={`p-2 active:scale-95 transition-transform ${showAudioSettings ? 'text-blue-300' : 'text-white/80 active:text-white'}`} onClick={() => setShowAudioSettings(!showAudioSettings)}>
                             <Sliders className="w-5 h-5" />
                         </button>
                         {/* 5. Fullscreen */}
                         <button className="p-2 text-white/80 active:text-white active:scale-95 transition-transform" onClick={toggleFullscreen}>
                             {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
                         </button>
-                        {/* 6. Settings */}
-                        <button className={`p-2 active:scale-95 transition-transform ${isSettingsOpen ? 'text-blue-400' : 'text-white/80 active:text-white'}`} onClick={() => setIsSettingsOpen(!isSettingsOpen)}>
-                            <Settings className="w-5 h-5" />
-                        </button>
+
+                        {/* Upward Cut-out Tab for Settings */}
+                        <div className="absolute -top-11 right-0 h-11 bg-[#155ab2] dark:bg-[#0f4082] px-4 flex items-center justify-center rounded-tl-[1.25rem] shadow-[0_-4px_6px_rgba(0,0,0,0.15)] border-t border-l border-white/10 z-20">
+                            <button className={`p-2 active:scale-95 transition-transform ${isSettingsOpen ? 'text-blue-300' : 'text-white/95 active:text-white'}`} onClick={() => setIsSettingsOpen(!isSettingsOpen)}>
+                                <Settings className="w-5 h-5" />
+                            </button>
+                            {/* Inner Curve (Concave) */}
+                            <svg className="absolute bottom-0 -left-[14px] w-[14px] h-[14px] text-[#155ab2] dark:text-[#0f4082]" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M16 0v16H0C8.8 16 16 8.8 16 0z" />
+                            </svg>
+                        </div>
                     </div>
 
                     {/* Dynamic Responsive Font Styles */}
