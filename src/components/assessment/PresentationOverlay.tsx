@@ -3878,13 +3878,13 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                             <div className={letterClasses} style={{ fontSize: 'var(--opt-size)' }}>
                                                                 {optLetter}
                                                             </div>
-                                                            <div className={`prose dark:prose-invert max-w-none ${optTextColor !== 'default' ? 'text-[var(--opt-color)] [&_*]:!text-[var(--opt-color)]' : 'text-slate-900 dark:text-white [&_*]:!text-slate-900 dark:[&_*]:!text-white'} [&>p]:m-0 [&>p]:text-[length:var(--opt-size)] [&>p]:font-semibold [&>p]:leading-snug flex-1 capitalize ${eliminatedOptions.includes(opt.key) && step === 0 ? 'line-through opacity-50' : ''}`} style={{ 
+                                                            <div className={`prose dark:prose-invert max-w-none ${optTextColor !== 'default' ? 'text-[var(--opt-color)] [&_*]:!text-[var(--opt-color)]' : 'text-slate-900 dark:text-white [&_*]:!text-slate-900 dark:[&_*]:!text-white'} [&>p]:m-0 [&>p]:text-[length:var(--opt-size)] [&>p]:font-semibold [&>p]:leading-snug [&>p]:whitespace-nowrap [&>p]:overflow-hidden [&>p]:text-ellipsis flex-1 capitalize ${eliminatedOptions.includes(opt.key) && step === 0 ? 'line-through opacity-50' : ''}`} style={{ 
                                                                 '--opt-color': optTextColor !== 'default' ? optTextColor : undefined,
                                                                 '--opt-size': (() => {
-                                                                    const tLen = opt.text?.length || 0;
+                                                                    const maxOptLen = parsedOptions.length > 0 ? Math.max(...parsedOptions.map((o:any) => o.text?.length || 0)) : 1;
                                                                     const isGrid = optionsLayout === 'grid';
                                                                     const cardWidth = isGrid ? 'min(45vw, 500px)' : 'min(94vw, 1000px)';
-                                                                    return `min(var(--base-opt-size), calc((${cardWidth} - 100px) * 1.7 / ${Math.max(1, tLen)}))`;
+                                                                    return `min(var(--base-opt-size), calc((${cardWidth} - 100px) * 1.2 / ${Math.max(1, maxOptLen)}))`;
                                                                 })()
                                                             } as React.CSSProperties}>
                                                                 <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
@@ -3957,17 +3957,17 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                                     {/* Explanation */}
                                     {step >= 2 && q.explanation && isExpEnabled && (
-                                        <div className="w-full max-w-5xl mt-4 animate-in fade-in slide-in-from-bottom-8 duration-700">
-                                            <div className="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-200 dark:border-gray-700 shadow-xl relative overflow-hidden transition-colors duration-500">
-                                                {/* Small colored accent line on the left */}
-                                                <div className="absolute left-0 top-0 bottom-0 w-2 bg-[#34A853]"></div>
-
-                                                <div className="text-[#34A853] font-bold text-xl mb-3 flex items-center gap-2 pl-4">
-                                                    <span className="text-2xl">💡</span>
+                                        <div className="w-full max-w-5xl mt-6 animate-in fade-in slide-in-from-bottom-8 duration-700 !print-color-adjust-exact">
+                                            <div className="bg-white dark:bg-gray-800 p-6 pt-10 md:p-8 md:pt-10 rounded-t-2xl rounded-b-[0.5rem] border-2 border-t-4 border-[#34A853]/30 border-t-[#34A853] dark:border-[#34A853]/40 dark:border-t-[#34A853] shadow-xl relative overflow-visible transition-colors duration-500">
+                                                
+                                                {/* Top Center Badge */}
+                                                <div className="absolute -top-7 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#34A853] to-emerald-600 text-white px-8 py-2 rounded-full font-bold text-lg md:text-xl shadow-[0_4px_12px_rgba(52,168,83,0.3)] flex items-center gap-2 border-[4px] border-white dark:border-gray-800 z-10 whitespace-nowrap !print-color-adjust-exact">
+                                                    <span className="text-xl md:text-2xl drop-shadow-md">💡</span>
                                                     Explanation
                                                 </div>
+
                                                 <div
-                                                    className="prose prose-xl dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 pl-4 font-medium [&_*]:!text-[length:var(--exp-size)] [&_*]:!leading-relaxed"
+                                                    className="prose prose-xl dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 font-medium [&_*]:!text-[length:var(--exp-size)] [&_*]:!leading-relaxed"
                                                     style={{ fontSize: 'var(--exp-size)' }}
                                                 >
                                                     <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
@@ -6081,52 +6081,54 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                                                 <div className="relative w-full max-w-[1200px] flex justify-center mt-6 md:mt-8 mb-4 mx-auto !print-color-adjust-exact">
                                                     <div className={optionsLayout === 'grid' ? "grid grid-cols-2 gap-x-6 gap-y-6 w-[94%] sm:w-full max-w-4xl xl:max-w-5xl mx-auto" : "flex flex-col gap-y-3 w-[94%] sm:w-full max-w-4xl xl:max-w-5xl mx-auto"}>
-                                                        {opts.map((opt: any, oIdx: number) => {
-                                                            const isCorrect = q.correctAnswer && q.correctAnswer.toLowerCase().includes(opt.key);
-                                                            const optLetter = getOptionLabel(opt.key, uiLang);
-                                                            const showCorrect = showHighlight && isCorrect;
+                                                        {(() => {
+                                                            const maxOptLen = opts.length > 0 ? Math.max(...opts.map((o: any) => o.text?.length || 0)) : 1;
+                                                            return opts.map((opt: any, oIdx: number) => {
+                                                                const isCorrect = q.correctAnswer && q.correctAnswer.toLowerCase().includes(opt.key);
+                                                                const optLetter = getOptionLabel(opt.key, uiLang);
+                                                                const showCorrect = showHighlight && isCorrect;
 
-                                                            const colorThemes = [
-                                                                { border: 'border-[#4285F4]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#4285F4]', letterText: 'text-white' }, // Blue
-                                                                { border: 'border-[#34A853]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#34A853]', letterText: 'text-white' }, // Green
-                                                                { border: 'border-[#F9AB00]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#F9AB00]', letterText: 'text-white' }, // Yellow/Orange
-                                                                { border: 'border-[#EA4335]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#EA4335]', letterText: 'text-white' }, // Red
-                                                                { border: 'border-[#9C27B0]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#9C27B0]', letterText: 'text-white' }, // Purple
-                                                            ];
-                                                            const theme = colorThemes[oIdx % colorThemes.length];
+                                                                const colorThemes = [
+                                                                    { border: 'border-[#4285F4]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#4285F4]', letterText: 'text-white' }, // Blue
+                                                                    { border: 'border-[#34A853]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#34A853]', letterText: 'text-white' }, // Green
+                                                                    { border: 'border-[#F9AB00]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#F9AB00]', letterText: 'text-white' }, // Yellow/Orange
+                                                                    { border: 'border-[#EA4335]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#EA4335]', letterText: 'text-white' }, // Red
+                                                                    { border: 'border-[#9C27B0]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#9C27B0]', letterText: 'text-white' }, // Purple
+                                                                ];
+                                                                const theme = colorThemes[oIdx % colorThemes.length];
 
-                                                            const bgClass = optBgColor === 'default' ? theme.bg : (optBgColor.startsWith('#') ? '' : optBgColor);
-                                                            let containerClasses = `flex items-center gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 transition-all duration-200 shadow-[0_4px_12px_rgba(0,0,0,0.04)] relative z-10 select-none ${bgClass} ${theme.border} !print-color-adjust-exact`;
-                                                            let letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 ${theme.letterBg} ${theme.letterText} !print-color-adjust-exact`;
+                                                                const bgClass = optBgColor === 'default' ? theme.bg : (optBgColor.startsWith('#') ? '' : optBgColor);
+                                                                let containerClasses = `flex items-center gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 transition-all duration-200 shadow-[0_4px_12px_rgba(0,0,0,0.04)] relative z-10 select-none ${bgClass} ${theme.border} !print-color-adjust-exact`;
+                                                                let letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 ${theme.letterBg} ${theme.letterText} !print-color-adjust-exact`;
 
-                                                            if (showCorrect) {
-                                                                containerClasses = `flex items-center gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 ring-4 ring-[#34A853]/30 bg-[#f0fdf4] dark:bg-[#064e3b] border-[#34A853] z-10 relative select-none !print-color-adjust-exact`;
-                                                                letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 bg-[#34A853] text-white !print-color-adjust-exact`;
-                                                            }
+                                                                if (showCorrect) {
+                                                                    containerClasses = `flex items-center gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 ring-4 ring-[#34A853]/30 bg-[#f0fdf4] dark:bg-[#064e3b] border-[#34A853] z-10 relative select-none !print-color-adjust-exact`;
+                                                                    letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 bg-[#34A853] text-white !print-color-adjust-exact`;
+                                                                }
 
-                                                            return (
-                                                                <div key={opt.key} className="flex flex-col gap-2 w-full relative !print-color-adjust-exact">
-                                                                    <div
-                                                                        className={containerClasses}
-                                                                        style={{
-                                                                            containerType: 'inline-size',
-                                                                            backgroundColor: (optBgColor !== 'default' && optBgColor.startsWith('#')) ? optBgColor : undefined,
-                                                                            ...(bgTheme === 'dots' ? {
-                                                                                backgroundImage: `radial-gradient(${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'} 1.5px, transparent 1.5px)`,
-                                                                                backgroundSize: '12px 12px'
-                                                                            } : bgTheme === 'grid' ? {
-                                                                                backgroundImage: `linear-gradient(to right, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px)`,
-                                                                                backgroundSize: '12px 12px'
-                                                                            } : {
-                                                                                backgroundImage: 'none',
-                                                                                backgroundSize: 'auto'
-                                                                            })
-                                                                        }}
-                                                                    >
-                                                                        <div className={letterClasses}>
-                                                                            {optLetter}
-                                                                        </div>
-                                                                        <div className={`prose dark:prose-invert max-w-none w-full leading-snug flex-1 font-bold text-[length:min(calc(var(--q-size)*0.85),calc((min(45vw,500px)-100px)*1.7/${Math.max(1, opt.text?.length||1)}))] [&_*]:!text-[length:min(calc(var(--q-size)*0.85),calc((min(45vw,500px)-100px)*1.7/${Math.max(1, opt.text?.length||1)}))] [&_*]:!leading-snug [&_*]:!m-0 ${optTextColor !== 'default' ? 'text-[var(--opt-color)] [&_*]:!text-[var(--opt-color)]' : 'text-slate-800 dark:text-slate-100'}`} style={{ '--opt-color': optTextColor !== 'default' ? optTextColor : undefined } as React.CSSProperties}>
+                                                                return (
+                                                                    <div key={opt.key} className="flex flex-col gap-2 w-full relative !print-color-adjust-exact">
+                                                                        <div
+                                                                            className={containerClasses}
+                                                                            style={{
+                                                                                containerType: 'inline-size',
+                                                                                backgroundColor: (optBgColor !== 'default' && optBgColor.startsWith('#')) ? optBgColor : undefined,
+                                                                                ...(bgTheme === 'dots' ? {
+                                                                                    backgroundImage: `radial-gradient(${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'} 1.5px, transparent 1.5px)`,
+                                                                                    backgroundSize: '12px 12px'
+                                                                                } : bgTheme === 'grid' ? {
+                                                                                    backgroundImage: `linear-gradient(to right, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} 1px, transparent 1px)`,
+                                                                                    backgroundSize: '12px 12px'
+                                                                                } : {
+                                                                                    backgroundImage: 'none',
+                                                                                    backgroundSize: 'auto'
+                                                                                })
+                                                                            }}
+                                                                        >
+                                                                            <div className={letterClasses}>
+                                                                                {optLetter}
+                                                                            </div>
+                                                                            <div className={`prose dark:prose-invert max-w-none w-full leading-snug flex-1 font-bold text-[length:min(calc(var(--q-size)*0.85),calc((min(45vw,500px)-100px)*1.2/${Math.max(1, maxOptLen)}))] [&_*]:!text-[length:min(calc(var(--q-size)*0.85),calc((min(45vw,500px)-100px)*1.2/${Math.max(1, maxOptLen)}))] [&_*]:!leading-snug [&_*]:!m-0 [&_*]:whitespace-nowrap [&_*]:overflow-hidden [&_*]:text-ellipsis ${optTextColor !== 'default' ? 'text-[var(--opt-color)] [&_*]:!text-[var(--opt-color)]' : 'text-slate-800 dark:text-slate-100'}`} style={{ '--opt-color': optTextColor !== 'default' ? optTextColor : undefined } as React.CSSProperties}>
                                                                             <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
                                                                                 {opt.text}
                                                                             </ReactMarkdown>
@@ -6139,7 +6141,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                                     </div>
                                                                 </div>
                                                             );
-                                                        })}
+                                                            });
+                                                        })()}
                                                     </div>
                                                 </div>
                                             </div>
