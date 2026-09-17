@@ -1597,7 +1597,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     }, []);
 
     const triggerHumanClick = useCallback((targetKey: string, onDone?: () => void) => {
-        const optionEl = document.getElementById(`option-card-${targetKey}`);
+        const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+        const optionEl = document.getElementById(isMobile ? `mobile-option-card-${targetKey}` : `desktop-option-card-${targetKey}`);
         if (!optionEl) {
             setSelectedOption(targetKey);
             setStep(1);
@@ -3695,6 +3696,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                                                     return (
                                                         <div
+                                                            id={`mobile-option-card-${opt.key}`}
                                                             key={oIdx}
                                                             className={`relative flex items-center gap-3 px-4 py-2 rounded-2xl shadow-sm cursor-pointer active:scale-[0.99] select-none transition-all duration-150 ${rowBg} ${rowBorder} ${textOpacity}`}
                                                             style={{
@@ -4036,7 +4038,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                                 <Confetti active={isConfettiActive && isSelected && showCorrect} config={CONFETTI_CONFIG} />
                                                             </div>
                                                             <div
-                                                                id={`option-card-${opt.key}`}
+                                                                id={`desktop-option-card-${opt.key}`}
                                                                 className={containerClasses}
                                                                 style={{
                                                                     containerType: 'inline-size',
